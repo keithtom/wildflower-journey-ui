@@ -2,6 +2,8 @@
 
 node_modules
 
+.next
+
 .DS_STORE
 
 yarn-error.log
