@@ -1,16 +1,10 @@
 import Head from 'next/head'
 import styled from 'styled-components';
 
-const MaxWidth = styled.div`
-  max-width: ${({ theme }) => theme.breakpoint.lg}px;
-  margin: ${({ theme }) => theme.util.buffer*10}px auto;
-`;
-
-const StyledContainer = styled.div`
-  padding: ${({ theme }) => theme.util.buffer*4}px;
-  border-radius: ${({ theme }) => theme.util.radiusLarge}px;
-  box-shadow: ${({ theme }) => theme.util.shadowLarge};
-`;
+import {
+  MaxWidth,
+  Container
+} from '../components/ui'
 
 export default function Home() {
   return (
@@ -26,9 +20,9 @@ export default function Home() {
           Welcome to the Wildflowers directory!
         </h1>
 
-        <StyledContainer>
+        <Container>
           here is a styled container!
-        </StyledContainer>
+        </Container>
 
       </MaxWidth>
     </div>
