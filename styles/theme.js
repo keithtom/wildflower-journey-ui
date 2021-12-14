@@ -39,8 +39,7 @@ export const theme = {
   breakpoint: {
     xs: 640,
     sm: 768,
-    // md: 1024,
-    md: 1200, //this breakpoint is used because the sidebar design is too wide for a 1024 breakpoint. Rethink this design to not require this.
+    md: 1024,
     lg: 1440
   },
   color: {

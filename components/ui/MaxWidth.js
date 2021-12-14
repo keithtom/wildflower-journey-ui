@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 const StyledMaxWidth = styled.div`
-  max-width: ${({ theme }) => theme.breakpoint.lg}px;
+  max-width: ${({ theme }) => theme.breakpoint.md}px;
   margin: ${({ theme }) => theme.util.buffer*10}px auto;
 `;
 
