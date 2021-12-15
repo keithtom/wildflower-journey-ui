@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 
 // Style values:
-const buffer = 10;
+const buffer = 4;
 const timing = '.15s';
 const easing = 'ease-in-out';
 const stroke = '#CECECE';
@@ -43,84 +43,79 @@ export const theme = {
     lg: 1440
   },
   color: {
-    light: '#ffffff',
-    border: {
-      main: stroke,
-      darkened: strokeDarkened
-    },
-    primary: {
-      main: '#5245EA',
-      lightened: '#F6F5FE',
-      darkened: '#0a6a7d'
-    },
-    secondary: {
-      main: '#FEBB39',
-      lightened: '#FFDE9E',
-      darkened: '#DAAA1C'
-    },
-    tertiary: {
-      main: '#F06C3A',
-      darkened: '#DA6336'
-    },
-    warning: {
-      main: '#F4CA4C',
-      lightened: '#fff2ca'
-    },
-    error: {
-      main: '#F06C3A',
-      darkened: '#DE5B2A',
-      lightened: '#F19B7B'
-    },
-    success: {
-      main: '#75BB1D',
-      lightened: '#c1e496'
-    },
-    bg: {
-      main: '#eee',
-      lightened: '#FAFAFA',
-      lightest: '#aaa',
-      light: '#fff',
-      dark: '#D9DCDD',
-      darkened: '#E8ECED'
+    neutral: {
+      white: '#FFFFFF',
+      light: '#F1F1F3',
+      medium: '#E1E1E2',
+      dark: '#CACACE',
     },
     text: {
-      main: '#11111a',
-      lightened: '#888888',
-      light: '#ffffff'
+      dark: '#11111A',
+      lightened: '#88888C',
+      light: '#FFFFFF',
     },
-    input: {
-      disabled: '#f9f9f9'
-    }
+    primary: {
+      yellow: {
+        main: 'rgba(243, 182, 19, 1)',
+        lightened: 'rgba(243, 182, 19, .25)'
+      },
+      purple: {
+        main: 'rgba(177, 113, 226, 1)',
+        lightened: 'rgba(177, 113, 226, .25)'
+      },
+      green: {
+        main: 'rgba(84, 165, 158, 1)',
+        lightened: 'rgba(84, 165, 158, .25)'
+      },
+      orange: {
+        main: 'rgba(248, 164, 110, 1)',
+        lightened: 'rgba(248, 164, 110, .25)'
+      },
+    },
   },
   text: {
     body: {
-      sizeSmall: 14,
-      size: 16,
-      sizeLarge: 22,
-      lineHeightSmall: 18,
-      lineHeight: 24,
-      lineHeightLarge: 32,
-      breakpoint: {
-        xs: 15,
-        md: 16
+      mini: {
+        size: 10,
+        lineHeight: 12
+      },
+      small: {
+        size: 12,
+        lineHeight: 16
+      },
+      regular: {
+        size: 14,
+        lineHeight: 20
+      },
+      large: {
+        size: 18,
+        lineHeight: 22
       }
     },
-    h1: {
-      size: 52,
-      lineHeight: 56
+    title: {
+      small: {
+        size: 20,
+        lineHeight: 24
+      },
+      regular: {
+        size: 24,
+        lineHeight: 32
+      },
+      large: {
+        size: 36,
+        lineHeight: 48
+      },
+      headline: {
+        size: 48,
+        lineHeight: 60
+      },
     },
-    h2: {
-      size: 36,
-      lineHeight: 48
-    },
-    h3: {
-      size: 24,
-      lineHeight: 36
-    },
-
     // TREATMENTS
-    weight: '400',
-    weightHeavy: '500',
+    weight: {
+      semibold: '600',
+      medium: '500',
+      regular: '400'
+    },
     family: 'Inter, Helvetica Neue, Helvetica, Arial, sans-serif'
   }
 };
@@ -144,7 +139,7 @@ export const GlobalStyle = createGlobalStyle`
     font-size: ${(props) => props.theme.text.body.size}px;
     line-height: ${(props) => props.theme.text.body.lineHeight}px;
     color: ${(props) => props.theme.color.text.main};
-    background-color: ${(props) => props.theme.color.bg.light};
+    background-color: ${(props) => props.theme.color.neutral.white};
   }
   * {
     box-sizing: border-box;
