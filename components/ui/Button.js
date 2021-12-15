@@ -19,6 +19,7 @@ const StyledButton = styled.button`
         : null
   };
   width: ${props => props.full && '100%'};
+  transition: ${({ theme }) => theme.util.transition};
 
   &:hover {
     cursor: ${props => props.disabled ? 'auto' : 'pointer'};

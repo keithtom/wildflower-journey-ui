@@ -98,9 +98,9 @@ const SchoolProfile = () => {
                   <Text title small bold>{members.length} Members</Text>
                 </Grid>
               </Grid>
-              <Grid container spacing={8}>
+              <Grid container spacing={4}>
                 {members.map((m, i) =>
-                  <Grid item xs={12}>
+                  <Grid item xs={12} key={i}>
                     <Container full>
                       <UserCard
                         name={m.name}
