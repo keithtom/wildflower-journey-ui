@@ -18,6 +18,7 @@ const StyledButton = styled.button`
       : props.disabled ? props.theme.color.text.lightened
         : null
   };
+  width: ${props => props.full && '100%'};
 
   &:hover {
     cursor: ${props => props.disabled ? 'auto' : 'pointer'};

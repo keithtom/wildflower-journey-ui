@@ -2,14 +2,25 @@ import styled from 'styled-components'
 
 const StyledContainer = styled.div`
   padding: ${({ theme }) => theme.util.buffer*8}px;
+  padding-top: ${props => props.paddingTopLarge && props.theme.util.buffer*48}px;
   border-radius: ${({ theme }) => theme.util.radiusLarge}px;
-  /* box-shadow: ${({ theme }) => theme.util.shadowLarge}; */
-  border: 1px solid ${({ theme }) => theme.color.neutral.light};
+  width: 100%;
+  border: 1px solid ${props => props.yellow ? 'none'
+    : props.theme.color.neutral.light
+  };
+  background: ${props => props.yellow ? props.theme.color.primary.yellow.lightened
+    : props.theme.color.neutral.white
+  };
 `;
 
-const Container = ({ children }) => {
+const Container = ({
+  children,
+  ...rest
+}) => {
   return (
-    <StyledContainer>
+    <StyledContainer
+      {...rest}
+    >
       {children}
     </StyledContainer>
   )
