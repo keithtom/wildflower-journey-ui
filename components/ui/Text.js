@@ -25,6 +25,15 @@ const StyledText = styled.span`
     : (props.body && props.bold) ? props.theme.text.weight.medium
       : props.theme.text.weight.regular
   };
+  color: ${props => props.lightened ? props.theme.color.text.lightened
+    : props.light ? props.theme.color.text.light
+      : props.theme.color.text.dark
+  };
+  opacity: ${props => (props.opacity === 'light') ? props.theme.color.opacity.light
+    : (props.opacity === 'medium') ? props.theme.color.opacity.medium
+      : (props.opacity === 'dark') ? props.theme.color.opacity.dark
+        : '1'
+  };
 `;
 
 const Text = ({

@@ -72,6 +72,12 @@ export const theme = {
         lightened: 'rgba(248, 164, 110, .25)'
       },
     },
+    // TREATMENTS
+    opacity: {
+      light: '.25',
+      medium: '.50',
+      dark: '.75'
+    }
   },
   text: {
     body: {
