@@ -1,5 +1,3 @@
-import styled from 'styled-components'
-
 import {
   Container,
   Grid,
@@ -7,10 +5,11 @@ import {
 } from './ui'
 
 
-const SchoolProfileHero = ({
+const SchoolProfileCard = ({
   schoolName,
   subtitle,
-  address
+  address,
+  large
 }) => {
   return (
     <Container yellow paddingTopLarge>
@@ -19,7 +18,7 @@ const SchoolProfileHero = ({
         <Grid item>
           <Grid container flexDirection="column" spacing={1}>
             <Grid item>
-              <Text title large bold>{schoolName}</Text>
+              <Text title large={large} small={!large} bold>{schoolName}</Text>
             </Grid>
             <Grid item>
               <Text body regular opacity="medium">{subtitle}</Text>
@@ -36,4 +35,4 @@ const SchoolProfileHero = ({
   )
 }
 
-export default SchoolProfileHero
+export default SchoolProfileCard

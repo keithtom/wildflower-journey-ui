@@ -1,13 +1,12 @@
 import Head from 'next/head'
-import styled from 'styled-components';
 
-import UserCard from '../components/UserCard'
-import SchoolProfileHero from '../components/SchoolProfileHero'
+import UserInfo from '../components/UserInfo'
+import UserProfileCard from '../components/UserProfileCard'
+import SchoolProfileCard from '../components/SchoolProfileCard'
 import {
   MaxWidth,
   Container,
   Text,
-  Button,
   PageContainer,
   Grid
 } from '../components/ui'
@@ -32,7 +31,8 @@ const SchoolProfile = () => {
           <Grid container spacing={12}>
 
             <Grid item xs={12}>
-              <SchoolProfileHero
+              <SchoolProfileCard
+                large
                 schoolName="Brooklyn Heights Montessori"
                 subtitle="brooklynheightsmontessori.com"
                 address="93 Pierrepont Street, Brooklyn, NY 11201"
@@ -78,7 +78,7 @@ const SchoolProfile = () => {
                         <Text title small bold>Contact</Text>
                       </Grid>
                       <Grid item xs={12}>
-                        <UserCard
+                        <UserInfo
                           name={schoolDetails.contactMember.name}
                           badge={schoolDetails.contactMember.badge}
                           profileImage={schoolDetails.contactMember.profileImage}
@@ -101,17 +101,21 @@ const SchoolProfile = () => {
               <Grid container spacing={4}>
                 {members.map((m, i) =>
                   <Grid item xs={12} key={i}>
-                    <Container full>
-                      <UserCard
+                    <UserProfileCard
+                      user={m}
+                    />
+                    {/* <Container full>
+                      <UserInfo
                         name={m.name}
                         badge={m.badge}
                         profileImage={m.profileImage}
                       />
-                    </Container>
+                    </Container> */}
                   </Grid>
                 )}
               </Grid>
             </Grid>
+
           </Grid>
 
         </MaxWidth>
