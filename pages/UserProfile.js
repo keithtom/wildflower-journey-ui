@@ -16,7 +16,7 @@ const UserProfile = ({}) => {
   return (
     <>
       <Head>
-        <title>Wildflower Schools Directory | School Profile</title>
+        <title>Wildflower Schools Directory | User Profile</title>
         <meta name="title" content="Wildflower Schools Directory" />
         <meta property="og:site_name" content="Wildflower Schools Directory" key="og_wf_site_name" />
         <meta name="description" content="Wildflower Schools Directory" />
