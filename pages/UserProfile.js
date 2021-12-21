@@ -33,6 +33,7 @@ const UserProfile = ({}) => {
 
             <Grid item xs={12}>
               <UserProfileCard
+                large
                 user={user}
               />
             </Grid>

@@ -32,7 +32,7 @@ const UserInfo = ({
           <Grid item>
             <Grid container spacing={large ? 8 : 4} alignItems="center">
               <Grid item>
-                <StyledProfileImage large bg={profileImage} />
+                <StyledProfileImage large={large} bg={profileImage} />
               </Grid>
               <Grid item>
                 <Grid container spacing={1} flexDirection="column">

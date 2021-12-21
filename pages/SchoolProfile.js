@@ -1,6 +1,7 @@
 import Head from 'next/head'
 
 import UserInfo from '../components/UserInfo'
+import UserProfileCard from '../components/UserProfileCard'
 import SchoolProfileCard from '../components/SchoolProfileCard'
 import {
   MaxWidth,
@@ -100,13 +101,16 @@ const SchoolProfile = () => {
               <Grid container spacing={4}>
                 {members.map((m, i) =>
                   <Grid item xs={12} key={i}>
-                    <Container full>
+                    <UserProfileCard
+                      user={m}
+                    />
+                    {/* <Container full>
                       <UserInfo
                         name={m.name}
                         badge={m.badge}
                         profileImage={m.profileImage}
                       />
-                    </Container>
+                    </Container> */}
                   </Grid>
                 )}
               </Grid>

@@ -9,17 +9,18 @@ import {
 
 
 const UserProfileCard = ({
-  user
+  user,
+  large
 }) => {
   return (
-    <Container outline paddingTopLarge>
+    <Container outline paddingTopLarge={large}>
       <Grid container alignItems="flex-end">
 
         <Grid item>
           <Grid container flexDirection="column" spacing={1}>
             <Grid item>
               <UserInfo
-                large
+                large={large}
                 name={user.name}
                 badge={user.badge}
                 profileImage={user.profileImage}
