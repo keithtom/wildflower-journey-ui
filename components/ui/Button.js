@@ -14,7 +14,7 @@ const StyledButton = styled.button`
         : null
   };
   color: ${props => (props.primary && props.lightened) ? props.theme.color.primary.purple.main
-    : props.primary ? props.theme.color.primary.purple.lightened
+    : props.primary ? props.theme.color.text.light
       : props.disabled ? props.theme.color.text.lightened
         : null
   };
