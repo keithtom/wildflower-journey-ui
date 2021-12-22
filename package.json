@@ -5,15 +5,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "next": "12.0.3",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "storybook-addon-styled-component-theme": "^2.0.0",
     "styled-components": "^5.3.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.16.5",
+    "@storybook/addon-actions": "^6.4.9",
+    "@storybook/addon-essentials": "^6.4.9",
+    "@storybook/addon-links": "^6.4.9",
+    "@storybook/react": "^6.4.9",
+    "babel-loader": "^8.2.3",
     "babel-plugin-styled-components": "^2.0.2",
     "eslint": "7",
     "eslint-config-next": "12.0.3"
