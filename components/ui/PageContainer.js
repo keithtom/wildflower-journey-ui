@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 
+import Nav from '../Nav'
+
 const StyledPageContainer = styled.div`
   height: 100vh;
   width: 100vw;
@@ -10,9 +12,12 @@ const StyledPageContainer = styled.div`
 
 const PageContainer = ({ children }) => {
   return (
-    <StyledPageContainer>
-      {children}
-    </StyledPageContainer>
+    <>
+      <Nav/>
+      <StyledPageContainer>
+        {children}
+      </StyledPageContainer>
+    </>
   )
 }
 
