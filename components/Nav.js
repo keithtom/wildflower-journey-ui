@@ -39,7 +39,7 @@ const StyledNav = styled.div`
   padding: ${({ theme }) => theme.util.buffer*36}px 0 ${({ theme }) => theme.util.buffer*12}px ${({ theme }) => theme.util.buffer*12}px;
 `;
 
-const StyledNavLink = styled(Link)`
+const StyledNavItem = styled(Grid)`
   * {
     color: ${({ theme }) => theme.color.text.lightened};
   }
@@ -68,17 +68,17 @@ const Nav = ({}) => {
           <Grid item>
             <Grid container spacing={2}>
 
-              <StyledNavLink href="/UserProfile">
-                <Grid item xs={12}>
+              <Link href="/UserProfile">
+                <StyledNavItem item xs={12}>
                   <Text body large>Your Profile</Text>
-                </Grid>
-              </StyledNavLink>
+                </StyledNavItem>
+              </Link>
 
-              <StyledNavLink href="/SchoolProfile">
-                <Grid item xs={12}>
+              <Link href="/SchoolProfile">
+                <StyledNavItem item xs={12}>
                   <Text body large>Your School</Text>
-                </Grid>
-              </StyledNavLink>
+                </StyledNavItem>
+              </Link>
             </Grid>
           </Grid>
 
