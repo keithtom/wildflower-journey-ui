@@ -2,7 +2,7 @@ import { createGlobalStyle } from 'styled-components';
 
 // Style values:
 const buffer = 4;
-const timing = '.15s';
+const timing = '.25s';
 const easing = 'ease-in-out';
 const stroke = '#CECECE';
 const strokeDarkened = '#adadc5';
@@ -31,9 +31,11 @@ export const theme = {
     maxFormWidth: 700,
     headerHeight: 100,
     siderailWidth: 200,
-    zIndexHeader: 3,
-    zIndexMenu: 2,
-    zIndexBanner: 1,
+    zIndexTop: 5,
+    zIndexMiddleTop: 4,
+    zIndexMiddle: 3,
+    zIndexMiddleBottom: 2,
+    zIndexBottom: 1,
     zIndexPageContainer: 0
   },
   breakpoint: {
