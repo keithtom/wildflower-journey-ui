@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 
 const StyledButton = styled.button`
-
   border: none;
   font-size: ${({ theme }) => theme.text.body.large.size}px;
   line-height: ${({ theme }) => theme.text.body.large.lineHeight}px;
