@@ -6,7 +6,13 @@ export default {
   component: Container,
   parameters: {
     // layout: 'fullscreen'
-  }
+  },
+  argTypes: {
+    bgUrl: {
+      options: ['', 'https://images.unsplash.com/photo-1542042238232-3a0b14425b71?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80'],
+      control: {type: 'select'}
+    },
+  },
 };
 
 const Template = (args) => <Container {...args}>I'm a container!</Container>
@@ -30,34 +36,29 @@ const ContainerInContext = (args) => {
 export const Demo = ContainerInContext.bind({});
 Demo.args = {
   small: false,
-  yellow: false,
-  paddingTopLarge: false
+  highlight: false
 }
 
 export const Default = Template.bind({});
 Default.args = {
   small: false,
-  yellow: false,
-  paddingTopLarge: false
+  highlight: false,
+  bgUrl: ''
 }
 
-export const Small = Template.bind({});
-Small.args = {
-  small: true,
-  yellow: false,
-  paddingTopLarge: false
-}
-
-export const Yellow = Template.bind({});
-Yellow.args = {
+export const Display = Template.bind({});
+Display.args = {
+  highlight: false,
+  display: true,
   small: false,
-  yellow: true,
-  paddingTopLarge: false
+  bgUrl: ''
 }
 
-export const PaddingTopLarge = Template.bind({});
-PaddingTopLarge.args = {
+export const Highlight = Template.bind({});
+Highlight.args = {
+  highlight: true,
+  display: false,
   small: false,
-  yellow: false,
-  paddingTopLarge: true
+  bgUrl: ''
 }
+

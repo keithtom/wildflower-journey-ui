@@ -2,7 +2,8 @@ import styled from 'styled-components'
 
 import {
   Container,
-  Grid
+  Grid,
+  Icon
 } from '../ui'
 
 const StyledInputWrapper = styled(Container)`
@@ -28,7 +29,7 @@ const Input = ({
 
         {icon ?
           <Grid item>
-            <div>hi</div>
+            <Icon type={icon} />
           </Grid>
         : null}
 

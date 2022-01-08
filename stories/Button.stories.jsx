@@ -6,16 +6,22 @@ export default {
   component: Button,
 };
 
-const Template = (args) => <Button {...args}>I'm a button!</Button>
+const Template = (args) => <Button {...args}>Button content</Button>
 
 export const Default = Template.bind({});
+Default.args = {
+  full: false
+}
 
-export const Primary = Template.bind({});
-Primary.args = {
-  primary: true
+export const Lightened = Template.bind({});
+Lightened.args = {
+  lightened: true,
+  full: false
 }
 
 export const Disabled = Template.bind({});
 Disabled.args = {
-  disabled: true
-};
+  disabled: true,
+  full: false
+}
+
