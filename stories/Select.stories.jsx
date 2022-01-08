@@ -6,10 +6,17 @@ export default {
   component: Select
 };
 
-const Template = (args) => <Select {...args} />
+const Template = (args) => (
+  <>
+    <div>
+      <Select {...args} checkbox/>
+    </div>
+    <div>
+      <Select {...args} radio/>
+    </div>
+  </>
+)
 
 export const Default = Template.bind({});
 Default.args = {
-  checkbox: true,
-  radio: false,
 }
