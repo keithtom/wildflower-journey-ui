@@ -7,30 +7,29 @@ const StyledButton = styled.button`
   min-width: ${({ theme }) => theme.util.buffer*48}px;
   border-radius: ${({ theme }) => theme.util.buffer*2}px;
   padding: ${({ theme }) => theme.util.buffer*4}px ${({ theme }) => theme.util.buffer*8}px;
-  background-color: ${props => (props.primary && props.lightened) ? props.theme.color.primary.purple.lightened
-    : props.primary ? props.theme.color.primary.purple.main
-      : props.disabled ? props.theme.color.neutral.light
-        : null
-  };
-  color: ${props => (props.primary && props.lightened) ? props.theme.color.primary.purple.main
-    : props.primary ? props.theme.color.text.light
-      : props.disabled ? props.theme.color.text.lightened
-        : null
-  };
-  width: ${props => props.full && '100%'};
   transition: ${({ theme }) => theme.util.transition};
+
+  width: ${props => props.full && '100%'};
+
+  background-color: ${props => props.lightened ? props.theme.color.primary.purple.lightened
+    : props.disabled ? props.theme.color.neutral.light
+      : props.theme.color.primary.purple.main
+  };
+  color: ${props => props.lightened ? props.theme.color.primary.purple.main
+    : props.disabled ? props.theme.color.text.lightened
+      : props.theme.color.text.light
+  };
 
   &:hover {
     cursor: ${props => props.disabled ? 'auto' : 'pointer'};
-    background-color: ${props => (props.primary && props.lightened) ? props.theme.color.primary.purple.main
-      : props.primary ? props.theme.color.primary.purple.lightened
-        : props.disabled ? props.theme.color.neutral.light
-          : null
+
+    background-color: ${props => props.lightened ? props.theme.color.primary.purple.main
+      : props.disabled ? props.theme.color.neutral.light
+        : props.theme.color.primary.purple.main
     };
-    color: ${props => (props.primary && props.lightened) ? props.theme.color.text.light
-      : props.primary ? props.theme.color.primary.purple.main
-        : props.disabled ? props.theme.color.text.lightened
-          : null
+    color: ${props => props.lightened ? props.theme.color.text.light
+      : props.disabled ? props.theme.color.text.lightened
+        : props.theme.color.text.light
     };
   }
 
