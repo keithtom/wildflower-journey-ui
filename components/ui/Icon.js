@@ -5,6 +5,7 @@ import {
 } from '@styled-icons/boxicons-solid'
 import {
   Check,
+  X,
 } from '@styled-icons/boxicons-regular'
 
 const StyledIcon = styled.span`
@@ -25,6 +26,8 @@ const Icon =({
     source = <User />
   } else if (type === 'check') {
     source = <Check />
+  } else if (type === 'close') {
+    source = <X />
   }
 
   return (
