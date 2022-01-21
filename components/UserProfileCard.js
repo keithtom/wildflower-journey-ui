@@ -12,6 +12,9 @@ const UserProfileCard = ({
   user,
   large
 }) => {
+
+  console.log({user})
+
   return (
     <Container outline paddingTopLarge={large}>
       <Grid container alignItems="flex-end">
@@ -22,7 +25,7 @@ const UserProfileCard = ({
               <UserInfo
                 large={large}
                 name={user.name}
-                badge={user.badge}
+                role={user.role}
                 profileImage={user.profileImage}
               />
             </Grid>

@@ -80,7 +80,7 @@ const SchoolProfile = () => {
                       <Grid item xs={12}>
                         <UserInfo
                           name={schoolDetails.contactMember.name}
-                          badge={schoolDetails.contactMember.badge}
+                          role={schoolDetails.contactMember.role}
                           profileImage={schoolDetails.contactMember.profileImage}
                           phoneNumber={schoolDetails.contactMember.phoneNumber}
                         />
@@ -107,7 +107,7 @@ const SchoolProfile = () => {
                     {/* <Container full>
                       <UserInfo
                         name={m.name}
-                        badge={m.badge}
+                        role={m.role}
                         profileImage={m.profileImage}
                       />
                     </Container> */}
@@ -153,7 +153,7 @@ const schoolDetails = {
   ],
   contactMember: {
     name: 'Maya Walley',
-    badge: 'Teacher Leader',
+    role: 'Teacher Leader',
     profileImage: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80',
     phoneNumber: '(917) 123-4567'
   }
@@ -162,27 +162,27 @@ const schoolDetails = {
 const members = [
   {
     name: 'Joey Aaronson',
-    badge: 'Teacher Leader',
+    role: 'Teacher Leader',
     profileImage: 'https://images.unsplash.com/photo-1619895862022-09114b41f16f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80'
   },
   {
     name: 'Michael Davidson',
-    badge: 'Teacher Leader',
+    role: 'Teacher Leader',
     profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3000&q=80'
   },
   {
     name: 'Sara Piper',
-    badge: 'Teacher Leader',
+    role: 'Teacher Leader',
     profileImage: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80'
   },
   {
     name: 'Johnathan Wang',
-    badge: 'Member',
+    role: 'Member',
     profileImage: 'https://images.unsplash.com/photo-1487309078313-fad80c3ec1e5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1635&q=80'
   },
   {
     name: 'Kimberly St.Cloud',
-    badge: 'Member',
+    role: 'Member',
     profileImage: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80'
   },
 ]

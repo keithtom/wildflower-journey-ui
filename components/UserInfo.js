@@ -19,7 +19,7 @@ const StyledProfileImage = styled.div`
 
 const UserInfo = ({
   name,
-  badge,
+  role,
   profileImage,
   phoneNumber,
   large
@@ -28,7 +28,7 @@ const UserInfo = ({
     <StyledUserInfo>
       <Grid container spacing={4}>
 
-        {(name && badge && profileImage) ?
+        {(name && role && profileImage) ?
           <Grid item>
             <Grid container spacing={large ? 8 : 4} alignItems="center">
               <Grid item>
@@ -40,7 +40,7 @@ const UserInfo = ({
                     <Text title={large} body={!large} large bold>{name}</Text>
                   </Grid>
                   <Grid item>
-                    <Text body regular lightened>{badge}</Text>
+                    <Text body regular={!large} large={large} lightened>{role}</Text>
                   </Grid>
                 </Grid>
               </Grid>
