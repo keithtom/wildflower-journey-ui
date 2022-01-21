@@ -79,7 +79,7 @@ const Select = ({
             onClick={onClick}
             disabled={disabled}
           >
-            <StyledIcon type="check" checked={checked}/>
+            <StyledIcon type="check" light checked={checked} size={16}/>
           </StyledCheckbox>
         </Grid>
         <Grid item>
