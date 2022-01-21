@@ -8,9 +8,7 @@ const StyledButton = styled.button`
   border-radius: ${({ theme }) => theme.util.buffer*2}px;
   padding: ${({ theme }) => theme.util.buffer*4}px ${({ theme }) => theme.util.buffer*8}px;
   transition: ${({ theme }) => theme.util.transition};
-
   width: ${props => props.full && '100%'};
-
   background-color: ${props => props.lightened ? props.theme.color.primary.purple.lightened
     : props.disabled ? props.theme.color.neutral.light
       : props.theme.color.primary.purple.main
@@ -19,7 +17,6 @@ const StyledButton = styled.button`
     : props.disabled ? props.theme.color.text.lightened
       : props.theme.color.text.light
   };
-
   &:hover {
     cursor: ${props => props.disabled ? 'auto' : 'pointer'};
 
@@ -38,11 +35,13 @@ const StyledButton = styled.button`
 const Button = ({
   children,
   full,
+  onClick,
   ...rest
 }) => {
   return (
     <StyledButton
       full={full}
+      onClick={onClick}
       {...rest}
     >
       {children}

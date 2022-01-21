@@ -20,6 +20,8 @@ export const theme = {
     borderWidth: strokeWidth,
     border: `${strokeWidth}px solid ${stroke}`,
     borderLight: `${strokeWidth}px solid ${strokeLightened}`,
+    shadow: 'rgba(0,0,0,.05) 0 0px 16px 0px',
+    maxFormWidth: 640,
   },
   breakpoint: {
     xs: 640,
