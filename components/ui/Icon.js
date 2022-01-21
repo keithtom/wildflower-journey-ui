@@ -2,12 +2,14 @@ import styled from 'styled-components'
 
 import {
   User,
-  CheckCircle
 } from '@styled-icons/boxicons-solid'
+import {
+  Check,
+} from '@styled-icons/boxicons-regular'
 
 const StyledIcon = styled.span`
-  width: ${({ theme }) => theme.util.buffer*4}px;
-  height: ${({ theme }) => theme.util.buffer*4}px;
+  width: ${({ theme }) => theme.util.buffer * 4}px;
+  height: ${({ theme }) => theme.util.buffer * 4}px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,7 +24,7 @@ const Icon =({
   if (type === 'user') {
     source = <User />
   } else if (type === 'check') {
-    source = <CheckCircle />
+    source = <Check />
   }
 
   return (
