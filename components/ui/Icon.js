@@ -2,7 +2,8 @@ import styled from 'styled-components'
 
 import {
   User,
-  Map
+  Map,
+  Star
 } from '@styled-icons/boxicons-solid'
 import {
   Check,
@@ -50,6 +51,8 @@ const Icon =({
     source = <X />
   } else if (type === 'map') {
     source = <Map />
+  } else if (type === 'star') {
+    source = <Star />
   }
 
   return (

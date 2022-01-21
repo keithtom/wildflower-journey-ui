@@ -3,18 +3,33 @@ import styled from 'styled-components'
 import {
   Grid,
   Text,
-  Button
+  Button,
+  Icon
 } from './ui'
 
 const StyledUserInfo = styled.div`
   width: 100%;
 `;
 const StyledProfileImage = styled.div`
-  width: ${props => props.large ? props.theme.util.buffer*20 : props.theme.util.buffer*12}px;
-  height: ${props => props.large ? props.theme.util.buffer*20 : props.theme.util.buffer*12}px;
+  width: ${props => props.large ? props.theme.util.buffer*20 : props.theme.util.buffer*8}px;
+  height: ${props => props.large ? props.theme.util.buffer*20 : props.theme.util.buffer*8}px;
   background-image: ${props => props.bg && `url('${props.bg}')`};
   background-size: cover;
   border-radius: ${({ theme }) => theme.util.radiusLarge*20}px;
+  position: relative;
+`;
+const StyledBadge = styled.div`
+  position: absolute;
+  top: -${({ theme }) => theme.util.buffer * 2}px;
+  right: -${({ theme }) => theme.util.buffer * 2}px;
+  outline: 2px solid ${({ theme }) => theme.color.neutral.white};
+  width: ${(props) => props.large ? props.theme.util.buffer * 8 : props.theme.util.buffer * 5}px;
+  height: ${(props) => props.large ? props.theme.util.buffer * 8 : props.theme.util.buffer * 5}px;
+  background: ${({ theme }) => theme.color.primary.purple.main};
+  border-radius: ${({ theme }) => theme.util.radiusLarge}px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const UserInfo = ({
@@ -22,6 +37,7 @@ const UserInfo = ({
   role,
   profileImage,
   phoneNumber,
+  isFoundationLeader,
   large
 }) => {
   return (
@@ -32,15 +48,21 @@ const UserInfo = ({
           <Grid item>
             <Grid container spacing={large ? 8 : 4} alignItems="center">
               <Grid item>
-                <StyledProfileImage large={large} bg={profileImage} />
+                <StyledProfileImage large={large} bg={profileImage}>
+                  {isFoundationLeader ?
+                    <StyledBadge large={large}>
+                      <Icon type="star" light size={large ? 24 : 12}/>
+                    </StyledBadge>
+                  : null}
+                </StyledProfileImage>
               </Grid>
               <Grid item>
-                <Grid container spacing={1} flexDirection="column">
+                <Grid container spacing={large ? 1 : 0} flexDirection="column">
                   <Grid item>
-                    <Text title={large} body={!large} large bold>{name}</Text>
+                    <Text title={large} body={!large} regular bold>{name}</Text>
                   </Grid>
                   <Grid item>
-                    <Text body regular={!large} large={large} lightened>{role}</Text>
+                    <Text body small={!large} large={large} lightened>{role}</Text>
                   </Grid>
                 </Grid>
               </Grid>

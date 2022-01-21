@@ -2,11 +2,11 @@ import styled from 'styled-components'
 
 const StyledButton = styled.button`
   border: none;
-  font-size: ${({ theme }) => theme.text.body.large.size}px;
-  line-height: ${({ theme }) => theme.text.body.large.lineHeight}px;
+  font-size: ${({ theme }) => theme.text.body.regular.size}px;
+  line-height: ${({ theme }) => theme.text.body.regular.lineHeight}px;
   min-width: ${({ theme }) => theme.util.buffer*48}px;
   border-radius: ${({ theme }) => theme.util.buffer*2}px;
-  padding: ${({ theme }) => theme.util.buffer*4}px ${({ theme }) => theme.util.buffer*8}px;
+  padding: ${({ theme }) => theme.util.buffer*3}px ${({ theme }) => theme.util.buffer*8}px;
   transition: ${({ theme }) => theme.util.transition};
   width: ${props => props.full && '100%'};
   background-color: ${props => props.lightened ? props.theme.color.primary.purple.lightened
