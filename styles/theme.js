@@ -47,20 +47,27 @@ export const theme = {
     primary: {
       yellow: {
         main: 'rgba(243, 182, 19, 1)',
-        lightened: 'rgba(243, 182, 19, .25)'
+        lightened: 'rgba(243, 182, 19, .12)',
+        medium: 'rgba(243, 182, 19, .24)'
       },
       purple: {
         main: 'rgba(177, 113, 226, 1)',
-        lightened: 'rgba(177, 113, 226, .25)'
+        lightened: 'rgba(177, 113, 226, .12)',
+        medium: 'rgba(177, 113, 226, .24)'
       },
       green: {
         main: 'rgba(84, 165, 158, 1)',
-        lightened: 'rgba(84, 165, 158, .25)'
+        lightened: 'rgba(84, 165, 158, .12)',
+        medium: 'rgba(84, 165, 158, .24)'
       },
       orange: {
         main: 'rgba(248, 164, 110, 1)',
-        lightened: 'rgba(248, 164, 110, .25)'
+        lightened: 'rgba(248, 164, 110, .12)',
+        medium: 'rgba(248, 164, 110, .24)'
       },
+    },
+    alert: {
+      main: '#FF4D57'
     },
     // TREATMENTS
     opacity: {

@@ -8,7 +8,7 @@ export default {
     // layout: 'fullscreen'
   },
   argTypes: {
-    bgUrl: {
+    bgImage: {
       options: ['', 'https://images.unsplash.com/photo-1542042238232-3a0b14425b71?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80'],
       control: {type: 'select'}
     },
@@ -43,7 +43,7 @@ export const Default = Template.bind({});
 Default.args = {
   small: false,
   highlight: false,
-  bgUrl: ''
+  bgImage: ''
 }
 
 export const Display = Template.bind({});
@@ -51,7 +51,7 @@ Display.args = {
   highlight: false,
   display: true,
   small: false,
-  bgUrl: ''
+  bgImage: ''
 }
 
 export const Highlight = Template.bind({});
@@ -59,6 +59,6 @@ Highlight.args = {
   highlight: true,
   display: false,
   small: false,
-  bgUrl: ''
+  bgImage: ''
 }
 
