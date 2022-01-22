@@ -1,7 +1,7 @@
 import React from 'react';
 
 import UserInfo from '../components/UserInfo'
-import ProfileMaya from '../public/assets/images/profile-maya.png'
+const ProfileMaya = 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80'
 
 export default {
   title: 'Feature/UserInfo',

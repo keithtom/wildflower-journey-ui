@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
-import ProfileMaya from '../public/assets/images/profile-maya.png'
 import {
   Text,
   Grid,
@@ -16,7 +15,7 @@ const StyledNav = styled.div`
   top: 0;
   bottom: 0;
   z-index: ${({ theme }) => theme.util.zIndexTop};
-  width: ${({ theme }) => theme.util.buffer * 80}px;
+  width: ${({ theme }) => theme.util.navWidth}px;
   background: ${({ theme }) => theme.color.neutral.white};
   border-right: ${({ theme }) => theme.util.border};
 `;
@@ -34,7 +33,7 @@ const StyledNavContents = styled(Grid)`
   padding: ${({ theme }) => theme.util.buffer * 6}px;
 `;
 const StyledNavFooter = styled(Grid)`
-  padding: ${({ theme }) => theme.util.buffer * 6}px;
+  padding: ${({ theme }) => theme.util.buffer * 8}px;
 `;
 
 const Nav = ({}) => {
@@ -51,11 +50,11 @@ const Nav = ({}) => {
               <UserInfo
                 name="Maya Whalley"
                 role="Teacher Leader"
-                profileImage={ProfileMaya}
+                profileImage="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80"
               />
             </Grid>
             <Grid item>
-              <Icon type="dot-menu" lightened/>
+              <Icon type="dot-menu"/>
             </Grid>
           </StyledNavActions>
           <StyledNavContents container spacing={2}>
@@ -65,6 +64,7 @@ const Nav = ({}) => {
                   route={n.route}
                   icon={n.icon}
                   name={n.name}
+                  disabled={n.disabled}
                   notificationCount={n.notificationCount}
                 />
               </Grid>
@@ -113,10 +113,12 @@ const Navigation = [
     name: 'Get Advice',
     route: '/',
     icon: 'directions',
+    disabled: true
   },
   {
     name: 'Resource Hub',
     route: '/',
     icon: 'layer',
+    disabled: true
   },
 ]
