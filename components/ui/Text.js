@@ -27,7 +27,8 @@ const StyledText = styled.span`
   };
   color: ${props => props.lightened ? props.theme.color.text.lightened
     : props.light ? props.theme.color.text.light
-      : props.theme.color.text.dark
+      : props.highlight ? props.theme.color.primary.purple.main
+        : props.theme.color.text.dark
   };
   opacity: ${props => (props.opacity === 'light') ? props.theme.color.opacity.light
     : (props.opacity === 'medium') ? props.theme.color.opacity.medium

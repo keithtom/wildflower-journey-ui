@@ -47,19 +47,19 @@ export const theme = {
     primary: {
       yellow: {
         main: 'rgba(243, 182, 19, 1)',
-        lightened: 'rgba(243, 182, 19, .25)'
+        lightened: 'rgba(243, 182, 19, .12)'
       },
       purple: {
         main: 'rgba(177, 113, 226, 1)',
-        lightened: 'rgba(177, 113, 226, .25)'
+        lightened: 'rgba(177, 113, 226, .12)'
       },
       green: {
         main: 'rgba(84, 165, 158, 1)',
-        lightened: 'rgba(84, 165, 158, .25)'
+        lightened: 'rgba(84, 165, 158, .12)'
       },
       orange: {
         main: 'rgba(248, 164, 110, 1)',
-        lightened: 'rgba(248, 164, 110, .25)'
+        lightened: 'rgba(248, 164, 110, .12)'
       },
     },
     // TREATMENTS
