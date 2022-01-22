@@ -4,7 +4,8 @@ import Link from 'next/link'
 import {
   Text,
   Grid,
-  Icon
+  Icon,
+  Tag
 } from './ui'
 
 const StyledNavItem = styled.div`
@@ -15,8 +16,11 @@ const StyledNavItem = styled.div`
   background: ${(props) => props.active ? props.theme.color.primary.purple.lightened : 'transparent'};
   &:hover {
     transition: ${({ theme }) => theme.util.transition};
-    cursor: pointer;
-    background: ${({ theme }) => theme.color.neutral.light};
+    cursor: ${(props) => props.disabled ? 'auto' : 'pointer'};
+    background: ${(props) => props.disabled ? 'transparent'
+      : props.active ? props.theme.color.primary.purple.medium
+        : props.theme.color.neutral.light
+    };
   }
 `;
 
@@ -25,22 +29,28 @@ const NavItem = ({
   icon,
   name,
   active,
+  disabled,
   notificationCount
 }) => {
   return (
-    <StyledNavItem active={active}>
+    <StyledNavItem active={active} disabled={disabled}>
       <Link href={route}>
-        <Grid container>
-          <Grid item xs={12}>
+        <Grid container alignItems="center" justifyContent="space-between">
+          <Grid item>
             <Grid container spacing={4} alignItems="center">
               <Grid item>
-                <Icon type={icon} primary={active}/>
+                <Icon type={icon} primary={active} lightened={disabled}/>
               </Grid>
               <Grid item>
-                <Text body large highlight={active}>{name}</Text>
+                <Text body large highlight={active} lightened={disabled}>{name}</Text>
               </Grid>
             </Grid>
           </Grid>
+          {notificationCount ?
+            <Grid item>
+              <Tag alert center small>{notificationCount}</Tag>
+            </Grid>
+          : null}
         </Grid>
       </Link>
     </StyledNavItem>
