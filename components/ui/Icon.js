@@ -3,11 +3,17 @@ import styled from 'styled-components'
 import {
   User,
   Map,
-  Star
+  Star,
+  Layout,
+  Graduation,
+  Search,
+  Directions,
+  Layer
 } from '@styled-icons/boxicons-solid'
 import {
   Check,
   X,
+  DotsVerticalRounded
 } from '@styled-icons/boxicons-regular'
 
 const StyledIcon = styled.span`
@@ -53,6 +59,18 @@ const Icon =({
     source = <Map />
   } else if (type === 'star') {
     source = <Star />
+  } else if (type === 'dot-menu') {
+    source = <DotsVerticalRounded />
+  } else if (type === 'layout') {
+    source = <Layout />
+  } else if (type === 'graduation') {
+    source = <Graduation />
+  } else if (type === 'search') {
+    source = <Search />
+  } else if (type === 'directions') {
+    source = <Directions />
+  } else if (type === 'layer') {
+    source = <Layer />
   }
 
   return (
