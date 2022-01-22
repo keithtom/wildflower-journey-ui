@@ -8,7 +8,8 @@ import {
   Graduation,
   Search,
   Directions,
-  Layer
+  Layer,
+  Phone
 } from '@styled-icons/boxicons-solid'
 import {
   Check,
@@ -71,6 +72,8 @@ const Icon =({
     source = <Directions />
   } else if (type === 'layer') {
     source = <Layer />
+  } else if (type === 'phone') {
+    source = <Phone />
   }
 
   return (

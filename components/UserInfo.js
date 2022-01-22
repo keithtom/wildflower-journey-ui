@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import styled from 'styled-components'
 
 import {
   Grid,
   Text,
   Button,
-  Icon
+  Icon,
+  Dialog,
+  Container
 } from './ui'
 
 const StyledUserInfo = styled.div`
@@ -40,50 +43,80 @@ const UserInfo = ({
   isFoundationLeader,
   large
 }) => {
-  return (
-    <StyledUserInfo>
-      <Grid container spacing={4}>
 
-        {(name && role && profileImage) ?
-          <Grid item>
-            <Grid container spacing={large ? 8 : 4} alignItems="center">
-              <Grid item>
-                <StyledProfileImage large={large} bg={profileImage}>
-                  {isFoundationLeader ?
-                    <StyledBadge large={large}>
-                      <Icon type="star" light size={large ? 24 : 12}/>
-                    </StyledBadge>
-                  : null}
-                </StyledProfileImage>
-              </Grid>
-              <Grid item>
-                <Grid container spacing={large ? 1 : 0} flexDirection="column">
-                  <Grid item>
-                    <Text title={large} body={!large} regular bold>{name}</Text>
-                  </Grid>
-                  <Grid item>
-                    <Text body small={!large} large={large} lightened>{role}</Text>
+  const [contactCardOpen, setContactCardOpen] = useState(false)
+
+  return (
+    <>
+      <StyledUserInfo>
+        <Grid container spacing={4}>
+
+          {(name && role && profileImage) ?
+            <Grid item>
+              <Grid container spacing={large ? 8 : 4} alignItems="center">
+                <Grid item>
+                  <StyledProfileImage large={large} bg={profileImage}>
+                    {isFoundationLeader ?
+                      <StyledBadge large={large}>
+                        <Icon type="star" light size={large ? 24 : 12}/>
+                      </StyledBadge>
+                    : null}
+                  </StyledProfileImage>
+                </Grid>
+                <Grid item>
+                  <Grid container spacing={large ? 1 : 0} flexDirection="column">
+                    <Grid item>
+                      <Text title={large} body={!large} regular bold>{name}</Text>
+                    </Grid>
+                    <Grid item>
+                      <Text body small={!large} large={large} lightened>{role}</Text>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        : null}
+          : null}
 
-        {phoneNumber ?
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={12}>
-                <Button primary lightened full>
-                  Contact {name}
-                </Button>
+          {phoneNumber ?
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Button primary lightened full onClick={() => setContactCardOpen(true)}>
+                    Contact {name}
+                  </Button>
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        : null}
+          : null}
 
-      </Grid>
-    </StyledUserInfo>
+        </Grid>
+      </StyledUserInfo>
+
+      <Dialog
+        open={contactCardOpen}
+        toggleDialog={() => setContactCardOpen(!contactCardOpen)}
+        title={`Contact ${name}`}
+      >
+        <Grid container spacing={4}>
+          <Grid item xs={12}>
+            <Text body regular lightened>Please contact members of this community within daylight hours.</Text>
+          </Grid>
+          <Grid item xs={12}>
+            <Container small>
+              <Grid container spacing={4}>
+                <Grid item>
+                  <Icon type="phone" />
+                </Grid>
+                <Grid item>
+                  <Text body regular>{phoneNumber}</Text>
+                </Grid>
+              </Grid>
+            </Container>
+          </Grid>
+        </Grid>
+      </Dialog>
+
+    </>
   )
 }
 

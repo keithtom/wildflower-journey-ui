@@ -57,7 +57,7 @@ const Dialog = ({
       onBackgroundClick={toggleDialog}
       onEscapeKeydown={toggleDialog}>
       <Content>
-        {title && <Grid mb={4}><Text lightened bold>{title}</Text></Grid>}
+        {title && <Grid mb={4}><Text body large bold>{title}</Text></Grid>}
         {children}
         <CloseContainer onClick={toggleDialog}>
           <Icon type="close" />
