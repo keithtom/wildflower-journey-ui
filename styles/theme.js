@@ -4,7 +4,7 @@ import { createGlobalStyle } from 'styled-components';
 const buffer = 4;
 const timing = '.25s';
 const easing = 'ease-in-out';
-const stroke = '#CECECE';
+const stroke = '#E1E1E2';
 const strokeDarkened = '#adadc5';
 const strokeLightened = '#E9EEEE';
 const strokeWidth = 1;
@@ -22,6 +22,9 @@ export const theme = {
     borderLight: `${strokeWidth}px solid ${strokeLightened}`,
     shadow: 'rgba(0,0,0,.05) 0 0px 16px 0px',
     maxFormWidth: 640,
+    zIndexBottom: 1,
+    zIndexMiddle: 2,
+    zIndexTop: 3
   },
   breakpoint: {
     xs: 640,
