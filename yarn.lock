@@ -1526,7 +1526,7 @@
   "resolved" "https://registry.npmjs.org/@rushstack/eslint-patch/-/eslint-patch-1.1.0.tgz"
   "version" "1.1.0"
 
-"@storybook/addon-actions@^6.4.9", "@storybook/addon-actions@6.4.9":
+"@storybook/addon-actions@^6.0.0", "@storybook/addon-actions@^6.4.9", "@storybook/addon-actions@6.4.9":
   "integrity" "sha512-L1N66p/vr+wPUBfrH3qffjNAcWSS/wvuL370T7cWxALA9LLA8yY9U2EpITc5btuCC5QOxApCeyHkFnrBhNa94g=="
   "resolved" "https://registry.npmjs.org/@storybook/addon-actions/-/addon-actions-6.4.9.tgz"
   "version" "6.4.9"
@@ -1736,7 +1736,7 @@
     "prop-types" "^15.7.2"
     "regenerator-runtime" "^0.13.7"
 
-"@storybook/addons@>=6.1.0", "@storybook/addons@6.4.9":
+"@storybook/addons@^6.0.0", "@storybook/addons@>=6.1.0", "@storybook/addons@6.4.9":
   "integrity" "sha512-y+oiN2zd+pbRWwkf6aQj4tPDFn+rQkrv7fiVoMxsYub+kKyZ3CNOuTSJH+A1A+eBL6DmzocChUyO6jvZFuh6Dg=="
   "resolved" "https://registry.npmjs.org/@storybook/addons/-/addons-6.4.9.tgz"
   "version" "6.4.9"
@@ -1885,7 +1885,7 @@
     "ts-dedent" "^2.0.0"
     "util-deprecate" "^1.0.2"
 
-"@storybook/client-api@6.4.9":
+"@storybook/client-api@^6.0.0", "@storybook/client-api@6.4.9":
   "integrity" "sha512-1IljlTr+ea2pIr6oiPhygORtccOdEb7SqaVzWDfLCHOhUnJ2Ka5UY9ADqDa35jvSSdRdynfk9Yl5/msY0yY1yg=="
   "resolved" "https://registry.npmjs.org/@storybook/client-api/-/client-api-6.4.9.tgz"
   "version" "6.4.9"
@@ -8366,7 +8366,7 @@
   "resolved" "https://registry.npmjs.org/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz"
   "version" "2.1.0"
 
-"next@>=10.2.0", "next@12.0.3":
+"next@^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0", "next@>=10.2.0", "next@12.0.3":
   "integrity" "sha512-GGdhTBcerdMZbitrO67IVetmB+AHa2X69xrkXKClUT8SRu8pEVto/2QMSnfI+uYc5czCUWPsVtVY3aMoMRMaCA=="
   "resolved" "https://registry.npmjs.org/next/-/next-12.0.3.tgz"
   "version" "12.0.3"
@@ -10895,6 +10895,13 @@
   "integrity" "sha512-iJtHSGmNgAUx0b/MCS6ASGxb//hGrHHRgzvN+K5bvkBTN7A9RTpPSf1WSp+nPGvWCJ1jRnvY7MKnuqfoi3OEqg=="
   "resolved" "https://registry.npmjs.org/store2/-/store2-2.13.1.tgz"
   "version" "2.13.1"
+
+"storybook-addon-next-router@^3.1.1":
+  "integrity" "sha512-Z14dED37vNXkN7+VY80HhF9itGReWoBAlKREHEk2By/dW7zSSqcSyXYV4bDMXIMAFYHMaA1svcBC1idVG8FhAw=="
+  "resolved" "https://registry.npmjs.org/storybook-addon-next-router/-/storybook-addon-next-router-3.1.1.tgz"
+  "version" "3.1.1"
+  dependencies:
+    "tslib" "^2.3.0"
 
 "storybook-addon-styled-component-theme@^2.0.0":
   "integrity" "sha512-y+KPFCxjIgRt/vNgKrpR0OK8jDDYFa1npU2hU57qcuRXpkvtojlTnyRSkIw1pnr/tMUJ1g//x45bDIt4KYj9/A=="

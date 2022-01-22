@@ -38,7 +38,7 @@ const StyledNavFooter = styled(Grid)`
   padding: ${({ theme }) => theme.util.buffer * 8}px;
 `;
 
-const Nav = ({}) => {
+const Nav = ({ user }) => {
   const [navOpen, setNavOpen] = useState(true)
   const router = useRouter()
 
@@ -49,14 +49,14 @@ const Nav = ({}) => {
 
         <Grid item flexDirection="column" justifyContent="flex-start">
 
-          <Link href={LoggedInUser.profileRoute}>
+          <Link href={user.profileRoute}>
             <StyledNavActions container alignItems="center" justifyContent="space-between">
               <Grid item>
                 <UserInfo
-                  name={LoggedInUser.name}
-                  role={LoggedInUser.role}
-                  profileRoute={LoggedInUser.profileRoute}
-                  profileImage={LoggedInUser.profileImage}
+                  name={user.name}
+                  role={user.role}
+                  profileRoute={user.profileRoute}
+                  profileImage={user.profileImage}
                 />
               </Grid>
               <Grid item>
@@ -100,14 +100,6 @@ const Nav = ({}) => {
 }
 
 export default Nav
-
-const LoggedInUser = {
-  name: 'Maya Whalley',
-  role: 'Teacher Leader',
-  phoneNumber: '917-123-4567',
-  profileRoute: '/user-profile',
-  profileImage: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80'
-}
 
 const Navigation = [
   {

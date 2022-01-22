@@ -19,6 +19,7 @@ Default.args = {
   schoolName: 'Brooklyn Heights Montessori',
   subtitle: 'www.brooklynheightsmontessori.com',
   address: '123 Test Avenue',
+  schoolLink: '/school-profile',
   schoolImage: BHMImage
 }
 export const Large = Template.bind({});
@@ -26,6 +27,7 @@ Large.args = {
   schoolName: 'Brooklyn Heights Montessori',
   subtitle: 'www.brooklynheightsmontessori.com',
   address: '123 Test Avenue',
+  schoolLink: '/school-profile',
   schoolImage: BHMImage,
   large: true
 }

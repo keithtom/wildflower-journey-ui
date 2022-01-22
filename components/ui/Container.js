@@ -10,7 +10,7 @@ const StyledContainer = styled.div`
     : props.theme.util.radiusLarge
   }px;
   background: ${props => props.highlight ? props.theme.color.primary.yellow.lightened
-      : props.theme.color.neutral.white
+    : props.theme.color.neutral.white
   };
   ${props => props.bgImage &&`
     background:linear-gradient(0deg, rgba(0,0,0, 0.48), rgba(0,0,0, 0.16)), url('${props.bgImage}');
@@ -21,12 +21,21 @@ const StyledContainer = styled.div`
     : props.theme.util.buffer*8
   }px;
   padding-top: ${props => props.display && props.theme.util.buffer*48}px;
+  transition: ${({ theme }) => theme.util.transition};
+  &:hover {
+    cursor: ${(props) => props.link ? 'pointer' : 'auto'};
+    background: ${(props) => (props.link && props.bgImage) ? 'auto'
+      : props.link && props.theme.color.neutral.light
+    };
+    transition: ${({ theme }) => theme.util.transition};
+  }
 `;
 
 const Container = ({
   children,
   ...rest
 }) => {
+
   return (
     <StyledContainer
       {...rest}
