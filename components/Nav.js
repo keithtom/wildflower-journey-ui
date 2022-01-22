@@ -48,6 +48,7 @@ const Nav = ({}) => {
       <Grid container style={{height: '100%'}} alignItems="space-between">
 
         <Grid item flexDirection="column" justifyContent="flex-start">
+
           <Link href={LoggedInUser.profileRoute}>
             <StyledNavActions container alignItems="center" justifyContent="space-between">
               <Grid item>
@@ -63,6 +64,7 @@ const Nav = ({}) => {
               </Grid>
             </StyledNavActions>
           </Link>
+
           <StyledNavContents container spacing={2}>
             {Navigation.map((n, i) =>
               <Grid item xs={12}>
