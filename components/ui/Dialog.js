@@ -14,6 +14,7 @@ export const DialogBackground = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: ${({ theme }) => theme.util.zIndexTop};
 `
 const Content = styled.div`
   background-color: ${({ theme }) => theme.color.neutral.white};

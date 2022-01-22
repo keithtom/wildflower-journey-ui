@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import styled from 'styled-components'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import {
   Text,
@@ -38,6 +40,7 @@ const StyledNavFooter = styled(Grid)`
 
 const Nav = ({}) => {
   const [navOpen, setNavOpen] = useState(true)
+  const router = useRouter()
 
   return (
     <StyledNav open={navOpen}>
@@ -45,22 +48,26 @@ const Nav = ({}) => {
       <Grid container style={{height: '100%'}} alignItems="space-between">
 
         <Grid item flexDirection="column" justifyContent="flex-start">
-          <StyledNavActions container alignItems="center" justifyContent="space-between">
-            <Grid item>
-              <UserInfo
-                name="Maya Whalley"
-                role="Teacher Leader"
-                profileImage="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80"
-              />
-            </Grid>
-            <Grid item>
-              <Icon type="dot-menu"/>
-            </Grid>
-          </StyledNavActions>
+          <Link href={LoggedInUser.profileRoute}>
+            <StyledNavActions container alignItems="center" justifyContent="space-between">
+              <Grid item>
+                <UserInfo
+                  name={LoggedInUser.name}
+                  role={LoggedInUser.role}
+                  profileRoute={LoggedInUser.profileRoute}
+                  profileImage={LoggedInUser.profileImage}
+                />
+              </Grid>
+              <Grid item>
+                <Icon type="dot-menu"/>
+              </Grid>
+            </StyledNavActions>
+          </Link>
           <StyledNavContents container spacing={2}>
             {Navigation.map((n, i) =>
               <Grid item xs={12}>
                 <NavItem
+                  active={n.route === router.pathname}
                   route={n.route}
                   icon={n.icon}
                   name={n.name}
@@ -92,6 +99,14 @@ const Nav = ({}) => {
 
 export default Nav
 
+const LoggedInUser = {
+  name: 'Maya Whalley',
+  role: 'Teacher Leader',
+  phoneNumber: '917-123-4567',
+  profileRoute: '/user-profile',
+  profileImage: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80'
+}
+
 const Navigation = [
   {
     name: 'Dashboard',
@@ -100,7 +115,7 @@ const Navigation = [
   },
   {
     name: 'Your School',
-    route: '/SchoolProfile',
+    route: '/school-profile',
     icon: 'graduation',
     notificationCount: 2
   },
@@ -111,13 +126,13 @@ const Navigation = [
   },
   {
     name: 'Get Advice',
-    route: '/',
+    route: '',
     icon: 'directions',
     disabled: true
   },
   {
     name: 'Resource Hub',
-    route: '/',
+    route: '',
     icon: 'layer',
     disabled: true
   },
