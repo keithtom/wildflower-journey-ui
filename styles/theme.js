@@ -24,7 +24,8 @@ export const theme = {
     maxFormWidth: 640,
     zIndexBottom: 1,
     zIndexMiddle: 2,
-    zIndexTop: 3
+    zIndexTop: 3,
+    navWidth: 320
   },
   breakpoint: {
     xs: 640,
