@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 
+import Button from './Material/Button'
+
 import Nav from '../Nav'
 
 const StyledPageContainer = styled.div`
@@ -16,7 +18,8 @@ const StyledPageContainer = styled.div`
 const PageContainer = ({ children }) => {
   return (
     <>
-      <Nav/>
+      <Nav user={user} />
+      <Button>hey!</Button>
       <StyledPageContainer>
         {children}
       </StyledPageContainer>
@@ -25,3 +28,11 @@ const PageContainer = ({ children }) => {
 }
 
 export default PageContainer
+
+const user = {
+  name: 'Maya Whalley',
+  role: 'Teacher Leader',
+  phoneNumber: '917-123-4567',
+  profileRoute: '/user-profile',
+  profileImage: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80'
+}
