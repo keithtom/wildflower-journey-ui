@@ -1,7 +1,5 @@
 import styled from 'styled-components'
 
-import Button from './Material/Button'
-
 import Nav from '../Nav'
 
 const StyledPageContainer = styled.div`
@@ -19,7 +17,6 @@ const PageContainer = ({ children }) => {
   return (
     <>
       <Nav user={user} />
-      <Button>hey!</Button>
       <StyledPageContainer>
         {children}
       </StyledPageContainer>
