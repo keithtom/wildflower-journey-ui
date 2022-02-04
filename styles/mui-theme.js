@@ -13,9 +13,27 @@ export const muiTheme = createTheme({
   components: {
     MuiButton: {
       defaultProps: {
-        disableElevation: true
+        disableElevation: true,
+        disableRipple: true
       }
-    }
+    },
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true
+      }
+    },
+    MuiPaper: {
+      defaultProps: {
+        variant: 'outlined',
+      },
+    },
+    MuiList: {
+      styleOverrides: {
+        root: {
+          padding: 0
+        }
+      }
+    },
   },
   util: {
     buffer,
