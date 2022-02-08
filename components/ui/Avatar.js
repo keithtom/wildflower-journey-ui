@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import defaultAvatar from '../../public/assets/images/profile-default.png'
+const defaultAvatar = '/assets/images/profile-default.png'
 
 const AvatarContainer = styled.div`
   height: ${props => props.small ? 24 : props.large ? 100 : 32}px;

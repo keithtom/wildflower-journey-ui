@@ -20,17 +20,14 @@ const UserProfileCard = ({
               <Grid item>
                 <UserInfo
                   large={large}
-                  name={user.name}
+                  firstName={user.firstName}
+                  lastName={user.lastName}
                   role={user.role}
                   profileImage={user.profileImage}
                 />
               </Grid>
             </Grid>
           </Grid>
-
-          {/* <Grid item>
-            <Icon type="dot-menu"/>
-          </Grid> */}
 
         </Grid>
       </Container>

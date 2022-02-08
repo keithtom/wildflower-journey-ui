@@ -7,19 +7,12 @@ import {
   Button,
   Icon,
   Dialog,
-  Container
+  Container,
+  Avatar
 } from './ui'
 
 const StyledUserInfo = styled.div`
   width: 100%;
-`;
-const StyledProfileImage = styled.div`
-  width: ${props => props.large ? props.theme.util.buffer*20 : props.theme.util.buffer*8}px;
-  height: ${props => props.large ? props.theme.util.buffer*20 : props.theme.util.buffer*8}px;
-  background-image: ${props => props.bg && `url('${props.bg}')`};
-  background-size: cover;
-  border-radius: ${({ theme }) => theme.util.radiusLarge*20}px;
-  position: relative;
 `;
 const StyledBadge = styled.div`
   position: absolute;
@@ -36,7 +29,8 @@ const StyledBadge = styled.div`
 `;
 
 const UserInfo = ({
-  name,
+  firstName,
+  lastName,
   role,
   profileImage,
   phoneNumber,
@@ -51,22 +45,22 @@ const UserInfo = ({
       <StyledUserInfo>
         <Grid container spacing={4}>
 
-          {(name && role && profileImage) ?
+          {(firstName && lastName) ?
             <Grid item>
               <Grid container spacing={large ? 8 : 4} alignItems="center">
                 <Grid item>
-                  <StyledProfileImage large={large} bg={profileImage}>
+                  <Avatar large={large} img={profileImage ? profileImage : null}>
                     {isFoundationLeader ?
                       <StyledBadge large={large}>
                         <Icon type="star" light size={large ? 24 : 12}/>
                       </StyledBadge>
                     : null}
-                  </StyledProfileImage>
+                  </Avatar>
                 </Grid>
                 <Grid item>
                   <Grid container spacing={large ? 1 : 0} flexDirection="column">
                     <Grid item>
-                      <Text title={large} body={!large} regular bold>{name}</Text>
+                      <Text title={large} body={!large} regular bold>{firstName} {lastName}</Text>
                     </Grid>
                     <Grid item>
                       <Text body small={!large} large={large} lightened>{role}</Text>
@@ -82,7 +76,7 @@ const UserInfo = ({
               <Grid container>
                 <Grid item xs={12}>
                   <Button primary lightened full onClick={() => setContactCardOpen(true)}>
-                    Contact {name}
+                    Contact {firstName}
                   </Button>
                 </Grid>
               </Grid>
@@ -95,7 +89,7 @@ const UserInfo = ({
       <Dialog
         open={contactCardOpen}
         toggleDialog={() => setContactCardOpen(!contactCardOpen)}
-        title={`Contact ${name}`}
+        title={`Contact ${firstName}`}
       >
         <Grid container spacing={4}>
           <Grid item xs={12}>

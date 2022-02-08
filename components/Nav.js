@@ -6,7 +6,8 @@ import { useRouter } from 'next/router'
 import {
   Text,
   Grid,
-  Icon
+  Icon,
+  ConditionalLink
 } from './ui'
 import UserInfo from '../components/UserInfo'
 import NavItem from '../components/NavItem'
@@ -49,11 +50,12 @@ const Nav = ({ user }) => {
 
         <Grid item flexDirection="column" justifyContent="flex-start">
 
-          <Link href={user.profileRoute}>
+          <ConditionalLink href={user.profileRoute}>
             <StyledNavActions container alignItems="center" justifyContent="space-between">
               <Grid item>
                 <UserInfo
-                  name={user.name}
+                  firstName={user.firstName}
+                  lastName={user.lastName}
                   role={user.role}
                   profileRoute={user.profileRoute}
                   profileImage={user.profileImage}
@@ -63,7 +65,7 @@ const Nav = ({ user }) => {
                 <Icon type="dot-menu"/>
               </Grid>
             </StyledNavActions>
-          </Link>
+          </ConditionalLink>
 
           <StyledNavContents container spacing={2}>
             {Navigation.map((n, i) =>
