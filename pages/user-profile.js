@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import Head from 'next/head'
+import { useApi } from '../hooks/api'
 
 import UserProfileCard from '../components/UserProfileCard'
 import UserInfo from '../components/UserInfo'
@@ -13,6 +15,24 @@ import {
 } from '../components/ui'
 
 const UserProfile = ({}) => {
+  const [isEditing, setIsEditing] = useState(false)
+  const [isSavingChanges, setIsSavingChanges] = useState(false)
+  const { editProfile } = useApi()
+
+  const handleSaveProfileChanges = async () => {
+    setIsSavingChanges(true)
+    try {
+      await editProfile({ userId: '', data: '' })
+      console.log('editing worked')
+      setIsEditing(false)
+      setIsSavingChanges(false)
+    } catch(error) {
+      console.log('editing failed')
+      alert("Oops! Something went wrong. Please try again in a few minutes.")
+      setIsSavingChanges(false)
+    }
+  }
+
   return (
     <>
       <Head>
