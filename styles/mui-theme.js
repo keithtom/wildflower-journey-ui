@@ -26,6 +26,12 @@ export const muiTheme = createTheme({
       defaultProps: {
         variant: 'outlined',
       },
+      styleOverrides: {
+        root: {
+          marginTop: '8px',
+          border: '1px solid #eaeaea',
+        }
+      }
     },
     MuiList: {
       styleOverrides: {
@@ -34,6 +40,15 @@ export const muiTheme = createTheme({
         }
       }
     },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            background: '#f1f1f3'
+          }
+        }
+      }
+    }
   },
   util: {
     buffer,
