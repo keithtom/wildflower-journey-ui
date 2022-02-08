@@ -30,5 +30,6 @@ const user = {
   "email": "laurinda_lockman@spencer-hickle.io",
   "firstName": "Barney",
   "lastName": "Wunsch",
-  "phone": null
+  "phone": null,
+  "profileRoute": "/user-profile"
 }

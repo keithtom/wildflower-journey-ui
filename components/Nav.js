@@ -43,6 +43,8 @@ const Nav = ({ user }) => {
   const [navOpen, setNavOpen] = useState(true)
   const router = useRouter()
 
+  console.log({user})
+
   return (
     <StyledNav open={navOpen}>
 
@@ -50,7 +52,7 @@ const Nav = ({ user }) => {
 
         <Grid item flexDirection="column" justifyContent="flex-start">
 
-          <ConditionalLink href={user.profileRoute}>
+          <ConditionalLink linkUrl={user.profileRoute}>
             <StyledNavActions container alignItems="center" justifyContent="space-between">
               <Grid item>
                 <UserInfo
