@@ -1,4 +1,4 @@
-import { default as FormControl } from '@mui/material/FormControl';
+import { default as MaterialFormControl } from '@mui/material/FormControl';
 import { default as MaterialMenuItem } from '@mui/material/MenuItem';
 import { default as MaterialSelect } from '@mui/material/Select';
 import { default as MaterialInputBase} from '@mui/material/InputBase';
@@ -7,24 +7,32 @@ import { styled } from '@mui/material/styles';
 import {
   Text
 } from '../index'
-import { Paper } from '@mui/material';
+
 
 const CustomDropdown = styled(MaterialSelect)(({ theme }) => `
-  width: '100%';
-  &.MuiInputBase-root {
-    border: ${({ theme })  => theme.util.borderLight};
-    border-radius: ${theme.util.radius * 2}px;
-    &:hover {
-      border: ${({ theme }) => theme.util.border};
-    }
-    &.Mui-focused {
-      border: none;
-    }
-  };
-`
+    width: '100%';
+    &.MuiInputBase-root {
+      .MuiOutlinedInput-notchedOutline {
+        display: none;
+      }
+      border-radius: ${theme.util.radius * 2}px;
+      border: ${theme.util.borderLight};
+      transition: ${theme.util.transition};
+      &:hover {
+        border: ${theme.util.border};
+        transition: ${theme.util.transition}
+      }
+      .MuiSelect-select {
+        padding: ${theme.util.buffer * 4}px;
+      }
+    };
+    /* .testing {
+      margin-top: 20px;
+    } */
+  `
 )
 const CustomMenuItem = styled(MaterialMenuItem)(({ theme }) => `
-    padding: ${({ theme }) => theme.util.buffer * 3}px;
+    padding: ${({ theme }) => theme.util.buffer * 4}px;
     &:last-child {
       border-bottom: 0;
     }
@@ -43,7 +51,7 @@ export const Dropdown = ({
 }) => {
 
   return (
-    <FormControl fullWidth>
+    <MaterialFormControl fullWidth>
       <CustomDropdown
         id={id}
         value={value}
@@ -56,10 +64,15 @@ export const Dropdown = ({
           return selected.join(', ');
         }}
         {...props}
+        MenuProps={{
+          classes: {
+            paper: 'testing'
+          }
+        }}
       >
         {children}
       </CustomDropdown>
-    </FormControl>
+    </MaterialFormControl>
   )
 }
 
