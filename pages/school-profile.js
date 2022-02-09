@@ -79,7 +79,8 @@ const SchoolProfile = () => {
                       </Grid>
                       <Grid item xs={12}>
                         <UserInfo
-                          name={schoolDetails.contactMember.name}
+                          firstName={schoolDetails.contactMember.firstName}
+                          lastName={schoolDetails.contactMember.lastName}
                           role={schoolDetails.contactMember.role}
                           profileImage={schoolDetails.contactMember.profileImage}
                           phoneNumber={schoolDetails.contactMember.phoneNumber}
@@ -152,7 +153,8 @@ const schoolDetails = {
     }
   ],
   contactMember: {
-    name: 'Maya Walley',
+    firstName: 'Maya',
+    lastName: 'Walley',
     role: 'Teacher Leader',
     profileImage: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80',
     phoneNumber: '(917) 123-4567'
