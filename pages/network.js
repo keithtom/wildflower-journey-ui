@@ -56,13 +56,13 @@ const SearchPage = ({}) => {
 
         <Grid container p={3} spacing={3}>
 
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={4}>
             <Card>
               <CardContent>
                 <FormControl fullWidth>
                   <Stack spacing={2}>
 
-                    <Typography>Filter</Typography>
+                    <Typography variant="h6">Filter</Typography>
 
                     <Divider />
 
@@ -115,10 +115,10 @@ const SearchPage = ({}) => {
             </Card>
           </Grid>
 
-          <Grid item xs={12} sm={9}>
+          <Grid item xs={12} sm={8}>
             {category === 'people' ?
               <Stack spacing={3}>
-                <Typography>{people.length} Results</Typography>
+                <Typography variant="h6">{people.length} Results</Typography>
                 <Stack spacing={1}>
                   {people.map((p, i) =>
                     <Card>
@@ -152,7 +152,7 @@ const SearchPage = ({}) => {
               </Stack>
             :
               <Stack spacing={3}>
-                <Typography>{schools.length} Results</Typography>
+                <Typography variant="h6">{schools.length} Results</Typography>
                 <Stack spacing={1}>
                   {schools.map((p, i) =>
                     <Card>
