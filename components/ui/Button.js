@@ -1,52 +1,38 @@
-import styled from 'styled-components'
+import { default as MaterialButton } from '@mui/material/Button';
+import { styled } from '@mui/material/styles';
 
-const StyledButton = styled.button`
-  border: none;
-  font-size: ${({ theme }) => theme.text.body.regular.size}px;
-  line-height: ${({ theme }) => theme.text.body.regular.lineHeight}px;
-  min-width: ${({ theme }) => theme.util.buffer*48}px;
-  border-radius: ${({ theme }) => theme.util.buffer*2}px;
-  padding: ${({ theme }) => theme.util.buffer*3}px ${({ theme }) => theme.util.buffer*8}px;
-  transition: ${({ theme }) => theme.util.transition};
-  width: ${props => props.full && '100%'};
-  background-color: ${props => props.lightened ? props.theme.color.primary.purple.lightened
-    : props.disabled ? props.theme.color.neutral.light
-      : props.theme.color.primary.purple.main
+const CustomButton = styled(MaterialButton)(
+  ({
+    primary,
+    outline,
+    theme
+  }) => `
+  padding: ${theme.util.buffer*2}px ${theme.util.buffer*4}px;
+  background-color: ${
+    primary ? theme.color.primary.purple.main
+    : outline ? theme.color.bg.light
+    : theme.color.primary.purple.lightened
   };
-  color: ${props => props.lightened ? props.theme.color.primary.purple.main
-    : props.disabled ? props.theme.color.text.lightened
-      : props.theme.color.text.light
+  color: ${
+    primary ? theme.color.text.light
+    : theme.color.primary.purple.main
   };
-  &:hover {
-    cursor: ${props => props.disabled ? 'auto' : 'pointer'};
+  text-transform: none;
 
-    background-color: ${props => props.lightened ? props.theme.color.primary.purple.main
-      : props.disabled ? props.theme.color.neutral.light
-        : props.theme.color.primary.purple.main
-    };
-    color: ${props => props.lightened ? props.theme.color.text.light
-      : props.disabled ? props.theme.color.text.lightened
-        : props.theme.color.text.light
-    };
+  :hover {
+    background-color: ${theme.color.primary.purple.lightened};
+    color: ${theme.color.primary.purple.main};
   }
+`,
+)
 
-`;
-
-const Button = ({
+export default function Button({
   children,
-  full,
-  onClick,
-  ...rest
-}) => {
+  ...props
+}) {
   return (
-    <StyledButton
-      full={full}
-      onClick={onClick}
-      {...rest}
-    >
-      {children}
-    </StyledButton>
-  )
+    <CustomButton
+      {...props}
+    >{children}</CustomButton>
+  );
 }
-
-export default Button

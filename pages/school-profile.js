@@ -1,15 +1,6 @@
 import Head from 'next/head'
 
-import UserInfo from '../components/UserInfo'
-import UserProfileCard from '../components/UserProfileCard'
-import SchoolProfileCard from '../components/SchoolProfileCard'
-import {
-  MaxWidth,
-  Container,
-  Text,
-  PageContainer,
-  Grid
-} from '../components/ui'
+import PageContainer from '../components/ui/PageContainer'
 
 const SchoolProfile = () => {
   return (
@@ -26,7 +17,7 @@ const SchoolProfile = () => {
 
       <PageContainer>
 
-        <MaxWidth>
+        {/* <MaxWidth>
 
           <Grid container spacing={12}>
 
@@ -105,13 +96,13 @@ const SchoolProfile = () => {
                     <UserProfileCard
                       user={m}
                     />
-                    {/* <Container full>
+                    <Container full>
                       <UserInfo
                         name={m.name}
                         role={m.role}
                         profileImage={m.profileImage}
                       />
-                    </Container> */}
+                    </Container>
                   </Grid>
                 )}
               </Grid>
@@ -119,7 +110,7 @@ const SchoolProfile = () => {
 
           </Grid>
 
-        </MaxWidth>
+        </MaxWidth> */}
 
       </PageContainer>
 

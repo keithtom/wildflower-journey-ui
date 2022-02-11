@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles';
 
 import {
   Text
-} from '../index'
+} from '../ui/index'
 
 
 const CustomDropdown = styled(MaterialSelect)(({ theme }) => `
