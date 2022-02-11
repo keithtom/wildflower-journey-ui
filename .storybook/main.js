@@ -8,5 +8,8 @@ module.exports = {
     "@storybook/addon-essentials",
     "storybook-addon-next-router"
   ],
-  "framework": "@storybook/react"
+  "framework": "@storybook/react",
+  "features": { 
+    "emotionAlias": false 
+  }
 }
