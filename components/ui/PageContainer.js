@@ -1,4 +1,6 @@
-import Box from '@mui/material/Box'
+import {
+  Box
+} from '@mui/material'
 
 import Nav from './Nav'
 
@@ -11,7 +13,8 @@ const PageContainer = ({ children }) => {
     <Box
       component="main"
       sx={{
-        flexGrow: 1
+        flexGrow: 1,
+        paddingTop: 8
       }}
     >
       {children}

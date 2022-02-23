@@ -1,5 +1,9 @@
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useMediaQuery } from 'react-responsive'
+
+import { theme } from '../../styles/theme'
 
 import {
   Drawer,
@@ -9,70 +13,113 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Avatar
+  Avatar,
+  AppBar,
+  IconButton,
+  Typography
 } from '@mui/material'
 import {
  PeopleAlt,
- MeetingRoom
+ MeetingRoom,
+ MenuOutlined
 } from '@mui/icons-material'
 
 import { styled } from '@mui/material/styles'
 
+const drawerWidth = 240
+
 const Nav = ({}) => {
+  const [navOpen, setNavOpen] = useState(false)
   const router = useRouter()
 
+  const isSm = useMediaQuery(
+    { maxDeviceWidth: theme.breakpoint.sm },
+  )
+
   return (
-    <Drawer
-      sx={{
-        width: 240,
-        '& .MuiDrawer-paper': {
-          width: 240
-        }
-      }}
-      variant="permanent"
-      anchor="left"
-    >
+    <>
+      <AppBar
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+        }}
+      >
+        <Toolbar>
+          {isSm ?
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={() => setNavOpen(true)}
+            >
+              <MenuOutlined />
+            </IconButton>
+          :
+            <Typography variant="h6" noWrap>
+              {router.pathname === '/network' ? 'Network'
+                : router.pathname === '/user-profile' ? 'Your Profile'
+                  : router.pathname === '/school-profile' ? 'Your School'
+                    : null
+              }
+            </Typography>
+          }
+        </Toolbar>
+      </AppBar>
 
-      <List>
-        <Link href="/user-profile">
-          <ListItem button selected={'/user-profile' === router.pathname}>
-            <ListItemIcon>
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32
-                }}
-                src={user.profileImage}
-              />
-            </ListItemIcon>
-            <ListItemText primary={`${user.firstName} ${user.lastName}`} />
-          </ListItem>
-        </Link>
-      </List>
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth
+          }
+        }}
+        variant={isSm ? `temporary` : `permanent`}
+        anchor="left"
+        open={navOpen}
+        onClose={() => setNavOpen(!navOpen)}
+      >
 
-      <Divider />
+        <List>
+          <Link href="/user-profile">
+            <ListItem button selected={'/user-profile' === router.pathname}>
+              <ListItemIcon>
+                <Avatar
+                  sx={{
+                    width: 32,
+                    height: 32
+                  }}
+                  src={user.profileImage}
+                />
+              </ListItemIcon>
+              <ListItemText primary={`${user.firstName} ${user.lastName}`} />
+            </ListItem>
+          </Link>
+        </List>
 
-      <List>
-        <Link href="/network">
-          <ListItem button selected={'/network' === router.pathname}>
-            <ListItemIcon>
-              <PeopleAlt />
-            </ListItemIcon>
-            <ListItemText primary='Network' />
-          </ListItem>
-        </Link>
+        <Divider />
 
-        <Link href="/school-profile">
-          <ListItem button selected={'/school-profile' === router.pathname}>
-            <ListItemIcon>
-              <MeetingRoom />
-            </ListItemIcon>
-            <ListItemText primary='Your School' />
-          </ListItem>
-        </Link>
-      </List>
+        <List>
+          <Link href="/network">
+            <ListItem button selected={'/network' === router.pathname}>
+              <ListItemIcon>
+                <PeopleAlt />
+              </ListItemIcon>
+              <ListItemText primary='Network' />
+            </ListItem>
+          </Link>
 
-    </Drawer>
+          <Link href="/school-profile">
+            <ListItem button selected={'/school-profile' === router.pathname}>
+              <ListItemIcon>
+                <MeetingRoom />
+              </ListItemIcon>
+              <ListItemText primary='Your School' />
+            </ListItem>
+          </Link>
+        </List>
+
+      </Drawer>
+    </>
   )
 }
 

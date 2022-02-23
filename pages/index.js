@@ -19,7 +19,6 @@ export default function Home() {
       <PageContainer>
         <h1>Welcome to Wildflower Schools</h1>
       </PageContainer>
-
     </>
   )
 }
