@@ -1,17 +1,30 @@
+import { useState } from 'react'
 import Head from 'next/head'
 
-import UserInfo from '../components/UserInfo'
-import UserProfileCard from '../components/UserProfileCard'
-import SchoolProfileCard from '../components/SchoolProfileCard'
 import {
-  MaxWidth,
-  Container,
-  Text,
-  PageContainer,
-  Grid
-} from '../components/ui'
+  Box,
+  Divider,
+  Grid,
+  Card,
+  CardContent,
+  Stack,
+  Typography,
+  Avatar,
+  Chip,
+  Button,
+  ToggleButton,
+  Modal,
+  Paper
+} from '@mui/material'
+import {
+  Close
+ } from '@mui/icons-material'
 
-const SchoolProfile = () => {
+import PageContainer from '../components/ui/PageContainer'
+
+const SchoolProfile = ({}) => {
+  const [contactModalOpen, setContactModalOpen] = useState(false)
+
   return (
     <>
       <Head>
@@ -26,100 +39,163 @@ const SchoolProfile = () => {
 
       <PageContainer>
 
-        <MaxWidth>
-
-          <Grid container spacing={12}>
-
-            <Grid item xs={12}>
-              <SchoolProfileCard
-                large
-                schoolName="Brooklyn Heights Montessori"
-                subtitle="brooklynheightsmontessori.com"
-                address="93 Pierrepont Street, Brooklyn, NY 11201"
-              />
+        <Box
+          sx={{
+            width: 1,
+            paddingTop: 20,
+            background: '#fafafa'
+          }}
+        >
+          <Grid container p={3} alignItems="center" spacing={3}>
+            <Grid item>
+              <Typography variant="h3">Brooklyn Heights Montessori</Typography>
             </Grid>
+          </Grid>
+          <Divider />
+        </Box>
 
-            <Grid item xs={12} md={5}>
-              <Container>
-                <Grid container spacing={6}>
-
-                  <Grid item xs={12}>
-                    <Grid container spacing={4}>
-                      <Grid item>
-                        <Text title small bold>About</Text>
-                      </Grid>
-                      <Grid item>
-                        <Text body regular>Brooklyn Heights Montessori is a welcoming and supportive community of passionate parents who sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</Text>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Grid container spacing={2}>
-
-                      {schoolDetails.attributes.map((s, i) =>
-                        <Grid item xs={12} key={i}>
-                          <Grid container>
-                            <Grid item xs={6}>
-                              <Text body small bold>{s.title}</Text>
+        <Grid container p={3} spacing={3}>
+          <Grid item xs={12} sm={4}>
+            <Card>
+              <CardContent>
+                <Stack spacing={3}>
+                  <Stack spacing={1}>
+                    <Typography variant="h6">About</Typography>
+                    <Typography>{schoolDetails.description}</Typography>
+                  </Stack>
+                  <Stack spacing={1}>
+                    <Grid container>
+                      {schoolDetails.attributes.map((a, i) =>
+                        <Grid item xs={12}>
+                          <Grid container alignItems="center">
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="overline">{a.title}</Typography>
                             </Grid>
-                            <Grid item xs={6}>
-                              <Text body small lightened>{s.value}</Text>
+                            <Grid item xs={12} sm={6}>
+                              <Typography>{a.value}</Typography>
                             </Grid>
                           </Grid>
                         </Grid>
                       )}
                     </Grid>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Grid container spacing={4}>
-                      <Grid item>
-                        <Text title small bold>Contact</Text>
+                  </Stack>
+                  <Stack spacing={1}>
+                    <Typography variant="h6">Contact</Typography>
+                    <Box>
+                      <Grid container alignItems="center" spacing={2}>
+                        <Grid item>
+                          <Avatar
+                            sx={{
+                              width: 32,
+                              height: 32
+                            }}
+                            src={schoolDetails.contactMember.profileImage}
+                          />
+                        </Grid>
+                        <Grid item>
+                          <Typography>{schoolDetails.contactMember.firstName} {schoolDetails.contactMember.lastName}</Typography>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12}>
-                        <UserInfo
-                          firstName={schoolDetails.contactMember.firstName}
-                          lastName={schoolDetails.contactMember.lastName}
-                          role={schoolDetails.contactMember.role}
-                          profileImage={schoolDetails.contactMember.profileImage}
-                          phoneNumber={schoolDetails.contactMember.phoneNumber}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                </Grid>
-              </Container>
-            </Grid>
-
-            <Grid item xs={12} md={7}>
-              <Grid container mb={8}>
-                <Grid item>
-                  <Text title small bold>{members.length} Members</Text>
-                </Grid>
-              </Grid>
-              <Grid container spacing={4}>
-                {members.map((m, i) =>
-                  <Grid item xs={12} key={i}>
-                    <UserProfileCard
-                      user={m}
-                    />
-                    {/* <Container full>
-                      <UserInfo
-                        name={m.name}
-                        role={m.role}
-                        profileImage={m.profileImage}
-                      />
-                    </Container> */}
-                  </Grid>
-                )}
-              </Grid>
-            </Grid>
-
+                    </Box>
+                    <Button
+                      variant="contained"
+                      onClick={() => setContactModalOpen(true)}
+                    >
+                      Contact {schoolDetails.contactMember.firstName}
+                    </Button>
+                  </Stack>
+                </Stack>
+              </CardContent>
+            </Card>
           </Grid>
 
-        </MaxWidth>
+          <Grid item xs={12} sm={8}>
+            <Stack spacing={3}>
+              <Typography variant="h6">{people.length} Members</Typography>
+              <Stack spacing={1}>
+                {people.map((p, i) =>
+                 <Card>
+                    <CardContent>
+                      <Grid container justifyContent="space-between" alignItems="center">
+                        <Grid item>
+                          <Grid container alignItems="center" spacing={2}>
+                            <Grid item>
+                              <Avatar sx={{
+                                width: 32,
+                                height: 32
+                              }} />
+                            </Grid>
+                            <Grid item>
+                              <Typography>{p.attributes.firstName} {p.attributes.lastName}</Typography>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                        <Grid item>
+                          <Grid container alignItems="center" spacing={2}>
+                            <Grid item>
+                              <Chip label="Finance" />
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                )}
+              </Stack>
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <Modal
+          open={contactModalOpen}
+          onClose={() => setContactModalOpen(false)}
+        >
+          <Card
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+            }}
+          >
+            <CardContent>
+              <Stack spacing={1}>
+                <Grid container alignItems="center" justifyContent="space-between">
+                  <Grid item>
+                    <Typography variant="h6">Contact {schoolDetails.contactMember.firstName} {schoolDetails.contactMember.lastName}</Typography>
+                  </Grid>
+                  <Grid item>
+                    <ToggleButton
+                      size="small"
+                      onChange={() => setContactModalOpen(!contactModalOpen)}
+                    >
+                      <Close />
+                    </ToggleButton>
+                  </Grid>
+                </Grid>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 1,
+                    background: '#fafafa'
+                  }}
+                >
+                  <Typography>{schoolDetails.contactMember.email}</Typography>
+                </Paper>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 1,
+                    background: '#fafafa'
+                  }}
+                >
+                  <Typography>{schoolDetails.contactMember.phoneNumber}</Typography>
+                </Paper>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Modal>
 
       </PageContainer>
 
@@ -130,6 +206,7 @@ const SchoolProfile = () => {
 export default SchoolProfile
 
 const schoolDetails = {
+  description: 'Brooklyn Heights Montessori is a welcoming and supportive community of passionate parents who sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
   attributes: [
     {
       title: 'Governance',
@@ -153,38 +230,19 @@ const schoolDetails = {
     }
   ],
   contactMember: {
-    firstName: 'Maya',
-    lastName: 'Walley',
-    role: 'Teacher Leader',
+    email: "laurinda_lockman@spencer-hickle.io",
+    firstName: "Maya",
+    lastName: "Walley",
     profileImage: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80',
-    phoneNumber: '(917) 123-4567'
+    phoneNumber: '(917) 123-4567',
+    location: 'New York City',
+    skills: [
+      'Finance',
+      'Home Schooling',
+      'Real Estate'
+    ],
+    bio: 'Hi there! I decided to pursue being a teacher leader 3 years ago when my son needed to sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. '
   }
 }
 
-const members = [
-  {
-    name: 'Joey Aaronson',
-    role: 'Teacher Leader',
-    profileImage: 'https://images.unsplash.com/photo-1619895862022-09114b41f16f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80'
-  },
-  {
-    name: 'Michael Davidson',
-    role: 'Teacher Leader',
-    profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3000&q=80'
-  },
-  {
-    name: 'Sara Piper',
-    role: 'Teacher Leader',
-    profileImage: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80'
-  },
-  {
-    name: 'Johnathan Wang',
-    role: 'Member',
-    profileImage: 'https://images.unsplash.com/photo-1487309078313-fad80c3ec1e5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1635&q=80'
-  },
-  {
-    name: 'Kimberly St.Cloud',
-    role: 'Member',
-    profileImage: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80'
-  },
-]
+const people = [{"id":"2601-8f69","type":"person","attributes":{"email":"noel_trantow@homenick.net","firstName":"Jaimee","lastName":"Gleichner","phone":null},"relationships":{"schools":{"data":[]},"roles":{"data":[]},"skills":{"data":[]},"experiences":{"data":[]},"address":{"data":null}}},{"id":"9acf-aef7","type":"person","attributes":{"email":"georgina_grant@schumm.info","firstName":"Pete","lastName":"Stiedemann","phone":null},"relationships":{"schools":{"data":[]},"roles":{"data":[]},"skills":{"data":[]},"experiences":{"data":[]},"address":{"data":null}}},{"id":"490f-89d5","type":"person","attributes":{"email":"robt@ledner.net","firstName":"Flossie","lastName":"Bashirian","phone":null},"relationships":{"schools":{"data":[]},"roles":{"data":[]},"skills":{"data":[]},"experiences":{"data":[]},"address":{"data":null}}},{"id":"4864-6bf1","type":"person","attributes":{"email":"dorsey.hand@fay-pfannerstill.net","firstName":"June","lastName":"Hegmann","phone":null},"relationships":{"schools":{"data":[{"id":"1","type":"school"}]},"roles":{"data":[{"id":"1","type":"role"}]},"skills":{"data":[{"id":"1","type":"skill"},{"id":"2","type":"skill"}]},"experiences":{"data":[{"id":"1","type":"experience"}]},"address":{"data":{"id":"3","type":"address"}}}},{"id":"2b1f-190a","type":"person","attributes":{"email":"hoyt@ortiz.org","firstName":"Phil","lastName":"Batz","phone":null},"relationships":{"schools":{"data":[]},"roles":{"data":[{"id":"2","type":"role"}]},"skills":{"data":[{"id":"3","type":"skill"}]},"experiences":{"data":[]},"address":{"data":null}}},{"id":"9d7e-32ec","type":"person","attributes":{"email":"laurinda_lockman@spencer-hickle.io","firstName":"Barney","lastName":"Wunsch","phone":null},"relationships":{"schools":{"data":[]},"roles":{"data":[]},"skills":{"data":[]},"experiences":{"data":[]},"address":{"data":null}}}]

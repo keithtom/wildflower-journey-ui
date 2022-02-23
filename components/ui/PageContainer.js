@@ -1,35 +1,23 @@
-import styled from 'styled-components'
+import Box from '@mui/material/Box'
 
-import Nav from '../Nav'
-
-const StyledPageContainer = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: ${({ theme }) => theme.util.navWidth}px;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  padding: ${({ theme }) => theme.util.buffer*12}px;
-`
+import Nav from './Nav'
 
 const PageContainer = ({ children }) => {
   return (
-    <>
-      <Nav user={user} />
-      <StyledPageContainer>
-        {children}
-      </StyledPageContainer>
-    </>
+    <Box sx={{
+      display: 'flex'
+    }}>
+    <Nav />
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1
+      }}
+    >
+      {children}
+    </Box>
+    </Box>
   )
 }
 
 export default PageContainer
-
-const user = {
-  "email": "laurinda_lockman@spencer-hickle.io",
-  "firstName": "Barney",
-  "lastName": "Wunsch",
-  "phone": null,
-  "profileRoute": "/user-profile"
-}
