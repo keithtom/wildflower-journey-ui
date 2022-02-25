@@ -6,9 +6,9 @@ const CustomRadio = styled(MaterialRadio)(({ theme }) => ({
   },
 }));
 
-const Radio = ({ ...props }) => {
+const Radio = ({ ...rest }) => {
   return (
-    <CustomRadio defaultChecked {...props} />
+    <CustomRadio defaultChecked {...rest} />
   );
 }
 

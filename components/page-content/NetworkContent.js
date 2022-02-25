@@ -2,25 +2,24 @@ import { useState } from 'react'
 
 import { schools, people } from '@lib/utils/fake-data'
 import {
-  Divider,
-  Grid,
-  Card,
-  CardContent,
-  Stack,
-  Typography,
   RadioGroup,
   FormControlLabel,
   FormControl,
   FormGroup,
   FormLabel,
-  Select,
   MenuItem,
   TextField,
   InputAdornment
 } from '@mui/material'
 import {
+  Divider,
+  Stack,
+  Typography,
   Radio,
-  Checkbox
+  Select,
+  Checkbox,
+  Grid,
+  Card,
 } from '@ui'
 import {
   Search
@@ -51,62 +50,60 @@ const NetworkContent = () => {
 
       <Grid item xs={12} sm={4}>
         <Card>
-          <CardContent>
-            <FormControl fullWidth>
-              <Stack spacing={2}>
+          <FormControl fullWidth>
+            <Stack spacing={2}>
 
-                <Typography variant="h6">Filter</Typography>
+              <Typography variant="h6">Filter</Typography>
 
-                <Divider />
+              <Divider />
 
-                <RadioGroup
-                  value={category}
-                  onChange={handleCategoryChange}
-                >
-                  <FormControlLabel value="people" control={<Radio />} label="People" />
-                  <FormControlLabel value="schools" control={<Radio />} label="Schools" />
-                </RadioGroup>
+              <RadioGroup
+                value={category}
+                onChange={handleCategoryChange}
+              >
+                <FormControlLabel value="people" control={<Radio />} label="People" />
+                <FormControlLabel value="schools" control={<Radio />} label="Schools" />
+              </RadioGroup>
 
-                <Divider />
+              <Divider />
 
-                <FormLabel>Role</FormLabel>
-                <FormGroup>
-                  <FormControlLabel value="teacher-leader" control={<Checkbox />} label="Teacher Leader" />
-                  <FormControlLabel value="hub-member" control={<Checkbox />} label="Hub Member" />
-                  <FormControlLabel value="foundation-partner" control={<Checkbox />} label="Foundation Partner" />
-                  <FormControlLabel value="operations-guide" control={<Checkbox />} label="Operations Guide" />
-                  <FormControlLabel value="board-member" control={<Checkbox />} label="Board Member" />
-                </FormGroup>
+              <FormLabel>Role</FormLabel>
+              <FormGroup>
+                <FormControlLabel value="teacher-leader" control={<Checkbox />} label="Teacher Leader" />
+                <FormControlLabel value="hub-member" control={<Checkbox />} label="Hub Member" />
+                <FormControlLabel value="foundation-partner" control={<Checkbox />} label="Foundation Partner" />
+                <FormControlLabel value="operations-guide" control={<Checkbox />} label="Operations Guide" />
+                <FormControlLabel value="board-member" control={<Checkbox />} label="Board Member" />
+              </FormGroup>
 
-                <Divider />
+              <Divider />
 
-                <FormLabel>Skills</FormLabel>
-                <FormGroup>
-                  <FormControlLabel value="accounting" control={<Checkbox />} label="Accounting" />
-                  <FormControlLabel value="branding" control={<Checkbox />} label="Branding" />
-                  <FormControlLabel value="construction" control={<Checkbox />} label="Construction" />
-                  <FormControlLabel value="development" control={<Checkbox />} label="Development" />
-                </FormGroup>
+              <FormLabel>Skills</FormLabel>
+              <FormGroup>
+                <FormControlLabel value="accounting" control={<Checkbox />} label="Accounting" />
+                <FormControlLabel value="branding" control={<Checkbox />} label="Branding" />
+                <FormControlLabel value="construction" control={<Checkbox />} label="Construction" />
+                <FormControlLabel value="development" control={<Checkbox />} label="Development" />
+              </FormGroup>
 
-                <Divider />
+              <Divider />
 
-                <FormLabel>Hub</FormLabel>
-                <Select>
-                  <MenuItem value="NY">New York</MenuItem>
-                  <MenuItem value="MA">Massachusetts</MenuItem>
-                </Select>
+              <FormLabel>Hub</FormLabel>
+              <Select>
+                <MenuItem value="NY">New York</MenuItem>
+                <MenuItem value="MA">Massachusetts</MenuItem>
+              </Select>
 
-                <Divider />
+              <Divider />
 
-                <FormLabel>Distance</FormLabel>
-                <Select>
-                  <MenuItem value="5">Within 5 miles</MenuItem>
-                  <MenuItem value="10">Within 10 miles</MenuItem>
-                </Select>
+              <FormLabel>Distance</FormLabel>
+              <Select>
+                <MenuItem value="5">Within 5 miles</MenuItem>
+                <MenuItem value="10">Within 10 miles</MenuItem>
+              </Select>
 
-              </Stack>
-            </FormControl>
-          </CardContent>
+            </Stack>
+          </FormControl>
         </Card>
       </Grid>
 

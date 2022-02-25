@@ -1,13 +1,12 @@
 import {
-  Grid,
-  Stack,
-  Typography,
-} from '@mui/material'
-
-import {
   schoolDetails,
   people
 } from '@lib/utils/fake-data'
+import{
+  Grid,
+  Stack,
+  Typography
+} from '@ui'
 import DirectoryHero from '@components/DirectoryHero'
 import SchoolProfileSummary from '@components/SchoolProfileSummary'
 import UserResultItem from '@components/UserResultItem'

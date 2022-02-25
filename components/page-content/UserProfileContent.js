@@ -2,7 +2,7 @@ import {
   Grid,
   Stack,
   Typography
-} from '@mui/material'
+} from '@ui'
 import DirectoryHero from '@components/DirectoryHero'
 import UserProfileSummary from '@components/UserProfileSummary'
 import SchoolResultItem from '@components/SchoolResultItem'

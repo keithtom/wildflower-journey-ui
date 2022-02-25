@@ -4,9 +4,9 @@ import { styled } from '@mui/material/styles';
 const CustomChip = styled(MaterialChip)(({ theme }) => ({
 }));
 
-const Chip = ({ ...props }) => {
+const Chip = ({ ...rest }) => {
   return (
-    <CustomChip {...props} />
+    <CustomChip {...rest} />
   );
 }
 

@@ -69,7 +69,10 @@ export const theme = createTheme({
       lineHeight: '12px'
     },
   },
-  spacing: 4,
+  spacing: buffer,
+  util: {
+    spacing: buffer
+  },
   breakpoints: {
     values: {
       xs: 640,

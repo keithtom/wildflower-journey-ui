@@ -1,6 +1,6 @@
 import {
   Box
-} from '@mui/material'
+} from '@ui'
 
 import Nav from './Nav'
 
@@ -14,7 +14,7 @@ const PageContainer = ({ children }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          paddingTop: 20,
+          paddingTop: 18,
         }}
       >
         {children}

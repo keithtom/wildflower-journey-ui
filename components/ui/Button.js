@@ -28,11 +28,11 @@ const CustomButton = styled(MaterialButton)(
 
 export default function Button({
   children,
-  ...props
+  ...rest
 }) {
   return (
     <CustomButton
-      {...props}
+      {...rest}
     >{children}</CustomButton>
   );
 }
