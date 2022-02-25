@@ -24,8 +24,6 @@ import {
  MenuOutlined
 } from '@mui/icons-material'
 
-import { styled } from '@mui/material/styles'
-
 const drawerWidth = 240
 
 const Nav = ({}) => {
@@ -42,7 +40,8 @@ const Nav = ({}) => {
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          paddingLeft: 6
+          paddingLeft: 6,
+          marginTop: 0
         }}
       >
         <Toolbar>
@@ -71,7 +70,8 @@ const Nav = ({}) => {
         sx={{
           width: drawerWidth,
           '& .MuiDrawer-paper': {
-            width: drawerWidth
+            width: drawerWidth,
+            marginTop: 0
           }
         }}
         variant={isSm ? `temporary` : `permanent`}

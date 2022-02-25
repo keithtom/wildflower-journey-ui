@@ -4,8 +4,10 @@ import {
   CardContent,
   Typography,
   Avatar,
-  Chip,
 } from '@mui/material'
+import {
+  Chip
+} from '@ui'
 
 const UserResultItem = ({ user }) => {
   return (
