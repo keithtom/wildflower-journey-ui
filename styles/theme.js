@@ -1,4 +1,5 @@
-import { createGlobalStyle } from 'styled-components';
+import CssBaseline from '@mui/material/CssBaseline'
+import { createTheme } from '@mui/material/styles';
 
 // Style values:
 const buffer = 4;
@@ -9,7 +10,55 @@ const strokeDarkened = '#adadc5';
 const strokeLightened = '#E9EEEE';
 const strokeWidth = 1;
 
-export const theme = {
+export const theme = createTheme({
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          padding: 0,
+          margin: 0,
+        }
+      }
+    },
+    MuiButton: {
+      defaultProps: {
+        disableElevation: false,
+        disableRipple: true
+      }
+    },
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true
+      }
+    },
+    MuiPaper: {
+      defaultProps: {
+        variant: 'outlined',
+      },
+      styleOverrides: {
+        root: {
+          marginTop: '8px',
+          border: '1px solid #eaeaea',
+        }
+      }
+    },
+    MuiList: {
+      styleOverrides: {
+        root: {
+          padding: 0
+        }
+      }
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            background: '#f1f1f3'
+          }
+        }
+      }
+    }
+  },
   util: {
     buffer,
     radius: 4,
@@ -122,87 +171,4 @@ export const theme = {
     },
     family: 'Inter, Helvetica Neue, Helvetica, Arial, sans-serif'
   }
-};
-
-// Global styles:
-export const GlobalStyle = createGlobalStyle`
-  html, body {
-    height: 100%;
-    margin: 0 !important;
-    font-family: ${(props) => props.theme.text.family};
-    -webkit-overflow-scrolling: touch;
-  }
-  html {
-    -ms-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-  }
-  body {
-    margin: 0;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size: ${(props) => props.theme.text.body.size}px;
-    line-height: ${(props) => props.theme.text.body.lineHeight}px;
-    color: ${(props) => props.theme.color.text.main};
-    background-color: ${(props) => props.theme.color.neutral.white};
-  }
-  * {
-    box-sizing: border-box;
-  }
-  input, textarea {
-    font-size: ${(props) => props.theme.text.body.size}px;
-    font-family: ${(props) => props.theme.text.family};
-    color: ${(props) => props.theme.color.text.main};
-  }
-  textarea {
-    line-height: ${(props) => props.theme.text.body.lineHeight}px;
-  }
-  button: {
-    cursor: pointer;
-  }
-  p, a, li, div, span {
-    font-family: ${(props) => props.theme.text.family};
-    font-size: ${(props) => props.theme.text.body.size}px;
-    font-weight: ${(props) => props.theme.text.weight};
-  }
-  /* h1,h2,h3,h4,h5,h6,a,p,div,span {} */
-  a {
-    text-decoration: underline;
-    cursor: pointer;
-    color: ${(props) => props.theme.color.primary.main};
-    font-weight: ${({ theme }) => theme.text.weightHeavy};
-    &:hover, &:hover * {
-      color: ${({ theme }) => theme.color.primary.darkened};
-    }
-    /* &:visited {
-      color: inherit;
-    } */
-  }
-  ::placeholder {
-    color: ${(props) => props.theme.color.text.lightened};
-  }
-
-
-  ul {
-    margin: 0;
-    padding: 0;
-  }
-
-  p {
-    line-height: ${(props) => props.theme.text.body.lineHeight}px;
-  }
-
-  pre {
-    font-family: ${(props) => props.theme.text.family};
-  }
-  @media print {
-    html, body {
-      height: initial !important;
-      overflow: initial !important;
-      -webkit-print-color-adjust: exact;
-    }
-  }
-  @page {
-    size: auto;
-    margin: 20mm;
-  }
-`;
+});

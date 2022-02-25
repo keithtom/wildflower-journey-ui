@@ -9,16 +9,16 @@ const PageContainer = ({ children }) => {
     <Box sx={{
       display: 'flex'
     }}>
-    <Nav />
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        paddingTop: 8
-      }}
-    >
-      {children}
-    </Box>
+      <Nav />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          paddingTop: 8
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   )
 }

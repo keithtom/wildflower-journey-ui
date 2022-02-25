@@ -1,29 +1,17 @@
-import { useState } from 'react'
 import Head from 'next/head'
 
 import {
-  Box,
-  Divider,
   Grid,
-  Card,
-  CardContent,
   Stack,
   Typography,
-  Avatar,
-  Chip,
-  Button,
-  ToggleButton,
-  Modal,
-  Paper
 } from '@mui/material'
-import {
-  Close
- } from '@mui/icons-material'
 
 import PageContainer from '../components/ui/PageContainer'
+import DirectoryHero from '../components/DirectoryHero'
+import SchoolProfileSummary from '../components/SchoolProfileSummary'
+import UserResultItem from '../components/UserResultItem'
 
 const SchoolProfile = ({}) => {
-  const [contactModalOpen, setContactModalOpen] = useState(false)
 
   return (
     <>
@@ -39,74 +27,13 @@ const SchoolProfile = ({}) => {
 
       <PageContainer>
 
-        <Box
-          sx={{
-            width: 1,
-            paddingTop: 20,
-            background: '#fafafa'
-          }}
-        >
-          <Grid container p={3} alignItems="center" spacing={3}>
-            <Grid item>
-              <Typography variant="h3">Brooklyn Heights Montessori</Typography>
-            </Grid>
-          </Grid>
-          <Divider />
-        </Box>
+        <DirectoryHero
+          school={schoolDetails}
+        />
 
         <Grid container p={3} spacing={3}>
           <Grid item xs={12} sm={4}>
-            <Card>
-              <CardContent>
-                <Stack spacing={3}>
-                  <Stack spacing={1}>
-                    <Typography variant="h6">About</Typography>
-                    <Typography>{schoolDetails.description}</Typography>
-                  </Stack>
-                  <Stack spacing={1}>
-                    <Grid container>
-                      {schoolDetails.attributes.map((a, i) =>
-                        <Grid item xs={12}>
-                          <Grid container alignItems="center">
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="overline">{a.title}</Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography>{a.value}</Typography>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      )}
-                    </Grid>
-                  </Stack>
-                  <Stack spacing={1}>
-                    <Typography variant="h6">Contact</Typography>
-                    <Box>
-                      <Grid container alignItems="center" spacing={2}>
-                        <Grid item>
-                          <Avatar
-                            sx={{
-                              width: 32,
-                              height: 32
-                            }}
-                            src={schoolDetails.contactMember.profileImage}
-                          />
-                        </Grid>
-                        <Grid item>
-                          <Typography>{schoolDetails.contactMember.firstName} {schoolDetails.contactMember.lastName}</Typography>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                    <Button
-                      variant="contained"
-                      onClick={() => setContactModalOpen(true)}
-                    >
-                      Contact {schoolDetails.contactMember.firstName}
-                    </Button>
-                  </Stack>
-                </Stack>
-              </CardContent>
-            </Card>
+            <SchoolProfileSummary school={schoolDetails} />
           </Grid>
 
           <Grid item xs={12} sm={8}>
@@ -114,88 +41,12 @@ const SchoolProfile = ({}) => {
               <Typography variant="h6">{people.length} Members</Typography>
               <Stack spacing={1}>
                 {people.map((p, i) =>
-                 <Card>
-                    <CardContent>
-                      <Grid container justifyContent="space-between" alignItems="center">
-                        <Grid item>
-                          <Grid container alignItems="center" spacing={2}>
-                            <Grid item>
-                              <Avatar sx={{
-                                width: 32,
-                                height: 32
-                              }} />
-                            </Grid>
-                            <Grid item>
-                              <Typography>{p.attributes.firstName} {p.attributes.lastName}</Typography>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                        <Grid item>
-                          <Grid container alignItems="center" spacing={2}>
-                            <Grid item>
-                              <Chip label="Finance" />
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
+                  <UserResultItem user={p} key={i} />
                 )}
               </Stack>
             </Stack>
           </Grid>
         </Grid>
-
-        <Modal
-          open={contactModalOpen}
-          onClose={() => setContactModalOpen(false)}
-        >
-          <Card
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 400,
-            }}
-          >
-            <CardContent>
-              <Stack spacing={1}>
-                <Grid container alignItems="center" justifyContent="space-between">
-                  <Grid item>
-                    <Typography variant="h6">Contact {schoolDetails.contactMember.firstName} {schoolDetails.contactMember.lastName}</Typography>
-                  </Grid>
-                  <Grid item>
-                    <ToggleButton
-                      size="small"
-                      onChange={() => setContactModalOpen(!contactModalOpen)}
-                    >
-                      <Close />
-                    </ToggleButton>
-                  </Grid>
-                </Grid>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 1,
-                    background: '#fafafa'
-                  }}
-                >
-                  <Typography>{schoolDetails.contactMember.email}</Typography>
-                </Paper>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 1,
-                    background: '#fafafa'
-                  }}
-                >
-                  <Typography>{schoolDetails.contactMember.phoneNumber}</Typography>
-                </Paper>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Modal>
 
       </PageContainer>
 
@@ -206,6 +57,7 @@ const SchoolProfile = ({}) => {
 export default SchoolProfile
 
 const schoolDetails = {
+  name: 'Brooklyn Heights Montessori',
   description: 'Brooklyn Heights Montessori is a welcoming and supportive community of passionate parents who sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
   attributes: [
     {
