@@ -2,9 +2,7 @@ import Head from 'next/head'
 import { useState } from 'react'
 
 import {
-  Toolbar,
   Divider,
-  InputBase,
   Grid,
   Card,
   CardContent,
@@ -19,11 +17,16 @@ import {
   Checkbox,
   Select,
   MenuItem,
-  Avatar,
-  Chip
+  TextField,
+  InputAdornment
 } from '@mui/material'
+import {
+  Search
+} from '@mui/icons-material'
 
 import PageContainer from '../components/ui/PageContainer'
+import UserResultItem from '../components/UserResultItem'
+import SchoolResultItem from '../components/SchoolResultItem'
 
 const SearchPage = ({}) => {
   const [category, setCategory] = useState('people')
@@ -46,15 +49,17 @@ const SearchPage = ({}) => {
 
       <PageContainer>
 
-        <Toolbar>
-          <InputBase
-            placeholder="Search for something..."
-          />
-        </Toolbar>
-
-        <Divider />
-
         <Grid container p={3} spacing={3}>
+
+          <Grid item xs={12} sm={12}>
+            <TextField
+              fullWidth
+              placeholder="Search for something..."
+              InputProps={{
+                startAdornment: <InputAdornment position="start"><Search/></InputAdornment>,
+              }}
+            />
+          </Grid>
 
           <Grid item xs={12} sm={4}>
             <Card>
@@ -95,6 +100,8 @@ const SearchPage = ({}) => {
                       <FormControlLabel value="development" control={<Checkbox />} label="Development" />
                     </FormGroup>
 
+                    <Divider />
+
                     <FormLabel>Hub</FormLabel>
                     <Select>
                       <MenuItem value="NY">New York</MenuItem>
@@ -121,32 +128,7 @@ const SearchPage = ({}) => {
                 <Typography variant="h6">{people.length} Results</Typography>
                 <Stack spacing={1}>
                   {people.map((p, i) =>
-                    <Card>
-                      <CardContent>
-                        <Grid container justifyContent="space-between" alignItems="center">
-                          <Grid item>
-                            <Grid container alignItems="center" spacing={2}>
-                              <Grid item>
-                                <Avatar sx={{
-                                  width: 32,
-                                  height: 32
-                                }} />
-                              </Grid>
-                              <Grid item>
-                                <Typography>{p.attributes.firstName} {p.attributes.lastName}</Typography>
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                          <Grid item>
-                            <Grid container alignItems="center" spacing={2}>
-                              <Grid item>
-                                <Chip label="Finance" />
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
+                    <UserResultItem user={p} key={i} />
                   )}
                 </Stack>
               </Stack>
@@ -155,19 +137,7 @@ const SearchPage = ({}) => {
                 <Typography variant="h6">{schools.length} Results</Typography>
                 <Stack spacing={1}>
                   {schools.map((p, i) =>
-                    <Card>
-                      <CardContent>
-                        <Grid container justifyContent="space-between" alignItems="center">
-                          <Grid item>
-                            <Grid container alignItems="center" spacing={2}>
-                              <Grid item>
-                                <Typography>{p.attributes.name}</Typography>
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
+                    <SchoolResultItem schoolName={p.attributes.name} />
                   )}
                 </Stack>
               </Stack>
