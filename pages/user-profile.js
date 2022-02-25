@@ -31,7 +31,7 @@ const UserProfile = ({}) => {
           user={user}
         />
 
-        <Grid container p={3} spacing={3}>
+        <Grid container p={8} spacing={8}>
           <Grid item xs={12} sm={4}>
             <UserProfileSummary user={user} />
           </Grid>

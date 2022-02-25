@@ -11,6 +11,73 @@ const strokeLightened = '#E9EEEE';
 const strokeWidth = 1;
 
 export const theme = createTheme({
+  palette: {
+    primary: {
+      light: '#F6EEFC',
+      main: '#B171E2',
+      dark: '#803DB5'
+    },
+    secondary: {
+      light: '#FEF6E3',
+      main: '#F3B613',
+      dark: '#D6A00F'
+    },
+    neutral: {
+      light: '#FAFAFA',
+      main: '#E1E1E2',
+      dark: 'CACACE'
+    }
+  },
+  typography: {
+    fontFamily: [
+      'Inter',
+      'Roboto',
+      'Helvetica Neue',
+      'Arial',
+      'sans-serif'
+    ].join(','),
+    h1: { //Title Headline
+      fontSize: '48px',
+      lineHeight: '60px'
+    },
+    h2: { //Title Large
+      fontSize: '36px',
+      lineHeight: '48px'
+    },
+    h3: { //Title Regular
+      fontSize: '24px',
+      lineHeight: '32px'
+    },
+    h4: { //Title Small
+      fontSize: '20px',
+      lineHeight: '24px'
+    },
+    h5: { //Body Large
+      fontSize: '18px',
+      lineHeight: '22px'
+    },
+    body1: { //Body Regular
+      fontSize: '14px',
+      lineHeight: '20px'
+    },
+    body2: { //Body Small
+      fontSize: '12px',
+      lineHeight: '16px'
+    },
+    caption: { //Body Mini
+      fontSize: '10px',
+      lineHeight: '12px'
+    },
+  },
+  spacing: 4,
+  breakpoints: {
+    values: {
+      xs: 640,
+      sm: 768,
+      md: 1024,
+      lg: 1440
+    }
+  },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
@@ -59,116 +126,4 @@ export const theme = createTheme({
       }
     }
   },
-  util: {
-    buffer,
-    radius: 4,
-    radiusMedium: 8,
-    radiusLarge: 16,
-    timing,
-    transition: `all ${timing} ${easing}`,
-    borderWidth: strokeWidth,
-    border: `${strokeWidth}px solid ${stroke}`,
-    borderLight: `${strokeWidth}px solid ${strokeLightened}`,
-    shadow: 'rgba(0,0,0,.05) 0 0px 16px 0px',
-    maxFormWidth: 640,
-    zIndexBottom: 1,
-    zIndexMiddle: 2,
-    zIndexTop: 3,
-    navWidth: 320
-  },
-  breakpoint: {
-    xs: 640,
-    sm: 768,
-    md: 1024,
-    lg: 1440
-  },
-  color: {
-    neutral: {
-      white: '#FFFFFF',
-      light: '#F1F1F3',
-      medium: '#E1E1E2',
-      dark: '#CACACE',
-    },
-    text: {
-      dark: '#11111A',
-      lightened: '#88888C',
-      light: '#FFFFFF',
-    },
-    primary: {
-      yellow: {
-        main: 'rgba(243, 182, 19, 1)',
-        lightened: 'rgba(243, 182, 19, .12)',
-        medium: 'rgba(243, 182, 19, .24)'
-      },
-      purple: {
-        main: 'rgba(177, 113, 226, 1)',
-        lightened: 'rgba(177, 113, 226, .12)',
-        medium: 'rgba(177, 113, 226, .24)'
-      },
-      green: {
-        main: 'rgba(84, 165, 158, 1)',
-        lightened: 'rgba(84, 165, 158, .12)',
-        medium: 'rgba(84, 165, 158, .24)'
-      },
-      orange: {
-        main: 'rgba(248, 164, 110, 1)',
-        lightened: 'rgba(248, 164, 110, .12)',
-        medium: 'rgba(248, 164, 110, .24)'
-      },
-    },
-    alert: {
-      main: '#FF4D57'
-    },
-    // TREATMENTS
-    opacity: {
-      light: '.25',
-      medium: '.50',
-      dark: '.75'
-    }
-  },
-  text: {
-    body: {
-      mini: {
-        size: 10,
-        lineHeight: 12
-      },
-      small: {
-        size: 12,
-        lineHeight: 16
-      },
-      regular: {
-        size: 14,
-        lineHeight: 20
-      },
-      large: {
-        size: 18,
-        lineHeight: 22
-      }
-    },
-    title: {
-      small: {
-        size: 20,
-        lineHeight: 24
-      },
-      regular: {
-        size: 24,
-        lineHeight: 32
-      },
-      large: {
-        size: 36,
-        lineHeight: 48
-      },
-      headline: {
-        size: 48,
-        lineHeight: 60
-      },
-    },
-    // TREATMENTS
-    weight: {
-      semibold: '600',
-      medium: '500',
-      regular: '400'
-    },
-    family: 'Inter, Helvetica Neue, Helvetica, Arial, sans-serif'
-  }
 });

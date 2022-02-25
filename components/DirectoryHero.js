@@ -11,11 +11,11 @@ const DirectoryHero = ({ user, school }) => {
     <Box
       sx={{
         width: 1,
-        paddingTop: 20,
+        paddingTop: 48,
         background: '#fafafa'
       }}
     >
-      <Grid container p={3} alignItems="center" spacing={3}>
+      <Grid container p={8} alignItems="center" spacing={8}>
         {user ?
           <Grid item>
             <Avatar
