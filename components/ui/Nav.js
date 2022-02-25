@@ -33,7 +33,7 @@ const Nav = ({}) => {
   const router = useRouter()
 
   const isSm = useMediaQuery(
-    { maxDeviceWidth: theme.breakpoint.sm },
+    { maxDeviceWidth: theme.breakpoints.values.sm },
   )
 
   return (
@@ -42,6 +42,7 @@ const Nav = ({}) => {
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
+          paddingLeft: 6
         }}
       >
         <Toolbar>
