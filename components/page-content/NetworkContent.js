@@ -67,24 +67,37 @@ const NetworkContent = () => {
 
               <Divider />
 
-              <FormLabel>Role</FormLabel>
-              <FormGroup>
-                <FormControlLabel value="teacher-leader" control={<Checkbox />} label="Teacher Leader" />
-                <FormControlLabel value="hub-member" control={<Checkbox />} label="Hub Member" />
-                <FormControlLabel value="foundation-partner" control={<Checkbox />} label="Foundation Partner" />
-                <FormControlLabel value="operations-guide" control={<Checkbox />} label="Operations Guide" />
-                <FormControlLabel value="board-member" control={<Checkbox />} label="Board Member" />
-              </FormGroup>
+              {category === 'people' ?
+                <>
+                  <FormLabel>Role</FormLabel>
+                  <FormGroup>
+                    <FormControlLabel value="teacher-leader" control={<Checkbox />} label="Teacher Leader" />
+                    <FormControlLabel value="hub-member" control={<Checkbox />} label="Hub Member" />
+                    <FormControlLabel value="foundation-partner" control={<Checkbox />} label="Foundation Partner" />
+                    <FormControlLabel value="operations-guide" control={<Checkbox />} label="Operations Guide" />
+                    <FormControlLabel value="board-member" control={<Checkbox />} label="Board Member" />
+                  </FormGroup>
 
-              <Divider />
+                  <Divider />
 
-              <FormLabel>Skills</FormLabel>
-              <FormGroup>
-                <FormControlLabel value="accounting" control={<Checkbox />} label="Accounting" />
-                <FormControlLabel value="branding" control={<Checkbox />} label="Branding" />
-                <FormControlLabel value="construction" control={<Checkbox />} label="Construction" />
-                <FormControlLabel value="development" control={<Checkbox />} label="Development" />
-              </FormGroup>
+                  <FormLabel>Skills</FormLabel>
+                  <FormGroup>
+                    <FormControlLabel value="accounting" control={<Checkbox />} label="Accounting" />
+                    <FormControlLabel value="branding" control={<Checkbox />} label="Branding" />
+                    <FormControlLabel value="construction" control={<Checkbox />} label="Construction" />
+                    <FormControlLabel value="development" control={<Checkbox />} label="Development" />
+                  </FormGroup>
+                </>
+              :
+                <>
+                  <FormLabel>Age level</FormLabel>
+                  <FormGroup>
+                    <FormControlLabel value="toddler" control={<Checkbox />} label="Toddler" />
+                    <FormControlLabel value="primary" control={<Checkbox />} label="Primary" />
+                    <FormControlLabel value="elementary" control={<Checkbox />} label="Elementary" />
+                  </FormGroup>
+                </>
+              }
 
               <Divider />
 
