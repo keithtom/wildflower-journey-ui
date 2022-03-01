@@ -5,10 +5,10 @@ import { styled } from '@mui/material/styles';
 
 const CustomCard = styled(MaterialCard)(({ theme }) => ({
 }));
-const CustomCardContent = styled(MaterialCardContent)((props) => {
-  padding: props.theme.spacing(4),
+const CustomCardContent = styled(MaterialCardContent)(({ theme }) => ({
+  padding: theme.spacing(4),
   '&:last-child': {
-    paddingBottom: props.theme.spacing(4)
+    paddingBottom: theme.spacing(4)
   }
 }));
 
