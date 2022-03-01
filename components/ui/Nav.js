@@ -21,7 +21,8 @@ import {
 import {
  PeopleAlt,
  MeetingRoom,
- MenuOutlined
+ MenuOutlined,
+ Quiz
 } from '@mui/icons-material'
 
 const drawerWidth = 240
@@ -57,9 +58,10 @@ const Nav = ({}) => {
           :
             <Typography variant="h6" noWrap>
               {router.pathname === '/network' ? 'Network'
-                : router.pathname === '/user-profile' ? 'Your Profile'
-                  : router.pathname === '/school-profile' ? 'Your School'
-                    : null
+              : router.pathname === '/user-profile' ? 'Your Profile'
+              : router.pathname === '/school-profile' ? 'Your School'
+              : router.pathname === '/advice' ? 'Advice Process'
+              : null
               }
             </Typography>
           }
@@ -115,6 +117,15 @@ const Nav = ({}) => {
                 <MeetingRoom />
               </ListItemIcon>
               <ListItemText primary='Your School' />
+            </ListItem>
+          </Link>
+
+          <Link href="/advice">
+            <ListItem button selected={'/advice' === router.pathname}>
+              <ListItemIcon>
+                <Quiz />
+              </ListItemIcon>
+              <ListItemText primary='Advice' />
             </ListItem>
           </Link>
         </List>

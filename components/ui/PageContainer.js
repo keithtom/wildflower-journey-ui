@@ -1,25 +1,26 @@
+import { styled } from '@mui/material/styles';
 import {
   Box
 } from '@ui'
 
 import Nav from './Nav'
 
+const PageWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex'
+}));
+const PageContent = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  paddingTop: theme.spacing(16)
+}));
+
 const PageContainer = ({ children }) => {
   return (
-    <Box sx={{
-      display: 'flex',
-    }}>
+    <PageWrapper>
       <Nav />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          paddingTop: 16,
-        }}
-      >
+      <PageContent>
         {children}
-      </Box>
-    </Box>
+      </PageContent>
+    </PageWrapper>
   )
 }
 
