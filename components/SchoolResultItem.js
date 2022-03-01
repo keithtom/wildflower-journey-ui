@@ -1,20 +1,17 @@
 import {
   Grid,
   Card,
-  CardContent,
   Typography
-} from '@mui/material'
+} from '@ui'
 
 const SchoolResultItem = ({ schoolName }) => {
   return (
     <Card>
-      <CardContent>
-        <Grid container>
-          <Grid item>
-            <Typography>{schoolName}</Typography>
-          </Grid>
+      <Grid container>
+        <Grid item>
+          <Typography>{schoolName}</Typography>
         </Grid>
-      </CardContent>
+      </Grid>
     </Card>
   )
 }

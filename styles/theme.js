@@ -64,15 +64,17 @@ export const theme = createTheme({
       fontSize: '12px',
       lineHeight: '16px'
     },
+    bodyLightened: {
+      fontSize: '14px',
+      lineHeight: '20px',
+      color: "#88888c"
+    },
     caption: { //Body Mini
       fontSize: '10px',
       lineHeight: '12px'
     },
   },
   spacing: buffer,
-  util: {
-    spacing: buffer
-  },
   breakpoints: {
     values: {
       xs: 640,

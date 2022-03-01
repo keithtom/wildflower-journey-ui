@@ -3,12 +3,11 @@ import { useState } from 'react'
 import {
   Grid,
   Card,
-  CardContent,
   Stack,
   Typography,
   Chip,
   Button
-} from '@mui/material'
+} from '@ui'
 import UserContactModal from '../components/UserContactModal'
 
 const UserProfileSummary = ({ user }) => {
@@ -17,34 +16,32 @@ const UserProfileSummary = ({ user }) => {
   return (
     <>
       <Card>
-        <CardContent>
-          <Stack spacing={3}>
-            <Stack spacing={1}>
-              <Typography variant="h6">About</Typography>
-              <Typography>{user.bio}</Typography>
-            </Stack>
-            <Stack spacing={1}>
-              <Typography variant="h6">Contact</Typography>
-              <Typography>{user.location}</Typography>
-              <Button
-                variant="contained"
-                onClick={() => setContactModalOpen(true)}
-              >
-                Contact {user.firstName}
-              </Button>
-            </Stack>
-            <Stack spacing={1}>
-              <Typography variant="h6">Skills</Typography>
-              <Grid container spacing={1}>
-                {user.skills.map((s, i) =>
-                  <Grid item key={i}>
-                    <Chip label={s} />
-                  </Grid>
-                )}
-              </Grid>
-            </Stack>
+        <Stack spacing={3}>
+          <Stack spacing={1}>
+            <Typography variant="h6">About</Typography>
+            <Typography>{user.bio}</Typography>
           </Stack>
-        </CardContent>
+          <Stack spacing={1}>
+            <Typography variant="h6">Contact</Typography>
+            <Typography>{user.location}</Typography>
+            <Button
+              variant="outlined"
+              onClick={() => setContactModalOpen(true)}
+            >
+              Contact {user.firstName}
+            </Button>
+          </Stack>
+          <Stack spacing={1}>
+            <Typography variant="h6">Skills</Typography>
+            <Grid container spacing={1}>
+              {user.skills.map((s, i) =>
+                <Grid item key={i}>
+                  <Chip label={s} />
+                </Grid>
+              )}
+            </Grid>
+          </Stack>
+        </Stack>
       </Card>
 
       <UserContactModal
