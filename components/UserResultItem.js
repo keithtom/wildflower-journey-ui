@@ -11,7 +11,9 @@ import {
   Typography,
   Grid,
   IconButton,
-  Popover
+  Popover,
+  Divider,
+  Button
 } from '@ui'
 import {
   MoreVert
@@ -35,9 +37,9 @@ const UserResultItem = ({ user }) => {
   return (
     <>
       <Card>
-        <Grid container justifyContent="space-between" alignItems="center">
+        <Grid container justifyContent="space-between" alignItems="center" mb={2}>
           <Grid item>
-            <Grid container alignItems="center" spacing={2}>
+            <Grid container alignItems="flex-start" spacing={4}>
               <Grid item>
                 <Avatar sx={{
                   width: 32,
@@ -45,16 +47,23 @@ const UserResultItem = ({ user }) => {
                 }} />
               </Grid>
               <Grid item>
-                <Typography>{user.attributes.firstName} {user.attributes.lastName}</Typography>
+                <Typography variant="h5">{user.attributes.firstName} {user.attributes.lastName}</Typography>
+                {user.roles ?
+                  user.roles.map((r, i) =>
+                    <Typography key={i}>{r}</Typography>
+                  )
+                : null}
               </Grid>
             </Grid>
           </Grid>
           <Grid item>
             <Grid container alignItems="center" spacing={2}>
-              <Grid item>
-                <Chip label="Finance" />
-              </Grid>
-              <Grid item>
+              {user.relationships.skills.map((s, i) =>
+                <Grid item key={i}>
+                  <Chip label={s} />
+                </Grid>
+              )}
+              {/* <Grid item>
                 <IconButton
                   id={id}
                   onClick={handleOpenActions}
@@ -77,10 +86,42 @@ const UserResultItem = ({ user }) => {
                     </ListItem>
                   </List>
                 </Popover>
+              </Grid> */}
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Divider />
+
+        <Grid container mt={2} spacing={2} justifyContent="space-between" alignItems="center">
+          <Grid item>
+            <Grid container spacing={2}>
+              <Grid item>
+                {user.relationships.schools ?
+                  user.relationships.schools.map((s, i) =>
+                    <Typography key={i}>{s}</Typography>
+                  )
+                : null}
+              </Grid>
+              <Grid item>
+                <Typography>• {user.relationships.address.city}, {user.relationships.address.state}</Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item>
+                <Typography>Contact {user.attributes.firstName}:</Typography>
+              </Grid>
+              <Grid item>
+                <Button onClick={() => setContactModalOpen(true)}>
+                  <Typography>Contact</Typography>
+                </Button>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
+
       </Card>
 
       <UserContactModal
