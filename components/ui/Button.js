@@ -8,10 +8,12 @@ const CustomButton = styled(MaterialButton)(({ theme }) => `
 
 export default function Button({
   children,
+  variant = "contained",
   ...rest
 }) {
   return (
     <CustomButton
+      variant={variant}
       {...rest}
     >{children}</CustomButton>
   );

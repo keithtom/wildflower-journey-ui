@@ -12,7 +12,7 @@ import {
 import EditProfile from '@components/EditProfile'
 
 const DirectoryHero = ({ user, school }) => {
-  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(true)
   const toggleEditModal = () => setEditModalOpen(!editModalOpen)
   return (
     <Box
