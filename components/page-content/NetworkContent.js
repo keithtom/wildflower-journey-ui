@@ -67,7 +67,8 @@ const NetworkContent = () => {
 
               <Divider />
 
-              {category === 'people' ?
+              <>
+                { category === 'people' &&
                 <>
                   <FormLabel>Role</FormLabel>
                   <FormGroup>
@@ -88,16 +89,41 @@ const NetworkContent = () => {
                     <FormControlLabel value="development" control={<Checkbox />} label="Development" />
                   </FormGroup>
                 </>
-              :
-                <>
-                  <FormLabel>Age level</FormLabel>
-                  <FormGroup>
-                    <FormControlLabel value="toddler" control={<Checkbox />} label="Toddler" />
-                    <FormControlLabel value="primary" control={<Checkbox />} label="Primary" />
-                    <FormControlLabel value="elementary" control={<Checkbox />} label="Elementary" />
-                  </FormGroup>
-                </>
-              }
+                }
+
+                <FormLabel>Ages Served</FormLabel>
+                <FormGroup>
+                  <FormControlLabel value="toddler" control={<Checkbox />} label="Parent Child" />
+                  <FormControlLabel value="toddler" control={<Checkbox />} label="Infants" />
+                  <FormControlLabel value="toddler" control={<Checkbox />} label="Toddlers" />
+                  <FormControlLabel value="primary" control={<Checkbox />} label="Primary" />
+                  <FormControlLabel value="elementary" control={<Checkbox />} label="Lower Elementary" />
+                  <FormControlLabel value="elementary" control={<Checkbox />} label="Upper Elementary" />
+                  <FormControlLabel value="elementary" control={<Checkbox />} label="Adolescent" />
+                  <FormControlLabel value="elementary" control={<Checkbox />} label="High School" />
+                </FormGroup>
+                <FormLabel>Governance Type</FormLabel>
+                <FormGroup>
+                  <FormControlLabel value="toddler" control={<Checkbox />} label="Charter" />
+                  <FormControlLabel value="primary" control={<Checkbox />} label="Independent" />
+                  <FormControlLabel value="elementary" control={<Checkbox />} label="District" />
+                </FormGroup>
+                <FormLabel>Tuition Assistance</FormLabel>
+                <FormGroup>
+                  <FormControlLabel value="toddler" control={<Checkbox />} label="State Vouchers" />
+                  <FormControlLabel value="primary" control={<Checkbox />} label="County Childcare Assistance Programs" />
+                  <FormControlLabel value="elementary" control={<Checkbox />} label="City Vouchers" />
+                  <FormControlLabel value="toddler" control={<Checkbox />} label="School-supported scholarship and/or tuition discount" />
+                  <FormControlLabel value="primary" control={<Checkbox />} label="Private-donor funded scholarship program" />
+                </FormGroup>
+                <FormLabel>Calendar</FormLabel>
+                <FormGroup>
+                  <FormControlLabel value="toddler" control={<Checkbox />} label="9 Month" />
+                  <FormControlLabel value="primary" control={<Checkbox />} label="10 Month" />
+                  <FormControlLabel value="elementary" control={<Checkbox />} label="Year Round" />
+                </FormGroup>
+              </>
+
 
               <Divider />
 
