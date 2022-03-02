@@ -6,13 +6,14 @@ import {
 } from '@ui'
 
 const SchoolResultItem = ({ school }) => {
+  const hasAddressInfo = (school.relationships.address.street && school.relationships.address.city && school.relationships.address.state)
   return (
     <Card>
       <Grid container mb={2} justifyContent="space-between">
         <Grid item>
           <Typography variant="h5">{school.attributes.name}</Typography>
           <Typography>{school.attributes.website}</Typography>
-          <Typography variant="bodyLightened">{school.relationships.address.street}, {school.relationships.address.city}, {school.relationships.address.state}</Typography>
+          {hasAddressInfo && <Typography variant="bodyLightened">{school.relationships.address.street}, {school.relationships.address.city}, {school.relationships.address.state}</Typography>}
         </Grid>
         <Grid item>
           <Grid container alignItems="flex-end" flexDirection="column">

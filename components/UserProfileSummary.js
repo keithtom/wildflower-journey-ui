@@ -17,12 +17,12 @@ const UserProfileSummary = ({ user }) => {
   return (
     <>
       <Card>
-        <Stack spacing={3}>
-          <Stack spacing={1}>
+        <Stack spacing={4}>
+          <Stack spacing={2}>
             <Typography variant="h6">About</Typography>
             <Typography>{user.bio}</Typography>
           </Stack>
-          <Stack spacing={1}>
+          <Stack spacing={2}>
             <Typography variant="h6">Contact</Typography>
             <Typography>{user.location}</Typography>
             { false &&
@@ -34,7 +34,7 @@ const UserProfileSummary = ({ user }) => {
               </Button>
             }
           </Stack>
-          <Stack spacing={1}>
+          <Stack spacing={2}>
             <Typography variant="h6">Roles</Typography>
             <Grid container spacing={1}>
               {user.roles.map((s, i) =>
@@ -44,7 +44,7 @@ const UserProfileSummary = ({ user }) => {
               )}
             </Grid>
           </Stack>
-          <Stack spacing={1}>
+          <Stack spacing={2}>
             <Typography variant="h6">Skills</Typography>
             <Grid container spacing={1}>
               {user.skills.map((s, i) =>

@@ -148,18 +148,18 @@ const NetworkContent = () => {
 
       <Grid item xs={12} sm={8}>
         {category === 'people' ?
-          <Stack spacing={3}>
+          <Stack spacing={4}>
             <Typography variant="h6">{people.length} Results</Typography>
-            <Stack spacing={2}>
+            <Stack spacing={4}>
               {people.map((p, i) =>
                 <UserResultItem user={p} key={i} />
               )}
             </Stack>
           </Stack>
         :
-          <Stack spacing={3}>
+          <Stack spacing={4}>
             <Typography variant="h6">{schools.length} Results</Typography>
-            <Stack spacing={2}>
+            <Stack spacing={4}>
               {schools.map((s, i) =>
                 <SchoolResultItem school={s} key={i} />
               )}

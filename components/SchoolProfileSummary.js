@@ -17,12 +17,12 @@ const SchoolProfileSummary = ({ school }) => {
   return (
     <>
       <Card>
-        <Stack spacing={3}>
-          <Stack spacing={1}>
+        <Stack spacing={4}>
+          <Stack spacing={2}>
             <Typography variant="h6">About</Typography>
             <Typography>{school.description}</Typography>
           </Stack>
-          <Stack spacing={1}>
+          <Stack spacing={2}>
             <Grid container>
               {school.attributes.map((a, i) =>
                 <Grid item xs={12}>

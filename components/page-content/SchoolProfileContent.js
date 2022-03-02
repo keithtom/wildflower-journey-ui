@@ -24,9 +24,9 @@ const SchoolProfileContent = () => {
         </Grid>
 
         <Grid item xs={12} sm={8}>
-          <Stack spacing={3}>
+          <Stack spacing={4}>
             <Typography variant="h6">{people.length} Members</Typography>
-            <Stack spacing={1}>
+            <Stack spacing={4}>
               {people.map((p, i) =>
                 <UserResultItem user={p} key={i} />
               )}

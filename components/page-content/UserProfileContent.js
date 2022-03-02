@@ -27,10 +27,10 @@ const UserProfileContent = () => {
         </Grid>
 
         <Grid item xs={12} sm={8}>
-          <Stack spacing={3}>
+          <Stack spacing={4}>
             <Typography variant="h6">School</Typography>
-            <Stack spacing={1}>
-              <SchoolResultItem schoolName={user.school.attributes.name} />
+            <Stack spacing={2}>
+              <SchoolResultItem school={user.school} />
             </Stack>
           </Stack>
         </Grid>
