@@ -1,9 +1,17 @@
+import React, { useState, useEffect } from "react";
 import SchoolProfileContent from '@components/page-content/SchoolProfileContent'
 import Head from 'next/head'
 import { PageContainer } from '@ui'
 
-const SchoolProfilePage = ({}) => {
 
+
+const SchoolProfilePage = ({}) => {
+  // API call gets user data, their school.
+  const [school, setSchool] = useState();
+
+  useEffect(() => {
+    getSchool({setSchool: setSchool});
+  }, []);
   return (
     <>
       <Head>
