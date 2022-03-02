@@ -12,6 +12,7 @@ import UserContactModal from '../components/UserContactModal'
 
 const UserProfileSummary = ({ user }) => {
   const [contactModalOpen, setContactModalOpen] = useState(false)
+  const toggleContactModal = () => setContactModalOpen(!contactModalOpen)
 
   return (
     <>
@@ -59,7 +60,7 @@ const UserProfileSummary = ({ user }) => {
       <UserContactModal
         user={user}
         open={contactModalOpen}
-        toggle={() => setContactModalOpen(!contactModalOpen)}
+        toggle={toggleContactModal}
       />
     </>
   )

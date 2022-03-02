@@ -7,15 +7,15 @@ import{
   Stack,
   Typography
 } from '@ui'
-import DirectoryHero from '@components/DirectoryHero'
+import ProfileHero from '@components/ProfileHero'
 import SchoolProfileSummary from '@components/SchoolProfileSummary'
 import UserResultItem from '@components/UserResultItem'
 
 const SchoolProfileContent = () => {
   return (
     <>
-      <DirectoryHero
-        school={schoolDetails}
+      <ProfileHero
+        name={schoolDetails.name}
       />
 
       <Grid container p={8} spacing={8}>

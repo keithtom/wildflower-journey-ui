@@ -1,18 +1,24 @@
+import { useState } from 'react'
 import {
   Grid,
   Stack,
-  Typography
+  Typography,
+  Button,
+  Modal
 } from '@ui'
-import DirectoryHero from '@components/DirectoryHero'
+import ProfileHero from '@components/ProfileHero'
 import UserProfileSummary from '@components/UserProfileSummary'
 import SchoolResultItem from '@components/SchoolResultItem'
+import EditUserProfile from '@components/EditUserProfile'
 import { user } from '@lib/utils/fake-data'
 
 const UserProfileContent = () => {
   return (
     <>
-      <DirectoryHero
-        user={user}
+      <ProfileHero
+        profileImage={user.profileImage}
+        name={`${user.firstName} ${user.lastName}`}
+        action={<UserAction user={user} />}
       />
 
       <Grid container p={8} spacing={8}>
@@ -34,3 +40,18 @@ const UserProfileContent = () => {
 }
 
 export default UserProfileContent
+
+const UserAction = ({ user }) => {
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const toggleEditModal = () => setEditModalOpen(!editModalOpen)
+  return (
+    <>
+      <Button variant="outlined" onClick={() => setEditModalOpen(true)}>Edit profile</Button>
+      <Modal
+        open={editModalOpen}
+        toggle={toggleEditModal}
+        title="Edit Profile"
+      ><EditUserProfile user={user} /></Modal>
+    </>
+  )
+}
