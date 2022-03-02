@@ -15,8 +15,8 @@ import {
   Grid
 } from '@ui'
 
-const EditProfile = ({ user }) => {
-  console.log("🚀 ~ file: EditProfile.js ~ line 6 ~ EditProfile ~ user", user)
+const EditUserProfile = ({ user }) => {
+  console.log("🚀 ~ file: EditUserProfile.js ~ line 6 ~ EditUserProfile ~ user", user)
   const [skills, setSkills] = useState(user.skills)
 
   const handleSkillChange = (event) => {
@@ -92,4 +92,4 @@ const EditProfile = ({ user }) => {
   )
 }
 
-export default EditProfile
+export default EditUserProfile

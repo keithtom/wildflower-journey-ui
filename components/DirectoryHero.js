@@ -9,7 +9,7 @@ import {
   Modal,
   Divider
 } from '@ui'
-import EditProfile from '@components/EditProfile'
+import EditUserProfile from '@components/EditUserProfile'
 
 const DirectoryHero = ({ user, school }) => {
   const [editModalOpen, setEditModalOpen] = useState(true)
@@ -43,7 +43,7 @@ const DirectoryHero = ({ user, school }) => {
             open={editModalOpen}
             toggle={toggleEditModal}
             title="Edit Profile"
-          ><EditProfile user={user} /></Modal>
+          ><EditUserProfile user={user} /></Modal>
         </Grid>
       </Grid>
       <Divider />
