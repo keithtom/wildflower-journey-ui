@@ -150,7 +150,7 @@ const NetworkContent = () => {
         {category === 'people' ?
           <Stack spacing={3}>
             <Typography variant="h6">{people.length} Results</Typography>
-            <Stack spacing={1}>
+            <Stack spacing={2}>
               {people.map((p, i) =>
                 <UserResultItem user={p} key={i} />
               )}
@@ -159,9 +159,9 @@ const NetworkContent = () => {
         :
           <Stack spacing={3}>
             <Typography variant="h6">{schools.length} Results</Typography>
-            <Stack spacing={1}>
-              {schools.map((p, i) =>
-                <SchoolResultItem schoolName={p.attributes.name} />
+            <Stack spacing={2}>
+              {schools.map((s, i) =>
+                <SchoolResultItem school={s} key={i} />
               )}
             </Stack>
           </Stack>

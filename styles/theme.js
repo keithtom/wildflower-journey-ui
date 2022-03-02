@@ -25,7 +25,7 @@ export const theme = createTheme({
     neutral: {
       light: '#FAFAFA',
       main: '#E1E1E2',
-      dark: 'CACACE'
+      dark: '#CACACE'
     }
   },
   typography: {
