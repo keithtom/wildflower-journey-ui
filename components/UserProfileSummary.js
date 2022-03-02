@@ -24,12 +24,24 @@ const UserProfileSummary = ({ user }) => {
           <Stack spacing={1}>
             <Typography variant="h6">Contact</Typography>
             <Typography>{user.location}</Typography>
-            <Button
-              variant="outlined"
-              onClick={() => setContactModalOpen(true)}
-            >
-              Contact {user.firstName}
-            </Button>
+            { false &&
+              <Button
+                variant="outlined"
+                onClick={() => setContactModalOpen(true)}
+              >
+                Contact {user.firstName}
+              </Button>
+            }
+          </Stack>
+          <Stack spacing={1}>
+            <Typography variant="h6">Roles</Typography>
+            <Grid container spacing={1}>
+              {user.roles.map((s, i) =>
+                <Grid item key={i}>
+                  <Chip label={s} />
+                </Grid>
+              )}
+            </Grid>
           </Stack>
           <Stack spacing={1}>
             <Typography variant="h6">Skills</Typography>
