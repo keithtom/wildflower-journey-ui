@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMediaQuery } from 'react-responsive'
 
@@ -16,13 +15,19 @@ import {
   Avatar,
   AppBar,
   IconButton,
-  Typography
+  Typography,
+  Stack,
+  Grid,
+  Link
 } from '@mui/material'
+import Card from './Card'
 import {
  PeopleAlt,
  MeetingRoom,
  MenuOutlined,
- Quiz
+ Quiz,
+ Info,
+ ArrowForward
 } from '@mui/icons-material'
 
 const drawerWidth = 240
@@ -82,53 +87,83 @@ const Nav = ({}) => {
         onClose={() => setNavOpen(!navOpen)}
       >
 
-        <List>
-          <Link href="/user-profile">
-            <ListItem button selected={'/user-profile' === router.pathname}>
-              <ListItemIcon>
-                <Avatar
-                  sx={{
-                    width: 32,
-                    height: 32
-                  }}
-                  src={user.profileImage}
-                />
-              </ListItemIcon>
-              <ListItemText primary={`${user.firstName} ${user.lastName}`} />
-            </ListItem>
-          </Link>
-        </List>
+        <Stack
+          justifyContent="space-between"
+          direction="column"
+          sx={{ height: '100%' }}
+        >
 
-        <Divider />
+          <div>
+            <List>
+              <Link href="/user-profile" color="text.main" underline="none">
+                <ListItem button selected={'/user-profile' === router.pathname}>
+                  <ListItemIcon>
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32
+                      }}
+                      src={user.profileImage}
+                    />
+                  </ListItemIcon>
+                  <ListItemText primary={`${user.firstName} ${user.lastName}`} />
+                </ListItem>
+              </Link>
+            </List>
 
-        <List>
-          <Link href="/network">
-            <ListItem button selected={'/network' === router.pathname}>
-              <ListItemIcon>
-                <PeopleAlt />
-              </ListItemIcon>
-              <ListItemText primary='Network' />
-            </ListItem>
-          </Link>
+            <Divider />
 
-          <Link href="/school-profile">
-            <ListItem button selected={'/school-profile' === router.pathname}>
-              <ListItemIcon>
-                <MeetingRoom />
-              </ListItemIcon>
-              <ListItemText primary='Your School' />
-            </ListItem>
-          </Link>
+            <List>
+              <Link href="/network" color="text.main" underline="none">
+                <ListItem button selected={'/network' === router.pathname}>
+                  <ListItemIcon>
+                    <PeopleAlt />
+                  </ListItemIcon>
+                  <ListItemText primary='Network' />
+                </ListItem>
+              </Link>
 
-          <Link href="/advice">
-            <ListItem button selected={'/advice' === router.pathname}>
-              <ListItemIcon>
-                <Quiz />
-              </ListItemIcon>
-              <ListItemText primary='Advice' />
-            </ListItem>
-          </Link>
-        </List>
+              <Link href="/school-profile" color="text.main" underline="none">
+                <ListItem button selected={'/school-profile' === router.pathname}>
+                  <ListItemIcon>
+                    <MeetingRoom />
+                  </ListItemIcon>
+                  <ListItemText primary='Your School' />
+                </ListItem>
+              </Link>
+
+              <Link href="/advice" color="text.main" underline="none">
+                <ListItem button selected={'/advice' === router.pathname}>
+                  <ListItemIcon>
+                    <Quiz />
+                  </ListItemIcon>
+                  <ListItemText primary='Advice' />
+                </ListItem>
+              </Link>
+            </List>
+          </div>
+
+          <Grid container p={4} spacing={8}>
+            <Grid item xs={12}>
+              <Card>
+                <Stack spacing={2}>
+                  <Info color="primary"/>
+                  <Typography variant="body1">We want to hear from you!</Typography>
+                  <Typography variant="body2">Send us an email with any and all feedback.</Typography>
+                  <Link href="mailto:tech-pilot@wildflowerschools.org?subject=Directory" underline="none">
+                    <Stack flexDirection="row" justifyContent="space-between">
+                        Send an email
+                      <ArrowForward color="primary" fontSize="small" />
+                    </Stack>
+                  </Link>
+                </Stack>
+              </Card>
+            </Grid>
+          </Grid>
+
+
+        </Stack>
+
 
       </Drawer>
     </>
