@@ -47,7 +47,7 @@ const Nav = ({}) => {
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
           paddingLeft: 6,
-          marginTop: 0
+          marginTop: 0,
         }}
       >
         <Toolbar>
