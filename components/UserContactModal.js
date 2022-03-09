@@ -19,7 +19,7 @@ const UserContactModal = ({ user, open, toggle }) => {
     <Modal
       open={open}
       toggle={toggle}
-      title={`Contact ${user.firstName} ${user.lastName}`}
+      title={`Contact ${user.attributes.firstName} ${user.attributes.lastName}`}
     >
       <Stack spacing={2}>
         {user.attributes.email ?
