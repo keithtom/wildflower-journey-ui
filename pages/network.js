@@ -1,8 +1,31 @@
+import React, { useState } from "react";
+import { useApi } from '../hooks/api'
+
 import Head from 'next/head'
 import NetworkContent from '@components/page-content/NetworkContent'
 import PageContainer from '@components/ui/PageContainer'
 
 const DirectoryPage = () => {
+  const [isSearching, setIsSearching] = useState(false)
+  const { search } = useApi()
+
+  // a lot of state.
+  // main search field text and then all the filters.
+  // on change, query api and redraw.
+
+  const handleSearchRequest = async () => {
+    setIsSearching(true)
+    try {
+      await search({ userId: '', data: '' })
+      console.log('search results found')
+      setIsSearching(false)
+    } catch(error) {
+      console.log('searching failed')
+      alert("Oops! Something went wrong. Please try again in a few minutes.")
+      setIsSearching(false)
+    }
+  }
+
   return (
     <>
       <Head>

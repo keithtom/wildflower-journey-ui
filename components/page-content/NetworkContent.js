@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import useSearch from "../../hooks/useSearch"
 
 import { schools, people } from '@lib/utils/fake-data'
+
 import {
   RadioGroup,
   FormControlLabel,
@@ -8,7 +10,7 @@ import {
   FormGroup,
   FormLabel,
   MenuItem,
-  InputAdornment
+  InputAdornment,
 } from '@mui/material'
 import {
   Divider,
@@ -29,7 +31,13 @@ import UserResultItem from '@components/UserResultItem'
 import SchoolResultItem from '@components/SchoolResultItem'
 
 const NetworkContent = () => {
+  const { query, setQuery, results } = useSearch();
+
   const [category, setCategory] = useState('people')
+
+  // form state, need to fire a query on every change to filters.
+  // form state can look at all filters and form the right API query
+  // return results for people and schools.
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value)
@@ -45,6 +53,7 @@ const NetworkContent = () => {
           InputProps={{
             startAdornment: <InputAdornment position="start"><Search/></InputAdornment>,
           }}
+          onChange={(e) => { setQuery(e.target.value) }}
         />
       </Grid>
 
@@ -149,9 +158,9 @@ const NetworkContent = () => {
       <Grid item xs={12} sm={8}>
         {category === 'people' ?
           <Stack spacing={4}>
-            <Typography variant="h6">{people.length} Results</Typography>
+            <Typography variant="h6">{results.length} Results</Typography>
             <Stack spacing={4}>
-              {people.map((p, i) =>
+              {results.map((p, i) =>
                 <UserResultItem user={p} key={i} />
               )}
             </Stack>
