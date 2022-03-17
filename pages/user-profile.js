@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useApi } from '../hooks/api'
 
 import Head from 'next/head'
 import PageContainer from '@components/ui/PageContainer'
@@ -7,6 +8,24 @@ import UserProfileContent from '@components/page-content/UserProfileContent'
 const UserProfilePage = ({}) => {
   // API call gets user data, their school.
   const [currentUser, setCurrentUser] = useState();
+  const [isEditing, setIsEditing] = useState(false)
+  const [isSavingChanges, setIsSavingChanges] = useState(false)
+  const { editProfile } = useApi()
+
+  const handleSaveProfileChanges = async () => {
+     setIsSavingChanges(true)
+     try {
+       await editProfile({ userId: '', data: '' })
+       console.log('editing worked')
+       setIsEditing(false)
+       setIsSavingChanges(false)
+     } catch(error) {
+       console.log('editing failed')
+       alert("Oops! Something went wrong. Please try again in a few minutes.")
+       setIsSavingChanges(false)
+     }
+   }
+
 
   useEffect(() => {
     // logged in user?
