@@ -6,6 +6,7 @@ import {
   genderIdentities
 } from '../lib/utils/fake-data'
 import {
+  Box,
   Grid,
   TextField,
   Select,
@@ -58,7 +59,7 @@ const EditUserProfile = ({ user }) => {
   const handleEconomicBackgroundChange = (event) => {
     setEconomicBackground(event.target.value)
   }
-  
+
   const [genderIdentity, setGenderIdentity] = useState(1)
   const handleGenderIdentityChange = (event) => {
     setGenderIdentity(event.target.value)
@@ -68,7 +69,7 @@ const EditUserProfile = ({ user }) => {
     <>
       <Grid container spacing={4}>
         <Grid item xs={12} sm={6}>
-          <TextField 
+          <TextField
             fullWidth
             label="First Name"
             value={firstName}
@@ -76,7 +77,7 @@ const EditUserProfile = ({ user }) => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField 
+          <TextField
             fullWidth
             label="Last Name"
             value={lastName}
@@ -85,7 +86,7 @@ const EditUserProfile = ({ user }) => {
         </Grid>
       </Grid>
 
-      <TextField 
+      <TextField
         fullWidth
         label="Phone Number"
         value={phone}
@@ -116,7 +117,7 @@ const EditUserProfile = ({ user }) => {
           </div>
 
           {/* Ethnicity select */}
-          <div>            
+          <div>
             <Select
               id="ethnicity-select"
               value={ethnicity}
@@ -124,7 +125,7 @@ const EditUserProfile = ({ user }) => {
               onChange={handleEthnicityChange}
               options={ethnicities}
             />
-            
+
             <Switch label="Make race/ethnicity publicly visible" />
           </div>
 
@@ -168,49 +169,51 @@ const EditUserProfile = ({ user }) => {
           </div>
 
           {/* Address fields */}
-          <Grid container spacing={4}>
-            <Grid item xs={12}>
-              <TextField 
-                fullWidth
-                label="Address line 1"
-                value="123 Clinton St"
-              />
+          <div>
+            <Grid container spacing={4}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Address line 1"
+                  value="123 Clinton St"
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Address line 2"
+                  value="Apt 3"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={5}>
+                <TextField
+                  fullWidth
+                  label="City"
+                  value="Brooklyn"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={3}>
+                <TextField
+                  fullWidth
+                  label="State"
+                  value="NY"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Zip"
+                  value="11211"
+                />
+              </Grid>
             </Grid>
-            
-            <Grid item xs={12}>
-              <TextField 
-                fullWidth
-                label="Address line 2"
-                value="Apt 3"
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={5}>
-              <TextField 
-                fullWidth
-                label="City"
-                value="Brooklyn"
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={3}>
-              <TextField 
-                fullWidth
-                label="State"
-                value="NY"
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={4}>
-              <TextField 
-                fullWidth
-                label="Zip"
-                value="11211"
-              />
-            </Grid>
-            
             <Switch label="Make address publicly visible" />
-          </Grid>
+          </div>
+
         </Stack>
       </Card>
 
