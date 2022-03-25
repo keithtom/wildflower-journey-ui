@@ -155,12 +155,12 @@ const NetworkContent = () => {
     setCategory(e.target.value)
   }
 
-  console.log("rolesSelected", rolesSelected)
-  console.log("skillsSelected", skillsSelected)
-  console.log("agesServedSelected", agesServedSelected)
-  console.log("governanceTypeSelected", governanceTypeSelected)
-  console.log("tuitionAssistanceSelected", tuitionAssistanceSelected)
-  console.log("calendarSelected", calendarSelected)
+  // console.log("rolesSelected", rolesSelected)
+  // console.log("skillsSelected", skillsSelected)
+  // console.log("agesServedSelected", agesServedSelected)
+  // console.log("governanceTypeSelected", governanceTypeSelected)
+  // console.log("tuitionAssistanceSelected", tuitionAssistanceSelected)
+  // console.log("calendarSelected", calendarSelected)
 
   return (
     <Grid container p={8} spacing={8}>
