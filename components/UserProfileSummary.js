@@ -6,7 +6,8 @@ import {
   Stack,
   Typography,
   Chip,
-  Button
+  Button,
+  Divider
 } from '@ui'
 import UserContactModal from '../components/UserContactModal'
 
@@ -54,6 +55,10 @@ const UserProfileSummary = ({ user }) => {
               )}
             </Grid>
           </Stack>
+
+          <Divider/>
+          <Typography variant="bodyLightened">Last updated 2 weeks ago</Typography>
+           
         </Stack>
       </Card>
 
