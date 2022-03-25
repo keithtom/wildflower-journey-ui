@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import {
-  Box,
+  Divider,
   Avatar,
   Grid,
   Card,
@@ -61,6 +61,8 @@ const SchoolProfileSummary = ({ school }) => {
               Contact {school.contactMember.firstName}
             </Button>
           </Stack>
+          <Divider/>
+          <Typography variant="bodyLightened">Last updated 2 weeks ago</Typography>
         </Stack>
       </Card>
 
