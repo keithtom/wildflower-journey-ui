@@ -5,12 +5,13 @@ import { createTheme } from '@mui/material/styles';
 const buffer = 4;
 const timing = '.25s';
 const easing = 'ease-in-out';
-const stroke = '#E1E1E2';
-const strokeDarkened = '#adadc5';
-const strokeLightened = '#E9EEEE';
-const strokeWidth = 1;
+const borderColor = '#EAEAEA';
+const borderWidth = '1px';
 
 export const theme = createTheme({
+  util: {
+    borderWidth: borderWidth
+  },
   palette: {
     primary: {
       light: '#F6EEFC',
@@ -26,6 +27,9 @@ export const theme = createTheme({
       light: '#FAFAFA',
       main: '#E1E1E2',
       dark: '#CACACE'
+    },
+    border: {
+      main: borderColor
     },
     text: {
       light: '#FFFFFF',
@@ -115,7 +119,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           marginTop: '8px',
-          border: '1px solid #eaeaea',
+          border: `${borderWidth} solid ${borderColor}`,
         }
       }
     },

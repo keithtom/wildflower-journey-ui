@@ -42,7 +42,7 @@ const UserProfileContent = () => {
 export default UserProfileContent
 
 const UserAction = ({ user }) => {
-  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(true)
   const toggleEditModal = () => setEditModalOpen(!editModalOpen)
   return (
     <>
@@ -51,7 +51,9 @@ const UserAction = ({ user }) => {
         open={editModalOpen}
         toggle={toggleEditModal}
         title="Edit Profile"
-      ><EditUserProfile user={user} /></Modal>
+      >
+        <EditUserProfile user={user} />
+      </Modal>
     </>
   )
 }

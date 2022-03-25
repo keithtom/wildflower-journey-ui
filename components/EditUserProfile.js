@@ -1,25 +1,41 @@
 import { useState } from 'react'
 import {
-  FormControl,
-  OutlinedInput,
-  MenuItem,
-  MenuProps,
-  InputLabel
-} from '@mui/material'
+  ethnicities,
+  languages,
+  incomeRanges,
+  genderIdentities
+} from '../lib/utils/fake-data'
 import {
-  Box,
+  Grid,
   TextField,
-  Chip,
   Select,
+  MultiSelect,
   Button,
-  Grid
+  Card,
+  Typography,
+  Stack,
+  Switch
 } from '@ui'
 
 const EditUserProfile = ({ user }) => {
-  console.log("🚀 ~ file: EditUserProfile.js ~ line 6 ~ EditUserProfile ~ user", user)
-  const [skills, setSkills] = useState(user.skills)
+console.log("🚀 ~ file: EditUserProfile.js ~ line 30 ~ EditUserProfile ~ user", user)
+  const [phone, setPhone] = useState(user.attributes.phone)
+  const handlePhoneChange = (event) => {
+    setPhone(event.target.value)
+  }
 
-  const handleSkillChange = (event) => {
+  const [firstName, setFirstName] = useState(user.firstName)
+  const handleFirstNameChange = (event) => {
+    setFirstName(event.target.value)
+  }
+
+  const [lastName, setLastName] = useState(user.lastName)
+  const handleLastNameChange = (event) => {
+    setLastName(event.target.value)
+  }
+
+  const [skills, setSkills] = useState(user.skills)
+  const handleSkillsChange = (event) => {
     const {
       target: { value },
     } = event;
@@ -29,23 +45,49 @@ const EditUserProfile = ({ user }) => {
     );
   };
 
+  const [ethnicity, setEthnicity] = useState(6)
+  const handleEthnicityChange = (event) => {
+    setEthnicity(event.target.value)
+  }
+
+  const [language, setLanguage] = useState(0)
+  const handleLanguageChange = (event) => {
+    setLanguage(event.target.value)
+  }
+
+  const [economicBackground, setEconomicBackground] = useState(1)
+  const handleEconomicBackgroundChange = (event) => {
+    setEconomicBackground(event.target.value)
+  }
+
   return (
     <>
-      <TextField 
-        fullWidth
-        label="First Name"
-        value={user.firstName}
-      />
-      <TextField 
-        fullWidth
-        label="Last Name"
-        value={user.lastName}
-      />
+      <Grid container spacing={4}>
+        <Grid item xs={12} sm={6}>
+          <TextField 
+            fullWidth
+            label="First Name"
+            value={firstName}
+            onChange={handleFirstNameChange}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField 
+            fullWidth
+            label="Last Name"
+            value={lastName}
+            onChange={handleLastNameChange}
+          />
+        </Grid>
+      </Grid>
+
       <TextField 
         fullWidth
         label="Phone Number"
-        value={user.attributes.phone}
+        value={phone}
+        onChange={handlePhoneChange}
       />
+
       <TextField
         label="About you"
         multiline
@@ -55,34 +97,105 @@ const EditUserProfile = ({ user }) => {
 
       {/* Skills selector */}
 
-      <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
-        <Select
-          labelId="demo-multiple-chip-label"
-          id="demo-multiple-chip"
-          multiple
-          value={skills}
-          onChange={handleSkillChange}
-          input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-          renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Box>
-          )}
-          MenuProps={MenuProps}
-        >
-          {user.skills.map((skill) => (
-            <MenuItem
-              key={skill}
-              value={skill}
-            >
-              {skill}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <MultiSelect
+        id="skills-select"
+        options={user.skills}
+        value={skills}
+        onChange={handleSkillsChange}
+      />
+
+      <Card variant="warning">
+        <Stack spacing={4}>
+          <div>
+            <Typography variant="h6">Admin-only fields</Typography>
+            <Typography variant="bodyLightened">These are only visible to admin users, and will not be shown in your public profile unless you decide to make any specific fields public.</Typography>
+          </div>
+
+          {/* Ethnicity select */}
+          <div>            
+            <Select
+              id="ethnicity-select"
+              value={ethnicity}
+              label="Race/ethnicity"
+              onChange={handleEthnicityChange}
+              options={ethnicities}
+            />
+            
+            <Switch label="Make race/ethnicity publicly visible" />
+          </div>
+
+          {/* Language select */}
+          <div>
+            <Select
+              id="language-select"
+              value={language}
+              label="Preferred Language"
+              onChange={handleLanguageChange}
+              options={languages}
+            />
+
+            <Switch label="Make preferred language publicly visible" />
+          </div>
+
+          {/* Income range select */}
+          <div>
+            <Select
+              id="economic-background-select"
+              value={economicBackground}
+              label="Economic background"
+              onChange={handleEconomicBackgroundChange}
+              options={incomeRanges}
+            />
+
+            <Switch label="Make economic background publicly visible" />
+          </div>
+
+          {/* Address fields */}
+          <Grid container spacing={4}>
+            <Grid item xs={12}>
+              <TextField 
+                fullWidth
+                label="Address line 1"
+                value="123 Clinton St"
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <TextField 
+                fullWidth
+                label="Address line 2"
+                value="Apt 3"
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={5}>
+              <TextField 
+                fullWidth
+                label="City"
+                value="Brooklyn"
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={3}>
+              <TextField 
+                fullWidth
+                label="State"
+                value="NY"
+              />
+            </Grid>
+            
+            <Grid item xs={12} sm={4}>
+              <TextField 
+                fullWidth
+                label="Zip"
+                value="11211"
+              />
+            </Grid>
+            
+            <Switch label="Make address publicly visible" />
+          </Grid>
+        </Stack>
+      </Card>
 
       <Grid container spacing={2} justifyContent="flex-end">
         <Grid item><Button variant="outlined">Cancel</Button></Grid>
