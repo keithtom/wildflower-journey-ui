@@ -8,7 +8,8 @@ import {
   FormGroup,
   FormLabel,
   MenuItem,
-  InputAdornment
+  InputAdornment,
+  Link
 } from '@mui/material'
 import {
   Divider,
@@ -22,11 +23,41 @@ import {
   TextField,
 } from '@ui'
 import {
+  Filter,
   Search
 } from '@mui/icons-material'
 
 import UserResultItem from '@components/UserResultItem'
 import SchoolResultItem from '@components/SchoolResultItem'
+
+
+const FilterGroup = ({ group }) => {
+  const [showAllItems, setShowAllItems] = useState(false)
+
+  return (
+    <>
+      <FormLabel>{group.name}</FormLabel>
+      <FormGroup>
+        { showAllItems ?
+          group.items.map((item, i) =>
+            <FormControlLabel ket={i} value={item.value} control={<Checkbox />} label={item.label} />
+          )
+        :
+          group.items.slice(0, 3).map((item, i) =>
+            <FormControlLabel ket={i} value={item.value} control={<Checkbox />} label={item.label} />
+          )
+        }
+      </FormGroup>
+      <Link
+        underline="none"
+        color="text.lightened"
+        onClick={() => setShowAllItems(!showAllItems)}
+      >
+        {showAllItems ? 'Show less' : 'Show more'}
+      </Link>
+    </>
+  )
+}
 
 const NetworkContent = () => {
   const [category, setCategory] = useState('people')
@@ -70,14 +101,10 @@ const NetworkContent = () => {
               <>
                 { category === 'people' &&
                 <>
-                  <FormLabel>Role</FormLabel>
-                  <FormGroup>
-                    <FormControlLabel value="teacher-leader" control={<Checkbox />} label="Teacher Leader" />
-                    <FormControlLabel value="hub-member" control={<Checkbox />} label="Hub Member" />
-                    <FormControlLabel value="foundation-partner" control={<Checkbox />} label="Foundation Partner" />
-                    <FormControlLabel value="operations-guide" control={<Checkbox />} label="Operations Guide" />
-                    <FormControlLabel value="board-member" control={<Checkbox />} label="Board Member" />
-                  </FormGroup>
+
+                  <FilterGroup
+                    group={Filters[0]}
+                  />
 
                   <Divider />
 
@@ -174,3 +201,32 @@ const NetworkContent = () => {
 }
 
 export default NetworkContent
+
+
+const Filters = [
+  {
+    name: 'Role',
+    items: [
+      {
+        value: 'teacher-leader',
+        label: 'Teacher Leader'
+      },
+      {
+        value: 'hub-member',
+        label: 'Hub Member'
+      },
+      {
+        value: 'foundation-partner',
+        label: 'Foundation Partner'
+      },
+      {
+        value: 'operations-guide',
+        label: 'Operations Guide'
+      },
+      {
+        value: 'board-member',
+        label: 'Board Member'
+      }
+    ]
+  }
+]
