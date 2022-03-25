@@ -8,7 +8,8 @@ import {
   FormGroup,
   FormLabel,
   MenuItem,
-  InputAdornment
+  InputAdornment,
+  Link
 } from '@mui/material'
 import {
   Divider,
@@ -22,7 +23,8 @@ import {
   TextField,
 } from '@ui'
 import {
-  Search
+  Search,
+  ArrowForwardIos
 } from '@mui/icons-material'
 
 import UserResultItem from '@components/UserResultItem'
@@ -149,23 +151,54 @@ const NetworkContent = () => {
       <Grid item xs={12} sm={8}>
         {category === 'people' ?
           <Stack spacing={4}>
-            <Typography variant="h6">{people.length} Results</Typography>
+            {people.length ?
             <Stack spacing={4}>
+              <Typography variant="h6">{people.length} Results</Typography>
               {people.map((p, i) =>
                 <UserResultItem user={p} key={i} />
               )}
             </Stack>
+            :
+              <Card>
+                <Stack p={6} alignItems="center" spacing={4}>
+                  <Typography variant="h4">Oops! Looks like there's nothing here.</Typography>
+                  <Typography variant="body">Try filtering less or searching for schools instead.</Typography>
+                    <Link onClick={() => setCategory('schools')}>
+                      <Stack direction="row" spacing={3}>
+                        <Typography>Search for schools</Typography>
+                        <ArrowForwardIos fontSize='small' />
+                      </Stack>
+                    </Link>
+                </Stack>
+              </Card>
+            }
           </Stack>
         :
+        <Stack spacing={4}>
           <Stack spacing={4}>
-            <Typography variant="h6">{schools.length} Results</Typography>
-            <Stack spacing={4}>
-              {schools.map((s, i) =>
-                <SchoolResultItem school={s} key={i} />
-              )}
-            </Stack>
+            {schools.length ?
+              <>
+                <Typography variant="h6">{schools.length} Results</Typography>
+                {schools.map((s, i) =>
+                  <SchoolResultItem school={s} key={i} />
+                )}
+              </>
+            :
+              <Card>
+                <Stack p={6} alignItems="center" spacing={4}>
+                  <Typography variant="h4">Oops! Looks like there's nothing here.</Typography>
+                  <Typography variant="body">Try filtering less or searching for people instead.</Typography>
+                    <Link onClick={() => setCategory('people')}>
+                      <Stack direction="row" spacing={3}>
+                        <Typography>Search for people</Typography>
+                        <ArrowForwardIos fontSize='small' />
+                      </Stack>
+                    </Link>
+                </Stack>
+              </Card>
+            }
           </Stack>
-
+        </Stack>
         }
       </Grid>
 
