@@ -31,7 +31,7 @@ import UserResultItem from '@components/UserResultItem'
 import SchoolResultItem from '@components/SchoolResultItem'
 
 
-const FilterGroup = ({ group }) => {
+const FilterGroup = ({ group, filtersSelected, handleOnChange }) => {
   const [showAllItems, setShowAllItems] = useState(false)
 
   return (
@@ -40,11 +40,25 @@ const FilterGroup = ({ group }) => {
       <FormGroup>
         { showAllItems ?
           group.items.map((item, i) =>
-            <FormControlLabel ket={i} value={item.value} control={<Checkbox />} label={item.label} />
+            <FormControlLabel
+              key={i}
+              value={item.value}
+              control={<Checkbox />}
+              label={item.label}
+              checked={filtersSelected[i]}
+              onChange={() => handleOnChange(i)}
+            />
           )
         :
           group.items.slice(0, 3).map((item, i) =>
-            <FormControlLabel ket={i} value={item.value} control={<Checkbox />} label={item.label} />
+            <FormControlLabel
+              key={i}
+              value={item.value}
+              control={<Checkbox />}
+              label={item.label}
+              checked={filtersSelected[i]}
+              onChange={() => handleOnChange(i)}
+            />
           )
         }
       </FormGroup>
@@ -61,10 +75,23 @@ const FilterGroup = ({ group }) => {
 
 const NetworkContent = () => {
   const [category, setCategory] = useState('people')
+  const [rolesSelected, setRolesSelected] = useState(
+    new Array(Filters[0].items.length).fill(false)
+  )
+
+  const handleOnChange = (position) => {
+    const updatedCheckedState = rolesSelected.map((item, index) =>
+      index === position ? !item : item
+    );
+    setRolesSelected(updatedCheckedState);
+  };
+
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value)
   }
+
+  console.log('rolesSelected', rolesSelected)
 
   return (
     <Grid container p={8} spacing={8}>
@@ -104,13 +131,19 @@ const NetworkContent = () => {
 
                   <FilterGroup
                     group={Filters[0]}
+                    filtersSelected={rolesSelected}
+                    handleOnChange={handleOnChange}
                   />
 
                   <Divider />
 
                   <FormLabel>Skills</FormLabel>
                   <FormGroup>
-                    <FormControlLabel value="accounting" control={<Checkbox />} label="Accounting" />
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      value="accounting"
+                      label="Accounting"
+                    />
                     <FormControlLabel value="branding" control={<Checkbox />} label="Branding" />
                     <FormControlLabel value="construction" control={<Checkbox />} label="Construction" />
                     <FormControlLabel value="development" control={<Checkbox />} label="Development" />
