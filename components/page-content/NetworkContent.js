@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { schools, people } from '@lib/utils/fake-data'
+import { schools, people, searchFilters, searchPeopleFilters } from '@lib/utils/fake-data'
 import {
   RadioGroup,
   FormControlLabel,
@@ -23,7 +23,6 @@ import {
   TextField,
 } from '@ui'
 import {
-  Filter,
   Search
 } from '@mui/icons-material'
 
@@ -62,36 +61,106 @@ const FilterGroup = ({ group, filtersSelected, handleOnChange }) => {
           )
         }
       </FormGroup>
-      <Link
-        underline="none"
-        color="text.lightened"
-        onClick={() => setShowAllItems(!showAllItems)}
-      >
-        {showAllItems ? 'Show less' : 'Show more'}
-      </Link>
+      {group.items.length > 3 ?
+        <Link
+          underline="none"
+          color="text.lightened"
+          onClick={() => setShowAllItems(!showAllItems)}
+        >
+          {showAllItems ? 'Show less' : 'Show more'}
+        </Link>
+      : null}
+      <Divider />
     </>
   )
 }
 
 const NetworkContent = () => {
   const [category, setCategory] = useState('people')
-  const [rolesSelected, setRolesSelected] = useState(
-    new Array(Filters[0].items.length).fill(false)
-  )
 
-  const handleOnChange = (position) => {
+  const Role = searchPeopleFilters.find( ({ name }) => name === 'Role')
+  const Skills = searchPeopleFilters.find( ({ name }) => name === 'Skills')
+  const AgesServed = searchFilters.find( ({ name }) => name === 'Ages Served')
+  const GovernanceType = searchFilters.find( ({ name }) => name === 'Governance Type')
+  const TuitionAssistance = searchFilters.find( ({ name }) => name === 'Tuition Assistance')
+  const Calendar = searchFilters.find( ({ name }) => name === 'Calendar')
+
+  //Roles
+  const [rolesSelected, setRolesSelected] = useState(
+    new Array(Role.items.length).fill(true)
+  )
+  const handleRolesChange = (position) => {
     const updatedCheckedState = rolesSelected.map((item, index) =>
       index === position ? !item : item
     );
     setRolesSelected(updatedCheckedState);
   };
 
+  //Skills
+  const [skillsSelected, setSkillsSelected] = useState(
+    new Array(Skills.items.length).fill(true)
+  )
+  const handleSkillsChange = (position) => {
+    const updatedCheckedState = skillsSelected.map((item, index) =>
+      index === position ? !item : item
+    );
+    setSkillsSelected(updatedCheckedState);
+  };
+
+  //Ages Served
+  const [agesServedSelected, setAgesServedSelected] = useState(
+    new Array(AgesServed.items.length).fill(true)
+  )
+  const handleAgesServedChange = (position) => {
+    const updatedCheckedState = agesServedSelected.map((item, index) =>
+      index === position ? !item : item
+    );
+    setAgesServedSelected(updatedCheckedState);
+  };
+
+  //Governance Type
+  const [governanceTypeSelected, setGovernanceTypeSelected] = useState(
+    new Array(GovernanceType.items.length).fill(true)
+  )
+  const handleGovernanceTypeChange = (position) => {
+    const updatedCheckedState = governanceTypeSelected.map((item, index) =>
+      index === position ? !item : item
+    );
+    setGovernanceTypeSelected(updatedCheckedState);
+  };
+
+  //Tuition Assistance
+  const [tuitionAssistanceSelected, setTuitionAssistanceSelected] = useState(
+    new Array(TuitionAssistance.items.length).fill(true)
+  )
+  const handleTuitionAssistanceChange = (position) => {
+    const updatedCheckedState = tuitionAssistanceSelected.map((item, index) =>
+      index === position ? !item : item
+    );
+    setTuitionAssistanceSelected(updatedCheckedState);
+  };
+
+  //Calendar
+  const [calendarSelected, setCalendarSelected] = useState(
+    new Array(Calendar.items.length).fill(true)
+  )
+  const handleCalendarChange = (position) => {
+    const updatedCheckedState = calendarSelected.map((item, index) =>
+      index === position ? !item : item
+    );
+    setCalendarSelected(updatedCheckedState);
+  };
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value)
   }
 
-  console.log('rolesSelected', rolesSelected)
+  console.log("rolesSelected", rolesSelected)
+  console.log("skillsSelected", skillsSelected)
+  console.log("agesServedSelected", agesServedSelected)
+  console.log("governanceTypeSelected", governanceTypeSelected)
+  console.log("tuitionAssistanceSelected", tuitionAssistanceSelected)
+  console.log("calendarSelected", calendarSelected)
 
   return (
     <Grid container p={8} spacing={8}>
@@ -109,7 +178,7 @@ const NetworkContent = () => {
       <Grid item xs={12} sm={4}>
         <Card>
           <FormControl fullWidth>
-            <Stack spacing={2}>
+            <Stack spacing={3}>
 
               <Typography variant="h6">Filter</Typography>
 
@@ -127,65 +196,42 @@ const NetworkContent = () => {
 
               <>
                 { category === 'people' &&
-                <>
-
-                  <FilterGroup
-                    group={Filters[0]}
-                    filtersSelected={rolesSelected}
-                    handleOnChange={handleOnChange}
-                  />
-
-                  <Divider />
-
-                  <FormLabel>Skills</FormLabel>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={<Checkbox />}
-                      value="accounting"
-                      label="Accounting"
+                  <>
+                    <FilterGroup
+                      group={Role}
+                      filtersSelected={rolesSelected}
+                      handleOnChange={handleRolesChange}
                     />
-                    <FormControlLabel value="branding" control={<Checkbox />} label="Branding" />
-                    <FormControlLabel value="construction" control={<Checkbox />} label="Construction" />
-                    <FormControlLabel value="development" control={<Checkbox />} label="Development" />
-                  </FormGroup>
-                </>
+                    <FilterGroup
+                      group={Skills}
+                      filtersSelected={skillsSelected}
+                      handleOnChange={handleSkillsChange}
+                    />
+                  </>
                 }
 
-                <FormLabel>Ages Served</FormLabel>
-                <FormGroup>
-                  <FormControlLabel value="toddler" control={<Checkbox />} label="Parent Child" />
-                  <FormControlLabel value="toddler" control={<Checkbox />} label="Infants" />
-                  <FormControlLabel value="toddler" control={<Checkbox />} label="Toddlers" />
-                  <FormControlLabel value="primary" control={<Checkbox />} label="Primary" />
-                  <FormControlLabel value="elementary" control={<Checkbox />} label="Lower Elementary" />
-                  <FormControlLabel value="elementary" control={<Checkbox />} label="Upper Elementary" />
-                  <FormControlLabel value="elementary" control={<Checkbox />} label="Adolescent" />
-                  <FormControlLabel value="elementary" control={<Checkbox />} label="High School" />
-                </FormGroup>
-                <FormLabel>Governance Type</FormLabel>
-                <FormGroup>
-                  <FormControlLabel value="toddler" control={<Checkbox />} label="Charter" />
-                  <FormControlLabel value="primary" control={<Checkbox />} label="Independent" />
-                  <FormControlLabel value="elementary" control={<Checkbox />} label="District" />
-                </FormGroup>
-                <FormLabel>Tuition Assistance</FormLabel>
-                <FormGroup>
-                  <FormControlLabel value="toddler" control={<Checkbox />} label="State Vouchers" />
-                  <FormControlLabel value="primary" control={<Checkbox />} label="County Childcare Assistance Programs" />
-                  <FormControlLabel value="elementary" control={<Checkbox />} label="City Vouchers" />
-                  <FormControlLabel value="toddler" control={<Checkbox />} label="School-supported scholarship and/or tuition discount" />
-                  <FormControlLabel value="primary" control={<Checkbox />} label="Private-donor funded scholarship program" />
-                </FormGroup>
-                <FormLabel>Calendar</FormLabel>
-                <FormGroup>
-                  <FormControlLabel value="toddler" control={<Checkbox />} label="9 Month" />
-                  <FormControlLabel value="primary" control={<Checkbox />} label="10 Month" />
-                  <FormControlLabel value="elementary" control={<Checkbox />} label="Year Round" />
-                </FormGroup>
+                <FilterGroup
+                  group={AgesServed}
+                  filtersSelected={agesServedSelected}
+                  handleOnChange={handleAgesServedChange}
+                />
+                <FilterGroup
+                  group={GovernanceType}
+                  filtersSelected={governanceTypeSelected}
+                  handleOnChange={handleGovernanceTypeChange}
+                />
+                <FilterGroup
+                  group={TuitionAssistance}
+                  filtersSelected={tuitionAssistanceSelected}
+                  handleOnChange={handleTuitionAssistanceChange}
+                />
+                <FilterGroup
+                  group={Calendar}
+                  filtersSelected={calendarSelected}
+                  handleOnChange={handleCalendarChange}
+                />
+
               </>
-
-
-              <Divider />
 
               <FormLabel>Hub</FormLabel>
               <Select>
@@ -234,32 +280,3 @@ const NetworkContent = () => {
 }
 
 export default NetworkContent
-
-
-const Filters = [
-  {
-    name: 'Role',
-    items: [
-      {
-        value: 'teacher-leader',
-        label: 'Teacher Leader'
-      },
-      {
-        value: 'hub-member',
-        label: 'Hub Member'
-      },
-      {
-        value: 'foundation-partner',
-        label: 'Foundation Partner'
-      },
-      {
-        value: 'operations-guide',
-        label: 'Operations Guide'
-      },
-      {
-        value: 'board-member',
-        label: 'Board Member'
-      }
-    ]
-  }
-]
