@@ -13,7 +13,7 @@ import {
 } from '@ui'
 
 function MyApp({ Component, pageProps }) {
-  const [passwordCorrect, setPasswordCorrect] = useState(false)
+  const [passwordCorrect, setPasswordCorrect] = useState(true)
   const [passwordValue, setPasswordValue] = useState('')
 
   const password = 'techPilot'
