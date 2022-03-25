@@ -18,7 +18,6 @@ import {
 } from '@ui'
 
 const EditUserProfile = ({ user }) => {
-console.log("🚀 ~ file: EditUserProfile.js ~ line 30 ~ EditUserProfile ~ user", user)
   const [phone, setPhone] = useState(user.attributes.phone)
   const handlePhoneChange = (event) => {
     setPhone(event.target.value)
@@ -58,6 +57,11 @@ console.log("🚀 ~ file: EditUserProfile.js ~ line 30 ~ EditUserProfile ~ user"
   const [economicBackground, setEconomicBackground] = useState(1)
   const handleEconomicBackgroundChange = (event) => {
     setEconomicBackground(event.target.value)
+  }
+  
+  const [genderIdentity, setGenderIdentity] = useState(1)
+  const handleGenderIdentityChange = (event) => {
+    setGenderIdentity(event.target.value)
   }
 
   return (
@@ -148,6 +152,19 @@ console.log("🚀 ~ file: EditUserProfile.js ~ line 30 ~ EditUserProfile ~ user"
             />
 
             <Switch label="Make economic background publicly visible" />
+          </div>
+
+          {/* Gender identity select */}
+          <div>
+            <Select
+              id="gender-identity-select"
+              value={genderIdentity}
+              label="Gender identity"
+              onChange={handleGenderIdentityChange}
+              options={genderIdentities}
+            />
+
+            <Switch label="Make gender identity publicly visible" />
           </div>
 
           {/* Address fields */}
