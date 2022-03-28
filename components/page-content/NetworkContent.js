@@ -235,18 +235,12 @@ const NetworkContent = () => {
               </>
 
               <FormLabel>Hub</FormLabel>
-              <Select>
-                <MenuItem value="NY">New York</MenuItem>
-                <MenuItem value="MA">Massachusetts</MenuItem>
-              </Select>
+              <Select options={hubs} />
 
               <Divider />
 
               <FormLabel>Distance</FormLabel>
-              <Select>
-                <MenuItem value="5">Within 5 miles</MenuItem>
-                <MenuItem value="10">Within 10 miles</MenuItem>
-              </Select>
+              <Select options={distances} />
 
             </Stack>
           </FormControl>
@@ -312,3 +306,6 @@ const NetworkContent = () => {
 }
 
 export default NetworkContent
+
+const hubs = ['New York', 'Massachussetts']
+const distances = ['Within 5 miles', 'Within 10 miles']

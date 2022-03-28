@@ -18,7 +18,7 @@ import {
   Switch
 } from '@ui'
 
-const EditUserProfile = ({ user }) => {
+const EditUserProfile = ({ user, toggle }) => {
   const [phone, setPhone] = useState(user.attributes.phone)
   const handlePhoneChange = (event) => {
     setPhone(event.target.value)
@@ -218,7 +218,7 @@ const EditUserProfile = ({ user }) => {
       </Card>
 
       <Grid container spacing={2} justifyContent="flex-end">
-        <Grid item><Button variant="outlined">Cancel</Button></Grid>
+        <Grid item><Button onClick={toggle} variant="outlined">Cancel</Button></Grid>
         <Grid item><Button>Save</Button></Grid>
       </Grid>
     </>

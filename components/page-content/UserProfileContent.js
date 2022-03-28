@@ -52,7 +52,7 @@ const UserAction = ({ user }) => {
         toggle={toggleEditModal}
         title="Edit Profile"
       >
-        <EditUserProfile user={user} />
+        <EditUserProfile user={user} toggle={toggleEditModal} />
       </Modal>
     </>
   )
