@@ -7,20 +7,19 @@ import { theme } from '../../styles/theme'
 import {
   Drawer,
   Toolbar,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Avatar,
   AppBar,
   IconButton,
+  Link
+} from '@mui/material'
+import {
+  Card,
+  NavLink,
   Typography,
   Stack,
   Grid,
-  Link
-} from '@mui/material'
-import Card from './Card'
+  Divider
+} from '@ui'
 import {
  PeopleAlt,
  MeetingRoom,
@@ -65,7 +64,7 @@ const Nav = ({}) => {
               {router.pathname === '/network' ? 'Network'
               : router.pathname === '/user-profile' ? 'Your Profile'
               : router.pathname === '/school-profile' ? 'Your School'
-              : router.pathname === '/advice' ? 'Advice Process'
+              : router.pathname === ('/advice/drafts' || 'advice/open' || 'advice/thought-partner' || 'advice/stakeholder') ? 'Advice Process'
               : null
               }
             </Typography>
@@ -94,53 +93,39 @@ const Nav = ({}) => {
         >
 
           <div>
-            <List>
-              <Link href="/user-profile" color="text.main" underline="none">
-                <ListItem button selected={'/user-profile' === router.pathname}>
-                  <ListItemIcon>
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32
-                      }}
-                      src={user.profileImage}
-                    />
-                  </ListItemIcon>
-                  <ListItemText primary={`${user.firstName} ${user.lastName}`} />
-                </ListItem>
-              </Link>
-            </List>
+            <NavLink
+              to="/user-profile"
+              label={`${user.firstName} ${user.lastName}`}
+              icon={
+                <Avatar
+                  sx={{
+                    width: 32,
+                    height: 32
+                  }}
+                  src={user.profileImage}
+                />
+              }
+            />
 
             <Divider />
 
-            <List>
-              <Link href="/network" color="text.main" underline="none">
-                <ListItem button selected={'/network' === router.pathname}>
-                  <ListItemIcon>
-                    <PeopleAlt />
-                  </ListItemIcon>
-                  <ListItemText primary='Network' />
-                </ListItem>
-              </Link>
+            <NavLink
+              to="/network"
+              label="Network"
+              icon={<PeopleAlt />}
+            />
 
-              <Link href="/school-profile" color="text.main" underline="none">
-                <ListItem button selected={'/school-profile' === router.pathname}>
-                  <ListItemIcon>
-                    <MeetingRoom />
-                  </ListItemIcon>
-                  <ListItemText primary='Your School' />
-                </ListItem>
-              </Link>
+            <NavLink
+              to="/school"
+              label="Your School"
+              icon={<MeetingRoom />}
+            />
 
-              <Link href="/advice" color="text.main" underline="none">
-                <ListItem button selected={'/advice' === router.pathname}>
-                  <ListItemIcon>
-                    <Quiz />
-                  </ListItemIcon>
-                  <ListItemText primary='Advice' />
-                </ListItem>
-              </Link>
-            </List>
+            <NavLink
+              to="/advice/drafts"
+              label="Advice"
+              icon={<Quiz />}
+            />
           </div>
 
           <Grid container p={4} spacing={8}>

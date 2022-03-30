@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import AdviceContent from '@components/page-content/AdviceContent'
+import AdviceDraftsContent from '@components/page-content/advice/AdviceDraftsContent'
 import PageContainer from '@components/ui/PageContainer'
 
 const DirectoryPage = () => {
@@ -16,9 +16,8 @@ const DirectoryPage = () => {
       </Head>
 
       <PageContainer>
-        <AdviceContent />
+        <AdviceDraftsContent />
       </PageContainer>
-
     </>
   )
 }
