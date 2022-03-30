@@ -1,12 +1,12 @@
 import Head from 'next/head'
 import AdviceProcessNavigation from '@components/page-content/advice/AdviceProcessNavigation'
-import AdviceDraftsContent from '@components/page-content/advice/AdviceDraftsContent'
+import AdviceOpenContent from '@components/page-content/advice/AdviceOpenContent'
 import {
   PageContainer,
   Grid
 } from '@ui'
 
-const AdviceDraftsPage = () => {
+const OpenAdvicePage = () => {
   return (
     <>
       <Head>
@@ -23,7 +23,7 @@ const AdviceDraftsPage = () => {
         <Grid container p={8}>
         <Grid container spacing={4}>
           <Grid item xs={12} sm={4}><AdviceProcessNavigation /></Grid>
-          <Grid item xs={12} sm={8}><AdviceDraftsContent /></Grid>
+          <Grid item xs={12} sm={8}><AdviceOpenContent /></Grid>
         </Grid>
       </Grid>
       </PageContainer>
@@ -31,4 +31,4 @@ const AdviceDraftsPage = () => {
   )
 }
 
-export default AdviceDraftsPage
+export default OpenAdvicePage

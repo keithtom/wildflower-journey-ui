@@ -116,7 +116,7 @@ const Nav = ({}) => {
             />
 
             <NavLink
-              to="/school"
+              to="/school-profile"
               label="Your School"
               icon={<MeetingRoom />}
             />
