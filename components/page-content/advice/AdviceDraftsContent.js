@@ -1,4 +1,7 @@
+import { useState } from 'react'
+
 import AdviceSummary from './AdviceSummary'
+import NewDraftModal from '../../NewDraftModal'
 import {
   Button,
   Grid,
@@ -9,6 +12,8 @@ import {
 import { ArrowForward } from '@mui/icons-material'
 
 const AdviceDraftsContent = () => {
+  const [newDraftOpen, setNewDraftOpen] = useState(false)
+
   return (
     <Stack spacing={4}>
       <Grid container spacing={4} direction="row" justify="space-between">
@@ -17,7 +22,11 @@ const AdviceDraftsContent = () => {
           <Typography variant="bodyLightened">Your home base to think through decisions before bringing them to your stakeholders for feedback.</Typography>
         </Grid>
         <Grid item xs={12} sm={3}>
-          <Button>New draft</Button>
+          <Button onClick={() => setNewDraftOpen(true)}>New draft</Button>
+          <NewDraftModal
+            open={newDraftOpen}
+            toggle={() => setNewDraftOpen(!newDraftOpen)}
+          />
         </Grid>
       </Grid>
 
