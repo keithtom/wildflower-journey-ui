@@ -1,8 +1,12 @@
 import Head from 'next/head'
-import AdviceContent from '@components/page-content/AdviceContent'
-import PageContainer from '@components/ui/PageContainer'
+import AdviceProcessNavigation from '@components/page-content/advice/AdviceProcessNavigation'
+import AdviceStakeholderContent from '@components/page-content/advice/AdviceStakeholderContent'
+import {
+  PageContainer,
+  Grid
+} from '@ui'
 
-const DirectoryPage = () => {
+const AdviceStakeholderPage = () => {
   return (
     <>
       <Head>
@@ -16,11 +20,15 @@ const DirectoryPage = () => {
       </Head>
 
       <PageContainer>
-        <AdviceContent />
+        <Grid container p={8}>
+        <Grid container spacing={4}>
+          <Grid item xs={12} sm={4}><AdviceProcessNavigation /></Grid>
+          <Grid item xs={12} sm={8}><AdviceStakeholderContent /></Grid>
+        </Grid>
+      </Grid>
       </PageContainer>
-
     </>
   )
 }
 
-export default DirectoryPage
+export default AdviceStakeholderPage
