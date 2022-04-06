@@ -112,19 +112,20 @@ const Nav = ({}) => {
             <NavLink
               to="/network"
               label="Network"
-              icon={<PeopleAlt />}
+              icon={<PeopleAlt fontSize="small" />}
             />
 
             <NavLink
               to="/school-profile"
               label="Your School"
-              icon={<MeetingRoom />}
+              icon={<MeetingRoom fontSize="small" />}
             />
 
             <NavLink
               to="/advice/drafts"
+              active={('/advice/drafts' || 'advice/open' || 'advice/thought-partner' || 'advice/stakeholder')}
               label="Advice"
-              icon={<Quiz />}
+              icon={<Quiz fontSize="small" />}
             />
           </div>
 

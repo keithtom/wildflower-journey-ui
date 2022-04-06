@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import {
   ListItem,
-  ListItemIcon,
   ListItemText,
 } from '@mui/material'
 import { Link, Grid } from '@ui'
@@ -18,11 +17,11 @@ const NavLink = ({
       <ListItem button selected={to === router.pathname}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
-            <Grid container direction="row">
-              {icon && <ListItemIcon>
+            <Grid container spacing={2} alignItems="center">
+              {icon && <Grid item xs="auto">
                 {icon}
-              </ListItemIcon>}
-              <ListItemText primary={label} />
+              </Grid>}
+              <Grid item><ListItemText primary={label} /></Grid>
             </Grid>
           </Grid>
           {adornment && <Grid item>

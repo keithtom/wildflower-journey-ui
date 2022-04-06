@@ -19,16 +19,16 @@ const AdviceProcessNavigation = () => {
         <Stack spacing={4}>
           <Typography variant="h4">Giving advice</Typography>
           <div>
-            <NavLink to="/advice/drafts" label="Your drafts" icon={<Edit />} />
-            <NavLink to="/advice/open" label="Your open advice" icon={<QuestionAnswer />} />
+            <NavLink to="/advice/drafts" label="Your drafts" icon={<Edit fontSize="small" />} />
+            <NavLink to="/advice/open" label="Your open advice" icon={<QuestionAnswer fontSize="small" />} />
           </div>
         </Stack>
 
         <Stack spacing={4}>
           <Typography variant="h4">Receiving advice</Typography>
           <div>
-            <NavLink to="/advice/thought-partner" label="As a thought partner" icon={<EmojiObjects />} />
-            <NavLink to="/advice/stakeholder" label="As a stakeholder" icon={<MenuBook />} />
+            <NavLink to="/advice/thought-partner" label="As a thought partner" icon={<EmojiObjects fontSize="small" />} />
+            <NavLink to="/advice/stakeholder" label="As a stakeholder" icon={<MenuBook fontSize="small" />} />
           </div>
         </Stack>
       </Stack>
