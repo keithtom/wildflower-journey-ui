@@ -23,6 +23,7 @@ const AdviceStakeholderContent = () => {
           createdAt={advice.createdAt}
           location={advice.location}
           thoughtPartners={advice.thoughtPartners}
+          deadline={advice.needAdviceBy}
         />
       )}
     </Stack>
@@ -35,9 +36,10 @@ const advices = [
   {
     id: 21,
     content: "I am going to update the bookkeeping process at my school.",
-    createdAt: "2022-03-14 05:01:47.589",
-    updatedAt: "2022-03-28 05:01:47.589",
+    createdAt: "2022-03-19 05:01:47.589",
+    updatedAt: "2022-04-02 05:01:47.589",
     location: 'Boston Montessori',
+    needAdviceBy: "2022-04-20 05:01:47.589",
     thoughtPartners: [
       {
         firstName: "Keith",
@@ -57,6 +59,7 @@ const advices = [
     createdAt: "2022-04-05 05:01:47.589",
     updatedAt: "2022-03-28 05:01:47.589",
     location: 'Cambridge Montessori',
+    needAdviceBy: "2022-04-05 05:01:47.589",
     thoughtPartners: [
       {
         firstName: "Keith",

@@ -1,3 +1,4 @@
+import { handleTimeUntil, handleTimeSince } from '@lib/utils/usefulHandlers'
 import {
   Avatar,
   AvatarGroup,
@@ -9,7 +10,8 @@ import {
   Chip
 } from '@ui'
 import {
-  LocationOn
+  LocationOn,
+  AccessTime
 } from '@mui/icons-material'
 
 const AdviceSummary = ({
@@ -17,23 +19,23 @@ const AdviceSummary = ({
   location,
   content,
   createdAt,
+  deadline,
   thoughtPartners,
   ...rest
 }) => {
   const adviceStatus = (status === 'draft') ? 'Draft' : (status === 'open') ? 'Open' : 'Closed'
   const action = (status === 'draft') ? 'drafted' : (status === 'open') ? 'opened' : 'closed'
 
-  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-  const today = new Date();
-  const createdDate = new Date(createdAt);
-  const daysAgo = Math.round(Math.abs((today - createdDate) / oneDay));
-  const createdDaysAgo = (daysAgo > 1) ? `${daysAgo} days ago` : (daysAgo === 1) ? `yesterday` : `today`
-
   return (
     <Card {...rest}>
       <Stack spacing={2}>
         <Grid container spacing={2} justifyContent="space-between" alignItems="center">
-          <Grid item><Chip label={adviceStatus} /></Grid>
+          <Grid item>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item><Chip label={adviceStatus} /></Grid>
+              { deadline && <Grid item><DeadlineCounter deadline={deadline} /></Grid> }
+            </Grid>
+          </Grid>
           {location && <Grid item>
             <Grid container spacing={1}>
               <Grid item><LocationOn fontSize="small" color="neutral"  /></Grid>
@@ -43,7 +45,7 @@ const AdviceSummary = ({
         </Grid>
         <Typography variant="h4">{content}</Typography>
         <div><Grid container spacing={4} alignItems="center">
-          <Grid item>You {action} this {createdDaysAgo}</Grid>
+          <Grid item>You {action} this {handleTimeUntil(createdAt)}</Grid>
           <Grid item><Divider orientation="vertical" flexItem style={{ height: 20 }} /></Grid>
           <Grid item>
             <Grid container spacing={1} alignItems="center">
@@ -62,3 +64,12 @@ const AdviceSummary = ({
 }
 
 export default AdviceSummary
+
+const DeadlineCounter = ({ deadline }) => {
+  return (
+    <Grid container spacing={1}>
+      <Grid item><AccessTime fontSize="small" color="neutral" /></Grid>
+      <Grid item><Typography variant="bodyLightened">{handleTimeSince(deadline)} remaining to give feedback</Typography></Grid>
+    </Grid>
+  )
+}
