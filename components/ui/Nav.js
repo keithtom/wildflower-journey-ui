@@ -64,7 +64,10 @@ const Nav = ({}) => {
               {router.pathname === '/network' ? 'Network'
               : router.pathname === '/user-profile' ? 'Your Profile'
               : router.pathname === '/school-profile' ? 'Your School'
-              : router.pathname === ('/advice/drafts' || 'advice/open' || 'advice/thought-partner' || 'advice/stakeholder') ? 'Advice Process'
+              : router.pathname === '/advice/drafts' ? 'Advice Process'
+              : router.pathname === '/advice/open' ? 'Advice Process'
+              : router.pathname === '/advice/thought-partner' ? 'Advice Process'
+              : router.pathname === '/advice/stakeholder' ? 'Advice Process'
               : null
               }
             </Typography>
