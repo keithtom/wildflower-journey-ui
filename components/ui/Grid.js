@@ -4,11 +4,18 @@ import { styled } from '@mui/material/styles';
 const CustomGrid = styled(MaterialGrid)(({ theme }) => ({
 }));
 
-const Grid = ({ children, ...rest }) => {
+const Grid = ({ container, children, ...rest }) => {
   return (
-    <CustomGrid {...rest}>
-      {children}
-    </CustomGrid>
+    container ?
+      <div>
+        <CustomGrid container={container} {...rest}>
+          {children}
+        </CustomGrid>
+      </div>
+    :
+      <CustomGrid {...rest}>
+        {children}
+      </CustomGrid>
   );
 }
 

@@ -51,7 +51,9 @@ const UserAction = ({ user }) => {
         open={editModalOpen}
         toggle={toggleEditModal}
         title="Edit Profile"
-      ><EditUserProfile user={user} /></Modal>
+      >
+        <EditUserProfile user={user} toggle={toggleEditModal} />
+      </Modal>
     </>
   )
 }
