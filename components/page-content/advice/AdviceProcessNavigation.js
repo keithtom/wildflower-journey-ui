@@ -17,7 +17,7 @@ const AdviceProcessNavigation = () => {
     <Card>
       <Stack spacing={8}>
         <Stack spacing={4}>
-          <Typography variant="h4">Giving advice</Typography>
+          <Typography variant="h4">Receiving advice</Typography>
           <div>
             <NavLink to="/advice/drafts" label="Your drafts" icon={<Edit fontSize="small" />} />
             <NavLink to="/advice/open" label="Your open advice" icon={<QuestionAnswer fontSize="small" />} />
@@ -25,7 +25,7 @@ const AdviceProcessNavigation = () => {
         </Stack>
 
         <Stack spacing={4}>
-          <Typography variant="h4">Receiving advice</Typography>
+          <Typography variant="h4">Giving advice</Typography>
           <div>
             <NavLink to="/advice/thought-partner" label="As a thought partner" icon={<EmojiObjects fontSize="small" />} />
             <NavLink to="/advice/stakeholder" label="As a stakeholder" icon={<MenuBook fontSize="small" />} />
