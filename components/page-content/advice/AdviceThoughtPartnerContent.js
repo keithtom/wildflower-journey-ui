@@ -1,5 +1,6 @@
-import AdviceSummary from './AdviceSummary'
+import AdviceSummary from '../../AdviceSummary'
 import {
+  Card,
   Grid,
   Stack,
   Typography
@@ -16,14 +17,16 @@ const AdviceThoughtPartnerContent = () => {
       </Grid>
 
       {advices.map((advice, i) => 
-        <AdviceSummary
-          key={i}
-          status="draft"
-          content={advice.content}
-          createdAt={advice.createdAt}
-          location={advice.location}
-          thoughtPartners={advice.thoughtPartners}
-        />
+        <Card>
+          <AdviceSummary
+            key={i}
+            status="draft"
+            content={advice.content}
+            createdAt={advice.createdAt}
+            location={advice.location}
+            thoughtPartners={advice.thoughtPartners}
+          />
+        </Card>
       )}
     </Stack>
   )

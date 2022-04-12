@@ -19,6 +19,7 @@ import {
   MoreVert
  } from '@mui/icons-material'
  import UserContactModal from './UserContactModal'
+ import UserSummary from './UserSummary'
 
 const UserResultItem = ({ user }) => {
   const [actionsAnchor, setActionsAnchor] = useState(false)
@@ -37,59 +38,12 @@ const UserResultItem = ({ user }) => {
   return (
     <>
       <Card>
-        <Grid container justifyContent="space-between" alignItems="center" mb={2}>
-          <Grid item>
-            <Grid container alignItems="flex-start" spacing={4}>
-              <Grid item>
-                <Avatar sx={{
-                  width: 32,
-                  height: 32
-                }} />
-              </Grid>
-              <Grid item>
-                <Typography variant="h5">{user.attributes.firstName} {user.attributes.lastName}</Typography>
-                {user.roles ?
-                  user.roles.map((r, i) =>
-                    <Typography key={i}>{r}</Typography>
-                  )
-                : null}
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item>
-            <Grid container alignItems="center" spacing={2}>
-              {user.relationships.skills.map((s, i) =>
-                <Grid item key={i}>
-                  <Chip label={s} />
-                </Grid>
-              )}
-              {/* <Grid item>
-                <IconButton
-                  id={id}
-                  onClick={handleOpenActions}
-                >
-                  <MoreVert />
-                </IconButton>
-                <Popover
-                  id={id}
-                  open={open}
-                  onClose={handleCloseActions}
-                  anchorEl={actionsAnchor}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                  }}
-                >
-                  <List>
-                    <ListItem button onClick={() => setContactModalOpen(true)}>
-                      <Typography>Contact</Typography>
-                    </ListItem>
-                  </List>
-                </Popover>
-              </Grid> */}
-            </Grid>
-          </Grid>
-        </Grid>
+        <UserSummary
+          firstName={user.attributes.firstName}
+          lastName={user.attributes.lastName}
+          roles={user.roles}
+          skills={user.relationships.skills}
+        />
 
         <Divider />
 
