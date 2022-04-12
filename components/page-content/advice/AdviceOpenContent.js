@@ -7,6 +7,7 @@ import {
 } from '@ui'
 
 const AdviceOpenContent = () => {
+
   return (
     <Stack spacing={4}>
       <Grid container spacing={4} direction="row" justify="space-between">
@@ -16,7 +17,7 @@ const AdviceOpenContent = () => {
         </Grid>
       </Grid>
 
-      {advices.map((advice, i) => 
+      {advices.map((advice, i) =>
         <Card>
           <AdviceSummary
             key={i}
@@ -35,10 +36,12 @@ export default AdviceOpenContent
 
 const advices = [
   {
-    id: 21,
-    content: "I am going to update the bookkeeping process at my school.",
-    createdAt: "2022-03-14 05:01:47.589",
-    updatedAt: "2022-03-28 05:01:47.589",
+    id: 13,
+    content: "I am going to introduce healthier lunches at my school.",
+    createdAt: "2022-04-12 05:01:47.589",
+    updatedAt: "2022-04-02 05:01:47.589",
+    location: 'Boston Montessori',
+    needAdviceBy: "2022-04-20 05:01:47.589",
     thoughtPartners: [
       {
         firstName: "Keith",

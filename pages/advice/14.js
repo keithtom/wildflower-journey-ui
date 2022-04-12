@@ -1,18 +1,25 @@
+import { useState } from 'react'
 import Head from 'next/head'
 import AdviceProcessNavigation from '@components/page-content/advice/AdviceProcessNavigation'
 import AdviceOpenContent from '@components/page-content/advice/AdviceOpenContent'
 import AdviceSummary from '@components/AdviceSummary'
+import AdviceActions from '@components/AdviceActions'
 import {
   PageContainer,
   Grid,
   Stack,
   Divider,
   Card,
-  Typography
+  Typography,
+  Button
 } from '@ui'
 import UserSummary from '@components/UserSummary'
 
 const AdviceDecisionPage = () => {
+  const [canAdvance, setCanAdvance] = useState(false)
+
+  const decisionStatus = 'draft'
+
   return (
     <>
       <Head>
@@ -26,10 +33,18 @@ const AdviceDecisionPage = () => {
       </Head>
 
       <PageContainer>
+
+        <AdviceActions
+          status={decisionStatus}
+          activeStep={null}
+          canAdvance={canAdvance}
+        />
+
         <Grid sx={{ p: 6 }}>
           <Stack spacing={4}>
+
             <AdviceSummary
-              status="open"
+              status={decisionStatus}
               content={adviceData.content}
               createdAt={adviceData.createdAt}
               location={adviceData.location}
@@ -44,13 +59,13 @@ const AdviceDecisionPage = () => {
               <Card>
                 <Typography>Summary</Typography>
                 <Card>
-                  The tuition process at my school has been wrought with challenges over the last year as we’ve seen increased growth in our student population. Not only does this lead to difficulties with tracking tuition payments and matching an increasing number of expenses to line items in our banking software, it has also caused friction for parents who are seeking more efficient ways of depositing their tuition payments. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                  {/* The tuition process at my school has been wrought with challenges over the last year as we’ve seen increased growth in our student population. Not only does this lead to difficulties with tracking tuition payments and matching an increasing number of expenses to line items in our banking software, it has also caused friction for parents who are seeking more efficient ways of depositing their tuition payments. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. */}
                 </Card>
               </Card>
 
               <Card>
                 <Typography>Attachments</Typography>
-                <Card>
+                {/* <Card>
                   <Stack spacing={1}>
                     <Typography>Vialeta Bookkeeping Plan - Final</Typography>
                     <Typography variant="bodyLightened">drive.google.com/drive/097823049uadcd</Typography>
@@ -61,7 +76,7 @@ const AdviceDecisionPage = () => {
                     <Typography>Vialeta Bookkeeping Plan - Final</Typography>
                     <Typography variant="bodyLightened">drive.google.com/drive/097823049uadcd</Typography>
                   </Stack>
-                </Card>
+                </Card> */}
               </Card>
             </Card>
 
@@ -69,7 +84,7 @@ const AdviceDecisionPage = () => {
               <Typography variant="h3">Stakeholders</Typography>
               <Card>
                 <Typography>Your School</Typography>
-                <Grid container spacing={2} alignItems="stretch">
+                {/* <Grid container spacing={2} alignItems="stretch">
                   <Grid item xs={12} sm={8}>
                     <Card>
                       <UserSummary
@@ -99,13 +114,13 @@ const AdviceDecisionPage = () => {
                   <Grid item xs={12} sm={4}>
                     <Card>Feedback status</Card>
                   </Grid>
-                </Grid>
+                </Grid> */}
 
               </Card>
 
               <Card>
                 <Typography>Your Hub</Typography>
-                <Grid container spacing={2} alignItems="stretch">
+                {/* <Grid container spacing={2} alignItems="stretch">
                   <Grid item xs={12} sm={8}>
                     <Card>
                       <UserSummary
@@ -135,12 +150,15 @@ const AdviceDecisionPage = () => {
                   <Grid item xs={12} sm={4}>
                     <Card>Feedback status</Card>
                   </Grid>
-                </Grid>
+                </Grid> */}
 
               </Card>
             </Card>
+            <Button variant="outlined" onClick={() => setCanAdvance(!canAdvance)}>Toggle can advance</Button>
           </Stack>
         </Grid>
+
+
       </PageContainer>
     </>
   )
@@ -149,9 +167,9 @@ const AdviceDecisionPage = () => {
 export default AdviceDecisionPage
 
 const adviceData = {
-  id: 21,
-  content: "I am going to update the bookkeeping process at my school.",
-  createdAt: "2022-03-19 05:01:47.589",
+  id: 14,
+  content: "I am going to introduce healthier lunches at my school.",
+  createdAt: "2022-04-12 05:01:47.589",
   updatedAt: "2022-04-02 05:01:47.589",
   location: 'Boston Montessori',
   needAdviceBy: "2022-04-20 05:01:47.589",

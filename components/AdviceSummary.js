@@ -32,7 +32,7 @@ const AdviceSummary = ({
         <Grid item>
           <Grid container spacing={2} alignItems="center">
             <Grid item><Chip label={adviceStatus} /></Grid>
-            { deadline && <Grid item><DeadlineCounter deadline={deadline} /></Grid> }
+            { (deadline && status !== 'draft') && <Grid item><DeadlineCounter deadline={deadline} /></Grid> }
           </Grid>
         </Grid>
         {location && <Grid item>
@@ -51,7 +51,7 @@ const AdviceSummary = ({
             <Grid item>
               <AvatarGroup sm total={thoughtPartners.length}>{thoughtPartners.map((tp, i) =>
                 <Avatar alt={`${tp.firstName} ${tp.lastName}`} src={tp.avatar} />
-              )}</AvatarGroup> 
+              )}</AvatarGroup>
             </Grid>
             <Grid item>{thoughtPartners.length} thought partners</Grid>
           </Grid>
