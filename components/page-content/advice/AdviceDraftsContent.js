@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import AdviceSummary from './AdviceSummary'
+import AdviceSummary from '../../AdviceSummary'
 import NewDraftModal from '../../NewDraftModal'
 import {
   Button,
@@ -45,13 +45,15 @@ const AdviceDraftsContent = () => {
       </Card>
 
       {drafts.map((draft, i) => 
-        <AdviceSummary
-          key={i}
-          status="draft"
-          content={draft.content}
-          createdAt={draft.createdAt}
-          thoughtPartners={draft.thoughtPartners}
-        />
+        <Card>
+          <AdviceSummary
+            key={i}
+            status="draft"
+            content={draft.content}
+            createdAt={draft.createdAt}
+            thoughtPartners={draft.thoughtPartners}
+          />
+        </Card>
       )}
     </Stack>
   )

@@ -40,7 +40,7 @@ const NewDraftModal = ({ open, toggle }) => {
           <Grid item xs={10}><Typography>I believe I have the authority to make this decision</Typography></Grid>
         </Grid>
 
-        <Button href="/advice/create">Create decision draft</Button>
+        <Button href="/advice/14">Create decision draft</Button>
       </Stack>
     </Modal>
   )
