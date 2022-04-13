@@ -47,14 +47,16 @@ const AdviceSummary = ({
         <Grid item>You {action} this {handleTimeUntil(createdAt)}</Grid>
         <Grid item><Divider orientation="vertical" flexItem style={{ height: 20 }} /></Grid>
         <Grid item>
-          <Grid container spacing={1} alignItems="center">
-            <Grid item>
-              <AvatarGroup sm total={thoughtPartners.length}>{thoughtPartners.map((tp, i) =>
-                <Avatar alt={`${tp.firstName} ${tp.lastName}`} src={tp.avatar} />
-              )}</AvatarGroup>
+          {thoughtPartners ?
+            <Grid container spacing={1} alignItems="center">
+              <Grid item>
+                <AvatarGroup sm total={thoughtPartners.length}>{thoughtPartners.map((tp, i) =>
+                  <Avatar alt={`${tp.firstName} ${tp.lastName}`} src={tp.avatar} />
+                )}</AvatarGroup>
+              </Grid>
+              <Grid item>{thoughtPartners.length} thought partners</Grid>
             </Grid>
-            <Grid item>{thoughtPartners.length} thought partners</Grid>
-          </Grid>
+          : null}
         </Grid>
       </Grid></div>
     </Stack>

@@ -8,7 +8,7 @@ const CustomCheckbox = styled(MaterialCheckbox)(({ theme }) => ({
 
 const Checkbox = ({ ...rest }) => {
   return (
-    <CustomCheckbox defaultChecked {...rest} />
+    <CustomCheckbox {...rest} />
   );
 }
 

@@ -11,14 +11,31 @@ import {
   Divider,
   Card,
   Typography,
-  Button
+  Button,
+  TextField
 } from '@ui'
+import {
+  Add,
+  Close
+} from '@mui/icons-material'
 import UserSummary from '@components/UserSummary'
 
+
 const AdviceDecisionPage = () => {
+
+  // Demo stuff
   const [canAdvance, setCanAdvance] = useState(false)
+  const [attachmentAdded, setAttachmentAdded] = useState(false)
+  const [schoolStakeholderAdded, setSchoolStakeholderAdded] = useState(false)
+  const [hubStakeholderAdded, setHubStakeholderAdded] = useState(false)
+  const [thoughtPartnersAdded, setThoughtPartnersAdded] = useState(false)
 
   const decisionStatus = 'draft'
+
+  const handleLastClick = () => {
+    setCanAdvance(true)
+    setHubStakeholderAdded(true)
+  }
 
   return (
     <>
@@ -48,113 +65,187 @@ const AdviceDecisionPage = () => {
               content={adviceData.content}
               createdAt={adviceData.createdAt}
               location={adviceData.location}
-              thoughtPartners={adviceData.thoughtPartners}
+              thoughtPartners={thoughtPartnersAdded && adviceData.thoughtPartners}
               deadline={adviceData.needAdviceBy}
             />
 
             <Divider />
 
+            <Stack spacing={2}>
+              <Typography variant="h4">Thought Partners</Typography>
+              <Typography variant="bodyLightened">Close confidants you’d like to gut-check this decision with before sharing it with impacted stakeholders.</Typography>
+              {thoughtPartnersAdded &&
+                  <Stack>
+                    <Card>
+                      <UserSummary
+                        firstName="Keith"
+                        lastName="Tom"
+                        roles={['Teacher leader']}
+                        skills={['Technology']}
+                      />
+                    </Card>
+                    <Card>
+                      <UserSummary
+                        firstName="Taylor"
+                        lastName="Zanke"
+                        roles={['Resident Site Entrepreneur']}
+                        skills={['Design']}
+                      />
+                    </Card>
+                  </Stack>
+              }
+              <Grid container alignItems="center" spacing={2}>
+                <Grid item>
+                  <Button variant="outlined" onClick={() => setThoughtPartnersAdded(true)}>
+                    <Add />
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Typography>Add a thought partner</Typography>
+                </Grid>
+              </Grid>
+            </Stack>
+
+            <Divider />
+
             <Card>
               <Typography variant="h3">Context</Typography>
-              <Card>
-                <Typography>Summary</Typography>
-                <Card>
-                  {/* The tuition process at my school has been wrought with challenges over the last year as we’ve seen increased growth in our student population. Not only does this lead to difficulties with tracking tuition payments and matching an increasing number of expenses to line items in our banking software, it has also caused friction for parents who are seeking more efficient ways of depositing their tuition payments. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. */}
-                </Card>
+              <Card sx={{backgroundColor: 'neutral.light'}}>
+                <Stack spacing={4}>
+                  <Typography>Summary</Typography>
+                  <TextField
+                    sx={{backgroundColor: 'white'}}
+                    placeholder="A summary of your decision"
+                    multiline
+                    maxRows={4}
+                  />
+                </Stack>
               </Card>
 
-              <Card>
-                <Typography>Attachments</Typography>
-                {/* <Card>
-                  <Stack spacing={1}>
-                    <Typography>Vialeta Bookkeeping Plan - Final</Typography>
-                    <Typography variant="bodyLightened">drive.google.com/drive/097823049uadcd</Typography>
-                  </Stack>
-                </Card>
-                <Card>
-                  <Stack spacing={1}>
-                    <Typography>Vialeta Bookkeeping Plan - Final</Typography>
-                    <Typography variant="bodyLightened">drive.google.com/drive/097823049uadcd</Typography>
-                  </Stack>
-                </Card> */}
+              <Card sx={{backgroundColor: 'neutral.light'}}>
+                <Stack spacing={4}>
+                  <Typography>Attachments</Typography>
+                  {attachmentAdded &&
+                    <Card>
+                      <Grid container justifyContent="space-between" alignItems="center">
+                        <Grid item>
+                          <Stack spacing={1}>
+                            <Typography>Boston Montessori Lunch Menu - Final</Typography>
+                            <Typography variant="bodyLightened">drive.google.com/drive/097823049uadcd</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item>
+                          <Close onClick={() => setAttachmentAdded(false)}/>
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  }
+
+                  <Grid container spacing={4}>
+                    <Grid item xs={11}>
+                      <TextField
+                        sx={{backgroundColor: 'white'}}
+                        placeholder="Paste a link to an attachment"
+                        multiline
+                        maxRows={4}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <Button variant="outlined" onClick={() => setAttachmentAdded(true)}>
+                        <Add />
+                      </Button>
+                    </Grid>
+                  </Grid>
+
+                </Stack>
               </Card>
             </Card>
 
             <Card>
               <Typography variant="h3">Stakeholders</Typography>
-              <Card>
-                <Typography>Your School</Typography>
-                {/* <Grid container spacing={2} alignItems="stretch">
-                  <Grid item xs={12} sm={8}>
-                    <Card>
-                      <UserSummary
-                        firstName="Molly"
-                        lastName="Brown"
-                        roles={['Teacher leader']}
-                        skills={['Finance', 'Real estate']}
-                      />
-                    </Card>
+              <Card sx={{backgroundColor: 'neutral.light'}}>
+                <Stack spacing={4}>
+                  <Typography>Your School</Typography>
+                  {schoolStakeholderAdded &&
+                    <Stack>
+                      <Card>
+                        <UserSummary
+                          firstName="Molly"
+                          lastName="Brown"
+                          roles={['Teacher leader']}
+                          skills={['Finance', 'Real estate']}
+                        />
+                      </Card>
+                      <Card>
+                        <UserSummary
+                          firstName="Jeffery"
+                          lastName="Smith"
+                          roles={['Resident Site Entrepreneur']}
+                          skills={['Finance', 'Nutrition']}
+                        />
+                      </Card>
+                    </Stack>
+                  }
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item>
+                      <Button variant="outlined" onClick={() => setSchoolStakeholderAdded(true)}>
+                        <Add />
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Typography>Add a stakeholder</Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Card>Feedback status</Card>
-                  </Grid>
-                </Grid>
-
-                <Grid container spacing={2} alignItems="stretch">
-                  <Grid item xs={12} sm={8}>
-                    <Card>
-                      <UserSummary
-                        firstName="Molly"
-                        lastName="Brown"
-                        roles={['Teacher leader']}
-                        skills={['Finance', 'Real estate']}
-                      />
-                    </Card>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Card>Feedback status</Card>
-                  </Grid>
-                </Grid> */}
-
-              </Card>
-
-              <Card>
-                <Typography>Your Hub</Typography>
-                {/* <Grid container spacing={2} alignItems="stretch">
-                  <Grid item xs={12} sm={8}>
-                    <Card>
-                      <UserSummary
-                        firstName="Molly"
-                        lastName="Brown"
-                        roles={['Teacher leader']}
-                        skills={['Finance', 'Real estate']}
-                      />
-                    </Card>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Card>Feedback status</Card>
-                  </Grid>
-                </Grid>
-
-                <Grid container spacing={2} alignItems="stretch">
-                  <Grid item xs={12} sm={8}>
-                    <Card>
-                      <UserSummary
-                        firstName="Molly"
-                        lastName="Brown"
-                        roles={['Teacher leader']}
-                        skills={['Finance', 'Real estate']}
-                      />
-                    </Card>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Card>Feedback status</Card>
-                  </Grid>
-                </Grid> */}
+                </Stack>
 
               </Card>
+
+              <Card sx={{backgroundColor: 'neutral.light'}}>
+                <Stack spacing={4}>
+                  <Typography>Your Hub</Typography>
+                  {hubStakeholderAdded &&
+                    <Stack>
+                      <Card>
+                        <UserSummary
+                          firstName="Tim"
+                          lastName="Peterson"
+                          roles={['Operations Guide']}
+                          skills={['Nutrition']}
+                        />
+                      </Card>
+                    </Stack>
+                  }
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item>
+                      <Button variant="outlined" onClick={handleLastClick}>
+                        <Add />
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Typography>Add a stakeholder</Typography>
+                    </Grid>
+                  </Grid>
+                </Stack>
+              </Card>
+
+              <Card sx={{backgroundColor: 'neutral.light'}}>
+                <Stack spacing={4}>
+                  <Typography>Wildflower Foundation</Typography>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item>
+                      <Button variant="outlined">
+                        <Add />
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Typography>Add a stakeholder</Typography>
+                    </Grid>
+                  </Grid>
+                </Stack>
+              </Card>
+
             </Card>
-            <Button variant="outlined" onClick={() => setCanAdvance(!canAdvance)}>Toggle can advance</Button>
+            {/* <Button variant="outlined" onClick={() => setCanAdvance(!canAdvance)}>Toggle can advance</Button> */}
           </Stack>
         </Grid>
 
