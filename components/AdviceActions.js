@@ -21,6 +21,8 @@ import {
   InfoOutlined
 } from '@mui/icons-material'
 import RequestAdviceModal from './RequestAdviceModal'
+import DecideAdviceModal from './DecideAdviceModal'
+import CommunicateAdviceModal from './CommunicateAdviceModal'
 
 const StepContext = ({ context }) => {
   const [showStepContext, setShowStepContext] = useState(null)
@@ -31,7 +33,7 @@ const StepContext = ({ context }) => {
     <>
       <InfoOutlined
         color="action"
-        aria-owns={open ? 'context-popover' : undefined}
+        aria-owns={showStepContext ? 'context-popover' : undefined}
         aria-haspopup="true"
         onMouseEnter={handleClick}
         onMouseLeave={() => setShowStepContext(null)}
@@ -64,6 +66,8 @@ const StepContext = ({ context }) => {
 
 const AdviceActions = ({ status, activeStep, canAdvance }) => {
   const [requestAdviceOpen, setRequestAdviceOpen] = useState(false)
+  const [decideAdviceOpen, setDecideAdviceOpen] = useState(false)
+  const [communicateAdviceOpen, setCommunicateAdviceOpen] = useState(false)
 
   return (
     <Box sx={{backgroundColor: 'neutral.light'}}>
@@ -75,21 +79,41 @@ const AdviceActions = ({ status, activeStep, canAdvance }) => {
               <Link href="/advice/drafts">
                 <Stack direction="row" spacing={4} sx={{'&:hover': {cursor: 'pointer'}}}>
                   <ArrowBack fontSize="small" />
-                  <Typography>Cancel</Typography>
+                  <Typography>Back to advice</Typography>
                 </Stack>
               </Link>
             </Grid>
             <Grid item>
               {
                 status === 'draft' ?
-                  <Button onClick={() => setRequestAdviceOpen(true)} variant={canAdvance ? 'contained' : 'disabled'}>Request advice</Button>
-                : status === 'open' ?
-                  <Grid container>
-                    <Grid item><Button variant="contained">Request advice again</Button></Grid>
-                    <Grid item><Button variant={canAdvance ? 'contained' : 'disabled'}>Make your decision</Button></Grid>
+                  <Button
+                    onClick={() => setRequestAdviceOpen(true)}
+                    variant="contained"
+                    disabled={!canAdvance}
+                  >
+                    Request advice
+                  </Button>
+                : (status === 'open' && activeStep < 4) ?
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <Button
+                        variant="outlined"
+                      >
+                        Request advice again
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        disabled={!canAdvance}
+                        onClick={() => setDecideAdviceOpen(true)}
+                      >
+                        Make your decision
+                      </Button>
+                    </Grid>
                   </Grid>
-                : status === 'closed' ?
-                  <Button variant="active">Communicate your decision</Button>
+                : (status === 'open' && activeStep === 4) ?
+                  <Button variant="contained" disabled={!canAdvance} onClick={() => setCommunicateAdviceOpen(true)}>Communicate your decision</Button>
                 : null
               }
               {/* Actions modals */}
@@ -97,11 +121,19 @@ const AdviceActions = ({ status, activeStep, canAdvance }) => {
                 open={requestAdviceOpen}
                 toggle={() => setRequestAdviceOpen(!requestAdviceOpen)}
               />
+              <DecideAdviceModal
+                open={decideAdviceOpen}
+                toggle={() => setDecideAdviceOpen(!decideAdviceOpen)}
+              />
+              <CommunicateAdviceModal
+                open={communicateAdviceOpen}
+                toggle={() => setCommunicateAdviceOpen(!communicateAdviceOpen)}
+              />
             </Grid>
           </Grid>
 
           {activeStep ?
-            <Grid container spacing={4}>
+            <Grid container spacing={2}>
               {AdviceSteps.map((a, i) =>
                 <Grid item xs={12} sm={3} key={i}>
                   <Card>

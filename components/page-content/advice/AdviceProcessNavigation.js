@@ -21,6 +21,7 @@ const AdviceProcessNavigation = () => {
           <div>
             <NavLink to="/advice/drafts" label="Your drafts" icon={<Edit fontSize="small" />} />
             <NavLink to="/advice/open" label="Your open advice" icon={<QuestionAnswer fontSize="small" />} />
+            <NavLink to="/advice/closed" label="Your closed advice" icon={<QuestionAnswer fontSize="small" />} />
           </div>
         </Stack>
 

@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import AdviceSummary from '../../AdviceSummary'
 import {
   Card,
@@ -18,15 +20,17 @@ const AdviceOpenContent = () => {
       </Grid>
 
       {advices.map((advice, i) =>
-        <Card>
-          <AdviceSummary
-            key={i}
-            status="open"
-            content={advice.content}
-            createdAt={advice.createdAt}
-            thoughtPartners={advice.thoughtPartners}
-          />
-        </Card>
+        <Link href="/advice/demo/14-1">
+          <Card>
+            <AdviceSummary
+              key={i}
+              status="open"
+              content={advice.content}
+              createdAt={advice.createdAt}
+              thoughtPartners={advice.thoughtPartners}
+            />
+          </Card>
+        </Link>
       )}
     </Stack>
   )
