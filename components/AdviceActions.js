@@ -136,7 +136,7 @@ const AdviceActions = ({ status, activeStep, canAdvance }) => {
             <Grid container spacing={2}>
               {AdviceSteps.map((a, i) =>
                 <Grid item xs={12} sm={3} key={i}>
-                  <Card>
+                  <Card sx={(activeStep === i+1) && {border: '1px solid black'}}>
                     <Stack spacing={2}>
                       <Grid container justifyContent="space-between">
                         <Grid item>

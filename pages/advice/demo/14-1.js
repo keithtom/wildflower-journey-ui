@@ -57,14 +57,14 @@ const AdviceDecisionPage = () => {
 
             <Card>
               <Typography variant="h3">Context</Typography>
-              <Card>
+              <Card sx={{backgroundColor: 'neutral.light'}}>
                 <Typography>Summary</Typography>
                 <Card>
                   My school's lunches have involved meat and fried food since opening. At first this was a function of affordability and availability, but as we've scaled it has become apparent that parents and students alike wish for healthier options. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                 </Card>
               </Card>
 
-              <Card>
+              <Card sx={{backgroundColor: 'neutral.light'}}>
                 <Typography>Attachments</Typography>
                 <Card>
                   <Stack spacing={1}>
@@ -77,7 +77,7 @@ const AdviceDecisionPage = () => {
 
             <Card>
               <Typography variant="h3">Stakeholders</Typography>
-              <Card>
+              <Card sx={{backgroundColor: 'neutral.light'}}>
                 <Typography>Your School</Typography>
                 <Grid container spacing={2} alignItems="stretch">
                   <Grid item xs={12} sm={8}>
@@ -117,7 +117,7 @@ const AdviceDecisionPage = () => {
 
               </Card>
 
-              <Card>
+              <Card sx={{backgroundColor: 'neutral.light'}}>
                 <Typography>Your Hub</Typography>
                 <Grid container spacing={2} alignItems="stretch">
                   <Grid item xs={12} sm={8}>

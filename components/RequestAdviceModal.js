@@ -28,8 +28,8 @@ const RequestAdviceModal = ({ open, toggle }) => {
 
         <Typography variant="bodyLightened">Consider whether you have the authority in your role to decide:</Typography>
         <Grid container spacing={1} alignItems="center" direction="row">
-          <Grid item xs={2}><Checkbox /></Grid>
-          <Grid item xs={10}><Typography>I believe I have the authority to make this decision</Typography></Grid>
+          <Grid item><Checkbox /></Grid>
+          <Grid item><Typography>I believe I have the authority to make this decision</Typography></Grid>
         </Grid>
 
         <Grid container justifyContent="flex-end" spacing={4}>

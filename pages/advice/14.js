@@ -72,7 +72,7 @@ const AdviceDecisionPage = () => {
             <Divider />
 
             <Stack spacing={2}>
-              <Typography variant="h4">Thought Partners</Typography>
+              <Typography variant="body1">Your Thought Partners</Typography>
               <Typography variant="bodyLightened">Close confidants you’d like to gut-check this decision with before sharing it with impacted stakeholders.</Typography>
               {thoughtPartnersAdded &&
                   <Stack>
@@ -88,7 +88,7 @@ const AdviceDecisionPage = () => {
                       <UserSummary
                         firstName="Taylor"
                         lastName="Zanke"
-                        roles={['Resident Site Entrepreneur']}
+                        roles={['Regional Site Entrepreneur']}
                         skills={['Design']}
                       />
                     </Card>
@@ -115,7 +115,7 @@ const AdviceDecisionPage = () => {
                   <Typography>Summary</Typography>
                   <TextField
                     sx={{backgroundColor: 'white'}}
-                    placeholder="A summary of your decision"
+                    placeholder="A summary of your proposed decision"
                     multiline
                     maxRows={4}
                   />
@@ -180,7 +180,7 @@ const AdviceDecisionPage = () => {
                         <UserSummary
                           firstName="Jeffery"
                           lastName="Smith"
-                          roles={['Resident Site Entrepreneur']}
+                          roles={['Regional Site Entrepreneur']}
                           skills={['Finance', 'Nutrition']}
                         />
                       </Card>

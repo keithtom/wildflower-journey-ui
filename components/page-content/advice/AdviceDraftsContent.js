@@ -44,7 +44,7 @@ const AdviceDraftsContent = () => {
       </Stack>
       </Card>
 
-      {drafts.map((draft, i) => 
+      {drafts.map((draft, i) =>
         <Card>
           <AdviceSummary
             key={i}
@@ -82,7 +82,7 @@ const drafts = [
   },
   {
     id: 21,
-    content: "I am going to update the bookkeeping process at my school.",
+    content: "I am going increase tuition at my school.",
     createdAt: "2022-04-05 05:01:47.589",
     updatedAt: "2022-03-28 05:01:47.589",
     thoughtPartners: [
