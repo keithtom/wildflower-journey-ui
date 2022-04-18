@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import useSearch from "../../hooks/useSearch"
 
 import { schools, people, searchFilters, searchPeopleFilters } from '@lib/utils/fake-data'
 import {
@@ -77,6 +78,12 @@ const FilterGroup = ({ group, filtersSelected, handleOnChange }) => {
 }
 
 const NetworkContent = () => {
+  // form state, need to fire a query on every change to filters.
+  // form state can look at all filters and form the right API query
+  // return results for people and schools.
+
+  const { query, setQuery, results } = useSearch();
+
   const [category, setCategory] = useState('people')
 
   const Role = searchPeopleFilters.find( ({ name }) => name === 'Role')
@@ -173,6 +180,7 @@ const NetworkContent = () => {
           InputProps={{
             startAdornment: <InputAdornment position="start"><Search/></InputAdornment>,
           }}
+          onChange={(e) => { setQuery(e.target.value) }}
         />
       </Grid>
 
@@ -250,10 +258,10 @@ const NetworkContent = () => {
       <Grid item xs={12} sm={8}>
         {category === 'people' ?
           <Stack spacing={4}>
-            {people.length ?
+            {results.length ?
             <Stack spacing={4}>
-              <Typography variant="h6">{people.length} Results</Typography>
-              {people.map((p, i) =>
+              <Typography variant="h6">{results.length} Results</Typography>
+              {results.map((p, i) =>
                 <UserResultItem user={p} key={i} />
               )}
             </Stack>
