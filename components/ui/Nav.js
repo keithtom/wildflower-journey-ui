@@ -10,7 +10,10 @@ import {
   Avatar,
   AppBar,
   IconButton,
-  Link
+  Link,
+  Box,
+  Menu,
+  MenuItem
 } from '@mui/material'
 import {
   Card,
@@ -33,6 +36,7 @@ const drawerWidth = 240
 
 const Nav = ({}) => {
   const [navOpen, setNavOpen] = useState(false)
+  const [profileNavOpen, setProfileNavOpen] = useState(false)
   const router = useRouter()
 
   const isSm = useMediaQuery(
@@ -40,47 +44,91 @@ const Nav = ({}) => {
   )
 
   return (
-    <>
+    <Box sx={{display: 'flex'}}>
       <AppBar
+        position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          paddingLeft: 6,
+          paddingLeft: 4,
+          paddingRight: 4,
           marginTop: 0,
+          zIndex: 2,
+          background: 'white',
+          color: 'black',
+          border: 0,
+          outline: `1px solid ${theme.palette.border.main}`
         }}
       >
-        <Toolbar>
-          {isSm ?
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={() => setNavOpen(true)}
-            >
-              <MenuOutlined />
-            </IconButton>
-          :
-            <Typography variant="h6" noWrap>
-              {router.pathname === '/network' ? 'Network'
-              : router.pathname === '/user-profile' ? 'Your Profile'
-              : router.pathname === '/school-profile' ? 'Your School'
-              : router.pathname === '/advice/drafts' ? 'Advice Process'
-              : router.pathname === '/advice/open' ? 'Advice Process'
-              : router.pathname === '/advice/thought-partner' ? 'Advice Process'
-              : router.pathname === '/advice/stakeholder' ? 'Advice Process'
-              : null
-              }
-            </Typography>
-          }
+        <Toolbar disableGutters>
+          <Box sx={{ flexGrow: 1 }}>
+            {isSm ?
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={() => setNavOpen(!navOpen)}
+                >
+                  <MenuOutlined />
+                </IconButton>
+                <Typography variant="body1" noWrap>Wildflower Platform</Typography>
+              </Stack>
+            :
+              <Typography variant="h6" noWrap>Wildflower Platform</Typography>
+            }
+          </Box>
+          <Box>
+            <Avatar
+              sx={{
+                width: 32,
+                height: 32
+              }}
+              src={user.profileImage}
+              onClick={() => setProfileNavOpen(true)}
+              id="profile-avatar"
+            />
+            {profileNavOpen &&
+              <Menu
+                id="menu-appbar"
+                anchorEl="profile-avatar"
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={() => setProfileNavOpen(!profileNavOpen)}
+                onClose={() => setProfileNavOpen(false)}
+              >
+                <NavLink
+                   onClick={() => setProfileNavOpen(false)}
+                   to="/user-profile"
+                    label="My Profile"
+                />
+                <NavLink
+                   onClick={() => setProfileNavOpen(false)}
+                   to="/school-profile"
+                    label="My School"
+                />
+              </Menu>
+            }
+          </Box>
         </Toolbar>
       </AppBar>
 
       <Drawer
         sx={{
           width: drawerWidth,
+          zIndex: 1,
+          flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
-            marginTop: 0
+            marginTop: 0,
+            border: 0,
+            outline: `1px solid ${theme.palette.border.main}`
           }
         }}
         variant={isSm ? `temporary` : `permanent`}
@@ -88,42 +136,19 @@ const Nav = ({}) => {
         open={navOpen}
         onClose={() => setNavOpen(!navOpen)}
       >
+        <Toolbar />
 
         <Stack
           justifyContent="space-between"
           direction="column"
           sx={{ height: '100%' }}
         >
-
           <div>
-            <NavLink
-              to="/user-profile"
-              label={`${user.firstName} ${user.lastName}`}
-              icon={
-                <Avatar
-                  sx={{
-                    width: 32,
-                    height: 32
-                  }}
-                  src={user.profileImage}
-                />
-              }
-            />
-
-            <Divider />
-
             <NavLink
               to="/network"
               label="Network"
               icon={<PeopleAlt fontSize="small" />}
             />
-
-            <NavLink
-              to="/school-profile"
-              label="Your School"
-              icon={<MeetingRoom fontSize="small" />}
-            />
-
             <NavLink
               to="/advice/drafts"
               active={('/advice/drafts' || 'advice/open' || 'advice/thought-partner' || 'advice/stakeholder')}
@@ -150,12 +175,10 @@ const Nav = ({}) => {
             </Grid>
           </Grid>
 
-
         </Stack>
 
-
       </Drawer>
-    </>
+    </Box>
   )
 }
 
