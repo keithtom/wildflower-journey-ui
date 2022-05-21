@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import AdviceProcessNavigation from '@components/page-content/advice/AdviceProcessNavigation'
+
 import AdviceStakeholderContent from '@components/page-content/advice/AdviceStakeholderContent'
 import {
   PageContainer,
@@ -25,8 +25,7 @@ const OpenAdvicePage = () => {
       <PageContainer>
         <Grid container p={8}>
         <Grid container spacing={4}>
-          <Grid item xs={12} sm={4}><AdviceProcessNavigation /></Grid>
-          <Grid item xs={12} sm={8}><AdviceStakeholderContent /></Grid>
+          <Grid item xs={12}><AdviceStakeholderContent /></Grid>
         </Grid>
       </Grid>
       </PageContainer>
