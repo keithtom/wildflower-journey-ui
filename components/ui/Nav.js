@@ -150,8 +150,8 @@ const Nav = ({}) => {
               icon={<PeopleAlt fontSize="small" />}
             />
             <NavLink
-              to="/advice/drafts"
-              active={('/advice/drafts' || 'advice/open' || 'advice/thought-partner' || 'advice/stakeholder')}
+              to="/advice"
+              // active={('/advice/drafts' || 'advice/open' || 'advice/thought-partner' || 'advice/stakeholder')}
               label="Advice"
               icon={<Quiz fontSize="small" />}
             />

@@ -11,7 +11,7 @@ import {
 } from '@ui'
 import { ArrowForward } from '@mui/icons-material'
 
-const AdviceDraftsContent = () => {
+const AdviceDraftsContent = ({drafts}) => {
   const [newDraftOpen, setNewDraftOpen] = useState(false)
 
   return (
@@ -44,14 +44,15 @@ const AdviceDraftsContent = () => {
       </Stack>
       </Card>
 
-      {drafts.map((draft, i) => 
+      {drafts.map((draft, i) =>
         <Card>
           <AdviceSummary
             key={i}
             status="draft"
-            content={draft.content}
-            createdAt={draft.createdAt}
-            thoughtPartners={draft.thoughtPartners}
+            adviceId={draft.id}
+            content={draft.attributes.title}
+            createdAt={draft.attributes.createdAt}
+            stakeholders={draft.relationships.stakeholders.data}
           />
         </Card>
       )}
@@ -60,75 +61,6 @@ const AdviceDraftsContent = () => {
 }
 
 export default AdviceDraftsContent
-
-const drafts = [
-  {
-    id: 21,
-    content: "I am going to update the bookkeeping process at my school.",
-    createdAt: "2022-03-14 05:01:47.589",
-    updatedAt: "2022-03-28 05:01:47.589",
-    thoughtPartners: [
-      {
-        firstName: "Keith",
-        lastName: "Tom",
-        avatar: "https://avatars.githubusercontent.com/u/12635?v=4"
-      },
-      {
-        firstName: "Taylor",
-        lastName: "Zanke",
-        avatar: "https://avatars.githubusercontent.com/u/1396123?v=4"
-      }
-    ]
-  },
-  {
-    id: 21,
-    content: "I am going to update the bookkeeping process at my school.",
-    createdAt: "2022-04-05 05:01:47.589",
-    updatedAt: "2022-03-28 05:01:47.589",
-    thoughtPartners: [
-      {
-        firstName: "Keith",
-        lastName: "Tom",
-        avatar: "https://avatars.githubusercontent.com/u/12635?v=4"
-      },
-      {
-        firstName: "Taylor",
-        lastName: "Zanke",
-        avatar: "https://avatars.githubusercontent.com/u/1396123?v=4"
-      },
-      {
-        firstName: "Keith",
-        lastName: "Tom",
-        avatar: "https://avatars.githubusercontent.com/u/12635?v=4"
-      },
-      {
-        firstName: "Taylor",
-        lastName: "Zanke",
-        avatar: "https://avatars.githubusercontent.com/u/1396123?v=4"
-      },
-      {
-        firstName: "Keith",
-        lastName: "Tom",
-        avatar: "https://avatars.githubusercontent.com/u/12635?v=4"
-      },
-      {
-        firstName: "Taylor",
-        lastName: "Zanke",
-        avatar: "https://avatars.githubusercontent.com/u/1396123?v=4"
-      },
-      {
-        firstName: "Keith",
-        lastName: "Tom",
-        avatar: "https://avatars.githubusercontent.com/u/12635?v=4"
-      },
-      {
-        firstName: "Taylor",
-        lastName: "Zanke",
-        avatar: "https://avatars.githubusercontent.com/u/1396123?v=4"
-      },
-    ]
-  }
-]
 
 const helpfulTips = [
   'Invite thought partners to a draft to gut-check your decision before sharing it.',
