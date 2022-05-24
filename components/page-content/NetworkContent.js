@@ -262,7 +262,7 @@ const NetworkContent = () => {
             <Stack spacing={4}>
               <Typography variant="h6">{results.length} Results</Typography>
               {results.map((p, i) =>
-                <UserResultItem user={p} key={i} />
+                <UserResultItem user={p} key={p.id} />
               )}
             </Stack>
             :

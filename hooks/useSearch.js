@@ -16,8 +16,8 @@ const useSearch = () => {
           try {
             // reusable for multiple searches...
             // add url params or attach params for query and data...
-            const response = await search.get(`?search[q]=query`);
-            setResults(response.data );
+            const response = await search.get(`?search%5Bq%5D=${query}`);
+            setResults(response.data.data);
           } catch (err) {
             console.error(err);
           }

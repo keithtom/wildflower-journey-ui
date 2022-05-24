@@ -42,7 +42,7 @@ const UserResultItem = ({ user }) => {
           firstName={user.attributes.firstName}
           lastName={user.attributes.lastName}
           roles={user.roles}
-          skills={user.relationships.skills}
+          skills={[]}
         />
 
         <Divider />
@@ -52,7 +52,7 @@ const UserResultItem = ({ user }) => {
             <Grid container spacing={2}>
               <Grid item>
                 {user.relationships.schools ?
-                  user.relationships.schools.map((s, i) =>
+                  user.relationships.schools.data.map((s, i) =>
                     <Typography key={i}>{s}</Typography>
                   )
                 : null}
