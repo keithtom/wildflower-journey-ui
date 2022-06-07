@@ -9,11 +9,13 @@ export default function TextField({
   charCount,
   charLimit,
   children,
+  placeholder,
   ...rest
 }) {
   return (
     <Stack spacing={1}>
       <CustomTextField
+        placeholder={placeholder}
         {...rest}
       >{children}</CustomTextField>
       {(charCount || charLimit) &&

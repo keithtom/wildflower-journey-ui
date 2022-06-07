@@ -32,6 +32,8 @@ import {
  ArrowForward
 } from '@mui/icons-material'
 
+import AdviceProcessNavigation from '@components/page-content/advice/AdviceProcessNavigation'
+
 const drawerWidth = 240
 
 const Nav = ({}) => {
@@ -146,15 +148,19 @@ const Nav = ({}) => {
           <div>
             <NavLink
               to="/network"
+              active={router.pathname.includes('/network')}
               label="Network"
               icon={<PeopleAlt fontSize="small" />}
             />
             <NavLink
-              to="/advice/drafts"
-              active={('/advice/drafts' || 'advice/open' || 'advice/thought-partner' || 'advice/stakeholder')}
+              to="/advice"
+              active={router.pathname.includes('/advice')}
               label="Advice"
               icon={<Quiz fontSize="small" />}
             />
+            {router.pathname.includes('/advice') &&
+              <AdviceProcessNavigation />
+            }
           </div>
 
           <Grid container p={4} spacing={8}>

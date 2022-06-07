@@ -1,12 +1,16 @@
 import Head from 'next/head'
-import AdviceProcessNavigation from '@components/page-content/advice/AdviceProcessNavigation'
-import AdviceThoughtPartnerContent from '@components/page-content/advice/AdviceThoughtPartnerContent'
+
+import AdviceDraftsContent from '@components/page-content/advice/AdviceDraftsContent'
 import {
   PageContainer,
   Grid
 } from '@ui'
 
-const AdviceThoughtPartnerPage = () => {
+
+const AdviceDraftsPage = ({ drafts }) => {
+
+  console.log(drafts)
+
   return (
     <>
       <Head>
@@ -22,8 +26,7 @@ const AdviceThoughtPartnerPage = () => {
       <PageContainer>
         <Grid container p={8}>
         <Grid container spacing={4}>
-          <Grid item xs={12} sm={4}><AdviceProcessNavigation /></Grid>
-          <Grid item xs={12} sm={8}><AdviceThoughtPartnerContent /></Grid>
+        <Grid item xs={12}><AdviceDraftsContent drafts={drafts}/></Grid>
         </Grid>
       </Grid>
       </PageContainer>
@@ -31,4 +34,22 @@ const AdviceThoughtPartnerPage = () => {
   )
 }
 
-export default AdviceThoughtPartnerPage
+export async function getServerSideProps({ query }) {
+
+  const userId = query.userId
+  const decisionState = 'draft'
+  const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`
+
+  const res = await fetch(apiRoute)
+  const data = await res.json()
+
+  const drafts = data.data.filter(decision => decision.attributes.state === decisionState)
+
+  return {
+    props: {
+      drafts
+    }
+  }
+}
+
+export default AdviceDraftsPage
