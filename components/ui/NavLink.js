@@ -16,7 +16,7 @@ const NavLink = ({
   const router = useRouter()
   return (
     <Link href={to} color="text.main" underline="none">
-      <ListItem button sx={(active && secondary) ? {bgcolor: "neutral.main"} : active && {bgcolor: "primary.main", color: "text.light"}}>
+      <ListItem button selected={to === router.pathname} sx={(active && secondary) ? {bgcolor: "neutral.main"} : active && {bgcolor: "primary.main", color: "text.light"}}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Grid container spacing={2} alignItems="center">

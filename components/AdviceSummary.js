@@ -31,9 +31,11 @@ const AdviceSummary = ({
   const action = (status === 'draft') ? 'drafted' : (status === 'open') ? 'opened' : 'closed'
 
   const router = useRouter()
+  const { userId } = router.query
+  // console.log("userId", userId)
 
   return (
-    <Link href={`${router.asPath }/${adviceId}`}>
+    <Link href={`/advice/people/${userId}/decisions/${adviceId}`}>
       <Stack spacing={2} {...rest}>
         <Grid container spacing={2} justifyContent="space-between" alignItems="center">
           <Grid item>
