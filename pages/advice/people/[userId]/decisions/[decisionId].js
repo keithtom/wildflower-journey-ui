@@ -29,6 +29,11 @@ const Decision = ({ decision, userId }) => {
     setProposal(event.target.value);
   };
 
+  const [stakeholders, setStakeholders] = useState(decision.relationships.stakeholders.data);
+  const handleSetStakeholders = (event) => {
+    setStakeholders(event.target.value);
+  };
+
   const [newLink, setNewLink] = useState(null);
   const handleSetNewLink = (event) => {
     setNewLink(event.target.value);
@@ -172,31 +177,36 @@ const Decision = ({ decision, userId }) => {
                     label="Context"
                     placeholder="Any relevant background information to help the advice givers get into your shoes..."
                     value={decision.attributes.context}
-                  />
+                    disabled={decisionState === "draft"}
+                    />
                   <TextField
                     fullWidth
                     label="Proposal"
                     placeholder="A summary of your proposal..."
                     value={decision.attributes.proposal}
-                  />
+                    disabled={decisionState === "draft"}
+                    />
 
                   <Grid container>
-                    <Grid item xs={12}>
-                      <Grid container spacing={4} alignItems="center">
-                        <Grid item flex={1}>
-                          <TextField
-                            fullWidth
-                            label="Attachments"
-                            placeholder="Paste a link to an attachment..."
-                            value={newLink}
-                            onChange={handleSetNewLink}
-                          />
-                        </Grid>
-                        <Grid item>
-                          <Button disabled={!newLink} onClick={handleAddLink}>+</Button>
+                    {decisionState === "draft" &&
+                      <Grid item xs={12}>
+                        <Grid container spacing={4} alignItems="center">
+                          <Grid item flex={1}>
+                            <TextField
+                              fullWidth
+                              disabled={decisionState === "draft"}
+                              label="Attachments"
+                              placeholder="Paste a link to an attachment..."
+                              value={newLink}
+                              onChange={handleSetNewLink}
+                            />
+                          </Grid>
+                            <Grid item>
+                              <Button disabled={!newLink} onClick={handleAddLink}>+</Button>
+                            </Grid>
                         </Grid>
                       </Grid>
-                    </Grid>
+                    }
                     <Grid item xs={12}>
                       <Stack spacing={2}>
                         {links.map((link, i) => (
@@ -223,38 +233,62 @@ const Decision = ({ decision, userId }) => {
                     <Stack spacing={4}>
                       {/* trigger modal with search for school */}
                       <div>Your school</div>
-                      <Grid container alignItems="center" spacing={4}>
-                        <Grid item>
-                          <Button>+</Button>
+                      {stakeholders && stakeholders.map((s,i) =>
+                        // Filter returned stakeholders by categoriy (ie: "Your School")
+                        <Card>
+                          <div>{s.id}</div>
+                        </Card>
+                      )}
+                      {decisionState === "draft" &&
+                        <Grid container alignItems="center" spacing={4}>
+                          <Grid item>
+                            <Button>+</Button>
+                          </Grid>
+                          <Grid item>Add an advice giver from your school</Grid>
                         </Grid>
-                        <Grid item>Add an advice giver from your school</Grid>
-                      </Grid>
+                      }
                     </Stack>
                   </Card>
                   <Card>
                     <Stack spacing={4}>
                       {/* trigger modal with search for hub */}
                       <div>Your hub</div>
-                      <Grid container alignItems="center" spacing={4}>
-                        <Grid item>
-                          <Button>+</Button>
+                      {stakeholders && stakeholders.map((s,i) =>
+                        // Filter returned stakeholders by categoriy (ie: "Your Hub")
+                        <Card>
+                          <div>{s.id}</div>
+                        </Card>
+                      )}
+                      {decisionState === "draft" &&
+                        <Grid container alignItems="center" spacing={4}>
+                          <Grid item>
+                            <Button>+</Button>
+                          </Grid>
+                          <Grid item>Add an advice giver from your hub</Grid>
                         </Grid>
-                        <Grid item>Add an advice giver from your hub</Grid>
-                      </Grid>
+                      }
                     </Stack>
                   </Card>
                   <Card>
                     <Stack spacing={4}>
                       {/* trigger modal with search for school */}
                       <div>Wildflower foundation</div>
-                      <Grid container alignItems="center" spacing={4}>
-                        <Grid item>
-                          <Button>+</Button>
+                      {stakeholders && stakeholders.map((s,i) =>
+                        // Filter returned stakeholders by categoriy (ie: "Foundation")
+                        <Card>
+                          <div>{s.id}</div>
+                        </Card>
+                      )}
+                      {decisionState === "draft" &&
+                        <Grid container alignItems="center" spacing={4}>
+                          <Grid item>
+                            <Button>+</Button>
+                          </Grid>
+                          <Grid item>
+                            Add an advice giver from the foundation
+                          </Grid>
                         </Grid>
-                        <Grid item>
-                          Add an advice giver from the foundation
-                        </Grid>
-                      </Grid>
+                      }
                     </Stack>
                   </Card>
                 </Stack>
@@ -266,6 +300,9 @@ const Decision = ({ decision, userId }) => {
     </>
   );
 };
+
+
+
 
 export async function getServerSideProps({ query }) {
   const userId = query.userId;
