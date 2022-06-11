@@ -10,6 +10,7 @@ import {
   Card,
   TextField,
   Button,
+  Avatar
 } from "@ui";
 
 const Decision = ({ decision, userId }) => {
@@ -44,8 +45,12 @@ const Decision = ({ decision, userId }) => {
     const newLinks = links.slice(0);
     newLinks.push(newLink);
     setLinks(newLinks);
-    setNewLink(null);
+    setNewLink('');
   };
+  const handleRemoveLink = (link) => {
+    const newLinks = links.filter(e => e !== link)
+    setLinks(newLinks)
+  }
 
   console.log(newLink);
   console.log(links);
@@ -138,7 +143,10 @@ const Decision = ({ decision, userId }) => {
                 <Typography variant="h3">
                   {decision.attributes.title}
                 </Typography>
-                <div>You created this 2 minutes ago</div>
+                <Stack direction="row" spacing={4} alignItems="center">
+                  <Avatar sm/>
+                  <div>You created this 2 minutes ago</div>
+                </Stack>
               </Stack>
             </Grid>
 
@@ -147,7 +155,7 @@ const Decision = ({ decision, userId }) => {
                 {(!validDecision && decisionState === "draft") ?
                   <Stack direction="row" spacing={4}>
                     <Button>Cancel</Button>
-                    <Button>Save</Button>
+                    <Button>Save</Button> {/* Submit */}
                   </Stack>
                 : (validDecision && decisionState === "draft") ?
                   <Stack direction="row" spacing={4}>
@@ -177,14 +185,14 @@ const Decision = ({ decision, userId }) => {
                     label="Context"
                     placeholder="Any relevant background information to help the advice givers get into your shoes..."
                     value={decision.attributes.context}
-                    disabled={decisionState === "draft"}
+                    disabled={decisionState !== "draft"}
                     />
                   <TextField
                     fullWidth
                     label="Proposal"
                     placeholder="A summary of your proposal..."
                     value={decision.attributes.proposal}
-                    disabled={decisionState === "draft"}
+                    disabled={decisionState !== "draft"}
                     />
 
                   <Grid container>
@@ -194,11 +202,11 @@ const Decision = ({ decision, userId }) => {
                           <Grid item flex={1}>
                             <TextField
                               fullWidth
-                              disabled={decisionState === "draft"}
                               label="Attachments"
                               placeholder="Paste a link to an attachment..."
                               value={newLink}
                               onChange={handleSetNewLink}
+                              disabled={decisionState !== "draft"}
                             />
                           </Grid>
                             <Grid item>
@@ -212,8 +220,16 @@ const Decision = ({ decision, userId }) => {
                         {links.map((link, i) => (
                           <Card key={i} fullWidth>
                             <Grid container justifyContent="space-between">
-                              <Grid item>{link}</Grid>
-                              <Grid item>x</Grid>
+                              <Grid item>
+                                <Stack>
+                                  <Typography variant="body2">GOOGLE DOC</Typography>
+                                  <Typography variant="h6">Vialeta Bookkeeping plan - Final</Typography>
+                                  <Typography variant="body2">{link}</Typography>
+                                </Stack>
+                              </Grid>
+                              <Grid item>
+                                <Button onClick={() => handleRemoveLink(link)}>x</Button>
+                              </Grid>
                             </Grid>
                           </Card>
                         ))}
