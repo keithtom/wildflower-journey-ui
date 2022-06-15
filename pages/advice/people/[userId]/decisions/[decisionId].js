@@ -14,23 +14,27 @@ import {
 } from "@ui";
 
 const Decision = ({ decision, userId }) => {
-  console.log("decision", decision);
+
+  const decisionContext = decision.attributes.context
+  const decisionProposal = decision.attributes.proposal
+  const decisionLinks = decision.attributes.links
+  const decisionStakeholders = decision.relationships.stakeholders.data
 
   const [decisionState, setDecisionState] = useState(decision.attributes.state);
 
   const [validDecision, setValidDecision] = useState((decision.attributes.context && decision.attributes.proposal && decision.relationships.stakeholders) ? true : false)
 
-  const [context, setContext] = useState(decision.attributes.context);
+  const [context, setContext] = useState(decisionContext ? decisionContext : null);
   const handleSetContext = (event) => {
     setContext(event.target.value);
   };
 
-  const [proposal, setProposal] = useState(decision.attributes.proposal);
+  const [proposal, setProposal] = useState(decisionProposal ? decisionProposal : null);
   const handleSetProposal = (event) => {
     setProposal(event.target.value);
   };
 
-  const [stakeholders, setStakeholders] = useState(decision.relationships.stakeholders.data);
+  const [stakeholders, setStakeholders] = useState(decisionStakeholders ? decisionStakeholders : null);
   const handleSetStakeholders = (event) => {
     setStakeholders(event.target.value);
   };
@@ -39,7 +43,7 @@ const Decision = ({ decision, userId }) => {
   const handleSetNewLink = (event) => {
     setNewLink(event.target.value);
   };
-  const [links, setLinks] = useState(decision.attributes.links);
+  const [links, setLinks] = useState(decisionLinks ? decisionLinks : null);
 
   const handleAddLink = () => {
     const newLinks = links.slice(0);
@@ -52,9 +56,10 @@ const Decision = ({ decision, userId }) => {
     setLinks(newLinks)
   }
 
-  console.log(newLink);
-  console.log(links);
-  console.log('validDecision', validDecision);
+  // console.log(newLink);
+  // console.log(links);
+  // console.log('validDecision', validDecision);
+  // console.log("decision", decision);
 
   return (
     <>
