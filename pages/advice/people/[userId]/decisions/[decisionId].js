@@ -16,7 +16,8 @@ import {
 
 import {
   NewDraftModal,
-  RequestAdviceModal
+  RequestAdviceModal,
+  MakeDecisionModal
 } from "@adviceModals"
 
 const Decision = ({ decision, userId }) => {
@@ -58,11 +59,12 @@ const Decision = ({ decision, userId }) => {
 
   const [requestIsValid, setRequestIsValid] = useState({context: true , proposal: proposal, stakeholders: stakeholders })
 
-  const [newDraftModalOpen, setNewDraftModalOpen] = useState(true)
+  const [newDraftModalOpen, setNewDraftModalOpen] = useState(false)
   const toggleNewDraftModalOpen = () => setNewDraftModalOpen(!newDraftModalOpen)
-
   const [requestAdviceModalOpen, setRequestAdviceModalOpen] = useState(false)
   const toggleRequestAdviceOpen = () => setRequestAdviceModalOpen(!requestAdviceModalOpen)
+  const [makeDecisionModalOpen, setMakeDecisionModalOpen] = useState(true)
+  const toggleMakeDecisionOpen = () => setMakeDecisionModalOpen(!makeDecisionModalOpen)
 
 
   // console.log(newLink);
@@ -74,12 +76,8 @@ const Decision = ({ decision, userId }) => {
     <>
 
       <NewDraftModal open={newDraftModalOpen} toggle={toggleNewDraftModalOpen}/>
-      <RequestAdviceModal
-        open={requestAdviceModalOpen}
-        toggle={toggleRequestAdviceOpen}
-        requestIsValid={requestIsValid}
-        requestAgain={decisionState === 'open'}
-      />
+      <RequestAdviceModal open={requestAdviceModalOpen} toggle={toggleRequestAdviceOpen} requestIsValid={requestIsValid} requestAgain={decisionState === 'open'} />
+      <MakeDecisionModal open={makeDecisionModalOpen} toggle={toggleMakeDecisionOpen} />
 
 
       <PageContainer>
