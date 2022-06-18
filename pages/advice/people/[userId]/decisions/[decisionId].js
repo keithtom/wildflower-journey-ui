@@ -10,8 +10,14 @@ import {
   Card,
   TextField,
   Button,
-  Avatar
+  Avatar,
+  Modal
 } from "@ui";
+
+import {
+  NewDraftModal,
+  RequestAdviceModal
+} from "@adviceModals"
 
 const Decision = ({ decision, userId }) => {
 
@@ -21,30 +27,24 @@ const Decision = ({ decision, userId }) => {
   const decisionStakeholders = decision.relationships.stakeholders.data
 
   const [decisionState, setDecisionState] = useState(decision.attributes.state);
-
   const [validDecision, setValidDecision] = useState((decision.attributes.context && decision.attributes.proposal && decision.relationships.stakeholders) ? true : false)
-
   const [context, setContext] = useState(decisionContext ? decisionContext : null);
   const handleSetContext = (event) => {
     setContext(event.target.value);
   };
-
   const [proposal, setProposal] = useState(decisionProposal ? decisionProposal : null);
   const handleSetProposal = (event) => {
     setProposal(event.target.value);
   };
-
   const [stakeholders, setStakeholders] = useState(decisionStakeholders ? decisionStakeholders : null);
   const handleSetStakeholders = (event) => {
     setStakeholders(event.target.value);
   };
-
+  const [links, setLinks] = useState(decisionLinks ? decisionLinks : null);
   const [newLink, setNewLink] = useState(null);
   const handleSetNewLink = (event) => {
     setNewLink(event.target.value);
   };
-  const [links, setLinks] = useState(decisionLinks ? decisionLinks : null);
-
   const handleAddLink = () => {
     const newLinks = links.slice(0);
     newLinks.push(newLink);
@@ -56,6 +56,15 @@ const Decision = ({ decision, userId }) => {
     setLinks(newLinks)
   }
 
+  const [requestIsValid, setRequestIsValid] = useState({context: true , proposal: proposal, stakeholders: stakeholders })
+
+  const [newDraftModalOpen, setNewDraftModalOpen] = useState(true)
+  const toggleNewDraftModalOpen = () => setNewDraftModalOpen(!newDraftModalOpen)
+
+  const [requestAdviceModalOpen, setRequestAdviceModalOpen] = useState(false)
+  const toggleRequestAdviceOpen = () => setRequestAdviceModalOpen(!requestAdviceModalOpen)
+
+
   // console.log(newLink);
   // console.log(links);
   // console.log('validDecision', validDecision);
@@ -63,6 +72,16 @@ const Decision = ({ decision, userId }) => {
 
   return (
     <>
+
+      <NewDraftModal open={newDraftModalOpen} toggle={toggleNewDraftModalOpen}/>
+      <RequestAdviceModal
+        open={requestAdviceModalOpen}
+        toggle={toggleRequestAdviceOpen}
+        requestIsValid={requestIsValid}
+        requestAgain={decisionState === 'open'}
+      />
+
+
       <PageContainer>
         <Grid container justifyContent="space-between" alignItems="center" p={6}>
           <Grid item>

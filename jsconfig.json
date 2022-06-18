@@ -4,7 +4,8 @@
     "paths": {
       "@ui": ["components/ui"],
       "@components/*": ["components/*"],
-      "@lib/*": ["lib/*"]
+      "@lib/*": ["lib/*"],
+      "@adviceModals": ["components/adviceModals"]
     }
   }
 }
