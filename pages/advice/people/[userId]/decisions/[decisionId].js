@@ -20,6 +20,7 @@ import {
   RequestAdviceModal,
   MakeDecisionModal,
   ShareDecisionModal,
+  WelcomeBackModal,
 } from "@adviceModals";
 
 const Decision = ({ decision, userId, includedStakeholders }) => {
@@ -87,6 +88,9 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
   const [shareDecisionModalOpen, setShareDecisionModalOpen] = useState(false);
   const toggleShareDecisionModalOpen = () =>
     setShareDecisionModalOpen(!shareDecisionModalOpen);
+  const [welcomeBackModalOpen, setWelcomeBackModalOpen] = useState(true);
+  const toggleWelcomeBackModalOpen = () =>
+    setWelcomeBackModalOpen(!welcomeBackModalOpen);
 
   // console.log(newLink);
   // console.log(links);
@@ -114,6 +118,10 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
       <ShareDecisionModal
         open={shareDecisionModalOpen}
         toggle={toggleShareDecisionModalOpen}
+      />
+      <WelcomeBackModal
+        open={welcomeBackModalOpen}
+        toggle={toggleWelcomeBackModalOpen}
       />
 
       <PageContainer>
