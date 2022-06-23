@@ -34,12 +34,15 @@ const MakeDecisionModal = ({ open, toggle, stakeholders }) => {
     <Modal
       open={open}
       toggle={toggle}
-      title={isValidDecision ? (
-        hasObjections ? "Your decision has objections"
-        : (isDeciding || isSuccess) ? "Make your decision"
-        : "You've received advice from everyone!"
-      )
-      : "You haven't received advice from everyone!"}
+      title={
+        isValidDecision
+          ? hasObjections
+            ? "Your decision has objections"
+            : isDeciding || isSuccess
+            ? "Make your decision"
+            : "You've received advice from everyone!"
+          : "You haven't received advice from everyone!"
+      }
     >
       <MakeDecisionContent
         toggle={toggle}
