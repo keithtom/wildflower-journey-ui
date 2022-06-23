@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Link from 'next/link'
-import { includes } from 'lodash'
+import Link from "next/link";
+import { includes } from "lodash";
 
 import {
   PageContainer,
@@ -12,32 +12,44 @@ import {
   TextField,
   Button,
   Avatar,
-  Modal
+  Modal,
 } from "@ui";
 
 import {
   NewDraftModal,
   RequestAdviceModal,
-  MakeDecisionModal
-} from "@adviceModals"
+  MakeDecisionModal,
+  ShareDecisionModal,
+} from "@adviceModals";
 
 const Decision = ({ decision, userId, includedStakeholders }) => {
-
-  const decisionContext = decision.attributes.context
-  const decisionProposal = decision.attributes.proposal
-  const decisionLinks = decision.attributes.links
+  const decisionContext = decision.attributes.context;
+  const decisionProposal = decision.attributes.proposal;
+  const decisionLinks = decision.attributes.links;
 
   const [decisionState, setDecisionState] = useState(decision.attributes.state);
-  const [validDecision, setValidDecision] = useState((decision.attributes.context && decision.attributes.proposal && decision.relationships.stakeholders) ? true : false)
-  const [context, setContext] = useState(decisionContext ? decisionContext : null);
+  const [validDecision, setValidDecision] = useState(
+    decision.attributes.context &&
+      decision.attributes.proposal &&
+      decision.relationships.stakeholders
+      ? true
+      : false
+  );
+  const [context, setContext] = useState(
+    decisionContext ? decisionContext : null
+  );
   const handleSetContext = (event) => {
     setContext(event.target.value);
   };
-  const [proposal, setProposal] = useState(decisionProposal ? decisionProposal : null);
+  const [proposal, setProposal] = useState(
+    decisionProposal ? decisionProposal : null
+  );
   const handleSetProposal = (event) => {
     setProposal(event.target.value);
   };
-  const [stakeholders, setStakeholders] = useState(includedStakeholders ? includedStakeholders : null);
+  const [stakeholders, setStakeholders] = useState(
+    includedStakeholders ? includedStakeholders : null
+  );
   const handleSetStakeholders = (event) => {
     setStakeholders(event.target.value);
   };
@@ -50,22 +62,31 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
     const newLinks = links.slice(0);
     newLinks.push(newLink);
     setLinks(newLinks);
-    setNewLink('');
+    setNewLink("");
   };
   const handleRemoveLink = (link) => {
-    const newLinks = links.filter(e => e !== link)
-    setLinks(newLinks)
-  }
+    const newLinks = links.filter((e) => e !== link);
+    setLinks(newLinks);
+  };
 
-  const [requestIsValid, setRequestIsValid] = useState({context: true , proposal: proposal, stakeholders: stakeholders })
+  const [requestIsValid, setRequestIsValid] = useState({
+    context: true,
+    proposal: proposal,
+    stakeholders: stakeholders,
+  });
 
-  const [newDraftModalOpen, setNewDraftModalOpen] = useState(false)
-  const toggleNewDraftModalOpen = () => setNewDraftModalOpen(!newDraftModalOpen)
-  const [requestAdviceModalOpen, setRequestAdviceModalOpen] = useState(false)
-  const toggleRequestAdviceOpen = () => setRequestAdviceModalOpen(!requestAdviceModalOpen)
-  const [makeDecisionModalOpen, setMakeDecisionModalOpen] = useState(true)
-  const toggleMakeDecisionOpen = () => setMakeDecisionModalOpen(!makeDecisionModalOpen)
-
+  const [newDraftModalOpen, setNewDraftModalOpen] = useState(false);
+  const toggleNewDraftModalOpen = () =>
+    setNewDraftModalOpen(!newDraftModalOpen);
+  const [requestAdviceModalOpen, setRequestAdviceModalOpen] = useState(false);
+  const toggleRequestAdviceOpen = () =>
+    setRequestAdviceModalOpen(!requestAdviceModalOpen);
+  const [makeDecisionModalOpen, setMakeDecisionModalOpen] = useState(false);
+  const toggleMakeDecisionOpen = () =>
+    setMakeDecisionModalOpen(!makeDecisionModalOpen);
+  const [shareDecisionModalOpen, setShareDecisionModalOpen] = useState(false);
+  const toggleShareDecisionModalOpen = () =>
+    setShareDecisionModalOpen(!shareDecisionModalOpen);
 
   // console.log(newLink);
   // console.log(links);
@@ -75,31 +96,49 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
 
   return (
     <>
-
-      <NewDraftModal open={newDraftModalOpen} toggle={toggleNewDraftModalOpen}/>
-      <RequestAdviceModal open={requestAdviceModalOpen} toggle={toggleRequestAdviceOpen} requestIsValid={requestIsValid} requestAgain={decisionState === 'open'} />
-      <MakeDecisionModal open={makeDecisionModalOpen} toggle={toggleMakeDecisionOpen} stakeholders={stakeholders} />
-
+      <NewDraftModal
+        open={newDraftModalOpen}
+        toggle={toggleNewDraftModalOpen}
+      />
+      <RequestAdviceModal
+        open={requestAdviceModalOpen}
+        toggle={toggleRequestAdviceOpen}
+        requestIsValid={requestIsValid}
+        requestAgain={decisionState === "open"}
+      />
+      <MakeDecisionModal
+        open={makeDecisionModalOpen}
+        toggle={toggleMakeDecisionOpen}
+        stakeholders={stakeholders}
+      />
+      <ShareDecisionModal
+        open={shareDecisionModalOpen}
+        toggle={toggleShareDecisionModalOpen}
+      />
 
       <PageContainer>
-        <Grid container justifyContent="space-between" alignItems="center" p={6}>
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          p={6}
+        >
           <Grid item>
             <Link href={`/advice/people/${userId}/decisions/${decisionState}`}>
               <Typography variant="body1">Back</Typography>
             </Link>
           </Grid>
           <Grid item>
-            {decisionState === "draft" ?
+            {decisionState === "draft" ? (
               <Button>Request advice</Button>
-              : decisionState === "open" ?
+            ) : decisionState === "open" ? (
               <Stack direction="row" spacing={2}>
                 <Button>Request advice again</Button>
                 <Button>Make your decision</Button>
               </Stack>
-            : decisionState === "stakeholder" ?
+            ) : decisionState === "stakeholder" ? (
               <Button>Give advice</Button>
-            : null
-            }
+            ) : null}
           </Grid>
         </Grid>
 
@@ -159,7 +198,6 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
         <Divider />
 
         <form>
-
           <Grid container justifyContent="space-between" p={6}>
             <Grid item>
               <Stack>
@@ -167,7 +205,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                   {decision.attributes.title}
                 </Typography>
                 <Stack direction="row" spacing={4} alignItems="center">
-                  <Avatar sm/>
+                  <Avatar sm />
                   <div>You created this 2 minutes ago</div>
                 </Stack>
               </Stack>
@@ -175,23 +213,22 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
 
             {/* actions */}
             <Grid item>
-                {(!validDecision && decisionState === "draft") ?
-                  <Stack direction="row" spacing={4}>
-                    <Button>Cancel</Button>
-                    <Button>Save</Button> {/* Submit */}
-                  </Stack>
-                : (validDecision && decisionState === "draft") ?
-                  <Stack direction="row" spacing={4}>
-                    <Button>Edit</Button>
-                    <Button>Share decision</Button>
-                  </Stack>
-                : decisionState === "open" ?
-                  <Stack direction="row" spacing={4}>
-                    <Button>Cancel</Button>
-                    <Button>Share decision</Button>
-                  </Stack>
-                : null
-                }
+              {!validDecision && decisionState === "draft" ? (
+                <Stack direction="row" spacing={4}>
+                  <Button>Cancel</Button>
+                  <Button>Save</Button> {/* Submit */}
+                </Stack>
+              ) : validDecision && decisionState === "draft" ? (
+                <Stack direction="row" spacing={4}>
+                  <Button>Edit</Button>
+                  <Button>Share decision</Button>
+                </Stack>
+              ) : decisionState === "open" ? (
+                <Stack direction="row" spacing={4}>
+                  <Button>Cancel</Button>
+                  <Button>Share decision</Button>
+                </Stack>
+              ) : null}
             </Grid>
           </Grid>
 
@@ -209,17 +246,17 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                     placeholder="Any relevant background information to help the advice givers get into your shoes..."
                     value={decision.attributes.context}
                     disabled={decisionState !== "draft"}
-                    />
+                  />
                   <TextField
                     fullWidth
                     label="Proposal"
                     placeholder="A summary of your proposal..."
                     value={decision.attributes.proposal}
                     disabled={decisionState !== "draft"}
-                    />
+                  />
 
                   <Grid container>
-                    {decisionState === "draft" &&
+                    {decisionState === "draft" && (
                       <Grid item xs={12}>
                         <Grid container spacing={4} alignItems="center">
                           <Grid item flex={1}>
@@ -232,12 +269,14 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                               disabled={decisionState !== "draft"}
                             />
                           </Grid>
-                            <Grid item>
-                              <Button disabled={!newLink} onClick={handleAddLink}>+</Button>
-                            </Grid>
+                          <Grid item>
+                            <Button disabled={!newLink} onClick={handleAddLink}>
+                              +
+                            </Button>
+                          </Grid>
                         </Grid>
                       </Grid>
-                    }
+                    )}
                     <Grid item xs={12}>
                       <Stack spacing={2}>
                         {links.map((link, i) => (
@@ -245,13 +284,21 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                             <Grid container justifyContent="space-between">
                               <Grid item>
                                 <Stack>
-                                  <Typography variant="body2">GOOGLE DOC</Typography>
-                                  <Typography variant="h6">Vialeta Bookkeeping plan - Final</Typography>
-                                  <Typography variant="body2">{link}</Typography>
+                                  <Typography variant="body2">
+                                    GOOGLE DOC
+                                  </Typography>
+                                  <Typography variant="h6">
+                                    Vialeta Bookkeeping plan - Final
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {link}
+                                  </Typography>
                                 </Stack>
                               </Grid>
                               <Grid item>
-                                <Button onClick={() => handleRemoveLink(link)}>x</Button>
+                                <Button onClick={() => handleRemoveLink(link)}>
+                                  x
+                                </Button>
                               </Grid>
                             </Grid>
                           </Card>
@@ -272,53 +319,56 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                     <Stack spacing={4}>
                       {/* trigger modal with search for school */}
                       <div>Your school</div>
-                      {stakeholders && stakeholders.map((s,i) =>
-                        // Filter returned stakeholders by categoriy (ie: "Your School")
-                        <Card>
-                          <div>{s.id}</div>
-                        </Card>
-                      )}
-                      {decisionState === "draft" &&
+                      {stakeholders &&
+                        stakeholders.map((s, i) => (
+                          // Filter returned stakeholders by categoriy (ie: "Your School")
+                          <Card>
+                            <div>{s.id}</div>
+                          </Card>
+                        ))}
+                      {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
                             <Button>+</Button>
                           </Grid>
                           <Grid item>Add an advice giver from your school</Grid>
                         </Grid>
-                      }
+                      )}
                     </Stack>
                   </Card>
                   <Card>
                     <Stack spacing={4}>
                       {/* trigger modal with search for hub */}
                       <div>Your hub</div>
-                      {stakeholders && stakeholders.map((s,i) =>
-                        // Filter returned stakeholders by categoriy (ie: "Your Hub")
-                        <Card>
-                          <div>{s.id}</div>
-                        </Card>
-                      )}
-                      {decisionState === "draft" &&
+                      {stakeholders &&
+                        stakeholders.map((s, i) => (
+                          // Filter returned stakeholders by categoriy (ie: "Your Hub")
+                          <Card>
+                            <div>{s.id}</div>
+                          </Card>
+                        ))}
+                      {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
                             <Button>+</Button>
                           </Grid>
                           <Grid item>Add an advice giver from your hub</Grid>
                         </Grid>
-                      }
+                      )}
                     </Stack>
                   </Card>
                   <Card>
                     <Stack spacing={4}>
                       {/* trigger modal with search for school */}
                       <div>Wildflower foundation</div>
-                      {stakeholders && stakeholders.map((s,i) =>
-                        // Filter returned stakeholders by categoriy (ie: "Foundation")
-                        <Card>
-                          <div>{s.id}</div>
-                        </Card>
-                      )}
-                      {decisionState === "draft" &&
+                      {stakeholders &&
+                        stakeholders.map((s, i) => (
+                          // Filter returned stakeholders by categoriy (ie: "Foundation")
+                          <Card>
+                            <div>{s.id}</div>
+                          </Card>
+                        ))}
+                      {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
                             <Button>+</Button>
@@ -327,7 +377,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                             Add an advice giver from the foundation
                           </Grid>
                         </Grid>
-                      }
+                      )}
                     </Stack>
                   </Card>
                 </Stack>
@@ -340,9 +390,6 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
   );
 };
 
-
-
-
 export async function getServerSideProps({ query }) {
   const userId = query.userId;
   const decisionId = query.decisionId;
@@ -353,15 +400,20 @@ export async function getServerSideProps({ query }) {
 
   const decision = data.data.filter((decision) => decision.id === decisionId);
 
-  const allStakeholders = data.included
-  const decisionStakeholders = decision[0].relationships.stakeholders.data
-  const includedStakeholders = allStakeholders.filter((stakeholder) => includes(decisionStakeholders.map((d) => d.id), stakeholder.relationships.decision.data.id))
+  const allStakeholders = data.included;
+  const decisionStakeholders = decision[0].relationships.stakeholders.data;
+  const includedStakeholders = allStakeholders.filter((stakeholder) =>
+    includes(
+      decisionStakeholders.map((d) => d.id),
+      stakeholder.relationships.decision.data.id
+    )
+  );
 
   return {
     props: {
       userId,
       decision: decision[0],
-      includedStakeholders
+      includedStakeholders,
     },
   };
 }
