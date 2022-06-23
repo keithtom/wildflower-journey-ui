@@ -88,7 +88,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
   const [shareDecisionModalOpen, setShareDecisionModalOpen] = useState(false);
   const toggleShareDecisionModalOpen = () =>
     setShareDecisionModalOpen(!shareDecisionModalOpen);
-  const [welcomeBackModalOpen, setWelcomeBackModalOpen] = useState(true);
+  const [welcomeBackModalOpen, setWelcomeBackModalOpen] = useState(false);
   const toggleWelcomeBackModalOpen = () =>
     setWelcomeBackModalOpen(!welcomeBackModalOpen);
 
