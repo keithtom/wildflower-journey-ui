@@ -42,13 +42,15 @@ const RequestAdviceContent = ({ toggle, hasContext, hasProposal, hasStakeholders
     setHasAuthority(true)
   }
 
+  const isValid = (hasContext && hasProposal && hasStakeholders)
+
   return (
     <div>
 
       <form>
 
 
-        {(hasContext && hasProposal && hasStakeholders) ?
+        {isValid ?
 
           <Grid container spacing={4}>
 

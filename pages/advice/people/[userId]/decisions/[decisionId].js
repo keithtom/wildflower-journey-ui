@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from 'next/link'
+import { includes } from 'lodash'
 
 import {
   PageContainer,
@@ -20,12 +21,11 @@ import {
   MakeDecisionModal
 } from "@adviceModals"
 
-const Decision = ({ decision, userId }) => {
+const Decision = ({ decision, userId, includedStakeholders }) => {
 
   const decisionContext = decision.attributes.context
   const decisionProposal = decision.attributes.proposal
   const decisionLinks = decision.attributes.links
-  const decisionStakeholders = decision.relationships.stakeholders.data
 
   const [decisionState, setDecisionState] = useState(decision.attributes.state);
   const [validDecision, setValidDecision] = useState((decision.attributes.context && decision.attributes.proposal && decision.relationships.stakeholders) ? true : false)
@@ -37,7 +37,7 @@ const Decision = ({ decision, userId }) => {
   const handleSetProposal = (event) => {
     setProposal(event.target.value);
   };
-  const [stakeholders, setStakeholders] = useState(decisionStakeholders ? decisionStakeholders : null);
+  const [stakeholders, setStakeholders] = useState(includedStakeholders ? includedStakeholders : null);
   const handleSetStakeholders = (event) => {
     setStakeholders(event.target.value);
   };
@@ -71,13 +71,14 @@ const Decision = ({ decision, userId }) => {
   // console.log(links);
   // console.log('validDecision', validDecision);
   // console.log("decision", decision);
+  // console.log("stakeholders", stakeholders);
 
   return (
     <>
 
       <NewDraftModal open={newDraftModalOpen} toggle={toggleNewDraftModalOpen}/>
       <RequestAdviceModal open={requestAdviceModalOpen} toggle={toggleRequestAdviceOpen} requestIsValid={requestIsValid} requestAgain={decisionState === 'open'} />
-      <MakeDecisionModal open={makeDecisionModalOpen} toggle={toggleMakeDecisionOpen} />
+      <MakeDecisionModal open={makeDecisionModalOpen} toggle={toggleMakeDecisionOpen} stakeholders={stakeholders} />
 
 
       <PageContainer>
@@ -352,10 +353,15 @@ export async function getServerSideProps({ query }) {
 
   const decision = data.data.filter((decision) => decision.id === decisionId);
 
+  const allStakeholders = data.included
+  const decisionStakeholders = decision[0].relationships.stakeholders.data
+  const includedStakeholders = allStakeholders.filter((stakeholder) => includes(decisionStakeholders.map((d) => d.id), stakeholder.relationships.decision.data.id))
+
   return {
     props: {
       userId,
       decision: decision[0],
+      includedStakeholders
     },
   };
 }

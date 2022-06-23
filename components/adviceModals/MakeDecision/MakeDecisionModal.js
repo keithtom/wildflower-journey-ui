@@ -5,7 +5,10 @@ import {
 } from "@ui"
 import MakeDecisionContent from "./MakeDecisionContent"
 
-const MakeDecisionModal = ({ open, toggle }) => {
+const MakeDecisionModal = ({ open, toggle, stakeholders }) => {
+
+  // Include logic for determining if has objections
+  // const hasPendingAdvice = true
 
   return (
     <Modal
@@ -13,7 +16,7 @@ const MakeDecisionModal = ({ open, toggle }) => {
       toggle={toggle}
       title="Make your decision"
     >
-      <MakeDecisionContent toggle={toggle}/>
+      <MakeDecisionContent toggle={toggle} stakeholders={stakeholders}/>
     </Modal>
   )
 }
