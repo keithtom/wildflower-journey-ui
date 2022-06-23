@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { useState } from "react";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 import {
   Box,
@@ -13,51 +13,51 @@ import {
   Stack,
   Switch,
   Checkbox,
-  DatePicker
-} from '@ui'
-import {
-  Check,
-  Close
- } from '@mui/icons-material'
+  DatePicker,
+} from "@ui";
+import { Check, Close } from "@mui/icons-material";
 
-const RequestAdviceContent = ({ toggle, hasContext, hasProposal, hasStakeholders, requestAgain }) => {
-  const [decisionDifference, setDecisionDifference] = useState('')
+const RequestAdviceContent = ({
+  toggle,
+  hasContext,
+  hasProposal,
+  hasStakeholders,
+  requestAgain,
+}) => {
+  const [decisionDifference, setDecisionDifference] = useState("");
   const handleDecicionDifferenceChange = (event) => {
-    setDecisionDifference(event.target.value)
-  }
-  const [decideByDate, setDecideByDate] = useState(null)
+    setDecisionDifference(event.target.value);
+  };
+  const [decideByDate, setDecideByDate] = useState(null);
   const handleDecideByDateChange = (event) => {
-    setDecideByDate(event.target.value)
-  }
-  const [adviceByDate, setAdviceByDate] = useState(null)
+    setDecideByDate(event.target.value);
+  };
+  const [adviceByDate, setAdviceByDate] = useState(null);
   const handleAdviceByDateChange = (event) => {
-    setAdviceByDate(event.target.value)
-  }
-  const [authorRole, setAuthorRole] = useState('')
+    setAdviceByDate(event.target.value);
+  };
+  const [authorRole, setAuthorRole] = useState("");
   const handleAuthorRoleChange = (event) => {
-    setAuthorRole(event.target.value)
-  }
-  const [hasAuthority, setHasAuthority] = useState(false)
+    setAuthorRole(event.target.value);
+  };
+  const [hasAuthority, setHasAuthority] = useState(false);
   const handleHasAuthorityChange = (event) => {
-    setHasAuthority(true)
-  }
+    setHasAuthority(true);
+  };
 
-  const isValid = (hasContext && hasProposal && hasStakeholders)
+  const isValid = hasContext && hasProposal && hasStakeholders;
 
   return (
     <div>
-
       <form>
-
-
-        {isValid ?
-
+        {isValid ? (
           <Grid container spacing={4}>
-
-            {requestAgain ?
+            {requestAgain ? (
               <Grid item xs={12}>
                 <Stack spacing={2}>
-                  <Typography variant="body1">How is your decision different from before?</Typography>
+                  <Typography variant="body1">
+                    How is your decision different from before?
+                  </Typography>
                   <TextField
                     fullWidth
                     label="My decision is different from before because..."
@@ -67,12 +67,13 @@ const RequestAdviceContent = ({ toggle, hasContext, hasProposal, hasStakeholders
                   />
                 </Stack>
               </Grid>
-            : null}
-
+            ) : null}
 
             <Grid item xs={12}>
               <Stack spacing={2}>
-                <Typography variant="body1">When do you need to decide by?</Typography>
+                <Typography variant="body1">
+                  When do you need to decide by?
+                </Typography>
                 <DatePicker
                   value={decideByDate}
                   onChange={handleDecideByDateChange}
@@ -82,7 +83,9 @@ const RequestAdviceContent = ({ toggle, hasContext, hasProposal, hasStakeholders
 
             <Grid item xs={12}>
               <Stack spacing={2}>
-                <Typography variant="body1">When do you need advice by?</Typography>
+                <Typography variant="body1">
+                  When do you need advice by?
+                </Typography>
                 <DatePicker
                   value={adviceByDate}
                   onChange={handleAdviceByDateChange}
@@ -92,7 +95,9 @@ const RequestAdviceContent = ({ toggle, hasContext, hasProposal, hasStakeholders
 
             <Grid item xs={12}>
               <Stack spacing={2}>
-                <Typography variant="body1">In what role are you making this decision?</Typography>
+                <Typography variant="body1">
+                  In what role are you making this decision?
+                </Typography>
                 <TextField
                   fullWidth
                   label="Your role"
@@ -105,28 +110,43 @@ const RequestAdviceContent = ({ toggle, hasContext, hasProposal, hasStakeholders
 
             <Grid item xs={12}>
               <Stack spacing={2}>
-                <Typography variant="body1">Consider whether you have the authority in your role to decide</Typography>
-                <FormControlLabel control={<Checkbox checked={hasAuthority} onChange={handleHasAuthorityChange} />} label="I believe I have the authority to decide"/>
+                <Typography variant="body1">
+                  Consider whether you have the authority in your role to decide
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={hasAuthority}
+                      onChange={handleHasAuthorityChange}
+                    />
+                  }
+                  label="I believe I have the authority to decide"
+                />
               </Stack>
             </Grid>
 
             <Grid item xs={12}>
               <Grid container spacing={4}>
                 <Grid item xs={12} sm={6}>
-                  <Button variant="outlined" fullWidth onClick={toggle}>Cancel</Button>
+                  <Button variant="outlined" fullWidth onClick={toggle}>
+                    Cancel
+                  </Button>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Button fullWidth onClick={toggle}>Request advice</Button>
+                  <Button fullWidth onClick={toggle}>
+                    Request advice
+                  </Button>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
-
-        :
-
+        ) : (
           <Grid container spacing={4}>
             <Grid item xs={12}>
-              <Typography variant="body1">It looks like you haven't included some of the important information that is needed to draft a decision. You need:</Typography>
+              <Typography variant="body1">
+                It looks like you haven't included some of the important
+                information that is needed to draft a decision. You need:
+              </Typography>
             </Grid>
             <Grid item xs={12}>
               <Card>
@@ -151,20 +171,17 @@ const RequestAdviceContent = ({ toggle, hasContext, hasProposal, hasStakeholders
             <Grid item xs={12}>
               <Grid container spacing={4}>
                 <Grid item xs={12}>
-                  <Button fullWidth onClick={toggle}>Close</Button>
+                  <Button fullWidth onClick={toggle}>
+                    Close
+                  </Button>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
-
-        }
-
-
-
+        )}
       </form>
-
     </div>
-  )
-}
+  );
+};
 
-export default RequestAdviceContent
+export default RequestAdviceContent;

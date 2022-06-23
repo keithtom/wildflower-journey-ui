@@ -17,7 +17,19 @@ import {
 } from "@ui";
 import { Check, Close } from "@mui/icons-material";
 
-const MakeDecisionContent = ({ toggle, hasPendingAdvice, stakeholders }) => {
+const MakeDecisionContent = ({
+  toggle,
+  stakeholders,
+  pendingAdvice,
+  hasObjections,
+  noObjection,
+  isValidDecision,
+  isValidating,
+  isDeciding,
+  isSuccess,
+  handleValidate,
+  handleDecide,
+}) => {
   const [whyDecisionMade, setWhyDecisionMade] = useState("");
   const handleWhyDecisionMadeChange = (event) => {
     setWhyDecisionMade(event.target.value);
@@ -34,32 +46,6 @@ const MakeDecisionContent = ({ toggle, hasPendingAdvice, stakeholders }) => {
   const handleHasAuthorityChange = (event) => {
     setHasAuthority(true);
   };
-
-  const pendingAdvice = JSON.parse(
-    stakeholders.map((s) => s.attributes.status.includes("pending"))
-  );
-  const hasObjections = JSON.parse(
-    stakeholders.map((s) => s.attributes.status.includes("objects"))
-  );
-  const noObjection = JSON.parse(
-    stakeholders.map((s) => s.attributes.status.includes("no objection"))
-  );
-
-  const [isValidDecision, setIsValidDecision] = useState(!pendingAdvice);
-  const [isValidating, setIsValidating] = useState(true);
-  const [isDeciding, setIsDeciding] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const handleValidate = () => {
-    setIsValidating(false)
-    setIsDeciding(true)
-    setIsSuccess(false)
-  }
-  const handleDecide = () => {
-    setIsValidating(false)
-    setIsDeciding(false)
-    setIsSuccess(true)
-  }
 
   return (
     <div>
