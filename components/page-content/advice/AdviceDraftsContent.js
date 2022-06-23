@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 import AdviceSummary from '../../AdviceSummary'
-import NewDraftModal from '../../NewDraftModal'
 import {
   Button,
   Grid,
@@ -9,6 +8,7 @@ import {
   Typography,
   Card
 } from '@ui'
+import { NewDraftModal } from '@adviceModals'
 import { ArrowForward } from '@mui/icons-material'
 
 const AdviceDraftsContent = ({drafts}) => {

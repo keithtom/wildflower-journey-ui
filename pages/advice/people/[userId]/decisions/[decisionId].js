@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from 'next/link'
+import { includes } from 'lodash'
 
 import {
   PageContainer,
@@ -10,41 +11,41 @@ import {
   Card,
   TextField,
   Button,
-  Avatar
+  Avatar,
+  Modal
 } from "@ui";
 
-const Decision = ({ decision, userId }) => {
+import {
+  NewDraftModal,
+  RequestAdviceModal,
+  MakeDecisionModal
+} from "@adviceModals"
+
+const Decision = ({ decision, userId, includedStakeholders }) => {
 
   const decisionContext = decision.attributes.context
   const decisionProposal = decision.attributes.proposal
   const decisionLinks = decision.attributes.links
-  const decisionStakeholders = decision.relationships.stakeholders.data
 
   const [decisionState, setDecisionState] = useState(decision.attributes.state);
-
   const [validDecision, setValidDecision] = useState((decision.attributes.context && decision.attributes.proposal && decision.relationships.stakeholders) ? true : false)
-
   const [context, setContext] = useState(decisionContext ? decisionContext : null);
   const handleSetContext = (event) => {
     setContext(event.target.value);
   };
-
   const [proposal, setProposal] = useState(decisionProposal ? decisionProposal : null);
   const handleSetProposal = (event) => {
     setProposal(event.target.value);
   };
-
-  const [stakeholders, setStakeholders] = useState(decisionStakeholders ? decisionStakeholders : null);
+  const [stakeholders, setStakeholders] = useState(includedStakeholders ? includedStakeholders : null);
   const handleSetStakeholders = (event) => {
     setStakeholders(event.target.value);
   };
-
+  const [links, setLinks] = useState(decisionLinks ? decisionLinks : null);
   const [newLink, setNewLink] = useState(null);
   const handleSetNewLink = (event) => {
     setNewLink(event.target.value);
   };
-  const [links, setLinks] = useState(decisionLinks ? decisionLinks : null);
-
   const handleAddLink = () => {
     const newLinks = links.slice(0);
     newLinks.push(newLink);
@@ -56,13 +57,30 @@ const Decision = ({ decision, userId }) => {
     setLinks(newLinks)
   }
 
+  const [requestIsValid, setRequestIsValid] = useState({context: true , proposal: proposal, stakeholders: stakeholders })
+
+  const [newDraftModalOpen, setNewDraftModalOpen] = useState(false)
+  const toggleNewDraftModalOpen = () => setNewDraftModalOpen(!newDraftModalOpen)
+  const [requestAdviceModalOpen, setRequestAdviceModalOpen] = useState(false)
+  const toggleRequestAdviceOpen = () => setRequestAdviceModalOpen(!requestAdviceModalOpen)
+  const [makeDecisionModalOpen, setMakeDecisionModalOpen] = useState(true)
+  const toggleMakeDecisionOpen = () => setMakeDecisionModalOpen(!makeDecisionModalOpen)
+
+
   // console.log(newLink);
   // console.log(links);
   // console.log('validDecision', validDecision);
   // console.log("decision", decision);
+  // console.log("stakeholders", stakeholders);
 
   return (
     <>
+
+      <NewDraftModal open={newDraftModalOpen} toggle={toggleNewDraftModalOpen}/>
+      <RequestAdviceModal open={requestAdviceModalOpen} toggle={toggleRequestAdviceOpen} requestIsValid={requestIsValid} requestAgain={decisionState === 'open'} />
+      <MakeDecisionModal open={makeDecisionModalOpen} toggle={toggleMakeDecisionOpen} stakeholders={stakeholders} />
+
+
       <PageContainer>
         <Grid container justifyContent="space-between" alignItems="center" p={6}>
           <Grid item>
@@ -335,10 +353,15 @@ export async function getServerSideProps({ query }) {
 
   const decision = data.data.filter((decision) => decision.id === decisionId);
 
+  const allStakeholders = data.included
+  const decisionStakeholders = decision[0].relationships.stakeholders.data
+  const includedStakeholders = allStakeholders.filter((stakeholder) => includes(decisionStakeholders.map((d) => d.id), stakeholder.relationships.decision.data.id))
+
   return {
     props: {
       userId,
       decision: decision[0],
+      includedStakeholders
     },
   };
 }
