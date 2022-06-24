@@ -23,7 +23,7 @@ import {
   WelcomeBackModal,
   AdviceExchangeModal,
   GiveAdviceModal,
-  AddStakeholderModal
+  AddStakeholderModal,
 } from "@adviceModals";
 
 const Decision = ({ decision, userId, includedStakeholders }) => {
@@ -167,14 +167,22 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
           </Grid>
           <Grid item>
             {decisionState === "draft" ? (
-              <Button>Request advice</Button>
+              <Button onClick={setRequestAdviceModalOpen(true)}>
+                Request advice
+              </Button>
             ) : decisionState === "open" ? (
               <Stack direction="row" spacing={2}>
-                <Button>Request advice again</Button>
-                <Button>Make your decision</Button>
+                <Button onClick={setRequestAdviceModalOpen(true)}>
+                  Request advice again
+                </Button>
+                <Button onClick={setMakeDecisionModalOpen(true)}>
+                  Make your decision
+                </Button>
               </Stack>
             ) : decisionState === "stakeholder" ? (
-              <Button>Give advice</Button>
+              <Button onClick={setGiveAdviceModalOpen(true)}>
+                Give advice
+              </Button>
             ) : null}
           </Grid>
         </Grid>
@@ -252,18 +260,30 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
             <Grid item>
               {!validDecision && decisionState === "draft" ? (
                 <Stack direction="row" spacing={4}>
-                  <Button>Cancel</Button>
-                  <Button>Save</Button> {/* Submit */}
+                  <Link
+                    href={`/advice/people/${userId}/decisions/${decisionState}`}
+                  >
+                    <Button>Cancel</Button>
+                  </Link>
+                  <Button>Save</Button> {/* Save drafted decision */}
                 </Stack>
               ) : validDecision && decisionState === "draft" ? (
                 <Stack direction="row" spacing={4}>
-                  <Button>Edit</Button>
-                  <Button>Share decision</Button>
+                  <Button>Edit</Button> {/* Edit drafted decision */}
+                  <Button onClick={setShareDecisionModalOpen(true)}>
+                    Share decision
+                  </Button>
                 </Stack>
               ) : decisionState === "open" ? (
                 <Stack direction="row" spacing={4}>
-                  <Button>Cancel</Button>
-                  <Button>Share decision</Button>
+                  <Link
+                    href={`/advice/people/${userId}/decisions/${decisionState}`}
+                  >
+                    <Button>Cancel</Button>
+                  </Link>
+                  <Button onClick={setShareDecisionModalOpen(true)}>
+                    Share decision
+                  </Button>
                 </Stack>
               ) : null}
             </Grid>
@@ -366,7 +386,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
-                            <Button>+</Button>
+                            <Button  >+</Button>
                           </Grid>
                           <Grid item>Add an advice giver from your school</Grid>
                         </Grid>
@@ -387,7 +407,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
-                            <Button>+</Button>
+                            <Button onClick={() => setAddStakeholderModalOpen(true)}>+</Button>
                           </Grid>
                           <Grid item>Add an advice giver from your hub</Grid>
                         </Grid>
@@ -408,7 +428,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
-                            <Button>+</Button>
+                            <Button onClick={() => setAddStakeholderModalOpen(true)}>+</Button>
                           </Grid>
                           <Grid item>
                             Add an advice giver from the foundation
