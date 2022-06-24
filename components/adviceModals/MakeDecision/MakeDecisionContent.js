@@ -16,6 +16,7 @@ import {
   DatePicker,
 } from "@ui";
 import { Check, Close } from "@mui/icons-material";
+import StakeholderStatusIndicator from "@components/StakeholderStatusIndicator";
 
 const MakeDecisionContent = ({
   toggle,
@@ -64,20 +65,7 @@ const MakeDecisionContent = ({
             </Grid>
             <Grid item xs={12}>
               {stakeholders.map((s, i) => (
-                <Card>
-                  <Grid container justifyContent="space-between">
-                    <Grid item>
-                      <Typography variant="body1">
-                        {s.attributes.name}
-                      </Typography>
-                    </Grid>
-                    <Grid item>
-                      <Typography variant="body1">
-                        {s.attributes.status}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Card>
+                <StakeholderStatusIndicator stakeholder={s} />
               ))}
             </Grid>
             <Grid item xs={12}>
@@ -89,10 +77,7 @@ const MakeDecisionContent = ({
                     </Button>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Button
-                      fullWidth
-                      onClick={handleValidate}
-                    >
+                    <Button fullWidth onClick={handleValidate}>
                       Make your decision
                     </Button>
                   </Grid>

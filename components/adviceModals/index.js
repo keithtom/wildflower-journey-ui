@@ -3,3 +3,4 @@ export { default as RequestAdviceModal } from './RequestAdvice/RequestAdviceModa
 export { default as MakeDecisionModal } from './MakeDecision/MakeDecisionModal'
 export { default as ShareDecisionModal } from './ShareDecision/ShareDecisionModal'
 export { default as WelcomeBackModal } from './WelcomeBack/WelcomeBackModal'
+export { default as AdviceExchangeModal } from './AdviceExchange/AdviceExchangeModal'

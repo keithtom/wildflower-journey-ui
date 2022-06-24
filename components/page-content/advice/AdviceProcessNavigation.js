@@ -31,7 +31,7 @@ const AdviceProcessNavigation = () => {
         <Stack>
           <Box sx={{padding: 4}}><Typography variant="subtitle1">Seeking advice</Typography></Box>
           <div>
-            <NavLink to={`/advice/people/${userId}/decisions/draft`} secondary label="Your drafts" icon={<Edit fontSize="small" />} active={router.pathname.includes('/drafts')}/>
+            <NavLink to={`/advice/people/${userId}/decisions/draft`} secondary label="Your drafts" icon={<Edit fontSize="small" />} active={router.pathname.includes('/draft')}/>
             <NavLink to={`/advice/people/${userId}/decisions/open`} secondary label="Your open advice" icon={<QuestionAnswer fontSize="small" />} active={router.pathname.includes('/open')}/>
             <NavLink to={`/advice/people/${userId}/decisions/closed`} secondary label="Your closed advice" icon={<QuestionAnswer fontSize="small" />} active={router.pathname.includes('/closed')}/>
           </div>

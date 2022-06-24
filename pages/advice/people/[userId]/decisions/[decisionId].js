@@ -21,6 +21,7 @@ import {
   MakeDecisionModal,
   ShareDecisionModal,
   WelcomeBackModal,
+  AdviceExchangeModal,
 } from "@adviceModals";
 
 const Decision = ({ decision, userId, includedStakeholders }) => {
@@ -91,12 +92,15 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
   const [welcomeBackModalOpen, setWelcomeBackModalOpen] = useState(false);
   const toggleWelcomeBackModalOpen = () =>
     setWelcomeBackModalOpen(!welcomeBackModalOpen);
+  const [adviceExchangeModalOpen, setAdviceExchangeModalOpen] = useState(false);
+  const toggleAdviceExchangeModalOpen = () =>
+    setAdviceExchangeModalOpen(!adviceExchangeModalOpen);
 
   // console.log(newLink);
   // console.log(links);
   // console.log('validDecision', validDecision);
   // console.log("decision", decision);
-  // console.log("stakeholders", stakeholders);
+  console.log("stakeholders", stakeholders);
 
   return (
     <>
@@ -122,6 +126,12 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
       <WelcomeBackModal
         open={welcomeBackModalOpen}
         toggle={toggleWelcomeBackModalOpen}
+      />
+      <AdviceExchangeModal
+        open={adviceExchangeModalOpen}
+        toggle={toggleAdviceExchangeModalOpen}
+        stakeholder={stakeholders[0]}
+        decision={decision}
       />
 
       <PageContainer>
