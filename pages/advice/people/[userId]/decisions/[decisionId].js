@@ -22,12 +22,14 @@ import {
   ShareDecisionModal,
   WelcomeBackModal,
   AdviceExchangeModal,
+  GiveAdviceModal,
 } from "@adviceModals";
 
 const Decision = ({ decision, userId, includedStakeholders }) => {
   const decisionContext = decision.attributes.context;
   const decisionProposal = decision.attributes.proposal;
   const decisionLinks = decision.attributes.links;
+  const adviceSeeker = decision.relationships.creator.data;
 
   const [decisionState, setDecisionState] = useState(decision.attributes.state);
   const [validDecision, setValidDecision] = useState(
@@ -95,12 +97,15 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
   const [adviceExchangeModalOpen, setAdviceExchangeModalOpen] = useState(false);
   const toggleAdviceExchangeModalOpen = () =>
     setAdviceExchangeModalOpen(!adviceExchangeModalOpen);
+  const [giveAdviceModalOpen, setGiveAdviceModalOpen] = useState(false);
+  const toggleGiveAdviceModalOpen = () =>
+    setGiveAdviceModalOpen(!giveAdviceModalOpen);
 
   // console.log(newLink);
   // console.log(links);
   // console.log('validDecision', validDecision);
   // console.log("decision", decision);
-  console.log("stakeholders", stakeholders);
+  // console.log("stakeholders", stakeholders);
 
   return (
     <>
@@ -131,6 +136,12 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
         open={adviceExchangeModalOpen}
         toggle={toggleAdviceExchangeModalOpen}
         stakeholder={stakeholders[0]}
+        decision={decision}
+      />
+      <GiveAdviceModal
+        open={giveAdviceModalOpen}
+        toggle={toggleGiveAdviceModalOpen}
+        adviceSeeker={adviceSeeker}
         decision={decision}
       />
 
