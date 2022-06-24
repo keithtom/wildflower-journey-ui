@@ -5,3 +5,4 @@ export { default as ShareDecisionModal } from './ShareDecision/ShareDecisionModa
 export { default as WelcomeBackModal } from './WelcomeBack/WelcomeBackModal'
 export { default as AdviceExchangeModal } from './AdviceExchange/AdviceExchangeModal'
 export { default as GiveAdviceModal } from './GiveAdvice/GiveAdviceModal'
+export { default as AddStakeholderModal } from './AddStakeholder/AddStakeholderModal'

@@ -1,9 +1,6 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import {
-  List,
-  ListItem,
-} from '@mui/material'
+import { List, ListItem } from "@mui/material";
 import {
   Avatar,
   Card,
@@ -13,27 +10,31 @@ import {
   IconButton,
   Popover,
   Divider,
-  Button
-} from '@ui'
-import {
-  MoreVert
- } from '@mui/icons-material'
- import UserContactModal from './UserContactModal'
- import UserSummary from './UserSummary'
+  Button,
+} from "@ui";
+import { MoreVert } from "@mui/icons-material";
+import UserContactModal from "./UserContactModal";
+import UserSummary from "./UserSummary";
 
-const UserResultItem = ({ user }) => {
-  const [actionsAnchor, setActionsAnchor] = useState(false)
-  const [contactModalOpen, setContactModalOpen] = useState(false)
+const UserResultItem = ({ user, asStakeholderSelection }) => {
+  const [actionsAnchor, setActionsAnchor] = useState(false);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
 
   const handleOpenActions = (e) => {
-    setActionsAnchor(e.currentTarget)
-  }
+    setActionsAnchor(e.currentTarget);
+  };
   const handleCloseActions = () => {
-    setActionsAnchor(null)
-  }
+    setActionsAnchor(null);
+  };
 
-  const open = Boolean(actionsAnchor)
-  const id = open ? 'user-result-actions' : undefined
+  const open = Boolean(actionsAnchor);
+  const id = open ? "user-result-actions" : undefined;
+
+  const [addedToStakeholders, setAddedToStakeholders] = useState(false);
+  const handleAddToStakeholders = () => {
+    setAddedToStakeholders(true);
+    // the decision id will be needed here? Can get from the path param?
+  };
 
   return (
     <>
@@ -47,35 +48,61 @@ const UserResultItem = ({ user }) => {
 
         <Divider />
 
-        <Grid container mt={2} spacing={2} justifyContent="space-between" alignItems="center">
+        <Grid
+          container
+          mt={2}
+          spacing={2}
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <Grid item>
             <Grid container spacing={2}>
               <Grid item>
-                {user.relationships.schools ?
-                  user.relationships.schools.data.map((s, i) =>
-                    <Typography key={i}>{s}</Typography>
-                  )
-                : null}
+                {user.relationships.schools
+                  ? user.relationships.schools.data.map((s, i) => (
+                      <Typography key={i}>{s}</Typography>
+                    ))
+                  : null}
               </Grid>
               <Grid item>
-                <Typography>• {user.relationships.address.city}, {user.relationships.address.state}</Typography>
+                <Typography>
+                  • {user.relationships.address.city},{" "}
+                  {user.relationships.address.state}
+                </Typography>
               </Grid>
             </Grid>
           </Grid>
           <Grid item>
             <Grid container spacing={2} alignItems="center">
               <Grid item>
-                <Typography>Contact {user.attributes.firstName}:</Typography>
+                <Typography>
+                  {asStakeholderSelection ? "Add" : "Contact"}{" "}
+                  {user.attributes.firstName}:
+                </Typography>
               </Grid>
-              <Grid item>
-                <Button onClick={() => setContactModalOpen(true)}>
-                  <Typography>Contact</Typography>
-                </Button>
-              </Grid>
+              {asStakeholderSelection ? (
+                <Grid item>
+                  <Button
+                    onClick={() => setAddedToStakeholders(!addedToStakeholders)}
+                    variant={addedToStakeholders ? "outlined" : "contained"}
+                  >
+                    {addedToStakeholders ? (
+                      <Typography>Remove</Typography>
+                    ) : (
+                      <Typography>Add</Typography>
+                    )}
+                  </Button>
+                </Grid>
+              ) : (
+                <Grid item>
+                  <Button onClick={() => setContactModalOpen(true)}>
+                    <Typography>Contact</Typography>
+                  </Button>
+                </Grid>
+              )}
             </Grid>
           </Grid>
         </Grid>
-
       </Card>
 
       <UserContactModal
@@ -84,7 +111,7 @@ const UserResultItem = ({ user }) => {
         toggle={() => setContactModalOpen(!contactModalOpen)}
       />
     </>
-  )
-}
+  );
+};
 
-export default UserResultItem
+export default UserResultItem;
