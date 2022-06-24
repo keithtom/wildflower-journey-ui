@@ -23,6 +23,7 @@ import {
   WelcomeBackModal,
   AdviceExchangeModal,
   GiveAdviceModal,
+  AddStakeholderModal
 } from "@adviceModals";
 
 const Decision = ({ decision, userId, includedStakeholders }) => {
@@ -100,6 +101,9 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
   const [giveAdviceModalOpen, setGiveAdviceModalOpen] = useState(false);
   const toggleGiveAdviceModalOpen = () =>
     setGiveAdviceModalOpen(!giveAdviceModalOpen);
+  const [addStakeholderModalOpen, setAddStakeholderModalOpen] = useState(false);
+  const toggleAddStakeholderModalOpen = () =>
+    setAddStakeholderModalOpen(!addStakeholderModalOpen);
 
   // console.log(newLink);
   // console.log(links);
@@ -143,6 +147,10 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
         toggle={toggleGiveAdviceModalOpen}
         adviceSeeker={adviceSeeker}
         decision={decision}
+      />
+      <AddStakeholderModal
+        open={addStakeholderModalOpen}
+        toggle={toggleAddStakeholderModalOpen}
       />
 
       <PageContainer>
