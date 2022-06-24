@@ -9,7 +9,7 @@ import {
 
 const AdviceDraftsPage = ({ drafts }) => {
 
-  console.log(drafts)
+  // console.log(drafts)
 
   return (
     <>

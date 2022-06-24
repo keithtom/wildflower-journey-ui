@@ -72,7 +72,7 @@ const AdviceActions = ({ status, activeStep, canAdvance }) => {
         <Stack>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
-              <Link href="/advice/drafts">
+              <Link href="/advice/draft">
                 <Stack direction="row" spacing={4} sx={{'&:hover': {cursor: 'pointer'}}}>
                   <ArrowBack fontSize="small" />
                   <Typography>Cancel</Typography>
