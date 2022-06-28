@@ -77,6 +77,7 @@ const MakeDecisionContent = ({
                     </Button>
                   </Grid>
                   <Grid item xs={12} sm={6}>
+                    {/* WIL-132 */}
                     <Button fullWidth onClick={handleValidate}>
                       Make your decision
                     </Button>

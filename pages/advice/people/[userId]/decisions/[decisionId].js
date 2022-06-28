@@ -40,24 +40,28 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
       ? true
       : false
   );
+  // WIL-129
   const [context, setContext] = useState(
     decisionContext ? decisionContext : null
   );
   const handleSetContext = (event) => {
     setContext(event.target.value);
   };
+  // WIL-129
   const [proposal, setProposal] = useState(
     decisionProposal ? decisionProposal : null
   );
   const handleSetProposal = (event) => {
     setProposal(event.target.value);
   };
+  // WIL-129
   const [stakeholders, setStakeholders] = useState(
     includedStakeholders ? includedStakeholders : null
   );
   const handleSetStakeholders = (event) => {
     setStakeholders(event.target.value);
   };
+  // WIL-129
   const [links, setLinks] = useState(decisionLinks ? decisionLinks : null);
   const [newLink, setNewLink] = useState(null);
   const handleSetNewLink = (event) => {
@@ -167,6 +171,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
           </Grid>
           <Grid item>
             {decisionState === "draft" ? (
+              // WIL-130
               <Button onClick={setRequestAdviceModalOpen(true)}>
                 Request advice
               </Button>
@@ -175,8 +180,9 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                 <Button onClick={setRequestAdviceModalOpen(true)}>
                   Request advice again
                 </Button>
+                {/* WIL-132 */}
                 <Button onClick={setMakeDecisionModalOpen(true)}>
-                  Make your decision
+                  Make you decision
                 </Button>
               </Stack>
             ) : decisionState === "stakeholder" ? (

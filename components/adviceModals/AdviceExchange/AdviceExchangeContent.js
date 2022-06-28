@@ -97,6 +97,7 @@ const MessageComposer = ({}) => {
         />
       </Grid>
       <Grid item xs={12} sm={4}>
+        {/* WIL-131 */}
         <Button fullWidth onClick={handleAddNote}>
           Add note
         </Button>

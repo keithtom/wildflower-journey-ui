@@ -72,6 +72,7 @@ const NewDraftContent = ({ toggle }) => {
         </Grid>
 
         <Grid item xs={12}>
+          {/* WIL-128 */}
           <Button fullWidth onClick={toggle}>Create your decision draft</Button>
         </Grid>
 
