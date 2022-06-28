@@ -6,7 +6,7 @@ const AdviceExchangeModal = ({ open, toggle, stakeholder, decision }) => {
     <Modal
       open={open}
       toggle={toggle}
-      title={`Advice with ${stakeholder.attributes.name}`}
+      title={`Advice with ${stakeholder ? stakeholder.attributes.name : 'stakeholder'}`}
     >
       <AdviceExchangeContent
         toggle={toggle}

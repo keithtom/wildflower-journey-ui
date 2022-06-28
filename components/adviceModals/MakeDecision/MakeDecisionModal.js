@@ -4,15 +4,15 @@ import { Modal } from "@ui";
 import MakeDecisionContent from "./MakeDecisionContent";
 
 const MakeDecisionModal = ({ open, toggle, stakeholders }) => {
-  const pendingAdvice = JSON.parse(
+  const pendingAdvice = stakeholders.length ? JSON.parse(
     stakeholders.map((s) => s.attributes.status.includes("pending"))
-  );
-  const hasObjections = JSON.parse(
+  ) : null;
+  const hasObjections = stakeholders.length ? JSON.parse(
     stakeholders.map((s) => s.attributes.status.includes("objects"))
-  );
-  const noObjection = JSON.parse(
+  ) : null;
+  const noObjection = stakeholders.length ? JSON.parse(
     stakeholders.map((s) => s.attributes.status.includes("no objection"))
-  );
+  ) : null;
 
   const [isValidDecision, setIsValidDecision] = useState(!pendingAdvice);
   const [isValidating, setIsValidating] = useState(true);

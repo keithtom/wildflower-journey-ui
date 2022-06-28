@@ -172,21 +172,21 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
           <Grid item>
             {decisionState === "draft" ? (
               // WIL-130
-              <Button onClick={setRequestAdviceModalOpen(true)}>
+              <Button onClick={toggleRequestAdviceOpen}>
                 Request advice
               </Button>
             ) : decisionState === "open" ? (
               <Stack direction="row" spacing={2}>
-                <Button onClick={setRequestAdviceModalOpen(true)}>
+                <Button onClick={toggleRequestAdviceOpen}>
                   Request advice again
                 </Button>
                 {/* WIL-132 */}
-                <Button onClick={setMakeDecisionModalOpen(true)}>
+                <Button onClick={toggleMakeDecisionOpen}>
                   Make you decision
                 </Button>
               </Stack>
             ) : decisionState === "stakeholder" ? (
-              <Button onClick={setGiveAdviceModalOpen(true)}>
+              <Button onClick={toggleGiveAdviceModalOpen}>
                 Give advice
               </Button>
             ) : null}
@@ -282,14 +282,14 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                 </Stack>
               ) : decisionState === "open" ? (
                 <Stack direction="row" spacing={4}>
-                  <Link
+                  {/* <Link
                     href={`/advice/people/${userId}/decisions/${decisionState}`}
                   >
                     <Button>Cancel</Button>
                   </Link>
                   <Button onClick={setShareDecisionModalOpen(true)}>
                     Share decision
-                  </Button>
+                  </Button> */}
                 </Stack>
               ) : null}
             </Grid>
