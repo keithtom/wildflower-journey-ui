@@ -1,3 +1,4 @@
+import adviceApi from "../../../api/advice";
 import { useState } from 'react'
 import FormControlLabel from '@mui/material/FormControlLabel';
 
@@ -26,7 +27,21 @@ const NewDraftContent = ({ toggle }) => {
   }
   const [hasAuthority, setHasAuthority] = useState(false)
   const handleHasAuthorityChange = (event) => {
-    setHasAuthority(true)
+    setHasAuthority(currentAuthority => !currentAuthority)
+  }
+
+  const personId = '2a09-fba2'; // should really come from currentUser session
+
+
+  function handleCreateDecision() {
+    adviceApi({ personId: personId }).create({title: decisionTitle, role: authorRole}).then(
+      (response) => {
+        console.log(response);
+        const id = response.data.data.id;
+        // redirect on success.
+    }, (error) => {
+      console.log(error);
+    });
   }
 
   return (
@@ -57,7 +72,7 @@ const NewDraftContent = ({ toggle }) => {
             <TextField
               fullWidth
               label="Your role"
-              placeholder="e.g. Teacher Leader, Finance Lead, etc."
+              placeholder="e.g. Finance, Governance & Compliance, Facilites, etc."
               value={authorRole}
               onChange={handleAuthorRoleChange}
             />
@@ -72,8 +87,7 @@ const NewDraftContent = ({ toggle }) => {
         </Grid>
 
         <Grid item xs={12}>
-          {/* WIL-128 */}
-          <Button fullWidth onClick={toggle}>Create your decision draft</Button>
+          <Button fullWidth disabled={!hasAuthority} onClick={handleCreateDecision}>Create your decision draft</Button>
         </Grid>
 
       </Grid>

@@ -22,7 +22,6 @@ const AdviceDraftsContent = ({drafts}) => {
           <Typography variant="bodyLightened">Your home base to think through decisions before bringing them to your stakeholders for feedback.</Typography>
         </Grid>
         <Grid item xs={12} sm={3}>
-          {/* WIL-128 */}
           <Button onClick={() => setNewDraftOpen(true)}>New draft</Button>
           <NewDraftModal
             open={newDraftOpen}
