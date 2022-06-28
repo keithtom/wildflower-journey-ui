@@ -276,20 +276,20 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
               ) : validDecision && decisionState === "draft" ? (
                 <Stack direction="row" spacing={4}>
                   <Button>Edit</Button> {/* Edit drafted decision */}
-                  <Button onClick={setShareDecisionModalOpen(true)}>
+                  <Button onClick={toggleShareDecisionModalOpen}>
                     Share decision
                   </Button>
                 </Stack>
               ) : decisionState === "open" ? (
                 <Stack direction="row" spacing={4}>
-                  {/* <Link
+                  <Link
                     href={`/advice/people/${userId}/decisions/${decisionState}`}
                   >
                     <Button>Cancel</Button>
                   </Link>
-                  <Button onClick={setShareDecisionModalOpen(true)}>
+                  <Button onClick={toggleShareDecisionModalOpen}>
                     Share decision
-                  </Button> */}
+                  </Button>
                 </Stack>
               ) : null}
             </Grid>
