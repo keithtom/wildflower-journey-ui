@@ -15,20 +15,19 @@ function adviceApi({personId, id}){
     }});
 
   function index(){
-    baseApi.get(`/people/${personId}/decisions`);
+    return baseApi.get(`/people/${personId}/decisions`);
   }
-  function create({title, role}){
-    // send the right data.
 
+  function create({title, role}){
     return baseApi.post(`/decisions`, {title: title, role: role, });
   }
 
   function show(){
-    baseApi.get(`/decisions/${id}`);
+    return baseApi.get(`/decisions/${id}`);
   }
 
-  function update(){
-    baseApi.put(`/decisions/${id}`);
+  function update({context, proposal}){
+    return baseApi.put(`/decisions/${id}`, {decision: {context: context, proposal: proposal, }});
   }
 
   function open() {
@@ -36,7 +35,7 @@ function adviceApi({personId, id}){
   }
 
   function amend() {
-    baseApi.put(`/decisions/${id}/amend`);
+    return baseApi.put(`/decisions/${id}/amend`);
   }
 
   function close() {
@@ -50,12 +49,12 @@ function adviceApi({personId, id}){
 
   function removeStakeholder({stakeholderId}){
     // needs specific ID, and should only apply for certain states...
-    baseApi.delete(`/decisions/${id}/stakeholders/${stakeholderId}`);
+    return baseApi.delete(`/decisions/${id}/stakeholders/${stakeholderId}`);
   }
 
   function createMessage(){
     // needs specific data
-    baseApi.post(`/decisions/${id}/messages`);
+    return baseApi.post(`/decisions/${id}/messages`);
   }
 
   return {

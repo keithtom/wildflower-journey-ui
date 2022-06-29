@@ -1,3 +1,4 @@
+import adviceApi from "../../../../../api/advice";
 import { useState } from "react";
 import Link from "next/link";
 import { includes } from "lodash";
@@ -26,7 +27,7 @@ import {
   AddStakeholderModal,
 } from "@adviceModals";
 
-const Decision = ({ decision, userId, includedStakeholders }) => {
+const Decision = ({ decisionId, decision, userId, includedStakeholders }) => {
   const decisionContext = decision.attributes.context;
   const decisionProposal = decision.attributes.proposal;
   const decisionLinks = decision.attributes.links;
@@ -40,14 +41,12 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
       ? true
       : false
   );
-  // WIL-129
   const [context, setContext] = useState(
     decisionContext ? decisionContext : null
   );
   const handleSetContext = (event) => {
     setContext(event.target.value);
   };
-  // WIL-129
   const [proposal, setProposal] = useState(
     decisionProposal ? decisionProposal : null
   );
@@ -109,6 +108,16 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
   const toggleAddStakeholderModalOpen = () =>
     setAddStakeholderModalOpen(!addStakeholderModalOpen);
 
+  function saveDecision(){
+    console.log(decisionId, context, proposal)
+    adviceApi({ id: decisionId }).update({context: context, proposal: proposal}).then(
+      (response) => {
+        console.log(response);
+        alert('success');
+    }, (error) => {
+      console.log(error);
+    });
+  }
   // console.log(newLink);
   // console.log(links);
   // console.log('validDecision', validDecision);
@@ -271,11 +280,12 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                   >
                     <Button>Cancel</Button>
                   </Link>
-                  <Button>Save</Button> {/* Save drafted decision */}
+                  <Button onClick={saveDecision}>Save</Button>
                 </Stack>
               ) : validDecision && decisionState === "draft" ? (
                 <Stack direction="row" spacing={4}>
                   <Button>Edit</Button> {/* Edit drafted decision */}
+                  <Button onClick={saveDecision}>Save</Button>
                   <Button onClick={toggleShareDecisionModalOpen}>
                     Share decision
                   </Button>
@@ -307,14 +317,16 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                     fullWidth
                     label="Context"
                     placeholder="Any relevant background information to help the advice givers get into your shoes..."
-                    value={decision.attributes.context}
+                    value={context}
+                    onChange={handleSetContext}
                     disabled={decisionState !== "draft"}
                   />
                   <TextField
                     fullWidth
                     label="Proposal"
                     placeholder="A summary of your proposal..."
-                    value={decision.attributes.proposal}
+                    value={proposal}
+                    onChange={handleSetProposal}
                     disabled={decisionState !== "draft"}
                   />
 
@@ -474,6 +486,7 @@ export async function getServerSideProps({ query }) {
 
   return {
     props: {
+      decisionId,
       userId,
       decision: decision[0],
       includedStakeholders,
