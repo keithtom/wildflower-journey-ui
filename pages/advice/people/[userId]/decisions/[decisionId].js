@@ -1,4 +1,5 @@
 import adviceApi from "../../../../../api/advice";
+import documentsApi from "../../../../../api/documents";
 import { useState } from "react";
 import Link from "next/link";
 import { includes } from "lodash";
@@ -27,10 +28,9 @@ import {
   AddStakeholderModal,
 } from "@adviceModals";
 
-const Decision = ({ decisionId, decision, userId, includedStakeholders }) => {
+const Decision = ({ decisionId, decision, userId, decisionStakeholders, decisionDocuments }) => {
   const decisionContext = decision.attributes.context;
   const decisionProposal = decision.attributes.proposal;
-  const decisionLinks = decision.attributes.links;
   const adviceSeeker = decision.relationships.creator.data;
 
   const [decisionState, setDecisionState] = useState(decision.attributes.state);
@@ -55,26 +55,34 @@ const Decision = ({ decisionId, decision, userId, includedStakeholders }) => {
   };
   // WIL-129
   const [stakeholders, setStakeholders] = useState(
-    includedStakeholders ? includedStakeholders : null
+    decisionStakeholders ? decisionStakeholders : []
   );
   const handleSetStakeholders = (event) => {
     setStakeholders(event.target.value);
   };
   // WIL-129
-  const [links, setLinks] = useState(decisionLinks ? decisionLinks : null);
+  const [links, setLinks] = useState(decisionDocuments ? decisionDocuments : []);
   const [newLink, setNewLink] = useState(null);
   const handleSetNewLink = (event) => {
     setNewLink(event.target.value);
   };
   const handleAddLink = () => {
-    const newLinks = links.slice(0);
-    newLinks.push(newLink);
-    setLinks(newLinks);
-    setNewLink("");
+    documentsApi().create({documentableType: 'decision', documentableId: decisionId, link: newLink}).then(
+      (response) => {
+        setLinks(currentLinks => currentLinks.push(response.data.data) && currentLinks);
+        setNewLink("");
+    }, (error) => {
+      console.log(error);
+    });
+
   };
-  const handleRemoveLink = (link) => {
-    const newLinks = links.filter((e) => e !== link);
-    setLinks(newLinks);
+  const handleRemoveLink = (documentId) => {
+    documentsApi().destroy(documentId).then(
+      (response) => {
+        setLinks(currentLinks => currentLinks.filter((e) => e.id !== documentId));
+    }, (error) => {
+      console.log(error);
+    });
   };
 
   const [requestIsValid, setRequestIsValid] = useState({
@@ -108,8 +116,7 @@ const Decision = ({ decisionId, decision, userId, includedStakeholders }) => {
   const toggleAddStakeholderModalOpen = () =>
     setAddStakeholderModalOpen(!addStakeholderModalOpen);
 
-  function saveDecision(){
-    console.log(decisionId, context, proposal)
+  function handleSaveDecision(){
     adviceApi({ id: decisionId }).update({context: context, proposal: proposal}).then(
       (response) => {
         console.log(response);
@@ -280,12 +287,12 @@ const Decision = ({ decisionId, decision, userId, includedStakeholders }) => {
                   >
                     <Button>Cancel</Button>
                   </Link>
-                  <Button onClick={saveDecision}>Save</Button>
+                  <Button onClick={handleSaveDecision}>Save</Button>
                 </Stack>
               ) : validDecision && decisionState === "draft" ? (
                 <Stack direction="row" spacing={4}>
                   <Button>Edit</Button> {/* Edit drafted decision */}
-                  <Button onClick={saveDecision}>Save</Button>
+                  <Button onClick={handleSaveDecision}>Save</Button>
                   <Button onClick={toggleShareDecisionModalOpen}>
                     Share decision
                   </Button>
@@ -366,12 +373,12 @@ const Decision = ({ decisionId, decision, userId, includedStakeholders }) => {
                                     Vialeta Bookkeeping plan - Final
                                   </Typography>
                                   <Typography variant="body2">
-                                    {link}
+                                    {link.attributes.link}
                                   </Typography>
                                 </Stack>
                               </Grid>
                               <Grid item>
-                                <Button onClick={() => handleRemoveLink(link)}>
+                                <Button onClick={() => handleRemoveLink(link.id)}>
                                   x
                                 </Button>
                               </Grid>
@@ -468,28 +475,21 @@ const Decision = ({ decisionId, decision, userId, includedStakeholders }) => {
 export async function getServerSideProps({ query }) {
   const userId = query.userId;
   const decisionId = query.decisionId;
-  const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`;
-
+  const apiRoute = `https://api.wildflowerschools.org/v1/advice/decisions/${decisionId}`;
   const res = await fetch(apiRoute);
   const data = await res.json();
 
-  const decision = data.data.filter((decision) => decision.id === decisionId);
-
-  const allStakeholders = data.included;
-  const decisionStakeholders = decision[0].relationships.stakeholders.data;
-  const includedStakeholders = allStakeholders.filter((stakeholder) =>
-    includes(
-      decisionStakeholders.map((d) => d.id),
-      stakeholder.relationships.decision.data.id
-    )
-  );
+  const decision = data.data
+  const decisionStakeholders = data.included.filter(data => data.type == "stakeholder");
+  const decisionDocuments = data.included.filter(data => data.type == "document");
 
   return {
     props: {
       decisionId,
       userId,
-      decision: decision[0],
-      includedStakeholders,
+      decision,
+      decisionStakeholders,
+      decisionDocuments
     },
   };
 }
