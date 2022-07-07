@@ -1,3 +1,4 @@
+import adviceApi from "../../../api/advice"
 import { useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
@@ -18,6 +19,7 @@ import {
 import { Check, Close } from "@mui/icons-material";
 
 const RequestAdviceContent = ({
+  decisionId,
   toggle,
   hasContext,
   hasProposal,
@@ -42,10 +44,35 @@ const RequestAdviceContent = ({
   };
   const [hasAuthority, setHasAuthority] = useState(false);
   const handleHasAuthorityChange = (event) => {
-    setHasAuthority(true);
+    setHasAuthority(currentAuthority => !currentAuthority);
   };
 
   const isValid = hasContext && hasProposal && hasStakeholders;
+
+  function handleRequestAdvice(){
+    if (requestAgain) {
+      adviceApi({id: decisionId}).amend({changesSummary: decisionDifference, decideByDate: decideByDate, adviceByDate: adviceByDate, role: authorRole}).then(
+        (response) => {
+          console.log(response);
+          alert("amend success")
+          const id = response.data.data.id;
+          // redirect on success to opened advice.
+      }, (error) => {
+        console.log(error);
+      });
+    }
+    else {
+      adviceApi({id: decisionId}).open({decideByDate: decideByDate, adviceByDate: adviceByDate, role: authorRole}).then(
+        (response) => {
+          console.log(response);
+          alert("open success")
+          const id = response.data.data.id;
+          // redirect on success to opened advice.
+      }, (error) => {
+        console.log(error);
+      });
+    }
+  }
 
   return (
     <div>
@@ -101,7 +128,7 @@ const RequestAdviceContent = ({
                 <TextField
                   fullWidth
                   label="Your role"
-                  placeholder="e.g. Teacher Leader, Finance Lead, etc."
+                  placeholder="e.g. Finance, Governance & Compliance, Facilites, etc."
                   value={authorRole}
                   onChange={handleAuthorRoleChange}
                 />
@@ -134,7 +161,7 @@ const RequestAdviceContent = ({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   {/* WIL-130 */}
-                  <Button fullWidth onClick={toggle}>
+                  <Button fullWidth disabled={!hasAuthority} onClick={handleRequestAdvice}>
                     Request advice
                   </Button>
                 </Grid>

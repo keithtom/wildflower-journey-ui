@@ -138,6 +138,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
         toggle={toggleNewDraftModalOpen}
       />
       <RequestAdviceModal
+        decisionId={decisionId}
         open={requestAdviceModalOpen}
         toggle={toggleRequestAdviceOpen}
         requestIsValid={requestIsValid}

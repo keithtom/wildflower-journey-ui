@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Modal } from "@ui";
 import RequestAdviceContent from "./RequestAdviceContent";
 
-const RequestAdviceModal = ({ open, toggle, requestIsValid, requestAgain }) => {
+const RequestAdviceModal = ({ decisionId, open, toggle, requestIsValid, requestAgain }) => {
   const hasContext = requestIsValid.context;
   const hasProposal = requestIsValid.proposal;
   const hasStakeholders = requestIsValid.stakeholders;
@@ -21,6 +21,7 @@ const RequestAdviceModal = ({ open, toggle, requestIsValid, requestAgain }) => {
       }
     >
       <RequestAdviceContent
+        decisionId={decisionId}      
         toggle={toggle}
         hasContext={hasContext}
         hasProposal={hasProposal}

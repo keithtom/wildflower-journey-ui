@@ -30,12 +30,12 @@ function adviceApi({personId, id}){
     return baseApi.put(`/decisions/${id}`, {decision: {context: context, proposal: proposal, }});
   }
 
-  function open() {
-    baseApi.put(`/decisions/${id}/open`);
+  function open({decideByDate, adviceByDate, role}) {
+    return baseApi.put(`/decisions/${id}/open`, {decide_by: decideByDate, advice_by: adviceByDate, role: role});
   }
 
-  function amend() {
-    return baseApi.put(`/decisions/${id}/amend`);
+  function amend({changesSummary, decideByDate, adviceByDate, role}) {
+    return baseApi.put(`/decisions/${id}/amend`, {changes_summary: changesSummary, decide_by: decideByDate, advice_by: adviceByDate, role: role});
   }
 
   function close() {

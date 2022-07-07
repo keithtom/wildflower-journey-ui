@@ -32,7 +32,6 @@ const NewDraftContent = ({ toggle }) => {
 
   const personId = '2a09-fba2'; // should really come from currentUser session
 
-
   function handleCreateDecision() {
     adviceApi({ personId: personId }).create({title: decisionTitle, role: authorRole}).then(
       (response) => {
