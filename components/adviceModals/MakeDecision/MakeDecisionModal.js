@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Modal } from "@ui";
 import MakeDecisionContent from "./MakeDecisionContent";
 
-const MakeDecisionModal = ({ open, toggle, stakeholders }) => {
+const MakeDecisionModal = ({ decisionId, open, toggle, stakeholders }) => {
   const pendingAdvice = stakeholders.length ? JSON.parse(
     stakeholders.map((s) => s.attributes.status.includes("pending"))
   ) : null;
@@ -15,20 +15,8 @@ const MakeDecisionModal = ({ open, toggle, stakeholders }) => {
   ) : null;
 
   const [isValidDecision, setIsValidDecision] = useState(!pendingAdvice);
-  const [isValidating, setIsValidating] = useState(true);
   const [isDeciding, setIsDeciding] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
-  const handleValidate = () => {
-    setIsValidating(false);
-    setIsDeciding(true);
-    setIsSuccess(false);
-  };
-  const handleDecide = () => {
-    setIsValidating(false);
-    setIsDeciding(false);
-    setIsSuccess(true);
-  };
 
   return (
     <Modal
@@ -45,17 +33,17 @@ const MakeDecisionModal = ({ open, toggle, stakeholders }) => {
       }
     >
       <MakeDecisionContent
+        decisionId={decisionId}
         toggle={toggle}
         stakeholders={stakeholders}
         pendingAdvice={pendingAdvice}
         hasObjections={hasObjections}
         noObjection={noObjection}
         isValidDecision={isValidDecision}
-        isValidating={isValidating}
         isDeciding={isDeciding}
         isSuccess={isSuccess}
-        handleValidate={handleValidate}
-        handleDecide={handleDecide}
+        setIsDeciding={setIsDeciding}
+        setIsSuccess={setIsSuccess}
       />
     </Modal>
   );

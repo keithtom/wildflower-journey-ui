@@ -145,6 +145,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
         requestAgain={decisionState === "open"}
       />
       <MakeDecisionModal
+        decisionId={decisionId}
         open={makeDecisionModalOpen}
         toggle={toggleMakeDecisionOpen}
         stakeholders={stakeholders}

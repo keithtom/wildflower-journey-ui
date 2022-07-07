@@ -38,8 +38,8 @@ function adviceApi({personId, id}){
     return baseApi.put(`/decisions/${id}/amend`, {changes_summary: changesSummary, decide_by: decideByDate, advice_by: adviceByDate, role: role});
   }
 
-  function close() {
-    baseApi.put(`/decisions/${id}/close`);
+  function close({finalSummary, changesSummary, role}) {
+    return baseApi.put(`/decisions/${id}/close`, { final_summary: finalSummary, changes_summary: changesSummary, role: role });
   }
 
   function addStakeholder(){

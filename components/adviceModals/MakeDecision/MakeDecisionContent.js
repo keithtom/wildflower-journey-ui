@@ -1,3 +1,4 @@
+import adviceApi from "../../../api/advice";
 import { useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
@@ -19,6 +20,7 @@ import { Check, Close } from "@mui/icons-material";
 import StakeholderStatusIndicator from "@components/StakeholderStatusIndicator";
 
 const MakeDecisionContent = ({
+  decisionId,
   toggle,
   stakeholders,
   pendingAdvice,
@@ -28,8 +30,9 @@ const MakeDecisionContent = ({
   isValidating,
   isDeciding,
   isSuccess,
-  handleValidate,
-  handleDecide,
+  setIsValidating,
+  setIsDeciding,
+  setIsSuccess
 }) => {
   const [whyDecisionMade, setWhyDecisionMade] = useState("");
   const handleWhyDecisionMadeChange = (event) => {
@@ -45,7 +48,27 @@ const MakeDecisionContent = ({
   };
   const [hasAuthority, setHasAuthority] = useState(false);
   const handleHasAuthorityChange = (event) => {
-    setHasAuthority(true);
+    setHasAuthority(currentAuthority => !currentAuthority);
+  };
+
+  function handleValidate() {
+    setIsValidating(false);
+    setIsDeciding(true);
+    setIsSuccess(false);
+  };
+
+  function handleDecide() {
+    adviceApi({id: decisionId}).close({finalSummary: whyDecisionMade, changesSummary: decisionChanges, role: authorRole}).then(
+      (response) => {
+        setIsValidating(false);
+        setIsDeciding(false);
+        setIsSuccess(true);
+
+        console.log(response);
+    }, (error) => {
+      console.log(error);
+    });
+
   };
 
   return (
@@ -77,7 +100,6 @@ const MakeDecisionContent = ({
                     </Button>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    {/* WIL-132 */}
                     <Button fullWidth onClick={handleValidate}>
                       Make your decision
                     </Button>
@@ -167,7 +189,7 @@ const MakeDecisionContent = ({
                   </Button>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Button fullWidth onClick={handleDecide}>
+                  <Button fullWidth disabled={!hasAuthority} onClick={handleDecide}>
                     Decide to proceed
                   </Button>
                 </Grid>
