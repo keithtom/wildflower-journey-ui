@@ -192,25 +192,37 @@ const NetworkContent = ({ asStakeholderSelection }) => {
   // console.log("governanceTypeSelected", governanceTypeSelected)
   // console.log("tuitionAssistanceSelected", tuitionAssistanceSelected)
   // console.log("calendarSelected", calendarSelected)
-  console.log("distance", distance)
+  // console.log("distance", distance);
 
   return (
     <Grid container p={asStakeholderSelection ? 0 : 8} spacing={8}>
       <Grid item xs={12} sm={12}>
-        <TextField
-          fullWidth
-          placeholder="Search for something..."
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-          onChange={(e) => {
-            setQuery(e.target.value);
-          }}
-        />
+        <Grid container spacing={4}>
+          <Grid item flex={1}>
+            <TextField
+              fullWidth
+              placeholder="Search for something..."
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={(e) => {
+                setQuery(e.target.value);
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <Button
+              variant="text"
+              sx={{ height: "100%" }}
+            >
+              Search
+            </Button>
+          </Grid>
+        </Grid>
       </Grid>
 
       <Grid item xs={12} sm={4}>
