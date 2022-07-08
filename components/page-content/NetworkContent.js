@@ -27,6 +27,7 @@ import {
   Grid,
   Card,
   TextField,
+  Button,
 } from "@ui";
 import { Search, ArrowForwardIos } from "@mui/icons-material";
 
@@ -164,8 +165,25 @@ const NetworkContent = ({ asStakeholderSelection }) => {
     setCalendarSelected(updatedCheckedState);
   };
 
+  //Location
+  const [hub, setHub] = useState(0);
+  const handleHubsChange = (event) => {
+    setHub(event.target.value);
+  };
+  const [distance, setDistance] = useState(0);
+  const handleDistanceChange = (event) => {
+    setDistance(event.target.value);
+  };
+
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
+  };
+
+  const handleSearchForBoard = () => {
+    setRolesSelected(["Teacher Leader"]);
+  };
+  const handleSearchForInArea = () => {
+    setDistance(1);
   };
 
   // console.log("rolesSelected", rolesSelected)
@@ -174,6 +192,7 @@ const NetworkContent = ({ asStakeholderSelection }) => {
   // console.log("governanceTypeSelected", governanceTypeSelected)
   // console.log("tuitionAssistanceSelected", tuitionAssistanceSelected)
   // console.log("calendarSelected", calendarSelected)
+  console.log("distance", distance)
 
   return (
     <Grid container p={asStakeholderSelection ? 0 : 8} spacing={8}>
@@ -199,6 +218,32 @@ const NetworkContent = ({ asStakeholderSelection }) => {
           <FormControl fullWidth>
             <Stack spacing={3}>
               <Typography variant="h6">Filter</Typography>
+
+              <Card>
+                <Grid container spacing={4} alignItems="center">
+                  <Grid item>
+                    <Typography variant="bodyLarge">Search for</Typography>
+                  </Grid>
+                  <Grid item flex={1}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "100%" }}
+                      onClick={handleSearchForBoard}
+                    >
+                      Board of directors
+                    </Button>
+                  </Grid>
+                  <Grid item flex={1}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "100%" }}
+                      onClick={handleSearchForInArea}
+                    >
+                      People in your area
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Card>
 
               <Divider />
 
@@ -258,12 +303,24 @@ const NetworkContent = ({ asStakeholderSelection }) => {
               </>
 
               <FormLabel>Hub</FormLabel>
-              <Select options={hubs} />
+              <Select
+                id="hub-select"
+                value={hub}
+                label="Hubs"
+                onChange={handleHubsChange}
+                options={hubs}
+              />
 
               <Divider />
 
               <FormLabel>Distance</FormLabel>
-              <Select options={distances} />
+              <Select
+                id="distance-select"
+                value={distance}
+                label="Distance"
+                onChange={handleDistanceChange}
+                options={distances}
+              />
             </Stack>
           </FormControl>
         </Card>
