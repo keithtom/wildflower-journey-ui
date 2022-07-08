@@ -29,7 +29,7 @@ import {
 const Decision = ({ decision, userId, includedStakeholders }) => {
   const decisionContext = decision.attributes.context;
   const decisionProposal = decision.attributes.proposal;
-  const decisionLinks = decision.attributes.links;
+  const decisionLinks = decision.relationships.documents.data;
   const adviceSeeker = decision.relationships.creator.data;
 
   const [decisionState, setDecisionState] = useState(decision.attributes.state);
@@ -123,11 +123,21 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
         requestIsValid={requestIsValid}
         requestAgain={decisionState === "open"}
       />
-      <MakeDecisionModal
-        open={makeDecisionModalOpen}
-        toggle={toggleMakeDecisionOpen}
-        stakeholders={stakeholders}
-      />
+      {decisionState === "open" && (
+        <>
+          <MakeDecisionModal
+            open={makeDecisionModalOpen}
+            toggle={toggleMakeDecisionOpen}
+            stakeholders={stakeholders}
+          />
+          <AdviceExchangeModal
+            open={adviceExchangeModalOpen}
+            toggle={toggleAdviceExchangeModalOpen}
+            stakeholder={stakeholders[0]}
+            decision={decision}
+          />
+        </>
+      )}
       <ShareDecisionModal
         open={shareDecisionModalOpen}
         toggle={toggleShareDecisionModalOpen}
@@ -135,12 +145,6 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
       <WelcomeBackModal
         open={welcomeBackModalOpen}
         toggle={toggleWelcomeBackModalOpen}
-      />
-      <AdviceExchangeModal
-        open={adviceExchangeModalOpen}
-        toggle={toggleAdviceExchangeModalOpen}
-        stakeholder={stakeholders[0]}
-        decision={decision}
       />
       <GiveAdviceModal
         open={giveAdviceModalOpen}
@@ -167,20 +171,20 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
           </Grid>
           <Grid item>
             {decisionState === "draft" ? (
-              <Button onClick={setRequestAdviceModalOpen(true)}>
+              <Button onClick={() => setRequestAdviceModalOpen(true)}>
                 Request advice
               </Button>
             ) : decisionState === "open" ? (
               <Stack direction="row" spacing={2}>
-                <Button onClick={setRequestAdviceModalOpen(true)}>
+                <Button onClick={() => setRequestAdviceModalOpen(true)}>
                   Request advice again
                 </Button>
-                <Button onClick={setMakeDecisionModalOpen(true)}>
+                <Button onClick={() => setMakeDecisionModalOpen(true)}>
                   Make your decision
                 </Button>
               </Stack>
             ) : decisionState === "stakeholder" ? (
-              <Button onClick={setGiveAdviceModalOpen(true)}>
+              <Button onClick={() => setGiveAdviceModalOpen(true)}>
                 Give advice
               </Button>
             ) : null}
@@ -270,7 +274,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
               ) : validDecision && decisionState === "draft" ? (
                 <Stack direction="row" spacing={4}>
                   <Button>Edit</Button> {/* Edit drafted decision */}
-                  <Button onClick={setShareDecisionModalOpen(true)}>
+                  <Button onClick={() => setShareDecisionModalOpen(true)}>
                     Share decision
                   </Button>
                 </Stack>
@@ -281,7 +285,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                   >
                     <Button>Cancel</Button>
                   </Link>
-                  <Button onClick={setShareDecisionModalOpen(true)}>
+                  <Button onClick={() => setShareDecisionModalOpen(true)}>
                     Share decision
                   </Button>
                 </Stack>
@@ -336,19 +340,19 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                     )}
                     <Grid item xs={12}>
                       <Stack spacing={2}>
-                        {links.map((link, i) => (
+                        {links && links.map((link, i) => (
                           <Card key={i} fullWidth>
                             <Grid container justifyContent="space-between">
                               <Grid item>
                                 <Stack>
                                   <Typography variant="body2">
-                                    GOOGLE DOC
+                                    Type
                                   </Typography>
                                   <Typography variant="h6">
-                                    Vialeta Bookkeeping plan - Final
+                                    Title
                                   </Typography>
                                   <Typography variant="body2">
-                                    {link}
+                                    {link.id}
                                   </Typography>
                                 </Stack>
                               </Grid>
@@ -386,7 +390,11 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
-                            <Button  >+</Button>
+                            <Button
+                              onClick={() => setAddStakeholderModalOpen(true)}
+                            >
+                              +
+                            </Button>
                           </Grid>
                           <Grid item>Add an advice giver from your school</Grid>
                         </Grid>
@@ -407,7 +415,11 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
-                            <Button onClick={() => setAddStakeholderModalOpen(true)}>+</Button>
+                            <Button
+                              onClick={() => setAddStakeholderModalOpen(true)}
+                            >
+                              +
+                            </Button>
                           </Grid>
                           <Grid item>Add an advice giver from your hub</Grid>
                         </Grid>
@@ -428,7 +440,11 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
-                            <Button onClick={() => setAddStakeholderModalOpen(true)}>+</Button>
+                            <Button
+                              onClick={() => setAddStakeholderModalOpen(true)}
+                            >
+                              +
+                            </Button>
                           </Grid>
                           <Grid item>
                             Add an advice giver from the foundation
@@ -462,7 +478,7 @@ export async function getServerSideProps({ query }) {
   const includedStakeholders = allStakeholders.filter((stakeholder) =>
     includes(
       decisionStakeholders.map((d) => d.id),
-      stakeholder.relationships.decision.data.id
+      stakeholder.id
     )
   );
 
