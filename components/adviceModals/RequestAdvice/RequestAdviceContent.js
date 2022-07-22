@@ -161,7 +161,7 @@ const RequestAdviceContent = ({
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   {/* WIL-130 */}
-                  <Button fullWidth disabled={!hasAuthority} onClick={handleRequestAdvice}>
+                  <Button fullWidth disabled={!hasAuthority} onClick={handleRequestAdvice} href="/advice/people/2a09-fba2/decisions/open">
                     Request advice
                   </Button>
                 </Grid>

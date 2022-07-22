@@ -6,6 +6,10 @@ import {
   Grid
 } from '@ui'
 
+import {
+  decisions
+} from "@lib/utils/fake-ap-data";
+
 const OpenAdvicePage = ({ openAdvice }) => {
 
   console.log(openAdvice)
@@ -42,7 +46,8 @@ export async function getServerSideProps({ query }) {
   const res = await fetch(apiRoute)
   const data = await res.json()
 
-  const openAdvice = data.data.filter(decision => decision.attributes.state === decisionState)
+  // const openAdvice = data.data.filter(decision => decision.attributes.state === decisionState)
+  const openAdvice = decisions.data.filter(decision => decision.attributes.state === decisionState)
 
   return {
     props: {

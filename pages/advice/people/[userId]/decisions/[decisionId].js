@@ -5,6 +5,10 @@ import Link from "next/link";
 import { includes } from "lodash";
 
 import {
+  decisions
+} from "@lib/utils/fake-ap-data";
+
+import {
   PageContainer,
   Grid,
   Stack,
@@ -27,6 +31,8 @@ import {
   GiveAdviceModal,
   AddStakeholderModal,
 } from "@adviceModals";
+
+import UserResultItem from "@components/UserResultItem"
 
 const Decision = ({ decisionId, decision, userId, decisionStakeholders, decisionDocuments }) => {
   const decisionContext = decision.attributes.context;
@@ -129,7 +135,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
   // console.log(links);
   // console.log('validDecision', validDecision);
   // console.log("decision", decision);
-  // console.log("stakeholders", stakeholders);
+  console.log("links", links);
 
   return (
     <>
@@ -184,7 +190,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
         >
           <Grid item>
             <Link href={`/advice/people/${userId}/decisions/${decisionState}`}>
-              <Typography variant="body1">Back</Typography>
+              <Button variant="text">Back</Button>
             </Link>
           </Grid>
           <Grid item>
@@ -287,15 +293,15 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                   <Link
                     href={`/advice/people/${userId}/decisions/${decisionState}`}
                   >
-                    <Button>Cancel</Button>
+                    <Button variant="outlined">Cancel</Button>
                   </Link>
-                  <Button onClick={handleSaveDecision}>Save</Button>
+                  <Button onClick={handleSaveDecision} variant="outlined">Save</Button>
                 </Stack>
               ) : validDecision && decisionState === "draft" ? (
                 <Stack direction="row" spacing={4}>
-                  <Button>Edit</Button> {/* Edit drafted decision */}
-                  <Button onClick={handleSaveDecision}>Save</Button>
-                  <Button onClick={toggleShareDecisionModalOpen}>
+                  <Button variant="outlined">Edit</Button> {/* Edit drafted decision */}
+                  <Button onClick={handleSaveDecision} variant="outlined">Save</Button>
+                  <Button onClick={toggleShareDecisionModalOpen} variant="outlined">
                     Share decision
                   </Button>
                 </Stack>
@@ -304,9 +310,9 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                   <Link
                     href={`/advice/people/${userId}/decisions/${decisionState}`}
                   >
-                    <Button>Cancel</Button>
+                    <Button variant="outlined">Cancel</Button>
                   </Link>
-                  <Button onClick={toggleShareDecisionModalOpen}>
+                  <Button onClick={toggleShareDecisionModalOpen} variant="outlined">
                     Share decision
                   </Button>
                 </Stack>
@@ -372,18 +378,20 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                                     GOOGLE DOC
                                   </Typography>
                                   <Typography variant="h6">
-                                    Vialeta Bookkeeping plan - Final
+                                    {link.attributes.title}
                                   </Typography>
                                   <Typography variant="body2">
                                     {link.attributes.link}
                                   </Typography>
                                 </Stack>
                               </Grid>
-                              <Grid item>
-                                <Button onClick={() => handleRemoveLink(link.id)}>
-                                  x
-                                </Button>
-                              </Grid>
+                              {decisionState === "draft" &&
+                                <Grid item>
+                                  <Button onClick={() => handleRemoveLink(link.id)}>
+                                    x
+                                  </Button>
+                                </Grid>
+                              }
                             </Grid>
                           </Card>
                         ))}
@@ -406,64 +414,22 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                       {stakeholders &&
                         stakeholders.map((s, i) => (
                           // Filter returned stakeholders by categoriy (ie: "Your School")
-                          <Card>
-                            <div>{s.id}</div>
-                          </Card>
+                          <UserResultItem user={s} />
+                          // <Card>
+                          //   <div>{s.id}</div>
+                          // </Card>
                         ))}
                       {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
-                            <Button  >+</Button>
+                            <Button >+</Button>
                           </Grid>
-                          <Grid item>Add an advice giver from your school</Grid>
+                          <Grid item>Add an advice giver</Grid>
                         </Grid>
                       )}
                     </Stack>
                   </Card>
-                  <Card>
-                    <Stack spacing={4}>
-                      {/* trigger modal with search for hub */}
-                      <div>Your hub</div>
-                      {stakeholders &&
-                        stakeholders.map((s, i) => (
-                          // Filter returned stakeholders by categoriy (ie: "Your Hub")
-                          <Card>
-                            <div>{s.id}</div>
-                          </Card>
-                        ))}
-                      {decisionState === "draft" && (
-                        <Grid container alignItems="center" spacing={4}>
-                          <Grid item>
-                            <Button onClick={() => setAddStakeholderModalOpen(true)}>+</Button>
-                          </Grid>
-                          <Grid item>Add an advice giver from your hub</Grid>
-                        </Grid>
-                      )}
-                    </Stack>
-                  </Card>
-                  <Card>
-                    <Stack spacing={4}>
-                      {/* trigger modal with search for school */}
-                      <div>Wildflower foundation</div>
-                      {stakeholders &&
-                        stakeholders.map((s, i) => (
-                          // Filter returned stakeholders by categoriy (ie: "Foundation")
-                          <Card>
-                            <div>{s.id}</div>
-                          </Card>
-                        ))}
-                      {decisionState === "draft" && (
-                        <Grid container alignItems="center" spacing={4}>
-                          <Grid item>
-                            <Button onClick={() => setAddStakeholderModalOpen(true)}>+</Button>
-                          </Grid>
-                          <Grid item>
-                            Add an advice giver from the foundation
-                          </Grid>
-                        </Grid>
-                      )}
-                    </Stack>
-                  </Card>
+
                 </Stack>
               </Card>
             </Grid>
@@ -481,15 +447,26 @@ export async function getServerSideProps({ query }) {
   const res = await fetch(apiRoute);
   const data = await res.json();
 
-  const decision = data.data
-  const decisionStakeholders = data.included.filter(data => data.type == "stakeholder");
-  const decisionDocuments = data.included.filter(data => data.type == "document");
+  const decisionState = data.data.attributes.state
+
+  // const decision = data.data
+  // const decisionStakeholders = data.included.filter(data => data.type == "stakeholder");
+  // const decisionDocuments = data.included.filter(data => data.type == "document");
+
+  const decisionTEST = decisions.data.filter(decision => decision.attributes.state === decisionState)
+  // const decision = decisions.data[1]
+
+  const decision = decisionTEST[0]
+
+  const decisionStakeholders = decision.relationships.stakeholders.data
+  const decisionDocuments = decision.relationships.documents.data
 
   return {
     props: {
       decisionId,
       userId,
       decision,
+      // decisionTEST2,
       decisionStakeholders,
       decisionDocuments
     },

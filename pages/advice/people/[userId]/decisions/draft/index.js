@@ -6,6 +6,9 @@ import {
   Grid
 } from '@ui'
 
+import {
+  decisions
+} from "@lib/utils/fake-ap-data";
 
 const AdviceDraftsPage = ({ drafts }) => {
 
@@ -43,7 +46,8 @@ export async function getServerSideProps({ query }) {
   const res = await fetch(apiRoute)
   const data = await res.json()
 
-  const drafts = data.data.filter(decision => decision.attributes.state === decisionState)
+  // const drafts = data.data.filter(decision => decision.attributes.state === decisionState)
+  const drafts = decisions.data.filter(decision => decision.attributes.state === decisionState)
 
   return {
     props: {

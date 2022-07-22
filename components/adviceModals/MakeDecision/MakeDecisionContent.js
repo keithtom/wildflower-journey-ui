@@ -51,25 +51,33 @@ const MakeDecisionContent = ({
     setHasAuthority(currentAuthority => !currentAuthority);
   };
 
-  function handleValidate() {
+  const handleValidate = () => {
     setIsValidating(false);
     setIsDeciding(true);
     setIsSuccess(false);
   };
-
-  function handleDecide() {
-    adviceApi({id: decisionId}).close({finalSummary: whyDecisionMade, changesSummary: decisionChanges, role: authorRole}).then(
-      (response) => {
-        setIsValidating(false);
-        setIsDeciding(false);
-        setIsSuccess(true);
-
-        console.log(response);
-    }, (error) => {
-      console.log(error);
-    });
-
+  const handleDecide = () => {
+    setIsValidating(false);
+    setIsDeciding(false);
+    setIsSuccess(true);
   };
+
+  // function handleDecide() {
+  //   adviceApi({id: decisionId}).close({finalSummary: whyDecisionMade, changesSummary: decisionChanges, role: authorRole}).then(
+  //     (response) => {
+  //       setIsValidating(false);
+  //       setIsDeciding(false);
+  //       setIsSuccess(true);
+
+  //       console.log(response);
+  //   }, (error) => {
+  //     console.log(error);
+  //   });
+
+  // };
+
+  console.log("isDeciding", isDeciding)
+  console.log("isValidating", isValidating)
 
   return (
     <div>
