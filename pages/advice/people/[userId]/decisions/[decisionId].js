@@ -410,7 +410,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                   <Card>
                     <Stack spacing={4}>
                       {/* trigger modal with search for school */}
-                      <div>Your school</div>
+                      {/* <div>Your school</div> */}
                       {stakeholders &&
                         stakeholders.map((s, i) => (
                           // Filter returned stakeholders by categoriy (ie: "Your School")
@@ -422,7 +422,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                       {decisionState === "draft" && (
                         <Grid container alignItems="center" spacing={4}>
                           <Grid item>
-                            <Button >+</Button>
+                            <Button onClick={() => setAddStakeholderModalOpen(true)}>+</Button>
                           </Grid>
                           <Grid item>Add an advice giver</Grid>
                         </Grid>
