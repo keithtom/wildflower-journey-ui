@@ -40,11 +40,11 @@ const UserResultItem = ({ user, asStakeholderSelection }) => {
     <>
       <Card>
         <UserSummary
-          avatar={user.attributes.profileImage}
-          firstName={user.attributes.firstName}
-          lastName={user.attributes.lastName}
+          avatar={user.profileImage}
+          firstName={user.firstName}
+          lastName={user.lastName}
           roles={user.attributes.roles}
-          skills={user.attributes.skills}
+          skills={user.skills}
         />
 
         <Divider />

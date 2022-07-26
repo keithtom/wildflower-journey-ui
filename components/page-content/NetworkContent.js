@@ -7,6 +7,7 @@ import {
   searchFilters,
   searchPeopleFilters,
 } from "@lib/utils/fake-data";
+import { users } from "@lib/utils/fake-directory-data";
 import {
   RadioGroup,
   FormControlLabel,
@@ -175,6 +176,10 @@ const NetworkContent = ({ asStakeholderSelection }) => {
   // console.log("tuitionAssistanceSelected", tuitionAssistanceSelected)
   // console.log("calendarSelected", calendarSelected)
 
+  // console.log("users", users);
+
+  const [advancedFiltersVisible, setAdvancedFiltersVisible] = useState(false);
+
   return (
     <Grid container p={asStakeholderSelection ? 0 : 8} spacing={8}>
       <Grid item xs={12} sm={12}>
@@ -245,25 +250,44 @@ const NetworkContent = ({ asStakeholderSelection }) => {
                   filtersSelected={governanceTypeSelected}
                   handleOnChange={handleGovernanceTypeChange}
                 />
-                <FilterGroup
-                  group={TuitionAssistance}
-                  filtersSelected={tuitionAssistanceSelected}
-                  handleOnChange={handleTuitionAssistanceChange}
-                />
-                <FilterGroup
-                  group={Calendar}
-                  filtersSelected={calendarSelected}
-                  handleOnChange={handleCalendarChange}
-                />
+
+                <Typography onClick={() => setAdvancedFiltersVisible(!advancedFiltersVisible)}>
+                {advancedFiltersVisible ? "Hide" : "Show"} Advanced Filters
+                </Typography>
+                {advancedFiltersVisible && (
+                  <Stack spacing={4}>
+                    <FilterGroup
+                      group={TuitionAssistance}
+                      filtersSelected={tuitionAssistanceSelected}
+                      handleOnChange={handleTuitionAssistanceChange}
+                    />
+                    <FilterGroup
+                      group={Calendar}
+                      filtersSelected={calendarSelected}
+                      handleOnChange={handleCalendarChange}
+                    />
+                  </Stack>
+                )}
               </>
 
-              <FormLabel>Hub</FormLabel>
-              <Select options={hubs} />
+              {category === "schools" && (
+                <>
+                  <Typography onClick={() => setAdvancedFiltersVisible(!advancedFiltersVisible)}>
+                    {advancedFiltersVisible ? "Hide" : "Show"} Advanced Filters
+                  </Typography>
+                  {advancedFiltersVisible && (
+                    <Stack spacing={4}>
+                      <FormLabel>Hub</FormLabel>
+                      <Select options={hubs} />
 
-              <Divider />
+                      <Divider />
 
-              <FormLabel>Distance</FormLabel>
-              <Select options={distances} />
+                      <FormLabel>Distance</FormLabel>
+                      <Select options={distances} />
+                    </Stack>
+                  )}
+                </>
+              )}
             </Stack>
           </FormControl>
         </Card>
@@ -274,8 +298,8 @@ const NetworkContent = ({ asStakeholderSelection }) => {
           <Stack spacing={4}>
             {results.length ? (
               <Stack spacing={4}>
-                <Typography variant="h6">{results.length} Results</Typography>
-                {results.map((p, i) => (
+                <Typography variant="h6">{users.length} Results</Typography>
+                {users.map((p, i) => (
                   <UserResultItem
                     user={p}
                     key={p.id}
