@@ -8,7 +8,7 @@ const UserContactModal = ({ user, open, toggle }) => {
     <Modal
       open={open}
       toggle={toggle}
-      title={`Contact ${user.attributes.firstName} ${user.attributes.lastName}`}
+      title={`Contact ${user.firstName} ${user.lastName}`}
     >
       <UserContactInfo user={user} />
     </Modal>

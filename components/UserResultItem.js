@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 
 import { List, ListItem } from "@mui/material";
 import {
@@ -43,7 +44,7 @@ const UserResultItem = ({ user, asStakeholderSelection }) => {
           avatar={user.profileImage}
           firstName={user.firstName}
           lastName={user.lastName}
-          roles={user.attributes.roles}
+          roles={user.roles}
           skills={user.skills}
         />
 
@@ -101,6 +102,13 @@ const UserResultItem = ({ user, asStakeholderSelection }) => {
                   </Button>
                 </Grid>
               )}
+              <Grid item>
+                <Link href="/user-profile">
+                  <Button variant="text">
+                    <Typography>View Profile</Typography>
+                  </Button>
+                </Link>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import {
+  Avatar,
   Box,
   Grid,
   TextField,
@@ -65,6 +66,7 @@ const AdviceMessage = ({ content, poster, postedTime }) => {
   return (
     <Stack>
       <Stack direction="row" spacing={4}>
+        <Avatar src={poster.profileImage} />
         <Typography variant="body1">{poster.name}</Typography>
         <Typography variant="body1">Posted at {postedTime}</Typography>
       </Stack>

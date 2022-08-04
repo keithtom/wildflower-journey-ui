@@ -29,7 +29,7 @@ const MakeDecisionModal = ({ decisionId, open, toggle, stakeholders }) => {
       title={
         isValidDecision
           ? hasObjections
-            ? "Your decision has objections"
+            ? "Make your decision"
             : isDeciding || isSuccess
             ? "Make your decision"
             : "You've received advice from everyone!"

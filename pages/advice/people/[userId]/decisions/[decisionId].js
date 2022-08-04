@@ -206,7 +206,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                 </Button>
                 {/* WIL-132 */}
                 <Button onClick={toggleMakeDecisionOpen}>
-                  Make you decision
+                  Make your decision
                 </Button>
               </Stack>
             ) : decisionState === "stakeholder" ? (
@@ -221,7 +221,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
 
         <Grid container p={6} spacing={4}>
           <Grid item xs={12} sm={3}>
-            <Card>
+            <Card sx={decisionState === "draft" && { border: '1px solid purple'}}>
               <Grid container spacing={2}>
                 <Grid item>
                   <Stack>
@@ -233,7 +233,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
             </Card>
           </Grid>
           <Grid item xs={12} sm={3}>
-            <Card>
+          <Card>
               <Grid container spacing={2}>
                 <Grid item>
                   <Stack>
@@ -245,7 +245,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
             </Card>
           </Grid>
           <Grid item xs={12} sm={3}>
-            <Card>
+          <Card sx={decisionState === "open" && { border: '1px solid purple'}}>
               <Grid container spacing={2}>
                 <Grid item>
                   <Stack>
@@ -329,6 +329,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                 <Stack spacing={6}>
                   <Typography variant="h5">Summary</Typography>
                   <TextField
+                    multiline
                     fullWidth
                     label="Context"
                     placeholder="Any relevant background information to help the advice givers get into your shoes..."
@@ -337,6 +338,7 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                     disabled={decisionState !== "draft"}
                   />
                   <TextField
+                    multiline
                     fullWidth
                     label="Proposal"
                     placeholder="A summary of your proposal..."
@@ -414,7 +416,10 @@ const Decision = ({ decisionId, decision, userId, decisionStakeholders, decision
                       {stakeholders &&
                         stakeholders.map((s, i) => (
                           // Filter returned stakeholders by categoriy (ie: "Your School")
-                          <UserResultItem user={s} />
+                          <div onClick={() => setAdviceExchangeModalOpen(true)}>
+
+                            <UserResultItem user={s} />
+                          </div>
                           // <Card>
                           //   <div>{s.id}</div>
                           // </Card>

@@ -28,6 +28,7 @@ import {
   Grid,
   Card,
   TextField,
+  Button
 } from "@ui";
 import { Search, ArrowForwardIos } from "@mui/icons-material";
 
@@ -205,6 +206,32 @@ const NetworkContent = ({ asStakeholderSelection }) => {
             <Stack spacing={3}>
               <Typography variant="h6">Filter</Typography>
 
+              <Card>
+                <Grid container spacing={4} alignItems="center">
+                  <Grid item>
+                    <Typography variant="bodyLarge">Filter for</Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "100%" }}
+                      // onClick={handleSearchForBoard}
+                    >
+                      Possible board members
+                    </Button>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "100%" }}
+                      // onClick={handleSearchForInArea}
+                    >
+                      People in your area
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Card>
+
               <Divider />
 
               <RadioGroup value={category} onChange={handleCategoryChange}>
@@ -321,17 +348,17 @@ const NetworkContent = ({ asStakeholderSelection }) => {
                 ) : (
                   <Stack p={6} alignItems="center" spacing={4}>
                     <Typography variant="h4">
-                      Oops! Looks like there's nothing here.
+                      Search the directory above!
                     </Typography>
                     <Typography variant="body">
-                      Try filtering less or searching for schools instead.
+                      Use filters on the left to refine your search.
                     </Typography>
-                    <Link onClick={() => setCategory("schools")}>
+                    {/* <Link onClick={() => setCategory("schools")}>
                       <Stack direction="row" spacing={3}>
                         <Typography>Search for schools</Typography>
                         <ArrowForwardIos fontSize="small" />
                       </Stack>
-                    </Link>
+                    </Link> */}
                   </Stack>
                 )}
               </Card>
