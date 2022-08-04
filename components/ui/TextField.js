@@ -1,26 +1,27 @@
-import { default as MaterialTextField } from '@mui/material/TextField';
-import { styled } from '@mui/material/styles';
-import { Stack, Typography } from '@ui'
-
-const CustomTextField = styled(MaterialTextField)(({ theme }) => `
-`)
+import FormControl from "@mui/material/FormControl";
+import { styled, css } from "@mui/material/styles";
+import { Stack, Input, Typography } from "./index";
 
 export default function TextField({
   charCount,
   charLimit,
-  children,
   placeholder,
-  ...rest
+  label,
+  ...props
 }) {
   return (
     <Stack spacing={1}>
-      <CustomTextField
-        placeholder={placeholder}
-        {...rest}
-      >{children}</CustomTextField>
-      {(charCount || charLimit) &&
-        <Typography>{charCount} / {charLimit}</Typography>
-      }
+      <FormControl variant="standard">
+        <Stack spacing={2}>
+          <Typography variant="bodyRegular">{label}</Typography>
+          <Input {...props} multiline />
+          {(charCount || charLimit) && (
+            <Typography variant="bodySmall" lightened>
+              {charCount} / {charLimit}
+            </Typography>
+          )}
+        </Stack>
+      </FormControl>
     </Stack>
   );
 }

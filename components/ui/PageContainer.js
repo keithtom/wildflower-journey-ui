@@ -1,27 +1,24 @@
-import { styled } from '@mui/material/styles';
-import {
-  Box
-} from '@ui'
+import { styled, css } from "@mui/material/styles";
+import { Box } from "./index";
+import Nav from "../Nav";
 
-import Nav from './Nav'
+// NOTE: This is not included in storybook
 
-const PageWrapper = styled(Box)(({ theme }) => ({
-  display: 'flex'
-}));
-const PageContent = styled(Box)(({ theme }) => ({
-  flexGrow: 1,
-  paddingTop: theme.spacing(16)
-}));
+const PageWrapper = styled(Box)`
+  display: flex;
+`;
+const PageContent = styled(Box)`
+  flex-grow: 1;
+  padding-top: ${({ theme }) => theme.util.buffer * 16}px;
+`;
 
 const PageContainer = ({ children }) => {
   return (
     <PageWrapper>
       <Nav />
-      <PageContent>
-        {children}
-      </PageContent>
+      <PageContent>{children}</PageContent>
     </PageWrapper>
-  )
-}
+  );
+};
 
-export default PageContainer
+export default PageContainer;

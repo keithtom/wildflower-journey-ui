@@ -1,40 +1,29 @@
-import React, { useState } from 'react';
-import { Select } from '../components/ui'
+import React, { useState } from "react";
+import Select from "../components/ui/Select";
+
+import { languages } from "../lib/utils/fake-data";
 
 export default {
-  title: 'UI/Select',
-  component: Select
+  title: "UI/Select",
+  component: Select,
 };
 
 const Template = (args) => {
-  const [checkboxChecked, setCheckboxChecked] = useState(false)
-  const [radioChecked, setRadioChecked] = useState(false)
-
+  const [language, setLanguage] = useState("");
+  const handleLanguageChange = (event) => {
+    setLanguage(event.target.value);
+  };
   return (
-    <>
-      <div>
-        <Select
-          {...args}
-          checkbox
-          label="This is a checkbox label"
-          checked={checkboxChecked}
-          onClick={() => setCheckboxChecked(!checkboxChecked)}
-        />
-      </div>
-      <div>
-        <Select
-          {...args}
-          radio
-          label="This is a radio label"
-          checked={radioChecked}
-          onClick={() => setRadioChecked(!radioChecked)}
-        />
-      </div>
-    </>
-  )
-}
+    <Select
+      {...args}
+      value={language}
+      label="Preferred Language"
+      placeholder="Your preferred language"
+      onChange={handleLanguageChange}
+      options={languages}
+    />
+  );
+};
 
 export const Default = Template.bind({});
-Default.args = {
-  disabled: false
-}
+Default.args = {};

@@ -1,18 +1,10 @@
-import { default as MaterialAvatarGroup } from '@mui/material/AvatarGroup';
-import { styled } from '@mui/material/styles';
+import { default as MaterialAvatarGroup } from "@mui/material/AvatarGroup";
+import { styled, css } from "@mui/material/styles";
 
-const CustomAvatarGroup = styled(MaterialAvatarGroup)(({ theme }) => ({
-}));
+const CustomAvatarGroup = styled(MaterialAvatarGroup)``;
 
-const AvatarGroup = ({ sm, md, lg, ...rest }) => {
-  let size = sm ? 24 : md ? 40 : lg ? 56 : 40
-  return (
-    <CustomAvatarGroup {...rest}
-      sx={{
-        '& .MuiAvatar-root': { height: size, width: size, fontSize: size/2 }
-      }}
-    />
-  );
-}
+const AvatarGroup = ({ children, ...props }) => {
+  return <CustomAvatarGroup {...props}>{children}</CustomAvatarGroup>;
+};
 
-export default AvatarGroup
+export default AvatarGroup;

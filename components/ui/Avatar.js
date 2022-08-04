@@ -1,16 +1,34 @@
-import { default as MaterialAvatar } from '@mui/material/Avatar';
-import { styled } from '@mui/material/styles';
+import { default as MaterialAvatar } from "@mui/material/Avatar";
+import { styled, css } from "@mui/material/styles";
 
-const CustomAvatar = styled(MaterialAvatar)(({ theme }) => ({
-}));
+const CustomAvatar = styled(MaterialAvatar)`
+  /* sm */
+  ${(props) =>
+    props.size === "sm" &&
+    css`
+      width: ${props.theme.util.buffer * 8}px;
+      height: ${props.theme.util.buffer * 8}px;
+    `}
 
-const Avatar = ({ sm, md, lg, ...rest }) => {
-  let size = sm ? 24 : md ? 40 : lg ? 56 : 40
-  return (
-    <CustomAvatar {...rest}
-      sx={{ width: size, height: size }}
-    />
-  );
-}
+  /* md */
+  ${(props) =>
+    props.size === "md" &&
+    css`
+      width: ${props.theme.util.buffer * 16}px;
+      height: ${props.theme.util.buffer * 16}px;
+    `}
 
-export default Avatar
+  /* lg */
+  ${(props) =>
+    props.size === "lg" &&
+    css`
+      width: ${props.theme.util.buffer * 32}px;
+      height: ${props.theme.util.buffer * 32}px;
+    `}
+`;
+
+const Avatar = ({ ...props }) => {
+  return <CustomAvatar {...props} />;
+};
+
+export default Avatar;

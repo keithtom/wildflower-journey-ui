@@ -1,15 +1,12 @@
-import { default as MaterialStack } from '@mui/material/Stack';
-import { styled } from '@mui/material/styles';
+import { default as MaterialStack } from "@mui/material/Stack";
+import { styled, css } from "@mui/material/styles";
 
-const CustomStack = styled(MaterialStack)(({ theme }) => ({
-}));
+// NOTE: This is not included in storybook
 
-const Stack = ({ children, ...rest }) => {
-  return (
-    <CustomStack {...rest}>
-      {children}
-    </CustomStack>
-  );
-}
+const CustomStack = styled(MaterialStack)``;
 
-export default Stack
+const Stack = ({ children, ...props }) => {
+  return <CustomStack {...props}>{children}</CustomStack>;
+};
+
+export default Stack;

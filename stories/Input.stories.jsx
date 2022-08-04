@@ -1,27 +1,16 @@
-import React from 'react';
-import { Input } from '../components/ui'
+import React, { useState } from "react";
+import Input from "../components/ui/Input";
+
+import { languages } from "../lib/utils/fake-data";
 
 export default {
-  title: 'UI/Input',
+  title: "UI/Input",
   component: Input,
-  argTypes: {
-    icon: {
-      options: ['user', 'check'],
-      control: {type: 'select'}
-    },
-  },
 };
 
-const Template = (args) => <Input {...args}>Input content</Input>
+const Template = (args) => {
+  return <Input {...args} />;
+};
 
 export const Default = Template.bind({});
-Default.args = {
-  placeholder: 'Placeholder content'
-}
-
-export const WithIcon = Template.bind({});
-WithIcon.args = {
-  placeholder: 'Placeholder content',
-  icon: 'user'
-}
-
+Default.args = {};

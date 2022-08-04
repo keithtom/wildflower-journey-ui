@@ -1,22 +1,18 @@
-import { default as MaterialGrid } from '@mui/material/Grid';
-import { styled } from '@mui/material/styles';
+import { default as MaterialGrid } from "@mui/material/Grid";
+import { styled, css } from "@mui/material/styles";
 
-const CustomGrid = styled(MaterialGrid)(({ theme }) => ({
-}));
+const CustomGrid = styled(MaterialGrid)``;
 
-const Grid = ({ container, children, ...rest }) => {
-  return (
-    container ?
-      <div>
-        <CustomGrid container={container} {...rest}>
-          {children}
-        </CustomGrid>
-      </div>
-    :
-      <CustomGrid {...rest}>
+const Grid = ({ container, children, ...props }) => {
+  return container ? (
+    <div>
+      <CustomGrid container={container} {...props}>
         {children}
       </CustomGrid>
+    </div>
+  ) : (
+    <CustomGrid {...props}>{children}</CustomGrid>
   );
-}
+};
 
-export default Grid
+export default Grid;
