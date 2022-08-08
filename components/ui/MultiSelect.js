@@ -1,87 +1,46 @@
-import { default as MaterialSelect } from '@mui/material/Select';
-import { styled } from '@mui/material/styles';
+import { default as MaterialSelect } from "@mui/material/Select";
+import { styled, css } from "@mui/material/styles";
 
-import {
-  FormControl,
-  OutlinedInput,
-  MenuItem,
-  InputLabel
-} from '@mui/material'
-import {
-  Box,
-  Chip
-} from '@ui'
+import { FormControl, MenuItem } from "@mui/material";
+import { Chip, Icon, Input, Stack, Typography } from "./index";
 
-const CustomMultiSelect = styled(MaterialSelect)(({ theme }) => ({
-}));
+const CustomMultiSelect = styled(MaterialSelect)`
+  border-radius: ${({ theme }) => theme.radius.md}px;
+  padding: 0 ${({ theme }) => theme.util.buffer * 3}px 0
+    ${({ theme }) => theme.util.buffer * 1}px;
+`;
 
-const MultiSelect = ({
-  options,
-  id,
-  value,
-  onChange,
-  ...rest
-}) => {
+const MultiSelect = ({ options, id, value, onChange, label, ...props }) => {
   return (
-    <FormControl>
-      <InputLabel id={`${id}-label`}>Skills</InputLabel>
-      <CustomMultiSelect
-        labelId={`${id}-label`}
-        id={id}
-        multiple
-        value={value}
-        onChange={onChange}
-        input={<OutlinedInput id={`${id}-chip`} />}
-        renderValue={(selected) => (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {selected.map((value) => (
-              <Chip key={value} label={value} />
-            ))}
-          </Box>
-        )}
-        {...rest}
-      >
-        {options.map((option) => (
-          <MenuItem
-            key={option}
-            value={option}
-          >
-            {option}
-          </MenuItem>
-        ))}
-      </CustomMultiSelect>
+    <FormControl fullWidth>
+      <Stack spacing={2}>
+        <Typography variant="bodyRegular">{label}</Typography>
+        <CustomMultiSelect
+          multiple
+          labelId={`${id}-label`}
+          id={id}
+          value={value}
+          onChange={onChange}
+          input={<Input />}
+          IconComponent={() => <Icon type="expandMore" variant="lightened" />}
+          renderValue={(selected) => (
+            <Stack direction="row" spacing={1}>
+              {selected.map((value) => (
+                <Chip key={value} label={value} />
+              ))}
+            </Stack>
+          )}
+          {...props}
+        >
+          {options.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </CustomMultiSelect>
+      </Stack>
     </FormControl>
   );
-}
+};
 
-export default MultiSelect
-
-
-// <FormControl sx={{ m: 1 }}>
-//   <InputLabel id="demo-multiple-chip-label">Skills</InputLabel>
-//   <Select
-//     labelId="demo-multiple-chip-label"
-//     id="demo-multiple-chip"
-//     multiple
-//     value={skills}
-//     onChange={handleSkillChange}
-//     input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-//     renderValue={(selected) => (
-//       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-//         {selected.map((value) => (
-//           <Chip key={value} label={value} />
-//         ))}
-//       </Box>
-//     )}
-//     MenuProps={MenuProps}
-//   >
-//     {user.skills.map((skill) => (
-//       <MenuItem
-//         key={skill}
-//         value={skill}
-//       >
-//         {skill}
-//       </MenuItem>
-//     ))}
-//   </Select>
-// </FormControl>
+export default MultiSelect;

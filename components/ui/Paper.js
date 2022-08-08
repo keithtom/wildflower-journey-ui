@@ -1,16 +1,8 @@
-import { default as MaterialPaper } from '@mui/material/Paper';
-import { styled } from '@mui/material/styles';
+import { default as MaterialPaper } from "@mui/material/Paper";
+import { styled, css } from "@mui/material/styles";
 
-const CustomPaper = styled(MaterialPaper)(({ theme }) => `
-`)
+const CustomPaper = styled(MaterialPaper)``;
 
-export default function Paper({
-  children,
-  ...rest
-}) {
-  return (
-    <CustomPaper
-      {...rest}
-    >{children}</CustomPaper>
-  );
+export default function Paper({ children, ...props }) {
+  return <CustomPaper {...props}>{children}</CustomPaper>;
 }

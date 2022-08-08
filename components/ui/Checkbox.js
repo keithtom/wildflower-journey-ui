@@ -1,15 +1,12 @@
-import { default as MaterialCheckbox } from '@mui/material/Checkbox';
-import { styled } from '@mui/material/styles';
+import { default as MaterialCheckbox } from "@mui/material/Checkbox";
+import { styled, css } from "@mui/material/styles";
 
-const CustomCheckbox = styled(MaterialCheckbox)(({ theme }) => ({
-  '&.Mui-checked': {
-  },
-}));
+const CustomCheckbox = styled(MaterialCheckbox)`
+  color: ${({ theme }) => theme.color.neutral.main};
+`;
 
-const Checkbox = ({ ...rest }) => {
-  return (
-    <CustomCheckbox defaultChecked {...rest} />
-  );
-}
+const Checkbox = ({ ...props }) => {
+  return <CustomCheckbox defaultChecked disableRipple {...props} />;
+};
 
-export default Checkbox
+export default Checkbox;

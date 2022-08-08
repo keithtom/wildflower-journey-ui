@@ -1,14 +1,11 @@
-import { useState } from 'react'
-import { DatePicker as MaterialDatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { styled } from '@mui/material/styles';
-import {
-  TextField
-} from '@ui'
+import { useState } from "react";
+import { DatePicker as MaterialDatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { styled, css } from "@mui/material/styles";
+import { TextField } from "./index";
 
-const CustomDatePicker = styled(MaterialDatePicker)(({ theme }) => `
-`)
+const CustomDatePicker = styled(MaterialDatePicker)``;
 
 export default function DatePicker({
   label,
@@ -19,8 +16,7 @@ export default function DatePicker({
   placeholder,
   ...rest
 }) {
-
-  const [dateValue, setDateValue] = useState(value)
+  const [dateValue, setDateValue] = useState(value);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>

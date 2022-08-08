@@ -1,19 +1,14 @@
-import React from "react"
-import { theme } from '../styles/theme'
-import { ThemeProvider as MUIThemeProvider } from '@mui/material/styles';
-import { ThemeProvider } from '@emotion/react'
-import { ModalProvider } from 'styled-react-modal'
-import { DialogBackground } from '../components/ui/Dialog'
+import React from "react";
+import { theme } from "../styles/theme";
+import { ThemeProvider as MUIThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@emotion/react";
 
-const ThemeDecorator = storyFn => {
-  return ( 
-  <MUIThemeProvider theme={theme}>
-    <ThemeProvider theme={theme}>
-      <ModalProvider backgroundComponent={DialogBackground}>
-        {storyFn()}
-      </ModalProvider>
-    </ThemeProvider>
-  </MUIThemeProvider>
-)}
+const ThemeDecorator = (storyFn) => {
+  return (
+    <MUIThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>{storyFn()}</ThemeProvider>
+    </MUIThemeProvider>
+  );
+};
 
-export default ThemeDecorator
+export default ThemeDecorator;

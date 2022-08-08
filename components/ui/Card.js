@@ -1,36 +1,74 @@
-import { PinDropSharp } from '@mui/icons-material';
-import { default as MaterialCard } from '@mui/material/Card';
-import { default as MaterialCardContent} from '@mui/material/CardContent';
-import { styled } from '@mui/material/styles';
+import { default as MaterialCard } from "@mui/material/Card";
+import { styled, css } from "@mui/material/styles";
 
-const CustomCard = styled(MaterialCard)(({ variant, fullHeight, theme }) => ({
-  backgroundColor: variant === "warning" ? theme.palette.secondary.light : "white",
-  border: variant === "warning" ? `${theme.util.borderWidth} solid ${theme.palette.secondary.light}` : `${theme.util.borderWidth} solid ${theme.palette.border.main}`
-}));
-const CustomCardContent = styled(MaterialCardContent)(({ theme }) => ({
-  padding: theme.spacing(4),
-  '&:last-child': {
-    paddingBottom: theme.spacing(4)
-  }
-}));
+const CustomCard = styled(MaterialCard)`
+  border-radius: ${({ theme }) => theme.radius.lg}px;
+  border: 1px solid ${({ theme }) => theme.color.neutral.main};
+  padding: ${({ theme }) => theme.util.buffer * 6}px;
+  background-color: ${({ theme }) => theme.color.neutral.light};
 
-const Card = ({
-  variant,
-  fullHeight,
-  children,
-  ...rest
-}) => {
+  /* Primary */
+  ${(props) =>
+    props.variant === "primary" &&
+    css`
+      background: ${props.theme.color.primary.main};
+      border: 1px solid ${props.theme.color.primary.main};
+    `}
+
+  /* Lightened */
+  ${(props) =>
+    props.variant === "lightened" &&
+    css`
+      background: ${props.theme.color.neutral.lightened};
+      border: 1px solid ${props.theme.color.neutral.lightened};
+    `}
+
+  /* Primary Lightened */
+  ${(props) =>
+    props.variant === "primaryLightened" &&
+    css`
+      background: ${props.theme.color.primary.lightest};
+      border: 1px solid ${props.theme.color.primary.lightest};
+    `}
+
+  /* Small */
+  ${(props) =>
+    props.size === "small" &&
+    css`
+      border-radius: ${props.theme.radius.md}px;
+      padding: ${props.theme.util.buffer * 3}px;
+    `}
+
+  /* Large */
+  ${(props) =>
+    props.size === "large" &&
+    css`
+      border-radius: ${props.theme.radius.lg}px;
+      padding: ${props.theme.util.buffer * 12}px;
+    `}
+
+  /* Elevated */
+  ${(props) =>
+    props.elevated &&
+    css`
+      box-shadow: ${props.theme.shadow.medium.lightened};
+    `}
+
+  /* No padding */
+  ${(props) =>
+    props.noPadding &&
+    css`
+      padding: 0;
+    `}
+`;
+
+const Card = ({ children, ...props }) => {
   return (
-    <CustomCard
-      {...rest}
-      variant={variant}
-      fullHeight={fullHeight}
-    >
-      <CustomCardContent>
-        {children}
-      </CustomCardContent>
+    <CustomCard {...props}>
+      {children}
+      {/* <CustomCardContent>{children}</CustomCardContent> */}
     </CustomCard>
   );
-}
+};
 
-export default Card
+export default Card;

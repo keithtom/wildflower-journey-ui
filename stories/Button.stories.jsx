@@ -1,27 +1,33 @@
-import React from 'react';
-import { Button } from '../components/ui'
+import React from "react";
+import Button from "../components/ui/Button";
 
 export default {
-  title: 'UI/Button',
+  title: "UI/Button",
   component: Button,
 };
 
-const Template = (args) => <Button {...args}>Button content</Button>
+const Template = (args) => <Button {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  full: false
-}
-
-export const Lightened = Template.bind({});
-Lightened.args = {
-  lightened: true,
-  full: false
-}
-
-export const Disabled = Template.bind({});
-Disabled.args = {
-  disabled: true,
-  full: false
-}
-
+  children: "Button Text",
+  disabled: false,
+  small: false,
+  full: false,
+};
+export const Text = Template.bind({});
+Text.args = {
+  variant: "text",
+  children: "Button Text",
+  disabled: false,
+  small: false,
+  full: false,
+};
+export const Secondary = Template.bind({});
+Secondary.args = {
+  variant: "secondary",
+  children: "Button Text",
+  disabled: false,
+  small: false,
+  full: false,
+};

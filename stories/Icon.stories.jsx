@@ -1,20 +1,32 @@
-import React from 'react';
-import { Icon } from '../components/ui'
+import React from "react";
+import Icon from "../components/ui/Icon";
 
 export default {
-  title: 'UI/Icon',
+  title: "UI/Icon",
   component: Icon,
   argTypes: {
     type: {
-      options: ['user', 'check'],
-      control: {type: 'select'}
+      options: [
+        "chevronRight",
+        "moreVert",
+        "arrowForward",
+        "close",
+        "expandMore",
+      ],
+      control: { type: "select" },
+    },
+    size: {
+      options: ["default", "small", "large"],
+      control: { type: "select" },
+    },
+    variant: {
+      options: ["default", "primary", "lightened", "light"],
+      control: { type: "select" },
     },
   },
 };
 
-const Template = (args) => <Icon {...args} />
+const Template = (args) => <Icon {...args} />;
 
 export const Default = Template.bind({});
-Default.args = {
-  type: 'user'
-}
+Default.args = {};
