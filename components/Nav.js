@@ -110,7 +110,7 @@ const Nav = ({}) => {
                       We want to hear from you!
                     </Typography>
                     <Typography variant="bodyRegular" lightened>
-                      Click here to send us an email with any and all feedback..
+                      Click here to send us an email with any and all feedback.
                     </Typography>
                   </Stack>
                 </Card>
