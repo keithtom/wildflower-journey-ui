@@ -1,60 +1,65 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useMediaQuery } from "react-responsive";
+import { styled, css } from "@mui/material/styles";
+import { Drawer, AppBar, IconButton, ListItem } from "@mui/material";
 
 import { theme } from "../styles/theme";
-
+import { user } from "../lib/utils/fake-data";
 import {
-  Drawer,
-  Toolbar,
   Avatar,
-  AppBar,
-  IconButton,
+  Card,
+  Typography,
+  Stack,
+  Grid,
+  Popover,
+  Link,
+  Icon,
   Box,
-  Menu,
-  MenuItem,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
-import { Card, Typography, Stack, Grid, Divider, Link } from "./ui/index";
-import {
-  PeopleAlt,
-  MeetingRoom,
-  MenuOutlined,
-  Quiz,
-  Info,
-  ArrowForward,
-} from "@mui/icons-material";
+} from "./ui/index";
 
 import AdviceProcessNavigation from "./page-content/advice/AdviceProcessNavigation";
 
-const drawerWidth = 240;
+const StyledNav = styled(Box)`
+  display: flex;
+`;
+const CustomAppBar = styled(AppBar)`
+  outline: 1px solid ${({ theme }) => theme.color.neutral.main};
+  border: none;
+  background: white;
+  margin: 0;
+  position: fixed;
+  height: ${({ theme }) => theme.util.appBarHeight}px;
+  z-index: 2;
+  padding: 0 ${({ theme }) => theme.util.buffer * 4}px;
+  justify-content: center;
+  display: flex;
+`;
+const CustomDrawer = styled(Drawer)`
+  margin: 0;
+  flex-shrink: 0;
+  width: ${({ theme }) => theme.util.drawerWidth}px;
+  z-index: 1;
+  .MuiDrawer-paper {
+    width: ${({ theme }) => theme.util.drawerWidth}px;
+    outline: 1px solid ${({ theme }) => theme.color.neutral.main};
+    border: none;
+    margin-top: 0;
+    padding-top: ${({ theme }) => theme.util.appBarHeight}px;
+  }
+`;
 
 const Nav = ({}) => {
   const [navOpen, setNavOpen] = useState(false);
-  const [profileNavOpen, setProfileNavOpen] = useState(false);
-  const router = useRouter();
 
+  const router = useRouter();
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBar
-        position="fixed"
-        sx={{
-          ml: { sm: `${drawerWidth}px` },
-          paddingLeft: 4,
-          paddingRight: 4,
-          marginTop: 0,
-          zIndex: 2,
-          background: "white",
-          color: "black",
-          border: 0,
-          outline: `1px solid ${theme.palette.border.main}`,
-        }}
-      >
-        <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1 }}>
+    <StyledNav sx={{ display: "flex" }}>
+      <CustomAppBar>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Grid item>
             {isSm ? (
               <Stack direction="row" alignItems="center" spacing={2}>
                 <IconButton
@@ -63,173 +68,248 @@ const Nav = ({}) => {
                   edge="start"
                   onClick={() => setNavOpen(!navOpen)}
                 >
-                  <MenuOutlined />
+                  <Icon type="menu" />
                 </IconButton>
-                <Typography variant="bodyRegular" noWrap>
+                <Typography variant="bodyRegular" bold noWrap>
                   Wildflower Platform
                 </Typography>
               </Stack>
             ) : (
-              <Typography variant="bodyLarge" noWrap>
+              <Typography variant="bodyLarge" bold noWrap>
                 Wildflower Platform
               </Typography>
             )}
-          </Box>
-          <Box>
-            <Avatar
-              sx={{
-                width: 32,
-                height: 32,
-              }}
-              src={user.profileImage}
-              onClick={() => setProfileNavOpen(true)}
-              id="profile-avatar"
+          </Grid>
+          <Grid item>
+            <AvatarMenu
+              avatarSrc={user.profileImage}
+              userName={`${user.firstName} ${user.lastName}`}
             />
-            {profileNavOpen && (
-              <Menu
-                id="menu-appbar"
-                anchorEl="profile-avatar"
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={() => setProfileNavOpen(!profileNavOpen)}
-                onClose={() => setProfileNavOpen(false)}
-              >
-                <NavLink
-                  onClick={() => setProfileNavOpen(false)}
-                  to="/user-profile"
-                  label="My Profile"
-                />
-                <NavLink
-                  onClick={() => setProfileNavOpen(false)}
-                  to="/school-profile"
-                  label="My School"
-                />
-              </Menu>
-            )}
-          </Box>
-        </Toolbar>
-      </AppBar>
+          </Grid>
+        </Grid>
+      </CustomAppBar>
 
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          zIndex: 1,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            marginTop: 0,
-            border: 0,
-            outline: `1px solid ${theme.palette.border.main}`,
-          },
-        }}
+      <CustomDrawer
         variant={isSm ? `temporary` : `permanent`}
         anchor="left"
         open={navOpen}
         onClose={() => setNavOpen(!navOpen)}
       >
-        <Toolbar />
-
         <Stack
           justifyContent="space-between"
           direction="column"
           sx={{ height: "100%" }}
         >
-          <div>
-            <NavLink
-              to="/network"
-              active={router.pathname.includes("/network")}
-              label="Network"
-              icon={<PeopleAlt fontSize="small" />}
-            />
-            <NavLink
-              to="/advice"
-              active={router.pathname.includes("/advice")}
-              label="Advice"
-              icon={<Quiz fontSize="small" />}
-            />
-            {router.pathname.includes("/advice") && <AdviceProcessNavigation />}
-          </div>
-
-          <Grid container p={4} spacing={8}>
+          <Navigation />
+          <Grid container p={4}>
             <Grid item xs={12}>
-              <Card>
-                <Stack spacing={2}>
-                  <Info color="primary" />
-                  <Typography variant="body1">
-                    We want to hear from you!
-                  </Typography>
-                  <Typography variant="body2">
-                    Send us an email with any and all feedback.
-                  </Typography>
-                  <Link
-                    href="mailto:tech-pilot@wildflowerschools.org?subject=Directory"
-                    underline="none"
-                  >
-                    <Stack flexDirection="row" justifyContent="space-between">
-                      Send an email
-                      <ArrowForward color="primary" fontSize="small" />
-                    </Stack>
-                  </Link>
-                </Stack>
-              </Card>
+              <Link href="mailto:tech-pilot@wildflowerschools.org?subject=Directory">
+                <Card variant="lightened" size="small" hoverable>
+                  <Stack spacing={1}>
+                    <Typography variant="bodyRegular" bold highlight>
+                      We want to hear from you!
+                    </Typography>
+                    <Typography variant="bodyRegular" lightened>
+                      Click here to send us an email with any and all feedback..
+                    </Typography>
+                  </Stack>
+                </Card>
+              </Link>
             </Grid>
           </Grid>
         </Stack>
-      </Drawer>
-    </Box>
+      </CustomDrawer>
+    </StyledNav>
   );
 };
 
 export default Nav;
 
-const user = {
-  email: "laurinda_lockman@spencer-hickle.io",
-  firstName: "Maya",
-  lastName: "Walley",
-  profileImage:
-    "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3270&q=80",
-  phoneNumber: "(917) 123-4567",
-  location: "New York City",
-  skills: ["Finance", "Home Schooling", "Real Estate"],
-  bio: "Hi there! I decided to pursue being a teacher leader 3 years ago when my son needed to sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. ",
+const NavLink = ({ to, icon, active, secondary, label }) => {
+  const CustomListItem = styled(ListItem)`
+    padding: ${({ theme }) => theme.util.buffer * 4}px;
+    &:hover {
+      background: ${({ theme }) => theme.color.neutral.lightened};
+    }
+
+    //Active
+    ${(props) =>
+      props.active &&
+      css`
+        background: ${props.theme.color.neutral.lightened};
+      `}
+
+    //Secondary
+    ${(props) =>
+      props.secondary &&
+      css`
+        padding: ${props.theme.util.buffer * 2}px
+          ${props.theme.util.buffer * 4}px;
+        border-bottom: 1px solid ${props.theme.color.neutral.lightened};
+      `}
+  `;
+
+  return (
+    <Link href={to}>
+      <CustomListItem button active={active} secondary={secondary}>
+        <Grid container spacing={secondary ? 5 : 3} alignItems="center">
+          {icon && (
+            <Grid item>
+              <Icon
+                type={icon}
+                variant={active ? "primary" : secondary && "transparent"}
+                size={secondary && "small"}
+              />
+            </Grid>
+          )}
+          <Grid item>
+            <Typography highlight={active} bold={!secondary}>
+              {label}
+            </Typography>
+          </Grid>
+        </Grid>
+      </CustomListItem>
+    </Link>
+  );
 };
 
-const NavLink = ({ to, icon, adornment, active, secondary, label }) => {
+const AvatarMenu = ({ avatarSrc, userName }) => {
+  const [profileNavOpen, setProfileNavOpen] = useState(false);
+  const handleOpen = (event) => {
+    setProfileNavOpen(event.currentTarget);
+  };
+  const handleClose = () => {
+    setProfileNavOpen(null);
+  };
+
+  const open = Boolean(profileNavOpen);
+  const id = open ? "profile-nav" : undefined;
+
+  const StyledOption = styled(ListItem)`
+    border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
+    &:last-child {
+      border-bottom: none;
+    }
+    /* Hoverable */
+    ${(props) =>
+      props.hoverable &&
+      css`
+        &:hover {
+          cursor: pointer;
+          background: ${props.theme.color.neutral.lightened};
+        }
+      `}
+  `;
+
+  const StyledUserMenu = styled(Popover)`
+    .MuiPopover-paper {
+      width: 240px;
+    }
+  `;
+
+  return (
+    <>
+      <Avatar
+        size="sm"
+        onClick={handleOpen}
+        aria-describedby={id}
+        src={avatarSrc}
+      />
+
+      <StyledUserMenu
+        id={id}
+        open={open}
+        anchorEl={profileNavOpen}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <StyledOption>
+          <Typography highlight>Signed in as {userName}</Typography>
+        </StyledOption>
+        <NavLink secondary to="/user-profile" label="Your profile" />
+        <NavLink secondary to="/school-profile" label="Your school" />
+        <StyledOption onClick={undefined} hoverable>
+          <Typography lightened>Sign out</Typography>
+        </StyledOption>
+      </StyledUserMenu>
+    </>
+  );
+};
+
+const Navigation = ({}) => {
   const router = useRouter();
   return (
-    <Link href={to} color="text.main" underline="none">
-      <ListItem
-        button
-        selected={to === router.pathname}
-        sx={
-          active && secondary
-            ? { bgcolor: "neutral.main" }
-            : active && { bgcolor: "primary.main", color: "text.light" }
-        }
-      >
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
-            <Grid container spacing={2} alignItems="center">
-              {icon && (
-                <Grid item xs="auto">
-                  {icon}
-                </Grid>
-              )}
-              <Grid item>
-                <ListItemText primary={label} />
-              </Grid>
-            </Grid>
-          </Grid>
-          {adornment && <Grid item>{adornment}</Grid>}
-        </Grid>
-      </ListItem>
-    </Link>
+    <Box>
+      <NavLink
+        to="/network"
+        active={router.pathname.includes("/network")}
+        label="Network"
+        icon="importContacts"
+      />
+      <NavLink
+        to="/ssj"
+        active={router.pathname.includes("/ssj")}
+        label="School Startup Journey"
+        icon="directionsBus"
+      />
+      {router.pathname.includes("/ssj") && <SSJNavigation />}
+      {/* <NavLink
+        to="/advice"
+        active={router.pathname.includes("/advice")}
+        label="Advice"
+        icon="questionAnswer"
+        />
+      {router.pathname.includes("/advice") && <AdviceProcessNavigation />} */}
+    </Box>
+  );
+};
+
+const SSJNavigation = ({}) => {
+  const router = useRouter();
+  return (
+    <Box>
+      <NavLink
+        secondary
+        to="/ssj/categories"
+        active={router.pathname.includes("/ssj/categories")}
+        label="All categories"
+        icon="circle"
+      />
+      <NavLink
+        secondary
+        to="/ssj/discovery"
+        active={router.pathname.includes("/ssj/discovery")}
+        label="Discovery"
+        icon="circle"
+      />
+      <NavLink
+        secondary
+        to="/ssj/visioning"
+        active={router.pathname.includes("/ssj/visioning")}
+        label="Visioning"
+        icon="circle"
+      />
+      <NavLink
+        secondary
+        to="/ssj/planning"
+        active={router.pathname.includes("/ssj/planning")}
+        label="Planning"
+        icon="circle"
+      />
+      <NavLink
+        secondary
+        to="/ssj/startup"
+        active={router.pathname.includes("/ssj/startup")}
+        label="Startup"
+        icon="circle"
+      />
+    </Box>
   );
 };

@@ -60,6 +60,16 @@ const CustomCard = styled(MaterialCard)`
     css`
       padding: 0;
     `}
+
+  /* Hoverable */
+  ${(props) =>
+    props.hoverable &&
+    css`
+      &:hover {
+        cursor: pointer;
+        box-shadow: ${props.theme.shadow.small.lightened};
+      }
+    `}
 `;
 
 const Card = ({ children, ...props }) => {
