@@ -12,6 +12,9 @@ export default {
     elevated: {
       control: "boolean",
     },
+    hoverable: {
+      control: "boolean",
+    },
     noPadding: {
       control: "boolean",
     },

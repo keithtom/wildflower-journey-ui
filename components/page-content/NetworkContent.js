@@ -195,7 +195,7 @@ const NetworkContent = ({ asStakeholderSelection }) => {
   // console.log("distance", distance);
 
   return (
-    <Grid container p={asStakeholderSelection ? 0 : 8} spacing={8}>
+    <Grid container spacing={8}>
       <Grid item xs={12} sm={12}>
         <Grid container spacing={4}>
           <Grid item flex={1}>
@@ -215,10 +215,7 @@ const NetworkContent = ({ asStakeholderSelection }) => {
             />
           </Grid>
           <Grid item>
-            <Button
-              variant="text"
-              sx={{ height: "100%" }}
-            >
+            <Button variant="text" sx={{ height: "100%" }}>
               Search
             </Button>
           </Grid>

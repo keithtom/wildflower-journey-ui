@@ -4,6 +4,12 @@ import {
   ArrowForward,
   Close,
   ExpandMore,
+  DirectionsBus,
+  ImportContacts,
+  QuestionAnswer,
+  Menu,
+  Info,
+  Circle,
 } from "@mui/icons-material";
 import { styled, css } from "@mui/material/styles";
 
@@ -61,6 +67,15 @@ const StyledIcon = styled("span")`
         color: ${props.theme.color.text.light};
       }
     `}
+
+  /* Transparent */
+  ${(props) =>
+    props.variant === "transparent" &&
+    css`
+      svg {
+        color: transparent;
+      }
+    `}
 `;
 
 export default function Icon({ ...props }) {
@@ -70,6 +85,12 @@ export default function Icon({ ...props }) {
     arrowForward: <ArrowForward />,
     close: <Close />,
     expandMore: <ExpandMore />,
+    directionsBus: <DirectionsBus />,
+    importContacts: <ImportContacts />,
+    questionAnswer: <QuestionAnswer />,
+    menu: <Menu />,
+    info: <Info />,
+    circle: <Circle />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

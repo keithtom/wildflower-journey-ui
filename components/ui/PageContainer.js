@@ -9,7 +9,8 @@ const PageWrapper = styled(Box)`
 `;
 const PageContent = styled(Box)`
   flex-grow: 1;
-  padding-top: ${({ theme }) => theme.util.buffer * 16}px;
+  margin-top: ${({ theme }) => theme.util.appBarHeight}px;
+  padding: ${({ theme }) => theme.util.buffer * 6}px;
 `;
 
 const PageContainer = ({ children }) => {

@@ -12,6 +12,8 @@ export const theme = createTheme({
   util: {
     buffer,
     borderWidth: borderWidth,
+    drawerWidth: 280,
+    appBarHeight: 64,
   },
   radius: {
     sm: 4,
