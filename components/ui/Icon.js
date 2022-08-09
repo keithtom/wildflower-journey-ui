@@ -1,6 +1,7 @@
 import {
   MoreVert,
   ChevronRight,
+  ChevronLeft,
   ArrowForward,
   Close,
   ExpandMore,
@@ -11,6 +12,7 @@ import {
   Info,
   Circle,
   CheckCircle,
+  Flag,
 } from "@mui/icons-material";
 import { styled, css } from "@mui/material/styles";
 
@@ -92,6 +94,7 @@ export default function Icon({ ...props }) {
   const icons = {
     moreVert: <MoreVert />,
     chevronRight: <ChevronRight />,
+    chevronLeft: <ChevronLeft />,
     arrowForward: <ArrowForward />,
     close: <Close />,
     expandMore: <ExpandMore />,
@@ -102,6 +105,7 @@ export default function Icon({ ...props }) {
     info: <Info />,
     circle: <Circle />,
     checkCircle: <CheckCircle />,
+    flag: <Flag />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

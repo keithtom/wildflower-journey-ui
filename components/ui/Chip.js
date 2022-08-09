@@ -14,6 +14,15 @@ const CustomChip = styled(MaterialChip)`
       font-weight: ${props.theme.typography.weight.bold};
     `}
 
+  /* Large */
+  ${(props) =>
+    props.size === "large" &&
+    css`
+      padding: ${props.theme.util.buffer * 2}px 0;
+      font-size: ${props.theme.typography.bodyLarge.fontSize};
+      font-weight: ${props.theme.typography.weight.bold};
+    `}
+
   /* Primary */
   ${(props) =>
     props.variant === "primary" &&

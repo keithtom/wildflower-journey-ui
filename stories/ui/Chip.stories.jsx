@@ -6,7 +6,7 @@ export default {
   component: Chip,
   argTypes: {
     size: {
-      options: ["default", "small"],
+      options: ["default", "small", "large"],
       control: { type: "select" },
     },
     bgColor: {
