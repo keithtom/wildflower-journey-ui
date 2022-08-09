@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TextField from "../components/ui/TextField";
+import TextField from "../../components/ui/TextField";
 
 export default {
   title: "UI/TextField",

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Input from "../components/ui/Input";
+import Input from "../../components/ui/Input";
 
-import { languages } from "../lib/utils/fake-data";
+import { languages } from "../../lib/utils/fake-data";
 
 export default {
   title: "UI/Input",

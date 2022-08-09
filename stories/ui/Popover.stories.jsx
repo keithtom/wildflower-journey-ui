@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Popover from "../components/ui/Popover";
-import Button from "../components/ui/Button";
+import Popover from "../../components/ui/Popover";
+import Button from "../../components/ui/Button";
 
 export default {
   title: "UI/Popover",

@@ -1,5 +1,5 @@
 import React from "react";
-import Switch from "../components/ui/Switch";
+import Switch from "../../components/ui/Switch";
 
 export default {
   title: "UI/Switch",

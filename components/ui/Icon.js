@@ -10,6 +10,7 @@ import {
   Menu,
   Info,
   Circle,
+  CheckCircle,
 } from "@mui/icons-material";
 import { styled, css } from "@mui/material/styles";
 
@@ -76,6 +77,15 @@ const StyledIcon = styled("span")`
         color: transparent;
       }
     `}
+
+  /* Success */
+  ${(props) =>
+    props.variant === "success" &&
+    css`
+      svg {
+        color: ${props.theme.color.success.medium};
+      }
+    `}
 `;
 
 export default function Icon({ ...props }) {
@@ -91,6 +101,7 @@ export default function Icon({ ...props }) {
     menu: <Menu />,
     info: <Info />,
     circle: <Circle />,
+    checkCircle: <CheckCircle />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

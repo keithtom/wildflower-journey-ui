@@ -3,7 +3,7 @@ import { styled, css } from "@mui/material/styles";
 
 const CustomChip = styled(MaterialChip)`
   border-radius: ${({ theme }) => theme.radius.md}px;
-  background: ${({ theme }) => theme.color.neutral.main};
+  background: ${({ theme }) => theme.color.transparent.main};
 
   /* Small */
   ${(props) =>

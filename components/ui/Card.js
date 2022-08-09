@@ -31,6 +31,14 @@ const CustomCard = styled(MaterialCard)`
       border: 1px solid ${props.theme.color.primary.lightest};
     `}
 
+  /* Success */
+  ${(props) =>
+    props.variant === "success" &&
+    css`
+      background: ${props.theme.color.success.lightest};
+      border: 1px solid ${props.theme.color.success.lightest};
+    `}
+
   /* Small */
   ${(props) =>
     props.size === "small" &&
@@ -67,7 +75,6 @@ const CustomCard = styled(MaterialCard)`
     css`
       &:hover {
         cursor: pointer;
-        box-shadow: ${props.theme.shadow.small.lightened};
       }
     `}
 `;
