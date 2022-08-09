@@ -3,7 +3,7 @@ import { styled, css } from "@mui/material/styles";
 
 const CustomChip = styled(MaterialChip)`
   border-radius: ${({ theme }) => theme.radius.md}px;
-  background: ${({ theme }) => theme.color.neutral.main};
+  background: ${({ theme }) => theme.color.transparent.main};
 
   /* Small */
   ${(props) =>
@@ -11,6 +11,15 @@ const CustomChip = styled(MaterialChip)`
     css`
       padding: ${props.theme.util.buffer * 1}px 0;
       font-size: ${props.theme.typography.bodyMini.fontSize};
+      font-weight: ${props.theme.typography.weight.bold};
+    `}
+
+  /* Large */
+  ${(props) =>
+    props.size === "large" &&
+    css`
+      padding: ${props.theme.util.buffer * 2}px 0;
+      font-size: ${props.theme.typography.bodyLarge.fontSize};
       font-weight: ${props.theme.typography.weight.bold};
     `}
 

@@ -1,5 +1,5 @@
 import React from "react";
-import Radio from "../components/ui/Radio";
+import Radio from "../../components/ui/Radio";
 
 export default {
   title: "UI/Radio",

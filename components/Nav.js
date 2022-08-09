@@ -280,35 +280,35 @@ const SSJNavigation = ({}) => {
         to="/ssj/categories"
         active={router.pathname.includes("/ssj/categories")}
         label="All categories"
-        icon="circle"
+        icon={true}
       />
       <NavLink
         secondary
         to="/ssj/discovery"
         active={router.pathname.includes("/ssj/discovery")}
         label="Discovery"
-        icon="circle"
+        icon={true}
       />
       <NavLink
         secondary
         to="/ssj/visioning"
         active={router.pathname.includes("/ssj/visioning")}
         label="Visioning"
-        icon="circle"
+        icon={true}
       />
       <NavLink
         secondary
         to="/ssj/planning"
         active={router.pathname.includes("/ssj/planning")}
         label="Planning"
-        icon="circle"
+        icon={true}
       />
       <NavLink
         secondary
         to="/ssj/startup"
         active={router.pathname.includes("/ssj/startup")}
         label="Startup"
-        icon="circle"
+        icon={true}
       />
     </Box>
   );

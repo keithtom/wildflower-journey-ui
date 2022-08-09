@@ -1,12 +1,12 @@
-import React from 'react';
-import Typography from '../components/ui/Typography'
+import React from "react";
+import Typography from "../../components/ui/Typography";
 
 export default {
-  title: 'UI/Typography',
+  title: "UI/Typography",
   component: Typography,
 };
 
-const Template = (args) => <Typography {...args} />
+const Template = (args) => <Typography {...args} />;
 
 export const H1 = Template.bind({});
 H1.args = {
@@ -20,7 +20,7 @@ H1.args = {
   error: false,
   capitalize: false,
   center: false,
-}
+};
 export const H2 = Template.bind({});
 H2.args = {
   variant: "h2",
@@ -33,7 +33,7 @@ H2.args = {
   error: false,
   capitalize: false,
   center: false,
-}
+};
 export const H3 = Template.bind({});
 H3.args = {
   variant: "h3",
@@ -46,7 +46,7 @@ H3.args = {
   error: false,
   capitalize: false,
   center: false,
-}
+};
 export const H4 = Template.bind({});
 H4.args = {
   variant: "h4",
@@ -59,7 +59,7 @@ H4.args = {
   error: false,
   capitalize: false,
   center: false,
-}
+};
 export const BodyLarge = Template.bind({});
 BodyLarge.args = {
   variant: "bodyLarge",
@@ -72,7 +72,7 @@ BodyLarge.args = {
   error: false,
   capitalize: false,
   center: false,
-}
+};
 export const BodyRegular = Template.bind({});
 BodyRegular.args = {
   variant: "bodyRegular",
@@ -85,7 +85,7 @@ BodyRegular.args = {
   error: false,
   capitalize: false,
   center: false,
-}
+};
 export const BodySmall = Template.bind({});
 BodySmall.args = {
   variant: "bodySmall",
@@ -98,7 +98,7 @@ BodySmall.args = {
   error: false,
   capitalize: false,
   center: false,
-}
+};
 export const BodyMini = Template.bind({});
 BodyMini.args = {
   variant: "bodyMini",
@@ -111,4 +111,4 @@ BodyMini.args = {
   error: false,
   capitalize: false,
   center: false,
-}
+};

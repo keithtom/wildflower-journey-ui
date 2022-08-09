@@ -1,6 +1,6 @@
 import React from "react";
-import AvatarGroup from "../components/ui/AvatarGroup";
-import Avatar from "../components/ui/Avatar";
+import AvatarGroup from "../../components/ui/AvatarGroup";
+import Avatar from "../../components/ui/Avatar";
 
 export default {
   title: "UI/AvatarGroup",

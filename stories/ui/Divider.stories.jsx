@@ -1,5 +1,5 @@
 import React from "react";
-import Divider from "../components/ui/Divider";
+import Divider from "../../components/ui/Divider";
 
 export default {
   title: "UI/Divider",

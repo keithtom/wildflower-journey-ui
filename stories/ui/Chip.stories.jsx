@@ -1,12 +1,12 @@
 import React from "react";
-import Chip from "../components/ui/Chip";
+import Chip from "../../components/ui/Chip";
 
 export default {
   title: "UI/Chip",
   component: Chip,
   argTypes: {
     size: {
-      options: ["default", "small"],
+      options: ["default", "small", "large"],
       control: { type: "select" },
     },
     bgColor: {

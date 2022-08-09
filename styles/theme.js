@@ -60,6 +60,11 @@ export const theme = createTheme({
       medium: "#BBD758",
       dark: "#61702E",
     },
+    transparent: {
+      light: "rgba(0, 0, 0, 0.04)",
+      main: "rgba(0, 0, 0, 0.08)",
+      dark: "rgba(0, 0, 0, 0.16)",
+    },
   },
   shadow: {
     small: {

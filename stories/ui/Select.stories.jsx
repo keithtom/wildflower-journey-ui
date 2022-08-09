@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Select from "../components/ui/Select";
+import Select from "../../components/ui/Select";
 
-import { languages } from "../lib/utils/fake-data";
+import { languages } from "../../lib/utils/fake-data";
 
 export default {
   title: "UI/Select",

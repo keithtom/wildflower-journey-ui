@@ -1,6 +1,7 @@
 import {
   MoreVert,
   ChevronRight,
+  ChevronLeft,
   ArrowForward,
   Close,
   ExpandMore,
@@ -10,6 +11,8 @@ import {
   Menu,
   Info,
   Circle,
+  CheckCircle,
+  Flag,
 } from "@mui/icons-material";
 import { styled, css } from "@mui/material/styles";
 
@@ -76,12 +79,22 @@ const StyledIcon = styled("span")`
         color: transparent;
       }
     `}
+
+  /* Success */
+  ${(props) =>
+    props.variant === "success" &&
+    css`
+      svg {
+        color: ${props.theme.color.success.medium};
+      }
+    `}
 `;
 
 export default function Icon({ ...props }) {
   const icons = {
     moreVert: <MoreVert />,
     chevronRight: <ChevronRight />,
+    chevronLeft: <ChevronLeft />,
     arrowForward: <ArrowForward />,
     close: <Close />,
     expandMore: <ExpandMore />,
@@ -91,6 +104,8 @@ export default function Icon({ ...props }) {
     menu: <Menu />,
     info: <Info />,
     circle: <Circle />,
+    checkCircle: <CheckCircle />,
+    flag: <Flag />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
