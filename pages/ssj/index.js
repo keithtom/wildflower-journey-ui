@@ -41,7 +41,7 @@ const SSJ = ({}) => {
           </Stack>
         </Card>
         <Card variant="lightened" size="large">
-          <Grid container justifyContent="space-between">
+          <Grid container justifyContent="space-between" spacing={6}>
             <Grid item>
               <Stack>
                 <Typography variant="h4" bold>
