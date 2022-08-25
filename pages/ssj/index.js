@@ -190,10 +190,14 @@ const SSJ = ({}) => {
                 </Grid>
               </Grid>
             ) : (
-              <Grid container spacing={3}>
+              <Grid container spacing={3} alignItems="stretch">
                 {phases.map((p, i) => (
                   <Grid item xs={12} sm={4}>
-                    <Card variant="lightened" key={i}>
+                    <Card
+                      variant="lightened"
+                      key={i}
+                      style={{ height: "100%" }}
+                    >
                       <Typography variant="bodyLarge" bold>
                         {p}
                       </Typography>
