@@ -106,6 +106,16 @@ const CustomTypography = styled(MaterialTypography)`
         cursor: pointer;
       }
     `}
+
+  /* hoverable */
+  ${(props) =>
+    props.hoverable &&
+    css`
+      cursor: pointer;
+      &:hover {
+        cursor: pointer;
+      }
+    `}
 `;
 
 const Typography = ({ children, ...props }) => {
