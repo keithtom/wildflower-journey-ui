@@ -7,11 +7,19 @@ export default {
   argTypes: {
     type: {
       options: [
+        "dotsVertical",
         "chevronRight",
-        "moreVert",
-        "arrowForward",
+        "chevronLeft",
+        "rightArrow",
         "close",
         "expandMore",
+        "bus",
+        "bookReader",
+        "conversation",
+        "menu",
+        "circle",
+        "checkCircle",
+        "flag",
       ],
       control: { type: "select" },
     },

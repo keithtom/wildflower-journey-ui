@@ -251,20 +251,20 @@ const Navigation = ({}) => {
         to="/network"
         active={router.pathname.includes("/network")}
         label="Network"
-        icon="importContacts"
+        icon="bookReader"
       />
       <NavLink
         to="/ssj"
         active={router.pathname.includes("/ssj")}
         label="School Startup Journey"
-        icon="directionsBus"
+        icon="bus"
       />
       {router.pathname.includes("/ssj") && <SSJNavigation />}
       {/* <NavLink
         to="/advice"
         active={router.pathname.includes("/advice")}
         label="Advice"
-        icon="questionAnswer"
+        icon="conversation"
         />
       {router.pathname.includes("/advice") && <AdviceProcessNavigation />} */}
     </Box>

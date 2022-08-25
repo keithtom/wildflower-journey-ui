@@ -1,19 +1,20 @@
 import {
-  MoreVert,
   ChevronRight,
   ChevronLeft,
-  ArrowForward,
-  Close,
-  ExpandMore,
-  DirectionsBus,
-  ImportContacts,
-  QuestionAnswer,
+  ChevronDown,
+  RightArrowAlt,
+  X,
   Menu,
-  Info,
+  DotsVerticalRounded,
   Circle,
+} from "@styled-icons/boxicons-regular";
+import {
+  Bus,
+  BookReader,
+  Conversation,
   CheckCircle,
   Flag,
-} from "@mui/icons-material";
+} from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
 const StyledIcon = styled("span")`
@@ -92,17 +93,16 @@ const StyledIcon = styled("span")`
 
 export default function Icon({ ...props }) {
   const icons = {
-    moreVert: <MoreVert />,
+    dotsVertical: <DotsVerticalRounded />,
     chevronRight: <ChevronRight />,
     chevronLeft: <ChevronLeft />,
-    arrowForward: <ArrowForward />,
-    close: <Close />,
-    expandMore: <ExpandMore />,
-    directionsBus: <DirectionsBus />,
-    importContacts: <ImportContacts />,
-    questionAnswer: <QuestionAnswer />,
+    rightArrow: <RightArrowAlt />,
+    close: <X />,
+    expandMore: <ChevronDown />,
+    bus: <Bus />,
+    bookReader: <BookReader />,
+    conversation: <Conversation />,
     menu: <Menu />,
-    info: <Info />,
     circle: <Circle />,
     checkCircle: <CheckCircle />,
     flag: <Flag />,

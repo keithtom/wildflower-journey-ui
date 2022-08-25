@@ -9,7 +9,7 @@ export default {
 
 const Template = (args) => (
   <IconButton {...args}>
-    <Icon type="moreVert" />
+    <Icon type="dotsVertical" />
   </IconButton>
 );
 
