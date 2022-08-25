@@ -15,7 +15,7 @@ const Select = ({ label, id, value, onChange, options, ...props }) => {
           value={value}
           onChange={onChange}
           input={<Input />}
-          IconComponent={() => <Icon type="expandMore" variant="lightened" />}
+          IconComponent={() => <Icon type="chevronDown" variant="lightened" />}
           {...props}
         >
           {options.map((option, i) => (
