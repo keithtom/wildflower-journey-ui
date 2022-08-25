@@ -8,6 +8,7 @@ const CustomButton = styled(MaterialButton)`
   background: ${({ theme }) => theme.color.primary.main};
   color: ${({ theme }) => theme.color.text.light};
   border: none;
+  text-transform: none;
   &:hover {
     border: none;
     background: ${({ theme }) => theme.color.primary.darkened};
