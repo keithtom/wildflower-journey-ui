@@ -2,6 +2,14 @@ import { default as MaterialAvatar } from "@mui/material/Avatar";
 import { styled, css } from "@mui/material/styles";
 
 const CustomAvatar = styled(MaterialAvatar)`
+  /* mini */
+  ${(props) =>
+    props.size === "mini" &&
+    css`
+      width: ${props.theme.util.buffer * 6}px;
+      height: ${props.theme.util.buffer * 6}px;
+    `}
+
   /* sm */
   ${(props) =>
     props.size === "sm" &&

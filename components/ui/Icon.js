@@ -7,6 +7,8 @@ import {
   Menu,
   DotsVerticalRounded,
   Circle,
+  Link,
+  LinkExternal,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -106,6 +108,8 @@ export default function Icon({ ...props }) {
     circle: <Circle />,
     checkCircle: <CheckCircle />,
     flag: <Flag />,
+    link: <Link />,
+    linkExternal: <LinkExternal />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

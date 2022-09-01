@@ -6,7 +6,7 @@ const CustomCheckbox = styled(MaterialCheckbox)`
 `;
 
 const Checkbox = ({ ...props }) => {
-  return <CustomCheckbox defaultChecked disableRipple {...props} />;
+  return <CustomCheckbox disableRipple {...props} />;
 };
 
 export default Checkbox;
