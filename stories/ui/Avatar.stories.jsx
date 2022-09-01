@@ -11,6 +11,10 @@ const placeholder =
 
 const Template = (args) => <Avatar src={placeholder} {...args} />;
 
+export const Mini = Template.bind({});
+Mini.args = {
+  size: "mini",
+};
 export const Small = Template.bind({});
 Small.args = {
   size: "sm",

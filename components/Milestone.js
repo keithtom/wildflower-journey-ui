@@ -4,7 +4,7 @@ import { Grid, Card, Typography, Stack, Chip, Icon, Link } from "./ui";
 
 const Milestone = ({ title, effort, category, isComplete, isUpNext }) => {
   return (
-    <Link href="/">
+    <Link href="/ssj/milestone">
       <Card
         variant={isComplete ? "success" : isUpNext ? "outlined" : "lightened"}
         hoverable
