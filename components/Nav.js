@@ -277,9 +277,9 @@ const SSJNavigation = ({}) => {
     <Box>
       <NavLink
         secondary
-        to="/ssj/categories"
-        active={router.pathname.includes("/ssj/categories")}
-        label="All categories"
+        to="/ssj/view-all"
+        active={router.pathname.includes("/ssj/view-all")}
+        label="View all"
         icon={true}
       />
       <NavLink

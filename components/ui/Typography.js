@@ -88,6 +88,13 @@ const CustomTypography = styled(MaterialTypography)`
       text-transform: capitalize;
     `}
 
+  /* uppercase */
+  ${(props) =>
+    props.uppercase &&
+    css`
+      text-transform: uppercase;
+    `}
+
   /* center */
   ${(props) =>
     props.center &&

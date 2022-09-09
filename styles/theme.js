@@ -65,6 +65,16 @@ export const theme = createTheme({
       main: "rgba(0, 0, 0, 0.08)",
       dark: "rgba(0, 0, 0, 0.16)",
     },
+    highlights: {
+      brown: "#EEE0DA",
+      red: "#FADEC9",
+      yellow: "#FDECC8",
+      green: "#DBEDDB",
+      blue: "#D3E5EF",
+      purple: "#E8DEEE",
+      pink: "#F0E1E9",
+      gray: "#F0ECE1",
+    },
   },
   shadow: {
     small: {

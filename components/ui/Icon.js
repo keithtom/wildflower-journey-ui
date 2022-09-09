@@ -16,6 +16,7 @@ import {
   Conversation,
   CheckCircle,
   Flag,
+  Category,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -110,6 +111,7 @@ export default function Icon({ ...props }) {
     flag: <Flag />,
     link: <Link />,
     linkExternal: <LinkExternal />,
+    category: <Category />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

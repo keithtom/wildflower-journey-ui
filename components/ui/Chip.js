@@ -29,6 +29,9 @@ const CustomChip = styled(MaterialChip)`
     css`
       background: ${props.theme.color.primary.main};
       color: ${props.theme.color.text.light};
+      &:hover {
+        background: ${props.theme.color.primary.darkened};
+      }
     `}
 
   /* Filled */

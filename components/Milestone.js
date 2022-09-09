@@ -1,8 +1,16 @@
 import { styled, css } from "@mui/material/styles";
 
-import { Grid, Card, Typography, Stack, Chip, Icon, Link } from "./ui";
+import { Grid, Card, Typography, Stack, Chip, Icon, Link, Avatar } from "./ui";
 
-const Milestone = ({ title, effort, category, isComplete, isUpNext }) => {
+const Milestone = ({
+  title,
+  effort,
+  category,
+  phase,
+  assignee,
+  isComplete,
+  isUpNext,
+}) => {
   return (
     <Link href="/ssj/milestone">
       <Card
@@ -16,36 +24,43 @@ const Milestone = ({ title, effort, category, isComplete, isUpNext }) => {
               <Typography variant="bodyLarge" bold lightened={isUpNext}>
                 {title}
               </Typography>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography variant="bodySmall" bold lightened capitalize>
-                  Effort
-                </Typography>
-                <Chip
-                  size="small"
-                  label="Small"
-                  variant={effort === "small" && "filled"}
-                />
-                <Chip
-                  size="small"
-                  label="Medium"
-                  variant={effort === "medium" && "filled"}
-                />
-                <Chip
-                  size="small"
-                  label="Large"
-                  variant={effort === "large" && "filled"}
-                />
-              </Stack>
             </Stack>
           </Grid>
+
           <Grid item>
             <Stack direction="row" spacing={6} alignItems="center">
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography variant="bodySmall" bold lightened capitalize>
-                  Category
-                </Typography>
-                <Chip size="small" label={category} />
-              </Stack>
+              {effort && (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="bodySmall" bold lightened uppercase>
+                    Effort
+                  </Typography>
+                  <Chip size="small" label={effort} />
+                </Stack>
+              )}
+              {category && (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="bodySmall" bold lightened uppercase>
+                    Category
+                  </Typography>
+                  <Chip size="small" label={category} />
+                </Stack>
+              )}
+              {phase && (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="bodySmall" bold lightened uppercase>
+                    Phase
+                  </Typography>
+                  <Chip size="small" label={phase} />
+                </Stack>
+              )}
+              {assignee && (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="bodySmall" bold lightened uppercase>
+                    Assignee
+                  </Typography>
+                  <Avatar />
+                </Stack>
+              )}
               <Icon type="chevronRight" />
             </Stack>
           </Grid>
