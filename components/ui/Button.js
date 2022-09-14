@@ -6,13 +6,17 @@ const CustomButton = styled(MaterialButton)`
     ${({ theme }) => theme.util.buffer * 6}px;
   border-radius: ${({ theme }) => theme.radius.full}px;
   background: ${({ theme }) => theme.color.primary.main};
-  color: ${({ theme }) => theme.color.text.light};
+  * {
+    color: ${({ theme }) => theme.color.text.light};
+  }
   border: none;
   text-transform: none;
   &:hover {
     border: none;
     background: ${({ theme }) => theme.color.primary.darkened};
-    color: ${({ theme }) => theme.color.primary.light};
+    * {
+      color: ${({ theme }) => theme.color.primary.light};
+    }
   }
 
   /* Text */
@@ -20,10 +24,14 @@ const CustomButton = styled(MaterialButton)`
     props.variant === "text" &&
     css`
       background: transparent;
-      color: ${props.theme.color.primary.main};
+      * {
+        color: ${props.theme.color.primary.main};
+      }
       &:hover {
         background: ${props.theme.color.primary.lightest};
-        color: ${props.theme.color.primary.light};
+        * {
+          color: ${props.theme.color.primary.light};
+        }
       }
     `}
 
@@ -32,10 +40,46 @@ const CustomButton = styled(MaterialButton)`
     props.variant === "secondary" &&
     css`
       background: ${props.theme.color.primary.lightest};
-      color: ${props.theme.color.primary.main};
+      * {
+        color: ${props.theme.color.primary.main};
+      }
       &:hover {
         background: ${props.theme.color.primary.lightened};
-        color: ${props.theme.color.primary.darkened};
+        * {
+          color: ${props.theme.color.primary.darkened};
+        }
+      }
+    `}
+
+  /* Light */
+  ${(props) =>
+    props.variant === "light" &&
+    css`
+      background: ${props.theme.color.neutral.lightest};
+      * {
+        color: ${props.theme.color.primary.main};
+      }
+      &:hover {
+        background: ${props.theme.color.neutral.lightened};
+        * {
+          color: ${props.theme.color.primary.main};
+        }
+      }
+    `}
+
+  /* Danger */
+  ${(props) =>
+    props.variant === "danger" &&
+    css`
+      background: ${props.theme.color.error.light};
+      * {
+        color: ${props.theme.color.error.dark};
+      }
+      &:hover {
+        background: ${props.theme.color.error.medium};
+        * {
+          color: ${props.theme.color.error.darkened};
+        }
       }
     `}
 
@@ -52,7 +96,9 @@ const CustomButton = styled(MaterialButton)`
     props.disabled &&
     css`
       background: ${props.theme.color.neutral.lightened};
-      color: ${props.theme.color.neutral.main};
+      * {
+        color: ${props.theme.color.neutral.main};
+      }
     `}
 
   /* Full */

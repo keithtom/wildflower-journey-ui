@@ -3,7 +3,7 @@ import { FormControlLabel } from "@mui/material";
 
 import { Grid, Card, Stack, Checkbox, Icon, Link, IconButton } from "./ui";
 
-const Task = ({ title, isComplete, notNavigable }) => {
+const Task = ({ title, isComplete, notNavigable, link }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const handleCompleteTask = () => {
     setTaskIsComplete(!taskIsComplete);

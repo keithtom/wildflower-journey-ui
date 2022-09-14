@@ -9,6 +9,8 @@ import {
   Circle,
   Link,
   LinkExternal,
+  RightArrowCircle,
+  Plus,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -17,6 +19,8 @@ import {
   CheckCircle,
   Flag,
   Category,
+  Label,
+  Pencil,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -112,6 +116,10 @@ export default function Icon({ ...props }) {
     link: <Link />,
     linkExternal: <LinkExternal />,
     category: <Category />,
+    rightArrowCircle: <RightArrowCircle />,
+    label: <Label />,
+    plus: <Plus />,
+    pencil: <Pencil />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
