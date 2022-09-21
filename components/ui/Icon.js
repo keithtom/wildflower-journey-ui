@@ -11,6 +11,7 @@ import {
   LinkExternal,
   RightArrowCircle,
   Plus,
+  Check,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -124,6 +125,7 @@ export default function Icon({ ...props }) {
     pencil: <Pencil />,
     pieChart: <PieChart />,
     zap: <Zap />,
+    check: <Check />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

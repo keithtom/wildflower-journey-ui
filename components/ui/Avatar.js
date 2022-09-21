@@ -2,6 +2,9 @@ import { default as MaterialAvatar } from "@mui/material/Avatar";
 import { styled, css } from "@mui/material/styles";
 
 const CustomAvatar = styled(MaterialAvatar)`
+  width: ${({ theme }) => theme.util.buffer * 12}px;
+  height: ${({ theme }) => theme.util.buffer * 12}px;
+
   /* mini */
   ${(props) =>
     props.size === "mini" &&
@@ -22,8 +25,8 @@ const CustomAvatar = styled(MaterialAvatar)`
   ${(props) =>
     props.size === "md" &&
     css`
-      width: ${props.theme.util.buffer * 16}px;
-      height: ${props.theme.util.buffer * 16}px;
+      width: ${props.theme.util.buffer * 12}px;
+      height: ${props.theme.util.buffer * 12}px;
     `}
 
   /* lg */

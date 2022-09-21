@@ -84,6 +84,13 @@ const CustomCard = styled(MaterialCard)`
         cursor: pointer;
       }
     `}
+
+  /* noBorder */
+  ${(props) =>
+    props.noBorder &&
+    css`
+      border: none;
+    `}
 `;
 
 const Card = ({ children, ...props }) => {
