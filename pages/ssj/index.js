@@ -2,7 +2,7 @@ import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import Link from "next/link";
 
-import { phases } from "../../lib/utils/fake-data";
+import { categories } from "../../lib/utils/fake-data";
 
 import {
   Box,
@@ -18,6 +18,7 @@ import {
   Icon,
   Modal,
 } from "@ui";
+import CategoryChip from "../../components/CategoryChip";
 
 const SSJ = ({}) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
@@ -190,7 +191,7 @@ const SSJ = ({}) => {
               </Stack>
 
               {viewPhaseProgress ? (
-                <Grid container spacing={3}>
+                <Grid container spacing={6}>
                   <Grid item xs={12} sm={3}>
                     <PhaseProgressCard
                       phase="Discovery"
@@ -237,18 +238,21 @@ const SSJ = ({}) => {
                   </Grid>
                 </Grid>
               ) : (
-                <Grid container spacing={3} alignItems="stretch">
-                  {phases.map((p, i) => (
+                <Grid container spacing={6} alignItems="stretch">
+                  {categories.map((p, i) => (
                     <Grid item xs={12} sm={4}>
-                      <Card
-                        variant="lightened"
-                        key={i}
-                        style={{ height: "100%" }}
-                      >
-                        <Typography variant="bodyLarge" bold>
-                          {p}
-                        </Typography>
-                      </Card>
+                      <Link href="/ssj/view-all">
+                        <Card key={i} style={{ height: "100%" }} hoverable>
+                          <Stack spacing={3}>
+                            <Grid container>
+                              <Grid item>
+                                <CategoryChip category={p.title} size="large" />
+                              </Grid>
+                            </Grid>
+                            <ProgressBar processes={p.processes} />
+                          </Stack>
+                        </Card>
+                      </Link>
                     </Grid>
                   ))}
                 </Grid>
@@ -271,35 +275,35 @@ const SSJ = ({}) => {
 
 export default SSJ;
 
-const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
-  const ProgressBar = ({ processes }) => {
-    const numberOfProcesses = processes.length;
-    const StyledProcessIndicator = styled(Box)`
-      width: calc(100% / ${numberOfProcesses});
-      height: ${({ theme }) => theme.util.buffer}px;
-      background: ${({ theme }) => theme.color.neutral.main};
-      border-radius: ${({ theme }) => theme.radius.full}px;
-      /* done */
-      ${(props) =>
-        props.done &&
-        css`
-          background: ${props.theme.color.success.medium};
-        `}
-    `;
-    return (
-      <Stack spacing={3}>
-        <Typography variant="bodyMini" bold lightened>
-          {processes.filter((process) => process.status === "done").length} OF{" "}
-          {processes.length} MILESTONES COMPLETED
-        </Typography>
-        <Stack spacing={1} direction="row">
-          {processes.map((t, i) => (
-            <StyledProcessIndicator key={i} done={t.status === "done"} />
-          ))}
-        </Stack>
+const ProgressBar = ({ processes }) => {
+  const numberOfProcesses = processes.length;
+  const StyledProcessIndicator = styled(Box)`
+    width: calc(100% / ${numberOfProcesses});
+    height: ${({ theme }) => theme.util.buffer}px;
+    background: ${({ theme }) => theme.color.neutral.main};
+    border-radius: ${({ theme }) => theme.radius.full}px;
+    /* done */
+    ${(props) =>
+      props.done &&
+      css`
+        background: ${props.theme.color.success.medium};
+      `}
+  `;
+  return (
+    <Stack spacing={3}>
+      <Typography variant="bodyMini" bold lightened>
+        {processes.filter((process) => process.status === "done").length} OF{" "}
+        {processes.length} MILESTONES COMPLETED
+      </Typography>
+      <Stack spacing={1} direction="row">
+        {processes.map((t, i) => (
+          <StyledProcessIndicator key={i} done={t.status === "done"} />
+        ))}
       </Stack>
-    );
-  };
+    </Stack>
+  );
+};
+const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
   const DeliverableImage = ({ completed }) => {
     const StyledDeliverableImage = styled(Box)`
       position: relative;
