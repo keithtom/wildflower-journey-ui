@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { FormControlLabel, RadioGroup } from "@mui/material";
+import { styled, css } from "@mui/material/styles";
+
 import {
   PageContainer,
   Typography,
@@ -10,6 +13,7 @@ import {
   Grid,
   Button,
   TextField,
+  Radio,
 } from "@ui";
 import Task from "../../components/Task";
 import Resource from "../../components/Resource";
@@ -17,6 +21,7 @@ import Resource from "../../components/Resource";
 const TaskPage = ({}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
+  const isDecision = true;
 
   return (
     <PageContainer>
@@ -59,8 +64,17 @@ const TaskPage = ({}) => {
           <Task
             notNavigable
             title="Complete WF School Name Research Document"
+            isDecision={isDecision}
+            isNext={true}
           />
         </Stack>
+
+        {isDecision ? (
+          <DecisionForm
+            options={FakeDecisionOptions}
+            disabled={userIsEditing}
+          />
+        ) : null}
 
         <Card>
           <Stack spacing={3}>
@@ -179,3 +193,73 @@ const EditableResourceItem = ({ title }) => {
     </Grid>
   );
 };
+const DecisionForm = ({ options, disabled }) => {
+  const [userIsUpdatingDecision, setUserIsUpdatingDecision] = useState(false);
+  const [decisionOption, setDecisionOption] = useState();
+  const handleDecisionOptionChange = (e) => {
+    setDecisionOption(e.target.value);
+  };
+  const notDecided = !decisionOption;
+  const isDecided = userIsUpdatingDecision ? false : true;
+
+  const StyledDecisionCard = styled(Card)`
+    /* Disabled */
+    ${(props) =>
+      props.disabled &&
+      css`
+        opacity: 0.25;
+        pointer-events: none;
+      `}
+  `;
+
+  return (
+    <StyledDecisionCard
+      variant={isDecided ? "outlined" : "primaryOutlined"}
+      disabled={disabled}
+    >
+      <Stack spacing={3}>
+        <RadioGroup value={decisionOption} handleOptionsChange>
+          {options.map((o, i) => (
+            <FormControlLabel
+              key={i}
+              value={o.value}
+              control={<Radio disabled={isDecided} />}
+              label={o.label}
+              onChange={handleDecisionOptionChange}
+            />
+          ))}
+        </RadioGroup>
+        <Grid container>
+          <Grid item>
+            {isDecided ? (
+              <Button
+                variant="light"
+                onClick={() => setUserIsUpdatingDecision(true)}
+              >
+                <Typography>Change decision</Typography>
+              </Button>
+            ) : (
+              <Button
+                disabled={notDecided}
+                onClick={() => setUserIsUpdatingDecision(false)}
+              >
+                <Typography>Decide</Typography>
+              </Button>
+            )}
+          </Grid>
+        </Grid>
+      </Stack>
+    </StyledDecisionCard>
+  );
+};
+
+const FakeDecisionOptions = [
+  {
+    value: "wildflower group exemption",
+    label: "I will apply with the Wildflower Group Exemption",
+  },
+  {
+    value: "independently with irs",
+    label: "I will apply independently using Form 1023 with the IRS",
+  },
+];

@@ -31,6 +31,13 @@ const CustomCard = styled(MaterialCard)`
       border: 1px solid ${props.theme.color.primary.lightest};
     `}
 
+  /* Primary Outlined */
+  ${(props) =>
+    props.variant === "primaryOutlined" &&
+    css`
+      border: 1px solid ${props.theme.color.primary.main};
+    `}
+
   /* Success */
   ${(props) =>
     props.variant === "success" &&

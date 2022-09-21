@@ -117,7 +117,14 @@ const MilestonePage = ({}) => {
                   ))}
               </>
             ) : FakeMilestoneTasks ? (
-              FakeMilestoneTasks.map((m, i) => <Task title={m.title} key={i} />)
+              FakeMilestoneTasks.map((m, i) => (
+                <Task
+                  title={m.title}
+                  key={i}
+                  isDecision={m.isDecision}
+                  isNext={i === 2}
+                />
+              ))
             ) : (
               <Card hoverable elevated size="small">
                 <Grid
@@ -202,6 +209,10 @@ export default MilestonePage;
 const FakeMilestoneTasks = [
   { title: "Complete WF School Name Research Document" },
   { title: "Complete advice process on your Name Research Document" },
+  {
+    title: "Are you going to use the WF Group Exemption or file independently?",
+    isDecision: true,
+  },
   {
     title:
       "Email your name and research document to support@wildflowerschools.org to confirm name selection",
