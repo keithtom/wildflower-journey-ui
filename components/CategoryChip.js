@@ -1,4 +1,4 @@
-import { Icon, Chip, Stack } from "@ui";
+import { Icon, Chip, Stack } from "./ui";
 import { theme } from "../styles/theme";
 
 const CategoryChip = ({ category, withIcon, ...props }) => {

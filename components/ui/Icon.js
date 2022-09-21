@@ -21,6 +21,7 @@ import {
   Category,
   Label,
   Pencil,
+  PieChart,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -120,6 +121,7 @@ export default function Icon({ ...props }) {
     label: <Label />,
     plus: <Plus />,
     pencil: <Pencil />,
+    pieChart: <PieChart />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

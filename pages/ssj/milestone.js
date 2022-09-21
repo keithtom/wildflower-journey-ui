@@ -17,6 +17,8 @@ import {
 import Task from "../../components/Task";
 import CategoryChip from "../../components/CategoryChip";
 import EffortChip from "../../components/EffortChip";
+import PhaseChip from "../../components/PhaseChip";
+import StatusChip from "../../components/StatusChip";
 
 const MilestonePage = ({}) => {
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
@@ -69,19 +71,25 @@ const MilestonePage = ({}) => {
               <Typography variant="bodyMini" lightened bold>
                 STATUS
               </Typography>
-              <Chip label="To Do" size="small" />
-            </Stack>
-            <Stack spacing={2}>
-              <Typography variant="bodyMini" lightened bold>
-                CATEGORY
-              </Typography>
-              <CategoryChip category="Finance" size="small" withIcon />
+              <StatusChip status="to do" size="small" withIcon />
             </Stack>
             <Stack spacing={2}>
               <Typography variant="bodyMini" lightened bold>
                 EFFORT
               </Typography>
               <EffortChip effort="Large" size="small" withIcon />
+            </Stack>
+            <Stack spacing={2}>
+              <Typography variant="bodyMini" lightened bold>
+                PHASE
+              </Typography>
+              <PhaseChip phase="Discovery" size="small" withIcon />
+            </Stack>
+            <Stack spacing={2}>
+              <Typography variant="bodyMini" lightened bold>
+                CATEGORY
+              </Typography>
+              <CategoryChip category="Finance" size="small" withIcon />
             </Stack>
             <Stack spacing={2}>
               <Typography variant="bodyMini" lightened bold>

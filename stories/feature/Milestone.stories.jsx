@@ -4,6 +4,36 @@ import Milestone from "../../components/Milestone";
 export default {
   title: "Feature/Milestone",
   component: Milestone,
+  argTypes: {
+    status: {
+      options: ["to do", "up next", "done"],
+      control: { type: "select" },
+    },
+    effort: {
+      options: ["Small", "Medium", "Large"],
+      control: { type: "select" },
+    },
+    phase: {
+      options: ["Discovery", "Visioning", "Planning", "Startup"],
+      control: { type: "select" },
+    },
+    category: {
+      options: [
+        "Finance",
+        "Facilities",
+        "Governance & Compliance",
+        "Human Resources",
+        "Community & Family Engagement",
+        "Classroom & Program Practices",
+        "Album Advice & Affiliation",
+        "WF Community & Culture",
+      ],
+      control: { type: "select" },
+    },
+    assignee: {
+      control: "boolean",
+    },
+  },
 };
 
 const Template = (args) => <Milestone {...args} />;
@@ -12,23 +42,7 @@ export const Default = Template.bind({});
 Default.args = {
   title: "Name your school",
   effort: "small",
+  phase: "Planning",
   category: "Governance & Compliance",
-  isComplete: false,
-  isUpNext: false,
-};
-export const Complete = Template.bind({});
-Complete.args = {
-  title: "Name your school",
-  effort: "small",
-  category: "Governance & Compliance",
-  isComplete: true,
-  isUpNext: false,
-};
-export const UpNext = Template.bind({});
-UpNext.args = {
-  title: "Name your school",
-  effort: "small",
-  category: "Governance & Compliance",
-  isComplete: false,
-  isUpNext: true,
+  status: "to do",
 };

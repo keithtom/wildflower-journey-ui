@@ -1,8 +1,7 @@
-import { styled, css } from "@mui/material/styles";
-
-import { Grid, Card, Typography, Stack, Chip, Icon, Link, Avatar } from "./ui";
+import { Grid, Card, Typography, Stack, Icon, Link, Avatar } from "./ui";
 import CategoryChip from "./CategoryChip";
 import EffortChip from "./EffortChip";
+import PhaseChip from "./PhaseChip";
 
 const Milestone = ({ title, effort, category, phase, assignee, status }) => {
   return (
@@ -18,7 +17,11 @@ const Milestone = ({ title, effort, category, phase, assignee, status }) => {
                 <Icon type="rightArrowCircle" variant="lightened" />
               )}
               {status === "to do" && <Icon type="circle" variant="primary" />}
-              <Typography variant="bodyLarge" bold>
+              <Typography
+                variant="bodyLarge"
+                bold
+                lightened={status === "up next"}
+              >
                 {title}
               </Typography>
             </Stack>
@@ -26,26 +29,28 @@ const Milestone = ({ title, effort, category, phase, assignee, status }) => {
 
           <Grid item>
             <Stack direction="row" spacing={6} alignItems="center">
-              {effort && (
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <EffortChip size="small" effort={effort} withIcon />
-                </Stack>
-              )}
-              {category && (
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <CategoryChip size="small" category={category} withIcon />
-                </Stack>
-              )}
-              {phase && (
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Chip size="small" label={phase} />
-                </Stack>
-              )}
-              {assignee && (
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Avatar size="mini" />
-                </Stack>
-              )}
+              <Stack direction="row" spacing={3} alignItems="center">
+                {effort && (
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <EffortChip size="small" effort={effort} withIcon />
+                  </Stack>
+                )}
+                {phase && (
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <PhaseChip size="small" phase={phase} withIcon />
+                  </Stack>
+                )}
+                {category && (
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <CategoryChip size="small" category={category} withIcon />
+                  </Stack>
+                )}
+                {assignee && (
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Avatar size="mini" />
+                  </Stack>
+                )}
+              </Stack>
               <Icon type="chevronRight" />
             </Stack>
           </Grid>

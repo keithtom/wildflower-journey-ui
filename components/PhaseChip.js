@@ -1,20 +1,20 @@
 import { Icon, Chip, Stack, Typography } from "./ui";
 
-const EffortChip = ({ effort, withIcon, ...props }) => {
+const PhaseChip = ({ phase, withIcon, ...props }) => {
   return (
     <Chip
       label={
         withIcon ? (
           <Stack spacing={2} direction="row" alignItems="center">
-            <Icon type="label" size="small" />
+            <Icon type="pieChart" size="small" />
 
             <Typography capitalize variant="bodyMini" bold>
-              {effort}
+              {phase}
             </Typography>
           </Stack>
         ) : (
           <Typography capitalize variant="bodyMini" bold>
-            {effort}
+            {phase}
           </Typography>
         )
       }
@@ -23,4 +23,4 @@ const EffortChip = ({ effort, withIcon, ...props }) => {
   );
 };
 
-export default EffortChip;
+export default PhaseChip;
