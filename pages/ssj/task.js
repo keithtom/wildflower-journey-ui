@@ -194,11 +194,13 @@ const EditableResourceItem = ({ title }) => {
   );
 };
 const DecisionForm = ({ options, disabled }) => {
+  const [userIsUpdatingDecision, setUserIsUpdatingDecision] = useState(false);
   const [decisionOption, setDecisionOption] = useState();
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };
   const notDecided = !decisionOption;
+  const isDecided = userIsUpdatingDecision ? false : true;
 
   const StyledDecisionCard = styled(Card)`
     /* Disabled */
@@ -211,14 +213,17 @@ const DecisionForm = ({ options, disabled }) => {
   `;
 
   return (
-    <StyledDecisionCard variant="primaryOutlined" disabled={disabled}>
+    <StyledDecisionCard
+      variant={isDecided ? "outlined" : "primaryOutlined"}
+      disabled={disabled}
+    >
       <Stack spacing={3}>
         <RadioGroup value={decisionOption} handleOptionsChange>
           {options.map((o, i) => (
             <FormControlLabel
               key={i}
               value={o.value}
-              control={<Radio />}
+              control={<Radio disabled={isDecided} />}
               label={o.label}
               onChange={handleDecisionOptionChange}
             />
@@ -226,9 +231,21 @@ const DecisionForm = ({ options, disabled }) => {
         </RadioGroup>
         <Grid container>
           <Grid item>
-            <Button disabled={notDecided}>
-              <Typography>Decide</Typography>
-            </Button>
+            {isDecided ? (
+              <Button
+                variant="light"
+                onClick={() => setUserIsUpdatingDecision(true)}
+              >
+                <Typography>Change decision</Typography>
+              </Button>
+            ) : (
+              <Button
+                disabled={notDecided}
+                onClick={() => setUserIsUpdatingDecision(false)}
+              >
+                <Typography>Decide</Typography>
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Stack>

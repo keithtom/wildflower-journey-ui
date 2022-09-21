@@ -48,6 +48,13 @@ const Task = ({
                 <Typography
                   variant="bodyLarge"
                   lightened={!taskIsComplete && !isNext}
+                  highlight={taskIsComplete || isNext}
+                >
+                  Decision
+                </Typography>
+                <Typography
+                  variant="bodyLarge"
+                  lightened={!taskIsComplete && !isNext}
                 >
                   {title}
                 </Typography>
