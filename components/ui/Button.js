@@ -41,7 +41,7 @@ const CustomButton = styled(MaterialButton)`
     css`
       background: ${props.theme.color.primary.lightest};
       * {
-        color: ${props.theme.color.primary.main};
+        color: ${props.theme.color.primary.main} !important;
       }
       &:hover {
         background: ${props.theme.color.primary.lightened};
