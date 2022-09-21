@@ -97,7 +97,7 @@ const CustomButton = styled(MaterialButton)`
     css`
       background: ${props.theme.color.neutral.lightened};
       * {
-        color: ${props.theme.color.neutral.main};
+        color: ${props.theme.color.neutral.darkened};
       }
     `}
 
