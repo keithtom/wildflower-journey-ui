@@ -21,7 +21,7 @@ import Resource from "../../components/Resource";
 const TaskPage = ({}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
-  const isDecision = true;
+  const isDecision = false;
 
   return (
     <PageContainer>

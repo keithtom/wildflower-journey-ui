@@ -34,7 +34,7 @@ const Task = ({
           ? "lightened"
           : "outlined"
       }
-      size={notNavigable ? null : "small"}
+      size="small"
     >
       <Grid container alignItems="center" justifyContent="space-between">
         <Grid item>
