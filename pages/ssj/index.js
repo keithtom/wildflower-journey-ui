@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import Link from "next/link";
+import moment from "moment";
 
 import { categories } from "../../lib/utils/fake-data";
 
@@ -17,6 +18,7 @@ import {
   IconButton,
   Icon,
   Modal,
+  DatePicker,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 
@@ -24,6 +26,12 @@ const SSJ = ({}) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
+  const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
+
+  const [openDate, setOpenDate] = useState("");
+  const handleOpenDateChange = (newValue) => {
+    setOpenDate(newValue);
+  };
 
   const hasPartner = !FakePartners.length;
 
@@ -31,9 +39,70 @@ const SSJ = ({}) => {
     <>
       <PageContainer>
         <Stack spacing={12}>
-          <Typography variant="h3" bold>
-            School Startup Journey
-          </Typography>
+          <Grid
+            container
+            spacing={3}
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Grid item>
+              <Typography variant="h3" bold>
+                School Startup Journey
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Stack direction="row" spacing={6} alignItems="center">
+                <Stack spacing={1}>
+                  <Typography variant="bodyMini" bold lightened>
+                    PHASE
+                  </Typography>
+                  <Typography variant="bodySmall">Discovery</Typography>
+                </Stack>
+                <Stack spacing={1}>
+                  <Typography variant="bodyMini" bold lightened>
+                    LOCATION
+                  </Typography>
+                  <Typography variant="bodySmall">Boston, MA</Typography>
+                </Stack>
+                <Stack spacing={1}>
+                  <Typography variant="bodyMini" bold lightened>
+                    HUB
+                  </Typography>
+                  <Typography variant="bodySmall">Massachusetts</Typography>
+                </Stack>
+                {openDate ? (
+                  <Card
+                    size="small"
+                    hoverable
+                    onClick={() => setAddOpenDateModalOpen(true)}
+                  >
+                    <Stack direction="row" spacing={6}>
+                      <Stack spacing={1}>
+                        <Typography variant="bodyMini" bold lightened>
+                          OPEN DATE
+                        </Typography>
+                        <Typography variant="bodySmall">
+                          {moment(openDate).format("MMMM D, YYYY")}
+                        </Typography>
+                      </Stack>
+                      <Icon type="pencil" size="small" variant="lightened" />
+                    </Stack>
+                  </Card>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    small
+                    onClick={() => setAddOpenDateModalOpen(true)}
+                  >
+                    <Stack direction="row" spacing={3}>
+                      <Icon type="plus" />
+                      <Typography>Add your open date</Typography>
+                    </Stack>
+                  </Button>
+                )}
+              </Stack>
+            </Grid>
+          </Grid>
 
           <Card>
             <Stack spacing={3}>
@@ -269,6 +338,12 @@ const SSJ = ({}) => {
         toggle={() => setViewEtlsModalOpen(!viewEtlsModalOpen)}
         open={viewEtlsModalOpen}
       />
+      <AddOpenDateModal
+        toggle={() => setAddOpenDateModalOpen(!addOpenDateModalOpen)}
+        open={addOpenDateModalOpen}
+        openDate={openDate}
+        handleOpenDateChange={handleOpenDateChange}
+      />
     </>
   );
 };
@@ -383,6 +458,41 @@ const ETLs = ({}) => {
         </Grid>
       ))}
     </Grid>
+  );
+};
+const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
+  return (
+    <Modal title="Add your open date" toggle={toggle} open={open}>
+      <Stack spacing={3}>
+        <Card variant="primaryLightened">
+          <Stack alignItems="center" justifyContent="center" spacing={3}>
+            <Typography variant="h4" highlight bold>
+              Add the date you'd like to have your school open
+            </Typography>
+            <Typography variant="bodyRegular" highlight center>
+              Don't worry, you can always change this later.
+            </Typography>
+          </Stack>
+        </Card>
+        <DatePicker
+          label="Your open date"
+          value={openDate}
+          onChange={handleOpenDateChange}
+        />
+        <Grid container justifyContent="space-between">
+          <Grid item>
+            <Button variant="light" onClick={toggle}>
+              <Typography>Cancel</Typography>
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button disabled={!openDate} onClick={toggle}>
+              <Typography>Set open date</Typography>
+            </Button>
+          </Grid>
+        </Grid>
+      </Stack>
+    </Modal>
   );
 };
 const ViewEtlsModal = ({ toggle, open }) => {

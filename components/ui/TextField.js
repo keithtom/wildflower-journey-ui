@@ -7,6 +7,8 @@ export default function TextField({
   charLimit,
   placeholder,
   label,
+  endAdornment,
+  inputRef,
   ...props
 }) {
   return (
@@ -14,7 +16,13 @@ export default function TextField({
       <FormControl variant="standard">
         <Stack spacing={2}>
           <Typography variant="bodyRegular">{label}</Typography>
-          <Input {...props} multiline placeholder={placeholder} />
+          <Input
+            multiline
+            inputRef={inputRef}
+            placeholder={placeholder}
+            endAdornment={endAdornment}
+            {...props}
+          />
           {(charCount || charLimit) && (
             <Typography variant="bodySmall" lightened>
               {charCount} / {charLimit}
