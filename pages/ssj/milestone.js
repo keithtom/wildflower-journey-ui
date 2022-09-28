@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { styled, css } from "@mui/material/styles";
+
 import {
   Avatar,
   Button,
@@ -9,7 +11,6 @@ import {
   Icon,
   IconButton,
   Link,
-  Chip,
   Modal,
   Grid,
   TextField,
@@ -19,16 +20,35 @@ import CategoryChip from "../../components/CategoryChip";
 import EffortChip from "../../components/EffortChip";
 import PhaseChip from "../../components/PhaseChip";
 import StatusChip from "../../components/StatusChip";
+import Milestone from "../../components/Milestone";
+
+const StyledMilestoneHeader = styled(Stack)`
+  /* downplayed */
+  ${(props) =>
+    props.downplayed &&
+    css`
+      opacity: 0.5;
+    `}
+`;
+const StyledMilestoneTasks = styled(Card)`
+  /* downplayed */
+  ${(props) =>
+    props.downplayed &&
+    css`
+      opacity: 0.5;
+    `}
+`;
 
 const MilestonePage = ({}) => {
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
+  const isUpNext = false;
 
   return (
     <PageContainer>
       <Stack spacing={12}>
-        <Stack spacing={3}>
+        <Stack spacing={6}>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
@@ -63,50 +83,83 @@ const MilestonePage = ({}) => {
               )}
             </Grid>
           </Grid>
-          <Typography variant="h3" bold>
-            Name Your School
-          </Typography>
-          <Stack direction="row" spacing={6} alignItems="center">
-            <Stack spacing={2}>
-              <Typography variant="bodyMini" lightened bold>
-                STATUS
-              </Typography>
-              <StatusChip status="to do" size="small" withIcon />
+          {isUpNext && (
+            <Card variant="primaryOutlined">
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Stack>
+                    <Typography variant="h3" bold>
+                      Try something else first!
+                    </Typography>
+                    <Typography variant="bodyLarge" lightened>
+                      Before completing this milestone, there are a few things
+                      to work on first.
+                    </Typography>
+                  </Stack>
+                </Grid>
+                <Grid item xs={12}>
+                  <Stack spacing={3}>
+                    {FakeAlternativeMilestones.map((m, i) => (
+                      <Milestone
+                        key={i}
+                        title={m.title}
+                        effort={m.effort}
+                        category={m.category}
+                        assignee={m.assignee}
+                        status={m.status}
+                      />
+                    ))}
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Card>
+          )}
+          <StyledMilestoneHeader spacing={6} downplayed={isUpNext}>
+            <Typography variant="h3" bold>
+              Name Your School
+            </Typography>
+            <Stack direction="row" spacing={6} alignItems="center">
+              <Stack spacing={2}>
+                <Typography variant="bodyMini" lightened bold>
+                  STATUS
+                </Typography>
+                <StatusChip status="to do" size="small" withIcon />
+              </Stack>
+              <Stack spacing={2}>
+                <Typography variant="bodyMini" lightened bold>
+                  EFFORT
+                </Typography>
+                <EffortChip effort="Large" size="small" withIcon />
+              </Stack>
+              <Stack spacing={2}>
+                <Typography variant="bodyMini" lightened bold>
+                  PHASE
+                </Typography>
+                <PhaseChip phase="Discovery" size="small" withIcon />
+              </Stack>
+              <Stack spacing={2}>
+                <Typography variant="bodyMini" lightened bold>
+                  CATEGORY
+                </Typography>
+                <CategoryChip category="Finance" size="small" withIcon />
+              </Stack>
+              <Stack spacing={2}>
+                <Typography variant="bodyMini" lightened bold>
+                  ASSIGNEE
+                </Typography>
+                <Avatar size="mini" />
+              </Stack>
+              <Stack spacing={2}>
+                <Typography variant="bodyMini" lightened bold>
+                  AUTHOR
+                </Typography>
+                <Avatar size="mini" />
+              </Stack>
             </Stack>
-            <Stack spacing={2}>
-              <Typography variant="bodyMini" lightened bold>
-                EFFORT
-              </Typography>
-              <EffortChip effort="Large" size="small" withIcon />
-            </Stack>
-            <Stack spacing={2}>
-              <Typography variant="bodyMini" lightened bold>
-                PHASE
-              </Typography>
-              <PhaseChip phase="Discovery" size="small" withIcon />
-            </Stack>
-            <Stack spacing={2}>
-              <Typography variant="bodyMini" lightened bold>
-                CATEGORY
-              </Typography>
-              <CategoryChip category="Finance" size="small" withIcon />
-            </Stack>
-            <Stack spacing={2}>
-              <Typography variant="bodyMini" lightened bold>
-                ASSIGNEE
-              </Typography>
-              <Avatar size="mini" />
-            </Stack>
-            <Stack spacing={2}>
-              <Typography variant="bodyMini" lightened bold>
-                AUTHOR
-              </Typography>
-              <Avatar size="mini" />
-            </Stack>
-          </Stack>
+          </StyledMilestoneHeader>
         </Stack>
 
-        <Card>
+        <StyledMilestoneTasks downplayed={isUpNext}>
           <Stack spacing={3}>
             {userIsEditing ? (
               <>
@@ -149,7 +202,7 @@ const MilestonePage = ({}) => {
               </Card>
             )}
           </Stack>
-        </Card>
+        </StyledMilestoneTasks>
 
         {userIsEditing ? (
           <Grid container alignItems="center" justifyContent="space-between">
@@ -216,6 +269,22 @@ const FakeMilestoneTasks = [
   {
     title:
       "Email your name and research document to support@wildflowerschools.org to confirm name selection",
+  },
+];
+const FakeAlternativeMilestones = [
+  {
+    title: "Form your board",
+    effort: "large",
+    category: "Album Advice & Affiliation",
+    assignee: "unassigned",
+    status: "to do",
+  },
+  {
+    title: "Get incorporated",
+    effort: "large",
+    category: "Album Advice & Affiliation",
+    assignee: "unassigned",
+    status: "to do",
   },
 ];
 
