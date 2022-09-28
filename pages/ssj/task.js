@@ -14,14 +14,33 @@ import {
   Button,
   TextField,
   Radio,
+  Box,
 } from "@ui";
 import Task from "../../components/Task";
 import Resource from "../../components/Resource";
+
+const StyledTaskHeader = styled(Box)`
+  /* downplayed */
+  ${(props) =>
+    props.downplayed &&
+    css`
+      opacity: 0.5;
+    `}
+`;
+const StyledTaskResources = styled(Card)`
+  /* downplayed */
+  ${(props) =>
+    props.downplayed &&
+    css`
+      opacity: 0.5;
+    `}
+`;
 
 const TaskPage = ({}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
   const isDecision = false;
+  const isUpNext = false;
 
   return (
     <PageContainer>
@@ -61,12 +80,14 @@ const TaskPage = ({}) => {
               )}
             </Grid>
           </Grid>
-          <Task
-            notNavigable
-            title="Complete WF School Name Research Document"
-            isDecision={isDecision}
-            isNext={true}
-          />
+          <StyledTaskHeader downplayed={isUpNext}>
+            <Task
+              notNavigable
+              title="Complete WF School Name Research Document"
+              isDecision={isDecision}
+              isNext={true}
+            />
+          </StyledTaskHeader>
         </Stack>
 
         {isDecision ? (
@@ -76,7 +97,7 @@ const TaskPage = ({}) => {
           />
         ) : null}
 
-        <Card>
+        <StyledTaskResources downplayed={isUpNext}>
           <Stack spacing={3}>
             <Typography variant="bodyLarge" bold>
               Resources
@@ -117,7 +138,7 @@ const TaskPage = ({}) => {
               </Card>
             )}
           </Stack>
-        </Card>
+        </StyledTaskResources>
       </Stack>
     </PageContainer>
   );
