@@ -14,11 +14,13 @@ import {
   Select,
   Radio,
   Button,
+  Divider,
 } from "@ui";
 import Milestone from "../../components/Milestone";
 
 const DiscoveryPage = ({}) => {
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
+  const milestonesToConsider = true;
 
   return (
     <>
@@ -145,6 +147,40 @@ const DiscoveryPage = ({}) => {
               </Stack>
             </Card>
           </Stack>
+
+          <Divider />
+
+          {milestonesToConsider && (
+            <>
+              <Stack direction="column" spacing={2}>
+                <Typography variant="bodyRegular" bold lightened>
+                  Start considering
+                </Typography>
+                <Typography variant="h3" bold>
+                  Visioning Milestones
+                </Typography>
+              </Stack>
+              <Card>
+                <Stack spacing={6}>
+                  <Stack spacing={3}>
+                    {FakeMilestonesToConsider.map((m, i) => (
+                      <Milestone
+                        key={i}
+                        title={m.title}
+                        effort={m.effort}
+                        category={m.category}
+                        assignee={m.assignee}
+                        status={m.status}
+                      />
+                    ))}
+                  </Stack>
+                  <Typography variant="bodyLarge" lightened>
+                    And 2 more...
+                  </Typography>
+                </Stack>
+              </Card>
+            </>
+          )}
         </Stack>
       </PageContainer>
       <AddMilestoneModal
@@ -158,6 +194,22 @@ const DiscoveryPage = ({}) => {
 
 export default DiscoveryPage;
 
+const FakeMilestonesToConsider = [
+  {
+    title: "Preview the Wildflower Budget Process",
+    effort: "large",
+    category: "Finance",
+    assignee: "unassigned",
+    status: "to do",
+  },
+  {
+    title: "Preview the Wildflower Affiliation Process",
+    effort: "large",
+    category: "Album Advice & Affiliation",
+    assignee: "unassigned",
+    status: "to do",
+  },
+];
 const FakeMilestonesToDo = [
   {
     title: "Schedule a conversation",
