@@ -9,7 +9,7 @@ const ModalCard = styled(Card)`
   left: 50%;
   transform: translate(-50%, -50%);
   width: 600px;
-  max-height: 680px;
+  max-height: 640px;
   overflow: auto;
 `;
 

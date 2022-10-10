@@ -1,4 +1,5 @@
 import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
 import { styled, css } from "@mui/material/styles";
 import { Stack, Input, Typography } from "./index";
 
@@ -9,6 +10,8 @@ export default function TextField({
   label,
   endAdornment,
   inputRef,
+  helperText,
+  error,
   ...props
 }) {
   return (
@@ -21,12 +24,16 @@ export default function TextField({
             inputRef={inputRef}
             placeholder={placeholder}
             endAdornment={endAdornment}
+            error={error}
             {...props}
           />
           {(charCount || charLimit) && (
             <Typography variant="bodySmall" lightened>
               {charCount} / {charLimit}
             </Typography>
+          )}
+          {helperText && (
+            <FormHelperText error={error}>{helperText}</FormHelperText>
           )}
         </Stack>
       </FormControl>

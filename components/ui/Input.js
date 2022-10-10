@@ -8,10 +8,16 @@ const StyledInput = styled(InputBase)`
     ${({ theme }) => theme.util.buffer * 3}px;
   font-size: ${({ theme }) => theme.typography.bodyRegular.fontSize};
   min-height: ${({ theme }) => theme.util.buffer * 12}px;
+  /* error */
+  ${(props) =>
+    props.error &&
+    css`
+      border: 1px solid ${props.theme.color.error.medium};
+    `}
 `;
 
-const Input = ({ inputRef, ...props }) => {
-  return <StyledInput ref={inputRef} {...props} />;
+const Input = ({ inputRef, error, ...props }) => {
+  return <StyledInput ref={inputRef} error={error} {...props} />;
 };
 
 export default Input;

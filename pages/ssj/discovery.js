@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
 
 import {
   PageContainer,
@@ -248,81 +249,128 @@ const FakeMilestonesDone = [
 ];
 
 const AddMilestoneModal = ({ toggle, title, open }) => {
-  const [milestoneTitle, setMilestoneTitle] = useState("");
-  const handleMilestoneTitleChange = (event) => {
-    setMilestoneTitle(event.target.value);
-  };
-
-  const [category, setCategory] = useState("");
-  const handleCategoryChange = (event) => {
-    setCategory(event.target.value);
-  };
-
-  const [status, setStatus] = useState("");
-  const handleStatusChange = (event) => {
-    setStatus(event.target.value);
-  };
-
-  const [effort, setEffort] = useState("");
-  const handleEffortChange = (event) => {
-    setEffort(event.target.value);
-  };
-
-  const [assignee, setAssignee] = useState("");
-  const handleAssigneeChange = (event) => {
-    setAssignee(event.target.value);
-  };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      title: "",
+      category: "",
+      status: "",
+      effort: "",
+      assignee: "",
+    },
+  });
+  const onSubmit = (data) => console.log(data);
+  console.log({ errors });
 
   return (
     <Modal title={title} toggle={toggle} open={open}>
-      <Stack spacing={3}>
-        <TextField
-          label="Title"
-          placeholder="Milestone title..."
-          value={milestoneTitle}
-          onChange={handleMilestoneTitleChange}
-        />
-        <Select
-          label="Category"
-          value={category}
-          onChange={handleCategoryChange}
-          placeholder="Select a category..."
-          options={["1", "2"]}
-        />
-        <Select
-          label="Status"
-          value={status}
-          onChange={handleStatusChange}
-          placeholder="Select a status..."
-          options={["1", "2"]}
-        />
-        <Select
-          label="Effort"
-          value={effort}
-          onChange={handleEffortChange}
-          placeholder="Select an effort level..."
-          options={["1", "2"]}
-        />
-        <RadioGroup value={assignee} onChange={handleAssigneeChange}>
-          <Typography variant="bodyRegular">Assignee</Typography>
-          <FormControlLabel value="you" control={<Radio />} label="You" />
-          <FormControlLabel
-            value="paula armstrong"
-            control={<Radio />}
-            label="Paula Armstrong"
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={3}>
+          <Controller
+            name="title"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                label="Title"
+                placeholder="Milestone title..."
+                error={errors.title}
+                helperText={
+                  errors &&
+                  errors.title &&
+                  errors.title &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
           />
-        </RadioGroup>
-      </Stack>
-      <Grid container justifyContent="space-between">
-        <Grid item>
-          <Button variant="light">Cancel</Button>
+          <Controller
+            name="category"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Select
+                label="Category"
+                placeholder="Select a category..."
+                options={["1", "2"]}
+                error={errors.category}
+                helperText={
+                  errors &&
+                  errors.category &&
+                  errors.category &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="status"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Select
+                label="Status"
+                placeholder="Select a status..."
+                options={["1", "2"]}
+                error={errors.status}
+                helperText={
+                  errors &&
+                  errors.status &&
+                  errors.status &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="effort"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Effort"
+                placeholder="Select an effort level..."
+                options={["1", "2"]}
+                {...field}
+              />
+            )}
+          />
+
+          <Typography variant="bodyRegular">Assignee</Typography>
+
+          <Controller
+            name="assignee"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <RadioGroup value={value} onChange={onChange}>
+                <FormControlLabel value="you" control={<Radio />} label="You" />
+                <FormControlLabel
+                  value="paula armstrong"
+                  control={<Radio />}
+                  label="Paula Armstrong"
+                />
+              </RadioGroup>
+            )}
+          />
+        </Stack>
+        <Grid container justifyContent="space-between">
+          <Grid item>
+            <Button variant="light" onClick={toggle}>
+              Cancel
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button variant="primary" disabled={isSubmitting} type="submit">
+              <Typography light>Add milestone</Typography>
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Button variant="primary" disabled={true}>
-            Add milestone
-          </Button>
-        </Grid>
-      </Grid>
+      </form>
     </Modal>
   );
 };

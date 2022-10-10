@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import Link from "next/link";
 import moment from "moment";
+import { useForm, Controller } from "react-hook-form";
 
 import { categories } from "../../lib/utils/fake-data";
 
@@ -518,22 +519,21 @@ const ViewEtlsModal = ({ toggle, open }) => {
 };
 const AddPartnerModal = ({ toggle, open }) => {
   const [isAddingByEmail, setIsAddingByEmail] = useState(true);
-  const [partnerFirstName, setPartnerFirstName] = useState("");
-  const handleFirstNameChange = (event) => {
-    setPartnerFirstName(event.target.value);
-  };
-  const [partnerLastName, setPartnerLastName] = useState("");
-  const handleLastNameChange = (event) => {
-    setPartnerLastName(event.target.value);
-  };
-  const [partnerEmail, setPartnerEmail] = useState("");
-  const handleEmailChange = (event) => {
-    setPartnerEmail(event.target.value);
-  };
-  const [partnerMessage, setPartnerMessage] = useState("");
-  const handleMessageChange = (event) => {
-    setPartnerMessage(event.target.value);
-  };
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      partnerFirstName: "",
+      partnerLastName: "",
+      partnerEmail: "",
+      partnerMessage: "",
+    },
+  });
+  const onSubmit = (data) => console.log(data);
+
   return (
     <Modal title="Add a partner" toggle={toggle} open={open}>
       <Stack spacing={3}>
@@ -564,32 +564,99 @@ const AddPartnerModal = ({ toggle, open }) => {
                 </Stack>
               </Stack>
             </Card>
-            <Stack spacing={3}>
-              <TextField
-                label="Your Partner's First Name"
-                placeholder="Your partner's first name..."
-                value={partnerFirstName}
-                onChange={handleFirstNameChange}
-              />
-              <TextField
-                label="Your Partner's Last Name"
-                placeholder="Your partner's last name..."
-                value={partnerLastName}
-                onChange={handleLastNameChange}
-              />
-              <TextField
-                label="Your Partner's Email"
-                placeholder="Your partner's email..."
-                value={partnerEmail}
-                onChange={handleEmailChange}
-              />
-              <TextField
-                label="A message to your partner"
-                placeholder="Write your partner a message..."
-                value={partnerMessage}
-                onChange={handleMessageChange}
-              />
-            </Stack>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={6}>
+                <Stack spacing={3}>
+                  <Controller
+                    name="partnerFirstName"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Your Partner's First Name"
+                        placeholder="e.g. Cathy"
+                        error={errors.partnerFirstName}
+                        helperText={
+                          errors &&
+                          errors.partnerFirstName &&
+                          errors.partnerFirstName &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="partnerLastName"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Your Partner's Last Name"
+                        placeholder="e.g. Lee"
+                        error={errors.partnerLastName}
+                        helperText={
+                          errors &&
+                          errors.partnerLastName &&
+                          errors.partnerLastName &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="partnerEmail"
+                    control={control}
+                    rules={{
+                      required: true,
+                      pattern:
+                        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Your Partner's Email"
+                        placeholder="e.g. cathylee@gmail.com"
+                        error={errors.partnerEmail}
+                        helperText={
+                          errors &&
+                          errors.partnerEmail &&
+                          errors.partnerEmail.type === "required"
+                            ? "This field is required"
+                            : errors &&
+                              errors.partnerEmail &&
+                              errors.partnerEmail.type === "pattern" &&
+                              "Please enter a valid email"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="partnerMessage"
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        rows={4}
+                        label="A message to your partner"
+                        placeholder="Type something..."
+                        {...field}
+                      />
+                    )}
+                  />
+                </Stack>
+                <Grid container justifyContent="space-between">
+                  <Grid item>
+                    <Button variant="text">Cancel</Button>
+                  </Grid>
+                  <Grid item>
+                    <Button type="submit" disabled={isSubmitting}>
+                      <Typography light>Invite partner</Typography>
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Stack>
+            </form>
           </>
         ) : (
           <>
@@ -620,18 +687,18 @@ const AddPartnerModal = ({ toggle, open }) => {
               </Stack>
             </Card>
             <ETLs />
+            <Grid container justifyContent="space-between">
+              <Grid item>
+                <Button variant="text">Cancel</Button>
+              </Grid>
+              <Grid item>
+                <Button>
+                  <Typography light>Invite partner</Typography>
+                </Button>
+              </Grid>
+            </Grid>
           </>
         )}
-        <Grid container justifyContent="space-between">
-          <Grid item>
-            <Button variant="text">Cancel</Button>
-          </Grid>
-          <Grid item>
-            <Button>
-              <Typography light>Invite partner</Typography>
-            </Button>
-          </Grid>
-        </Grid>
       </Stack>
     </Modal>
   );
