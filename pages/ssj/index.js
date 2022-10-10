@@ -523,7 +523,6 @@ const AddPartnerModal = ({ toggle, open }) => {
   const {
     control,
     handleSubmit,
-    setError,
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -534,8 +533,6 @@ const AddPartnerModal = ({ toggle, open }) => {
     },
   });
   const onSubmit = (data) => console.log(data);
-
-  console.log({ errors });
 
   return (
     <Modal title="Add a partner" toggle={toggle} open={open}>
@@ -653,7 +650,7 @@ const AddPartnerModal = ({ toggle, open }) => {
                     <Button variant="text">Cancel</Button>
                   </Grid>
                   <Grid item>
-                    <Button type="submit">
+                    <Button type="submit" disabled={isSubmitting}>
                       <Typography light>Invite partner</Typography>
                     </Button>
                   </Grid>
