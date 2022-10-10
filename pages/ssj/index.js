@@ -19,6 +19,7 @@ import {
   Icon,
   Modal,
   DatePicker,
+  TextField,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 
@@ -516,32 +517,121 @@ const ViewEtlsModal = ({ toggle, open }) => {
   );
 };
 const AddPartnerModal = ({ toggle, open }) => {
+  const [isAddingByEmail, setIsAddingByEmail] = useState(true);
+  const [partnerFirstName, setPartnerFirstName] = useState("");
+  const handleFirstNameChange = (event) => {
+    setPartnerFirstName(event.target.value);
+  };
+  const [partnerLastName, setPartnerLastName] = useState("");
+  const handleLastNameChange = (event) => {
+    setPartnerLastName(event.target.value);
+  };
+  const [partnerEmail, setPartnerEmail] = useState("");
+  const handleEmailChange = (event) => {
+    setPartnerEmail(event.target.value);
+  };
+  const [partnerMessage, setPartnerMessage] = useState("");
+  const handleMessageChange = (event) => {
+    setPartnerMessage(event.target.value);
+  };
   return (
     <Modal title="Add a partner" toggle={toggle} open={open}>
       <Stack spacing={3}>
-        <Card variant="primaryLightened">
-          <Stack alignItems="center" justifyContent="center" spacing={3}>
-            <Typography variant="h4" highlight bold>
-              Add your partner
-            </Typography>
-            <Typography variant="bodyRegular" highlight center>
-              Search for your partner below and add them to your school. They'll
-              be notified and, when they accept, your accounts will be tied
-              together.
-            </Typography>
-            <Stack direction="row" alignItems="center" spacing={3}>
-              <Typography variant="bodyRegular" highlight>
-                Not here?
-              </Typography>
-              <Button variant="secondary" small>
-                <Typography variant="bodyRegular" center bold>
-                  Add via email
+        {isAddingByEmail ? (
+          <>
+            <Card variant="primaryLightened">
+              <Stack alignItems="center" justifyContent="center" spacing={3}>
+                <Typography variant="h4" highlight bold>
+                  Add your partner via email!
                 </Typography>
-              </Button>
+                <Typography variant="bodyRegular" highlight center>
+                  Invite your partner to work with you and join the Wildflower
+                  Network.
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={3}>
+                  <Typography variant="bodyRegular" highlight>
+                    Are they already in the network?
+                  </Typography>
+                  <Button
+                    variant="secondary"
+                    small
+                    onClick={() => setIsAddingByEmail(false)}
+                  >
+                    <Typography variant="bodyRegular" center bold>
+                      Add via the directory
+                    </Typography>
+                  </Button>
+                </Stack>
+              </Stack>
+            </Card>
+            <Stack spacing={3}>
+              <TextField
+                label="Your Partner's First Name"
+                placeholder="Your partner's first name..."
+                value={partnerFirstName}
+                onChange={handleFirstNameChange}
+              />
+              <TextField
+                label="Your Partner's Last Name"
+                placeholder="Your partner's last name..."
+                value={partnerLastName}
+                onChange={handleLastNameChange}
+              />
+              <TextField
+                label="Your Partner's Email"
+                placeholder="Your partner's email..."
+                value={partnerEmail}
+                onChange={handleEmailChange}
+              />
+              <TextField
+                label="A message to your partner"
+                placeholder="Write your partner a message..."
+                value={partnerMessage}
+                onChange={handleMessageChange}
+              />
             </Stack>
-          </Stack>
-        </Card>
-        <ETLs />
+          </>
+        ) : (
+          <>
+            <Card variant="primaryLightened">
+              <Stack alignItems="center" justifyContent="center" spacing={3}>
+                <Typography variant="h4" highlight bold>
+                  Add your partner
+                </Typography>
+                <Typography variant="bodyRegular" highlight center>
+                  Search for your partner below and add them to your school.
+                  They'll be notified and, when they accept, your accounts will
+                  be tied together.
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={3}>
+                  <Typography variant="bodyRegular" highlight>
+                    Not here?
+                  </Typography>
+                  <Button
+                    variant="secondary"
+                    small
+                    onClick={() => setIsAddingByEmail(true)}
+                  >
+                    <Typography variant="bodyRegular" center bold>
+                      Add via email
+                    </Typography>
+                  </Button>
+                </Stack>
+              </Stack>
+            </Card>
+            <ETLs />
+          </>
+        )}
+        <Grid container justifyContent="space-between">
+          <Grid item>
+            <Button variant="text">Cancel</Button>
+          </Grid>
+          <Grid item>
+            <Button>
+              <Typography light>Invite partner</Typography>
+            </Button>
+          </Grid>
+        </Grid>
       </Stack>
     </Modal>
   );
