@@ -74,7 +74,7 @@ const Task = ({
         </Grid>
         {notNavigable ? null : (
           <Grid item>
-            <Link href="/ssj/task">
+            <Link href={link ? link : ""}>
               <IconButton>
                 <Icon
                   type="chevronRight"

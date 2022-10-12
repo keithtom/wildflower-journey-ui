@@ -16,8 +16,8 @@ import {
   Radio,
   Box,
 } from "@ui";
-import Task from "../../components/Task";
-import Resource from "../../components/Resource";
+import Task from "../../../../../components/Task";
+import Resource from "../../../../../components/Resource";
 
 const StyledTaskHeader = styled(Box)`
   /* downplayed */
@@ -36,7 +36,13 @@ const StyledTaskResources = styled(Card)`
     `}
 `;
 
-const TaskPage = ({}) => {
+const TaskPage = ({
+  PhaseTitle,
+  MilestoneTitle,
+  TaskTitle,
+  FakeDecisionOptions,
+  FakeResources,
+}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
   const isDecision = false;
@@ -49,12 +55,12 @@ const TaskPage = ({}) => {
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href="/ssj/milestone">
+                <Link href={`/ssj/${PhaseTitle}/${MilestoneTitle}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>
                 </Link>
-                <Typography>Name your school</Typography>
+                <Typography capitalize>{MilestoneTitle}</Typography>
               </Stack>
             </Grid>
             <Grid item>
@@ -83,7 +89,7 @@ const TaskPage = ({}) => {
           <StyledTaskHeader downplayed={isUpNext}>
             <Task
               notNavigable
-              title="Complete WF School Name Research Document"
+              title={TaskTitle}
               isDecision={isDecision}
               isNext={true}
             />
@@ -145,13 +151,6 @@ const TaskPage = ({}) => {
 };
 
 export default TaskPage;
-
-const FakeResources = [
-  {
-    title: "School name research document",
-    link: "/",
-  },
-];
 
 const NewResourceInput = ({}) => {
   const [resourceTitle, setResourceTitle] = useState("");
@@ -274,13 +273,42 @@ const DecisionForm = ({ options, disabled }) => {
   );
 };
 
-const FakeDecisionOptions = [
-  {
-    value: "wildflower group exemption",
-    label: "I will apply with the Wildflower Group Exemption",
-  },
-  {
-    value: "independently with irs",
-    label: "I will apply independently using Form 1023 with the IRS",
-  },
-];
+export async function getServerSideProps({ query }) {
+  const userId = query.userId;
+  const ssjId = query.ssjId;
+  // put the correct SSJ API route here
+  // const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`;
+
+  // const res = await fetch(apiRoute);
+  // const data = await res.json();
+
+  const PhaseTitle = query.phase;
+  const MilestoneTitle = query.milestone;
+  const TaskTitle = query.task;
+  const FakeDecisionOptions = [
+    {
+      value: "wildflower group exemption",
+      label: "I will apply with the Wildflower Group Exemption",
+    },
+    {
+      value: "independently with irs",
+      label: "I will apply independently using Form 1023 with the IRS",
+    },
+  ];
+  const FakeResources = [
+    {
+      title: "School name research document",
+      link: "/",
+    },
+  ];
+
+  return {
+    props: {
+      PhaseTitle,
+      MilestoneTitle,
+      TaskTitle,
+      FakeDecisionOptions,
+      FakeResources,
+    },
+  };
+}

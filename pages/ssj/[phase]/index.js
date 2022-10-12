@@ -17,9 +17,15 @@ import {
   Button,
   Divider,
 } from "@ui";
-import Milestone from "../../components/Milestone";
+import Milestone from "../../../components/Milestone";
 
-const DiscoveryPage = ({}) => {
+const DiscoveryPage = ({
+  PhaseTitle,
+  FakeMilestonesToDo,
+  FakeMilestonesUpNext,
+  FakeMilestonesToConsider,
+  FakeMilestonesDone,
+}) => {
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
   const milestonesToConsider = true;
 
@@ -27,8 +33,8 @@ const DiscoveryPage = ({}) => {
     <>
       <PageContainer>
         <Stack spacing={12}>
-          <Typography variant="h3" bold>
-            Discovery
+          <Typography variant="h3" bold capitalize>
+            {PhaseTitle}
           </Typography>
 
           <Stack spacing={6}>
@@ -64,6 +70,7 @@ const DiscoveryPage = ({}) => {
                 <Stack spacing={3}>
                   {FakeMilestonesToDo.map((m, i) => (
                     <Milestone
+                      link={`/ssj/${PhaseTitle}/${m.title}`}
                       key={i}
                       title={m.title}
                       effort={m.effort}
@@ -100,6 +107,7 @@ const DiscoveryPage = ({}) => {
                 <Stack spacing={3}>
                   {FakeMilestonesUpNext.map((m, i) => (
                     <Milestone
+                      link={`/ssj/${PhaseTitle}/${m.title}`}
                       key={i}
                       title={m.title}
                       effort={m.effort}
@@ -136,6 +144,7 @@ const DiscoveryPage = ({}) => {
                 <Stack spacing={3}>
                   {FakeMilestonesDone.map((m, i) => (
                     <Milestone
+                      link={`/ssj/${PhaseTitle}/${m.title}`}
                       key={i}
                       title={m.title}
                       effort={m.effort}
@@ -166,6 +175,7 @@ const DiscoveryPage = ({}) => {
                   <Stack spacing={3}>
                     {FakeMilestonesToConsider.map((m, i) => (
                       <Milestone
+                        link={`/ssj/${PhaseTitle}/${m.title}`}
                         key={i}
                         title={m.title}
                         effort={m.effort}
@@ -195,59 +205,6 @@ const DiscoveryPage = ({}) => {
 
 export default DiscoveryPage;
 
-const FakeMilestonesToConsider = [
-  {
-    title: "Preview the Wildflower Budget Process",
-    effort: "large",
-    category: "Finance",
-    assignee: "unassigned",
-    status: "to do",
-  },
-  {
-    title: "Preview the Wildflower Affiliation Process",
-    effort: "large",
-    category: "Album Advice & Affiliation",
-    assignee: "unassigned",
-    status: "to do",
-  },
-];
-const FakeMilestonesToDo = [
-  {
-    title: "Schedule a conversation",
-    effort: "large",
-    category: "Album Advice & Affiliation",
-    assignee: "unassigned",
-    status: "to do",
-  },
-];
-
-const FakeMilestonesUpNext = [
-  {
-    title: "Decide whether to continue your SSJ",
-    effort: "large",
-    category: "Album Advice & Affiliation",
-    assignee: "unassigned",
-    status: "up next",
-  },
-];
-
-const FakeMilestonesDone = [
-  {
-    title: "Get to know Wildflower",
-    effort: "large",
-    category: "Album Advice & Affiliation",
-    assignee: "unassigned",
-    status: "done",
-  },
-  {
-    title: "Discovery self assessment",
-    effort: "large",
-    category: "Album Advice & Affiliation",
-    assignee: "unassigned",
-    status: "done",
-  },
-];
-
 const AddMilestoneModal = ({ toggle, title, open }) => {
   const {
     control,
@@ -263,7 +220,6 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
     },
   });
   const onSubmit = (data) => console.log(data);
-  console.log({ errors });
 
   return (
     <Modal title={title} toggle={toggle} open={open}>
@@ -374,3 +330,77 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
     </Modal>
   );
 };
+
+export async function getServerSideProps({ query }) {
+  const userId = query.userId;
+  const ssjId = query.ssjId;
+  // put the correct SSJ API route here
+  // const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`;
+
+  // const res = await fetch(apiRoute);
+  // const data = await res.json();
+
+  const PhaseTitle = query.phase;
+  const FakeMilestonesToConsider = [
+    {
+      title: "Preview the Wildflower Budget Process",
+      effort: "large",
+      category: "Finance",
+      assignee: "unassigned",
+      status: "to do",
+    },
+    {
+      title: "Preview the Wildflower Affiliation Process",
+      effort: "large",
+      category: "Album Advice & Affiliation",
+      assignee: "unassigned",
+      status: "to do",
+    },
+  ];
+  const FakeMilestonesToDo = [
+    {
+      title: "Schedule a conversation",
+      effort: "large",
+      category: "Album Advice & Affiliation",
+      assignee: "unassigned",
+      status: "to do",
+    },
+  ];
+
+  const FakeMilestonesUpNext = [
+    {
+      title: "Decide whether to continue your SSJ",
+      effort: "large",
+      category: "Album Advice & Affiliation",
+      assignee: "unassigned",
+      status: "up next",
+    },
+  ];
+
+  const FakeMilestonesDone = [
+    {
+      title: "Get to know Wildflower",
+      effort: "large",
+      category: "Album Advice & Affiliation",
+      assignee: "unassigned",
+      status: "done",
+    },
+    {
+      title: "Discovery self assessment",
+      effort: "large",
+      category: "Album Advice & Affiliation",
+      assignee: "unassigned",
+      status: "done",
+    },
+  ];
+
+  return {
+    props: {
+      PhaseTitle,
+      FakeMilestonesToConsider,
+      FakeMilestonesToDo,
+      FakeMilestonesUpNext,
+      FakeMilestonesDone,
+    },
+  };
+}

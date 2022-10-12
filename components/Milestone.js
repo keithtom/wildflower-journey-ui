@@ -3,9 +3,17 @@ import CategoryChip from "./CategoryChip";
 import EffortChip from "./EffortChip";
 import PhaseChip from "./PhaseChip";
 
-const Milestone = ({ title, effort, category, phase, assignee, status }) => {
+const Milestone = ({
+  link,
+  title,
+  effort,
+  category,
+  phase,
+  assignee,
+  status,
+}) => {
   return (
-    <Link href="/ssj/milestone">
+    <Link href={link ? link : "/"}>
       <Card variant="lightened" hoverable>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
