@@ -15,12 +15,12 @@ import {
   Grid,
   TextField,
 } from "@ui";
-import Task from "../../components/Task";
-import CategoryChip from "../../components/CategoryChip";
-import EffortChip from "../../components/EffortChip";
-import PhaseChip from "../../components/PhaseChip";
-import StatusChip from "../../components/StatusChip";
-import Milestone from "../../components/Milestone";
+import Task from "../../../../components/Task";
+import CategoryChip from "../../../../components/CategoryChip";
+import EffortChip from "../../../../components/EffortChip";
+import PhaseChip from "../../../../components/PhaseChip";
+import StatusChip from "../../../../components/StatusChip";
+import Milestone from "../../../../components/Milestone";
 
 const StyledMilestoneHeader = styled(Stack)`
   /* downplayed */
@@ -39,7 +39,12 @@ const StyledMilestoneTasks = styled(Card)`
     `}
 `;
 
-const MilestonePage = ({}) => {
+const MilestonePage = ({
+  PhaseTitle,
+  MilestoneTitle,
+  FakeMilestoneTasks,
+  FakeAlternativeMilestones,
+}) => {
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
@@ -52,12 +57,12 @@ const MilestonePage = ({}) => {
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href="/ssj/discovery">
+                <Link href={`/ssj/${PhaseTitle}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>
                 </Link>
-                <Typography>Discovery</Typography>
+                <Typography capitalize>{PhaseTitle}</Typography>
               </Stack>
             </Grid>
             <Grid item>
@@ -101,6 +106,7 @@ const MilestonePage = ({}) => {
                   <Stack spacing={3}>
                     {FakeAlternativeMilestones.map((m, i) => (
                       <Milestone
+                        link={`/ssj/${PhaseTitle}/${m.title}`}
                         key={i}
                         title={m.title}
                         effort={m.effort}
@@ -115,8 +121,8 @@ const MilestonePage = ({}) => {
             </Card>
           )}
           <StyledMilestoneHeader spacing={6} downplayed={isUpNext}>
-            <Typography variant="h3" bold>
-              Name Your School
+            <Typography variant="h3" bold capitalize>
+              {MilestoneTitle}
             </Typography>
             <Stack direction="row" spacing={6} alignItems="center">
               <Stack spacing={2}>
@@ -170,11 +176,12 @@ const MilestonePage = ({}) => {
                   ))}
               </>
             ) : FakeMilestoneTasks ? (
-              FakeMilestoneTasks.map((m, i) => (
+              FakeMilestoneTasks.map((t, i) => (
                 <Task
-                  title={m.title}
+                  link={`/ssj/${PhaseTitle}/${MilestoneTitle}/${t.title}`}
+                  title={t.title}
                   key={i}
-                  isDecision={m.isDecision}
+                  isDecision={t.isDecision}
                   isNext={i === 2}
                 />
               ))
@@ -259,35 +266,6 @@ const MilestonePage = ({}) => {
 
 export default MilestonePage;
 
-const FakeMilestoneTasks = [
-  { title: "Complete WF School Name Research Document" },
-  { title: "Complete advice process on your Name Research Document" },
-  {
-    title: "Are you going to use the WF Group Exemption or file independently?",
-    isDecision: true,
-  },
-  {
-    title:
-      "Email your name and research document to support@wildflowerschools.org to confirm name selection",
-  },
-];
-const FakeAlternativeMilestones = [
-  {
-    title: "Form your board",
-    effort: "large",
-    category: "Album Advice & Affiliation",
-    assignee: "unassigned",
-    status: "to do",
-  },
-  {
-    title: "Get incorporated",
-    effort: "large",
-    category: "Album Advice & Affiliation",
-    assignee: "unassigned",
-    status: "to do",
-  },
-];
-
 const NewTaskInput = ({}) => {
   const [taskTitle, setTaskTitle] = useState("");
   const handleTaskTitleChange = (event) => {
@@ -331,3 +309,54 @@ const EditableTaskItem = ({ title }) => {
     </Grid>
   );
 };
+
+export async function getServerSideProps({ query }) {
+  const userId = query.userId;
+  const ssjId = query.ssjId;
+  // put the correct SSJ API route here
+  // const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`;
+
+  // const res = await fetch(apiRoute);
+  // const data = await res.json();
+
+  const PhaseTitle = query.phase;
+  const MilestoneTitle = query.milestone;
+  const FakeMilestoneTasks = [
+    { title: "Complete WF School Name Research Document" },
+    { title: "Complete advice process on your Name Research Document" },
+    {
+      title:
+        "Are you going to use the WF Group Exemption or file independently?",
+      isDecision: true,
+    },
+    {
+      title:
+        "Email your name and research document to support@wildflowerschools.org to confirm name selection",
+    },
+  ];
+  const FakeAlternativeMilestones = [
+    {
+      title: "Form your board",
+      effort: "large",
+      category: "Album Advice & Affiliation",
+      assignee: "unassigned",
+      status: "to do",
+    },
+    {
+      title: "Get incorporated",
+      effort: "large",
+      category: "Album Advice & Affiliation",
+      assignee: "unassigned",
+      status: "to do",
+    },
+  ];
+
+  return {
+    props: {
+      PhaseTitle,
+      MilestoneTitle,
+      FakeMilestoneTasks,
+      FakeAlternativeMilestones,
+    },
+  };
+}
