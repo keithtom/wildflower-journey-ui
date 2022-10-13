@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
+import { useForm, Controller } from "react-hook-form";
 
 import {
   PageContainer,
@@ -153,45 +154,76 @@ const TaskPage = ({
 export default TaskPage;
 
 const NewResourceInput = ({}) => {
-  const [resourceTitle, setResourceTitle] = useState("");
-  const handleResourceTitleChange = (event) => {
-    setResourceTitle(event.target.value);
-  };
-  const [resourceLink, setResourceLink] = useState("");
-  const handleResourceLinkChange = (event) => {
-    setResourceLink(event.target.value);
-  };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      title: "",
+      linkUrl: "",
+    },
+  });
+  const onSubmit = (data) => console.log(data);
 
   return (
-    <Grid container flexDirection="row" spacing={3} alignItems="center">
-      <Grid item flex={1}>
-        <Card size="small">
-          <Grid container spacing={3}>
-            <Grid item flex={1}>
-              <TextField
-                label="Title"
-                placeholder="Provide a title for this resource"
-                value={resourceTitle}
-                onChange={handleResourceTitleChange}
-              />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Grid container flexDirection="row" spacing={3} alignItems="center">
+        <Grid item flex={1}>
+          <Card size="small">
+            <Grid container spacing={3}>
+              <Grid item flex={1}>
+                <Controller
+                  name="title"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <TextField
+                      label="Resource title"
+                      placeholder="Provide a title for this resource"
+                      error={errors.title}
+                      helperText={
+                        errors &&
+                        errors.title &&
+                        errors.title &&
+                        "This field is required"
+                      }
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item flex={1}>
+                <Controller
+                  name="linkUrl"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <TextField
+                      label="Link URL"
+                      placeholder="Add a link to a resource to help complete this task"
+                      error={errors.linkUrl}
+                      helperText={
+                        errors &&
+                        errors.linkUrl &&
+                        errors.linkUrl &&
+                        "This field is required"
+                      }
+                      {...field}
+                    />
+                  )}
+                />
+              </Grid>
             </Grid>
-            <Grid item flex={1}>
-              <TextField
-                label="Link URL"
-                placeholder="Add a link to a resource to help complete this task"
-                value={resourceLink}
-                onChange={handleResourceLinkChange}
-              />
-            </Grid>
-          </Grid>
-        </Card>
+          </Card>
+        </Grid>
+        <Grid item>
+          <IconButton type="submit">
+            <Icon type="plus" />
+          </IconButton>
+        </Grid>
       </Grid>
-      <Grid item>
-        <IconButton>
-          <Icon type="plus" />
-        </IconButton>
-      </Grid>
-    </Grid>
+    </form>
   );
 };
 const EditableResourceItem = ({ title }) => {
