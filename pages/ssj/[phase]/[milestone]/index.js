@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
+import { useForm, Controller } from "react-hook-form";
 
 import {
   Avatar,
@@ -267,27 +268,48 @@ const MilestonePage = ({
 export default MilestonePage;
 
 const NewTaskInput = ({}) => {
-  const [taskTitle, setTaskTitle] = useState("");
-  const handleTaskTitleChange = (event) => {
-    setTaskTitle(event.target.value);
-  };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      title: "",
+    },
+  });
+  const onSubmit = (data) => console.log(data);
 
   return (
-    <Grid container flexDirection="row" spacing={3} alignItems="center">
-      <Grid item flex={1}>
-        <TextField
-          label="Task to complete"
-          placeholder="Add a task to do in order to complete this milestone"
-          value={taskTitle}
-          onChange={handleTaskTitleChange}
-        />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Grid container spacing={3} alignItems="center">
+        <Grid item flex={1}>
+          <Controller
+            name="title"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                label="Task to complete"
+                placeholder="Add a task to do in order to complete this milestone"
+                error={errors.title}
+                helperText={
+                  errors &&
+                  errors.title &&
+                  errors.title &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item>
+          <IconButton type="submit" disabled={isSubmitting}>
+            <Icon type="plus" />
+          </IconButton>
+        </Grid>
       </Grid>
-      <Grid item>
-        <IconButton>
-          <Icon type="plus" />
-        </IconButton>
-      </Grid>
-    </Grid>
+    </form>
   );
 };
 const EditableTaskItem = ({ title }) => {
