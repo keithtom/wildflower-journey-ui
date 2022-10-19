@@ -51,6 +51,11 @@ const MilestonePage = ({
   const isSensibleDefault = false;
   const isUpNext = false;
 
+  const handleCompleteMilestone = () => {
+    setCompleteModalOpen(true);
+    //send data to backend
+  };
+
   return (
     <PageContainer>
       <Stack spacing={12}>
@@ -184,6 +189,9 @@ const MilestonePage = ({
                   key={i}
                   isDecision={t.isDecision}
                   isNext={i === 2}
+                  isLast={i + 1 === FakeMilestoneTasks.length}
+                  isComplete={t.completed === true}
+                  handleCompleteMilestone={handleCompleteMilestone}
                 />
               ))
             ) : (
@@ -344,16 +352,21 @@ export async function getServerSideProps({ query }) {
   const PhaseTitle = query.phase;
   const MilestoneTitle = query.milestone;
   const FakeMilestoneTasks = [
-    { title: "Complete WF School Name Research Document" },
-    { title: "Complete advice process on your Name Research Document" },
+    { title: "Complete WF School Name Research Document", completed: false },
+    {
+      title: "Complete advice process on your Name Research Document",
+      completed: false,
+    },
     {
       title:
         "Are you going to use the WF Group Exemption or file independently?",
       isDecision: true,
+      completed: false,
     },
     {
       title:
         "Email your name and research document to support@wildflowerschools.org to confirm name selection",
+      completed: false,
     },
   ];
   const FakeAlternativeMilestones = [
