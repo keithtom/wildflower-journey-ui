@@ -18,11 +18,16 @@ const Task = ({
   notNavigable,
   isDecision,
   isNext,
+  isLast,
   link,
+  handleCompleteMilestone,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const handleCompleteTask = () => {
     setTaskIsComplete(!taskIsComplete);
+    if (isLast) {
+      handleCompleteMilestone();
+    }
   };
 
   return (
