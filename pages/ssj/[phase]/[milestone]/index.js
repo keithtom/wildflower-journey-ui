@@ -347,7 +347,7 @@ const EditableTaskList = ({ tasks }) => {
   const [taskList, setTaskList] = useState(tasks);
 
   const onDrop = ({ removedIndex, addedIndex }) => {
-    console.log({ removedIndex, addedIndex });
+    // console.log({ removedIndex, addedIndex });
     setTaskList((items) => arrayMoveImmutable(items, removedIndex, addedIndex));
   };
   return (
