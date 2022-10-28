@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
+import { Container, Draggable } from "react-smooth-dnd";
+import { arrayMoveImmutable } from "array-move";
 
 import {
   Avatar,
@@ -176,10 +178,7 @@ const MilestonePage = ({
             {userIsEditing ? (
               <>
                 <NewTaskInput />
-                {FakeMilestoneTasks &&
-                  FakeMilestoneTasks.map((m, i) => (
-                    <EditableTaskItem title={m.title} key={i} />
-                  ))}
+                <EditableTaskList tasks={FakeMilestoneTasks} />
               </>
             ) : FakeMilestoneTasks ? (
               FakeMilestoneTasks.map((t, i) => (
@@ -320,11 +319,16 @@ const NewTaskInput = ({}) => {
     </form>
   );
 };
-const EditableTaskItem = ({ title }) => {
+const EditableTaskItem = ({ title, isDraggable }) => {
   return (
     <Grid container flexDirection="row" spacing={3} alignItems="center">
       <Grid item>
-        <Icon type="dotsVertical" />
+        <Icon
+          type="dotsVertical"
+          className={isDraggable && "drag-handle"}
+          hoverable={isDraggable}
+          variant={!isDraggable && "lightened"}
+        />
       </Grid>
       <Grid item flex={1}>
         <Card size="small" variant="lightened">
@@ -332,11 +336,32 @@ const EditableTaskItem = ({ title }) => {
         </Card>
       </Grid>
       <Grid item>
-        <IconButton>
-          <Icon type="close" />
+        <IconButton disabled={!isDraggable}>
+          <Icon type="close" variant={!isDraggable && "lightened"} />
         </IconButton>
       </Grid>
     </Grid>
+  );
+};
+const EditableTaskList = ({ tasks }) => {
+  const [taskList, setTaskList] = useState(tasks);
+
+  const onDrop = ({ removedIndex, addedIndex }) => {
+    // console.log({ removedIndex, addedIndex });
+    setTaskList((items) => arrayMoveImmutable(items, removedIndex, addedIndex));
+  };
+  return (
+    <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
+      {taskList &&
+        taskList.map((t, i) => (
+          <Draggable key={i}>
+            <EditableTaskItem
+              title={t.title}
+              isDraggable={!t.isSensibleDefault}
+            />
+          </Draggable>
+        ))}
+    </Container>
   );
 };
 
@@ -352,21 +377,28 @@ export async function getServerSideProps({ query }) {
   const PhaseTitle = query.phase;
   const MilestoneTitle = query.milestone;
   const FakeMilestoneTasks = [
-    { title: "Complete WF School Name Research Document", completed: false },
+    {
+      title: "Complete WF School Name Research Document",
+      completed: false,
+      isSensibleDefault: true,
+    },
     {
       title: "Complete advice process on your Name Research Document",
       completed: false,
+      isSensibleDefault: true,
     },
     {
       title:
         "Are you going to use the WF Group Exemption or file independently?",
       isDecision: true,
       completed: false,
+      isSensibleDefault: true,
     },
     {
       title:
         "Email your name and research document to support@wildflowerschools.org to confirm name selection",
       completed: false,
+      isSensibleDefault: false,
     },
   ];
   const FakeAlternativeMilestones = [

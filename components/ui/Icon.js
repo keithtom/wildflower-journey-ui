@@ -99,6 +99,15 @@ const StyledIcon = styled("span")`
         color: ${props.theme.color.success.medium};
       }
     `}
+
+  /* Hoverable */
+  ${(props) =>
+    props.hoverable &&
+    css`
+      &:hover {
+        cursor: pointer;
+      }
+    `}
 `;
 
 export default function Icon({ ...props }) {
