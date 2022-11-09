@@ -43,8 +43,11 @@ const StyledMilestoneTasks = styled(Card)`
 `;
 
 const MilestonePage = ({
+  MilestoneId,
   PhaseTitle,
   MilestoneTitle,
+  MilestoneAttributes,
+  MilestoneTasks,
   FakeMilestoneTasks,
   FakeAlternativeMilestones,
 }) => {
@@ -57,6 +60,8 @@ const MilestonePage = ({
     setCompleteModalOpen(true);
     //send data to backend
   };
+
+  console.log("Tasks", MilestoneTasks);
 
   return (
     <PageContainer>
@@ -133,42 +138,58 @@ const MilestonePage = ({
               {MilestoneTitle}
             </Typography>
             <Stack direction="row" spacing={6} alignItems="center">
-              <Stack spacing={2}>
-                <Typography variant="bodyMini" lightened bold>
-                  STATUS
-                </Typography>
-                <StatusChip status="to do" size="small" withIcon />
-              </Stack>
-              <Stack spacing={2}>
-                <Typography variant="bodyMini" lightened bold>
-                  EFFORT
-                </Typography>
-                <EffortChip effort="Large" size="small" withIcon />
-              </Stack>
-              <Stack spacing={2}>
-                <Typography variant="bodyMini" lightened bold>
-                  PHASE
-                </Typography>
-                <PhaseChip phase="Discovery" size="small" withIcon />
-              </Stack>
-              <Stack spacing={2}>
-                <Typography variant="bodyMini" lightened bold>
-                  CATEGORY
-                </Typography>
-                <CategoryChip category="Finance" size="small" withIcon />
-              </Stack>
-              <Stack spacing={2}>
-                <Typography variant="bodyMini" lightened bold>
-                  ASSIGNEE
-                </Typography>
-                <Avatar size="mini" />
-              </Stack>
-              <Stack spacing={2}>
-                <Typography variant="bodyMini" lightened bold>
-                  AUTHOR
-                </Typography>
-                <Avatar size="mini" />
-              </Stack>
+              {MilestoneAttributes.status ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    STATUS
+                  </Typography>
+                  <StatusChip
+                    status={MilestoneAttributes.status}
+                    size="small"
+                    withIcon
+                  />
+                </Stack>
+              ) : null}
+              {MilestoneAttributes.effort ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    EFFORT
+                  </Typography>
+                  <EffortChip
+                    effort={MilestoneAttributes.effort}
+                    size="small"
+                    withIcon
+                  />
+                </Stack>
+              ) : null}
+              {MilestoneAttributes.category ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    CATEGORY
+                  </Typography>
+                  <CategoryChip
+                    category={MilestoneAttributes.category}
+                    size="small"
+                    withIcon
+                  />
+                </Stack>
+              ) : null}
+              {MilestoneAttributes.assignee ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    ASSIGNEE
+                  </Typography>
+                  <Avatar size="mini" />
+                </Stack>
+              ) : null}
+              {MilestoneAttributes.author ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    AUTHOR
+                  </Typography>
+                  <Avatar size="mini" />
+                </Stack>
+              ) : null}
             </Stack>
           </StyledMilestoneHeader>
         </Stack>
@@ -180,16 +201,16 @@ const MilestonePage = ({
                 <NewTaskInput />
                 <EditableTaskList tasks={FakeMilestoneTasks} />
               </>
-            ) : FakeMilestoneTasks ? (
-              FakeMilestoneTasks.map((t, i) => (
+            ) : MilestoneTasks ? (
+              MilestoneTasks.map((t, i) => (
                 <Task
-                  link={`/ssj/${PhaseTitle}/${MilestoneTitle}/${t.title}`}
-                  title={t.title}
+                  link={`/ssj/${PhaseTitle}/${MilestoneId}/${t.id}`}
+                  title={t.attributes.title}
                   key={i}
-                  isDecision={t.isDecision}
+                  isDecision={t.attributes.kind === "decision"}
                   isNext={i === 2}
                   isLast={i + 1 === FakeMilestoneTasks.length}
-                  isComplete={t.completed === true}
+                  isComplete={t.attributes.completed === true}
                   handleCompleteMilestone={handleCompleteMilestone}
                 />
               ))
@@ -366,16 +387,18 @@ const EditableTaskList = ({ tasks }) => {
 };
 
 export async function getServerSideProps({ query }) {
-  const userId = query.userId;
-  const ssjId = query.ssjId;
-  // put the correct SSJ API route here
-  // const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`;
+  const MilestoneId = query.milestone;
+  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/processes/${MilestoneId}`;
 
-  // const res = await fetch(apiRoute);
-  // const data = await res.json();
+  const res = await fetch(apiRoute);
+  const data = await res.json();
 
-  const PhaseTitle = query.phase;
-  const MilestoneTitle = query.milestone;
+  const Workflow = data.included.filter((i) => i.type === "workflow");
+  const PhaseTitle = Workflow[0].attributes.name;
+  const MilestoneTitle = data.data.attributes.title;
+  const MilestoneAttributes = data.data.attributes;
+  const MilestoneTasks = data.included.filter((i) => i.type === "step");
+
   const FakeMilestoneTasks = [
     {
       title: "Complete WF School Name Research Document",
@@ -420,8 +443,11 @@ export async function getServerSideProps({ query }) {
 
   return {
     props: {
+      MilestoneId,
       PhaseTitle,
       MilestoneTitle,
+      MilestoneAttributes,
+      MilestoneTasks,
       FakeMilestoneTasks,
       FakeAlternativeMilestones,
     },

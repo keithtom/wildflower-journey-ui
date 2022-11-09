@@ -306,17 +306,16 @@ const DecisionForm = ({ options, disabled }) => {
 };
 
 export async function getServerSideProps({ query }) {
-  const userId = query.userId;
-  const ssjId = query.ssjId;
-  // put the correct SSJ API route here
-  // const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`;
+  const MilestoneId = query.milestone;
+  const TaskId = query.task;
+  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/processes/${MilestoneId}/steps/${TaskId}`;
 
-  // const res = await fetch(apiRoute);
-  // const data = await res.json();
+  const res = await fetch(apiRoute);
+  const data = await res.json();
 
   const PhaseTitle = query.phase;
   const MilestoneTitle = query.milestone;
-  const TaskTitle = query.task;
+  const TaskTitle = data.data.attributes.title;
   const FakeDecisionOptions = [
     {
       value: "wildflower group exemption",
