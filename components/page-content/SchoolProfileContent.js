@@ -27,7 +27,7 @@ const SchoolProfileContent = () => {
           <Stack spacing={4}>
             <Typography variant="h6">{people.length} Members</Typography>
             <Stack spacing={4}>
-              {people.map((p, i) =>
+              {people && people.map((p, i) =>
                 <UserResultItem user={p} key={i} />
               )}
             </Stack>
