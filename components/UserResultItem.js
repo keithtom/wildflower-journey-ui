@@ -59,7 +59,7 @@ const UserResultItem = ({ user, asStakeholderSelection }) => {
             <Grid container spacing={2}>
               <Grid item>
                 {user.relationships.schools
-                  ? user.relationships.schools.data.map((s, i) => (
+                  ? user.relationships.schools.map((s, i) => (
                       <Typography key={i}>{s}</Typography>
                     ))
                   : null}
