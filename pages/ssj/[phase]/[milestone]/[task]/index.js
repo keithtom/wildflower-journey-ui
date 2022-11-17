@@ -1,3 +1,4 @@
+import {useRouter} from 'next/router'
 import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
@@ -38,7 +39,6 @@ const StyledTaskResources = styled(Card)`
 `;
 
 const TaskPage = ({
-  PhaseTitle,
   MilestoneTitle,
   TaskTitle,
   FakeDecisionOptions,
@@ -49,6 +49,9 @@ const TaskPage = ({
   const isDecision = false;
   const isUpNext = false;
 
+  const router = useRouter()
+  const { phase } = router.query
+
   return (
     <PageContainer>
       <Stack spacing={12}>
@@ -56,7 +59,7 @@ const TaskPage = ({
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href={`/ssj/${PhaseTitle}/${MilestoneTitle}`}>
+                <Link href={`/ssj/${phase}/${MilestoneTitle}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>
@@ -313,7 +316,6 @@ export async function getServerSideProps({ query }) {
   const res = await fetch(apiRoute);
   const data = await res.json();
 
-  const PhaseTitle = query.phase;
   const MilestoneTitle = query.milestone;
   const TaskTitle = data.data.attributes.title;
   const FakeDecisionOptions = [
@@ -335,7 +337,6 @@ export async function getServerSideProps({ query }) {
 
   return {
     props: {
-      PhaseTitle,
       MilestoneTitle,
       TaskTitle,
       FakeDecisionOptions,

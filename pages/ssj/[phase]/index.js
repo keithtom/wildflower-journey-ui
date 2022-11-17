@@ -1,3 +1,4 @@
+import {useRouter} from 'next/router'
 import { useState } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
@@ -20,7 +21,6 @@ import {
 import Milestone from "../../../components/Milestone";
 
 const PhasePage = ({
-  PhaseTitle,
   FakeMilestonesToDo,
   FakeMilestonesUpNext,
   FakeMilestonesToConsider,
@@ -33,6 +33,8 @@ const PhasePage = ({
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
   const milestonesToConsider = true;
 
+  const router = useRouter()
+  const { phase } = router.query
   console.log({ data });
 
   return (
@@ -40,7 +42,7 @@ const PhasePage = ({
       <PageContainer>
         <Stack spacing={12}>
           <Typography variant="h3" bold capitalize>
-            {PhaseTitle}
+            {phase}
           </Typography>
 
           <Stack spacing={6}>
@@ -77,7 +79,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {MilestonesToDo.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${PhaseTitle}/${m.id}`}
+                        link={`/ssj/${phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         effort={m.attributes.effort}
@@ -116,7 +118,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {MilestonesUpNext.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${PhaseTitle}/${m.attributes.title}`}
+                        link={`/ssj/${phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         effort={m.attributes.effort}
@@ -155,7 +157,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {MilestonesDone.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${PhaseTitle}/${m.attributes.title}`}
+                        link={`/ssj/${phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         effort={m.attributes.effort}
@@ -187,7 +189,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {FakeMilestonesToConsider.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${PhaseTitle}/${m.title}`}
+                        link={`/ssj/${phase}/${m.title}`}
                         key={i}
                         title={m.title}
                         effort={m.effort}
@@ -347,12 +349,11 @@ export async function getServerSideProps({ query }) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
 
-  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/workflows/1d50-fea7`;
+  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/workflows/4f31-cb15`;
 
   const res = await fetch(apiRoute);
   const data = await res.json();
 
-  const PhaseTitle = data.data.attributes.name;
   const MilestonesToDo = data.included.filter(
     (milestone) => milestone.attributes.status === "todo"
   );
@@ -418,7 +419,6 @@ export async function getServerSideProps({ query }) {
 
   return {
     props: {
-      PhaseTitle,
       FakeMilestonesToConsider,
       FakeMilestonesToDo,
       FakeMilestonesUpNext,

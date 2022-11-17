@@ -1,3 +1,4 @@
+import {useRouter} from 'next/router'
 import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
@@ -44,7 +45,6 @@ const StyledMilestoneTasks = styled(Card)`
 
 const MilestonePage = ({
   MilestoneId,
-  PhaseTitle,
   MilestoneTitle,
   MilestoneAttributes,
   MilestoneTasks,
@@ -61,6 +61,9 @@ const MilestonePage = ({
     //send data to backend
   };
 
+  const router = useRouter()
+  const { phase } = router.query
+
   console.log("Tasks", MilestoneTasks);
 
   return (
@@ -70,12 +73,12 @@ const MilestonePage = ({
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href={`/ssj/${PhaseTitle}`}>
+                <Link href={`/ssj/${phase}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>
                 </Link>
-                <Typography capitalize>{PhaseTitle}</Typography>
+                <Typography capitalize>{phase}</Typography>
               </Stack>
             </Grid>
             <Grid item>
@@ -119,7 +122,7 @@ const MilestonePage = ({
                   <Stack spacing={3}>
                     {FakeAlternativeMilestones.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${PhaseTitle}/${m.title}`}
+                        link={`/ssj/${phase}/${m.title}`}
                         key={i}
                         title={m.title}
                         effort={m.effort}
@@ -204,7 +207,7 @@ const MilestonePage = ({
             ) : MilestoneTasks ? (
               MilestoneTasks.map((t, i) => (
                 <Task
-                  link={`/ssj/${PhaseTitle}/${MilestoneId}/${t.id}`}
+                  link={`/ssj/${phase}/${MilestoneId}/${t.id}`}
                   title={t.attributes.title}
                   key={i}
                   isDecision={t.attributes.kind === "decision"}
@@ -394,7 +397,6 @@ export async function getServerSideProps({ query }) {
   const data = await res.json();
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
-  const PhaseTitle = Workflow[0].attributes.name;
   const MilestoneTitle = data.data.attributes.title;
   const MilestoneAttributes = data.data.attributes;
   const MilestoneTasks = data.included.filter((i) => i.type === "step");
@@ -444,7 +446,6 @@ export async function getServerSideProps({ query }) {
   return {
     props: {
       MilestoneId,
-      PhaseTitle,
       MilestoneTitle,
       MilestoneAttributes,
       MilestoneTasks,

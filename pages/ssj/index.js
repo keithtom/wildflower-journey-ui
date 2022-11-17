@@ -58,7 +58,7 @@ const SSJ = ({}) => {
                   <Typography variant="bodyMini" bold lightened>
                     PHASE
                   </Typography>
-                  <Typography variant="bodySmall">Discovery</Typography>
+                  <Typography variant="bodySmall">Visioning</Typography>
                 </Stack>
                 <Stack spacing={1}>
                   <Typography variant="bodyMini" bold lightened>
@@ -263,17 +263,7 @@ const SSJ = ({}) => {
 
               {viewPhaseProgress ? (
                 <Grid container spacing={6}>
-                  <Grid item xs={12} sm={3}>
-                    <PhaseProgressCard
-                      phase="Discovery"
-                      link="/ssj/discovery"
-                      processes={[
-                        { id: "1", status: "done" },
-                        { id: "2", status: "done" },
-                      ]}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid item xs={12} sm={4}>
                     <PhaseProgressCard
                       phase="Visioning"
                       link="/ssj/visioning"
@@ -285,7 +275,7 @@ const SSJ = ({}) => {
                       ]}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid item xs={12} sm={4}>
                     <PhaseProgressCard
                       phase="Planning"
                       link="/ssj/planning"
@@ -295,7 +285,7 @@ const SSJ = ({}) => {
                       ]}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  <Grid item xs={12} sm={4}>
                     <PhaseProgressCard
                       phase="Startup"
                       link="/ssj/startup"
