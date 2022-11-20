@@ -12,6 +12,9 @@ import {
   RightArrowCircle,
   Plus,
   Check,
+  BuildingHouse,
+  Extension,
+  Palette,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -135,6 +138,9 @@ export default function Icon({ ...props }) {
     pieChart: <PieChart />,
     zap: <Zap />,
     check: <Check />,
+    buildingHouse: <BuildingHouse />,
+    extension: <Extension />,
+    palette: <Palette />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
