@@ -1,4 +1,4 @@
-import {useRouter} from 'next/router'
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
@@ -47,6 +47,7 @@ const MilestonePage = ({
   MilestoneId,
   MilestoneTitle,
   MilestoneAttributes,
+  MilestoneRelationships,
   MilestoneTasks,
   FakeMilestoneTasks,
   FakeAlternativeMilestones,
@@ -61,10 +62,11 @@ const MilestonePage = ({
     //send data to backend
   };
 
-  const router = useRouter()
-  const { phase } = router.query
+  const router = useRouter();
+  const { phase } = router.query;
 
-  console.log("Tasks", MilestoneTasks);
+  // console.log("Tasks", MilestoneTasks);
+  console.log("Milestone Relationships", MilestoneRelationships);
 
   return (
     <PageContainer>
@@ -177,7 +179,7 @@ const MilestonePage = ({
                   />
                 </Stack>
               ) : null}
-              {MilestoneAttributes.assignee ? (
+              {MilestoneRelationships.assignee.data ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     ASSIGNEE
@@ -399,6 +401,7 @@ export async function getServerSideProps({ query }) {
   const Workflow = data.included.filter((i) => i.type === "workflow");
   const MilestoneTitle = data.data.attributes.title;
   const MilestoneAttributes = data.data.attributes;
+  const MilestoneRelationships = data.data.relationships;
   const MilestoneTasks = data.included.filter((i) => i.type === "step");
 
   const FakeMilestoneTasks = [
@@ -448,6 +451,7 @@ export async function getServerSideProps({ query }) {
       MilestoneId,
       MilestoneTitle,
       MilestoneAttributes,
+      MilestoneRelationships,
       MilestoneTasks,
       FakeMilestoneTasks,
       FakeAlternativeMilestones,

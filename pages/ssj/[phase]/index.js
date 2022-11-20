@@ -1,4 +1,4 @@
-import {useRouter} from 'next/router'
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
@@ -33,9 +33,9 @@ const PhasePage = ({
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
   const milestonesToConsider = true;
 
-  const router = useRouter()
-  const { phase } = router.query
-  console.log({ data });
+  const router = useRouter();
+  const { phase } = router.query;
+  // console.log({ data });
 
   return (
     <>
@@ -84,7 +84,7 @@ const PhasePage = ({
                         title={m.attributes.title}
                         effort={m.attributes.effort}
                         category={m.attributes.category}
-                        assignee={m.attributes.assignee}
+                        assignee={m.relationships.assignee.data}
                         status={m.attributes.status}
                       />
                     ))}
@@ -123,7 +123,7 @@ const PhasePage = ({
                         title={m.attributes.title}
                         effort={m.attributes.effort}
                         category={m.attributes.category}
-                        assignee={m.attributes.assignee}
+                        assignee={m.relationships.assignee.data}
                         status={m.attributes.status}
                       />
                     ))}
@@ -162,7 +162,7 @@ const PhasePage = ({
                         title={m.attributes.title}
                         effort={m.attributes.effort}
                         category={m.attributes.category}
-                        assignee={m.attributes.assignee}
+                        assignee={m.relationships.assignee.data}
                         status={m.attributes.status}
                       />
                     ))}
