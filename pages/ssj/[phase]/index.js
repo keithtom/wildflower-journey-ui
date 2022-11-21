@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
@@ -19,143 +20,156 @@ import {
 } from "@ui";
 import Milestone from "../../../components/Milestone";
 
-const DiscoveryPage = ({
-  PhaseTitle,
+const PhasePage = ({
   FakeMilestonesToDo,
   FakeMilestonesUpNext,
   FakeMilestonesToConsider,
   FakeMilestonesDone,
+  data,
+  MilestonesToDo,
+  MilestonesUpNext,
+  MilestonesDone,
 }) => {
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
   const milestonesToConsider = true;
+
+  const router = useRouter();
+  const { phase } = router.query;
+  // console.log({ data });
 
   return (
     <>
       <PageContainer>
         <Stack spacing={12}>
           <Typography variant="h3" bold capitalize>
-            {PhaseTitle}
+            {phase}
           </Typography>
 
           <Stack spacing={6}>
-            <Card>
-              <Stack spacing={3}>
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <Stack direction="row" spacing={6}>
-                      <Icon type="circle" variant="primary" />
-                      <Typography variant="bodyLarge" bold>
-                        To do
-                      </Typography>
-                      <Typography variant="bodyLarge" lightened>
-                        {FakeMilestonesToDo.length}
-                      </Typography>
-                    </Stack>
+            {MilestonesToDo.length ? (
+              <Card>
+                <Stack spacing={3}>
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Grid item>
+                      <Stack direction="row" spacing={6}>
+                        <Icon type="circle" variant="primary" />
+                        <Typography variant="bodyLarge" bold>
+                          To do
+                        </Typography>
+                        <Typography variant="bodyLarge" lightened>
+                          {MilestonesToDo.length}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid item>
+                      <IconButton
+                        onClick={() =>
+                          setAddMilestoneModalOpen(!addMilestoneModalOpen)
+                        }
+                      >
+                        <Icon type="plus" variant="lightened" />
+                      </IconButton>
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                    <IconButton
-                      onClick={() =>
-                        setAddMilestoneModalOpen(!addMilestoneModalOpen)
-                      }
-                    >
-                      <Icon type="plus" variant="lightened" />
-                    </IconButton>
-                  </Grid>
-                </Grid>
 
-                <Stack spacing={3}>
-                  {FakeMilestonesToDo.map((m, i) => (
-                    <Milestone
-                      link={`/ssj/${PhaseTitle}/${m.title}`}
-                      key={i}
-                      title={m.title}
-                      effort={m.effort}
-                      category={m.category}
-                      assignee={m.assignee}
-                      status={m.status}
-                    />
-                  ))}
+                  <Stack spacing={3}>
+                    {MilestonesToDo.map((m, i) => (
+                      <Milestone
+                        link={`/ssj/${phase}/${m.id}`}
+                        key={i}
+                        title={m.attributes.title}
+                        effort={m.attributes.effort}
+                        category={m.attributes.category}
+                        assignee={m.relationships.assignee.data}
+                        status={m.attributes.status}
+                      />
+                    ))}
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Card>
-            <Card>
-              <Stack spacing={3}>
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <Stack direction="row" spacing={6}>
-                      <Icon type="rightArrowCircle" variant="lightened" />
-                      <Typography variant="bodyLarge" bold>
-                        Up Next
-                      </Typography>
-                      <Typography variant="bodyLarge" lightened>
-                        {FakeMilestonesUpNext.length}
-                      </Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item>
-                    <Icon type="plus" variant="lightened" />
-                  </Grid>
-                </Grid>
+              </Card>
+            ) : null}
+            {MilestonesUpNext.length ? (
+              <Card>
                 <Stack spacing={3}>
-                  {FakeMilestonesUpNext.map((m, i) => (
-                    <Milestone
-                      link={`/ssj/${PhaseTitle}/${m.title}`}
-                      key={i}
-                      title={m.title}
-                      effort={m.effort}
-                      category={m.category}
-                      assignee={m.assignee}
-                      status={m.status}
-                    />
-                  ))}
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Grid item>
+                      <Stack direction="row" spacing={6}>
+                        <Icon type="rightArrowCircle" variant="lightened" />
+                        <Typography variant="bodyLarge" bold>
+                          Up Next
+                        </Typography>
+                        <Typography variant="bodyLarge" lightened>
+                          {MilestonesUpNext.length}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid item>
+                      <Icon type="plus" variant="lightened" />
+                    </Grid>
+                  </Grid>
+                  <Stack spacing={3}>
+                    {MilestonesUpNext.map((m, i) => (
+                      <Milestone
+                        link={`/ssj/${phase}/${m.id}`}
+                        key={i}
+                        title={m.attributes.title}
+                        effort={m.attributes.effort}
+                        category={m.attributes.category}
+                        assignee={m.relationships.assignee.data}
+                        status={m.attributes.status}
+                      />
+                    ))}
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Card>
-            <Card>
-              <Stack spacing={3}>
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <Stack direction="row" spacing={6}>
-                      <Icon type="checkCircle" variant="success" />
-                      <Typography variant="bodyLarge" bold>
-                        Done
-                      </Typography>
-                      <Typography variant="bodyLarge" lightened>
-                        {FakeMilestonesDone.length}
-                      </Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item>
-                    <Icon type="plus" variant="lightened" />
-                  </Grid>
-                </Grid>
+              </Card>
+            ) : null}
+            {MilestonesDone.length ? (
+              <Card>
                 <Stack spacing={3}>
-                  {FakeMilestonesDone.map((m, i) => (
-                    <Milestone
-                      link={`/ssj/${PhaseTitle}/${m.title}`}
-                      key={i}
-                      title={m.title}
-                      effort={m.effort}
-                      category={m.category}
-                      assignee={m.assignee}
-                      status={m.status}
-                    />
-                  ))}
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Grid item>
+                      <Stack direction="row" spacing={6}>
+                        <Icon type="checkCircle" variant="success" />
+                        <Typography variant="bodyLarge" bold>
+                          Done
+                        </Typography>
+                        <Typography variant="bodyLarge" lightened>
+                          {MilestonesDone.length}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid item>
+                      <Icon type="plus" variant="lightened" />
+                    </Grid>
+                  </Grid>
+                  <Stack spacing={3}>
+                    {MilestonesDone.map((m, i) => (
+                      <Milestone
+                        link={`/ssj/${phase}/${m.id}`}
+                        key={i}
+                        title={m.attributes.title}
+                        effort={m.attributes.effort}
+                        category={m.attributes.category}
+                        assignee={m.relationships.assignee.data}
+                        status={m.attributes.status}
+                      />
+                    ))}
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Card>
+              </Card>
+            ) : null}
           </Stack>
 
           <Divider />
@@ -175,7 +189,7 @@ const DiscoveryPage = ({
                   <Stack spacing={3}>
                     {FakeMilestonesToConsider.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${PhaseTitle}/${m.title}`}
+                        link={`/ssj/${phase}/${m.title}`}
                         key={i}
                         title={m.title}
                         effort={m.effort}
@@ -203,7 +217,7 @@ const DiscoveryPage = ({
   );
 };
 
-export default DiscoveryPage;
+export default PhasePage;
 
 const AddMilestoneModal = ({ toggle, title, open }) => {
   const {
@@ -332,15 +346,24 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
 };
 
 export async function getServerSideProps({ query }) {
-  const userId = query.userId;
-  const ssjId = query.ssjId;
-  // put the correct SSJ API route here
-  // const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`;
+  // const userId = query.userId;
+  // const ssjId = query.ssjId;
 
-  // const res = await fetch(apiRoute);
-  // const data = await res.json();
+  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/workflows/4f31-cb15`;
 
-  const PhaseTitle = query.phase;
+  const res = await fetch(apiRoute);
+  const data = await res.json();
+
+  const MilestonesToDo = data.included.filter(
+    (milestone) => milestone.attributes.status === "todo"
+  );
+  const MilestonesUpNext = data.included.filter(
+    (milestone) => milestone.attributes.status === "upnext"
+  );
+  const MilestonesDone = data.included.filter(
+    (milestone) => milestone.attributes.status === "done"
+  );
+
   const FakeMilestonesToConsider = [
     {
       title: "Preview the Wildflower Budget Process",
@@ -396,11 +419,14 @@ export async function getServerSideProps({ query }) {
 
   return {
     props: {
-      PhaseTitle,
       FakeMilestonesToConsider,
       FakeMilestonesToDo,
       FakeMilestonesUpNext,
       FakeMilestonesDone,
+      data,
+      MilestonesToDo,
+      MilestonesUpNext,
+      MilestonesDone,
     },
   };
 }

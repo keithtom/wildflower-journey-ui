@@ -284,13 +284,6 @@ const SSJNavigation = ({}) => {
       />
       <NavLink
         secondary
-        to="/ssj/discovery"
-        active={router.pathname.includes("/ssj/discovery")}
-        label="Discovery"
-        icon={true}
-      />
-      <NavLink
-        secondary
         to="/ssj/visioning"
         active={router.pathname.includes("/ssj/visioning")}
         label="Visioning"

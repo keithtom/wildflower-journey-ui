@@ -1,3 +1,4 @@
+import {useRouter} from 'next/router'
 import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
@@ -38,7 +39,6 @@ const StyledTaskResources = styled(Card)`
 `;
 
 const TaskPage = ({
-  PhaseTitle,
   MilestoneTitle,
   TaskTitle,
   FakeDecisionOptions,
@@ -49,6 +49,9 @@ const TaskPage = ({
   const isDecision = false;
   const isUpNext = false;
 
+  const router = useRouter()
+  const { phase } = router.query
+
   return (
     <PageContainer>
       <Stack spacing={12}>
@@ -56,7 +59,7 @@ const TaskPage = ({
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href={`/ssj/${PhaseTitle}/${MilestoneTitle}`}>
+                <Link href={`/ssj/${phase}/${MilestoneTitle}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>
@@ -306,17 +309,15 @@ const DecisionForm = ({ options, disabled }) => {
 };
 
 export async function getServerSideProps({ query }) {
-  const userId = query.userId;
-  const ssjId = query.ssjId;
-  // put the correct SSJ API route here
-  // const apiRoute = `https://api.wildflowerschools.org/v1/advice/people/${userId}/decisions`;
+  const MilestoneId = query.milestone;
+  const TaskId = query.task;
+  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/processes/${MilestoneId}/steps/${TaskId}`;
 
-  // const res = await fetch(apiRoute);
-  // const data = await res.json();
+  const res = await fetch(apiRoute);
+  const data = await res.json();
 
-  const PhaseTitle = query.phase;
   const MilestoneTitle = query.milestone;
-  const TaskTitle = query.task;
+  const TaskTitle = data.data.attributes.title;
   const FakeDecisionOptions = [
     {
       value: "wildflower group exemption",
@@ -336,7 +337,6 @@ export async function getServerSideProps({ query }) {
 
   return {
     props: {
-      PhaseTitle,
       MilestoneTitle,
       TaskTitle,
       FakeDecisionOptions,
