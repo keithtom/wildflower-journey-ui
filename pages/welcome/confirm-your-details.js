@@ -47,10 +47,14 @@ const ConfirmYourDetails = ({}) => {
         <Grid container alignItems="center" justifyContent="center">
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <Card>
-              <Stack alignItems="center" spacing={6}>
-                <Typography variant="h4" bold>
-                  Confirm your personal details
-                </Typography>
+              <Stack spacing={6}>
+                <Grid container justifyContent="center">
+                  <Grid item>
+                    <Typography variant="h4" bold>
+                      Confirm your personal details
+                    </Typography>
+                  </Grid>
+                </Grid>
                 <Card variant="primaryLightened" size="small">
                   <Stack direction="row" spacing={3}>
                     <Icon type="star" variant="primary" />
@@ -62,9 +66,12 @@ const ConfirmYourDetails = ({}) => {
                   </Stack>
                 </Card>
                 <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80" />
+                  <Avatar
+                    size="sm"
+                    src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
+                  />
                   <Stack>
-                    <Typography variant="bodyRegular" bold>
+                    <Typography variant="bodySmall" bold>
                       Mary Truman
                     </Typography>
                     <Typography variant="bodySmall" lightened>
