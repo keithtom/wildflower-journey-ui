@@ -27,6 +27,7 @@ import {
   Pencil,
   PieChart,
   Zap,
+  Star,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -141,6 +142,7 @@ export default function Icon({ ...props }) {
     buildingHouse: <BuildingHouse />,
     extension: <Extension />,
     palette: <Palette />,
+    star: <Star />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
