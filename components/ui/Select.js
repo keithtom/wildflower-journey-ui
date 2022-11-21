@@ -13,6 +13,7 @@ const Select = ({
   options,
   error,
   helperText,
+  placeholder,
   ...props
 }) => {
   return (
@@ -29,6 +30,9 @@ const Select = ({
           IconComponent={() => <Icon type="expandMore" variant="lightened" />}
           {...props}
         >
+          <MenuItem disabled value="">
+            {placeholder}
+          </MenuItem>
           {options.map((option, i) => (
             <MenuItem key={i} value={i}>
               {option}

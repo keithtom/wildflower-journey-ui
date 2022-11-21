@@ -22,7 +22,7 @@ const MultiSelect = ({ options, id, value, onChange, label, ...props }) => {
           value={value}
           onChange={onChange}
           input={<Input />}
-          IconComponent={() => <Icon type="chevronDown" variant="lightened" />}
+          IconComponent={() => <Icon type="expandMore" variant="lightened" />}
           renderValue={(selected) => (
             <Stack direction="row" spacing={1}>
               {selected.map((value) => (
