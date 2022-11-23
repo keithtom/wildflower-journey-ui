@@ -39,6 +39,7 @@ const StyledTaskResources = styled(Card)`
 `;
 
 const TaskPage = ({
+  MilestoneId,
   MilestoneTitle,
   TaskTitle,
   FakeDecisionOptions,
@@ -59,7 +60,7 @@ const TaskPage = ({
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href={`/ssj/${phase}/${MilestoneTitle}`}>
+                <Link href={`/ssj/${phase}/${MilestoneId}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>
@@ -316,7 +317,8 @@ export async function getServerSideProps({ query }) {
   const res = await fetch(apiRoute);
   const data = await res.json();
 
-  const MilestoneTitle = query.milestone;
+  const milestone = data.included.filter(e => e.type == "process")[0];
+  const MilestoneTitle = milestone.attributes.title;
   const TaskTitle = data.data.attributes.title;
   const FakeDecisionOptions = [
     {
@@ -337,6 +339,8 @@ export async function getServerSideProps({ query }) {
 
   return {
     props: {
+      MilestoneId,
+      TaskId,
       MilestoneTitle,
       TaskTitle,
       FakeDecisionOptions,

@@ -345,24 +345,31 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
   );
 };
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps(context) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
 
-  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/workflows/4f31-cb15`;
+  const { phase } = context.params;
+
+  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;
 
   const res = await fetch(apiRoute);
   const data = await res.json();
+  const MilestonesToDo = []
+  const MilestonesUpNext = []
+  const MilestonesDone = []
 
-  const MilestonesToDo = data.included.filter(
-    (milestone) => milestone.attributes.status === "todo"
-  );
-  const MilestonesUpNext = data.included.filter(
-    (milestone) => milestone.attributes.status === "upnext"
-  );
-  const MilestonesDone = data.included.filter(
-    (milestone) => milestone.attributes.status === "done"
-  );
+  data.data.forEach((milestone) => {
+    if (milestone.attributes.status == "to do") {
+      MilestonesToDo.push(milestone);
+    }
+    else if (milestone.attributes.status == "up next") {
+      MilestonesUpNext.push(milestone);
+    }
+    else if (milestone.attributes.status == "done") {
+      MilestonesDone.push(milestone);
+    }
+  });
 
   const FakeMilestonesToConsider = [
     {
