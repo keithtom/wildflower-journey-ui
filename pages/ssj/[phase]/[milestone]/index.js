@@ -209,6 +209,7 @@ const MilestonePage = ({
             ) : MilestoneTasks ? (
               MilestoneTasks.map((t, i) => (
                 <Task
+                  taskId={t.id}
                   link={`/ssj/${phase}/${MilestoneId}/${t.id}`}
                   title={t.attributes.title}
                   key={i}

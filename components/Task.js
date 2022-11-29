@@ -1,3 +1,4 @@
+import processesApi from "../api/processes";
 import { useState } from "react";
 import { FormControlLabel } from "@mui/material";
 
@@ -13,6 +14,7 @@ import {
 } from "./ui";
 
 const Task = ({
+  taskId,
   title,
   isComplete,
   notNavigable,
@@ -23,8 +25,17 @@ const Task = ({
   handleCompleteMilestone,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
-  const handleCompleteTask = () => {
-    setTaskIsComplete(!taskIsComplete);
+
+  async function handleCompleteTask() {
+    // api call, backend determiens state. needs spinner and error management.
+    try {
+      // if checking, complete, if unchecking, uncomplete.
+      const response = await processesApi.complete(taskId);
+      setTaskIsComplete(!taskIsComplete); // take state from API response?
+    } catch (err) {
+      console.error(err);
+    }
+
     if (isLast) {
       handleCompleteMilestone();
     }
