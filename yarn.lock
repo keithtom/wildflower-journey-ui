@@ -9649,7 +9649,7 @@ react-fast-compare@^3.0.1, react-fast-compare@^3.2.0:
 
 react-filepond@^7.1.2:
   version "7.1.2"
-  resolved "https://registry.npmjs.org/react-filepond/-/react-filepond-7.1.2.tgz"
+  resolved "https://registry.yarnpkg.com/react-filepond/-/react-filepond-7.1.2.tgz#8f04d06396a59b5980dda479c095ed23e6d1f68b"
   integrity sha512-vrlx9o/n+jGikh6jLey+PpUGYtEZn8MdeB6JFeX/5/N/Mu75IHG+MFQbv8R27bNXvS41mDtV9Fo5DG+s6siVIA==
 
 react-helmet-async@^1.0.7:
