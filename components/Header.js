@@ -135,6 +135,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
         </StyledOption>
         <NavLink secondary to="/user-profile" label="Your profile" />
         <NavLink secondary to="/school-profile" label="Your school" />
+        <NavLink secondary to="/settings" label="Settings" />
         <StyledOption onClick={undefined} hoverable>
           <Typography lightened>Sign out</Typography>
         </StyledOption>
