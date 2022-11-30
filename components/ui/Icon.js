@@ -17,6 +17,7 @@ import {
   Palette,
   Pause,
   Play,
+  WindowClose,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -149,6 +150,7 @@ export default function Icon({ ...props }) {
     message: <Message />,
     pause: <Pause />,
     play: <Play />,
+    windowClose: <WindowClose />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
