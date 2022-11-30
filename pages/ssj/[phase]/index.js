@@ -30,6 +30,7 @@ const PhasePage = ({
   MilestonesUpNext,
   MilestonesDone,
 }) => {
+  const [phaseCompleteModalOpen, setPhaseCompleteModalOpen] = useState(false);
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
   const milestonesToConsider = true;
 
@@ -213,6 +214,30 @@ const PhasePage = ({
         toggle={() => setAddMilestoneModalOpen(!addMilestoneModalOpen)}
         open={addMilestoneModalOpen}
       />
+      {phaseCompleteModalOpen ? (
+        <Modal
+          title="Great work!"
+          open={phaseCompleteModalOpen}
+          toggle={() => setPhaseCompleteModalOpen(!phaseCompleteModalOpen)}
+        >
+          <Card variant="lightened" size="large">
+            <Stack spacing={4} alignItems="center">
+              <Stack direction="row" spacing={3} alignItems="center">
+                <Icon type="flag" variant="primary" size="large" />
+                <Typography variant="bodyLarge" bold highlight>
+                  Phase completed!
+                </Typography>
+              </Stack>
+              <Typography variant="h2" bold capitalize>
+                {phase}
+              </Typography>
+              <Typography variant="bodyLarge" lightened center>
+                You're making great progress!
+              </Typography>
+            </Stack>
+          </Card>
+        </Modal>
+      ) : null}
     </>
   );
 };
@@ -355,18 +380,16 @@ export async function getServerSideProps(context) {
 
   const res = await fetch(apiRoute);
   const data = await res.json();
-  const MilestonesToDo = []
-  const MilestonesUpNext = []
-  const MilestonesDone = []
+  const MilestonesToDo = [];
+  const MilestonesUpNext = [];
+  const MilestonesDone = [];
 
   data.data.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
       MilestonesToDo.push(milestone);
-    }
-    else if (milestone.attributes.status == "up next") {
+    } else if (milestone.attributes.status == "up next") {
       MilestonesUpNext.push(milestone);
-    }
-    else if (milestone.attributes.status == "done") {
+    } else if (milestone.attributes.status == "done") {
       MilestonesDone.push(milestone);
     }
   });
