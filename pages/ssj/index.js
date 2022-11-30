@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import Link from "next/link";
+import Router from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
 
@@ -29,6 +30,33 @@ const SSJ = ({}) => {
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
   const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
+  const [viewWaysToWorkModalOpen, setViewWaysToWorkModalOpen] = useState(false);
+
+  const isFirstTimeUser = false;
+
+  const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
+    useState(isFirstTimeUser);
+  const [userOnboardedPeers, setUserOnboardedPeers] = useState(
+    !isFirstTimeUser
+  );
+  const toggleOnboardingPeers = () => {
+    setViewEtlsModalOpen(true);
+    setUserOnboardedPeers(true);
+  };
+  const [userOnboardedWaysToWork, setUserOnboardedWaysToWork] = useState(
+    !isFirstTimeUser
+  );
+  const toggleOnboardingWaysToWork = () => {
+    setViewWaysToWorkModalOpen(true);
+    setUserOnboardedWaysToWork(true);
+  };
+  const [userOnboardedprogress, setUserOnboardedProgress] = useState(
+    !isFirstTimeUser
+  );
+  const toggleOnboardingProgress = () => {
+    // setUserOnboardedProgress(true);
+    Router.push("/ssj/visioning");
+  };
 
   const [openDate, setOpenDate] = useState("");
   const handleOpenDateChange = (newValue) => {
@@ -146,182 +174,232 @@ const SSJ = ({}) => {
             </Stack>
           </Card>
 
-          <Card variant="lightened" size="large">
-            <Grid
-              container
-              justifyContent="space-between"
-              alignItems="center"
-              spacing={6}
-            >
-              <Grid item>
-                <Stack>
-                  <Typography variant="h3" bold>
-                    There are 22 other Emerging Teacher Leaders
-                  </Typography>
-                  <Typography variant="bodyRegular" lightened>
-                    Get to know a growing number of ETLs, share learnings, and
-                    educate together.
-                  </Typography>
-                </Stack>
-              </Grid>
-              <Grid item>
-                <Stack direction="row" spacing={6}>
-                  <AvatarGroup>
-                    {FakeETLs.slice(0, 4).map((f, i) => (
-                      <Avatar src={f.attributes.profileImage} key={i} />
-                    ))}
-                  </AvatarGroup>
-                  <Button onClick={() => setViewEtlsModalOpen(true)}>
-                    <Typography variant="h4" bold light>
-                      Meet your peers
+          {userOnboardedPeers ? (
+            <Card variant="lightened" size="large">
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+                spacing={6}
+              >
+                <Grid item>
+                  <Stack>
+                    <Typography variant="h3" bold>
+                      There are 22 other Emerging Teacher Leaders
                     </Typography>
-                  </Button>
-                </Stack>
+                    <Typography variant="bodyRegular" lightened>
+                      Get to know a growing number of ETLs, share learnings, and
+                      educate together.
+                    </Typography>
+                  </Stack>
+                </Grid>
+                <Grid item>
+                  <Stack direction="row" spacing={6}>
+                    <AvatarGroup>
+                      {FakeETLs.slice(0, 4).map((f, i) => (
+                        <Avatar src={f.attributes.profileImage} key={i} />
+                      ))}
+                    </AvatarGroup>
+                    <Button onClick={() => setViewEtlsModalOpen(true)}>
+                      <Typography variant="h4" bold light>
+                        Meet your peers
+                      </Typography>
+                    </Button>
+                  </Stack>
+                </Grid>
               </Grid>
-            </Grid>
-          </Card>
+            </Card>
+          ) : (
+            <OnboardingCard
+              icon="message"
+              title="Meet your peers"
+              description="You're not alone! There are more than 20 other Emerging Teacher Leaders (ETLs) currently working on their own journeys."
+              action="Start by taking a peek at who else is here"
+              ctaText="Meet others"
+              img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
+              setUnlocked={toggleOnboardingPeers}
+            />
+          )}
 
-          <Card>
-            <Stack spacing={6}>
-              <Typography variant="h4" bold>
-                Ways to work together
-              </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={4}>
-                  <Card variant="lightened">
-                    <Stack spacing={6}>
-                      <Typography variant="bodyLarge" bold>
-                        With your self
-                      </Typography>
-                      <Stack spacing={3}>
-                        <Card size="small">Check on your growth plan</Card>
-                        <Card size="small">Engage in equity training</Card>
-                        <Card size="small" variant="lightened">
-                          View more
-                        </Card>
-                      </Stack>
-                    </Stack>
-                  </Card>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Card variant="lightened">
-                    <Stack spacing={6}>
-                      <Typography variant="bodyLarge" bold>
-                        With your team
-                      </Typography>
-                      <Stack spacing={3}>
-                        <Card size="small">Check on your growth plan</Card>
-                        <Card size="small">Engage in equity training</Card>
-                        <Card size="small" variant="lightened">
-                          View more
-                        </Card>
-                      </Stack>
-                    </Stack>
-                  </Card>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Card variant="lightened">
-                    <Stack spacing={6}>
-                      <Typography variant="bodyLarge" bold>
-                        With your community
-                      </Typography>
-                      <Stack spacing={3}>
-                        <Card size="small">Check on your growth plan</Card>
-                        <Card size="small">Engage in equity training</Card>
-                        <Card size="small" variant="lightened">
-                          View more
-                        </Card>
-                      </Stack>
-                    </Stack>
-                  </Card>
-                </Grid>
-              </Grid>
-            </Stack>
-          </Card>
-          <Card>
-            <Stack spacing={6}>
-              <Stack direction="row" spacing={6}>
-                <Typography
-                  variant="h4"
-                  bold
-                  hoverable
-                  lightened={!viewPhaseProgress}
-                  onClick={() => setViewPhaseProgress(true)}
-                >
-                  Phases
+          {userOnboardedWaysToWork ? (
+            <Card>
+              <Stack spacing={6}>
+                <Typography variant="h4" bold>
+                  Ways to work together
                 </Typography>
-                <Typography
-                  variant="h4"
-                  bold
-                  hoverable
-                  lightened={viewPhaseProgress}
-                  onClick={() => setViewPhaseProgress(false)}
-                >
-                  Categories
-                </Typography>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={4}>
+                    <Card variant="lightened">
+                      <Stack spacing={6}>
+                        <Typography variant="bodyLarge" bold>
+                          With your self
+                        </Typography>
+                        <Stack spacing={3}>
+                          <Card size="small">Check on your growth plan</Card>
+                          <Card size="small">Engage in equity training</Card>
+                          <Card size="small" variant="lightened">
+                            View more
+                          </Card>
+                        </Stack>
+                      </Stack>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Card variant="lightened">
+                      <Stack spacing={6}>
+                        <Typography variant="bodyLarge" bold>
+                          With your team
+                        </Typography>
+                        <Stack spacing={3}>
+                          <Card size="small">Check on your growth plan</Card>
+                          <Card size="small">Engage in equity training</Card>
+                          <Card size="small" variant="lightened">
+                            View more
+                          </Card>
+                        </Stack>
+                      </Stack>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Card variant="lightened">
+                      <Stack spacing={6}>
+                        <Typography variant="bodyLarge" bold>
+                          With your community
+                        </Typography>
+                        <Stack spacing={3}>
+                          <Card size="small">Check on your growth plan</Card>
+                          <Card size="small">Engage in equity training</Card>
+                          <Card size="small" variant="lightened">
+                            View more
+                          </Card>
+                        </Stack>
+                      </Stack>
+                    </Card>
+                  </Grid>
+                </Grid>
               </Stack>
+            </Card>
+          ) : (
+            <OnboardingCard
+              icon="conversation"
+              title="Ways to work together"
+              description="Access resources and trainings to start improving yourself, working with your team, and engaging your community."
+              action="Start by exploring resources"
+              ctaText="Explore resources"
+              img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
+              setUnlocked={toggleOnboardingWaysToWork}
+            />
+          )}
 
-              {viewPhaseProgress ? (
-                <Grid container spacing={6}>
-                  <Grid item xs={12} sm={4}>
-                    <PhaseProgressCard
-                      phase="Visioning"
-                      link="/ssj/visioning"
-                      isCurrentPhase
-                      processes={[
-                        { id: "1", status: "done" },
-                        { id: "2", status: "to do" },
-                        { id: "3", status: "to do" },
-                      ]}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <PhaseProgressCard
-                      phase="Planning"
-                      link="/ssj/planning"
-                      processes={[
-                        { id: "1", status: "done" },
-                        { id: "2", status: "to do" },
-                      ]}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <PhaseProgressCard
-                      phase="Startup"
-                      link="/ssj/startup"
-                      processes={[
-                        { id: "1", status: "done" },
-                        { id: "2", status: "to do" },
-                        { id: "3", status: "to do" },
-                        { id: "4", status: "to do" },
-                      ]}
-                    />
-                  </Grid>
-                </Grid>
-              ) : (
-                <Grid container spacing={6} alignItems="stretch">
-                  {categories.map((p, i) => (
+          {userOnboardedprogress ? (
+            <Card>
+              <Stack spacing={6}>
+                <Stack direction="row" spacing={6}>
+                  <Typography
+                    variant="h4"
+                    bold
+                    hoverable
+                    lightened={!viewPhaseProgress}
+                    onClick={() => setViewPhaseProgress(true)}
+                  >
+                    Phases
+                  </Typography>
+                  <Typography
+                    variant="h4"
+                    bold
+                    hoverable
+                    lightened={viewPhaseProgress}
+                    onClick={() => setViewPhaseProgress(false)}
+                  >
+                    Categories
+                  </Typography>
+                </Stack>
+
+                {viewPhaseProgress ? (
+                  <Grid container spacing={6}>
                     <Grid item xs={12} sm={4}>
-                      <Link href="/ssj/view-all">
-                        <Card key={i} style={{ height: "100%" }} hoverable>
-                          <Stack spacing={3}>
-                            <Grid container>
-                              <Grid item>
-                                <CategoryChip category={p.title} size="large" />
-                              </Grid>
-                            </Grid>
-                            <ProgressBar processes={p.processes} />
-                          </Stack>
-                        </Card>
-                      </Link>
+                      <PhaseProgressCard
+                        phase="Visioning"
+                        link="/ssj/visioning"
+                        isCurrentPhase
+                        processes={[
+                          { id: "1", status: "done" },
+                          { id: "2", status: "to do" },
+                          { id: "3", status: "to do" },
+                        ]}
+                      />
                     </Grid>
-                  ))}
-                </Grid>
-              )}
-            </Stack>
-          </Card>
+                    <Grid item xs={12} sm={4}>
+                      <PhaseProgressCard
+                        phase="Planning"
+                        link="/ssj/planning"
+                        processes={[
+                          { id: "1", status: "done" },
+                          { id: "2", status: "to do" },
+                        ]}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <PhaseProgressCard
+                        phase="Startup"
+                        link="/ssj/startup"
+                        processes={[
+                          { id: "1", status: "done" },
+                          { id: "2", status: "to do" },
+                          { id: "3", status: "to do" },
+                          { id: "4", status: "to do" },
+                        ]}
+                      />
+                    </Grid>
+                  </Grid>
+                ) : (
+                  <Grid container spacing={6} alignItems="stretch">
+                    {categories.map((p, i) => (
+                      <Grid item xs={12} sm={4}>
+                        <Link href="/ssj/view-all">
+                          <Card key={i} style={{ height: "100%" }} hoverable>
+                            <Stack spacing={3}>
+                              <Grid container>
+                                <Grid item>
+                                  <CategoryChip
+                                    category={p.title}
+                                    size="large"
+                                  />
+                                </Grid>
+                              </Grid>
+                              <ProgressBar processes={p.processes} />
+                            </Stack>
+                          </Card>
+                        </Link>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
+              </Stack>
+            </Card>
+          ) : (
+            <OnboardingCard
+              icon="category"
+              title="Your progress"
+              description="The Wildflower School Startup Journey is organized into 3 phases: Visioning, Planning, and Startup."
+              action='Start viewing whats next in the "Visioning" phase'
+              ctaText="View visioning"
+              img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
+              setUnlocked={toggleOnboardingProgress}
+            />
+          )}
         </Stack>
       </PageContainer>
+
+      <FirstTimeUserModal
+        toggle={() => setFirstTimeUserModalOpen(!firstTimeUserModalOpen)}
+        open={firstTimeUserModalOpen}
+        firstName="Jane"
+      />
+      <ViewResourcesModal
+        toggle={() => setViewWaysToWorkModalOpen(!viewWaysToWorkModalOpen)}
+        open={viewWaysToWorkModalOpen}
+      />
       <AddPartnerModal
         toggle={() => setAddPartnerModalOpen(!addPartnerModalOpen)}
         open={addPartnerModalOpen}
@@ -341,6 +419,64 @@ const SSJ = ({}) => {
 };
 
 export default SSJ;
+
+const OnboardingCard = ({
+  icon,
+  title,
+  description,
+  action,
+  ctaText,
+  img,
+  setUnlocked,
+}) => {
+  const StyledDirections = styled(Box)`
+    background: ${({ theme }) => theme.color.neutral.lightened};
+    padding: ${({ theme }) => theme.util.buffer * 8}px;
+  `;
+  const StyledCTAImage = styled(Box)`
+    background-image: ${(props) => props.src && `url(${props.src})`};
+    background-size: cover;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+
+  return (
+    <Card noPadding variant="primaryOutlined">
+      <Grid container>
+        <Grid item xs={12} sm={6}>
+          <StyledDirections>
+            <Stack spacing={3}>
+              <Icon type={icon} variant="primary" />
+              <Typography variant="bodyLarge" bold>
+                {title}
+              </Typography>
+              <Typography variant="bodyRegular" lightened>
+                {description}
+              </Typography>
+              <Stack direction="row" spacing={3} alignItems="center">
+                <Icon type="rightArrowCircle" variant="primary" />
+                <Typography variant="bodyRegular" highlight>
+                  {action}
+                </Typography>
+              </Stack>
+            </Stack>
+          </StyledDirections>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <StyledCTAImage src={img}>
+            <Button onClick={setUnlocked}>
+              <Typography variant="bodyRegular" bold light>
+                {ctaText}
+              </Typography>
+            </Button>
+          </StyledCTAImage>
+        </Grid>
+      </Grid>
+    </Card>
+  );
+};
 
 const ProgressBar = ({ processes }) => {
   const numberOfProcesses = processes.length;
@@ -503,6 +639,71 @@ const ViewEtlsModal = ({ toggle, open }) => {
           </Stack>
         </Card>
         <ETLs />
+      </Stack>
+    </Modal>
+  );
+};
+const ViewResourcesModal = ({ toggle, open }) => {
+  return (
+    <Modal title="Ways to work with others" toggle={toggle} open={open}>
+      <Stack spacing={3}>
+        <Card variant="lightened">
+          <Typography variant="bodyLarge">Content</Typography>
+        </Card>
+        <Card variant="lightened">
+          <Typography variant="bodyLarge">Content</Typography>
+        </Card>
+        <Card variant="lightened">
+          <Typography variant="bodyLarge">Content</Typography>
+        </Card>
+      </Stack>
+    </Modal>
+  );
+};
+const FirstTimeUserModal = ({ toggle, open, firstName }) => {
+  return (
+    <Modal
+      title="Welcome to your School Startup Journey dashboard!"
+      toggle={toggle}
+      open={open}
+    >
+      <Stack spacing={3}>
+        <Card variant="primaryLightened" size="small">
+          <Stack direction="row" spacing={3}>
+            <div>
+              <Icon type="star" variant="primary" />
+            </div>
+
+            <Stack spacing={3}>
+              <Typography variant="bodyRegular">
+                {firstName}, welcome to the home base for your journey into
+                becoming a montessori educator! Again, we're so excited you're
+                here. This is Wildflower Platform, a tool we created to
+                centralize all of the support and resources we have to offer,
+                and to make it easier for you to make progress toward your
+                goals.
+              </Typography>
+              <Typography variant="bodyRegular">
+                Poke around! I'd start by completing the actions on your
+                dashboard.
+              </Typography>
+            </Stack>
+          </Stack>
+        </Card>
+        <Stack direction="row" spacing={3} alignItems="center">
+          <Avatar
+            size="sm"
+            src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
+          />
+          <Stack>
+            <Typography variant="bodySmall" bold>
+              Mary Truman
+            </Typography>
+            <Typography variant="bodySmall" lightened>
+              Operations Guide
+            </Typography>
+          </Stack>
+        </Stack>
       </Stack>
     </Modal>
   );

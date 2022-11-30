@@ -28,6 +28,7 @@ import {
   PieChart,
   Zap,
   Star,
+  Message,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -143,6 +144,7 @@ export default function Icon({ ...props }) {
     extension: <Extension />,
     palette: <Palette />,
     star: <Star />,
+    message: <Message />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
