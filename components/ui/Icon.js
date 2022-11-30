@@ -15,6 +15,8 @@ import {
   BuildingHouse,
   Extension,
   Palette,
+  Pause,
+  Play,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -145,6 +147,8 @@ export default function Icon({ ...props }) {
     palette: <Palette />,
     star: <Star />,
     message: <Message />,
+    pause: <Pause />,
+    play: <Play />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
