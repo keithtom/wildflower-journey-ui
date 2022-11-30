@@ -1,4 +1,4 @@
-import {useRouter} from 'next/router'
+import { useRouter } from 'next/router'
 import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
@@ -51,7 +51,8 @@ const TaskPage = ({
   const isUpNext = false;
 
   const router = useRouter()
-  const { phase } = router.query
+  const { phase, task } = router.query
+  const taskId = task;
 
   return (
     <PageContainer>
@@ -93,6 +94,7 @@ const TaskPage = ({
           </Grid>
           <StyledTaskHeader downplayed={isUpNext}>
             <Task
+              taskId={taskId}
               notNavigable
               title={TaskTitle}
               isDecision={isDecision}
