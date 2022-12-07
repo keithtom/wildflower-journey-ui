@@ -47,6 +47,8 @@ const AddProfileInfo = ({}) => {
 
   // console.log({ profilePicture });
 
+  const isExistingTL = false;
+
   return (
     <>
       <Header user={false} />
@@ -62,29 +64,33 @@ const AddProfileInfo = ({}) => {
                     </Typography>
                   </Grid>
                 </Grid>
-                <Card variant="primaryLightened" size="small">
-                  <Stack direction="row" spacing={3}>
-                    <Icon type="star" variant="primary" />
-                    <Typography variant="bodySmall">
-                      This helps other members of the Wildflower Schools network
-                      better connect with you!
-                    </Typography>
-                  </Stack>
-                </Card>
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar
-                    size="sm"
-                    src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
-                  />
-                  <Stack>
-                    <Typography variant="bodySmall" bold>
-                      Mary Truman
-                    </Typography>
-                    <Typography variant="bodySmall" lightened>
-                      Operations Guide
-                    </Typography>
-                  </Stack>
-                </Stack>
+                {isExistingTL ? null : (
+                  <>
+                    <Card variant="primaryLightened" size="small">
+                      <Stack direction="row" spacing={3}>
+                        <Icon type="star" variant="primary" />
+                        <Typography variant="bodySmall">
+                          This helps other members of the Wildflower Schools
+                          network better connect with you!
+                        </Typography>
+                      </Stack>
+                    </Card>
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Avatar
+                        size="sm"
+                        src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
+                      />
+                      <Stack>
+                        <Typography variant="bodySmall" bold>
+                          Mary Truman
+                        </Typography>
+                        <Typography variant="bodySmall" lightened>
+                          Operations Guide
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </>
+                )}
 
                 <Divider />
 
@@ -106,16 +112,13 @@ const AddProfileInfo = ({}) => {
                 <Grid container spacing={3} justifyContent="space-between">
                   <Grid item xs={6}>
                     <Link href="/welcome/confirm-demographic-info">
-                      <Button
-                        full
-                        disabled={!profilePicture}
-                        variant="secondary"
-                      >
+                      <Button full variant="secondary">
                         <Typography variant="bodyRegular">Back</Typography>
                       </Button>
                     </Link>
                   </Grid>
                   <Grid item xs={6}>
+                    {/* TODO: Change the destination depending on existing vs new TL */}
                     <Link href="/ssj">
                       <Button full disabled={!profilePicture}>
                         <Typography variant="bodyRegular" light>

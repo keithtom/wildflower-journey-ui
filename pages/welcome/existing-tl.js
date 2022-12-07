@@ -30,27 +30,12 @@ const StyledHeroText = styled(Box)`
   position: absolute;
   padding: ${({ theme }) => theme.util.buffer * 24}px;
 `;
-const StyledGreetingAvatar = styled(Box)`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  position: relative;
-`;
-const StyledShiftedAvatar = styled(Box)`
-  position: absolute;
-  top: -${({ theme }) => theme.util.buffer * 8}px;
-`;
-const StyledMessage = styled(Card)`
-  margin-top: 130px;
-  &:before {
-  }
-`;
 
-const YourInvitation = ({}) => {
-  const user = false;
+const ExistingTL = ({}) => {
+  const loggedInUser = false;
   return (
     <>
-      <Header user={user} />
+      <Header user={loggedInUser} />
       <PageContent>
         <Grid container alignItems="center" justifyContent="center">
           <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -73,40 +58,23 @@ const YourInvitation = ({}) => {
                       <Icon type="palette" variant="light" />
                     </Stack>
                     <Typography variant="h4" bold light center>
-                      You're invited to join Wildflower Schools!
+                      It's time to join the Wildflower Platform!
                     </Typography>
                   </Stack>
                 </StyledHeroText>
               </StyledInviteHero>
-              <StyledGreetingAvatar>
-                <StyledShiftedAvatar>
-                  <Stack spacing={3} alignItems="center">
-                    <Avatar
-                      sx={{ border: "2px solid white" }}
-                      size="lg"
-                      src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
-                    />
-                    <Stack alignItems="center">
-                      <Typography variant="bodyRegular" bold>
-                        Mary Truman
-                      </Typography>
-                      <Typography variant="bodyRegular" lightened>
-                        Operations Guide
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </StyledShiftedAvatar>
-              </StyledGreetingAvatar>
+
               <Card noBorder>
-                <Stack spacing={3}>
-                  <StyledMessage variant="primaryLightened" size="small">
-                    <Typography variant="bodySmall">
-                      Hi Jane! We are so excited for you to join our community
-                      and start accessing support and resources along the path
-                      to opening your own Montessori School! Let's get started
-                      by confirming a few details.
-                    </Typography>
-                  </StyledMessage>
+                <Stack spacing={6}>
+                  <Typography variant="h3" bold>
+                    Welcome in, {user.firstName}
+                  </Typography>
+                  <Typography variant="bodyRegular">
+                    We've been hard at work building tools for you. Get ready
+                    for more support and connection you on your teaching
+                    journey!
+                  </Typography>
+
                   <Link href="/welcome/confirm-your-details">
                     <Button full>
                       <Typography variant="bodyRegular" light>
@@ -124,4 +92,12 @@ const YourInvitation = ({}) => {
   );
 };
 
-export default YourInvitation;
+export default ExistingTL;
+
+const user = {
+  firstName: "Jane",
+  lastName: "Smith",
+  city: "Boston",
+  state: "Massachusetts",
+  email: "jane.smith@gmail.com",
+};
