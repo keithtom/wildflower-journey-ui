@@ -40,6 +40,8 @@ const ConfirmYourDetails = ({}) => {
   });
   const onSubmit = (data) => console.log(data);
 
+  const isExistingTL = false;
+
   return (
     <>
       <Header user={false} />
@@ -55,30 +57,34 @@ const ConfirmYourDetails = ({}) => {
                     </Typography>
                   </Grid>
                 </Grid>
-                <Card variant="primaryLightened" size="small">
-                  <Stack direction="row" spacing={3}>
-                    <Icon type="star" variant="primary" />
-                    <Typography variant="bodySmall">
-                      This helps us understand and notify you of what support
-                      networks you can tap into and what resources are available
-                      to you.
-                    </Typography>
-                  </Stack>
-                </Card>
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar
-                    size="sm"
-                    src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
-                  />
-                  <Stack>
-                    <Typography variant="bodySmall" bold>
-                      Mary Truman
-                    </Typography>
-                    <Typography variant="bodySmall" lightened>
-                      Operations Guide
-                    </Typography>
-                  </Stack>
-                </Stack>
+                {isExistingTL ? null : (
+                  <>
+                    <Card variant="primaryLightened" size="small">
+                      <Stack direction="row" spacing={3}>
+                        <Icon type="star" variant="primary" />
+                        <Typography variant="bodySmall">
+                          This helps us understand and notify you of what
+                          support networks you can tap into and what resources
+                          are available to you.
+                        </Typography>
+                      </Stack>
+                    </Card>
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Avatar
+                        size="sm"
+                        src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
+                      />
+                      <Stack>
+                        <Typography variant="bodySmall" bold>
+                          Mary Truman
+                        </Typography>
+                        <Typography variant="bodySmall" lightened>
+                          Operations Guide
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </>
+                )}
                 <Card
                   variant={userIsEditing ? null : "lightened"}
                   sx={{ width: "100%" }}
