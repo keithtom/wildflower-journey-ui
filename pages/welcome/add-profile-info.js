@@ -106,11 +106,7 @@ const AddProfileInfo = ({}) => {
                 <Grid container spacing={3} justifyContent="space-between">
                   <Grid item xs={6}>
                     <Link href="/welcome/confirm-demographic-info">
-                      <Button
-                        full
-                        disabled={!profilePicture}
-                        variant="secondary"
-                      >
+                      <Button full variant="secondary">
                         <Typography variant="bodyRegular">Back</Typography>
                       </Button>
                     </Link>
