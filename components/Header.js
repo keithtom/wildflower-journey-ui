@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
+import Router from "next/router";
 
 import { theme } from "../styles/theme";
 import {
@@ -107,6 +108,11 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
     }
   `;
 
+  const handleLogOut = () => {
+    console.log("logging out");
+    Router.push("/logged-out");
+  };
+
   return (
     <>
       <Avatar
@@ -136,7 +142,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
         <NavLink secondary to="/user-profile" label="Your profile" />
         <NavLink secondary to="/school-profile" label="Your school" />
         <NavLink secondary to="/settings" label="Settings" />
-        <StyledOption onClick={undefined} hoverable>
+        <StyledOption onClick={handleLogOut} hoverable>
           <Typography lightened>Sign out</Typography>
         </StyledOption>
       </StyledUserMenu>
