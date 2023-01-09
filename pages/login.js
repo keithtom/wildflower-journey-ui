@@ -25,9 +25,22 @@ const Login = ({}) => {
     handleSubmit,
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    axios.post('http://localhost:3001/login', { // TODO: set base url in some variable that switches out based on env
+      user: {
+        email: data.email,
+        password: data.password,
+      },
+    }).then(function (response) {
+      axios.defaults.headers.common['Authorization'] = response.headers.authorization 
+      // TODO: research if saving the JWT here is secure. can someone easily access this JWT?
+      // TODO: update context state to be logged in
+    }).catch(function (error) {
+      // handle error
+      console.log(error);
+    })
+  }
 
-  // console.log({ errors });
   const googleLogo = "/assets/images/google-g-logo.svg";
 
   return (
