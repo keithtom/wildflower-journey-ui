@@ -3,6 +3,7 @@ import { useMediaQuery } from "react-responsive";
 import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
+import axios from "axios";
 
 import { theme } from "../styles/theme";
 import {
@@ -110,7 +111,15 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
 
   const handleLogOut = () => {
     console.log("logging out");
-    Router.push("/logged-out");
+    console.dir(axios.defaults.headers.common);
+    axios.delete('http://localhost:3001/logout', { // TODO: set base url in some variable that switches out based on env
+      }).then((res) => {
+        // TODO: update logged out state
+          console.log("successfully logged out");
+          axios.defaults.headers.common['Authorization'] = null;
+          console.dir(axios.defaults.headers.common);
+          Router.push("/logged-out");
+      }).catch((err) => console.error(err));
   };
 
   return (

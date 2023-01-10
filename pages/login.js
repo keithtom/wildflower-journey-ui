@@ -14,6 +14,8 @@ import {
 } from "@ui";
 import Header from "@components/Header";
 
+let user = false;
+
 const PageContent = styled(Box)`
   flex-grow: 1;
   margin-top: ${({ theme }) => theme.util.appBarHeight}px;
@@ -32,7 +34,10 @@ const Login = ({}) => {
         password: data.password,
       },
     }).then(function (response) {
+      console.log("logged in");
+      console.log(response.headers.authorization);
       axios.defaults.headers.common['Authorization'] = response.headers.authorization 
+      user = true;
       // TODO: research if saving the JWT here is secure. can someone easily access this JWT?
       // TODO: update context state to be logged in
     }).catch(function (error) {
@@ -45,7 +50,7 @@ const Login = ({}) => {
 
   return (
     <>
-      <Header user={false} />
+      <Header user={user} />
       <PageContent>
         <Grid container alignItems="center" justifyContent="center">
           <Grid item xs={12} sm={6} md={4} lg={3}>
