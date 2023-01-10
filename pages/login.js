@@ -14,7 +14,6 @@ import {
 } from "@ui";
 import Header from "@components/Header";
 
-let user = false;
 
 const PageContent = styled(Box)`
   flex-grow: 1;
@@ -28,18 +27,18 @@ const Login = ({}) => {
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm();
   const onSubmit = (data) => {
-    axios.post('http://localhost:3001/login', { // TODO: set base url in some variable that switches out based on env
-      user: {
-        email: data.email,
-        password: data.password,
+    axios.post(
+      'http://localhost:3001/login', // TODO: set base url in some variable that switches out based on env
+      {
+        user:
+        {
+          email: data.email,
+          password: data.password,
+        }
       },
-    }).then(function (response) {
+      { withCredentials: true }
+    ).then(function (response) {
       console.log("logged in");
-      console.log(response.headers.authorization);
-      axios.defaults.headers.common['Authorization'] = response.headers.authorization 
-      user = true;
-      // TODO: research if saving the JWT here is secure. can someone easily access this JWT?
-      // TODO: update context state to be logged in
     }).catch(function (error) {
       // handle error
       console.log(error);
@@ -50,7 +49,7 @@ const Login = ({}) => {
 
   return (
     <>
-      <Header user={user} />
+      <Header user={false} />
       <PageContent>
         <Grid container alignItems="center" justifyContent="center">
           <Grid item xs={12} sm={6} md={4} lg={3}>

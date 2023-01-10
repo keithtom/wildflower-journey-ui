@@ -112,12 +112,10 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
   const handleLogOut = () => {
     console.log("logging out");
     console.dir(axios.defaults.headers.common);
-    axios.delete('http://localhost:3001/logout', { // TODO: set base url in some variable that switches out based on env
+    axios.delete('http://localhost:3001/logout', { withCredentials: true  // TODO: set base url in some variable that switches out based on env
       }).then((res) => {
         // TODO: update logged out state
           console.log("successfully logged out");
-          axios.defaults.headers.common['Authorization'] = null;
-          console.dir(axios.defaults.headers.common);
           Router.push("/logged-out");
       }).catch((err) => console.error(err));
   };
