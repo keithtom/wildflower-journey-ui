@@ -15,6 +15,9 @@ import {
 import Header from "@components/Header";
 
 
+// const loginRoute = `http://localhost:3001/login`;
+const loginRoute = `https://api.wildflowerschools.org/login`;
+
 const PageContent = styled(Box)`
   flex-grow: 1;
   margin-top: ${({ theme }) => theme.util.appBarHeight}px;
@@ -28,7 +31,7 @@ const Login = ({}) => {
   } = useForm();
   const onSubmit = (data) => {
     axios.post(
-      'http://localhost:3001/login', // TODO: set base url in some variable that switches out based on env
+      loginRoute, // TODO: set base url in some variable that switches out based on env
       {
         user:
         {
