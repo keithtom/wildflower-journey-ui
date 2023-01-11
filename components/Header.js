@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
+import Router from "next/router";
+import axios from "axios";
 
 import { theme } from "../styles/theme";
 import {
@@ -13,6 +15,9 @@ import {
   Icon,
   NavLink,
 } from "./ui/index";
+
+// const logoutRoute = `http://localhost:3001/logout`;
+const logoutRoute = `https://api.wildflowerschools.org/logout`;
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -107,6 +112,17 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
     }
   `;
 
+  const handleLogOut = () => {
+    console.log("logging out");
+    console.dir(axios.defaults.headers.common);
+    axios.delete(logoutRoute, { withCredentials: true  // TODO: set base url in some variable that switches out based on env
+      }).then((res) => {
+        // TODO: update logged out state
+          console.log("successfully logged out");
+          Router.push("/logged-out");
+      }).catch((err) => console.error(err));
+  };
+
   return (
     <>
       <Avatar
@@ -136,7 +152,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
         <NavLink secondary to="/user-profile" label="Your profile" />
         <NavLink secondary to="/school-profile" label="Your school" />
         <NavLink secondary to="/settings" label="Settings" />
-        <StyledOption onClick={undefined} hoverable>
+        <StyledOption onClick={handleLogOut} hoverable>
           <Typography lightened>Sign out</Typography>
         </StyledOption>
       </StyledUserMenu>

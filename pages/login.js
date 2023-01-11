@@ -14,6 +14,10 @@ import {
 } from "@ui";
 import Header from "@components/Header";
 
+
+// const loginRoute = `http://localhost:3001/login`;
+const loginRoute = `https://api.wildflowerschools.org/login`;
+
 const PageContent = styled(Box)`
   flex-grow: 1;
   margin-top: ${({ theme }) => theme.util.appBarHeight}px;
@@ -25,9 +29,25 @@ const Login = ({}) => {
     handleSubmit,
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    axios.post(
+      loginRoute, // TODO: set base url in some variable that switches out based on env
+      {
+        user:
+        {
+          email: data.email,
+          password: data.password,
+        }
+      },
+      { withCredentials: true }
+    ).then(function (response) {
+      console.log("logged in");
+    }).catch(function (error) {
+      // handle error
+      console.log(error);
+    })
+  }
 
-  // console.log({ errors });
   const googleLogo = "/assets/images/google-g-logo.svg";
 
   return (
