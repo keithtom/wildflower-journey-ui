@@ -123,6 +123,13 @@ const CustomTypography = styled(MaterialTypography)`
         cursor: pointer;
       }
     `}
+
+  /* struck */
+  ${(props) =>
+    props.struck &&
+    css`
+      text-decoration: line-through;
+    `}
 `;
 
 const Typography = ({ children, ...props }) => {

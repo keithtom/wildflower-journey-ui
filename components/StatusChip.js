@@ -10,16 +10,16 @@ const StatusChip = ({ status, withIcon, ...props }) => {
               type={
                 status === "done"
                   ? "checkCircle"
-                  : status === "upnext"
+                  : status === "up next"
                   ? "rightArrowCircle"
-                  : status === "todo" && "circle"
+                  : status === "to do" && "circle"
               }
               variant={
                 status === "done"
                   ? "success"
-                  : status === "upnext"
+                  : status === "up next"
                   ? "lightened"
-                  : status === "todo" && "primary"
+                  : status === "to do" && "primary"
               }
               size="small"
             />

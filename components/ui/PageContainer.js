@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
+
+import { user } from "../../lib/utils/fake-data";
+
 import { Box, Grid, Card, Stack, Icon, Typography } from "./index";
 import Nav from "../Nav";
 import Header from "../Header";
+import InfoDrawer from "../InfoDrawer";
 
 // NOTE: This is not included in storybook
 
@@ -17,6 +22,9 @@ const PageContent = styled(Box)`
 const PageContainer = ({ children }) => {
   //TODO: Get this data from the backend
   const SSJAbandonProcessStarted = false;
+
+  const [navOpen, setNavOpen] = useState(false);
+  const toggleNavOpen = () => setNavOpen(!navOpen);
 
   return (
     <>
@@ -52,7 +60,8 @@ const PageContainer = ({ children }) => {
           </>
         ) : (
           <>
-            <Nav />
+            <Header toggleNavOpen={toggleNavOpen} user={user} />
+            <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
             <PageContent>{children}</PageContent>
           </>
         )}

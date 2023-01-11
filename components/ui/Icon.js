@@ -18,6 +18,7 @@ import {
   Pause,
   Play,
   WindowClose,
+  Glasses,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -53,6 +54,14 @@ const StyledIcon = styled("span")`
     css`
       width: ${props.theme.util.buffer * 4}px;
       height: ${props.theme.util.buffer * 4}px;
+    `}
+
+  /* Medium */
+  ${(props) =>
+    props.size === "medium" &&
+    css`
+      width: ${props.theme.util.buffer * 6}px;
+      height: ${props.theme.util.buffer * 6}px;
     `}
 
   /* Large */
@@ -151,6 +160,7 @@ export default function Icon({ ...props }) {
     pause: <Pause />,
     play: <Play />,
     windowClose: <WindowClose />,
+    glasses: <Glasses />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

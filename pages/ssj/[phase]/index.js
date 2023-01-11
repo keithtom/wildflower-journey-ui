@@ -17,6 +17,7 @@ import {
   Radio,
   Button,
   Divider,
+  Link,
 } from "@ui";
 import Milestone from "../../../components/Milestone";
 
@@ -36,13 +37,12 @@ const PhasePage = ({
 
   const router = useRouter();
   const { phase } = router.query;
-  // console.log({ data });
 
   return (
     <>
       <PageContainer>
         <Stack spacing={12}>
-          <Typography variant="h3" bold capitalize>
+          <Typography variant="h2" bold capitalize>
             {phase}
           </Typography>
 
@@ -84,9 +84,10 @@ const PhasePage = ({
                         key={i}
                         title={m.attributes.title}
                         effort={m.attributes.effort}
-                        category={m.attributes.category}
+                        categories={m.attributes.categories}
                         assignee={m.relationships.assignee.data}
                         status={m.attributes.status}
+                        stepCount={m.relationships.steps.data.length}
                       />
                     ))}
                   </Stack>
