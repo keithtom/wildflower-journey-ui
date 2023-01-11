@@ -28,7 +28,7 @@ const Milestone = ({
 
   return (
     <>
-      <Link href={link ? link : null}>
+      <Link href={link && link}>
         <Card variant="lightened" hoverable size="small">
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
