@@ -1,70 +1,106 @@
-import { Grid, Card, Typography, Stack, Icon, Link, Avatar } from "./ui";
+import { useState } from "react";
+
+import {
+  Grid,
+  Card,
+  Typography,
+  Stack,
+  Icon,
+  IconButton,
+  Link,
+  Avatar,
+} from "./ui";
 import CategoryChip from "./CategoryChip";
 import EffortChip from "./EffortChip";
 import PhaseChip from "./PhaseChip";
+import InfoDrawer from "./InfoDrawer";
 
 const Milestone = ({
   link,
   title,
   effort,
-  category,
+  categories,
   phase,
-  assignee,
   status,
+  stepCount,
 }) => {
-  return (
-    <Link href={link ? link : "/"}>
-      <Card variant="lightened" hoverable>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Stack direction="row" spacing={6} alignItems="center">
-              {status === "done" && (
-                <Icon type="checkCircle" variant="success" />
-              )}
-              {status === "up next" && (
-                <Icon type="rightArrowCircle" variant="lightened" />
-              )}
-              {status === "to do" && <Icon type="circle" variant="primary" />}
-              <Typography
-                variant="bodyLarge"
-                bold
-                lightened={status === "up next"}
-              >
-                {title}
-              </Typography>
-            </Stack>
-          </Grid>
+  const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
 
-          <Grid item>
-            <Stack direction="row" spacing={6} alignItems="center">
+  return (
+    <>
+      <Link href={link ? link : null}>
+        <Card variant="lightened" hoverable size="small">
+          <Grid container alignItems="center" justifyContent="space-between">
+            <Grid item>
               <Stack direction="row" spacing={3} alignItems="center">
-                {effort && (
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <EffortChip size="small" effort={effort} withIcon />
-                  </Stack>
+                {status === "done" && (
+                  <Icon type="checkCircle" variant="success" />
                 )}
-                {phase && (
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <PhaseChip size="small" phase={phase} withIcon />
-                  </Stack>
+                {status === "up next" && (
+                  <Icon type="rightArrowCircle" variant="lightened" />
                 )}
-                {category && (
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <CategoryChip size="small" category={category} withIcon />
-                  </Stack>
-                )}
-                {assignee && (
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar size="mini" />
-                  </Stack>
-                )}
+                {status === "to do" && <Icon type="circle" variant="primary" />}
+                <Typography
+                  variant="bodyLarge"
+                  bold
+                  lightened={status === "up next"}
+                >
+                  {title}
+                </Typography>
               </Stack>
-              <Icon type="chevronRight" />
-            </Stack>
+            </Grid>
+
+            <Grid item>
+              <Stack direction="row" spacing={6} alignItems="center">
+                <Stack direction="row" spacing={3} alignItems="center">
+                  {effort && (
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <EffortChip size="small" effort={effort} withIcon />
+                    </Stack>
+                  )}
+                  {phase && (
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <PhaseChip size="small" phase={phase} withIcon />
+                    </Stack>
+                  )}
+                  {categories && (
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Stack direction="row" spacing={2}>
+                        {categories.map((m, i) => (
+                          <CategoryChip
+                            category={m}
+                            size="small"
+                            withIcon
+                            key={i}
+                          />
+                        ))}
+                      </Stack>
+                    </Stack>
+                  )}
+                  <IconButton onMouseDown={() => setInfoDrawerOpen(true)}>
+                    <Icon type="dotsVertical" variant="lightened" />
+                  </IconButton>
+                </Stack>
+              </Stack>
+            </Grid>
           </Grid>
-        </Grid>
-      </Card>
-    </Link>
+        </Card>
+      </Link>
+
+      <InfoDrawer
+        toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
+        milestone={{
+          title: title,
+          effort: effort,
+          status: status,
+          taskCount: stepCount,
+          link: link,
+        }}
+        categories={categories}
+        about="About the milestone"
+        open={infoDrawerOpen}
+      />
+    </>
   );
 };
 

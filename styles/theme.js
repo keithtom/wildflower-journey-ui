@@ -14,6 +14,7 @@ export const theme = createTheme({
     borderWidth: borderWidth,
     drawerWidth: 280,
     appBarHeight: 64,
+    infoDrawerWidth: 480,
   },
   radius: {
     sm: 4,
@@ -217,7 +218,6 @@ export const theme = createTheme({
       },
       styleOverrides: {
         root: {
-          marginTop: "8px",
           border: `${borderWidth} solid ${borderColor}`,
         },
       },

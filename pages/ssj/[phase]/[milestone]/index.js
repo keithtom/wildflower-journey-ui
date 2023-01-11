@@ -61,12 +61,17 @@ const MilestonePage = ({
     setCompleteModalOpen(true);
     //send data to backend
   };
+  const handleSaveEditedMilestone = () => {
+    //updateMilestone
+    setUserIsEditing(false);
+  };
 
   const router = useRouter();
   const { phase } = router.query;
 
   // console.log("Tasks", MilestoneTasks);
-  console.log("Milestone Relationships", MilestoneRelationships);
+  // console.log("MilestoneAttributes", MilestoneAttributes);
+  // console.log("Milestone Relationships", MilestoneRelationships);
 
   return (
     <PageContainer>
@@ -92,7 +97,7 @@ const MilestonePage = ({
                   >
                     <Typography variant="bodyRegular">Cancel</Typography>
                   </Button>
-                  <Button variant="primary">
+                  <Button variant="primary" onClick={handleSaveEditedMilestone}>
                     <Typography variant="bodyRegular">Save</Typography>
                   </Button>
                 </Stack>
@@ -139,7 +144,7 @@ const MilestonePage = ({
             </Card>
           )}
           <StyledMilestoneHeader spacing={6} downplayed={isUpNext}>
-            <Typography variant="h3" bold capitalize>
+            <Typography variant="h2" bold capitalize>
               {MilestoneTitle}
             </Typography>
             <Stack direction="row" spacing={6} alignItems="center">
@@ -155,6 +160,23 @@ const MilestonePage = ({
                   />
                 </Stack>
               ) : null}
+              {MilestoneAttributes.categories ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    CATEGORY
+                  </Typography>
+                  <Stack direction="row" spacing={2}>
+                    {MilestoneAttributes.categories.map((m, i) => (
+                      <CategoryChip
+                        category={m}
+                        size="small"
+                        withIcon
+                        key={i}
+                      />
+                    ))}
+                  </Stack>
+                </Stack>
+              ) : null}
               {MilestoneAttributes.effort ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
@@ -165,34 +187,6 @@ const MilestonePage = ({
                     size="small"
                     withIcon
                   />
-                </Stack>
-              ) : null}
-              {MilestoneAttributes.category ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    CATEGORY
-                  </Typography>
-                  <CategoryChip
-                    category={MilestoneAttributes.category}
-                    size="small"
-                    withIcon
-                  />
-                </Stack>
-              ) : null}
-              {MilestoneRelationships.assignee.data ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    ASSIGNEE
-                  </Typography>
-                  <Avatar size="mini" />
-                </Stack>
-              ) : null}
-              {MilestoneAttributes.author ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    AUTHOR
-                  </Typography>
-                  <Avatar size="mini" />
                 </Stack>
               ) : null}
             </Stack>
@@ -218,6 +212,8 @@ const MilestonePage = ({
                   isLast={i + 1 === FakeMilestoneTasks.length}
                   isComplete={t.attributes.completed === true}
                   handleCompleteMilestone={handleCompleteMilestone}
+                  categories={MilestoneAttributes.categories}
+                  assignee={t.relationships.assignee}
                 />
               ))
             ) : (
@@ -379,15 +375,17 @@ const EditableTaskList = ({ tasks }) => {
   };
   return (
     <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
-      {taskList &&
-        taskList.map((t, i) => (
-          <Draggable key={i}>
-            <EditableTaskItem
-              title={t.title}
-              isDraggable={!t.isSensibleDefault}
-            />
-          </Draggable>
-        ))}
+      <Stack spacing={3}>
+        {taskList &&
+          taskList.map((t, i) => (
+            <Draggable key={i}>
+              <EditableTaskItem
+                title={t.title}
+                isDraggable={!t.isSensibleDefault}
+              />
+            </Draggable>
+          ))}
+      </Stack>
     </Container>
   );
 };

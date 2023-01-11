@@ -143,7 +143,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "left",
+          horizontal: "right",
         }}
       >
         <StyledOption>

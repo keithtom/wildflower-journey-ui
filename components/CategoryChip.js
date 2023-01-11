@@ -9,7 +9,8 @@ const CategoryChip = ({ category, withIcon, ...props }) => {
     "Human Resources": theme.color.highlights.green,
     "Community & Family Engagement": theme.color.highlights.blue,
     "Classroom & Program Practices": theme.color.highlights.purple,
-    "Album Advice & Affiliation": theme.color.highlights.pink,
+    Albums: theme.color.highlights.pink,
+    "Advice & Affiliation": theme.color.highlights.brown,
     "WF Community & Culture": theme.color.highlights.gray,
   };
 
