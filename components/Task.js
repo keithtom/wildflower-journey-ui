@@ -100,7 +100,7 @@ const Task = ({
           </Grid>
           <Grid item>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar size="mini" src={undefined} />
+              <Avatar size="mini" />
             </Stack>
           </Grid>
         </Grid>

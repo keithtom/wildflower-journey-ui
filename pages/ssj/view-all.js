@@ -98,6 +98,7 @@ const DiscoveryPage = ({}) => {
                 <Stack spacing={3}>
                   {a.milestones.map((m, i) => (
                     <Milestone
+                      link={null}
                       key={i}
                       title={m.title}
                       effort={m.effort}

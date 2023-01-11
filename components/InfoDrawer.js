@@ -85,7 +85,7 @@ const InfoDrawer = ({
                     <Typography variant="bodyMini" lightened bold>
                       ASSIGNEE
                     </Typography>
-                    <Avatar size="mini" src={undefined} />
+                    <Avatar size="mini" />
                   </Stack>
                 )}
                 {milestone && milestone.status && (

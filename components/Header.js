@@ -88,7 +88,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
   };
 
   const open = Boolean(profileNavOpen);
-  const id = open ? "profile-nav" : undefined;
+  const id = open ? "profile-nav" : null;
 
   const StyledOption = styled(ListItem)`
     border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
@@ -115,12 +115,16 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
   const handleLogOut = () => {
     console.log("logging out");
     console.dir(axios.defaults.headers.common);
-    axios.delete(logoutRoute, { withCredentials: true  // TODO: set base url in some variable that switches out based on env
-      }).then((res) => {
+    axios
+      .delete(logoutRoute, {
+        withCredentials: true, // TODO: set base url in some variable that switches out based on env
+      })
+      .then((res) => {
         // TODO: update logged out state
-          console.log("successfully logged out");
-          Router.push("/logged-out");
-      }).catch((err) => console.error(err));
+        console.log("successfully logged out");
+        Router.push("/logged-out");
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
