@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
+import { FormControlLabel, RadioGroup } from "@mui/material";
 
 import {
   Card,
@@ -13,6 +15,7 @@ import {
   Button,
   Avatar,
   Link,
+  Radio,
 } from "./ui/index";
 import EffortChip from "./EffortChip";
 import CategoryChip from "./CategoryChip";
@@ -51,6 +54,19 @@ const InfoDrawer = ({
     console.log("marking the task incomplete");
   };
 
+  const [userIsUpdatingDecision, setUserIsUpdatingDecision] = useState(false);
+  const [decisionOption, setDecisionOption] = useState();
+  const handleDecisionOptionChange = (e) => {
+    setDecisionOption(e.target.value);
+  };
+  const handleMakeDecision = () => {
+    setUserIsUpdatingDecision(false);
+    console.log("made a decision!");
+    //send decision to backend
+  };
+  const notDecided = !decisionOption;
+  const isDecided = userIsUpdatingDecision ? false : true;
+
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
       <Stack
@@ -67,7 +83,16 @@ const InfoDrawer = ({
                 alignItems="center"
               >
                 <Grid item>
-                  <Chip label={milestone ? "Milestone" : "Task"} size="small" />
+                  <Chip
+                    label={
+                      milestone
+                        ? "Milestone"
+                        : task.isDecision
+                        ? "Decision"
+                        : "Task"
+                    }
+                    size="small"
+                  />
                 </Grid>
                 <Grid item>
                   <IconButton onClick={toggle}>
@@ -143,6 +168,17 @@ const InfoDrawer = ({
                 <Typography>{about}</Typography>
               </Stack>
             )}
+            {task &&
+              task.assignee &&
+              task.isDecision &&
+              FakeDecisionOptions && (
+                <DecisionForm
+                  options={FakeDecisionOptions}
+                  isDecided={isDecided}
+                  decisionOption={decisionOption}
+                  handleDecisionOptionChange={handleDecisionOptionChange}
+                />
+              )}
           </Stack>
         </Card>
         <Card noBorder>
@@ -212,6 +248,26 @@ const InfoDrawer = ({
                       </Button>
                     </Grid>
                   </>
+                ) : task.assignee && task.isDecision ? (
+                  <Grid item xs={12}>
+                    {isDecided ? (
+                      <Button
+                        full
+                        variant="secondary"
+                        onClick={() => setUserIsUpdatingDecision(true)}
+                      >
+                        <Typography>Change decision</Typography>
+                      </Button>
+                    ) : (
+                      <Button
+                        full
+                        disabled={notDecided}
+                        onClick={() => setUserIsUpdatingDecision(false)}
+                      >
+                        <Typography>Decide</Typography>
+                      </Button>
+                    )}
+                  </Grid>
                 ) : (
                   <Grid item xs={12}>
                     <Button full onClick={handleAssignSelf}>
@@ -231,3 +287,53 @@ const InfoDrawer = ({
 };
 
 export default InfoDrawer;
+
+const DecisionForm = ({
+  options,
+  disabled,
+  isDecided,
+  decisionOption,
+  handleDecisionOptionChange,
+}) => {
+  const StyledDecisionCard = styled(Card)`
+    /* Disabled */
+    ${(props) =>
+      props.disabled &&
+      css`
+        opacity: 0.25;
+        pointer-events: none;
+      `}
+  `;
+
+  return (
+    <StyledDecisionCard
+      variant={isDecided ? "outlined" : "primaryOutlined"}
+      disabled={disabled}
+    >
+      <Stack spacing={6}>
+        <RadioGroup value={decisionOption} handleOptionsChange>
+          {options.map((o, i) => (
+            <FormControlLabel
+              key={i}
+              value={o.value}
+              control={<Radio disabled={isDecided} />}
+              label={o.label}
+              onChange={handleDecisionOptionChange}
+            />
+          ))}
+        </RadioGroup>
+      </Stack>
+    </StyledDecisionCard>
+  );
+};
+
+const FakeDecisionOptions = [
+  {
+    value: "wildflower group exemption",
+    label: "I will apply with the Wildflower Group Exemption",
+  },
+  {
+    value: "independently with irs",
+    label: "I will apply independently using Form 1023 with the IRS",
+  },
+];

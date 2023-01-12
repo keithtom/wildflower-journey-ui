@@ -69,7 +69,7 @@ const MilestonePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
-  // console.log("Tasks", MilestoneTasks);
+  console.log("Tasks", MilestoneTasks);
   // console.log("MilestoneAttributes", MilestoneAttributes);
   // console.log("Milestone Relationships", MilestoneRelationships);
 
@@ -207,7 +207,8 @@ const MilestonePage = ({
                   link={`/ssj/${phase}/${MilestoneId}/${t.id}`}
                   title={t.attributes.title}
                   key={i}
-                  isDecision={t.attributes.kind === "decision"}
+                  isDecision={t.attributes.kind === "Decision"}
+                  decisionOptions={t.attributes.decisionOptions}
                   isNext={i === 2}
                   isLast={i + 1 === FakeMilestoneTasks.length}
                   isComplete={t.attributes.completed === true}
