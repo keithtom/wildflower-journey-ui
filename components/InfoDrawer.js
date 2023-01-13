@@ -16,6 +16,7 @@ import {
   Avatar,
   Link,
   Radio,
+  Snackbar,
 } from "./ui/index";
 import EffortChip from "./EffortChip";
 import CategoryChip from "./CategoryChip";
@@ -44,8 +45,24 @@ const InfoDrawer = ({
   categories,
   handleCompleteTask,
 }) => {
+  const [userIsUpdatingDecision, setUserIsUpdatingDecision] = useState(false);
+  const [decisionOption, setDecisionOption] = useState();
+  const [isDecided, setIsDecided] = useState(false);
+  const [assignToastOpen, setAssignToastOpen] = useState(false);
+  const [unassignToastOpen, setUnassignToastOpen] = useState(false);
+  const [assignee, setAssignee] = useState(task && task.assignee);
+
   const handleAssignSelf = () => {
-    console.log("assigning yourself");
+    // console.log("assigning yourself");
+    setAssignee(true); //assign the user
+    setAssignToastOpen(true);
+    //update the assignee on the task
+  };
+  const handleUnassignSelf = () => {
+    // console.log("unassigning yourself");
+    setAssignee(false); //assign the user
+    setUnassignToastOpen(true);
+    //update the assignee on the task
   };
   const handleAskOpsGuide = () => {
     console.log("ask ops guide");
@@ -53,125 +70,120 @@ const InfoDrawer = ({
   const handleMarkTaskIncomplete = () => {
     console.log("marking the task incomplete");
   };
-
-  const [userIsUpdatingDecision, setUserIsUpdatingDecision] = useState(false);
-  const [decisionOption, setDecisionOption] = useState();
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };
   const handleMakeDecision = () => {
     setUserIsUpdatingDecision(false);
+    setIsDecided(true);
     console.log("made a decision!");
     //send decision to backend
   };
-  const notDecided = !decisionOption;
-  const isDecided = userIsUpdatingDecision ? false : true;
 
   return (
-    <CustomDrawer anchor="right" open={open} onClose={toggle}>
-      <Stack
-        justifyContent="space-between"
-        direction="column"
-        sx={{ height: "100%" }}
-      >
-        <Card noBorder>
-          <Stack spacing={12}>
-            <Stack spacing={6}>
-              <Grid
-                container
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Grid item>
-                  <Chip
-                    label={
-                      milestone
-                        ? "Milestone"
-                        : task.isDecision
-                        ? "Decision"
-                        : "Task"
-                    }
-                    size="small"
-                  />
+    <>
+      <CustomDrawer anchor="right" open={open} onClose={toggle}>
+        <Stack
+          justifyContent="space-between"
+          direction="column"
+          sx={{ height: "100%" }}
+        >
+          <Card noBorder>
+            <Stack spacing={12}>
+              <Stack spacing={6}>
+                <Grid
+                  container
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <Chip
+                      label={
+                        milestone
+                          ? "Milestone"
+                          : task.isDecision
+                          ? "Decision"
+                          : "Task"
+                      }
+                      size="small"
+                    />
+                  </Grid>
+                  <Grid item>
+                    <IconButton onClick={toggle}>
+                      <Icon type="close" />
+                    </IconButton>
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <IconButton onClick={toggle}>
-                    <Icon type="close" />
-                  </IconButton>
-                </Grid>
-              </Grid>
 
-              <Typography variant="bodyLarge" bold>
-                {milestone ? milestone.title : task && task.title}
-              </Typography>
-              <Stack direction="row" spacing={4}>
-                {task && (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      ASSIGNEE
-                    </Typography>
-                    <Avatar size="mini" />
-                  </Stack>
-                )}
-                {milestone && milestone.status && (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      STATUS
-                    </Typography>
-                    <StatusChip
-                      status={milestone.status}
-                      size="small"
-                      withIcon
-                    />
-                  </Stack>
-                )}
-                {categories && (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      CATEGORY
-                    </Typography>
-                    <Stack direction="row" spacing={2}>
-                      {categories.map((m, i) => (
-                        <CategoryChip
-                          category={m}
-                          size="small"
-                          withIcon
-                          key={i}
-                        />
-                      ))}
-                    </Stack>
-                  </Stack>
-                )}
-                {milestone && milestone.effort && (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      EFFORT
-                    </Typography>
-                    <EffortChip
-                      size="small"
-                      effort={milestone.effort}
-                      withIcon
-                    />
-                  </Stack>
-                )}
-              </Stack>
-            </Stack>
-            {about && (
-              <Stack spacing={4}>
+                <Typography variant="bodyLarge" bold>
+                  {milestone ? milestone.title : task && task.title}
+                </Typography>
                 <Stack direction="row" spacing={4}>
-                  <Icon type="glasses" variant="primary" size="medium" />
-                  <Typography variant="bodyRegular" bold>
-                    About
-                  </Typography>
+                  {task && (
+                    <Stack spacing={2}>
+                      <Typography variant="bodyMini" lightened bold>
+                        ASSIGNEE
+                      </Typography>
+                      <Avatar size="mini" />
+                      {/* use assignee.src or equivalent, if none, show null */}
+                    </Stack>
+                  )}
+                  {milestone && milestone.status && (
+                    <Stack spacing={2}>
+                      <Typography variant="bodyMini" lightened bold>
+                        STATUS
+                      </Typography>
+                      <StatusChip
+                        status={milestone.status}
+                        size="small"
+                        withIcon
+                      />
+                    </Stack>
+                  )}
+                  {categories && (
+                    <Stack spacing={2}>
+                      <Typography variant="bodyMini" lightened bold>
+                        CATEGORY
+                      </Typography>
+                      <Stack direction="row" spacing={2}>
+                        {categories.map((m, i) => (
+                          <CategoryChip
+                            category={m}
+                            size="small"
+                            withIcon
+                            key={i}
+                          />
+                        ))}
+                      </Stack>
+                    </Stack>
+                  )}
+                  {milestone && milestone.effort && (
+                    <Stack spacing={2}>
+                      <Typography variant="bodyMini" lightened bold>
+                        EFFORT
+                      </Typography>
+                      <EffortChip
+                        size="small"
+                        effort={milestone.effort}
+                        withIcon
+                      />
+                    </Stack>
+                  )}
                 </Stack>
-                <Divider />
-                <Typography>{about}</Typography>
               </Stack>
-            )}
-            {task &&
-              task.assignee &&
-              task.isDecision &&
-              FakeDecisionOptions && (
+              {about && (
+                <Stack spacing={4}>
+                  <Stack direction="row" spacing={4}>
+                    <Icon type="glasses" variant="primary" size="medium" />
+                    <Typography variant="bodyRegular" bold>
+                      About
+                    </Typography>
+                  </Stack>
+                  <Divider />
+                  <Typography>{about}</Typography>
+                </Stack>
+              )}
+              {task && assignee && task.isDecision && FakeDecisionOptions && (
                 <DecisionForm
                   options={FakeDecisionOptions}
                   isDecided={isDecided}
@@ -179,114 +191,169 @@ const InfoDrawer = ({
                   handleDecisionOptionChange={handleDecisionOptionChange}
                 />
               )}
-          </Stack>
-        </Card>
-        <Card noBorder>
-          <Stack spacing={6}>
-            <Divider />
-            <Grid container spacing={4}>
-              {milestone ? (
-                <>
-                  <Grid item xs={6}>
-                    <Button full variant="secondary">
-                      <Typography>Ask your ops guide</Typography>
-                    </Button>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Link href={milestone.link}>
-                      <Button full>
-                        <Typography light bold>
-                          View {milestone && milestone.taskCount} tasks
-                        </Typography>
-                      </Button>
-                    </Link>
-                  </Grid>
-                </>
-              ) : (
-                task &&
-                (task.assignee ? (
+            </Stack>
+          </Card>
+          <Card noBorder>
+            <Stack spacing={6}>
+              <Divider />
+              <Grid container spacing={4}>
+                {milestone ? (
                   <>
                     <Grid item xs={6}>
-                      <Button
-                        full
-                        variant="secondary"
-                        onClick={handleAskOpsGuide}
-                      >
-                        <Typography light bold>
-                          Ask your ops guide
-                        </Typography>
+                      <Button full variant="secondary">
+                        <Typography>Ask your ops guide</Typography>
                       </Button>
                     </Grid>
                     <Grid item xs={6}>
-                      <Button full onClick={handleCompleteTask}>
-                        <Typography light bold>
-                          Mark task complete
-                        </Typography>
-                      </Button>
+                      <Link href={milestone.link}>
+                        <Button full>
+                          <Typography light bold>
+                            View {milestone && milestone.taskCount} tasks
+                          </Typography>
+                        </Button>
+                      </Link>
                     </Grid>
                   </>
-                ) : task.isComplete ? (
-                  <>
-                    <Grid item xs={6}>
-                      <Button
-                        full
-                        variant="secondary"
-                        onClick={handleAskOpsGuide}
-                      >
-                        <Typography light bold>
-                          Ask your ops guide
-                        </Typography>
-                      </Button>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Button
-                        full
-                        variant="danger"
-                        onClick={handleMarkTaskIncomplete}
-                      >
-                        <Typography bold>Mark incomplete</Typography>
-                      </Button>
-                    </Grid>
-                  </>
-                ) : task.assignee && task.isDecision ? (
-                  <Grid item xs={12}>
-                    {isDecided ? (
-                      <Button
-                        full
-                        variant="secondary"
-                        onClick={() => setUserIsUpdatingDecision(true)}
-                      >
-                        <Typography>Change decision</Typography>
-                      </Button>
-                    ) : (
-                      <Button
-                        full
-                        disabled={notDecided}
-                        onClick={() => setUserIsUpdatingDecision(false)}
-                      >
-                        <Typography>Decide</Typography>
-                      </Button>
-                    )}
-                  </Grid>
                 ) : (
-                  <Grid item xs={12}>
-                    <Button full onClick={handleAssignSelf}>
-                      <Typography light bold>
-                        Assign yourself
-                      </Typography>
-                    </Button>
-                  </Grid>
-                ))
-              )}
-            </Grid>
-          </Stack>
-        </Card>
-      </Stack>
-    </CustomDrawer>
+                  task &&
+                  (assignee && !task.isDecision ? (
+                    <>
+                      <Grid item xs={6}>
+                        <Button
+                          full
+                          variant="text"
+                          onClick={handleUnassignSelf}
+                        >
+                          <Typography light bold>
+                            Unassign yourself
+                          </Typography>
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button full onClick={handleCompleteTask}>
+                          <Typography light bold>
+                            Mark task complete
+                          </Typography>
+                        </Button>
+                      </Grid>
+                    </>
+                  ) : task.isComplete ? (
+                    <>
+                      <Grid item xs={6}>
+                        <Button
+                          full
+                          variant="secondary"
+                          onClick={handleAskOpsGuide}
+                        >
+                          <Typography light bold>
+                            Ask your ops guide
+                          </Typography>
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          full
+                          variant="danger"
+                          onClick={handleMarkTaskIncomplete}
+                        >
+                          <Typography bold>Mark incomplete</Typography>
+                        </Button>
+                      </Grid>
+                    </>
+                  ) : assignee && task.isDecision ? (
+                    <Grid item xs={12}>
+                      {isDecided ? (
+                        <Button
+                          full
+                          variant="secondary"
+                          onClick={() => setIsDecided(false)}
+                        >
+                          <Typography>Change decision</Typography>
+                        </Button>
+                      ) : (
+                        <Button
+                          full
+                          disabled={!decisionOption}
+                          onClick={handleMakeDecision}
+                        >
+                          <Typography>Decide</Typography>
+                        </Button>
+                      )}
+                    </Grid>
+                  ) : (
+                    <Grid item xs={12}>
+                      <Button full onClick={handleAssignSelf}>
+                        <Typography light bold>
+                          Assign yourself
+                        </Typography>
+                      </Button>
+                    </Grid>
+                  ))
+                )}
+              </Grid>
+            </Stack>
+          </Card>
+        </Stack>
+      </CustomDrawer>
+      <TaskToast
+        open={assignToastOpen}
+        onClose={() => setAssignToastOpen(false)}
+        isAssignToast={true}
+        title={task && task.title}
+      />
+      <TaskToast
+        open={unassignToastOpen}
+        onClose={() => setUnassignToastOpen(false)}
+        isAssignToast={false}
+        title={task && task.title}
+      />
+    </>
   );
 };
 
 export default InfoDrawer;
+
+const TaskToast = ({ isAssignToast, open, onClose, title }) => {
+  return (
+    <Snackbar
+      open={open}
+      onClose={onClose}
+      autoHideDuration={6000}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+    >
+      <div>
+        <Card size="small" variant="primaryOutlined" sx={{ width: "320px" }}>
+          <Stack spacing={1}>
+            <Grid container alignItems="center" justifyContent="space-between">
+              <Grid item>
+                <Typography variant="bodySmall" lightened>
+                  TASK {isAssignToast ? "ASSIGNED" : "UNASSIGNED"}
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Icon type="close" hoverable onClick={onClose} />
+              </Grid>
+            </Grid>
+            <Typography variant="bodyRegular" bold>
+              {title}
+            </Typography>
+            <Stack direction="row" spacing={3} alignItems="center">
+              <Avatar size="mini" />
+              {/* use assignee.src or equivalent, if none, show null */}
+              <Stack direction="row" spacing={1}>
+                <Typography variant="bodySmall">You</Typography>
+                <Typography variant="bodySmall" lightened>
+                  {isAssignToast ? "assigned" : "unassigned"}
+                </Typography>
+                <Typography variant="bodySmall">yourself</Typography>
+              </Stack>
+            </Stack>
+          </Stack>
+        </Card>
+      </div>
+    </Snackbar>
+  );
+};
 
 const DecisionForm = ({
   options,

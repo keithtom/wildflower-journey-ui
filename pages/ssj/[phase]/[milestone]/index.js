@@ -69,7 +69,7 @@ const MilestonePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
-  console.log("Tasks", MilestoneTasks);
+  // console.log("Tasks", MilestoneTasks);
   // console.log("MilestoneAttributes", MilestoneAttributes);
   // console.log("Milestone Relationships", MilestoneRelationships);
 
@@ -194,7 +194,7 @@ const MilestonePage = ({
         </Stack>
 
         <StyledMilestoneTasks downplayed={isUpNext}>
-          <Stack spacing={3}>
+          <Stack>
             {userIsEditing ? (
               <>
                 <NewTaskInput />
