@@ -48,6 +48,7 @@ const Task = ({
 
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
+    // console.log("complete");
     try {
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.complete(taskId);
