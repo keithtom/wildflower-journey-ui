@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
@@ -50,8 +50,8 @@ const TaskPage = ({
   const isDecision = false;
   const isUpNext = false;
 
-  const router = useRouter()
-  const { phase, task } = router.query
+  const router = useRouter();
+  const { phase, task } = router.query;
   const taskId = task;
 
   return (
@@ -319,7 +319,7 @@ export async function getServerSideProps({ query }) {
   const res = await fetch(apiRoute);
   const data = await res.json();
 
-  const milestone = data.included.filter(e => e.type == "process")[0];
+  const milestone = data.included.filter((e) => e.type == "process")[0];
   const MilestoneTitle = milestone.attributes.title;
   const TaskTitle = data.data.attributes.title;
   const FakeDecisionOptions = [

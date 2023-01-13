@@ -12,6 +12,7 @@ import {
   Icon,
   Link,
   IconButton,
+  Chip,
   Avatar,
 } from "./ui";
 import InfoDrawer from "./InfoDrawer";
@@ -34,6 +35,7 @@ const Task = ({
   isComplete,
   notNavigable,
   isDecision,
+  decisionOptions,
   isNext,
   isLast,
   link,
@@ -69,19 +71,10 @@ const Task = ({
                 <>
                   <Icon
                     type="zap"
-                    variant={taskIsComplete || isNext ? "primary" : "lightened"}
+                    variant={isComplete ? "primary" : "lightened"}
                   />
-                  <Typography
-                    variant="bodyLarge"
-                    lightened={!taskIsComplete && !isNext}
-                    highlight={taskIsComplete || isNext}
-                  >
-                    Decision
-                  </Typography>
-                  <Typography
-                    variant="bodyLarge"
-                    lightened={!taskIsComplete && !isNext}
-                  >
+                  <Chip label="Decision" size="small" />
+                  <Typography variant="bodyLarge" struck={isComplete} bold>
                     {title}
                   </Typography>
                 </>
@@ -113,6 +106,8 @@ const Task = ({
           resourceType: null,
           resourceUrl: null,
           isComplete: isComplete,
+          isDecision: isDecision,
+          decisionOptions: decisionOptions,
         }}
         categories={categories}
         about="About the task"
