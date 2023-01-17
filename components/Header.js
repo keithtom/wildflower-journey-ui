@@ -18,10 +18,19 @@ import {
   NavLink,
 } from "./ui/index";
 
+<<<<<<< HEAD
 // const logoutRoute = `http://localhost:3001/logout`;
 const logoutRoute = `https://api.wildflowerschools.org/logout`;
 const token = getCookie('auth');
 axios.defaults.headers.common['Authorization'] = token;
+=======
+const logoutRoute = `http://localhost:3001/logout`;
+// const logoutRoute = `https://api.wildflowerschools.org/logout`;
+if (typeof window !== 'undefined') {
+  // Perform localStorage action
+  axios.defaults.headers.common['Authorization'] = localStorage.getItem('token');
+}
+>>>>>>> 5f9df79 (set axios default header)
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -127,10 +136,17 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
       .then((res) => {
         // TODO: update logged out state
           console.log("successfully logged out");
+<<<<<<< HEAD
           delete axios.defaults.headers.common["Authorization"];
           deleteCookie("auth", {});
           Router.push("/logged-out");
       }).catch((err) => console.error(err));
+=======
+          Router.push("/logged-out");
+      }).catch((err) => {
+        console.error(err)
+      });
+>>>>>>> 5f9df79 (set axios default header)
   };
 
   return (
