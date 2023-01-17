@@ -15,8 +15,8 @@ import {
 import Header from "@components/Header";
 
 
-// const loginRoute = `http://localhost:3001/login`;
-const loginRoute = `https://api.wildflowerschools.org/login`;
+const loginRoute = `http://localhost:3001/login`;
+// const loginRoute = `https://api.wildflowerschools.org/login`;
 
 const PageContent = styled(Box)`
   flex-grow: 1;
@@ -39,9 +39,10 @@ const Login = ({}) => {
           password: data.password,
         }
       },
-      { withCredentials: true }
     ).then(function (response) {
       console.log("logged in");
+      localStorage.setItem("token", response.headers["authorization"]);
+      // TODO: set logged in state
     }).catch(function (error) {
       // handle error
       console.log(error);

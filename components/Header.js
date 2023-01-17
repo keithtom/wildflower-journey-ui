@@ -16,8 +16,12 @@ import {
   NavLink,
 } from "./ui/index";
 
-// const logoutRoute = `http://localhost:3001/logout`;
-const logoutRoute = `https://api.wildflowerschools.org/logout`;
+const logoutRoute = `http://localhost:3001/logout`;
+// const logoutRoute = `https://api.wildflowerschools.org/logout`;
+if (typeof window !== 'undefined') {
+  // Perform localStorage action
+  axios.defaults.headers.common['Authorization'] = localStorage.getItem('token');
+}
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -113,14 +117,14 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
   `;
 
   const handleLogOut = () => {
-    console.log("logging out");
-    console.dir(axios.defaults.headers.common);
-    axios.delete(logoutRoute, { withCredentials: true  // TODO: set base url in some variable that switches out based on env
-      }).then((res) => {
+    axios.delete(logoutRoute)  // TODO: set base url in some variable that switches out based on env
+      .then((res) => {
         // TODO: update logged out state
           console.log("successfully logged out");
           Router.push("/logged-out");
-      }).catch((err) => console.error(err));
+      }).catch((err) => {
+        console.error(err)
+      });
   };
 
   return (

@@ -378,7 +378,8 @@ export async function getServerSideProps(context) {
 
   const apiRoute = `https://api.wildflowerschools.org/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;
 
-  const res = await fetch(apiRoute);
+  const res = await fetch(apiRoute, { credentials: 'include' });
+  console.log(res);
   const data = await res.json();
   const MilestonesToDo = [];
   const MilestonesUpNext = [];
