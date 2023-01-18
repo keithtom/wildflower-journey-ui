@@ -4,8 +4,12 @@ import Link from "next/link";
 import Router from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
+import setAuthHeader from "../../lib/setAuthHeader";
+import axios from "axios";
 
 import { categories } from "../../lib/utils/fake-data";
+import Milestone from "../../components/Milestone";
+import Task from "../../components/Task";
 
 import {
   Box,
@@ -25,7 +29,7 @@ import {
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 
-const SSJ = ({}) => {
+const SSJ = ({ milestonesToDo, phase, data }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
@@ -35,6 +39,7 @@ const SSJ = ({}) => {
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
+  const hasAssignedTasks = false;
 
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
@@ -66,6 +71,8 @@ const SSJ = ({}) => {
   };
 
   const hasPartner = !FakePartners.length;
+
+  // console.log({ data });
 
   return (
     <>
@@ -113,19 +120,19 @@ const SSJ = ({}) => {
               </Grid>
               <Grid item>
                 <Stack direction="row" spacing={6} alignItems="center">
-                  <Stack spacing={1}>
+                  <Stack>
                     <Typography variant="bodyMini" bold lightened>
                       PHASE
                     </Typography>
                     <Typography variant="bodySmall">Visioning</Typography>
                   </Stack>
-                  <Stack spacing={1}>
+                  <Stack>
                     <Typography variant="bodyMini" bold lightened>
                       LOCATION
                     </Typography>
                     <Typography variant="bodySmall">Boston, MA</Typography>
                   </Stack>
-                  <Stack spacing={1}>
+                  <Stack>
                     <Typography variant="bodyMini" bold lightened>
                       HUB
                     </Typography>
@@ -138,7 +145,7 @@ const SSJ = ({}) => {
                       onClick={() => setAddOpenDateModalOpen(true)}
                     >
                       <Stack direction="row" spacing={6}>
-                        <Stack spacing={1}>
+                        <Stack>
                           <Typography variant="bodyMini" bold lightened>
                             OPEN DATE
                           </Typography>
@@ -151,19 +158,99 @@ const SSJ = ({}) => {
                     </Card>
                   ) : (
                     <Button
-                      variant="secondary"
+                      variant="light"
                       small
                       onClick={() => setAddOpenDateModalOpen(true)}
                     >
-                      <Stack direction="row" spacing={3}>
+                      <Stack direction="row" spacing={2} alignItems="center">
                         <Icon type="plus" />
-                        <Typography>Add your open date</Typography>
+                        <Typography variant="bodyRegular">
+                          Add your open date
+                        </Typography>
                       </Stack>
                     </Button>
                   )}
                 </Stack>
               </Grid>
             </Grid>
+
+            {hasAssignedTasks ? (
+              <Card>
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={4} alignItems="center">
+                    <Avatar />
+                    <Stack spacing={1}>
+                      <Typography variant="bodyLarge" bold>
+                        Assigned to you
+                      </Typography>
+                      <Typography variant="bodyRegular">
+                        2 tasks from 2 milestones
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                  <Card noPadding>
+                    <Milestone variant="compressed" />
+                    <Card size="small" noBorder>
+                      <Task size="small" />
+                    </Card>
+                  </Card>
+                </Stack>
+              </Card>
+            ) : (
+              <Card variant="lightened" size="large">
+                <Grid container spacing={6}>
+                  <Grid item xs={12} sm={6}>
+                    <Stack spacing={6}>
+                      <Avatar size="md" /> {/* TODO: User avatar */}
+                      <Typography variant="bodyRegular" bold>
+                        Welcome, Jane!
+                      </Typography>
+                      {/* TODO: user name */}
+                      <Typography variant="bodyLarge" bold>
+                        Start making progress on your SSJ by working toward one
+                        of these milestones!
+                      </Typography>
+                      <Typography variant="bodyLarge" lightened>
+                        Each milestone has a number of tasks you can assign
+                        yourself. Head over to one of these to try it out!
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Stack spacing={6}>
+                      <Typography variant="bodyRegular" bold>
+                        Milestones to start working on
+                      </Typography>
+                      <Stack spacing={2}>
+                        {milestonesToDo.map((m, i) => (
+                          <Link href={`/ssj/${phase}/${m.id}`}>
+                            <Card
+                              variant="light"
+                              size="small"
+                              key={i}
+                              hoverable
+                            >
+                              <Stack
+                                direction="row"
+                                alignItems="center"
+                                justifyContent="space-between"
+                              >
+                                <Typography variant="bodyRegular" bold>
+                                  {m.attributes.title}
+                                </Typography>
+                                <Button small variant="text">
+                                  Start here
+                                </Button>
+                              </Stack>
+                            </Card>
+                          </Link>
+                        ))}
+                      </Stack>
+                    </Stack>
+                  </Grid>
+                </Grid>
+              </Card>
+            )}
 
             <Card>
               <Stack spacing={3}>
@@ -204,123 +291,6 @@ const SSJ = ({}) => {
                 </Grid>
               </Stack>
             </Card>
-
-            {userOnboardedPeers ? (
-              <Card variant="lightened" size="large">
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center"
-                  spacing={6}
-                >
-                  <Grid item>
-                    <Stack>
-                      <Typography variant="h3" bold>
-                        There are 22 other Emerging Teacher Leaders
-                      </Typography>
-                      <Typography variant="bodyRegular" lightened>
-                        Get to know a growing number of ETLs, share learnings,
-                        and educate together.
-                      </Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item>
-                    <Stack direction="row" spacing={6}>
-                      <AvatarGroup>
-                        {FakeETLs.slice(0, 4).map((f, i) => (
-                          <Avatar src={f.attributes.profileImage} key={i} />
-                        ))}
-                      </AvatarGroup>
-                      <Button onClick={() => setViewEtlsModalOpen(true)}>
-                        <Typography variant="h4" bold light>
-                          Meet your peers
-                        </Typography>
-                      </Button>
-                    </Stack>
-                  </Grid>
-                </Grid>
-              </Card>
-            ) : (
-              <OnboardingCard
-                icon="message"
-                title="Meet your peers"
-                description="You're not alone! There are more than 20 other Emerging Teacher Leaders (ETLs) currently working on their own journeys."
-                action="Start by taking a peek at who else is here"
-                ctaText="Meet others"
-                img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
-                setUnlocked={toggleOnboardingPeers}
-              />
-            )}
-
-            {userOnboardedWaysToWork ? (
-              <Card>
-                <Stack spacing={6}>
-                  <Typography variant="h4" bold>
-                    Ways to work together
-                  </Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your self
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your team
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your community
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
-                  </Grid>
-                </Stack>
-              </Card>
-            ) : (
-              <OnboardingCard
-                icon="conversation"
-                title="Ways to work together"
-                description="Access resources and trainings to start improving yourself, working with your team, and engaging your community."
-                action="Start by exploring resources"
-                ctaText="Explore resources"
-                img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
-                setUnlocked={toggleOnboardingWaysToWork}
-              />
-            )}
 
             {userOnboardedprogress ? (
               <Card>
@@ -417,6 +387,122 @@ const SSJ = ({}) => {
                 ctaText="View visioning"
                 img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
                 setUnlocked={toggleOnboardingProgress}
+              />
+            )}
+
+            {userOnboardedWaysToWork ? (
+              <Card>
+                <Stack spacing={6}>
+                  <Typography variant="h4" bold>
+                    Ways to work together
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={4}>
+                      <Card variant="lightened">
+                        <Stack spacing={6}>
+                          <Typography variant="bodyLarge" bold>
+                            With your self
+                          </Typography>
+                          <Stack spacing={3}>
+                            <Card size="small">Check on your growth plan</Card>
+                            <Card size="small">Engage in equity training</Card>
+                            <Card size="small" variant="lightened">
+                              View more
+                            </Card>
+                          </Stack>
+                        </Stack>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Card variant="lightened">
+                        <Stack spacing={6}>
+                          <Typography variant="bodyLarge" bold>
+                            With your team
+                          </Typography>
+                          <Stack spacing={3}>
+                            <Card size="small">Check on your growth plan</Card>
+                            <Card size="small">Engage in equity training</Card>
+                            <Card size="small" variant="lightened">
+                              View more
+                            </Card>
+                          </Stack>
+                        </Stack>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Card variant="lightened">
+                        <Stack spacing={6}>
+                          <Typography variant="bodyLarge" bold>
+                            With your community
+                          </Typography>
+                          <Stack spacing={3}>
+                            <Card size="small">Check on your growth plan</Card>
+                            <Card size="small">Engage in equity training</Card>
+                            <Card size="small" variant="lightened">
+                              View more
+                            </Card>
+                          </Stack>
+                        </Stack>
+                      </Card>
+                    </Grid>
+                  </Grid>
+                </Stack>
+              </Card>
+            ) : (
+              <OnboardingCard
+                icon="conversation"
+                title="Ways to work together"
+                description="Access resources and trainings to start improving yourself, working with your team, and engaging your community."
+                action="Start by exploring resources"
+                ctaText="Explore resources"
+                img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
+                setUnlocked={toggleOnboardingWaysToWork}
+              />
+            )}
+            {userOnboardedPeers ? (
+              <Card variant="lightened" size="large">
+                <Grid
+                  container
+                  justifyContent="space-between"
+                  alignItems="center"
+                  spacing={6}
+                >
+                  <Grid item>
+                    <Stack>
+                      <Typography variant="h3" bold>
+                        There are 22 other Emerging Teacher Leaders
+                      </Typography>
+                      <Typography variant="bodyRegular" lightened>
+                        Get to know a growing number of ETLs, share learnings,
+                        and educate together.
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  <Grid item>
+                    <Stack direction="row" spacing={6}>
+                      <AvatarGroup>
+                        {FakeETLs.slice(0, 4).map((f, i) => (
+                          <Avatar src={f.attributes.profileImage} key={i} />
+                        ))}
+                      </AvatarGroup>
+                      <Button onClick={() => setViewEtlsModalOpen(true)}>
+                        <Typography variant="h4" bold light>
+                          Meet your peers
+                        </Typography>
+                      </Button>
+                    </Stack>
+                  </Grid>
+                </Grid>
+              </Card>
+            ) : (
+              <OnboardingCard
+                icon="message"
+                title="Meet your peers"
+                description="You're not alone! There are more than 20 other Emerging Teacher Leaders (ETLs) currently working on their own journeys."
+                action="Start by taking a peek at who else is here"
+                ctaText="Meet others"
+                img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
+                setUnlocked={toggleOnboardingPeers}
               />
             )}
           </Stack>
@@ -1072,3 +1158,36 @@ const FakeETLs = [
     },
   },
 ];
+
+export async function getServerSideProps({ params, req, res }) {
+  // const userId = query.userId;
+  // const ssjId = query.ssjId;
+
+  const phase = "visioning";
+  // const baseUrl = "http://localhost:3001"
+  const baseUrl = "https://api.wildflowerschools.org";
+  const apiRoute = `${baseUrl}/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;
+  setAuthHeader({ req, res });
+
+  const response = await axios.get(apiRoute);
+  const data = await response.data;
+  const milestonesToDo = [];
+  const milestonesUpNext = [];
+  const milestonesDone = [];
+
+  data.data.forEach((milestone) => {
+    if (milestone.attributes.status == "to do") {
+      milestonesToDo.push(milestone);
+    }
+  });
+
+  return {
+    props: {
+      data,
+      milestonesToDo,
+      milestonesUpNext,
+      milestonesDone,
+      phase,
+    },
+  };
+}

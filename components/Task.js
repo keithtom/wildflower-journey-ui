@@ -2,7 +2,7 @@ import processesApi from "../api/processes";
 
 import { useState } from "react";
 import { FormControlLabel } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, css } from "@mui/material/styles";
 import {
   Typography,
   Grid,
@@ -21,6 +21,14 @@ const StyledTask = styled(Box)`
   width: 100%;
   border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
   padding: ${({ theme }) => theme.util.buffer * 6}px 0;
+
+  /* Small */
+  ${(props) =>
+    props.size === "small" &&
+    css`
+      padding: ${props.theme.util.buffer * 2}px 0;
+    `}
+
   &:last-child {
     border-bottom: none;
   }
@@ -42,29 +50,30 @@ const Task = ({
   handleCompleteMilestone,
   categories,
   assignee,
+  size,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
 
-  async function handleCompleteTask() {
-    // api call, backend determiens state. needs spinner and error management.
-    // console.log("complete");
-    try {
-      // if checking, complete, if unchecking, uncomplete.
-      const response = await processesApi.complete(taskId);
-      setTaskIsComplete(!taskIsComplete); // take state from API response?
-    } catch (err) {
-      console.error(err);
-    }
+  // async function handleCompleteTask() {
+  //   // api call, backend determiens state. needs spinner and error management.
+  //   // console.log("complete");
+  //   try {
+  //     // if checking, complete, if unchecking, uncomplete.
+  //     const response = await processesApi.complete(taskId);
+  //     setTaskIsComplete(!taskIsComplete); // take state from API response?
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
 
-    if (isLast) {
-      handleCompleteMilestone();
-    }
-  }
+  //   if (isLast) {
+  //     handleCompleteMilestone();
+  //   }
+  // }
 
   return (
     <>
-      <StyledTask onClick={() => setInfoDrawerOpen(true)}>
+      <StyledTask onClick={() => setInfoDrawerOpen(true)} size={size}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
             <Stack direction="row" spacing={4} alignItems="center">
@@ -106,15 +115,16 @@ const Task = ({
           resourceTitle: null,
           resourceType: null,
           resourceUrl: null,
-          isComplete: isComplete,
+          isComplete: isComplete === null ? false : true,
           isDecision: isDecision,
           decisionOptions: decisionOptions,
+          isLast,
         }}
         categories={categories}
         about="About the task"
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
-        handleCompleteTask={handleCompleteTask}
+        // handleCompleteTask={handleCompleteTask}
       />
     </>
   );
