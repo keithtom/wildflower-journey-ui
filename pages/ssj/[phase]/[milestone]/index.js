@@ -4,7 +4,9 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
+// import { getCookie } from 'cookies-next';
 import axios from "axios";
+import { withJWTCapture } from "../../../../lib/withJWTCapture"
 
 import {
   Avatar,
@@ -300,7 +302,7 @@ const MilestonePage = ({
   );
 };
 
-export default MilestonePage;
+export default withJWTCapture(MilestonePage);
 
 const NewTaskInput = ({}) => {
   const {
@@ -393,15 +395,19 @@ const EditableTaskList = ({ tasks }) => {
   );
 };
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps({ query, res, req }) {
   const MilestoneId = query.milestone;
   const baseUrl = "http://localhost:3001"
   // const baseUrl = "https://api.wildflowerschools.org"
   const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
+  // const token = getCookie('auth', res, req);
+  // console.log("#######################")
+  // console.log(token)
+  // axios.defaults.headers.common['Authorization'] = token;
 
   console.log(axios.defaults.headers.common)
-  const res = await axios.get(apiRoute)
-  const data = await res.json();
+  const response = await axios.get(apiRoute)
+  const data = await response.json();
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
   const MilestoneTitle = data.data.attributes.title;

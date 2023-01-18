@@ -18,6 +18,8 @@ import {
 
 const logoutRoute = `http://localhost:3001/logout`;
 // const logoutRoute = `https://api.wildflowerschools.org/logout`;
+const token = getCookie('auth');
+axios.defaults.headers.common['Authorization'] = token;
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -78,19 +80,6 @@ const Header = ({ toggleNavOpen, user }) => {
 
 export default Header;
 
-export async function getServerSideProps({ req, res }) {
-  console.log("################## . getting server side props in the header");
-  const token = getCookie('auth', {req, res});
-  if (token !== undefined) {
-    axios.defaults.headers.common['Authorization'] = token;
-  } else {
-    console.log("Token was undefined at this moment");
-  }
-
-  return {
-    props: {},
-  }
-}
 
 const AvatarMenu = ({ avatarSrc, userName }) => {
   const [profileNavOpen, setProfileNavOpen] = useState(false);
