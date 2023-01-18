@@ -5,6 +5,8 @@ import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
 import axios from "axios";
 import { getCookie, deleteCookie } from 'cookies-next';
+import { useUserContext } from "../lib/useUserContext";
+
 import { theme } from "../styles/theme";
 import {
   Avatar,
@@ -36,7 +38,12 @@ const CustomAppBar = styled(AppBar)`
 
 const Header = ({ toggleNavOpen, user }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
-  const loggedIn = user;
+  const loggedIn = user; //this is static fake data
+
+  const { currentUser, isLoggedIn } = useUserContext();
+  console.log({ currentUser });
+  console.log({ isLoggedIn });
+
   return (
     <CustomAppBar>
       <Grid
