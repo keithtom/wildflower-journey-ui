@@ -6,7 +6,7 @@ import Router from "next/router";
 import axios from "axios";
 import { getCookie, deleteCookie } from 'cookies-next';
 import { useUserContext } from "../lib/useUserContext";
-
+import { getCookie, deleteCookie } from 'cookies-next';
 import { theme } from "../styles/theme";
 import {
   Avatar,
@@ -26,11 +26,14 @@ axios.defaults.headers.common['Authorization'] = token;
 =======
 const logoutRoute = `http://localhost:3001/logout`;
 // const logoutRoute = `https://api.wildflowerschools.org/logout`;
+<<<<<<< HEAD
 if (typeof window !== 'undefined') {
   // Perform localStorage action
   axios.defaults.headers.common['Authorization'] = localStorage.getItem('token');
 }
 >>>>>>> 5f9df79 (set axios default header)
+=======
+>>>>>>> 97320bc (failed attempt at just using cookies and trying to set axios default)
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -96,6 +99,22 @@ const Header = ({ toggleNavOpen, user }) => {
 
 export default Header;
 
+<<<<<<< HEAD
+=======
+export async function getServerSideProps({ req, res }) {
+  console.log("################## . getting server side props in the header");
+  const token = getCookie('auth', {req, res});
+  if (token !== undefined) {
+    axios.defaults.headers.common['Authorization'] = token;
+  } else {
+    console.log("Token was undefined at this moment");
+  }
+
+  return {
+    props: {},
+  }
+}
+>>>>>>> 97320bc (failed attempt at just using cookies and trying to set axios default)
 
 const AvatarMenu = ({ avatarSrc, userName }) => {
   const [profileNavOpen, setProfileNavOpen] = useState(false);
@@ -137,11 +156,16 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
         // TODO: update logged out state
           console.log("successfully logged out");
 <<<<<<< HEAD
+<<<<<<< HEAD
           delete axios.defaults.headers.common["Authorization"];
           deleteCookie("auth", {});
           Router.push("/logged-out");
       }).catch((err) => console.error(err));
 =======
+=======
+          delete axios.defaults.headers.common["Authorization"];
+          deleteCookie("auth", {});
+>>>>>>> 97320bc (failed attempt at just using cookies and trying to set axios default)
           Router.push("/logged-out");
       }).catch((err) => {
         console.error(err)

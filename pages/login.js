@@ -4,6 +4,7 @@ import axios from "axios";
 import { setCookie } from "cookies-next";
 import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
+import { setCookie } from 'cookies-next';
 
 import {
   Button,

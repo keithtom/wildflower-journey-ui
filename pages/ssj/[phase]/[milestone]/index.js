@@ -5,7 +5,10 @@ import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
 import axios from "axios";
+<<<<<<< HEAD
 import setAuthHeader from "../../../../lib/setAuthHeader";
+=======
+>>>>>>> 97320bc (failed attempt at just using cookies and trying to set axios default)
 
 import {
   Avatar,
@@ -409,6 +412,7 @@ const EditableTaskList = ({ tasks }) => {
 
 export async function getServerSideProps({ query, req, res }) {
   const MilestoneId = query.milestone;
+<<<<<<< HEAD
   // const baseUrl = "http://localhost:3001"
   const baseUrl = "https://api.wildflowerschools.org";
   const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
@@ -416,6 +420,15 @@ export async function getServerSideProps({ query, req, res }) {
 
   const response = await axios.get(apiRoute);
   const data = await response.data;
+=======
+  const baseUrl = "http://localhost:3001"
+  // const baseUrl = "https://api.wildflowerschools.org"
+  const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
+
+  console.log(axios.defaults.headers.common)
+  const res = await axios.get(apiRoute)
+  const data = await res.json();
+>>>>>>> 97320bc (failed attempt at just using cookies and trying to set axios default)
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
   const MilestoneTitle = data.data.attributes.title;
