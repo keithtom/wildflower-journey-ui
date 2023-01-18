@@ -4,7 +4,7 @@ import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
 import axios from "axios";
-
+import { getCookie, deleteCookie } from 'cookies-next';
 import { theme } from "../styles/theme";
 import {
   Avatar,
@@ -18,10 +18,6 @@ import {
 
 const logoutRoute = `http://localhost:3001/logout`;
 // const logoutRoute = `https://api.wildflowerschools.org/logout`;
-if (typeof window !== 'undefined') {
-  // Perform localStorage action
-  axios.defaults.headers.common['Authorization'] = localStorage.getItem('token');
-}
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -82,6 +78,20 @@ const Header = ({ toggleNavOpen, user }) => {
 
 export default Header;
 
+export async function getServerSideProps({ req, res }) {
+  console.log("################## . getting server side props in the header");
+  const token = getCookie('auth', {req, res});
+  if (token !== undefined) {
+    axios.defaults.headers.common['Authorization'] = token;
+  } else {
+    console.log("Token was undefined at this moment");
+  }
+
+  return {
+    props: {},
+  }
+}
+
 const AvatarMenu = ({ avatarSrc, userName }) => {
   const [profileNavOpen, setProfileNavOpen] = useState(false);
   const handleOpen = (event) => {
@@ -121,6 +131,8 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
       .then((res) => {
         // TODO: update logged out state
           console.log("successfully logged out");
+          delete axios.defaults.headers.common["Authorization"];
+          deleteCookie("auth", {});
           Router.push("/logged-out");
       }).catch((err) => {
         console.error(err)

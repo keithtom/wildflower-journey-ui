@@ -4,6 +4,7 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
+import axios from "axios";
 
 import {
   Avatar,
@@ -394,9 +395,12 @@ const EditableTaskList = ({ tasks }) => {
 
 export async function getServerSideProps({ query }) {
   const MilestoneId = query.milestone;
-  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/processes/${MilestoneId}`;
+  const baseUrl = "http://localhost:3001"
+  // const baseUrl = "https://api.wildflowerschools.org"
+  const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
 
-  const res = await fetch(apiRoute);
+  console.log(axios.defaults.headers.common)
+  const res = await axios.get(apiRoute)
   const data = await res.json();
 
   const Workflow = data.included.filter((i) => i.type === "workflow");

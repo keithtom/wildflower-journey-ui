@@ -1,6 +1,7 @@
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
+import { setCookie } from 'cookies-next';
 
 import {
   Button,
@@ -41,8 +42,7 @@ const Login = ({}) => {
       },
     ).then(function (response) {
       console.log("logged in");
-      localStorage.setItem("token", response.headers["authorization"]);
-      // TODO: set logged in state
+      setCookie("auth", response.headers["authorization"], {});
     }).catch(function (error) {
       // handle error
       console.log(error);
