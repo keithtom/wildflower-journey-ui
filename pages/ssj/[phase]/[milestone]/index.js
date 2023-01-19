@@ -415,7 +415,7 @@ export async function getServerSideProps({ query, req, res }) {
   setAuthHeader({ req, res });
 
   const response = await axios.get(apiRoute)
-  const data = await response.json();
+  const data = await response.data;
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
   const MilestoneTitle = data.data.attributes.title;
