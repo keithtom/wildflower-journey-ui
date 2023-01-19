@@ -18,22 +18,10 @@ import {
   NavLink,
 } from "./ui/index";
 
-<<<<<<< HEAD
 // const logoutRoute = `http://localhost:3001/logout`;
 const logoutRoute = `https://api.wildflowerschools.org/logout`;
 const token = getCookie('auth');
 axios.defaults.headers.common['Authorization'] = token;
-=======
-const logoutRoute = `http://localhost:3001/logout`;
-// const logoutRoute = `https://api.wildflowerschools.org/logout`;
-<<<<<<< HEAD
-if (typeof window !== 'undefined') {
-  // Perform localStorage action
-  axios.defaults.headers.common['Authorization'] = localStorage.getItem('token');
-}
->>>>>>> 5f9df79 (set axios default header)
-=======
->>>>>>> 97320bc (failed attempt at just using cookies and trying to set axios default)
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};

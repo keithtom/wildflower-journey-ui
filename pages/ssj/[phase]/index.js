@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import setAuthHeader from "../../../lib/setAuthHeader";
+import setAuthHeader from "../../../lib/setAuthHeader"
 import axios from "axios";
 
 import {
@@ -372,7 +372,7 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
   );
 };
 
-export async function getServerSideProps({ params, req, res }) {
+export async function getServerSideProps({params, req, res}) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
 
@@ -380,24 +380,12 @@ export async function getServerSideProps({ params, req, res }) {
   // const baseUrl = "http://localhost:3001"
   const baseUrl = "https://api.wildflowerschools.org";
   const apiRoute = `${baseUrl}/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;
-  setAuthHeader({ req, res });
 
-<<<<<<< HEAD
   const response = await axios.get(apiRoute);
   const data = await response.data;
   const milestonesToDo = [];
   const milestonesUpNext = [];
   const milestonesDone = [];
-=======
-  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;
-
-  const res = await fetch(apiRoute, { credentials: 'include' });
-  console.log(res);
-  const data = await res.json();
-  const MilestonesToDo = [];
-  const MilestonesUpNext = [];
-  const MilestonesDone = [];
->>>>>>> 5f9df79 (set axios default header)
 
   data.data.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
