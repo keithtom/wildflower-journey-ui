@@ -4,7 +4,7 @@ import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
 import axios from "axios";
-
+import { getCookie, deleteCookie } from 'cookies-next';
 import { theme } from "../styles/theme";
 import {
   Avatar,
@@ -18,6 +18,8 @@ import {
 
 // const logoutRoute = `http://localhost:3001/logout`;
 const logoutRoute = `https://api.wildflowerschools.org/logout`;
+const token = getCookie('auth');
+axios.defaults.headers.common['Authorization'] = token;
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -78,6 +80,7 @@ const Header = ({ toggleNavOpen, user }) => {
 
 export default Header;
 
+
 const AvatarMenu = ({ avatarSrc, userName }) => {
   const [profileNavOpen, setProfileNavOpen] = useState(false);
   const handleOpen = (event) => {
@@ -113,18 +116,14 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
   `;
 
   const handleLogOut = () => {
-    console.log("logging out");
-    console.dir(axios.defaults.headers.common);
-    axios
-      .delete(logoutRoute, {
-        withCredentials: true, // TODO: set base url in some variable that switches out based on env
-      })
+    axios.delete(logoutRoute)  // TODO: set base url in some variable that switches out based on env
       .then((res) => {
         // TODO: update logged out state
-        console.log("successfully logged out");
-        Router.push("/logged-out");
-      })
-      .catch((err) => console.error(err));
+          console.log("successfully logged out");
+          delete axios.defaults.headers.common["Authorization"];
+          deleteCookie("auth", {});
+          Router.push("/logged-out");
+      }).catch((err) => console.error(err));
   };
 
   return (

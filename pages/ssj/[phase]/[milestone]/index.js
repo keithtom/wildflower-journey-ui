@@ -4,6 +4,8 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
+import axios from "axios";
+import setAuthHeader from "../../../../lib/setAuthHeader"
 
 import {
   Avatar,
@@ -187,6 +189,22 @@ const MilestonePage = ({
                     size="small"
                     withIcon
                   />
+                </Stack>
+              ) : null}
+              {/* {MilestoneRelationships.assignee.data ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    ASSIGNEE
+                  </Typography>
+                  <Avatar size="mini" />
+                </Stack>
+              ) : null} */}
+              {MilestoneAttributes.author ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    AUTHOR
+                  </Typography>
+                  <Avatar size="mini" />
                 </Stack>
               ) : null}
             </Stack>
@@ -391,12 +409,15 @@ const EditableTaskList = ({ tasks }) => {
   );
 };
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps({ query, req, res }) {
   const MilestoneId = query.milestone;
-  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/processes/${MilestoneId}`;
+  // const baseUrl = "http://localhost:3001"
+  const baseUrl = "https://api.wildflowerschools.org"
+  const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
+  setAuthHeader({ req, res });
 
-  const res = await fetch(apiRoute);
-  const data = await res.json();
+  const response = await axios.get(apiRoute)
+  const data = await response.data;
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
   const MilestoneTitle = data.data.attributes.title;

@@ -1,6 +1,7 @@
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
+import { setCookie } from 'cookies-next';
 
 import {
   Button,
@@ -39,9 +40,9 @@ const Login = ({}) => {
           password: data.password,
         }
       },
-      { withCredentials: true }
     ).then(function (response) {
       console.log("logged in");
+      setCookie("auth", response.headers["authorization"], { maxAge: 60 * 60 * 24});
     }).catch(function (error) {
       // handle error
       console.log(error);
