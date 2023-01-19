@@ -2,6 +2,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
+import setAuthHeader from "../../../lib/setAuthHeader"
+import axios from "axios";
 
 import {
   PageContainer,
@@ -370,17 +372,24 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
   );
 };
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps({params, req, res}) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
 
-  const { phase } = context.params;
+  const { phase } = params;
+  // const baseUrl = "http://localhost:3001"
+  const baseUrl = "https://api.wildflowerschools.org"
+  const apiRoute = `${baseUrl}/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;
+  setAuthHeader({req, res});
 
-  const apiRoute = `https://api.wildflowerschools.org/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;
-
-  const res = await fetch(apiRoute, { credentials: 'include' });
+  const response = await axios.get(apiRoute);
+  if (res.status == 401) {
+    console.log("UNAUTHORIZED")
+    console.log(req);
+    console.log(axios.defaults.headers.common);
+  }
   console.log(res);
-  const data = await res.json();
+  const data = await response.json();
   const MilestonesToDo = [];
   const MilestonesUpNext = [];
   const MilestonesDone = [];

@@ -2,7 +2,6 @@ import { useState, React } from "react";
 import { theme } from "../styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import WithJWTCapture from "../lib/withJWTCapture";
 
 import { Card, Stack, Grid, Typography, TextField, Button } from "@ui";
 
@@ -22,9 +21,7 @@ function MyApp({ Component, pageProps }) {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       {passwordCorrect ? (
-        <WithJWTCapture>
-          <Component {...pageProps} />
-        </WithJWTCapture>
+        <Component {...pageProps} />
       ) : (
         <Grid
           container

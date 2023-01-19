@@ -3,6 +3,8 @@ import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
+import setAuthHeader from "../../../../../lib/setAuthHeader"
+import axios from "axios";
 
 import {
   PageContainer,
@@ -311,13 +313,14 @@ const DecisionForm = ({ options, disabled }) => {
   );
 };
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps({ query, req, res }) {
   const MilestoneId = query.milestone;
   const TaskId = query.task;
   const apiRoute = `https://api.wildflowerschools.org/v1/workflow/processes/${MilestoneId}/steps/${TaskId}`;
+  setAuthHeader({req, res});
 
-  const res = await fetch(apiRoute);
-  const data = await res.json();
+  const response = await axios.get(apiRoute);
+  const data = await response.json();
 
   const milestone = data.included.filter(e => e.type == "process")[0];
   const MilestoneTitle = milestone.attributes.title;
