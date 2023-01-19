@@ -91,7 +91,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
   };
 
   const open = Boolean(profileNavOpen);
-  const id = open ? "profile-nav" : undefined;
+  const id = open ? "profile-nav" : null;
 
   const StyledOption = styled(ListItem)`
     border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
@@ -123,9 +123,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
           delete axios.defaults.headers.common["Authorization"];
           deleteCookie("auth", {});
           Router.push("/logged-out");
-      }).catch((err) => {
-        console.error(err)
-      });
+      }).catch((err) => console.error(err));
   };
 
   return (
@@ -148,7 +146,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "left",
+          horizontal: "right",
         }}
       >
         <StyledOption>

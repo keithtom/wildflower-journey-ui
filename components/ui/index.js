@@ -25,3 +25,4 @@ export { default as Typography } from "./Typography";
 export { default as Popover } from "./Popover";
 export { default as Input } from "./Input";
 export { default as NavLink } from "./NavLink";
+export { default as Snackbar } from "./Snackbar";

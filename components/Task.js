@@ -1,17 +1,33 @@
 import processesApi from "../api/processes";
+
 import { useState } from "react";
 import { FormControlLabel } from "@mui/material";
-
+import { styled } from "@mui/material/styles";
 import {
   Typography,
   Grid,
-  Card,
+  Box,
   Stack,
   Checkbox,
   Icon,
   Link,
   IconButton,
+  Chip,
+  Avatar,
 } from "./ui";
+import InfoDrawer from "./InfoDrawer";
+
+const StyledTask = styled(Box)`
+  width: 100%;
+  border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
+  padding: ${({ theme }) => theme.util.buffer * 6}px 0;
+  &:last-child {
+    border-bottom: none;
+  }
+  &:hover {
+    cursor: pointer;
+  }
+`;
 
 const Task = ({
   taskId,
@@ -19,15 +35,20 @@ const Task = ({
   isComplete,
   notNavigable,
   isDecision,
+  decisionOptions,
   isNext,
   isLast,
   link,
   handleCompleteMilestone,
+  categories,
+  assignee,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
+  const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
 
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
+    // console.log("complete");
     try {
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.complete(taskId);
@@ -39,71 +60,63 @@ const Task = ({
     if (isLast) {
       handleCompleteMilestone();
     }
-  };
+  }
 
   return (
-    <Card
-      variant={
-        !taskIsComplete && isNext && isDecision
-          ? "primaryLightened"
-          : taskIsComplete || isNext
-          ? "lightened"
-          : "outlined"
-      }
-      size="small"
-    >
-      <Grid container alignItems="center" justifyContent="space-between">
-        <Grid item>
-          <Stack direction="row" spacing={4} alignItems="center">
-            {isDecision ? (
-              <>
-                <Icon
-                  type="zap"
-                  variant={taskIsComplete || isNext ? "primary" : "lightened"}
-                />
-                <Typography
-                  variant="bodyLarge"
-                  lightened={!taskIsComplete && !isNext}
-                  highlight={taskIsComplete || isNext}
-                >
-                  Decision
-                </Typography>
-                <Typography
-                  variant="bodyLarge"
-                  lightened={!taskIsComplete && !isNext}
-                >
-                  {title}
-                </Typography>
-              </>
-            ) : (
-              <FormControlLabel
-                label={title}
-                control={
-                  <Checkbox
-                    checked={taskIsComplete}
-                    onChange={handleCompleteTask}
-                  />
-                }
-              />
-            )}
-          </Stack>
-        </Grid>
-        {notNavigable ? null : (
+    <>
+      <StyledTask onClick={() => setInfoDrawerOpen(true)}>
+        <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
-            <Link href={link ? link : ""}>
-              <IconButton>
-                <Icon
-                  type="chevronRight"
-                  variant={
-                    taskIsComplete ? null : isNext ? "primary" : "lightened"
-                  }
-                />
-              </IconButton>
-            </Link>
+            <Stack direction="row" spacing={4} alignItems="center">
+              {isDecision ? (
+                <>
+                  <Icon
+                    type="zap"
+                    variant={isComplete ? "primary" : "lightened"}
+                  />
+                  <Chip label="Decision" size="small" />
+                  <Typography variant="bodyLarge" struck={isComplete} bold>
+                    {title}
+                  </Typography>
+                </>
+              ) : (
+                <Stack direction="row" spacing={4}>
+                  <Icon
+                    type={isComplete ? "checkCircle" : "circle"}
+                    variant={isComplete ? "primary" : "lightened"}
+                  />
+                  <Typography variant="bodyLarge" bold struck={isComplete}>
+                    {title}
+                  </Typography>
+                </Stack>
+              )}
+            </Stack>
           </Grid>
-        )}
-      </Grid>
-    </Card>
+          <Grid item>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Avatar size="mini" />
+            </Stack>
+          </Grid>
+        </Grid>
+      </StyledTask>
+      <InfoDrawer
+        task={{
+          title: title,
+          assignee: assignee,
+          resourceTitle: null,
+          resourceType: null,
+          resourceUrl: null,
+          isComplete: isComplete,
+          isDecision: isDecision,
+          decisionOptions: decisionOptions,
+        }}
+        categories={categories}
+        about="About the task"
+        open={infoDrawerOpen}
+        toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
+        handleCompleteTask={handleCompleteTask}
+      />
+    </>
   );
 };
 
