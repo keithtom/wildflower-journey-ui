@@ -16,8 +16,8 @@ import {
 import Header from "@components/Header";
 
 
-const loginRoute = `http://localhost:3001/login`;
-// const loginRoute = `https://api.wildflowerschools.org/login`;
+// const loginRoute = `http://localhost:3001/login`;
+const loginRoute = `https://api.wildflowerschools.org/login`;
 
 const PageContent = styled(Box)`
   flex-grow: 1;
@@ -42,7 +42,7 @@ const Login = ({}) => {
       },
     ).then(function (response) {
       console.log("logged in");
-      setCookie("auth", response.headers["authorization"], {});
+      setCookie("auth", response.headers["authorization"], { maxAge: 60 * 60 * 24});
     }).catch(function (error) {
       // handle error
       console.log(error);

@@ -191,6 +191,22 @@ const MilestonePage = ({
                   />
                 </Stack>
               ) : null}
+              {/* {MilestoneRelationships.assignee.data ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    ASSIGNEE
+                  </Typography>
+                  <Avatar size="mini" />
+                </Stack>
+              ) : null} */}
+              {MilestoneAttributes.author ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    AUTHOR
+                  </Typography>
+                  <Avatar size="mini" />
+                </Stack>
+              ) : null}
             </Stack>
           </StyledMilestoneHeader>
         </Stack>
@@ -401,7 +417,7 @@ export async function getServerSideProps({ query, req, res }) {
   setAuthHeader({ req, res });
 
   const response = await axios.get(apiRoute)
-  const data = await response.json();
+  const data = await response.data;
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
   const MilestoneTitle = data.data.attributes.title;

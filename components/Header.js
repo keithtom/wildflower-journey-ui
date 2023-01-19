@@ -16,8 +16,8 @@ import {
   NavLink,
 } from "./ui/index";
 
-const logoutRoute = `http://localhost:3001/logout`;
-// const logoutRoute = `https://api.wildflowerschools.org/logout`;
+// const logoutRoute = `http://localhost:3001/logout`;
+const logoutRoute = `https://api.wildflowerschools.org/logout`;
 const token = getCookie('auth');
 axios.defaults.headers.common['Authorization'] = token;
 

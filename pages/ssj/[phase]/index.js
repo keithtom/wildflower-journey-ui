@@ -86,8 +86,8 @@ const PhasePage = ({
                         key={i}
                         title={m.attributes.title}
                         effort={m.attributes.effort}
-                        categories={m.attributes.categories}
-                        assignee={m.relationships.assignee.data}
+                        category={m.attributes.category}
+                        // assignee={m.relationships.assignee.data}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
                       />
@@ -127,7 +127,7 @@ const PhasePage = ({
                         title={m.attributes.title}
                         effort={m.attributes.effort}
                         category={m.attributes.category}
-                        assignee={m.relationships.assignee.data}
+                        // assignee={m.relationships.assignee.data}
                         status={m.attributes.status}
                       />
                     ))}
@@ -166,7 +166,7 @@ const PhasePage = ({
                         title={m.attributes.title}
                         effort={m.attributes.effort}
                         category={m.attributes.category}
-                        assignee={m.relationships.assignee.data}
+                        // assignee={m.relationships.assignee.data}
                         status={m.attributes.status}
                       />
                     ))}
@@ -384,13 +384,7 @@ export async function getServerSideProps({params, req, res}) {
   setAuthHeader({req, res});
 
   const response = await axios.get(apiRoute);
-  if (res.status == 401) {
-    console.log("UNAUTHORIZED")
-    console.log(req);
-    console.log(axios.defaults.headers.common);
-  }
-  console.log(res);
-  const data = await response.json();
+  const data = await response.data;
   const MilestonesToDo = [];
   const MilestonesUpNext = [];
   const MilestonesDone = [];
