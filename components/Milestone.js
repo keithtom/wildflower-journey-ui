@@ -34,7 +34,7 @@ const Milestone = ({
           variant="lightened"
           hoverable
           size="small"
-          noRadius={variant === "compressed" ? true : false}
+          noRadius={variant === "small" ? true : false}
         >
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
@@ -47,7 +47,7 @@ const Milestone = ({
                 )}
                 {status === "to do" && <Icon type="circle" variant="primary" />}
                 <Typography
-                  variant="bodyLarge"
+                  variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
                   bold
                   lightened={status === "up next"}
                 >

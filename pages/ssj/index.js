@@ -7,7 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 
-import { categories } from "../../lib/utils/fake-data";
+import { categories, FakeTasksByMilestone } from "../../lib/utils/fake-data";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
 
@@ -39,7 +39,7 @@ const SSJ = ({ milestonesToDo, phase, data }) => {
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
-  const hasAssignedTasks = false;
+  const hasAssignedTasks = true;
 
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
@@ -72,7 +72,8 @@ const SSJ = ({ milestonesToDo, phase, data }) => {
 
   const hasPartner = !FakePartners.length;
 
-  // console.log({ data });
+  console.log({ data });
+  console.log({ milestonesToDo });
 
   return (
     <>
@@ -175,27 +176,28 @@ const SSJ = ({ milestonesToDo, phase, data }) => {
             </Grid>
 
             {hasAssignedTasks ? (
-              <Card>
-                <Stack spacing={6}>
-                  <Stack direction="row" spacing={4} alignItems="center">
-                    <Avatar />
-                    <Stack spacing={1}>
-                      <Typography variant="bodyLarge" bold>
-                        Assigned to you
-                      </Typography>
-                      <Typography variant="bodyRegular">
-                        2 tasks from 2 milestones
-                      </Typography>
-                    </Stack>
+              <Stack spacing={6}>
+                <Stack direction="row" spacing={4} alignItems="center">
+                  <Avatar />
+                  <Stack spacing={1}>
+                    <Typography variant="bodyLarge" bold>
+                      Assigned to you
+                    </Typography>
+                    <Typography variant="bodyRegular">
+                      Tasks from {FakeTasksByMilestone.length} milestones
+                    </Typography>
                   </Stack>
-                  <Card noPadding>
-                    <Milestone variant="compressed" />
-                    <Card size="small" noBorder>
-                      <Task size="small" />
-                    </Card>
-                  </Card>
                 </Stack>
-              </Card>
+                <Card noPadding>
+                  {FakeTasksByMilestone.map((m, i) => (
+                    <AssignedTaskByMilestone
+                      tasksByMilestone={m}
+                      key={i}
+                      phase={phase}
+                    />
+                  ))}
+                </Card>
+              </Stack>
             ) : (
               <Card variant="lightened" size="large">
                 <Grid container spacing={6}>
@@ -203,7 +205,7 @@ const SSJ = ({ milestonesToDo, phase, data }) => {
                     <Stack spacing={6}>
                       <Avatar size="md" /> {/* TODO: User avatar */}
                       <Typography variant="bodyRegular" bold>
-                        Welcome, Jane!
+                        Welcome, Keith!
                       </Typography>
                       {/* TODO: user name */}
                       <Typography variant="bodyLarge" bold>
@@ -1066,6 +1068,59 @@ const AddPartnerCard = ({ onClick }) => {
   );
 };
 
+const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
+  const [expandedTasks, setExpandedTasks] = useState(false);
+  const m = tasksByMilestone;
+  return (
+    <>
+      <Milestone
+        variant="small"
+        link={`/ssj/${phase}/${m.id}`}
+        title={m.attributes.title}
+        effort={m.attributes.effort}
+        categories={m.attributes.categories}
+        status={m.attributes.status}
+        stepCount={m.relationships.steps.data.length}
+      />
+      {m.relationships.steps.data
+        .slice(0, !expandedTasks ? 1 : 100)
+        .map((t, i) => (
+          <Task
+            variant="small"
+            taskId={t.id}
+            link={`/ssj/${phase}/${m.id}/${t.id}`}
+            title={t.attributes.title}
+            key={i}
+            isDecision={t.attributes.kind === "Decision"}
+            decisionOptions={t.attributes.decisionOptions}
+            isComplete={t.attributes.completed}
+            isNext={i === 0}
+            // handleCompleteMilestone={handleCompleteMilestone}
+            categories={m.attributes.categories}
+            assignee={t.relationships.assignee.data}
+          />
+        ))}
+      {m.relationships.steps.data.length > 1 && (
+        <Card
+          noBorder
+          size="small"
+          onClick={() => setExpandedTasks(!expandedTasks)}
+          hoverable
+        >
+          <Grid container justifyContent="center">
+            <Grid item>
+              <Typography variant="bodySmall" bold highlight>
+                Show {m.relationships.steps.data.length - 1}{" "}
+                {expandedTasks ? "less" : "more"}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Card>
+      )}
+    </>
+  );
+};
+
 const FakePartners = [
   {
     id: "2601-8f69",
@@ -1164,6 +1219,7 @@ export async function getServerSideProps({ params, req, res }) {
   // const ssjId = query.ssjId;
 
   const phase = "visioning";
+
   // const baseUrl = "http://localhost:3001"
   const baseUrl = "https://api.wildflowerschools.org";
   const apiRoute = `${baseUrl}/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;

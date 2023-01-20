@@ -8,7 +8,7 @@ import {
   Grid,
   Box,
   Stack,
-  Checkbox,
+  Button,
   Icon,
   Link,
   IconButton,
@@ -24,9 +24,9 @@ const StyledTask = styled(Box)`
 
   /* Small */
   ${(props) =>
-    props.size === "small" &&
+    props.variant === "small" &&
     css`
-      padding: ${props.theme.util.buffer * 2}px 0;
+      padding: ${props.theme.util.buffer * 2.5}px;
     `}
 
   &:last-child {
@@ -50,7 +50,8 @@ const Task = ({
   handleCompleteMilestone,
   categories,
   assignee,
-  size,
+  variant,
+  resources,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -73,9 +74,17 @@ const Task = ({
 
   return (
     <>
-      <StyledTask onClick={() => setInfoDrawerOpen(true)} size={size}>
+      <StyledTask onClick={() => setInfoDrawerOpen(true)} variant={variant}>
         <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
+          <Grid
+            item
+            flex={1}
+            sx={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             <Stack direction="row" spacing={4} alignItems="center">
               {isDecision ? (
                 <>
@@ -84,26 +93,46 @@ const Task = ({
                     variant={isComplete ? "primary" : "lightened"}
                   />
                   <Chip label="Decision" size="small" />
-                  <Typography variant="bodyLarge" struck={isComplete} bold>
+                  <Typography
+                    variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
+                    struck={isComplete}
+                    bold
+                  >
                     {title}
                   </Typography>
                 </>
               ) : (
-                <Stack direction="row" spacing={4}>
+                <Stack direction="row" spacing={4} alignItems="center">
                   <Icon
                     type={isComplete ? "checkCircle" : "circle"}
                     variant={isComplete ? "primary" : "lightened"}
                   />
-                  <Typography variant="bodyLarge" bold struck={isComplete}>
+                  <Typography
+                    variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
+                    bold
+                    struck={isComplete}
+                  >
                     {title}
                   </Typography>
                 </Stack>
               )}
             </Stack>
           </Grid>
+          {isNext && (
+            <Grid item mr={2}>
+              <Button small>
+                <Typography light variant="bodySmall">
+                  Start
+                </Typography>
+              </Button>
+            </Grid>
+          )}
           <Grid item>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar size="mini" />
+              <Avatar
+                size="mini"
+                src={assignee.profileImage && assignee.profileImage}
+              />
             </Stack>
           </Grid>
         </Grid>
@@ -112,10 +141,8 @@ const Task = ({
         task={{
           title: title,
           assignee: assignee,
-          resourceTitle: null,
-          resourceType: null,
-          resourceUrl: null,
-          isComplete: isComplete === null ? false : true,
+          resources: resources,
+          isComplete: isComplete,
           isDecision: isDecision,
           decisionOptions: decisionOptions,
           isLast,

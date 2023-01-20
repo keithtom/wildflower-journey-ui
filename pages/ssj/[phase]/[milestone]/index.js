@@ -72,7 +72,7 @@ const MilestonePage = ({
   const { phase } = router.query;
 
   console.log("Tasks", MilestoneTasks);
-  console.log("MilestoneAttributes", MilestoneAttributes);
+  // console.log("MilestoneAttributes", MilestoneAttributes);
   // console.log("Milestone Relationships", MilestoneRelationships);
 
   return (
@@ -205,6 +205,12 @@ const MilestonePage = ({
 
         <StyledMilestoneTasks downplayed={isUpNext}>
           <Stack>
+            <Stack direction="row" spacing={3} alignItems="center">
+              <Icon type="checkDouble" variant="primary" size="large" />
+              <Typography variant="h4" bold>
+                Tasks
+              </Typography>
+            </Stack>
             {userIsEditing ? (
               <>
                 <NewTaskInput />
@@ -219,12 +225,12 @@ const MilestonePage = ({
                   key={i}
                   isDecision={t.attributes.kind === "Decision"}
                   decisionOptions={t.attributes.decisionOptions}
-                  isNext={i === 2}
                   isLast={i + 1 === FakeMilestoneTasks.length}
                   isComplete={t.attributes.completed}
                   handleCompleteMilestone={handleCompleteMilestone}
                   categories={MilestoneAttributes.categories}
                   assignee={t.relationships.assignee.data}
+                  resources={t.relationships.documents.data}
                 />
               ))
             ) : (

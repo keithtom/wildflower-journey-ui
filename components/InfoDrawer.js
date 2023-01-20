@@ -141,7 +141,13 @@ const InfoDrawer = ({
                       <Typography variant="bodyMini" lightened bold>
                         ASSIGNEE
                       </Typography>
-                      <Avatar size="mini" />
+                      <Avatar
+                        size="mini"
+                        src={
+                          task.assignee.profileImage &&
+                          task.assignee.profileImage
+                        }
+                      />
                       {/* use assignee.src or equivalent, if none, show null */}
                     </Stack>
                   )}
@@ -188,6 +194,14 @@ const InfoDrawer = ({
                   )}
                 </Stack>
               </Stack>
+              {task && task.resources && task.resources.data && (
+                <Stack spacing={2}>
+                  {task.resources.data.map((r, i) => (
+                    //TODO: Add resource data once shape is defined
+                    <Card size="small" variant="lightened"></Card>
+                  ))}
+                </Stack>
+              )}
               {about && (
                 <Stack spacing={4}>
                   <Stack direction="row" spacing={4}>
@@ -264,7 +278,7 @@ const InfoDrawer = ({
                     </Grid>
                   )
                 ) : assignee ? (
-                  isComplete ? (
+                  taskIsComplete ? (
                     <>
                       <Grid item xs={6}>
                         <Button
@@ -295,9 +309,7 @@ const InfoDrawer = ({
                           variant="text"
                           onClick={handleUnassignSelf}
                         >
-                          <Typography light bold>
-                            Unassign yourself
-                          </Typography>
+                          <Typography bold>Unassign yourself</Typography>
                         </Button>
                       </Grid>
                       <Grid item xs={6}>
@@ -309,29 +321,6 @@ const InfoDrawer = ({
                       </Grid>
                     </>
                   )
-                ) : task.isComplete ? (
-                  <>
-                    <Grid item xs={6}>
-                      <Button
-                        full
-                        variant="secondary"
-                        onClick={handleAskOpsGuide}
-                      >
-                        <Typography light bold>
-                          Ask your ops guide
-                        </Typography>
-                      </Button>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Button
-                        full
-                        variant="danger"
-                        onClick={handleMarkTaskIncomplete}
-                      >
-                        <Typography bold>Mark incomplete</Typography>
-                      </Button>
-                    </Grid>
-                  </>
                 ) : (
                   <Grid item xs={12}>
                     <Button full onClick={handleAssignSelf}>
