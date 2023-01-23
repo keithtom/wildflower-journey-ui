@@ -1,7 +1,8 @@
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
-import { setCookie } from 'cookies-next';
+import { setCookie } from "cookies-next";
+import Router from "next/router";
 
 import {
   Button,
@@ -14,7 +15,6 @@ import {
   TextField,
 } from "@ui";
 import Header from "@components/Header";
-
 
 // const loginRoute = `http://localhost:3001/login`;
 const loginRoute = `https://api.wildflowerschools.org/login`;
@@ -31,23 +31,28 @@ const Login = ({}) => {
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm();
   const onSubmit = (data) => {
-    axios.post(
-      loginRoute, // TODO: set base url in some variable that switches out based on env
-      {
-        user:
+    axios
+      .post(
+        loginRoute, // TODO: set base url in some variable that switches out based on env
         {
-          email: data.email,
-          password: data.password,
+          user: {
+            email: data.email,
+            password: data.password,
+          },
         }
-      },
-    ).then(function (response) {
-      console.log("logged in");
-      setCookie("auth", response.headers["authorization"], { maxAge: 60 * 60 * 24});
-    }).catch(function (error) {
-      // handle error
-      console.log(error);
-    })
-  }
+      )
+      .then(function (response) {
+        console.log("logged in");
+        setCookie("auth", response.headers["authorization"], {
+          maxAge: 60 * 60 * 24,
+        });
+        Router.push("/ssj");
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      });
+  };
 
   const googleLogo = "/assets/images/google-g-logo.svg";
 

@@ -23,13 +23,19 @@ const Milestone = ({
   phase,
   status,
   stepCount,
+  variant,
 }) => {
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
 
   return (
     <>
       <Link href={link ? link : "/"}>
-        <Card variant="lightened" hoverable size="small">
+        <Card
+          variant="lightened"
+          hoverable
+          size="small"
+          noRadius={variant === "small" ? true : false}
+        >
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
               <Stack direction="row" spacing={3} alignItems="center">
@@ -41,7 +47,7 @@ const Milestone = ({
                 )}
                 {status === "to do" && <Icon type="circle" variant="primary" />}
                 <Typography
-                  variant="bodyLarge"
+                  variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
                   bold
                   lightened={status === "up next"}
                 >

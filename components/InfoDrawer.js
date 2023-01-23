@@ -51,6 +51,7 @@ const InfoDrawer = ({
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [assignee, setAssignee] = useState(task && task.assignee);
+  const [taskIsComplete, setTaskIsComplete] = useState(task && task.isComplete);
 
   const handleAssignSelf = () => {
     // console.log("assigning yourself");
@@ -79,6 +80,22 @@ const InfoDrawer = ({
     console.log("made a decision!");
     //send decision to backend
   };
+
+  async function handleCompleteTask() {
+    // api call, backend determiens state. needs spinner and error management.
+    // console.log("complete");
+    try {
+      // if checking, complete, if unchecking, uncomplete.
+      const response = await processesApi.complete(taskId);
+      setTaskIsComplete(!taskIsComplete); // take state from API response?
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (task.isLast) {
+      handleCompleteMilestone();
+    }
+  }
 
   return (
     <>
@@ -124,7 +141,13 @@ const InfoDrawer = ({
                       <Typography variant="bodyMini" lightened bold>
                         ASSIGNEE
                       </Typography>
-                      <Avatar size="mini" />
+                      <Avatar
+                        size="mini"
+                        src={
+                          task.assignee.profileImage &&
+                          task.assignee.profileImage
+                        }
+                      />
                       {/* use assignee.src or equivalent, if none, show null */}
                     </Stack>
                   )}
@@ -171,6 +194,14 @@ const InfoDrawer = ({
                   )}
                 </Stack>
               </Stack>
+              {task && task.resources && task.resources.data && (
+                <Stack spacing={2}>
+                  {task.resources.data.map((r, i) => (
+                    //TODO: Add resource data once shape is defined
+                    <Card size="small" variant="lightened"></Card>
+                  ))}
+                </Stack>
+              )}
               {about && (
                 <Stack spacing={4}>
                   <Stack direction="row" spacing={4}>
@@ -214,30 +245,40 @@ const InfoDrawer = ({
                       </Link>
                     </Grid>
                   </>
-                ) : (
-                  task &&
-                  (assignee && !task.isDecision ? (
-                    <>
-                      <Grid item xs={6}>
+                ) : task && task.isDecision ? (
+                  assignee ? (
+                    isDecided ? (
+                      <Grid item xs={12}>
                         <Button
                           full
-                          variant="text"
-                          onClick={handleUnassignSelf}
+                          variant="secondary"
+                          onClick={() => setIsDecided(false)}
                         >
-                          <Typography light bold>
-                            Unassign yourself
-                          </Typography>
+                          <Typography>Change decision</Typography>
                         </Button>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Button full onClick={handleCompleteTask}>
-                          <Typography light bold>
-                            Mark task complete
-                          </Typography>
+                    ) : (
+                      <Grid item xs={12}>
+                        <Button
+                          full
+                          disabled={!decisionOption}
+                          onClick={handleMakeDecision}
+                        >
+                          <Typography>Decide</Typography>
                         </Button>
                       </Grid>
-                    </>
-                  ) : task.isComplete ? (
+                    )
+                  ) : (
+                    <Grid item xs={12}>
+                      <Button full onClick={handleAssignSelf}>
+                        <Typography light bold>
+                          Assign yourself
+                        </Typography>
+                      </Button>
+                    </Grid>
+                  )
+                ) : assignee ? (
+                  taskIsComplete ? (
                     <>
                       <Grid item xs={6}>
                         <Button
@@ -260,35 +301,34 @@ const InfoDrawer = ({
                         </Button>
                       </Grid>
                     </>
-                  ) : assignee && task.isDecision ? (
-                    <Grid item xs={12}>
-                      {isDecided ? (
-                        <Button
-                          full
-                          variant="secondary"
-                          onClick={() => setIsDecided(false)}
-                        >
-                          <Typography>Change decision</Typography>
-                        </Button>
-                      ) : (
-                        <Button
-                          full
-                          disabled={!decisionOption}
-                          onClick={handleMakeDecision}
-                        >
-                          <Typography>Decide</Typography>
-                        </Button>
-                      )}
-                    </Grid>
                   ) : (
-                    <Grid item xs={12}>
-                      <Button full onClick={handleAssignSelf}>
-                        <Typography light bold>
-                          Assign yourself
-                        </Typography>
-                      </Button>
-                    </Grid>
-                  ))
+                    <>
+                      <Grid item xs={6}>
+                        <Button
+                          full
+                          variant="text"
+                          onClick={handleUnassignSelf}
+                        >
+                          <Typography bold>Unassign yourself</Typography>
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button full onClick={handleCompleteTask}>
+                          <Typography light bold>
+                            Mark task complete
+                          </Typography>
+                        </Button>
+                      </Grid>
+                    </>
+                  )
+                ) : (
+                  <Grid item xs={12}>
+                    <Button full onClick={handleAssignSelf}>
+                      <Typography light bold>
+                        Assign yourself
+                      </Typography>
+                    </Button>
+                  </Grid>
                 )}
               </Grid>
             </Stack>

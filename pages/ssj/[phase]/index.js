@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import setAuthHeader from "../../../lib/setAuthHeader"
+import setAuthHeader from "../../../lib/setAuthHeader";
 import axios from "axios";
 
 import {
@@ -29,9 +29,9 @@ const PhasePage = ({
   FakeMilestonesToConsider,
   FakeMilestonesDone,
   data,
-  MilestonesToDo,
-  MilestonesUpNext,
-  MilestonesDone,
+  milestonesToDo,
+  milestonesUpNext,
+  milestonesDone,
 }) => {
   const [phaseCompleteModalOpen, setPhaseCompleteModalOpen] = useState(false);
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
@@ -39,6 +39,8 @@ const PhasePage = ({
 
   const router = useRouter();
   const { phase } = router.query;
+
+  console.log({ data });
 
   return (
     <>
@@ -49,7 +51,7 @@ const PhasePage = ({
           </Typography>
 
           <Stack spacing={6}>
-            {MilestonesToDo.length ? (
+            {milestonesToDo.length ? (
               <Card>
                 <Stack spacing={3}>
                   <Grid
@@ -64,7 +66,7 @@ const PhasePage = ({
                           To do
                         </Typography>
                         <Typography variant="bodyLarge" lightened>
-                          {MilestonesToDo.length}
+                          {milestonesToDo.length}
                         </Typography>
                       </Stack>
                     </Grid>
@@ -80,14 +82,13 @@ const PhasePage = ({
                   </Grid>
 
                   <Stack spacing={3}>
-                    {MilestonesToDo.map((m, i) => (
+                    {milestonesToDo.map((m, i) => (
                       <Milestone
                         link={`/ssj/${phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         effort={m.attributes.effort}
-                        category={m.attributes.category}
-                        // assignee={m.relationships.assignee.data}
+                        categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
                       />
@@ -96,7 +97,7 @@ const PhasePage = ({
                 </Stack>
               </Card>
             ) : null}
-            {MilestonesUpNext.length ? (
+            {milestonesUpNext.length ? (
               <Card>
                 <Stack spacing={3}>
                   <Grid
@@ -111,7 +112,7 @@ const PhasePage = ({
                           Up Next
                         </Typography>
                         <Typography variant="bodyLarge" lightened>
-                          {MilestonesUpNext.length}
+                          {milestonesUpNext.length}
                         </Typography>
                       </Stack>
                     </Grid>
@@ -120,14 +121,13 @@ const PhasePage = ({
                     </Grid>
                   </Grid>
                   <Stack spacing={3}>
-                    {MilestonesUpNext.map((m, i) => (
+                    {milestonesUpNext.map((m, i) => (
                       <Milestone
                         link={`/ssj/${phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         effort={m.attributes.effort}
-                        category={m.attributes.category}
-                        // assignee={m.relationships.assignee.data}
+                        categories={m.attributes.categories}
                         status={m.attributes.status}
                       />
                     ))}
@@ -135,7 +135,7 @@ const PhasePage = ({
                 </Stack>
               </Card>
             ) : null}
-            {MilestonesDone.length ? (
+            {milestonesDone.length ? (
               <Card>
                 <Stack spacing={3}>
                   <Grid
@@ -150,7 +150,7 @@ const PhasePage = ({
                           Done
                         </Typography>
                         <Typography variant="bodyLarge" lightened>
-                          {MilestonesDone.length}
+                          {milestonesDone.length}
                         </Typography>
                       </Stack>
                     </Grid>
@@ -159,14 +159,13 @@ const PhasePage = ({
                     </Grid>
                   </Grid>
                   <Stack spacing={3}>
-                    {MilestonesDone.map((m, i) => (
+                    {milestonesDone.map((m, i) => (
                       <Milestone
                         link={`/ssj/${phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         effort={m.attributes.effort}
-                        category={m.attributes.category}
-                        // assignee={m.relationships.assignee.data}
+                        categories={m.attributes.categories}
                         status={m.attributes.status}
                       />
                     ))}
@@ -373,29 +372,29 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
   );
 };
 
-export async function getServerSideProps({params, req, res}) {
+export async function getServerSideProps({ params, req, res }) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
 
   const { phase } = params;
   // const baseUrl = "http://localhost:3001"
-  const baseUrl = "https://api.wildflowerschools.org"
+  const baseUrl = "https://api.wildflowerschools.org";
   const apiRoute = `${baseUrl}/v1/workflow/workflows/b9fb-d65c/processes?phase=${phase}`;
-  setAuthHeader({req, res});
+  setAuthHeader({ req, res });
 
   const response = await axios.get(apiRoute);
   const data = await response.data;
-  const MilestonesToDo = [];
-  const MilestonesUpNext = [];
-  const MilestonesDone = [];
+  const milestonesToDo = [];
+  const milestonesUpNext = [];
+  const milestonesDone = [];
 
   data.data.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
-      MilestonesToDo.push(milestone);
+      milestonesToDo.push(milestone);
     } else if (milestone.attributes.status == "up next") {
-      MilestonesUpNext.push(milestone);
+      milestonesUpNext.push(milestone);
     } else if (milestone.attributes.status == "done") {
-      MilestonesDone.push(milestone);
+      milestonesDone.push(milestone);
     }
   });
 
@@ -459,9 +458,9 @@ export async function getServerSideProps({params, req, res}) {
       FakeMilestonesUpNext,
       FakeMilestonesDone,
       data,
-      MilestonesToDo,
-      MilestonesUpNext,
-      MilestonesDone,
+      milestonesToDo,
+      milestonesUpNext,
+      milestonesDone,
     },
   };
 }

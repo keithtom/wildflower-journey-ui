@@ -5,7 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
 import axios from "axios";
-import setAuthHeader from "../../../../lib/setAuthHeader"
+import setAuthHeader from "../../../../lib/setAuthHeader";
 
 import {
   Avatar,
@@ -71,7 +71,7 @@ const MilestonePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
-  // console.log("Tasks", MilestoneTasks);
+  console.log("Tasks", MilestoneTasks);
   // console.log("MilestoneAttributes", MilestoneAttributes);
   // console.log("Milestone Relationships", MilestoneRelationships);
 
@@ -191,14 +191,6 @@ const MilestonePage = ({
                   />
                 </Stack>
               ) : null}
-              {/* {MilestoneRelationships.assignee.data ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    ASSIGNEE
-                  </Typography>
-                  <Avatar size="mini" />
-                </Stack>
-              ) : null} */}
               {MilestoneAttributes.author ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
@@ -213,6 +205,12 @@ const MilestonePage = ({
 
         <StyledMilestoneTasks downplayed={isUpNext}>
           <Stack>
+            <Stack direction="row" spacing={3} alignItems="center">
+              <Icon type="checkDouble" variant="primary" size="large" />
+              <Typography variant="h4" bold>
+                Tasks
+              </Typography>
+            </Stack>
             {userIsEditing ? (
               <>
                 <NewTaskInput />
@@ -227,12 +225,12 @@ const MilestonePage = ({
                   key={i}
                   isDecision={t.attributes.kind === "Decision"}
                   decisionOptions={t.attributes.decisionOptions}
-                  isNext={i === 2}
                   isLast={i + 1 === FakeMilestoneTasks.length}
-                  isComplete={t.attributes.completed === true}
+                  isComplete={t.attributes.completed}
                   handleCompleteMilestone={handleCompleteMilestone}
                   categories={MilestoneAttributes.categories}
-                  assignee={t.relationships.assignee}
+                  assignee={t.relationships.assignee.data}
+                  resources={t.relationships.documents.data}
                 />
               ))
             ) : (
@@ -412,11 +410,11 @@ const EditableTaskList = ({ tasks }) => {
 export async function getServerSideProps({ query, req, res }) {
   const MilestoneId = query.milestone;
   // const baseUrl = "http://localhost:3001"
-  const baseUrl = "https://api.wildflowerschools.org"
+  const baseUrl = "https://api.wildflowerschools.org";
   const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
   setAuthHeader({ req, res });
 
-  const response = await axios.get(apiRoute)
+  const response = await axios.get(apiRoute);
   const data = await response.data;
 
   const Workflow = data.included.filter((i) => i.type === "workflow");

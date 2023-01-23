@@ -12,6 +12,7 @@ export default function TextField({
   inputRef,
   helperText,
   error,
+  multiline,
   ...props
 }) {
   return (
@@ -20,7 +21,7 @@ export default function TextField({
         <Stack spacing={2}>
           <Typography variant="bodyRegular">{label}</Typography>
           <Input
-            multiline
+            multiline={multiline}
             inputRef={inputRef}
             placeholder={placeholder}
             endAdornment={endAdornment}
