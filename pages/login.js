@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import { setCookie } from "cookies-next";
 import Router from "next/router";
+import { useUserContext } from "../lib/useUserContext";
 
 import {
   Button,
@@ -25,6 +26,7 @@ const PageContent = styled(Box)`
   padding: ${({ theme }) => theme.util.buffer * 6}px;
 `;
 const Login = ({}) => {
+  const { currentUser, setCurrentUser } = useUserContext();
   const {
     control,
     handleSubmit,
