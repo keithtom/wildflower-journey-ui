@@ -21,6 +21,7 @@ import {
 import EffortChip from "./EffortChip";
 import CategoryChip from "./CategoryChip";
 import StatusChip from "./StatusChip";
+import Resource from "./Resource";
 
 const CustomDrawer = styled(Drawer)`
   margin: 0;
@@ -197,8 +198,7 @@ const InfoDrawer = ({
               {task && task.resources && task.resources.data && (
                 <Stack spacing={2}>
                   {task.resources.data.map((r, i) => (
-                    //TODO: Add resource data once shape is defined
-                    <Card size="small" variant="lightened"></Card>
+                    <Resource link={r.link} title={r.title} key={i} />
                   ))}
                 </Stack>
               )}
