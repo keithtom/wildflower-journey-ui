@@ -72,6 +72,22 @@ const Task = ({
   //   }
   // }
 
+  async function handleUncompleteTask() {
+    // api call, backend determiens state. needs spinner and error management.
+    try {
+      // if checking, complete, if unchecking, uncomplete.
+      const response = await processesApi.uncomplete(taskId);
+      setTaskIsComplete(!taskIsComplete); // take state from API response?
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (isLast) {
+      // TODO
+      // handleUncompleteMilestone();
+    }
+  }
+
   return (
     <>
       <StyledTask onClick={() => setInfoDrawerOpen(true)} variant={variant}>

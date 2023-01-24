@@ -5,7 +5,7 @@ import { getCookie } from 'cookies-next';
 const token = getCookie('auth');
 
 const api = axios.create({
-  baseURL: `${apiUrl}/v1/workflow`,
+  baseURL: `${apiUrl}/v1/workflow/`,
   timeout: 3000,
   mode: "no-cors",
   headers: {
@@ -20,14 +20,14 @@ const api = axios.create({
 
 async function index() {}
 
-async function complete(taskId) {
-  const response = await api.put(`/steps/${taskId}/complete`);
+async function assign(taskId) {
+  const response = await api.put(`/steps/${taskId}/assign`);
   // if response good, great.  else.  error out?
 }
 
-async function uncomplete(taskId) {
-  const response = await api.put(`/steps/${taskId}/uncomplete`);
+async function unassign(taskId) {
+  const response = await api.put(`/steps/${taskId}/unassign`);
   // TODO: do something w/ the response if it's not 200
 }
 
-export default { complete, uncomplete };
+export default { assign, unassign };

@@ -17,9 +17,9 @@ import {
   Icon,
   NavLink,
 } from "./ui/index";
+import baseUrl from "../lib/utils/baseUrl"
 
-const logoutRoute = `http://localhost:3001/logout`;
-// const logoutRoute = `https://api.wildflowerschools.org/logout`;
+const logoutRoute = `${baseUrl}/logout`;
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -34,9 +34,8 @@ const CustomAppBar = styled(AppBar)`
   display: flex;
 `;
 
-const Header = ({ toggleNavOpen, user }) => {
+const Header = ({ toggleNavOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
-  const loggedIn = user; //this is static fake data
 
   const { currentUser, isLoggedIn } = useUserContext();
   console.log({ currentUser });
@@ -46,11 +45,11 @@ const Header = ({ toggleNavOpen, user }) => {
     <CustomAppBar>
       <Grid
         container
-        justifyContent={loggedIn ? "space-between" : "center"}
+        justifyContent={isLoggedIn ? "space-between" : "center"}
         alignItems="center"
       >
         <Grid item>
-          {isSm && loggedIn ? (
+          {isSm && isLoggedIn ? (
             <Stack direction="row" alignItems="center" spacing={2}>
               <IconButton
                 color="inherit"
@@ -70,11 +69,11 @@ const Header = ({ toggleNavOpen, user }) => {
             </Typography>
           )}
         </Grid>
-        {loggedIn ? (
+        {isLoggedIn ? (
           <Grid item>
             <AvatarMenu
-              avatarSrc={user.profileImage}
-              userName={`${user.firstName} ${user.lastName}`}
+              avatarSrc={currentUser.profileImage}
+              userName={`${currentUser.firstName} ${currentUser.lastName}`}
             />
           </Grid>
         ) : null}

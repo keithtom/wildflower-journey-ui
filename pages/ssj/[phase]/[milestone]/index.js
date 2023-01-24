@@ -5,7 +5,8 @@ import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
 import axios from "axios";
-import setAuthHeader from "../../../../lib/setAuthHeader";
+import setAuthHeader from "../../../../lib/setAuthHeader"
+import baseUrl from "../../../../lib/utils/baseUrl"
 
 import {
   Avatar,
@@ -409,8 +410,6 @@ const EditableTaskList = ({ tasks }) => {
 
 export async function getServerSideProps({ query, req, res }) {
   const MilestoneId = query.milestone;
-  // const baseUrl = "http://localhost:3001"
-  const baseUrl = "https://api.wildflowerschools.org"
   const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
   setAuthHeader({ req, res });
 

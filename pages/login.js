@@ -5,6 +5,7 @@ import { setCookie } from "cookies-next";
 import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from 'cookies-next';
+import baseUrl from "../lib/utils/baseUrl"
 
 import {
   Button,
@@ -18,8 +19,7 @@ import {
 } from "@ui";
 import Header from "@components/Header";
 
-const loginRoute = `http://localhost:3001/login`;
-// const loginRoute = `https://api.wildflowerschools.org/login`;
+const loginRoute = `${baseUrl}/login`;
 
 const PageContent = styled(Box)`
   flex-grow: 1;
