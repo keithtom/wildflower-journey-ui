@@ -5,6 +5,7 @@ import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
 import axios from "axios";
 import { getCookie, deleteCookie } from 'cookies-next';
+import { useUserContext } from "../lib/useUserContext";
 import { theme } from "../styles/theme";
 import {
   Avatar,
@@ -15,11 +16,9 @@ import {
   Icon,
   NavLink,
 } from "./ui/index";
+import baseUrl from "../lib/utils/baseUrl"
 
-// const logoutRoute = `http://localhost:3001/logout`;
-const logoutRoute = `https://api.wildflowerschools.org/logout`;
-const token = getCookie('auth');
-axios.defaults.headers.common['Authorization'] = token;
+const logoutRoute = `${baseUrl}/logout`;
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -34,18 +33,20 @@ const CustomAppBar = styled(AppBar)`
   display: flex;
 `;
 
-const Header = ({ toggleNavOpen, user }) => {
+const Header = ({ toggleNavOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
-  const loggedIn = user;
+
+  const { currentUser, isLoggedIn } = useUserContext();
+
   return (
     <CustomAppBar>
       <Grid
         container
-        justifyContent={loggedIn ? "space-between" : "center"}
+        justifyContent={isLoggedIn ? "space-between" : "center"}
         alignItems="center"
       >
         <Grid item>
-          {isSm && loggedIn ? (
+          {isSm && isLoggedIn ? (
             <Stack direction="row" alignItems="center" spacing={2}>
               <IconButton
                 color="inherit"
@@ -65,11 +66,11 @@ const Header = ({ toggleNavOpen, user }) => {
             </Typography>
           )}
         </Grid>
-        {loggedIn ? (
+        {isLoggedIn ? (
           <Grid item>
             <AvatarMenu
-              avatarSrc={user.profileImage}
-              userName={`${user.firstName} ${user.lastName}`}
+              avatarSrc={currentUser.profileImage}
+              userName={`${currentUser.firstName} ${currentUser.lastName}`}
             />
           </Grid>
         ) : null}
@@ -79,7 +80,6 @@ const Header = ({ toggleNavOpen, user }) => {
 };
 
 export default Header;
-
 
 const AvatarMenu = ({ avatarSrc, userName }) => {
   const [profileNavOpen, setProfileNavOpen] = useState(false);
@@ -92,6 +92,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
 
   const open = Boolean(profileNavOpen);
   const id = open ? "profile-nav" : null;
+  const { setCurrentUser } = useUserContext();
 
   const StyledOption = styled(ListItem)`
     border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
@@ -119,9 +120,11 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
     axios.delete(logoutRoute)  // TODO: set base url in some variable that switches out based on env
       .then((res) => {
         // TODO: update logged out state
-          console.log("successfully logged out");
-          delete axios.defaults.headers.common["Authorization"];
           deleteCookie("auth", {});
+          delete axios.defaults.headers.common["Authorization"];
+
+          setCurrentUser(null);
+
           Router.push("/logged-out");
       }).catch((err) => console.error(err));
   };

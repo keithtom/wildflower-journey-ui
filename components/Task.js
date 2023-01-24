@@ -1,5 +1,3 @@
-import processesApi from "../api/processes";
-
 import { useState } from "react";
 import { FormControlLabel } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
@@ -55,22 +53,6 @@ const Task = ({
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
-
-  // async function handleCompleteTask() {
-  //   // api call, backend determiens state. needs spinner and error management.
-  //   // console.log("complete");
-  //   try {
-  //     // if checking, complete, if unchecking, uncomplete.
-  //     const response = await processesApi.complete(taskId);
-  //     setTaskIsComplete(!taskIsComplete); // take state from API response?
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-
-  //   if (isLast) {
-  //     handleCompleteMilestone();
-  //   }
-  // }
 
   return (
     <>
@@ -131,7 +113,7 @@ const Task = ({
             <Stack direction="row" spacing={2} alignItems="center">
               <Avatar
                 size="mini"
-                src={assignee.profileImage && assignee.profileImage}
+                // src={assignee.profileImage && assignee.profileImage} TODO: get this to work!
               />
             </Stack>
           </Grid>
@@ -140,6 +122,7 @@ const Task = ({
       <InfoDrawer
         task={{
           title: title,
+          id: taskId,
           assignee: assignee,
           resources: resources,
           isComplete: isComplete,

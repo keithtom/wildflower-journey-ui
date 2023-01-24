@@ -2,6 +2,9 @@ import { useState } from "react";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
 import { FormControlLabel, RadioGroup } from "@mui/material";
+import processesApi from "../api/processes";
+import stepsApi from "../api/steps";
+import { useUserContext } from "@lib/useUserContext";
 
 import {
   Card,
@@ -53,25 +56,39 @@ const InfoDrawer = ({
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [assignee, setAssignee] = useState(task && task.assignee);
   const [taskIsComplete, setTaskIsComplete] = useState(task && task.isComplete);
+  const { currentUser } = useUserContext();
 
-  const handleAssignSelf = () => {
+  async function handleAssignSelf() {
+    try {
+      const response = await stepsApi.assign(task.id, currentUser.id);
+      setAssignee(currentUser)
+      // TODO: update UI for Taylor
+    } catch (err) {
+      console.error(err);
+    }
+
     // console.log("assigning yourself");
-    setAssignee(true); //assign the user
+    // setAssignee(true); //assign the user
     setAssignToastOpen(true);
     //update the assignee on the task
   };
-  const handleUnassignSelf = () => {
+
+  async function handleUnassignSelf() {
+    try {
+      const response = await stepsApi.unassign(task.id);
+      setAssignee(null)
+      // TODO: update UI for Taylor
+    } catch (err) {
+      console.error(err);
+    }
     // console.log("unassigning yourself");
-    setAssignee(false); //assign the user
     setUnassignToastOpen(true);
     //update the assignee on the task
   };
   const handleAskOpsGuide = () => {
     console.log("ask ops guide");
   };
-  const handleMarkTaskIncomplete = () => {
-    console.log("marking the task incomplete");
-  };
+
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };
@@ -84,19 +101,39 @@ const InfoDrawer = ({
 
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
-    // console.log("complete");
     try {
       // if checking, complete, if unchecking, uncomplete.
-      const response = await processesApi.complete(taskId);
-      setTaskIsComplete(!taskIsComplete); // take state from API response?
+      const response = await processesApi.complete(task.id);
+      setTaskIsComplete(true); 
+      // TODO: update UI for Taylor
     } catch (err) {
       console.error(err);
     }
 
     if (task.isLast) {
-      handleCompleteMilestone();
+      // TODO: Taylor
+      // handleCompleteMilestone();
     }
   }
+
+  async function handleMarkTaskIncomplete() {
+    // api call, backend determiens state. needs spinner and error management.
+    try {
+      // if checking, complete, if unchecking, uncomplete.
+      const response = await processesApi.uncomplete(task.id);
+      setTaskIsComplete(false); 
+      // TODO: update UI for Taylor
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (task.isLast) {
+      // TODO: Taylor
+      // handleUncompleteMilestone(); 
+    }
+    console.log("marking the task incomplete");
+  };
+
 
   return (
     <>
@@ -144,10 +181,11 @@ const InfoDrawer = ({
                       </Typography>
                       <Avatar
                         size="mini"
-                        src={
-                          task.assignee.profileImage &&
-                          task.assignee.profileImage
-                        }
+                        // TODO: can we get the assignee information for each task in the process serializer
+                        // src={
+                        //   task.assignee.profileImage &&
+                        //   task.assignee.profileImage
+                        // }
                       />
                       {/* use assignee.src or equivalent, if none, show null */}
                     </Stack>

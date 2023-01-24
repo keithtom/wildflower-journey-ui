@@ -1,8 +1,10 @@
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
-import { setCookie } from "cookies-next";
 import Router from "next/router";
+import { useUserContext } from "../lib/useUserContext";
+import { setCookie } from 'cookies-next';
+import baseUrl from "../lib/utils/baseUrl"
 
 import {
   Button,
@@ -16,8 +18,7 @@ import {
 } from "@ui";
 import Header from "@components/Header";
 
-// const loginRoute = `http://localhost:3001/login`;
-const loginRoute = `https://api.wildflowerschools.org/login`;
+const loginRoute = `${baseUrl}/login`;
 
 const PageContent = styled(Box)`
   flex-grow: 1;
@@ -25,6 +26,7 @@ const PageContent = styled(Box)`
   padding: ${({ theme }) => theme.util.buffer * 6}px;
 `;
 const Login = ({}) => {
+  const { currentUser, setCurrentUser } = useUserContext();
   const {
     control,
     handleSubmit,
@@ -40,19 +42,21 @@ const Login = ({}) => {
             password: data.password,
           },
         }
-      )
-      .then(function (response) {
-        console.log("logged in");
-        setCookie("auth", response.headers["authorization"], {
-          maxAge: 60 * 60 * 24,
+      ).then(function (response) {
+        setCookie("auth", response.headers["authorization"], { maxAge: 60 * 60 * 24});
+        const user = response.data.data.attributes
+        setCurrentUser({
+          firstName: user.firstName, 
+          lastName: user.lastName, 
+          email: user.email, 
+          profileImage: user.imageUrl
         });
         Router.push("/ssj");
-      })
-      .catch(function (error) {
+      }).catch(function (error) {
         // handle error
         console.log(error);
-      });
-  };
+      })
+  }
 
   const googleLogo = "/assets/images/google-g-logo.svg";
 
