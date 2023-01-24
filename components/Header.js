@@ -37,8 +37,6 @@ const Header = ({ toggleNavOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
 
   const { currentUser, isLoggedIn } = useUserContext();
-  console.log({ currentUser });
-  console.log({ isLoggedIn });
 
   return (
     <CustomAppBar>
@@ -126,7 +124,6 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
           delete axios.defaults.headers.common["Authorization"];
 
           setCurrentUser(null);
-          console.log("successfully logged out");
 
           Router.push("/logged-out");
       }).catch((err) => console.error(err));

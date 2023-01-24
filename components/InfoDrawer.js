@@ -104,7 +104,6 @@ const InfoDrawer = ({
     try {
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.complete(task.id);
-      console.log(response)
       setTaskIsComplete(true); 
       // TODO: update UI for Taylor
     } catch (err) {
@@ -123,7 +122,6 @@ const InfoDrawer = ({
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.uncomplete(task.id);
       setTaskIsComplete(false); 
-      console.log(response);
       // TODO: update UI for Taylor
     } catch (err) {
       console.error(err);
