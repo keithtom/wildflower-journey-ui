@@ -18,8 +18,8 @@ import {
 } from "@ui";
 import Header from "@components/Header";
 
-// const loginRoute = `http://localhost:3001/login`;
-const loginRoute = `https://api.wildflowerschools.org/login`;
+const loginRoute = `http://localhost:3001/login`;
+// const loginRoute = `https://api.wildflowerschools.org/login`;
 
 const PageContent = styled(Box)`
   flex-grow: 1;
@@ -43,19 +43,21 @@ const Login = ({}) => {
             password: data.password,
           },
         }
-      )
-      .then(function (response) {
-        console.log("logged in");
-        setCookie("auth", response.headers["authorization"], {
-          maxAge: 60 * 60 * 24,
+      ).then(function (response) {
+        setCookie("auth", response.headers["authorization"], { maxAge: 60 * 60 * 24});
+        const user = response.data.data.attributes
+        setCurrentUser({
+          firstName: user.firstName, 
+          lastName: user.lastName, 
+          email: user.email, 
+          profileImage: user.imageUrl
         });
         Router.push("/ssj");
-      })
-      .catch(function (error) {
+      }).catch(function (error) {
         // handle error
         console.log(error);
-      });
-  };
+      })
+  }
 
   const googleLogo = "/assets/images/google-g-logo.svg";
 
