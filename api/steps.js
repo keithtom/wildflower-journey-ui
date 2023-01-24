@@ -20,8 +20,8 @@ const api = axios.create({
 
 async function index() {}
 
-async function assign(taskId) {
-  const response = await api.put(`/steps/${taskId}/assign`);
+async function assign(taskId, userId) {
+  const response = await api.put(`/steps/${taskId}/assign`, {step: { assignee_id: userId }} );
   // if response good, great.  else.  error out?
 }
 

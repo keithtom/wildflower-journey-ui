@@ -1,7 +1,6 @@
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
-import { setCookie } from "cookies-next";
 import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from 'cookies-next';

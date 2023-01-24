@@ -113,7 +113,7 @@ const Task = ({
             <Stack direction="row" spacing={2} alignItems="center">
               <Avatar
                 size="mini"
-                src={assignee.profileImage && assignee.profileImage}
+                // src={assignee.profileImage && assignee.profileImage} TODO: get this to work!
               />
             </Stack>
           </Grid>
