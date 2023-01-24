@@ -6,7 +6,6 @@ import Router from "next/router";
 import axios from "axios";
 import { getCookie, deleteCookie } from 'cookies-next';
 import { useUserContext } from "../lib/useUserContext";
-import { deleteCookie } from 'cookies-next';
 import { theme } from "../styles/theme";
 import {
   Avatar,

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
 import { FormControlLabel, RadioGroup } from "@mui/material";
+import processesApi from "../api/processes";
 
 import {
   Card,
@@ -69,9 +70,7 @@ const InfoDrawer = ({
   const handleAskOpsGuide = () => {
     console.log("ask ops guide");
   };
-  const handleMarkTaskIncomplete = () => {
-    console.log("marking the task incomplete");
-  };
+
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };
@@ -84,19 +83,41 @@ const InfoDrawer = ({
 
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
-    // console.log("complete");
     try {
       // if checking, complete, if unchecking, uncomplete.
-      const response = await processesApi.complete(taskId);
-      setTaskIsComplete(!taskIsComplete); // take state from API response?
+      const response = await processesApi.complete(task.id);
+      console.log(response)
+      setTaskIsComplete(true); 
+      // TODO: update UI for Taylor
     } catch (err) {
       console.error(err);
     }
 
     if (task.isLast) {
-      handleCompleteMilestone();
+      // TODO: Taylor
+      // handleCompleteMilestone();
     }
   }
+
+  async function handleMarkTaskIncomplete() {
+    // api call, backend determiens state. needs spinner and error management.
+    try {
+      // if checking, complete, if unchecking, uncomplete.
+      const response = await processesApi.uncomplete(task.id);
+      setTaskIsComplete(false); 
+      console.log(response);
+      // TODO: update UI for Taylor
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (task.isLast) {
+      // TODO: Taylor
+      // handleUncompleteMilestone(); 
+    }
+    console.log("marking the task incomplete");
+  };
+
 
   return (
     <>
