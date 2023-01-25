@@ -22,13 +22,15 @@ async function index() {}
 
 async function assign(taskId, userId) {
   const response = await api.put(`/steps/${taskId}/assign`, {step: { assignee_id: userId }} );
-  return response.data
+  const data = await response.data
+  return data
   // if response good, great.  else.  error out?
 }
 
 async function unassign(taskId) {
   const response = await api.put(`/steps/${taskId}/unassign`);
-  return response.data
+  const data = await response.data
+  return data
   // TODO: do something w/ the response if it's not 200
 }
 
