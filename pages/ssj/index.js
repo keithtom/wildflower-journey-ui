@@ -73,8 +73,8 @@ const SSJ = ({ milestonesToDo, phase, data }) => {
 
   const hasPartner = !FakePartners.length;
 
-  console.log({ data });
-  console.log({ milestonesToDo });
+  // console.log({ data });
+  // console.log({ milestonesToDo });
 
   return (
     <>
