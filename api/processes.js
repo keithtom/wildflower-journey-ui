@@ -22,11 +22,13 @@ async function index() {}
 
 async function complete(taskId) {
   const response = await api.put(`/steps/${taskId}/complete`);
+  return response.data
   // if response good, great.  else.  error out?
 }
 
 async function uncomplete(taskId) {
   const response = await api.put(`/steps/${taskId}/uncomplete`);
+  return response.data
   // TODO: do something w/ the response if it's not 200
 }
 
