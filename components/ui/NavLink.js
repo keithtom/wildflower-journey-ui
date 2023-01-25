@@ -41,7 +41,11 @@ const NavLink = ({ to, icon, active, secondary, label }) => {
             </Grid>
           )}
           <Grid item>
-            <Typography highlight={active} bold={!secondary}>
+            <Typography
+              highlight={active}
+              bold={!secondary}
+              variant="bodyRegular"
+            >
               {label}
             </Typography>
           </Grid>

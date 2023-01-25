@@ -5,8 +5,8 @@ import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
 import axios from "axios";
-import setAuthHeader from "../../../../lib/setAuthHeader"
-import baseUrl from "../../../../lib/utils/baseUrl"
+import setAuthHeader from "../../../../lib/setAuthHeader";
+import baseUrl from "../../../../lib/utils/baseUrl";
 
 import {
   Avatar,
@@ -30,14 +30,6 @@ import StatusChip from "../../../../components/StatusChip";
 import Milestone from "../../../../components/Milestone";
 
 const StyledMilestoneHeader = styled(Stack)`
-  /* downplayed */
-  ${(props) =>
-    props.downplayed &&
-    css`
-      opacity: 0.5;
-    `}
-`;
-const StyledMilestoneTasks = styled(Card)`
   /* downplayed */
   ${(props) =>
     props.downplayed &&
@@ -72,7 +64,7 @@ const MilestonePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
-  console.log("Tasks", MilestoneTasks);
+  // console.log("Tasks", MilestoneTasks);
   // console.log("MilestoneAttributes", MilestoneAttributes);
   // console.log("Milestone Relationships", MilestoneRelationships);
 
@@ -204,61 +196,59 @@ const MilestonePage = ({
           </StyledMilestoneHeader>
         </Stack>
 
-        <StyledMilestoneTasks downplayed={isUpNext}>
-          <Stack>
-            <Stack direction="row" spacing={3} alignItems="center">
-              <Icon type="checkDouble" variant="primary" size="large" />
-              <Typography variant="h4" bold>
-                Tasks
-              </Typography>
-            </Stack>
-            {userIsEditing ? (
-              <>
-                <NewTaskInput />
-                <EditableTaskList tasks={FakeMilestoneTasks} />
-              </>
-            ) : MilestoneTasks ? (
-              MilestoneTasks.map((t, i) => (
-                <Task
-                  taskId={t.id}
-                  link={`/ssj/${phase}/${MilestoneId}/${t.id}`}
-                  title={t.attributes.title}
-                  key={i}
-                  isDecision={t.attributes.kind === "Decision"}
-                  decisionOptions={t.attributes.decisionOptions}
-                  isLast={i + 1 === FakeMilestoneTasks.length}
-                  isComplete={t.attributes.completed}
-                  handleCompleteMilestone={handleCompleteMilestone}
-                  categories={MilestoneAttributes.categories}
-                  assignee={t.relationships.assignee.data}
-                  resources={t.relationships.documents.data}
-                />
-              ))
-            ) : (
-              <Card hoverable elevated size="small">
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <Stack>
-                      <Typography variant="bodyRegular" bold>
-                        Looks like there are no tasks for this milestone.
-                      </Typography>
-                      <Typography variant="bodySmall" lightened>
-                        Add a task to do in order to complete this milestone.
-                      </Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item>
-                    <Icon type="plus" variant="primary" />
-                  </Grid>
-                </Grid>
-              </Card>
-            )}
+        <Stack>
+          <Stack direction="row" spacing={3} alignItems="center">
+            <Icon type="checkDouble" variant="primary" size="large" />
+            <Typography variant="h4" bold>
+              Tasks
+            </Typography>
           </Stack>
-        </StyledMilestoneTasks>
+          {userIsEditing ? (
+            <>
+              <NewTaskInput />
+              <EditableTaskList tasks={FakeMilestoneTasks} />
+            </>
+          ) : MilestoneTasks ? (
+            MilestoneTasks.map((t, i) => (
+              <Task
+                taskId={t.id}
+                link={`/ssj/${phase}/${MilestoneId}/${t.id}`}
+                title={t.attributes.title}
+                key={i}
+                isDecision={t.attributes.kind === "Decision"}
+                decisionOptions={t.attributes.decisionOptions}
+                isLast={i + 1 === MilestoneTasks.length}
+                isComplete={t.attributes.completed}
+                handleCompleteMilestone={handleCompleteMilestone}
+                categories={MilestoneAttributes.categories}
+                taskAssignee={t.relationships.assignee.data}
+                resources={t.relationships.documents.data}
+              />
+            ))
+          ) : (
+            <Card hoverable elevated size="small">
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Grid item>
+                  <Stack>
+                    <Typography variant="bodyRegular" bold>
+                      Looks like there are no tasks for this milestone.
+                    </Typography>
+                    <Typography variant="bodySmall" lightened>
+                      Add a task to do in order to complete this milestone.
+                    </Typography>
+                  </Stack>
+                </Grid>
+                <Grid item>
+                  <Icon type="plus" variant="primary" />
+                </Grid>
+              </Grid>
+            </Card>
+          )}
+        </Stack>
 
         {userIsEditing ? (
           <Grid container alignItems="center" justifyContent="space-between">
@@ -300,7 +290,7 @@ const MilestonePage = ({
                 </Typography>
               </Stack>
               <Typography variant="h2" bold>
-                Name Your School
+                {MilestoneTitle}
               </Typography>
               <Typography variant="bodyLarge" lightened center>
                 You're making great progress!
@@ -413,7 +403,7 @@ export async function getServerSideProps({ query, req, res }) {
   const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
   setAuthHeader({ req, res });
 
-  const response = await axios.get(apiRoute)
+  const response = await axios.get(apiRoute);
   const data = await response.data;
 
   const Workflow = data.included.filter((i) => i.type === "workflow");

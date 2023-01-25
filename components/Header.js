@@ -4,7 +4,7 @@ import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
 import axios from "axios";
-import { getCookie, deleteCookie } from 'cookies-next';
+import { getCookie, deleteCookie } from "cookies-next";
 import { useUserContext } from "../lib/useUserContext";
 import { theme } from "../styles/theme";
 import {
@@ -16,7 +16,7 @@ import {
   Icon,
   NavLink,
 } from "./ui/index";
-import baseUrl from "../lib/utils/baseUrl"
+import baseUrl from "../lib/utils/baseUrl";
 
 const logoutRoute = `${baseUrl}/logout`;
 
@@ -111,27 +111,31 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
   `;
 
   const StyledUserMenu = styled(Popover)`
+    margin-top: ${({ theme }) => theme.util.buffer * 2}px;
     .MuiPopover-paper {
       width: 240px;
     }
   `;
 
   const handleLogOut = () => {
-    axios.delete(logoutRoute)  // TODO: set base url in some variable that switches out based on env
+    axios
+      .delete(logoutRoute) // TODO: set base url in some variable that switches out based on env
       .then((res) => {
         // TODO: update logged out state
-          deleteCookie("auth", {});
-          delete axios.defaults.headers.common["Authorization"];
+        deleteCookie("auth", {});
+        delete axios.defaults.headers.common["Authorization"];
 
-          setCurrentUser(null);
+        setCurrentUser(null);
 
-          Router.push("/logged-out");
-      }).catch((err) => console.error(err));
+        Router.push("/logged-out");
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
     <>
       <Avatar
+        hoverable
         size="sm"
         onClick={handleOpen}
         aria-describedby={id}
@@ -153,13 +157,15 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
         }}
       >
         <StyledOption>
-          <Typography highlight>Signed in as {userName}</Typography>
+          <Typography variant="bodyRegular" lightened>
+            Signed in as {userName}
+          </Typography>
         </StyledOption>
         <NavLink secondary to="/user-profile" label="Your profile" />
         <NavLink secondary to="/school-profile" label="Your school" />
         <NavLink secondary to="/settings" label="Settings" />
         <StyledOption onClick={handleLogOut} hoverable>
-          <Typography lightened>Sign out</Typography>
+          <Typography variant="bodyRegular">Sign out</Typography>
         </StyledOption>
       </StyledUserMenu>
     </>

@@ -9,6 +9,7 @@ import {
   IconButton,
   Link,
   Avatar,
+  Button,
 } from "./ui";
 import CategoryChip from "./CategoryChip";
 import EffortChip from "./EffortChip";
@@ -94,20 +95,34 @@ const Milestone = ({
       </Link>
 
       <InfoDrawer
-        toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
-        milestone={{
-          title: title,
-          effort: effort,
-          status: status,
-          taskCount: stepCount,
-          link: link,
-        }}
-        categories={categories}
-        about="About the milestone"
         open={infoDrawerOpen}
+        toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
+        link={link}
+        title={title}
+        status={status}
+        effort={effort}
+        categories={categories}
+        about="..."
+        actions={<MilestoneDrawerActions stepCount={stepCount} link={link} />}
       />
     </>
   );
 };
 
 export default Milestone;
+
+const MilestoneDrawerActions = ({ stepCount, link }) => {
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <Link href={link}>
+          <Button full>
+            <Typography light bold>
+              View {stepCount} tasks
+            </Typography>
+          </Button>
+        </Link>
+      </Grid>
+    </Grid>
+  );
+};

@@ -36,6 +36,15 @@ const CustomAvatar = styled(MaterialAvatar)`
       width: ${props.theme.util.buffer * 32}px;
       height: ${props.theme.util.buffer * 32}px;
     `}
+
+  /* hoverable */
+  ${(props) =>
+    props.hoverable &&
+    css`
+      &:hover {
+        cursor: pointer;
+      }
+    `}
 `;
 
 const Avatar = ({ ...props }) => {

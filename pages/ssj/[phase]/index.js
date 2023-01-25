@@ -2,9 +2,9 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import setAuthHeader from "../../../lib/setAuthHeader"
+import setAuthHeader from "../../../lib/setAuthHeader";
 import axios from "axios";
-import baseUrl from "../../../lib/utils/baseUrl"
+import baseUrl from "../../../lib/utils/baseUrl";
 
 import {
   PageContainer,
@@ -25,10 +25,7 @@ import {
 import Milestone from "../../../components/Milestone";
 
 const PhasePage = ({
-  FakeMilestonesToDo,
-  FakeMilestonesUpNext,
   FakeMilestonesToConsider,
-  FakeMilestonesDone,
   data,
   milestonesToDo,
   milestonesUpNext,
@@ -41,7 +38,7 @@ const PhasePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
-  console.log({ data });
+  // console.log({ data });
 
   return (
     <>
@@ -60,7 +57,7 @@ const PhasePage = ({
                     justifyContent="space-between"
                     alignItems="center"
                   >
-                    <Grid item>
+                    <Grid item ml={3}>
                       <Stack direction="row" spacing={6}>
                         <Icon type="circle" variant="primary" />
                         <Typography variant="bodyLarge" bold>
@@ -70,15 +67,6 @@ const PhasePage = ({
                           {milestonesToDo.length}
                         </Typography>
                       </Stack>
-                    </Grid>
-                    <Grid item>
-                      <IconButton
-                        onClick={() =>
-                          setAddMilestoneModalOpen(!addMilestoneModalOpen)
-                        }
-                      >
-                        <Icon type="plus" variant="lightened" />
-                      </IconButton>
                     </Grid>
                   </Grid>
 
@@ -106,7 +94,7 @@ const PhasePage = ({
                     justifyContent="space-between"
                     alignItems="center"
                   >
-                    <Grid item>
+                    <Grid item ml={3}>
                       <Stack direction="row" spacing={6}>
                         <Icon type="rightArrowCircle" variant="lightened" />
                         <Typography variant="bodyLarge" bold>
@@ -116,9 +104,6 @@ const PhasePage = ({
                           {milestonesUpNext.length}
                         </Typography>
                       </Stack>
-                    </Grid>
-                    <Grid item>
-                      <Icon type="plus" variant="lightened" />
                     </Grid>
                   </Grid>
                   <Stack spacing={3}>
@@ -144,7 +129,7 @@ const PhasePage = ({
                     justifyContent="space-between"
                     alignItems="center"
                   >
-                    <Grid item>
+                    <Grid item ml={3}>
                       <Stack direction="row" spacing={6}>
                         <Icon type="checkCircle" variant="success" />
                         <Typography variant="bodyLarge" bold>
@@ -154,9 +139,6 @@ const PhasePage = ({
                           {milestonesDone.length}
                         </Typography>
                       </Stack>
-                    </Grid>
-                    <Grid item>
-                      <Icon type="plus" variant="lightened" />
                     </Grid>
                   </Grid>
                   <Stack spacing={3}>
@@ -373,15 +355,15 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
   );
 };
 
-export async function getServerSideProps({params, req, res}) {
+export async function getServerSideProps({ params, req, res }) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
 
   const { phase } = params;
-  const workflowId = "b9fb-d65c"
+  const workflowId = "b9fb-d65c";
   // const workflowId = "9afe-6e28"
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-  setAuthHeader({req, res});
+  setAuthHeader({ req, res });
 
   const response = await axios.get(apiRoute);
   const data = await response.data;

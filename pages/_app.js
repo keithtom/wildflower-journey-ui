@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { theme } from "../styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { UserProvider, useUserContext } from "../lib/useUserContext";
+import { UserProvider } from "../lib/useUserContext";
 
 function MyApp({ Component, pageProps }) {
   return (
