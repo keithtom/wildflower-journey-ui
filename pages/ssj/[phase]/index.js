@@ -358,8 +358,8 @@ export async function getServerSideProps({ params, req, res }) {
   // const ssjId = query.ssjId;
 
   const { phase } = params;
-  const workflowId = "b9fb-d65c";
-  // const workflowId = "9afe-6e28"
+  // const workflowId = "b9fb-d65c"
+  const workflowId = "5947-ab7f"
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
 

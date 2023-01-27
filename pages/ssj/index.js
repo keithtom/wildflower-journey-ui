@@ -1098,7 +1098,7 @@ const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
             isNext={i === 0}
             // handleCompleteMilestone={handleCompleteMilestone}
             categories={m.attributes.categories}
-            assignee={t.relationships.assignee.data}
+            assignee={t.attributes.assignee}
           />
         ))}
       {m.relationships.steps.data.length > 1 && (
@@ -1220,7 +1220,7 @@ export async function getServerSideProps({ params, req, res }) {
   // const ssjId = query.ssjId;
 
   const phase = "visioning";
-  const workflowId = "b9fb-d65c"
+  const workflowId = "5947-ab7f"
   // const workflowId = "9afe-6e28"
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });

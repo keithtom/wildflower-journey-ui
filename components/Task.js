@@ -177,7 +177,7 @@ const Task = ({
           )}
           <Grid item>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar size="mini" src={assignee && assignee.profileImage} />
+              <Avatar size="mini" src={assignee && assignee.imageUrl} />
             </Stack>
           </Grid>
         </Grid>
