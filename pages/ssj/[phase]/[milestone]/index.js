@@ -221,7 +221,7 @@ const MilestonePage = ({
                 isComplete={t.attributes.completed}
                 handleCompleteMilestone={handleCompleteMilestone}
                 categories={MilestoneAttributes.categories}
-                taskAssignee={t.relationships.assignee.data}
+                taskAssignee={t.attributes.assigneeInfo}
                 resources={t.relationships.documents.data}
               />
             ))

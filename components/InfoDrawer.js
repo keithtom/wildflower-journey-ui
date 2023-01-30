@@ -88,7 +88,7 @@ const InfoDrawer = ({
                     <Avatar
                       size="mini"
                       // TODO: can we get the assignee information for each task in the process serializer
-                      src={assignee && assignee.profileImage}
+                      src={assignee && assignee.imageUrl}
                     />
                   </Stack>
                 )}

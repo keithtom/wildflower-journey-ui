@@ -29,8 +29,9 @@ import {
   TextField,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
+import { ListItemSecondaryAction } from "@mui/material";
 
-const SSJ = ({ milestonesToDo, phase, data }) => {
+const SSJ = ({ phase, data, MilestoneWithSelfAssignedTasks }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
@@ -74,7 +75,7 @@ const SSJ = ({ milestonesToDo, phase, data }) => {
   const hasPartner = !FakePartners.length;
 
   console.log({ data });
-  console.log({ milestonesToDo });
+  // console.log({ milestonesToDo });
 
   return (
     <>
@@ -185,12 +186,12 @@ const SSJ = ({ milestonesToDo, phase, data }) => {
                       Assigned to you
                     </Typography>
                     <Typography variant="bodyRegular">
-                      Tasks from {FakeTasksByMilestone.length} milestones
+                      Tasks from {MilestoneWithSelfAssignedTasks.length} milestones
                     </Typography>
                   </Stack>
                 </Stack>
                 <Card noPadding>
-                  {FakeTasksByMilestone.map((m, i) => (
+                  {MilestoneWithSelfAssignedTasks.map((m, i) => (
                     <AssignedTaskByMilestone
                       tasksByMilestone={m}
                       key={i}
@@ -287,7 +288,7 @@ const SSJ = ({ milestonesToDo, phase, data }) => {
                         firstName={f.attributes.firstName}
                         lastName={f.attributes.lastName}
                         role={f.roles[0]}
-                        profileImage={f.attributes.profileImage}
+                        profileImage={f.attributes.imageUrl}
                       />
                     </Grid>
                   ))}
@@ -1098,7 +1099,7 @@ const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
             isNext={i === 0}
             // handleCompleteMilestone={handleCompleteMilestone}
             categories={m.attributes.categories}
-            assignee={t.relationships.assignee.data}
+            assignee={t.attributes.assignee}
           />
         ))}
       {m.relationships.steps.data.length > 1 && (
@@ -1220,30 +1221,34 @@ export async function getServerSideProps({ params, req, res }) {
   // const ssjId = query.ssjId;
 
   const phase = "visioning";
-  const workflowId = "b9fb-d65c"
-  // const workflowId = "9afe-6e28"
-  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  // const workflowId = "5947-ab7f"
+  const workflowId = "c502-4f84"
+  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&self_assigned=true`;
   setAuthHeader({ req, res });
 
   const response = await axios.get(apiRoute);
   const data = await response.data;
-  const milestonesToDo = [];
-  const milestonesUpNext = [];
-  const milestonesDone = [];
 
-  data.data.forEach((milestone) => {
-    if (milestone.attributes.status == "to do") {
-      milestonesToDo.push(milestone);
+  const steps = {};
+
+  data.included.forEach((included) => {
+    if (included.type == "step") {
+      steps[included.id] = included
     }
   });
+
+  data.data.forEach((milestone) => {
+    milestone.relationships.steps.data.forEach((includedStep, i) =>{
+      milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id])
+    })
+  })
+  const MilestoneWithSelfAssignedTasks = data.data;
 
   return {
     props: {
       data,
-      milestonesToDo,
-      milestonesUpNext,
-      milestonesDone,
       phase,
+      MilestoneWithSelfAssignedTasks,
     },
   };
 }
