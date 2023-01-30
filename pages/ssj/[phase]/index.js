@@ -370,7 +370,7 @@ export async function getServerSideProps({ params, req, res }) {
   const milestonesDone = [];
 
   data.data.forEach((milestone) => {
-    if (milestone.attributes.status == "to do") {
+  if (milestone.attributes.status == "to do") {
       milestonesToDo.push(milestone);
     } else if (milestone.attributes.status == "up next") {
       milestonesUpNext.push(milestone);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import processesApi from "../api/processes";
@@ -95,7 +95,7 @@ const Task = ({
   async function handleAssignSelf() {
     try {
       const response = await stepsApi.assign(taskId, currentUser.id);
-      setAssignee(currentUser);
+      setAssignee(response.data.attributes.assigneeInfo);
     } catch (err) {
       console.error(err);
     }
