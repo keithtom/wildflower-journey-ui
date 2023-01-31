@@ -13,11 +13,11 @@ const Resource = ({ title, link }) => {
           </Stack>
         </Grid>
         <Grid item>
-          <Link href={link}>
+          <a href={link} target="_blank">
             <IconButton>
               <Icon type="linkExternal" variant="lightened" />
             </IconButton>
-          </Link>
+          </a>
         </Grid>
       </Grid>
     </Card>

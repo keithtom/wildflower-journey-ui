@@ -47,6 +47,8 @@ const MilestonePage = ({
   FakeMilestoneTasks,
   FakeAlternativeMilestones,
   sortedMilestoneTasks,
+  data,
+  includedDocuments,
 }) => {
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
@@ -66,6 +68,8 @@ const MilestonePage = ({
   const { phase } = router.query;
 
   // console.log("Tasks", MilestoneTasks);
+  // console.log("data", data);
+  // console.log("includedDocuments", includedDocuments);
   // console.log("MilestoneAttributes", MilestoneAttributes);
   // console.log("Milestone Relationships", MilestoneRelationships);
 
@@ -225,6 +229,7 @@ const MilestonePage = ({
                 categories={MilestoneAttributes.categories}
                 taskAssignee={t.attributes.assigneeInfo}
                 resources={t.relationships.documents.data}
+                includedDocuments={includedDocuments}
               />
             ))
           ) : (
@@ -408,6 +413,13 @@ export async function getServerSideProps({ query, req, res }) {
   const response = await axios.get(apiRoute);
   const data = await response.data;
 
+  const includedDocuments = {};
+  data.included
+    .filter((i) => i.type === "document")
+    .forEach((i) => {
+      includedDocuments[i.id] = i;
+    });
+
   const Workflow = data.included.filter((i) => i.type === "workflow");
   const MilestoneTitle = data.data.attributes.title;
   const MilestoneAttributes = data.data.attributes;
@@ -461,6 +473,8 @@ export async function getServerSideProps({ query, req, res }) {
 
   return {
     props: {
+      includedDocuments,
+      data,
       MilestoneId,
       MilestoneTitle,
       MilestoneAttributes,
