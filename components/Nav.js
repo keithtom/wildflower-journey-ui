@@ -74,12 +74,12 @@ const Navigation = ({}) => {
   const router = useRouter();
   return (
     <Box>
-      <NavLink
+      {/* <NavLink
         to="/network"
         active={router.pathname.includes("/network")}
         label="Network"
         icon="bookReader"
-      />
+      /> */}
       <NavLink
         to="/ssj"
         active={router.pathname === "/ssj"}

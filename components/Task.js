@@ -24,8 +24,13 @@ import InfoDrawer from "./InfoDrawer";
 
 const StyledTask = styled(Box)`
   width: 100%;
-  border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
+  border-bottom: 1px solid ${({ theme }) => theme.color.neutral.main};
   padding: ${({ theme }) => theme.util.buffer * 6}px 0;
+  transition: all 0.15s ease;
+  &:hover {
+    background: ${({ theme }) => theme.color.neutral.lightened};
+    transition: all 0.15s ease;
+  }
 
   /* Small */
   ${(props) =>
@@ -72,7 +77,7 @@ const Task = ({
     try {
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.complete(taskId);
-      setTaskIsComplete(true);
+      setTaskIsComplete(response.data.attributes.completed);
     } catch (err) {
       console.error(err);
     }
@@ -87,7 +92,8 @@ const Task = ({
     try {
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.uncomplete(taskId);
-      setTaskIsComplete(false);
+
+      setTaskIsComplete(response.data.attributes.completed);
     } catch (err) {
       console.error(err);
     }
@@ -127,6 +133,7 @@ const Task = ({
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              width: 0,
             }}
           >
             <Stack direction="row" spacing={4} alignItems="center">
@@ -166,7 +173,7 @@ const Task = ({
               )}
             </Stack>
           </Grid>
-          {isNext && (
+          {/* {isNext && (
             <Grid item mr={2}>
               <Button small>
                 <Typography light variant="bodySmall">
@@ -174,7 +181,7 @@ const Task = ({
                 </Typography>
               </Button>
             </Grid>
-          )}
+          )} */}
           <Grid item>
             <Stack direction="row" spacing={2} alignItems="center">
               <Avatar size="mini" src={assignee && assignee.imageUrl} />
@@ -186,7 +193,7 @@ const Task = ({
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
         assignee={assignee}
-        about="...."
+        about="..."
         taskId={taskId}
         title={title}
         resources={resources}
@@ -205,7 +212,7 @@ const Task = ({
           ) : (
             <TaskDrawerActions
               assignee={assignee}
-              isComplete={isComplete}
+              isComplete={taskIsComplete}
               handleAssignSelf={handleAssignSelf}
               handleUnassignSelf={handleUnassignSelf}
               handleCompleteTask={handleCompleteTask}
@@ -398,7 +405,7 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
               {title}
             </Typography>
             <Stack direction="row" spacing={3} alignItems="center">
-              <Avatar size="mini" src={assignee && assignee.profileImage} />
+              <Avatar size="mini" src={assignee && assignee.imageUrl} />
               <Stack direction="row" spacing={1}>
                 <Typography variant="bodySmall">You</Typography>
                 <Typography variant="bodySmall" lightened>

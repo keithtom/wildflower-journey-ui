@@ -46,6 +46,7 @@ const MilestonePage = ({
   MilestoneTasks,
   FakeMilestoneTasks,
   FakeAlternativeMilestones,
+  sortedMilestoneTasks,
 }) => {
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
@@ -208,8 +209,8 @@ const MilestonePage = ({
               <NewTaskInput />
               <EditableTaskList tasks={FakeMilestoneTasks} />
             </>
-          ) : MilestoneTasks ? (
-            MilestoneTasks.map((t, i) => (
+          ) : sortedMilestoneTasks ? (
+            sortedMilestoneTasks.map((t, i) => (
               <Task
                 taskId={t.id}
                 link={`/ssj/${phase}/${MilestoneId}/${t.id}`}
@@ -217,7 +218,8 @@ const MilestonePage = ({
                 key={i}
                 isDecision={t.attributes.kind === "Decision"}
                 decisionOptions={t.attributes.decisionOptions}
-                isLast={i + 1 === MilestoneTasks.length}
+                isLast={i + 1 === sortedMilestoneTasks.length}
+                isNext={isUpNext}
                 isComplete={t.attributes.completed}
                 handleCompleteMilestone={handleCompleteMilestone}
                 categories={MilestoneAttributes.categories}
@@ -411,6 +413,9 @@ export async function getServerSideProps({ query, req, res }) {
   const MilestoneAttributes = data.data.attributes;
   const MilestoneRelationships = data.data.relationships;
   const MilestoneTasks = data.included.filter((i) => i.type === "step");
+  const sortedMilestoneTasks = MilestoneTasks.sort((a, b) =>
+    a.attributes.position > b.attributes.position ? 1 : -1
+  );
 
   const FakeMilestoneTasks = [
     {
@@ -463,6 +468,7 @@ export async function getServerSideProps({ query, req, res }) {
       MilestoneTasks,
       FakeMilestoneTasks,
       FakeAlternativeMilestones,
+      sortedMilestoneTasks,
     },
   };
 }
