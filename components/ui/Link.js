@@ -1,11 +1,9 @@
-import NextLink from 'next/link'
-// import { Link as MUILink } from '@mui/material'
+import NextLink from "next/link";
 
-const Link = ({ children, ...rest }) => {
-  return (
-  <NextLink {...rest}>
-    {children}
-  </NextLink>
-)}
+// NOTE: This is not included in storybook
 
-export default Link
+const Link = ({ children, ...props }) => {
+  return <NextLink {...props}>{children}</NextLink>;
+};
+
+export default Link;

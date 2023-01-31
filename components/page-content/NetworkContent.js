@@ -1,7 +1,12 @@
-import { useState } from 'react'
-import useSearch from "../../hooks/useSearch"
+import { useState } from "react";
+import useSearch from "../../hooks/useSearch";
 
-import { schools, people, searchFilters, searchPeopleFilters } from '@lib/utils/fake-data'
+import {
+  schools,
+  people,
+  searchFilters,
+  searchPeopleFilters,
+} from "@lib/utils/fake-data";
 import {
   RadioGroup,
   FormControlLabel,
@@ -10,8 +15,8 @@ import {
   FormLabel,
   MenuItem,
   InputAdornment,
-  Link
-} from '@mui/material'
+  Link,
+} from "@mui/material";
 import {
   Divider,
   Stack,
@@ -22,81 +27,82 @@ import {
   Grid,
   Card,
   TextField,
-} from '@ui'
-import {
-  Search,
-  ArrowForwardIos
-} from '@mui/icons-material'
+  Button,
+} from "@ui";
+import { Search, ArrowForwardIos } from "@mui/icons-material";
 
-import UserResultItem from '@components/UserResultItem'
-import SchoolResultItem from '@components/SchoolResultItem'
-
+import UserResultItem from "@components/UserResultItem";
+import SchoolResultItem from "@components/SchoolResultItem";
 
 const FilterGroup = ({ group, filtersSelected, handleOnChange }) => {
-  const [showAllItems, setShowAllItems] = useState(false)
+  const [showAllItems, setShowAllItems] = useState(false);
 
   return (
     <>
       <FormLabel>{group.name}</FormLabel>
       <FormGroup>
-        { showAllItems ?
-          group.items.map((item, i) =>
-            <FormControlLabel
-              key={i}
-              value={item.value}
-              control={<Checkbox />}
-              label={item.label}
-              checked={filtersSelected[i]}
-              onChange={() => handleOnChange(i)}
-            />
-          )
-        :
-          group.items.slice(0, 3).map((item, i) =>
-            <FormControlLabel
-              key={i}
-              value={item.value}
-              control={<Checkbox />}
-              label={item.label}
-              checked={filtersSelected[i]}
-              onChange={() => handleOnChange(i)}
-            />
-          )
-        }
+        {showAllItems
+          ? group.items.map((item, i) => (
+              <FormControlLabel
+                key={i}
+                value={item.value}
+                control={<Checkbox />}
+                label={item.label}
+                checked={filtersSelected[i]}
+                onChange={() => handleOnChange(i)}
+              />
+            ))
+          : group.items
+              .slice(0, 3)
+              .map((item, i) => (
+                <FormControlLabel
+                  key={i}
+                  value={item.value}
+                  control={<Checkbox />}
+                  label={item.label}
+                  checked={filtersSelected[i]}
+                  onChange={() => handleOnChange(i)}
+                />
+              ))}
       </FormGroup>
-      {group.items.length > 3 ?
+      {group.items.length > 3 ? (
         <Link
           underline="none"
           color="text.lightened"
           onClick={() => setShowAllItems(!showAllItems)}
         >
-          {showAllItems ? 'Show less' : 'Show more'}
+          {showAllItems ? "Show less" : "Show more"}
         </Link>
-      : null}
+      ) : null}
       <Divider />
     </>
-  )
-}
+  );
+};
 
-const NetworkContent = () => {
+const NetworkContent = ({ asStakeholderSelection }) => {
   // form state, need to fire a query on every change to filters.
   // form state can look at all filters and form the right API query
   // return results for people and schools.
 
   const { query, setQuery, results } = useSearch();
 
-  const [category, setCategory] = useState('people')
+  const [category, setCategory] = useState("people");
 
-  const Role = searchPeopleFilters.find( ({ name }) => name === 'Role')
-  const Skills = searchPeopleFilters.find( ({ name }) => name === 'Skills')
-  const AgesServed = searchFilters.find( ({ name }) => name === 'Ages Served')
-  const GovernanceType = searchFilters.find( ({ name }) => name === 'Governance Type')
-  const TuitionAssistance = searchFilters.find( ({ name }) => name === 'Tuition Assistance')
-  const Calendar = searchFilters.find( ({ name }) => name === 'Calendar')
+  const Role = searchPeopleFilters.find(({ name }) => name === "Role");
+  const Skills = searchPeopleFilters.find(({ name }) => name === "Skills");
+  const AgesServed = searchFilters.find(({ name }) => name === "Ages Served");
+  const GovernanceType = searchFilters.find(
+    ({ name }) => name === "Governance Type"
+  );
+  const TuitionAssistance = searchFilters.find(
+    ({ name }) => name === "Tuition Assistance"
+  );
+  const Calendar = searchFilters.find(({ name }) => name === "Calendar");
 
   //Roles
   const [rolesSelected, setRolesSelected] = useState(
     new Array(Role.items.length).fill(true)
-  )
+  );
   const handleRolesChange = (position) => {
     const updatedCheckedState = rolesSelected.map((item, index) =>
       index === position ? !item : item
@@ -107,7 +113,7 @@ const NetworkContent = () => {
   //Skills
   const [skillsSelected, setSkillsSelected] = useState(
     new Array(Skills.items.length).fill(true)
-  )
+  );
   const handleSkillsChange = (position) => {
     const updatedCheckedState = skillsSelected.map((item, index) =>
       index === position ? !item : item
@@ -118,7 +124,7 @@ const NetworkContent = () => {
   //Ages Served
   const [agesServedSelected, setAgesServedSelected] = useState(
     new Array(AgesServed.items.length).fill(true)
-  )
+  );
   const handleAgesServedChange = (position) => {
     const updatedCheckedState = agesServedSelected.map((item, index) =>
       index === position ? !item : item
@@ -129,7 +135,7 @@ const NetworkContent = () => {
   //Governance Type
   const [governanceTypeSelected, setGovernanceTypeSelected] = useState(
     new Array(GovernanceType.items.length).fill(true)
-  )
+  );
   const handleGovernanceTypeChange = (position) => {
     const updatedCheckedState = governanceTypeSelected.map((item, index) =>
       index === position ? !item : item
@@ -140,7 +146,7 @@ const NetworkContent = () => {
   //Tuition Assistance
   const [tuitionAssistanceSelected, setTuitionAssistanceSelected] = useState(
     new Array(TuitionAssistance.items.length).fill(true)
-  )
+  );
   const handleTuitionAssistanceChange = (position) => {
     const updatedCheckedState = tuitionAssistanceSelected.map((item, index) =>
       index === position ? !item : item
@@ -151,7 +157,7 @@ const NetworkContent = () => {
   //Calendar
   const [calendarSelected, setCalendarSelected] = useState(
     new Array(Calendar.items.length).fill(true)
-  )
+  );
   const handleCalendarChange = (position) => {
     const updatedCheckedState = calendarSelected.map((item, index) =>
       index === position ? !item : item
@@ -159,9 +165,26 @@ const NetworkContent = () => {
     setCalendarSelected(updatedCheckedState);
   };
 
+  //Location
+  const [hub, setHub] = useState(0);
+  const handleHubsChange = (event) => {
+    setHub(event.target.value);
+  };
+  const [distance, setDistance] = useState(0);
+  const handleDistanceChange = (event) => {
+    setDistance(event.target.value);
+  };
+
   const handleCategoryChange = (e) => {
-    setCategory(e.target.value)
-  }
+    setCategory(e.target.value);
+  };
+
+  const handleSearchForBoard = () => {
+    setRolesSelected(["Teacher Leader"]);
+  };
+  const handleSearchForInArea = () => {
+    setDistance(1);
+  };
 
   // console.log("rolesSelected", rolesSelected)
   // console.log("skillsSelected", skillsSelected)
@@ -169,42 +192,89 @@ const NetworkContent = () => {
   // console.log("governanceTypeSelected", governanceTypeSelected)
   // console.log("tuitionAssistanceSelected", tuitionAssistanceSelected)
   // console.log("calendarSelected", calendarSelected)
+  // console.log("distance", distance);
 
   return (
-    <Grid container p={8} spacing={8}>
-
+    <Grid container spacing={8}>
       <Grid item xs={12} sm={12}>
-        <TextField
-          fullWidth
-          placeholder="Search for something..."
-          InputProps={{
-            startAdornment: <InputAdornment position="start"><Search/></InputAdornment>,
-          }}
-          onChange={(e) => { setQuery(e.target.value) }}
-        />
+        <Grid container spacing={4}>
+          <Grid item flex={1}>
+            <TextField
+              fullWidth
+              placeholder="Search for something..."
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={(e) => {
+                setQuery(e.target.value);
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <Button variant="text" sx={{ height: "100%" }}>
+              Search
+            </Button>
+          </Grid>
+        </Grid>
       </Grid>
 
       <Grid item xs={12} sm={4}>
         <Card>
           <FormControl fullWidth>
             <Stack spacing={3}>
-
               <Typography variant="h6">Filter</Typography>
+
+              <Card>
+                <Grid container spacing={4} alignItems="center">
+                  <Grid item>
+                    <Typography variant="bodyLarge">Search for</Typography>
+                  </Grid>
+                  <Grid item flex={1}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "100%" }}
+                      onClick={handleSearchForBoard}
+                    >
+                      Board of directors
+                    </Button>
+                  </Grid>
+                  <Grid item flex={1}>
+                    <Button
+                      variant="outlined"
+                      sx={{ width: "100%" }}
+                      onClick={handleSearchForInArea}
+                    >
+                      People in your area
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Card>
 
               <Divider />
 
-              <RadioGroup
-                value={category}
-                onChange={handleCategoryChange}
-              >
-                <FormControlLabel value="people" control={<Radio />} label="People" />
-                <FormControlLabel value="schools" control={<Radio />} label="Schools" />
+              <RadioGroup value={category} onChange={handleCategoryChange}>
+                <FormControlLabel
+                  value="people"
+                  control={<Radio />}
+                  label="People"
+                />
+                {!asStakeholderSelection && (
+                  <FormControlLabel
+                    value="schools"
+                    control={<Radio />}
+                    label="Schools"
+                  />
+                )}
               </RadioGroup>
 
               <Divider />
 
               <>
-                { category === 'people' &&
+                {category === "people" && (
                   <>
                     <FilterGroup
                       group={Role}
@@ -217,7 +287,7 @@ const NetworkContent = () => {
                       handleOnChange={handleSkillsChange}
                     />
                   </>
-                }
+                )}
 
                 <FilterGroup
                   group={AgesServed}
@@ -239,81 +309,117 @@ const NetworkContent = () => {
                   filtersSelected={calendarSelected}
                   handleOnChange={handleCalendarChange}
                 />
-
               </>
 
               <FormLabel>Hub</FormLabel>
-              <Select options={hubs} />
+              <Select
+                id="hub-select"
+                value={hub}
+                label="Hubs"
+                onChange={handleHubsChange}
+                options={hubs}
+              />
 
               <Divider />
 
               <FormLabel>Distance</FormLabel>
-              <Select options={distances} />
-
+              <Select
+                id="distance-select"
+                value={distance}
+                label="Distance"
+                onChange={handleDistanceChange}
+                options={distances}
+              />
             </Stack>
           </FormControl>
         </Card>
       </Grid>
 
       <Grid item xs={12} sm={8}>
-        {category === 'people' ?
+        {category === "people" ? (
           <Stack spacing={4}>
-            {results.length ?
-            <Stack spacing={4}>
-              <Typography variant="h6">{results.length} Results</Typography>
-              {results.map((p, i) =>
-                <UserResultItem user={p} key={p.id} />
-              )}
-            </Stack>
-            :
+            {results.length ? (
+              <Stack spacing={4}>
+                <Typography variant="h6">{results.length} Results</Typography>
+                {results.map((p, i) => (
+                  <UserResultItem
+                    user={p}
+                    key={p.id}
+                    asStakeholderSelection={asStakeholderSelection}
+                  />
+                ))}
+              </Stack>
+            ) : (
               <Card>
-                <Stack p={6} alignItems="center" spacing={4}>
-                  <Typography variant="h4">Oops! Looks like there's nothing here.</Typography>
-                  <Typography variant="body">Try filtering less or searching for schools instead.</Typography>
-                    <Link onClick={() => setCategory('schools')}>
+                {asStakeholderSelection ? (
+                  <Stack p={6} alignItems="center" spacing={4}>
+                    <Typography variant="h4">
+                      Oops! Looks like there's nothing here.
+                    </Typography>
+                    <Typography variant="body">
+                      Try filtering less or refining your search.
+                    </Typography>
+                  </Stack>
+                ) : (
+                  <Stack p={6} alignItems="center" spacing={4}>
+                    <Typography variant="h4">
+                      Oops! Looks like there's nothing here.
+                    </Typography>
+                    <Typography variant="body">
+                      Try filtering less or searching for schools instead.
+                    </Typography>
+                    <Link onClick={() => setCategory("schools")}>
                       <Stack direction="row" spacing={3}>
                         <Typography>Search for schools</Typography>
-                        <ArrowForwardIos fontSize='small' />
+                        <ArrowForwardIos fontSize="small" />
                       </Stack>
                     </Link>
-                </Stack>
-              </Card>
-            }
-          </Stack>
-        :
-        <Stack spacing={4}>
-          <Stack spacing={4}>
-            {schools.length ?
-              <>
-                <Typography variant="h6">{schools.length} Results</Typography>
-                {schools.map((s, i) =>
-                  <SchoolResultItem school={s} key={i} />
+                  </Stack>
                 )}
-              </>
-            :
-              <Card>
-                <Stack p={6} alignItems="center" spacing={4}>
-                  <Typography variant="h4">Oops! Looks like there's nothing here.</Typography>
-                  <Typography variant="body">Try filtering less or searching for people instead.</Typography>
-                    <Link onClick={() => setCategory('people')}>
-                      <Stack direction="row" spacing={3}>
-                        <Typography>Search for people</Typography>
-                        <ArrowForwardIos fontSize='small' />
-                      </Stack>
-                    </Link>
-                </Stack>
               </Card>
-            }
+            )}
           </Stack>
-        </Stack>
-        }
+        ) : (
+          !asStakeholderSelection && (
+            <Stack spacing={4}>
+              <Stack spacing={4}>
+                {schools.length ? (
+                  <>
+                    <Typography variant="h6">
+                      {schools.length} Results
+                    </Typography>
+                    {schools.map((s, i) => (
+                      <SchoolResultItem school={s} key={i} />
+                    ))}
+                  </>
+                ) : (
+                  <Card>
+                    <Stack p={6} alignItems="center" spacing={4}>
+                      <Typography variant="h4">
+                        Oops! Looks like there's nothing here.
+                      </Typography>
+                      <Typography variant="body">
+                        Try filtering less or searching for people instead.
+                      </Typography>
+                      <Link onClick={() => setCategory("people")}>
+                        <Stack direction="row" spacing={3}>
+                          <Typography>Search for people</Typography>
+                          <ArrowForwardIos fontSize="small" />
+                        </Stack>
+                      </Link>
+                    </Stack>
+                  </Card>
+                )}
+              </Stack>
+            </Stack>
+          )
+        )}
       </Grid>
-
     </Grid>
-  )
-}
+  );
+};
 
-export default NetworkContent
+export default NetworkContent;
 
-const hubs = ['New York', 'Massachussetts']
-const distances = ['Within 5 miles', 'Within 10 miles']
+const hubs = ["New York", "Massachussetts"];
+const distances = ["Within 5 miles", "Within 10 miles"];

@@ -1,60 +1,44 @@
-import { default as MaterialModal } from '@mui/material/Modal';
-import {
-  Card,
-  Grid,
-  Divider,
-  Stack,
-  ToggleButton,
-  Typography
-} from '@ui'
-import { styled } from '@mui/material/styles';
-import {
-  Close
-} from '@mui/icons-material'
+import { default as MaterialModal } from "@mui/material/Modal";
+import { Card, Grid, Icon, Stack, IconButton, Typography } from "./index";
+import { styled, css } from "@mui/material/styles";
 
-const CustomModal = styled(MaterialModal)(({ theme }) => `
-`)
+const CustomModal = styled(MaterialModal)``;
+const ModalCard = styled(Card)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  max-height: 640px;
+  overflow: auto;
+`;
 
 export default function Modal({
   title,
   toggle,
   children,
-  ...rest
+  noPadding,
+  ...props
 }) {
   return (
-    <CustomModal
-      {...rest}
-      onClose={toggle}
-    >
-      <Card
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 600,
-          maxHeight: '90vh',
-          overflow: 'auto'
-        }}
-      >
+    <CustomModal {...props} onClose={toggle}>
+      <ModalCard elevated noPadding={noPadding}>
         <Stack spacing={4}>
-          <Grid container alignItems="center" justifyContent="space-between">
-            {title &&<Grid item>
-              <Typography variant="h6">{title}</Typography>
-            </Grid>}
+          <Grid container alignItems="center" justifyContent="flex-end">
+            {title && (
+              <Grid item flex={1}>
+                <Typography variant="h4">{title}</Typography>
+              </Grid>
+            )}
             <Grid item>
-              <ToggleButton
-                size="small"
-                onChange={toggle}
-              >
-                <Close />
-              </ToggleButton>
+              <IconButton size="small" onClick={toggle}>
+                <Icon type="close" />
+              </IconButton>
             </Grid>
           </Grid>
-          <Divider />
           {children}
         </Stack>
-      </Card>
+      </ModalCard>
     </CustomModal>
   );
 }

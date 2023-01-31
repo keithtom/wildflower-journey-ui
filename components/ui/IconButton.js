@@ -1,18 +1,8 @@
-import { default as MaterialIconButton } from '@mui/material/IconButton';
-import { styled } from '@mui/material/styles';
+import { default as MaterialIconButton } from "@mui/material/IconButton";
+import { styled, css } from "@mui/material/styles";
 
-const CustomIconButton = styled(MaterialIconButton)(({ theme }) => `
-  text-transform: none;
-  box-shadow: none;
-`)
+const CustomIconButton = styled(MaterialIconButton)``;
 
-export default function IconButton({
-  children,
-  ...rest
-}) {
-  return (
-    <CustomIconButton
-      {...rest}
-    >{children}</CustomIconButton>
-  );
+export default function IconButton({ children, ...props }) {
+  return <CustomIconButton {...props}>{children}</CustomIconButton>;
 }

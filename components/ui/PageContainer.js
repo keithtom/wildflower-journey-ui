@@ -1,27 +1,73 @@
-import { styled } from '@mui/material/styles';
-import {
-  Box
-} from '@ui'
+import { useState } from "react";
+import { styled, css } from "@mui/material/styles";
 
-import Nav from './Nav'
+import { user } from "../../lib/utils/fake-data";
 
-const PageWrapper = styled(Box)(({ theme }) => ({
-  display: 'flex'
-}));
-const PageContent = styled(Box)(({ theme }) => ({
-  flexGrow: 1,
-  paddingTop: theme.spacing(16)
-}));
+import { Box, Grid, Card, Stack, Icon, Typography } from "./index";
+import Nav from "../Nav";
+import Header from "../Header";
+import InfoDrawer from "../InfoDrawer";
+
+// NOTE: This is not included in storybook
+
+const PageWrapper = styled(Box)`
+  display: flex;
+`;
+const PageContent = styled(Box)`
+  flex-grow: 1;
+  margin-top: ${({ theme }) => theme.util.appBarHeight}px;
+  padding: ${({ theme }) => theme.util.buffer * 6}px;
+`;
 
 const PageContainer = ({ children }) => {
-  return (
-    <PageWrapper>
-      <Nav />
-      <PageContent>
-        {children}
-      </PageContent>
-    </PageWrapper>
-  )
-}
+  //TODO: Get this data from the backend
+  const SSJAbandonProcessStarted = false;
 
-export default PageContainer
+  const [navOpen, setNavOpen] = useState(false);
+  const toggleNavOpen = () => setNavOpen(!navOpen);
+
+  return (
+    <>
+      <PageWrapper>
+        {SSJAbandonProcessStarted ? (
+          <>
+            <Header />
+            <PageContent>
+              <Grid container alignItems="center" justifyContent="center">
+                <Grid item xs={12} sm={6} md={5} lg={4}>
+                  <Card>
+                    <Stack spacing={6}>
+                      <Icon type="windowClose" variant="primary" size="large" />
+                      <Typography variant="h4" bold>
+                        You abandoned your School Startup Journey
+                      </Typography>
+                      <Typography variant="bodyLarge" lightened>
+                        We're sorry to see you go. If it looks like you may
+                        start a different Montessori school in the future, we
+                        hope you choose Wildflower Schools.
+                      </Typography>
+                      <Card variant="primaryLightened" size="small">
+                        <Typography variant="bodySmall">
+                          Email rengage@wildflowerschools.org to talk to someone
+                          about working with Wildflowers again.
+                        </Typography>
+                      </Card>
+                    </Stack>
+                  </Card>
+                </Grid>
+              </Grid>
+            </PageContent>
+          </>
+        ) : (
+          <>
+            <Header toggleNavOpen={toggleNavOpen} user={user} />
+            <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
+            <PageContent>{children}</PageContent>
+          </>
+        )}
+      </PageWrapper>
+    </>
+  );
+};
+
+export default PageContainer;

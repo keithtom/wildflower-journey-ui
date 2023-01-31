@@ -1,3 +1,6 @@
+import {useRouter} from 'next/router'
+import Link from 'next/link'
+
 import { handleTimeUntil, handleTimeSince } from '@lib/utils/usefulHandlers'
 import {
   Avatar,
@@ -15,49 +18,58 @@ import {
 } from '@mui/icons-material'
 
 const AdviceSummary = ({
+  adviceId,
   status,
   location,
   content,
   createdAt,
   deadline,
-  thoughtPartners,
+  stakeholders,
   ...rest
 }) => {
   const adviceStatus = (status === 'draft') ? 'Draft' : (status === 'open') ? 'Open' : 'Closed'
   const action = (status === 'draft') ? 'drafted' : (status === 'open') ? 'opened' : 'closed'
 
+  const router = useRouter()
+  const { userId } = router.query
+  // console.log("userId", userId)
+
   return (
-    <Stack spacing={2} {...rest}>
-      <Grid container spacing={2} justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item><Chip label={adviceStatus} /></Grid>
-            { (deadline && status !== 'draft') && <Grid item><DeadlineCounter deadline={deadline} /></Grid> }
-          </Grid>
-        </Grid>
-        {location && <Grid item>
-          <Grid container spacing={1}>
-            <Grid item><LocationOn fontSize="small" color="neutral"  /></Grid>
-            <Grid item><Typography variant="bodyLightened">{location}</Typography></Grid>
-          </Grid>
-        </Grid>}
-      </Grid>
-      <Typography variant="h4">{content}</Typography>
-      <div><Grid container spacing={4} alignItems="center">
-        <Grid item>You {action} this {handleTimeUntil(createdAt)}</Grid>
-        <Grid item><Divider orientation="vertical" flexItem style={{ height: 20 }} /></Grid>
-        <Grid item>
-          <Grid container spacing={1} alignItems="center">
-            <Grid item>
-              <AvatarGroup sm total={thoughtPartners.length}>{thoughtPartners.map((tp, i) =>
-                <Avatar alt={`${tp.firstName} ${tp.lastName}`} src={tp.avatar} />
-              )}</AvatarGroup>
+    <Link href={`/advice/people/${userId}/decisions/${adviceId}`}>
+      <Stack spacing={2} {...rest}>
+        <Grid container spacing={2} justifyContent="space-between" alignItems="center">
+          <Grid item>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item><Chip label={adviceStatus} /></Grid>
+              { (deadline && status !== 'draft') && <Grid item><DeadlineCounter deadline={deadline} /></Grid> }
             </Grid>
-            <Grid item>{thoughtPartners.length} thought partners</Grid>
           </Grid>
+          {location && <Grid item>
+            <Grid container spacing={1}>
+              <Grid item><LocationOn fontSize="small" color="neutral"  /></Grid>
+              <Grid item><Typography variant="bodyLightened">{location}</Typography></Grid>
+            </Grid>
+          </Grid>}
         </Grid>
-      </Grid></div>
-    </Stack>
+        <Typography variant="h4">{content}</Typography>
+        <div><Grid container spacing={4} alignItems="center">
+          <Grid item>You {action} this {handleTimeUntil(createdAt)}</Grid>
+          <Grid item><Divider orientation="vertical" flexItem style={{ height: 20 }} /></Grid>
+          {stakeholders &&
+            <Grid item>
+              <Grid container spacing={1} alignItems="center">
+                <Grid item>
+                  <AvatarGroup sm total={stakeholders.length}>{stakeholders.map((tp, i) =>
+                    <Avatar alt={`${tp.firstName} ${tp.lastName}`} src={tp.avatar} />
+                  )}</AvatarGroup>
+                </Grid>
+                <Grid item>{stakeholders.length} stakeholders</Grid>
+              </Grid>
+            </Grid>
+          }
+        </Grid></div>
+      </Stack>
+    </Link>
   )
 }
 

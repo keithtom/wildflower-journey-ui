@@ -1,36 +1,58 @@
-import { useRouter } from 'next/router'
-import {
-  ListItem,
-  ListItemText,
-} from '@mui/material'
-import { Link, Grid } from '@ui'
+import { styled, css } from "@mui/material/styles";
+import { ListItem } from "@mui/material";
 
-const NavLink = ({
-  to,
-  icon,
-  adornment,
-  label
-}) => {
-  const router = useRouter()
+import { Typography, Grid, Link, Icon } from "./index";
+
+const NavLink = ({ to, icon, active, secondary, label }) => {
+  const CustomListItem = styled(ListItem)`
+    padding: ${({ theme }) => theme.util.buffer * 4}px;
+    &:hover {
+      background: ${({ theme }) => theme.color.neutral.lightened};
+    }
+
+    //Active
+    ${(props) =>
+      props.active &&
+      css`
+        background: ${props.theme.color.neutral.lightened};
+      `}
+
+    //Secondary
+    ${(props) =>
+      props.secondary &&
+      css`
+        padding: ${props.theme.util.buffer * 2}px
+          ${props.theme.util.buffer * 4}px;
+        border-bottom: 1px solid ${props.theme.color.neutral.lightened};
+      `}
+  `;
+
   return (
-    <Link href={to} color="text.main" underline="none">
-      <ListItem button selected={to === router.pathname}>
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
-            <Grid container spacing={2} alignItems="center">
-              {icon && <Grid item xs="auto">
-                {icon}
-              </Grid>}
-              <Grid item><ListItemText primary={label} /></Grid>
+    <Link href={to}>
+      <CustomListItem button active={active} secondary={secondary}>
+        <Grid container spacing={secondary ? 5 : 3} alignItems="center">
+          {icon && (
+            <Grid item>
+              <Icon
+                type={icon}
+                variant={active ? "primary" : secondary && "transparent"}
+                size={secondary && "small"}
+              />
             </Grid>
+          )}
+          <Grid item>
+            <Typography
+              highlight={active}
+              bold={!secondary}
+              variant="bodyRegular"
+            >
+              {label}
+            </Typography>
           </Grid>
-          {adornment && <Grid item>
-            {adornment}
-          </Grid>}
         </Grid>
-      </ListItem>
+      </CustomListItem>
     </Link>
-  )
-}
+  );
+};
 
-export default NavLink
+export default NavLink;

@@ -16,7 +16,7 @@ const AdviceStakeholderContent = () => {
         </Grid>
       </Grid>
 
-      {advices.map((advice, i) => 
+      {advices.map((advice, i) =>
         <Card>
           <AdviceSummary
             key={i}

@@ -1,15 +1,12 @@
-import { default as MaterialBox } from '@mui/material/Box';
-import { styled } from '@mui/material/styles';
+import { default as MaterialBox } from "@mui/material/Box";
+import { styled, css } from "@mui/material/styles";
 
-const CustomBox = styled(MaterialBox)(({ theme }) => ({
-}));
+// NOTE: This is not included in storybook
 
-const Box = ({ children, ...rest }) => {
-  return (
-    <CustomBox {...rest}>
-      {children}
-    </CustomBox>
-  );
-}
+const CustomBox = styled(MaterialBox)``;
 
-export default Box
+const Box = ({ children, ...props }) => {
+  return <CustomBox {...props}>{children}</CustomBox>;
+};
+
+export default Box;

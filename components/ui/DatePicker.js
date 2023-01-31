@@ -1,37 +1,33 @@
-import { useState } from 'react'
-import { DatePicker as MaterialDatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { styled } from '@mui/material/styles';
-import {
-  TextField
-} from '@ui'
+import { DatePicker as MaterialDatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { styled, css } from "@mui/material/styles";
+import { TextField } from "./index";
 
-const CustomDatePicker = styled(MaterialDatePicker)(({ theme }) => `
-`)
+const CustomDatePicker = styled(MaterialDatePicker)``;
 
 export default function DatePicker({
-  label,
   id,
   value,
   onChange,
   options,
-  placeholder,
-  ...rest
+  label,
+  ...props
 }) {
-
-  const [dateValue, setDateValue] = useState(value)
-
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <CustomDatePicker
-        label={placeholder}
-        value={dateValue}
-        onChange={(newValue) => {
-          setDateValue(newValue);
-        }}
-        renderInput={(params) => <TextField {...params} />}
-        {...rest}
+        label={label}
+        value={value}
+        onChange={onChange}
+        renderInput={({ inputRef, inputProps, InputProps }) => (
+          <TextField
+            inputRef={inputRef}
+            {...inputProps}
+            endAdornment={InputProps?.endAdornment}
+          />
+        )}
+        {...props}
       />
     </LocalizationProvider>
   );
