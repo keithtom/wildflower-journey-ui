@@ -6,9 +6,10 @@ import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
-import baseUrl from "@lib/utils/baseUrl"
+import baseUrl from "@lib/utils/baseUrl";
 
-import { categories, FakeTasksByMilestone } from "../../lib/utils/fake-data";
+import { categories } from "../../lib/utils/fake-data";
+import { useUserContext } from "@lib/useUserContext";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
 
@@ -27,21 +28,28 @@ import {
   Modal,
   DatePicker,
   TextField,
+  Chip,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import { ListItemSecondaryAction } from "@mui/material";
 
-const SSJ = ({ phase, data, MilestoneWithSelfAssignedTasks }) => {
+const SSJ = ({
+  phase,
+  data,
+  milestonesToDo,
+  MilestoneWithSelfAssignedTasks,
+}) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
   const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
   const [viewWaysToWorkModalOpen, setViewWaysToWorkModalOpen] = useState(false);
+  const { currentUser } = useUserContext();
 
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
-  const hasAssignedTasks = true;
+  const hasAssignedTasks = MilestoneWithSelfAssignedTasks.length;
 
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
@@ -74,8 +82,9 @@ const SSJ = ({ phase, data, MilestoneWithSelfAssignedTasks }) => {
 
   const hasPartner = !FakePartners.length;
 
-  console.log({ data });
-  // console.log({ milestonesToDo });
+  // console.log({ data });
+  // console.log({ MilestoneWithSelfAssignedTasks });
+  // console.log({ currentUser });
 
   return (
     <>
@@ -180,13 +189,14 @@ const SSJ = ({ phase, data, MilestoneWithSelfAssignedTasks }) => {
             {hasAssignedTasks ? (
               <Stack spacing={6}>
                 <Stack direction="row" spacing={4} alignItems="center">
-                  <Avatar />
+                  <Avatar src={currentUser && currentUser.profileImage} />
                   <Stack spacing={1}>
                     <Typography variant="bodyLarge" bold>
                       Assigned to you
                     </Typography>
                     <Typography variant="bodyRegular">
-                      Tasks from {MilestoneWithSelfAssignedTasks.length} milestones
+                      Tasks from {MilestoneWithSelfAssignedTasks.length}{" "}
+                      milestones
                     </Typography>
                   </Stack>
                 </Stack>
@@ -205,11 +215,13 @@ const SSJ = ({ phase, data, MilestoneWithSelfAssignedTasks }) => {
                 <Grid container spacing={6}>
                   <Grid item xs={12} sm={6}>
                     <Stack spacing={6}>
-                      <Avatar size="md" /> {/* TODO: User avatar */}
+                      <Avatar
+                        size="md"
+                        src={currentUser && currentUser.profileImage}
+                      />
                       <Typography variant="bodyRegular" bold>
                         Welcome, Keith!
                       </Typography>
-                      {/* TODO: user name */}
                       <Typography variant="bodyLarge" bold>
                         Start making progress on your SSJ by working toward one
                         of these milestones!
@@ -222,9 +234,20 @@ const SSJ = ({ phase, data, MilestoneWithSelfAssignedTasks }) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Stack spacing={6}>
-                      <Typography variant="bodyRegular" bold>
-                        Milestones to start working on
-                      </Typography>
+                      <Stack spacing={4}>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Typography variant="bodyRegulr">
+                            You're currently in
+                          </Typography>
+                          <Link href="/ssj/visioning">
+                            <Chip label="Visioning" />
+                          </Link>
+                        </Stack>
+
+                        <Typography variant="bodyLarge" bold>
+                          Milestones to start working on
+                        </Typography>
+                      </Stack>
                       <Stack spacing={2}>
                         {milestonesToDo.map((m, i) => (
                           <Link href={`/ssj/${phase}/${m.id}`}>
@@ -649,7 +672,7 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
     return (
       <StyledDeliverableImage>
         <img
-          src="https://picsum.photos/500"
+          src="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
           style={{
             width: "100%",
             height: "200px",
@@ -1082,7 +1105,7 @@ const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
         effort={m.attributes.effort}
         categories={m.attributes.categories}
         status={m.attributes.status}
-        stepCount={m.relationships.steps.data.length}
+        stepCount={m.attributes.stepsCount}
       />
       {m.relationships.steps.data
         .slice(0, !expandedTasks ? 1 : 100)
@@ -1099,7 +1122,7 @@ const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
             isNext={i === 0}
             // handleCompleteMilestone={handleCompleteMilestone}
             categories={m.attributes.categories}
-            assignee={t.attributes.assignee}
+            taskAssignee={t.attributes.assigneeInfo}
           />
         ))}
       {m.relationships.steps.data.length > 1 && (
@@ -1222,30 +1245,39 @@ export async function getServerSideProps({ params, req, res }) {
 
   const phase = "visioning";
   // const workflowId = "5947-ab7f"
-  const workflowId = "c502-4f84"
+  const workflowId = "c502-4f84";
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&self_assigned=true`;
   setAuthHeader({ req, res });
-
   const response = await axios.get(apiRoute);
   const data = await response.data;
-
   const steps = {};
-
   data.included.forEach((included) => {
     if (included.type == "step") {
-      steps[included.id] = included
+      steps[included.id] = included;
     }
   });
 
   data.data.forEach((milestone) => {
-    milestone.relationships.steps.data.forEach((includedStep, i) =>{
-      milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id])
-    })
-  })
+    milestone.relationships.steps.data.forEach((includedStep, i) => {
+      milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
+    });
+  });
   const MilestoneWithSelfAssignedTasks = data.data;
+
+  const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+
+  const responseMilestones = await axios.get(apiRouteMilestones);
+  const dataMilestones = await responseMilestones.data;
+  const milestonesToDo = [];
+  dataMilestones.data.forEach((milestone) => {
+    if (milestone.attributes.status == "to do") {
+      milestonesToDo.push(milestone);
+    }
+  });
 
   return {
     props: {
+      milestonesToDo,
       data,
       phase,
       MilestoneWithSelfAssignedTasks,

@@ -3,8 +3,8 @@ import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
-import { setCookie } from 'cookies-next';
-import baseUrl from "../lib/utils/baseUrl"
+import { setCookie } from "cookies-next";
+import baseUrl from "../lib/utils/baseUrl";
 
 import {
   Button,
@@ -42,21 +42,25 @@ const Login = ({}) => {
             password: data.password,
           },
         }
-      ).then(function (response) {
-        setCookie("auth", response.headers["authorization"], { maxAge: 60 * 60 * 24});
-        const user = response.data.data.attributes
+      )
+      .then(function (response) {
+        setCookie("auth", response.headers["authorization"], {
+          maxAge: 60 * 60 * 24,
+        });
+        const user = response.data.data.attributes;
         setCurrentUser({
-          firstName: user.firstName, 
-          lastName: user.lastName, 
-          email: user.email, 
-          profileImage: user.imageUrl
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          profileImage: user.imageUrl,
         });
         Router.push("/ssj");
-      }).catch(function (error) {
+      })
+      .catch(function (error) {
         // handle error
         console.log(error);
-      })
-  }
+      });
+  };
 
   const googleLogo = "/assets/images/google-g-logo.svg";
 

@@ -358,7 +358,7 @@ export async function getServerSideProps({ params, req, res }) {
   // const ssjId = query.ssjId;
 
   const { phase } = params;
-  const workflowId = "c502-4f84"
+  const workflowId = "c502-4f84";
   // const workflowId = "5947-ab7f"
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
@@ -370,7 +370,7 @@ export async function getServerSideProps({ params, req, res }) {
   const milestonesDone = [];
 
   data.data.forEach((milestone) => {
-  if (milestone.attributes.status == "to do") {
+    if (milestone.attributes.status == "to do") {
       milestonesToDo.push(milestone);
     } else if (milestone.attributes.status == "up next") {
       milestonesUpNext.push(milestone);
@@ -395,49 +395,10 @@ export async function getServerSideProps({ params, req, res }) {
       status: "to do",
     },
   ];
-  const FakeMilestonesToDo = [
-    {
-      title: "Schedule a conversation",
-      effort: "large",
-      category: "Album Advice & Affiliation",
-      assignee: "unassigned",
-      status: "to do",
-    },
-  ];
-
-  const FakeMilestonesUpNext = [
-    {
-      title: "Decide whether to continue your SSJ",
-      effort: "large",
-      category: "Album Advice & Affiliation",
-      assignee: "unassigned",
-      status: "up next",
-    },
-  ];
-
-  const FakeMilestonesDone = [
-    {
-      title: "Get to know Wildflower",
-      effort: "large",
-      category: "Album Advice & Affiliation",
-      assignee: "unassigned",
-      status: "done",
-    },
-    {
-      title: "Discovery self assessment",
-      effort: "large",
-      category: "Album Advice & Affiliation",
-      assignee: "unassigned",
-      status: "done",
-    },
-  ];
 
   return {
     props: {
       FakeMilestonesToConsider,
-      FakeMilestonesToDo,
-      FakeMilestonesUpNext,
-      FakeMilestonesDone,
       data,
       milestonesToDo,
       milestonesUpNext,

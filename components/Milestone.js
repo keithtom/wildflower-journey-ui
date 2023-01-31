@@ -118,7 +118,7 @@ const MilestoneDrawerActions = ({ stepCount, link }) => {
         <Link href={link}>
           <Button full>
             <Typography light bold>
-              View {stepCount} tasks
+              View all {stepCount} tasks
             </Typography>
           </Button>
         </Link>
