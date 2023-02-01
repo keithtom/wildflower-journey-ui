@@ -62,6 +62,7 @@ const Task = ({
   taskAssignee,
   variant,
   resources,
+  includedDocuments,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -200,6 +201,7 @@ const Task = ({
         categories={categories}
         isDecision={isDecision}
         isComplete={taskIsComplete}
+        includedDocuments={includedDocuments}
         actions={
           isDecision ? (
             <DecisionDrawerActions

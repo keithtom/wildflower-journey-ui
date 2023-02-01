@@ -45,6 +45,7 @@ const InfoDrawer = ({
   actions,
   isDecision,
   isComplete,
+  includedDocuments,
 }) => {
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
@@ -127,13 +128,17 @@ const InfoDrawer = ({
                 )}
               </Stack>
             </Stack>
-            {resources && resources.data && (
+            {resources && resources.length ? (
               <Stack spacing={2}>
-                {resources.data.map((r, i) => (
-                  <Resource link={r.link} title={r.title} key={i} />
+                {resources.map((r, i) => (
+                  <Resource
+                    link={includedDocuments[r.id].attributes.link}
+                    title={includedDocuments[r.id].attributes.title}
+                    key={i}
+                  />
                 ))}
               </Stack>
-            )}
+            ) : null}
             {about && (
               <Stack spacing={4}>
                 <Stack direction="row" spacing={4}>
