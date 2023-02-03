@@ -22,23 +22,22 @@ import baseUrl from "@lib/utils/baseUrl";
 const DiscoveryPage = ({ data, processByCategory }) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
-  const [showMilestonesByAssignee, setShowMilestonesByAssignee] =
-    useState(false);
+  const [showTasksByAssignee, setShowTasksByAssignee] = useState(false);
   const [showResourcesByCategory, setShowResourcesByCategory] = useState(false);
 
   const handleShowMilestonesByCategory = () => {
     setShowMilestonesByCategory(true);
-    setShowMilestonesByAssignee(false);
+    setShowTasksByAssignee(false);
     setShowResourcesByCategory(false);
   };
-  const handleShowMilestonesByAssignee = () => {
+  const handleShowTasksByAssignee = () => {
     setShowMilestonesByCategory(false);
-    setShowMilestonesByAssignee(true);
+    setShowTasksByAssignee(true);
     setShowResourcesByCategory(false);
   };
   const handleShowResourcesByCategory = () => {
     setShowMilestonesByCategory(false);
-    setShowMilestonesByAssignee(false);
+    setShowTasksByAssignee(false);
     setShowResourcesByCategory(true);
   };
 
@@ -77,9 +76,9 @@ const DiscoveryPage = ({ data, processByCategory }) => {
                   onClick={handleShowMilestonesByCategory}
                 />
                 <Chip
-                  label="Milestones by Assignee"
-                  variant={showMilestonesByAssignee && "primary"}
-                  onClick={handleShowMilestonesByAssignee}
+                  label="Tasks by Assignee"
+                  variant={showTasksByAssignee && "primary"}
+                  onClick={handleShowTasksByAssignee}
                 />
                 <Chip
                   label="Resources by Category"
@@ -117,8 +116,8 @@ const DiscoveryPage = ({ data, processByCategory }) => {
             </Card>
           ))}
 
-        {showMilestonesByAssignee &&
-          FakeMilestonesByAssignee.map((a, i) => (
+        {showTasksByAssignee &&
+          FakeTasksByAssignee.map((a, i) => (
             <Card key={i}>
               <Stack spacing={6}>
                 <Stack direction="row" spacing={6} alignItems="center">
@@ -307,7 +306,7 @@ const FakeMilestonesByCategory = [
   },
 ];
 
-const FakeMilestonesByAssignee = [
+const FakeTasksByAssignee = [
   {
     assignee: {
       firstName: "Maya",
