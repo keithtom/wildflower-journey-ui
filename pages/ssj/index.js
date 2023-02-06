@@ -1244,8 +1244,8 @@ export async function getServerSideProps({ params, req, res }) {
   // const ssjId = query.ssjId;
 
   const phase = "visioning";
-  // const workflowId = "5947-ab7f"
-  const workflowId = "c502-4f84";
+  const workflowId = "5947-ab7f"
+  // const workflowId = "c502-4f84";
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&self_assigned=true`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);

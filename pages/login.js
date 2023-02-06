@@ -5,6 +5,7 @@ import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
 import baseUrl from "../lib/utils/baseUrl";
+import GoogleAuthButton from "@components/GoogleAuthButton";
 
 import {
   Button,
@@ -61,8 +62,6 @@ const Login = ({}) => {
         console.log(error);
       });
   };
-
-  const googleLogo = "/assets/images/google-g-logo.svg";
 
   return (
     <>
@@ -154,18 +153,7 @@ const Login = ({}) => {
                         </Typography>
                       </Grid>
                       <Grid item xs={12}>
-                        <Button full disabled={isSubmitting} variant="light">
-                          <Stack
-                            direction="row"
-                            spacing={3}
-                            alignItems="center"
-                          >
-                            <img src={googleLogo} />
-                            <Typography variant="bodyRegular">
-                              Log in with Google
-                            </Typography>
-                          </Stack>
-                        </Button>
+                        <GoogleAuthButton isSubmitting={isSubmitting} userId={"test@test.com"}>"blah"</GoogleAuthButton>
                       </Grid>
                     </Grid>
                   </Stack>
