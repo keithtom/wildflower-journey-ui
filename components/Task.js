@@ -69,7 +69,6 @@ const Task = ({
   const [assignee, setAssignee] = useState(taskAssignee);
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
-  const [userIsUpdatingDecision, setUserIsUpdatingDecision] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
   const { currentUser } = useUserContext();
 
@@ -119,7 +118,6 @@ const Task = ({
   }
   const handleMakeDecision = () => {
     //TODO: Api call to set decision
-    setUserIsUpdatingDecision(false);
     setIsDecided(true);
   };
 
@@ -259,7 +257,7 @@ const DecisionDrawerActions = ({
     ${(props) =>
       props.disabled &&
       css`
-        opacity: 0.5;
+        opacity: 0.7;
         pointer-events: none;
       `}
   `;
@@ -292,16 +290,39 @@ const DecisionDrawerActions = ({
         {assignee ? (
           isDecided ? (
             <Grid item xs={12}>
-              <Button
-                full
-                variant="secondary"
-                onClick={() => setIsDecided(false)}
-              >
-                <Typography>Change decision</Typography>
-              </Button>
+              <Card variant="lightened">
+                <Stack spacing={3}>
+                  <Stack direction="row" spacing={3} alignItems="center">
+                    <Icon type="check" variant="primary" />
+                    <Typography variant="bodyLarge" bold highlight>
+                      Decision made!
+                    </Typography>
+                  </Stack>
+                  <Typography variant="bodyRegular">
+                    You can't easily change this, but if you must, please reach
+                    out to support@wildflowerschools.org
+                  </Typography>
+                </Stack>
+              </Card>
             </Grid>
           ) : (
             <>
+              <Grid item xs={12}>
+                <Card size="small" variant="lightened">
+                  <Grid container spacing={3} alignItems="center">
+                    <Grid item>
+                      <Icon type="commentError" variant="primary" />
+                    </Grid>
+                    <Grid item flex={1}>
+                      <Typography variant="bodySmall">
+                        Changing decisions is not advised. Please take the
+                        necessary steps to be certain about your decision before
+                        making it here.
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Grid>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
                   <Typography bold>Unassign yourself</Typography>
@@ -313,7 +334,7 @@ const DecisionDrawerActions = ({
                   disabled={!decisionOption}
                   onClick={handleMakeDecision}
                 >
-                  <Typography>Decide</Typography>
+                  <Typography bold>Make final decision</Typography>
                 </Button>
               </Grid>
             </>

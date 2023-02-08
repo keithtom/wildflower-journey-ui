@@ -34,6 +34,7 @@ import {
   Zap,
   Star,
   Message,
+  CommentError,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -163,6 +164,7 @@ export default function Icon({ ...props }) {
     windowClose: <WindowClose />,
     glasses: <Glasses />,
     checkDouble: <CheckDouble />,
+    commentError: <CommentError />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
