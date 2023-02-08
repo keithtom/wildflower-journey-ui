@@ -40,10 +40,11 @@ const StyledMilestoneHeader = styled(Stack)`
 
 const MilestonePage = ({
   MilestoneId,
-  MilestoneTitle,
-  MilestoneAttributes,
-  MilestoneRelationships,
-  MilestoneTasks,
+  milestoneTitle,
+  milestoneDescription,
+  milestoneAttributes,
+  milestoneRelationships,
+  milestoneTasks,
   FakeMilestoneTasks,
   FakeAlternativeMilestones,
   sortedMilestoneTasks,
@@ -68,10 +69,10 @@ const MilestonePage = ({
   const { phase } = router.query;
 
   // console.log("Tasks", MilestoneTasks);
-  // console.log("data", data);
+  console.log("data", data);
   // console.log("includedDocuments", includedDocuments);
-  // console.log("MilestoneAttributes", MilestoneAttributes);
-  // console.log("Milestone Relationships", MilestoneRelationships);
+  // console.log("milestoneAttributes", milestoneAttributes);
+  // console.log("Milestone Relationships", milestoneRelationships);
 
   return (
     <PageContainer>
@@ -143,30 +144,33 @@ const MilestonePage = ({
               </Grid>
             </Card>
           )}
-          <StyledMilestoneHeader spacing={6} downplayed={isUpNext}>
+          <StyledMilestoneHeader spacing={8} downplayed={isUpNext}>
             <Typography variant="h2" bold capitalize>
-              {MilestoneTitle}
+              {milestoneTitle}
+            </Typography>
+            <Typography variant="bodyLarge" lightened>
+              {milestoneDescription}
             </Typography>
             <Stack direction="row" spacing={6} alignItems="center">
-              {MilestoneAttributes.status ? (
+              {milestoneAttributes.status ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     STATUS
                   </Typography>
                   <StatusChip
-                    status={MilestoneAttributes.status}
+                    status={milestoneAttributes.status}
                     size="small"
                     withIcon
                   />
                 </Stack>
               ) : null}
-              {MilestoneAttributes.categories ? (
+              {milestoneAttributes.categories ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     CATEGORY
                   </Typography>
                   <Stack direction="row" spacing={2}>
-                    {MilestoneAttributes.categories.map((m, i) => (
+                    {milestoneAttributes.categories.map((m, i) => (
                       <CategoryChip
                         category={m}
                         size="small"
@@ -177,19 +181,19 @@ const MilestonePage = ({
                   </Stack>
                 </Stack>
               ) : null}
-              {MilestoneAttributes.effort ? (
+              {milestoneAttributes.effort ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     EFFORT
                   </Typography>
                   <EffortChip
-                    effort={MilestoneAttributes.effort}
+                    effort={milestoneAttributes.effort}
                     size="small"
                     withIcon
                   />
                 </Stack>
               ) : null}
-              {MilestoneAttributes.author ? (
+              {milestoneAttributes.author ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     AUTHOR
@@ -219,6 +223,7 @@ const MilestonePage = ({
                 taskId={t.id}
                 link={`/ssj/${phase}/${MilestoneId}/${t.id}`}
                 title={t.attributes.title}
+                description={t.attributes.description}
                 key={i}
                 isDecision={t.attributes.kind === "Decision"}
                 decisionOptions={t.attributes.decisionOptions}
@@ -226,7 +231,7 @@ const MilestonePage = ({
                 isNext={isUpNext}
                 isComplete={t.attributes.completed}
                 handleCompleteMilestone={handleCompleteMilestone}
-                categories={MilestoneAttributes.categories}
+                categories={milestoneAttributes.categories}
                 taskAssignee={t.attributes.assigneeInfo}
                 resources={t.relationships.documents.data}
                 includedDocuments={includedDocuments}
@@ -297,7 +302,7 @@ const MilestonePage = ({
                 </Typography>
               </Stack>
               <Typography variant="h2" bold>
-                {MilestoneTitle}
+                {milestoneTitle}
               </Typography>
               <Typography variant="bodyLarge" lightened center>
                 You're making great progress!
@@ -421,11 +426,12 @@ export async function getServerSideProps({ query, req, res }) {
     });
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
-  const MilestoneTitle = data.data.attributes.title;
-  const MilestoneAttributes = data.data.attributes;
-  const MilestoneRelationships = data.data.relationships;
-  const MilestoneTasks = data.included.filter((i) => i.type === "step");
-  const sortedMilestoneTasks = MilestoneTasks.sort((a, b) =>
+  const milestoneTitle = data.data.attributes.title;
+  const milestoneDescription = data.data.attributes.description;
+  const milestoneAttributes = data.data.attributes;
+  const milestoneRelationships = data.data.relationships;
+  const milestoneTasks = data.included.filter((i) => i.type === "step");
+  const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
   );
 
@@ -476,10 +482,11 @@ export async function getServerSideProps({ query, req, res }) {
       includedDocuments,
       data,
       MilestoneId,
-      MilestoneTitle,
-      MilestoneAttributes,
-      MilestoneRelationships,
-      MilestoneTasks,
+      milestoneTitle,
+      milestoneDescription,
+      milestoneAttributes,
+      milestoneRelationships,
+      milestoneTasks,
       FakeMilestoneTasks,
       FakeAlternativeMilestones,
       sortedMilestoneTasks,

@@ -50,6 +50,7 @@ const StyledTask = styled(Box)`
 const Task = ({
   taskId,
   title,
+  description,
   isComplete,
   notNavigable,
   isDecision,
@@ -192,7 +193,7 @@ const Task = ({
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
         assignee={assignee}
-        about="..."
+        about={description}
         taskId={taskId}
         title={title}
         resources={resources}

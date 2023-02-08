@@ -19,6 +19,7 @@ import InfoDrawer from "./InfoDrawer";
 const Milestone = ({
   link,
   title,
+  description,
   effort,
   categories,
   phase,
@@ -102,7 +103,7 @@ const Milestone = ({
         status={status}
         effort={effort}
         categories={categories}
-        about="..."
+        about={description}
         actions={<MilestoneDrawerActions stepCount={stepCount} link={link} />}
       />
     </>
