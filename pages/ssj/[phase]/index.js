@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../../lib/setAuthHeader";
@@ -161,6 +161,32 @@ const PhasePage = ({
 
           <Divider />
 
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              <Stack>
+                <Typography variant="bodyRegular" bold>
+                  Is there a milestone you need to work toward that isn't here?
+                </Typography>
+                <Typography variant="bodyRegular" lightened>
+                  Add a custom milestone to your journey so you can track your
+                  progress!
+                </Typography>
+              </Stack>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="secondary"
+                onClick={() => setAddMilestoneModalOpen(true)}
+              >
+                <Typography variant="bodyRegular">
+                  Add custom milestone
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+
+          <Divider />
+
           {milestonesToConsider && (
             <>
               <Stack direction="column" spacing={2}>
@@ -231,127 +257,159 @@ const PhasePage = ({
 export default PhasePage;
 
 const AddMilestoneModal = ({ toggle, title, open }) => {
+  const resetFormTime = 1000;
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm({
     defaultValues: {
       title: "",
       category: "",
       status: "",
-      effort: "",
-      assignee: "",
+      description: "",
     },
   });
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    //TODO: Submit the custom milestone data to the backend
+    console.log(data);
+    setTimeout(() => {
+      toggle();
+    }, resetFormTime);
+  };
+  useEffect(() => {
+    setTimeout(() => {
+      reset({
+        title: "",
+        category: "",
+        status: "",
+        description: "",
+      });
+    }, resetFormTime);
+  }, [isSubmitSuccessful]);
 
   return (
     <Modal title={title} toggle={toggle} open={open}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={3}>
-          <Controller
-            name="title"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <TextField
-                label="Title"
-                placeholder="Milestone title..."
-                error={errors.title}
-                helperText={
-                  errors &&
-                  errors.title &&
-                  errors.title &&
-                  "This field is required"
-                }
-                {...field}
+      {isSubmitSuccessful ? (
+        <Card variant="lightened" size="large">
+          <Stack spacing={6} alignItems="center">
+            <Typography variant="h4" bold>
+              You added a custom milestone!
+            </Typography>
+          </Stack>
+        </Card>
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={6}>
+            <Stack spacing={3}>
+              <Controller
+                name="title"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <TextField
+                    label="Title"
+                    placeholder="Milestone title..."
+                    error={errors.title}
+                    helperText={
+                      errors &&
+                      errors.title &&
+                      errors.title &&
+                      "This field is required"
+                    }
+                    {...field}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="category"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select
-                label="Category"
-                placeholder="Select a category..."
-                options={["1", "2"]}
-                error={errors.category}
-                helperText={
-                  errors &&
-                  errors.category &&
-                  errors.category &&
-                  "This field is required"
-                }
-                {...field}
+              <Controller
+                name="description"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <TextField
+                    multiline
+                    label="Description"
+                    placeholder="Milestone description..."
+                    error={errors.description}
+                    helperText={
+                      errors &&
+                      errors.description &&
+                      errors.description &&
+                      "This field is required"
+                    }
+                    {...field}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="status"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select
-                label="Status"
-                placeholder="Select a status..."
-                options={["1", "2"]}
-                error={errors.status}
-                helperText={
-                  errors &&
-                  errors.status &&
-                  errors.status &&
-                  "This field is required"
-                }
-                {...field}
+              <Controller
+                name="category"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Select
+                    label="Category"
+                    placeholder="Select a category..."
+                    options={[
+                      "Finance",
+                      "Facilities",
+                      "Governance & Compliance",
+                      "Human Resources",
+                      "Community & Family Engagement",
+                      "Classroom & Program Practices",
+                      "Albums",
+                      "Advice & Affiliation",
+                      "WF Community & Culture",
+                    ]}
+                    error={errors.category}
+                    helperText={
+                      errors &&
+                      errors.category &&
+                      errors.category &&
+                      "This field is required"
+                    }
+                    {...field}
+                  />
+                )}
               />
-            )}
-          />
-          <Controller
-            name="effort"
-            control={control}
-            render={({ field }) => (
-              <Select
-                label="Effort"
-                placeholder="Select an effort level..."
-                options={["1", "2"]}
-                {...field}
+              <Controller
+                name="status"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Select
+                    label="Status"
+                    placeholder="Select a status..."
+                    options={["To Do", "Done"]}
+                    error={errors.status}
+                    helperText={
+                      errors &&
+                      errors.status &&
+                      errors.status &&
+                      "This field is required"
+                    }
+                    {...field}
+                  />
+                )}
               />
-            )}
-          />
-
-          <Typography variant="bodyRegular">Assignee</Typography>
-
-          <Controller
-            name="assignee"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <RadioGroup value={value} onChange={onChange}>
-                <FormControlLabel value="you" control={<Radio />} label="You" />
-                <FormControlLabel
-                  value="paula armstrong"
-                  control={<Radio />}
-                  label="Paula Armstrong"
-                />
-              </RadioGroup>
-            )}
-          />
-        </Stack>
-        <Grid container justifyContent="space-between">
-          <Grid item>
-            <Button variant="light" onClick={toggle}>
-              Cancel
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button variant="primary" disabled={isSubmitting} type="submit">
-              <Typography light>Add milestone</Typography>
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
+            </Stack>
+            <Grid container justifyContent="space-between">
+              <Grid item>
+                <Button variant="light" onClick={toggle}>
+                  Cancel
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button variant="primary" disabled={isSubmitting} type="submit">
+                  <Typography light variant="bodyRegular">
+                    Add milestone
+                  </Typography>
+                </Button>
+              </Grid>
+            </Grid>
+          </Stack>
+        </form>
+      )}
     </Modal>
   );
 };
