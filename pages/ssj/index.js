@@ -44,6 +44,7 @@ const SSJ = ({
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
   const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
   const [viewWaysToWorkModalOpen, setViewWaysToWorkModalOpen] = useState(false);
+  const [submittedPartnerRequest, setSubmittedPartnerRequest] = useState(false);
   const { currentUser } = useUserContext();
 
   //TODO: Get this data from the backend
@@ -301,6 +302,7 @@ const SSJ = ({
                   {hasPartner ? null : (
                     <Grid item xs={12} sm={4}>
                       <AddPartnerCard
+                        submittedPartnerRequest={submittedPartnerRequest}
                         onClick={() => setAddPartnerModalOpen(true)}
                       />
                     </Grid>
@@ -546,6 +548,7 @@ const SSJ = ({
         open={viewWaysToWorkModalOpen}
       />
       <AddPartnerModal
+        setSubmittedPartnerRequest={setSubmittedPartnerRequest}
         toggle={() => setAddPartnerModalOpen(!addPartnerModalOpen)}
         open={addPartnerModalOpen}
       />
@@ -853,9 +856,7 @@ const FirstTimeUserModal = ({ toggle, open, firstName }) => {
     </Modal>
   );
 };
-const AddPartnerModal = ({ toggle, open }) => {
-  const [isAddingByEmail, setIsAddingByEmail] = useState(true);
-
+const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
   const {
     control,
     handleSubmit,
@@ -868,12 +869,31 @@ const AddPartnerModal = ({ toggle, open }) => {
       partnerMessage: "",
     },
   });
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    setSubmittedPartnerRequest(true);
+    console.log(data);
+  };
 
   return (
     <Modal title="Add a partner" toggle={toggle} open={open}>
       <Stack spacing={3}>
-        {isAddingByEmail ? (
+        {isSubmitSuccessful ? (
+          <Card variant="lightened" size="large">
+            <Stack spacing={6}>
+              <Typography variant="h4" bold>
+                Thanks for making a request to add a partner!
+              </Typography>
+              <Typography variant="bodyLarge">
+                Someone from Wildflower Schools will be in touch with you to
+                help set up your partnership shortly!
+              </Typography>
+              <Typography variant="bodyRegular" lightened>
+                In the mean time, if you have any questions or concerns, please
+                reach out to support@wildflowerschools.org
+              </Typography>
+            </Stack>
+          </Card>
+        ) : (
           <>
             <Card variant="primaryLightened">
               <Stack alignItems="center" justifyContent="center" spacing={3}>
@@ -881,23 +901,9 @@ const AddPartnerModal = ({ toggle, open }) => {
                   Add your partner via email!
                 </Typography>
                 <Typography variant="bodyRegular" highlight center>
-                  Invite your partner to work with you and join the Wildflower
-                  Network.
+                  Make a request to invite your partner to work with you and
+                  join the Wildflower Network.
                 </Typography>
-                <Stack direction="row" alignItems="center" spacing={3}>
-                  <Typography variant="bodyRegular" highlight>
-                    Are they already in the network?
-                  </Typography>
-                  <Button
-                    variant="secondary"
-                    small
-                    onClick={() => setIsAddingByEmail(false)}
-                  >
-                    <Typography variant="bodyRegular" center bold>
-                      Add via the directory
-                    </Typography>
-                  </Button>
-                </Stack>
               </Stack>
             </Card>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -994,46 +1000,6 @@ const AddPartnerModal = ({ toggle, open }) => {
               </Stack>
             </form>
           </>
-        ) : (
-          <>
-            <Card variant="primaryLightened">
-              <Stack alignItems="center" justifyContent="center" spacing={3}>
-                <Typography variant="h4" highlight bold>
-                  Add your partner
-                </Typography>
-                <Typography variant="bodyRegular" highlight center>
-                  Search for your partner below and add them to your school.
-                  They'll be notified and, when they accept, your accounts will
-                  be tied together.
-                </Typography>
-                <Stack direction="row" alignItems="center" spacing={3}>
-                  <Typography variant="bodyRegular" highlight>
-                    Not here?
-                  </Typography>
-                  <Button
-                    variant="secondary"
-                    small
-                    onClick={() => setIsAddingByEmail(true)}
-                  >
-                    <Typography variant="bodyRegular" center bold>
-                      Add via email
-                    </Typography>
-                  </Button>
-                </Stack>
-              </Stack>
-            </Card>
-            <ETLs />
-            <Grid container justifyContent="space-between">
-              <Grid item>
-                <Button variant="text">Cancel</Button>
-              </Grid>
-              <Grid item>
-                <Button>
-                  <Typography light>Invite partner</Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          </>
         )}
       </Stack>
     </Modal>
@@ -1060,7 +1026,7 @@ const UserCard = ({ firstName, lastName, role, profileImage }) => {
     </Card>
   );
 };
-const AddPartnerCard = ({ onClick }) => {
+const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
   const IconWrapper = styled(Box)`
     width: ${({ theme }) => theme.util.buffer * 12}px;
     height: ${({ theme }) => theme.util.buffer * 12}px;
@@ -1071,24 +1037,49 @@ const AddPartnerCard = ({ onClick }) => {
     justify-content: center;
   `;
   return (
-    <Card variant="primaryOutlined" size="small" hoverable onClick={onClick}>
-      <Grid container spacing={3} alignItems="center">
-        <Grid item>
-          <IconWrapper>
-            <Icon type="plus" variant="primary" />
-          </IconWrapper>
+    <Card
+      variant={submittedPartnerRequest ? "lightened" : "primaryOutlined"}
+      size="small"
+      hoverable
+      onClick={onClick}
+    >
+      {submittedPartnerRequest ? (
+        <Grid container spacing={3} alignItems="center">
+          <Grid item>
+            <IconWrapper>
+              <Icon type="check" variant="primary" />
+            </IconWrapper>
+          </Grid>
+          <Grid item flex={1}>
+            <Stack>
+              <Typography variant="bodyRegular" bold highlight>
+                We're adding your partner
+              </Typography>
+              <Typography variant="bodySmall" lightened>
+                Check back soon to work together!
+              </Typography>
+            </Stack>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Stack>
-            <Typography variant="bodyRegular" highlight bold>
-              Add a partner
-            </Typography>
-            <Typography variant="bodySmall" lightened>
-              Add a partner to collaborate
-            </Typography>
-          </Stack>
+      ) : (
+        <Grid container spacing={3} alignItems="center">
+          <Grid item>
+            <IconWrapper>
+              <Icon type="plus" variant="primary" />
+            </IconWrapper>
+          </Grid>
+          <Grid item>
+            <Stack>
+              <Typography variant="bodyRegular" highlight bold>
+                Add a partner
+              </Typography>
+              <Typography variant="bodySmall" lightened>
+                Add a partner to collaborate
+              </Typography>
+            </Stack>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </Card>
   );
 };
