@@ -38,6 +38,8 @@ const PhasePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
+  // console.log({ data });
+
   return (
     <>
       <PageContainer>
