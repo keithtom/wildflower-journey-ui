@@ -159,8 +159,8 @@ const Task = ({
               ) : (
                 <Stack direction="row" spacing={4} alignItems="center">
                   <Icon
-                    type={taskIsComplete ? "checkCircle" : "circle"}
-                    variant={taskIsComplete ? "primary" : "lightened"}
+                    type={taskIsComplete ? "checkCircle" : "circleSolid"}
+                    variant={taskIsComplete ? "primary" : "lightest"}
                   />
                   <Typography
                     variant={variant === "small" ? "bodyRegular" : "bodyLarge"}

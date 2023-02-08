@@ -27,6 +27,7 @@ import Milestone from "../../../components/Milestone";
 const PhasePage = ({
   FakeMilestonesToConsider,
   data,
+  milestonesInProgress,
   milestonesToDo,
   milestonesUpNext,
   milestonesDone,
@@ -49,6 +50,46 @@ const PhasePage = ({
           </Typography>
 
           <Stack spacing={6}>
+            {milestonesInProgress.length ? (
+              <Card>
+                <Stack spacing={3}>
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Grid item ml={3}>
+                      <Stack direction="row" spacing={6}>
+                        <Icon type="rightArrowCircleSolid" variant="primary" />
+                        <Typography variant="bodyLarge" bold>
+                          In Progress
+                        </Typography>
+                        <Typography variant="bodyLarge" lightened>
+                          {milestonesInProgress.length}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Grid>
+
+                  <Stack spacing={3}>
+                    {milestonesInProgress.map((m, i) => (
+                      <Milestone
+                        link={`/ssj/${phase}/${m.id}`}
+                        key={i}
+                        title={m.attributes.title}
+                        description={m.attributes.description}
+                        effort={m.attributes.effort}
+                        categories={m.attributes.categories}
+                        status={m.attributes.status}
+                        stepCount={m.relationships.steps.data.length}
+                        completedStepsCount={m.attributes.completedStepsCount}
+                        stepsAssignedCount={m.attributes.stepsAssignedCount}
+                      />
+                    ))}
+                  </Stack>
+                </Stack>
+              </Card>
+            ) : null}
             {milestonesToDo.length ? (
               <Card>
                 <Stack spacing={3}>
@@ -59,7 +100,7 @@ const PhasePage = ({
                   >
                     <Grid item ml={3}>
                       <Stack direction="row" spacing={6}>
-                        <Icon type="circle" variant="primary" />
+                        <Icon type="rightArrowCircle" variant="primary" />
                         <Typography variant="bodyLarge" bold>
                           To do
                         </Typography>
@@ -80,7 +121,9 @@ const PhasePage = ({
                         effort={m.attributes.effort}
                         categories={m.attributes.categories}
                         status={m.attributes.status}
-                        stepCount={m.relationships.steps.data.length}
+                        stepsCount={m.attributes.stepsCount}
+                        completedStepsCount={m.attributes.completedStepsCount}
+                        stepsAssignedCount={m.attributes.stepsAssignedCount}
                       />
                     ))}
                   </Stack>
@@ -97,7 +140,7 @@ const PhasePage = ({
                   >
                     <Grid item ml={3}>
                       <Stack direction="row" spacing={6}>
-                        <Icon type="rightArrowCircle" variant="lightened" />
+                        <Icon type="circle" variant="lightened" />
                         <Typography variant="bodyLarge" bold>
                           Up Next
                         </Typography>
@@ -428,6 +471,7 @@ export async function getServerSideProps({ params, req, res }) {
 
   const response = await axios.get(apiRoute);
   const data = await response.data;
+  const milestonesInProgress = [];
   const milestonesToDo = [];
   const milestonesUpNext = [];
   const milestonesDone = [];
@@ -439,6 +483,8 @@ export async function getServerSideProps({ params, req, res }) {
       milestonesUpNext.push(milestone);
     } else if (milestone.attributes.status == "done") {
       milestonesDone.push(milestone);
+    } else if (milestone.attributes.status == "in progress") {
+      milestonesInProgress.push(milestone);
     }
   });
 
@@ -463,6 +509,7 @@ export async function getServerSideProps({ params, req, res }) {
     props: {
       FakeMilestonesToConsider,
       data,
+      milestonesInProgress,
       milestonesToDo,
       milestonesUpNext,
       milestonesDone,
