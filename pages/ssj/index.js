@@ -178,7 +178,7 @@ const SSJ = ({
                       <Stack direction="row" spacing={2} alignItems="center">
                         <Icon type="plus" />
                         <Typography variant="bodyRegular">
-                          Add your open date
+                          Add your anticipated open date
                         </Typography>
                       </Stack>
                     </Button>
@@ -191,11 +191,11 @@ const SSJ = ({
               <Stack spacing={6}>
                 <Stack direction="row" spacing={4} alignItems="center">
                   <Avatar src={currentUser && currentUser.profileImage} />
-                  <Stack spacing={1}>
-                    <Typography variant="bodyLarge" bold>
-                      Assigned to you
+                  <Stack>
+                    <Typography variant="h4" bold>
+                      My tasks
                     </Typography>
-                    <Typography variant="bodyRegular">
+                    <Typography variant="bodyRegular" lightened>
                       Tasks from {MilestoneWithSelfAssignedTasks.length}{" "}
                       milestones
                     </Typography>
@@ -221,15 +221,16 @@ const SSJ = ({
                         src={currentUser && currentUser.profileImage}
                       />
                       <Typography variant="bodyRegular" bold>
-                        Welcome, Keith!
+                        Welcome, {currentUser.firstName}!
                       </Typography>
                       <Typography variant="bodyLarge" bold>
-                        Start making progress on your SSJ by working toward one
-                        of these milestones!
+                        We invite you to begin your School Startup Journey by
+                        working towards one of these milestones.
                       </Typography>
                       <Typography variant="bodyLarge" lightened>
-                        Each milestone has a number of tasks you can assign
-                        yourself. Head over to one of these to try it out!
+                        Each milestone has a number of tasks that you can take
+                        on at your own pace, according to your interest, needs
+                        and timeline. Click on a milestone to begin!
                       </Typography>
                     </Stack>
                   </Grid>
@@ -738,7 +739,7 @@ const ETLs = ({}) => {
 };
 const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
   return (
-    <Modal title="Add your open date" toggle={toggle} open={open}>
+    <Modal title="Add your anticipated open date" toggle={toggle} open={open}>
       <Stack spacing={3}>
         <Card variant="primaryLightened">
           <Stack alignItems="center" justifyContent="center" spacing={3}>
@@ -751,7 +752,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
           </Stack>
         </Card>
         <DatePicker
-          label="Your open date"
+          label="Your anticipated open date"
           value={openDate}
           onChange={handleOpenDateChange}
         />
@@ -763,7 +764,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
           </Grid>
           <Grid item>
             <Button disabled={!openDate} onClick={toggle}>
-              <Typography>Set open date</Typography>
+              <Typography>Set an anticipated open date</Typography>
             </Button>
           </Grid>
         </Grid>
