@@ -25,7 +25,8 @@ import {
 import Milestone from "../../../components/Milestone";
 
 const PhasePage = ({
-  FakeMilestonesToConsider,
+  currentPhaseMilestones,
+  startConsideringMilestones,
   data,
   milestonesInProgress,
   milestonesToDo,
@@ -34,7 +35,6 @@ const PhasePage = ({
 }) => {
   const [phaseCompleteModalOpen, setPhaseCompleteModalOpen] = useState(false);
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
-  const milestonesToConsider = true;
 
   const router = useRouter();
   const { phase } = router.query;
@@ -74,7 +74,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {milestonesInProgress.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${phase}/${m.id}`}
+                        link={`/ssj/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         description={m.attributes.description}
@@ -114,7 +114,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {milestonesToDo.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${phase}/${m.id}`}
+                        link={`/ssj/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         description={m.attributes.description}
@@ -153,7 +153,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {milestonesUpNext.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${phase}/${m.id}`}
+                        link={`/ssj/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         description={m.attributes.description}
@@ -189,7 +189,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {milestonesDone.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${phase}/${m.id}`}
+                        link={`/ssj/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         description={m.attributes.description}
@@ -204,62 +204,61 @@ const PhasePage = ({
             ) : null}
           </Stack>
 
-          <Divider />
-
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Grid item>
-              <Stack>
-                <Typography variant="bodyRegular" bold>
-                  Is there a milestone you need to work toward that isn't here?
-                </Typography>
-                <Typography variant="bodyRegular" lightened>
-                  Add a custom milestone to your journey so you can track your
-                  progress!
-                </Typography>
-              </Stack>
+          <Card variant="lightened">
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Grid item>
+                <Stack>
+                  <Typography variant="bodyRegular" bold>
+                    Is there a milestone you need to work toward that isn't
+                    here?
+                  </Typography>
+                  <Typography variant="bodyRegular" lightened>
+                    Add a custom milestone to your journey so you can track your
+                    progress!
+                  </Typography>
+                </Stack>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="secondary"
+                  onClick={() => setAddMilestoneModalOpen(true)}
+                >
+                  <Typography variant="bodyRegular">
+                    Add custom milestone
+                  </Typography>
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Button
-                variant="secondary"
-                onClick={() => setAddMilestoneModalOpen(true)}
-              >
-                <Typography variant="bodyRegular">
-                  Add custom milestone
-                </Typography>
-              </Button>
-            </Grid>
-          </Grid>
+          </Card>
 
-          <Divider />
-
-          {milestonesToConsider && (
+          {startConsideringMilestones && phase !== "startup" && (
             <>
-              <Stack direction="column" spacing={2}>
+              <Stack direction="column">
                 <Typography variant="bodyRegular" bold lightened>
                   Start considering
                 </Typography>
                 <Typography variant="h3" bold>
-                  Visioning Milestones
+                  {phase === "visioning"
+                    ? "Planning"
+                    : phase === "planning" && "Startup"}{" "}
+                  Milestones
                 </Typography>
               </Stack>
               <Card>
                 <Stack spacing={6}>
                   <Stack spacing={3}>
-                    {FakeMilestonesToConsider.map((m, i) => (
+                    {startConsideringMilestones.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${phase}/${m.title}`}
+                        link={`/ssj/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.title}
-                        effort={m.effort}
-                        category={m.category}
-                        assignee={m.assignee}
-                        status={m.status}
+                        title={m.attributes.title}
+                        description={m.attributes.description}
+                        effort={m.attributes.effort}
+                        categories={m.attributes.categories}
+                        status={m.attributes.status}
                       />
                     ))}
                   </Stack>
-                  <Typography variant="bodyLarge" lightened>
-                    And 2 more...
-                  </Typography>
                 </Stack>
               </Card>
             </>
@@ -466,17 +465,25 @@ export async function getServerSideProps({ params, req, res }) {
   const { phase } = params;
   const workflowId = "c502-4f84";
   // const workflowId = "5947-ab7f"
-  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&start_considering=true`;
   setAuthHeader({ req, res });
 
   const response = await axios.get(apiRoute);
   const data = await response.data;
+
   const milestonesInProgress = [];
   const milestonesToDo = [];
   const milestonesUpNext = [];
   const milestonesDone = [];
 
-  data.data.forEach((milestone) => {
+  const currentPhaseMilestones = data.data.filter(
+    (m) => m.attributes.phase === phase
+  );
+  const startConsideringMilestones = data.data.filter(
+    (m) => m.attributes.phase !== phase
+  );
+
+  currentPhaseMilestones.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
       milestonesToDo.push(milestone);
     } else if (milestone.attributes.status == "up next") {
@@ -508,7 +515,9 @@ export async function getServerSideProps({ params, req, res }) {
   return {
     props: {
       FakeMilestonesToConsider,
+      startConsideringMilestones,
       data,
+      currentPhaseMilestones,
       milestonesInProgress,
       milestonesToDo,
       milestonesUpNext,
