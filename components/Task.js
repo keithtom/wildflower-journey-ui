@@ -287,7 +287,7 @@ const DecisionDrawerActions = ({
         </Grid>
       ) : null}
 
-      <Grid container spacing={4}>
+      <Grid container spacing={6}>
         {assignee ? (
           isDecided ? (
             <Grid item xs={12}>
@@ -326,7 +326,7 @@ const DecisionDrawerActions = ({
               </Grid>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Unassign yourself</Typography>
+                  <Typography bold>Opt out of deciding</Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -344,7 +344,7 @@ const DecisionDrawerActions = ({
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
               <Typography light bold>
-                Assign yourself
+                Take on this decision
               </Typography>
             </Button>
           </Grid>
@@ -378,7 +378,7 @@ const TaskDrawerActions = ({
             <>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Unassign yourself</Typography>
+                  <Typography bold>Opt out of this task</Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -394,7 +394,7 @@ const TaskDrawerActions = ({
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
               <Typography light bold>
-                Assign yourself
+                Take on this task
               </Typography>
             </Button>
           </Grid>
@@ -418,7 +418,7 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid item>
                 <Typography variant="bodySmall" lightened>
-                  TASK {isAssignToast ? "ASSIGNED" : "UNASSIGNED"}
+                  TASK {isAssignToast ? "TAKEN ON" : "OPTED OUT"}
                 </Typography>
               </Grid>
               <Grid item>
@@ -433,9 +433,8 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
               <Stack direction="row" spacing={1}>
                 <Typography variant="bodySmall">You</Typography>
                 <Typography variant="bodySmall" lightened>
-                  {isAssignToast ? "assigned" : "unassigned"}
+                  {isAssignToast ? "took this on" : "opted out"}
                 </Typography>
-                <Typography variant="bodySmall">yourself</Typography>
               </Stack>
             </Stack>
           </Stack>

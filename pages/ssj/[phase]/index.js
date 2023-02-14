@@ -39,7 +39,7 @@ const PhasePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
-  // console.log({ data });
+  console.log({ data });
 
   return (
     <>
@@ -121,7 +121,7 @@ const PhasePage = ({
                         effort={m.attributes.effort}
                         categories={m.attributes.categories}
                         status={m.attributes.status}
-                        stepsCount={m.attributes.stepsCount}
+                        stepCount={m.relationships.steps.data.length}
                         completedStepsCount={m.attributes.completedStepsCount}
                         stepsAssignedCount={m.attributes.stepsAssignedCount}
                       />
@@ -160,6 +160,7 @@ const PhasePage = ({
                         effort={m.attributes.effort}
                         categories={m.attributes.categories}
                         status={m.attributes.status}
+                        stepCount={m.relationships.steps.data.length}
                       />
                     ))}
                   </Stack>
@@ -196,6 +197,7 @@ const PhasePage = ({
                         effort={m.attributes.effort}
                         categories={m.attributes.categories}
                         status={m.attributes.status}
+                        stepCount={m.relationships.steps.data.length}
                       />
                     ))}
                   </Stack>
@@ -256,6 +258,7 @@ const PhasePage = ({
                         effort={m.attributes.effort}
                         categories={m.attributes.categories}
                         status={m.attributes.status}
+                        stepCount={m.relationships.steps.data.length}
                       />
                     ))}
                   </Stack>

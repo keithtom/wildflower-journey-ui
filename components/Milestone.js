@@ -25,12 +25,15 @@ const Milestone = ({
   categories,
   phase,
   status,
-  stepsCount,
+  stepCount,
   stepsAssignedCount,
-  stepsCompleteCount,
+  completedStepsCount,
   variant,
 }) => {
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
+
+  const remainingSteps = stepCount - completedStepsCount;
+  const assignedIncomplete = stepsAssignedCount - completedStepsCount;
 
   return (
     <>
@@ -63,12 +66,22 @@ const Milestone = ({
                 >
                   {title}
                 </Typography>
-                {status === "in progress" && stepsAssignedCount ? (
+                {assignedIncomplete && remainingSteps ? (
                   <Chip
                     size="small"
                     label={
                       <Stack spacing={1} direction="row">
-                        Working on {stepsAssignedCount} of {stepsCount} tasks
+                        Working on {assignedIncomplete} of {remainingSteps}{" "}
+                        remaining tasks
+                      </Stack>
+                    }
+                  />
+                ) : completedStepsCount ? (
+                  <Chip
+                    size="small"
+                    label={
+                      <Stack spacing={1} direction="row">
+                        {completedStepsCount} of {stepCount} tasks completed
                       </Stack>
                     }
                   />
@@ -117,7 +130,7 @@ const Milestone = ({
         effort={effort}
         categories={categories}
         about={description}
-        actions={<MilestoneDrawerActions stepsCount={stepsCount} link={link} />}
+        actions={<MilestoneDrawerActions stepCount={stepCount} link={link} />}
       />
     </>
   );
@@ -125,14 +138,14 @@ const Milestone = ({
 
 export default Milestone;
 
-const MilestoneDrawerActions = ({ stepsCount, link }) => {
+const MilestoneDrawerActions = ({ stepCount, link }) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Link href={link}>
           <Button full>
             <Typography light bold>
-              View all {stepsCount} tasks
+              View all {stepCount} tasks
             </Typography>
           </Button>
         </Link>

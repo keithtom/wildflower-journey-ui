@@ -84,7 +84,7 @@ const Navigation = ({}) => {
         to="/ssj"
         active={router.pathname === "/ssj"}
         label="School Startup Journey"
-        icon="bus"
+        icon="home"
       />
       {router.pathname.includes("/ssj") && <SSJNavigation />}
       {/* <NavLink

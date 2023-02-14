@@ -20,6 +20,7 @@ import {
   WindowClose,
   Glasses,
   CheckDouble,
+  Home,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -178,6 +179,7 @@ export default function Icon({ ...props }) {
     glasses: <Glasses />,
     checkDouble: <CheckDouble />,
     commentError: <CommentError />,
+    home: <Home />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
