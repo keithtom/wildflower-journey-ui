@@ -38,6 +38,7 @@ import {
   CommentError,
   RightArrowCircle as RightArrowCircleSolid,
   Circle as CircleSolid,
+  Time,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -180,6 +181,7 @@ export default function Icon({ ...props }) {
     checkDouble: <CheckDouble />,
     commentError: <CommentError />,
     home: <Home />,
+    time: <Time />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

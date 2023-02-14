@@ -13,7 +13,6 @@ import {
   Chip,
 } from "./ui";
 import CategoryChip from "./CategoryChip";
-import EffortChip from "./EffortChip";
 import PhaseChip from "./PhaseChip";
 import InfoDrawer from "./InfoDrawer";
 
