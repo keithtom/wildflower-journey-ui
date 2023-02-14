@@ -1,20 +1,20 @@
 import { Icon, Chip, Stack, Typography } from "./ui";
 
-const EffortChip = ({ effort, withIcon, ...props }) => {
+const WorktimeChip = ({ worktime, withIcon, ...props }) => {
   return (
     <Chip
       label={
         withIcon ? (
           <Stack spacing={2} direction="row" alignItems="center">
-            <Icon type="label" size="small" />
+            <Icon type="time" size="small" />
 
-            <Typography capitalize variant="bodyMini" bold>
-              {effort}
+            <Typography variant="bodyMini" bold>
+              About {worktime} hours
             </Typography>
           </Stack>
         ) : (
-          <Typography capitalize variant="bodyMini" bold>
-            {effort}
+          <Typography variant="bodyMini" bold>
+            About {worktime} hours
           </Typography>
         )
       }
@@ -23,4 +23,4 @@ const EffortChip = ({ effort, withIcon, ...props }) => {
   );
 };
 
-export default EffortChip;
+export default WorktimeChip;

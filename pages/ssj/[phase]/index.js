@@ -25,7 +25,6 @@ import {
 import Milestone from "../../../components/Milestone";
 
 const PhasePage = ({
-  currentPhaseMilestones,
   startConsideringMilestones,
   data,
   milestonesInProgress,
@@ -39,7 +38,7 @@ const PhasePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
-  console.log({ data });
+  // console.log({ data });
 
   return (
     <>
@@ -498,26 +497,8 @@ export async function getServerSideProps({ params, req, res }) {
     }
   });
 
-  const FakeMilestonesToConsider = [
-    {
-      title: "Preview the Wildflower Budget Process",
-      effort: "large",
-      category: "Finance",
-      assignee: "unassigned",
-      status: "to do",
-    },
-    {
-      title: "Preview the Wildflower Affiliation Process",
-      effort: "large",
-      category: "Album Advice & Affiliation",
-      assignee: "unassigned",
-      status: "to do",
-    },
-  ];
-
   return {
     props: {
-      FakeMilestonesToConsider,
       startConsideringMilestones,
       data,
       currentPhaseMilestones,

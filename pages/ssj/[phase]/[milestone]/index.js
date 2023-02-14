@@ -24,7 +24,6 @@ import {
 } from "@ui";
 import Task from "../../../../components/Task";
 import CategoryChip from "../../../../components/CategoryChip";
-import EffortChip from "../../../../components/EffortChip";
 import PhaseChip from "../../../../components/PhaseChip";
 import StatusChip from "../../../../components/StatusChip";
 import Milestone from "../../../../components/Milestone";
@@ -184,18 +183,7 @@ const MilestonePage = ({
                   </Stack>
                 </Stack>
               ) : null}
-              {milestoneAttributes.effort ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    EFFORT
-                  </Typography>
-                  <EffortChip
-                    effort={milestoneAttributes.effort}
-                    size="small"
-                    withIcon
-                  />
-                </Stack>
-              ) : null}
+
               {milestoneAttributes.author ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
@@ -238,6 +226,9 @@ const MilestonePage = ({
                 taskAssignee={t.attributes.assigneeInfo}
                 resources={t.relationships.documents.data}
                 includedDocuments={includedDocuments}
+                worktime={
+                  (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
+                }
               />
             ))
           ) : (

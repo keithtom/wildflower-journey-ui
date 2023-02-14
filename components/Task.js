@@ -64,6 +64,7 @@ const Task = ({
   variant,
   resources,
   includedDocuments,
+  worktime,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -198,6 +199,7 @@ const Task = ({
         title={title}
         resources={resources}
         categories={categories}
+        worktime={worktime}
         isDecision={isDecision}
         isComplete={taskIsComplete}
         includedDocuments={includedDocuments}
@@ -326,7 +328,7 @@ const DecisionDrawerActions = ({
               </Grid>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Opt out of deciding</Typography>
+                  <Typography bold>Remove from my tasks</Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -344,7 +346,7 @@ const DecisionDrawerActions = ({
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
               <Typography light bold>
-                Take on this decision
+                Add to my tasks
               </Typography>
             </Button>
           </Grid>
@@ -378,7 +380,7 @@ const TaskDrawerActions = ({
             <>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Opt out of this task</Typography>
+                  <Typography bold>Remove from my tasks</Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -394,7 +396,7 @@ const TaskDrawerActions = ({
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
               <Typography light bold>
-                Take on this task
+                Add to my tasks
               </Typography>
             </Button>
           </Grid>
@@ -418,7 +420,7 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid item>
                 <Typography variant="bodySmall" lightened>
-                  TASK {isAssignToast ? "TAKEN ON" : "OPTED OUT"}
+                  TASK {isAssignToast ? "ADDED" : "REMOVED"}
                 </Typography>
               </Grid>
               <Grid item>
@@ -433,8 +435,9 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
               <Stack direction="row" spacing={1}>
                 <Typography variant="bodySmall">You</Typography>
                 <Typography variant="bodySmall" lightened>
-                  {isAssignToast ? "took this on" : "opted out"}
+                  {isAssignToast ? "added" : "removed"}
                 </Typography>
+                <Typography variant="bodySmall">this task</Typography>
               </Stack>
             </Stack>
           </Stack>
