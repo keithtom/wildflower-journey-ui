@@ -40,6 +40,7 @@ const SSJ = ({
   data,
   milestonesToDo,
   MilestoneWithSelfAssignedTasks,
+  includedDocuments,
 }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
@@ -85,7 +86,7 @@ const SSJ = ({
 
   // console.log({ data });
   // console.log({ dataProgress });
-  // console.log({ MilestoneWithSelfAssignedTasks });
+  console.log({ MilestoneWithSelfAssignedTasks });
   // console.log({ currentUser });
 
   return (
@@ -205,6 +206,7 @@ const SSJ = ({
                 <Card noPadding>
                   {MilestoneWithSelfAssignedTasks.map((m, i) => (
                     <AssignedTaskByMilestone
+                      includedDocuments={includedDocuments}
                       tasksByMilestone={m}
                       key={i}
                       phase={phase}
@@ -1097,7 +1099,11 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
   );
 };
 
-const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
+const AssignedTaskByMilestone = ({
+  tasksByMilestone,
+  phase,
+  includedDocuments,
+}) => {
   const [expandedTasks, setExpandedTasks] = useState(false);
   const m = tasksByMilestone;
   return (
@@ -1125,7 +1131,13 @@ const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
             isComplete={t.attributes.completed}
             isNext={i === 0}
             // handleCompleteMilestone={handleCompleteMilestone}
+            resources={t.relationships.documents.data}
+            includedDocuments={includedDocuments}
             categories={m.attributes.categories}
+            description={t.attributes.description}
+            worktime={
+              (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
+            }
             taskAssignee={t.attributes.assigneeInfo}
           />
         ))}
@@ -1348,6 +1360,13 @@ export async function getServerSideProps({ params, req, res }) {
     }
   });
 
+  const includedDocuments = {};
+  data.included
+    .filter((i) => i.type === "document")
+    .forEach((i) => {
+      includedDocuments[i.id] = i;
+    });
+
   data.data.forEach((milestone) => {
     milestone.relationships.steps.data.forEach((includedStep, i) => {
       milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
@@ -1372,6 +1391,7 @@ export async function getServerSideProps({ params, req, res }) {
   return {
     props: {
       milestonesToDo,
+      includedDocuments,
       dataProgress,
       data,
       phase,
