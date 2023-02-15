@@ -35,6 +35,7 @@ import { ListItemSecondaryAction } from "@mui/material";
 
 const SSJ = ({
   phase,
+  dataProgress,
   data,
   milestonesToDo,
   MilestoneWithSelfAssignedTasks,
@@ -84,6 +85,7 @@ const SSJ = ({
   const hasPartner = !FakePartners.length;
 
   // console.log({ data });
+  // console.log({ dataProgress });
   // console.log({ MilestoneWithSelfAssignedTasks });
   // console.log({ currentUser });
 
@@ -221,7 +223,7 @@ const SSJ = ({
                         src={currentUser && currentUser.profileImage}
                       />
                       <Typography variant="bodyRegular" bold>
-                        Welcome, {currentUser.firstName}!
+                        Welcome, {currentUser && currentUser.firstName}!
                       </Typography>
                       <Typography variant="bodyLarge" bold>
                         We invite you to begin your School Startup Journey by
@@ -348,57 +350,37 @@ const SSJ = ({
 
                   {viewPhaseProgress ? (
                     <Grid container spacing={6}>
-                      <Grid item xs={12} sm={4}>
-                        <PhaseProgressCard
-                          phase="Visioning"
-                          link="/ssj/visioning"
-                          isCurrentPhase
-                          processes={[
-                            { id: "1", status: "done" },
-                            { id: "2", status: "to do" },
-                            { id: "3", status: "to do" },
-                          ]}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <PhaseProgressCard
-                          phase="Planning"
-                          link="/ssj/planning"
-                          processes={[
-                            { id: "1", status: "done" },
-                            { id: "2", status: "to do" },
-                          ]}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <PhaseProgressCard
-                          phase="Startup"
-                          link="/ssj/startup"
-                          processes={[
-                            { id: "1", status: "done" },
-                            { id: "2", status: "to do" },
-                            { id: "3", status: "to do" },
-                            { id: "4", status: "to do" },
-                          ]}
-                        />
-                      </Grid>
+                      {dataProgress.by_phase.map((p, i) => (
+                        <Grid item xs={12} sm={4} key={i}>
+                          <PhaseProgressCard
+                            phase={p.name}
+                            link={`/ssj/${p.title}`}
+                            processes={p.statuses}
+                          />
+                        </Grid>
+                      ))}
                     </Grid>
                   ) : (
                     <Grid container spacing={6} alignItems="stretch">
-                      {categories.map((p, i) => (
+                      {dataProgress.by_category.map((c, i) => (
                         <Grid item xs={12} sm={4}>
                           <Link href="/ssj/view-all">
-                            <Card key={i} style={{ height: "100%" }} hoverable>
-                              <Stack spacing={3}>
+                            <Card
+                              key={i}
+                              style={{ height: "100%" }}
+                              hoverable
+                              variant="lightened"
+                            >
+                              <Stack spacing={6}>
                                 <Grid container>
                                   <Grid item>
                                     <CategoryChip
-                                      category={p.title}
+                                      category={c.name}
                                       size="large"
                                     />
                                   </Grid>
                                 </Grid>
-                                <ProgressBar processes={p.processes} />
+                                <ProgressBar processes={c.statuses} />
                               </Stack>
                             </Card>
                           </Link>
@@ -636,20 +618,39 @@ const ProgressBar = ({ processes }) => {
     border-radius: ${({ theme }) => theme.radius.full}px;
     /* done */
     ${(props) =>
-      props.done &&
+      props.variant === "done" &&
       css`
         background: ${props.theme.color.success.medium};
       `}
+    /* inProgress */
+    ${(props) =>
+      props.variant === "in progress" &&
+      css`
+        background: ${props.theme.color.primary.main};
+      `}
+    /* toDo */
+    ${(props) =>
+      props.variant === "to do" &&
+      css`
+        background: ${props.theme.color.primary.lightened};
+      `}
+    /* upNext */
+    ${(props) =>
+      props.variant === "up next" &&
+      css`
+        background: ${props.theme.color.neutral.main};
+      `}
   `;
+
   return (
     <Stack spacing={3}>
       <Typography variant="bodyMini" bold lightened>
-        {processes.filter((process) => process.status === "done").length} OF{" "}
-        {processes.length} MILESTONES COMPLETED
+        {processes.filter((p) => p === "done").length} OF {processes.length}{" "}
+        MILESTONES COMPLETED
       </Typography>
       <Stack spacing={1} direction="row">
-        {processes.map((t, i) => (
-          <StyledProcessIndicator key={i} done={t.status === "done"} />
+        {processes.map((p, i) => (
+          <StyledProcessIndicator key={i} variant={p} />
         ))}
       </Stack>
     </Stack>
@@ -681,7 +682,6 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
             width: "100%",
             height: "200px",
             objectFit: "cover",
-            borderRadius: "4px",
           }}
         />
         {completed ? (
@@ -700,21 +700,35 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
         hoverable
       >
         <Stack spacing={6}>
-          <Typography variant="bodyLarge" bold>
+          <Typography variant="bodyLarge" bold capitalize>
             {phase}
           </Typography>
           <ProgressBar processes={processes} />
-          <Card size="small" variant={isCurrentPhase && "lightened"}>
-            <Stack spacing={3}>
-              <DeliverableImage
-                completed={
-                  processes.filter((process) => process.status === "done")
-                    .length === processes.length
-                }
-              />
-              <Typography variant="bodyRegular">Self Assessment</Typography>
-            </Stack>
-          </Card>
+          <Stack spacing={2}>
+            <Typography variant="bodyRegular" bold>
+              Key milestone
+            </Typography>
+            <Card
+              size="small"
+              variant={isCurrentPhase && "lightened"}
+              noPadding
+              noBorder
+            >
+              <Stack>
+                <DeliverableImage
+                  completed={
+                    processes.filter((p) => p === "done").length ===
+                    processes.length
+                  }
+                />
+                <Card size="small" noBorder>
+                  <Typography variant="bodyRegular" bold>
+                    Take the phase survey
+                  </Typography>
+                </Card>
+              </Stack>
+            </Card>
+          </Stack>
         </Stack>
       </Card>
     </Link>
@@ -1257,7 +1271,6 @@ export async function getServerSideProps({ params, req, res }) {
   const MilestoneWithSelfAssignedTasks = data.data;
 
   const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-
   const responseMilestones = await axios.get(apiRouteMilestones);
   const dataMilestones = await responseMilestones.data;
   const milestonesToDo = [];
@@ -1267,9 +1280,14 @@ export async function getServerSideProps({ params, req, res }) {
     }
   });
 
+  const apiRouteProgress = `${baseUrl}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
+  const responseProgress = await axios.get(apiRouteProgress);
+  const dataProgress = await responseProgress.data;
+
   return {
     props: {
       milestonesToDo,
+      dataProgress,
       data,
       phase,
       MilestoneWithSelfAssignedTasks,
