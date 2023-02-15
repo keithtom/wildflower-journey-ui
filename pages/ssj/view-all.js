@@ -19,7 +19,12 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
-const DiscoveryPage = ({ data, processByCategory }) => {
+const DiscoveryPage = ({
+  data,
+  processByCategory,
+  dataResources,
+  dataAssignedSteps,
+}) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
   const [showTasksByAssignee, setShowTasksByAssignee] = useState(false);
@@ -43,6 +48,8 @@ const DiscoveryPage = ({ data, processByCategory }) => {
 
   console.log({ data });
   console.log({ processByCategory });
+  console.log({ dataResources });
+  console.log({ dataAssignedSteps });
 
   return (
     <PageContainer>
@@ -145,19 +152,19 @@ const DiscoveryPage = ({ data, processByCategory }) => {
           ))}
 
         {showResourcesByCategory &&
-          FakeResourcesByCategory.map((a, i) => (
+          processByCategory.map((a, i) => (
             <Card key={i}>
               <Stack spacing={6}>
                 <Stack direction="row" spacing={6} alignItems="center">
                   <CategoryChip category={a.category} size="large" withIcon />
                   <Typography variant="h4" lightened>
-                    {a.resources.length}
+                    {a.category}
                   </Typography>
                 </Stack>
                 <Stack spacing={3}>
-                  {a.resources.map((r, i) => (
+                  {/* {a.resources.map((r, i) => (
                     <Resource title={r.title} link="/" key={i} />
-                  ))}
+                  ))} */}
                 </Stack>
               </Stack>
             </Card>
@@ -235,11 +242,20 @@ export async function getServerSideProps({ req, res }) {
     },
   ];
 
+  const apiRouteResources = `${baseUrl}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
+  const responseResources = await axios.get(apiRouteResources);
+  const dataResources = await responseResources.data;
+
+  const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
+  const dataAssignedSteps = await responseAssignedSteps.data;
+
   return {
     props: {
       data: data.data,
-
       processByCategory,
+      dataResources,
+      dataAssignedSteps,
     },
   };
 }
