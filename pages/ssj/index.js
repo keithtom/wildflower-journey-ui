@@ -31,6 +31,7 @@ import {
   Chip,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
+import Resource from "../../components/Resource";
 import { ListItemSecondaryAction } from "@mui/material";
 
 const SSJ = ({
@@ -44,7 +45,6 @@ const SSJ = ({
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
   const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
-  const [viewWaysToWorkModalOpen, setViewWaysToWorkModalOpen] = useState(false);
   const [submittedPartnerRequest, setSubmittedPartnerRequest] = useState(false);
   const { currentUser } = useUserContext();
 
@@ -66,7 +66,6 @@ const SSJ = ({
     !isFirstTimeUser
   );
   const toggleOnboardingWaysToWork = () => {
-    setViewWaysToWorkModalOpen(true);
     setUserOnboardedWaysToWork(true);
   };
   const [userOnboardedprogress, setUserOnboardedProgress] = useState(
@@ -409,54 +408,11 @@ const SSJ = ({
                     Ways to work together
                   </Typography>
                   <Grid container spacing={3}>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your self
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your team
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your community
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
+                    {waysToWorkTogether.map((w, i) => (
+                      <Grid item xs={12} sm={4} alignItems="stretch" key={i}>
+                        <WaysToWorkCard waysToWork={w} />
+                      </Grid>
+                    ))}
                   </Grid>
                 </Stack>
               </Card>
@@ -525,10 +481,6 @@ const SSJ = ({
         toggle={() => setFirstTimeUserModalOpen(!firstTimeUserModalOpen)}
         open={firstTimeUserModalOpen}
         firstName="Jane"
-      />
-      <ViewResourcesModal
-        toggle={() => setViewWaysToWorkModalOpen(!viewWaysToWorkModalOpen)}
-        open={viewWaysToWorkModalOpen}
       />
       <AddPartnerModal
         setSubmittedPartnerRequest={setSubmittedPartnerRequest}
@@ -735,6 +687,53 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
   );
 };
 
+const WaysToWorkCard = ({ waysToWork }) => {
+  const [waysToWorkModalOpen, setWaysToWorkModalOpen] = useState(false);
+  return (
+    <>
+      <Card
+        variant="lightened"
+        sx={{ height: "100%" }}
+        hoverable
+        onClick={() => setWaysToWorkModalOpen(true)}
+      >
+        <Stack spacing={6}>
+          <Grid container justifyContent="space-between">
+            <Grid item>
+              <Typography variant="bodyLarge" bold>
+                {waysToWork.name}
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Icon type="chevronRight" />
+            </Grid>
+          </Grid>
+          <Stack spacing={3}>
+            {waysToWork.resources.slice(0, 3).map((r, i) => (
+              <Card size="small" noBorder key={i}>
+                <Typography variant="bodyRegular">{r.title}</Typography>
+              </Card>
+            ))}
+            <Card size="small" noBorder variant="lightened">
+              <Typography variant="bodyRegular" lightened>
+                {waysToWork.resources.length > 3
+                  ? `And ${waysToWork.resources.slice(3).length} more`
+                  : `View more`}
+              </Typography>
+            </Card>
+          </Stack>
+        </Stack>
+      </Card>
+      <WaysToWorkModal
+        toggle={() => setWaysToWorkModalOpen(!waysToWorkModalOpen)}
+        open={waysToWorkModalOpen}
+        title={waysToWork.name}
+        resources={waysToWork.resources}
+      />
+    </>
+  );
+};
+
 const ETLs = ({}) => {
   return (
     <Grid container spacing={3}>
@@ -806,19 +805,18 @@ const ViewEtlsModal = ({ toggle, open }) => {
     </Modal>
   );
 };
-const ViewResourcesModal = ({ toggle, open }) => {
+const WaysToWorkModal = ({ toggle, open, title, resources }) => {
   return (
-    <Modal title="Ways to work with others" toggle={toggle} open={open}>
-      <Stack spacing={3}>
-        <Card variant="lightened">
-          <Typography variant="bodyLarge">Content</Typography>
-        </Card>
-        <Card variant="lightened">
-          <Typography variant="bodyLarge">Content</Typography>
-        </Card>
-        <Card variant="lightened">
-          <Typography variant="bodyLarge">Content</Typography>
-        </Card>
+    <Modal title={title} toggle={toggle} open={open}>
+      <Stack spacing={2}>
+        {resources.map((r, i) => (
+          <Resource
+            title={r.title}
+            link={r.url}
+            description={r.description}
+            key={i}
+          />
+        ))}
       </Stack>
     </Modal>
   );
@@ -1245,6 +1243,93 @@ const FakeETLs = [
   },
 ];
 
+const waysToWorkTogether = [
+  {
+    name: "With Yourself",
+    resources: [
+      {
+        title: "Revisit your learning and growth plan",
+        url: "https://connected.wildflowerschools.org/posts/4432337-from-teacher-to-transformational-teacher-leader-recorded-etl-gathering?video_markers=learn%2Cgrowth%2Clearning+and+growth%2Clearning.%2Cgrowth%2C",
+        type: "Connected Post",
+        description:
+          'From time to time, you may want to revisit the Learning and Growth plan in your Visioning album and use it to guide you towards further learning opportunities. If you would like to make a new Learning and Growth Plan, you can use this link to access an "Emerging Teacher Leader Self-Awareness Reflective Guide" and accompanying presentation.',
+      },
+      {
+        title: "Learn about Wildflower Ways of Working",
+        url: "https://connected.wildflowerschools.org/posts/4840229-self-management-learning-series-virtual-classroom-welcome",
+        type: "Connected Post",
+        description:
+          "This resource provides six, self-guided learning modules on Wildflower Ways of Working. The six modules include; An Introduction to Self-Management and Domination Culture; The Advice Process; Roles & Responsibilities; Conflict Resolution; Radical Transparency; and Integration.",
+      },
+      {
+        title: "Learn about Liberatory Leadership",
+        url: "https://connected.wildflowerschools.org/series/4588030-series-liberatory-leadership-series",
+        type: "Connected Series",
+        description:
+          'These sessions explore our collective vision for what "Liberatory Montessori" means at Wildflower and how we support our ongoing development in service of our shared purpose for liberation in our schools and communities.',
+      },
+      {
+        title: "Engage these Tools for Resilience",
+        url: "https://connected.wildflowerschools.org/series/4687002-tools-for-resilience",
+        type: "Connected Series",
+        description:
+          "This series includes nine, self-guided modules of resilience-building and stress-reducing activities.",
+      },
+      {
+        title: "Enroll in equity training",
+        url: "https://connected.wildflowerschools.org/series/4527958-series-equity-trainings",
+        type: "Connected Series",
+        description:
+          "Wildflower Teacher Leaders commit to a lifelong journey of personal racial identity development, critical consciousness, and anti-bias anti-racist action (commonly referred to as ABAR). You can use this list of vetted equity trainings to support you along your learning journey.",
+      },
+    ],
+  },
+  {
+    name: "With Your Team",
+    resources: [
+      {
+        title: "Identify a Teacher Leader partner",
+        url: "https://docs.google.com/presentation/d/1ymc_PZDNMtAoNdIV0QHPWw5NdekQRQrdjhkT19eyivg/view",
+        type: "Google Slides",
+        description:
+          "Finding a Teacher Leader partner can be a daunting task, but there are ways to spread the word and activate your network. This resource provides reflection prompts, templates and framing to help you chart a path towards finding a supportive partnership.",
+      },
+      {
+        title: "Engage a Growth & Connectedness coach",
+        url: "https://connected.wildflowerschools.org/series/4406175-series-growth-connectedness-coaches",
+        type: "Connected Series",
+        description:
+          "Once you have identified a partner, Wildflower highly recommends investing in the wellbeing of your partnership by engaging a Growth & Connectedness coach. Growth & Connectedness coaches typically focus on leadership, identity, and teamwork development. If you have questions about how to access coaching, please contact your Operations Guide. ",
+      },
+      {
+        title: "Engage an Equity or ABAR coach",
+        url: "https://connected.wildflowerschools.org/series/4527903-series-equity-consultants",
+        type: "Connected Series",
+        description:
+          "In addition to engaging in equity or identity development trainings, many Teacher Leader teams engage an Equity coach to help them create an intentionally anti-racist, anti-bias school community.",
+      },
+    ],
+  },
+  {
+    name: "With Your Community",
+    resources: [
+      {
+        title: "Attend Wildflower Community events",
+        url: "https://connected.wildflowerschools.org/posts/4634392-wildflower-events-calendar",
+        type: "Connected Post",
+        description:
+          "As an Emerging Teacher Leader you can begin attending Wildflower events and offerings. You can use this calendar to identify upcoming opportunities. When in doubt, you can also reach out to your Operations Guide to identify upcoming opportunities.",
+      },
+      {
+        title: "Join a Pod of Wildflower Schools",
+        url: "https://connected.wildflowerschools.org/posts/4529540-essay-a-decentralized-network-by-erin-mckay",
+        type: "Connected Post",
+        description:
+          "Pods are small groupings of 5 - 7 schools that provide mutual support, accountability and community for one another. Read this first-hand account from a Teacher Leader about her experience of a Pod in a decentralized network. Schools typically connect with Pods once they have affiliated, but it is never too early to begin exploring and visit a pod meeting or two. To get connected please contact your Operations Guide.",
+      },
+    ],
+  },
+];
 export async function getServerSideProps({ params, req, res }) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
