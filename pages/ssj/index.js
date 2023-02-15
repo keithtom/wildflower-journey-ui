@@ -353,7 +353,7 @@ const SSJ = ({
                         <Grid item xs={12} sm={4} key={i}>
                           <PhaseProgressCard
                             phase={p.name}
-                            link={`/ssj/${p.title}`}
+                            link={`/ssj/${p.name}`}
                             processes={p.statuses}
                           />
                         </Grid>
