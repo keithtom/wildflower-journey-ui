@@ -85,8 +85,8 @@ const SSJ = ({
   const hasPartner = !FakePartners.length;
 
   // console.log({ data });
-  // console.log({ dataProgress });
-  console.log({ milestonesWithSelfAssignedTasks });
+  console.log({ dataProgress });
+  // console.log({ milestonesWithSelfAssignedTasks });
   // console.log({ currentUser });
 
   return (
