@@ -1114,6 +1114,7 @@ const AssignedTaskByMilestone = ({
         title={m.attributes.title}
         effort={m.attributes.effort}
         categories={m.attributes.categories}
+        description={m.attributes.description}
         status={m.attributes.status}
         stepCount={m.attributes.stepsCount}
       />
