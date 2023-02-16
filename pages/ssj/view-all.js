@@ -11,9 +11,11 @@ import {
   Grid,
   Chip,
   Avatar,
+  Divider,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import Milestone from "../../components/Milestone";
+import Task from "../../components/Task";
 import Resource from "../../components/Resource";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
@@ -46,10 +48,12 @@ const DiscoveryPage = ({
     setShowResourcesByCategory(true);
   };
 
-  console.log({ data });
-  console.log({ processByCategory });
-  console.log({ dataResources });
-  console.log({ dataAssignedSteps });
+  // console.log({ data });
+  // console.log({ processByCategory });
+  // console.log(dataResources[4].length);
+  // console.log({ dataAssignedSteps });
+
+  // console.log(Object.keys(dataResources[0])[0]);
 
   return (
     <PageContainer>
@@ -124,26 +128,42 @@ const DiscoveryPage = ({
           ))}
 
         {showTasksByAssignee &&
-          FakeTasksByAssignee.map((a, i) => (
+          dataAssignedSteps.map((a, i) => (
             <Card key={i}>
               <Stack spacing={6}>
                 <Stack direction="row" spacing={6} alignItems="center">
-                  <Avatar src={a.assignee.profileImage} size="sm" />
+                  <Avatar src={a.assignee_info.imageUrl} size="sm" />
                   <Typography variant="bodyLarge" bold>
-                    {a.assignee.firstName} {a.assignee.lastName}
+                    Keith Tom
                   </Typography>
                   <Typography variant="h4" lightened>
-                    {a.milestones.length}
+                    {a.steps.length}
                   </Typography>
                 </Stack>
-                <Stack spacing={3}>
-                  {a.milestones.map((m, i) => (
-                    <Milestone
+                <Stack>
+                  <Divider />
+                  {a.steps.map((t, i) => (
+                    <Task
+                      taskId={t.data.id}
+                      // link={`/ssj/${phase}/${m.id}/${t.id}`}
+                      title={t.data.attributes.title}
                       key={i}
-                      title={m.title}
-                      effort={m.effort}
-                      phase={m.phase}
-                      assignee={m.assignee}
+                      isDecision={t.data.attributes.kind === "Decision"}
+                      decisionOptions={t.data.attributes.decisionOptions}
+                      isComplete={t.data.attributes.completed}
+                      isNext={i === 0}
+                      // handleCompleteMilestone={handleCompleteMilestone}
+                      // resources={t.data.relationships.documents.data}
+                      // includedDocuments={includedDocuments}
+                      // categories={m.attributes.categories}
+                      description={t.data.attributes.description}
+                      worktime={
+                        (t.data.attributes.maxWorktime +
+                          t.data.attributes.minWorktime) /
+                        2 /
+                        60
+                      }
+                      taskAssignee={dataAssignedSteps[0].assignee_info}
                     />
                   ))}
                 </Stack>
@@ -152,23 +172,30 @@ const DiscoveryPage = ({
           ))}
 
         {showResourcesByCategory &&
-          processByCategory.map((a, i) => (
-            <Card key={i}>
-              <Stack spacing={6}>
-                <Stack direction="row" spacing={6} alignItems="center">
-                  <CategoryChip category={a.category} size="large" withIcon />
-                  <Typography variant="h4" lightened>
-                    {a.category}
-                  </Typography>
-                </Stack>
-                <Stack spacing={3}>
-                  {/* {a.resources.map((r, i) => (
-                    <Resource title={r.title} link="/" key={i} />
+          dataResources.map((a, i) => {
+            const name = Object.keys(a)[0];
+            return (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={6} alignItems="center">
+                    <CategoryChip category={name} size="large" withIcon />
+                    <Typography variant="h4" lightened>
+                      {/* {a} */}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={3}>
+                    {/* {a.map((r, i) => (
+                    <Resource
+                      title={r.data.attributes.title}
+                      link={r.data.attributes.link}
+                      key={i}
+                    />
                   ))} */}
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
       </Stack>
     </PageContainer>
   );
