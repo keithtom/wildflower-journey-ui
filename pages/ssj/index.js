@@ -39,7 +39,7 @@ const SSJ = ({
   dataProgress,
   data,
   milestonesToDo,
-  MilestoneWithSelfAssignedTasks,
+  milestonesWithSelfAssignedTasks,
   includedDocuments,
 }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
@@ -52,7 +52,7 @@ const SSJ = ({
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
-  const hasAssignedTasks = MilestoneWithSelfAssignedTasks.length;
+  const hasAssignedTasks = milestonesWithSelfAssignedTasks.length;
 
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
@@ -85,8 +85,8 @@ const SSJ = ({
   const hasPartner = !FakePartners.length;
 
   // console.log({ data });
-  // console.log({ dataProgress });
-  console.log({ MilestoneWithSelfAssignedTasks });
+  console.log({ dataProgress });
+  // console.log({ milestonesWithSelfAssignedTasks });
   // console.log({ currentUser });
 
   return (
@@ -198,13 +198,13 @@ const SSJ = ({
                       My tasks
                     </Typography>
                     <Typography variant="bodyRegular" lightened>
-                      Tasks from {MilestoneWithSelfAssignedTasks.length}{" "}
+                      Tasks from {milestonesWithSelfAssignedTasks.length}{" "}
                       milestones
                     </Typography>
                   </Stack>
                 </Stack>
                 <Card noPadding>
-                  {MilestoneWithSelfAssignedTasks.map((m, i) => (
+                  {milestonesWithSelfAssignedTasks.map((m, i) => (
                     <AssignedTaskByMilestone
                       includedDocuments={includedDocuments}
                       tasksByMilestone={m}
@@ -1373,7 +1373,7 @@ export async function getServerSideProps({ params, req, res }) {
       milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
     });
   });
-  const MilestoneWithSelfAssignedTasks = data.data;
+  const milestonesWithSelfAssignedTasks = data.data;
 
   const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   const responseMilestones = await axios.get(apiRouteMilestones);
@@ -1396,7 +1396,7 @@ export async function getServerSideProps({ params, req, res }) {
       dataProgress,
       data,
       phase,
-      MilestoneWithSelfAssignedTasks,
+      milestonesWithSelfAssignedTasks,
     },
   };
 }
