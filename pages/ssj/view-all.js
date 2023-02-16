@@ -50,7 +50,7 @@ const DiscoveryPage = ({
 
   // console.log({ data });
   // console.log({ processByCategory });
-  // console.log(dataResources[4].length);
+  // console.log({ dataResources });
   // console.log({ dataAssignedSteps });
 
   // console.log(Object.keys(dataResources[0])[0]);
@@ -174,23 +174,25 @@ const DiscoveryPage = ({
         {showResourcesByCategory &&
           dataResources.map((a, i) => {
             const name = Object.keys(a)[0];
+            const array = Object.values(a);
+            // console.log("~~~~~~~~", array);
             return (
               <Card key={i}>
                 <Stack spacing={6}>
                   <Stack direction="row" spacing={6} alignItems="center">
                     <CategoryChip category={name} size="large" withIcon />
                     <Typography variant="h4" lightened>
-                      {/* {a} */}
+                      {array[0].length}
                     </Typography>
                   </Stack>
                   <Stack spacing={3}>
-                    {/* {a.map((r, i) => (
-                    <Resource
-                      title={r.data.attributes.title}
-                      link={r.data.attributes.link}
-                      key={i}
-                    />
-                  ))} */}
+                    {array[0].map((r, i) => (
+                      <Resource
+                        title={r.data.attributes.title}
+                        link={r.data.attributes.link}
+                        key={i}
+                      />
+                    ))}
                   </Stack>
                 </Stack>
               </Card>
