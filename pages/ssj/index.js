@@ -31,25 +31,28 @@ import {
   Chip,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
+import Resource from "../../components/Resource";
 import { ListItemSecondaryAction } from "@mui/material";
 
 const SSJ = ({
   phase,
+  dataProgress,
   data,
   milestonesToDo,
-  MilestoneWithSelfAssignedTasks,
+  milestonesWithSelfAssignedTasks,
+  includedDocuments,
 }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
   const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
-  const [viewWaysToWorkModalOpen, setViewWaysToWorkModalOpen] = useState(false);
+  const [submittedPartnerRequest, setSubmittedPartnerRequest] = useState(false);
   const { currentUser } = useUserContext();
 
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
-  const hasAssignedTasks = MilestoneWithSelfAssignedTasks.length;
+  const hasAssignedTasks = milestonesWithSelfAssignedTasks.length;
 
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
@@ -64,7 +67,6 @@ const SSJ = ({
     !isFirstTimeUser
   );
   const toggleOnboardingWaysToWork = () => {
-    setViewWaysToWorkModalOpen(true);
     setUserOnboardedWaysToWork(true);
   };
   const [userOnboardedprogress, setUserOnboardedProgress] = useState(
@@ -83,7 +85,8 @@ const SSJ = ({
   const hasPartner = !FakePartners.length;
 
   // console.log({ data });
-  // console.log({ MilestoneWithSelfAssignedTasks });
+  console.log({ dataProgress });
+  // console.log({ milestonesWithSelfAssignedTasks });
   // console.log({ currentUser });
 
   return (
@@ -177,7 +180,7 @@ const SSJ = ({
                       <Stack direction="row" spacing={2} alignItems="center">
                         <Icon type="plus" />
                         <Typography variant="bodyRegular">
-                          Add your open date
+                          Add your anticipated open date
                         </Typography>
                       </Stack>
                     </Button>
@@ -190,19 +193,20 @@ const SSJ = ({
               <Stack spacing={6}>
                 <Stack direction="row" spacing={4} alignItems="center">
                   <Avatar src={currentUser && currentUser.profileImage} />
-                  <Stack spacing={1}>
-                    <Typography variant="bodyLarge" bold>
-                      Assigned to you
+                  <Stack>
+                    <Typography variant="h4" bold>
+                      My tasks
                     </Typography>
-                    <Typography variant="bodyRegular">
-                      Tasks from {MilestoneWithSelfAssignedTasks.length}{" "}
+                    <Typography variant="bodyRegular" lightened>
+                      Tasks from {milestonesWithSelfAssignedTasks.length}{" "}
                       milestones
                     </Typography>
                   </Stack>
                 </Stack>
                 <Card noPadding>
-                  {MilestoneWithSelfAssignedTasks.map((m, i) => (
+                  {milestonesWithSelfAssignedTasks.map((m, i) => (
                     <AssignedTaskByMilestone
+                      includedDocuments={includedDocuments}
                       tasksByMilestone={m}
                       key={i}
                       phase={phase}
@@ -220,15 +224,16 @@ const SSJ = ({
                         src={currentUser && currentUser.profileImage}
                       />
                       <Typography variant="bodyRegular" bold>
-                        Welcome, Keith!
+                        Welcome, {currentUser && currentUser.firstName}!
                       </Typography>
                       <Typography variant="bodyLarge" bold>
-                        Start making progress on your SSJ by working toward one
-                        of these milestones!
+                        We invite you to begin your School Startup Journey by
+                        working towards one of these milestones.
                       </Typography>
                       <Typography variant="bodyLarge" lightened>
-                        Each milestone has a number of tasks you can assign
-                        yourself. Head over to one of these to try it out!
+                        Each milestone has a number of tasks that you can take
+                        on at your own pace, according to your interest, needs
+                        and timeline. Click on a milestone to begin!
                       </Typography>
                     </Stack>
                   </Grid>
@@ -301,6 +306,7 @@ const SSJ = ({
                   {hasPartner ? null : (
                     <Grid item xs={12} sm={4}>
                       <AddPartnerCard
+                        submittedPartnerRequest={submittedPartnerRequest}
                         onClick={() => setAddPartnerModalOpen(true)}
                       />
                     </Grid>
@@ -345,57 +351,37 @@ const SSJ = ({
 
                   {viewPhaseProgress ? (
                     <Grid container spacing={6}>
-                      <Grid item xs={12} sm={4}>
-                        <PhaseProgressCard
-                          phase="Visioning"
-                          link="/ssj/visioning"
-                          isCurrentPhase
-                          processes={[
-                            { id: "1", status: "done" },
-                            { id: "2", status: "to do" },
-                            { id: "3", status: "to do" },
-                          ]}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <PhaseProgressCard
-                          phase="Planning"
-                          link="/ssj/planning"
-                          processes={[
-                            { id: "1", status: "done" },
-                            { id: "2", status: "to do" },
-                          ]}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <PhaseProgressCard
-                          phase="Startup"
-                          link="/ssj/startup"
-                          processes={[
-                            { id: "1", status: "done" },
-                            { id: "2", status: "to do" },
-                            { id: "3", status: "to do" },
-                            { id: "4", status: "to do" },
-                          ]}
-                        />
-                      </Grid>
+                      {dataProgress.by_phase.map((p, i) => (
+                        <Grid item xs={12} sm={4} key={i}>
+                          <PhaseProgressCard
+                            phase={p.name}
+                            link={`/ssj/${p.name}`}
+                            processes={p.statuses}
+                          />
+                        </Grid>
+                      ))}
                     </Grid>
                   ) : (
                     <Grid container spacing={6} alignItems="stretch">
-                      {categories.map((p, i) => (
+                      {dataProgress.by_category.map((c, i) => (
                         <Grid item xs={12} sm={4}>
                           <Link href="/ssj/view-all">
-                            <Card key={i} style={{ height: "100%" }} hoverable>
-                              <Stack spacing={3}>
+                            <Card
+                              key={i}
+                              style={{ height: "100%" }}
+                              hoverable
+                              variant="lightened"
+                            >
+                              <Stack spacing={6}>
                                 <Grid container>
                                   <Grid item>
                                     <CategoryChip
-                                      category={p.title}
+                                      category={c.name}
                                       size="large"
                                     />
                                   </Grid>
                                 </Grid>
-                                <ProgressBar processes={p.processes} />
+                                <ProgressBar processes={c.statuses} />
                               </Stack>
                             </Card>
                           </Link>
@@ -424,54 +410,11 @@ const SSJ = ({
                     Ways to work together
                   </Typography>
                   <Grid container spacing={3}>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your self
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your team
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <Card variant="lightened">
-                        <Stack spacing={6}>
-                          <Typography variant="bodyLarge" bold>
-                            With your community
-                          </Typography>
-                          <Stack spacing={3}>
-                            <Card size="small">Check on your growth plan</Card>
-                            <Card size="small">Engage in equity training</Card>
-                            <Card size="small" variant="lightened">
-                              View more
-                            </Card>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                    </Grid>
+                    {waysToWorkTogether.map((w, i) => (
+                      <Grid item xs={12} sm={4} alignItems="stretch" key={i}>
+                        <WaysToWorkCard waysToWork={w} />
+                      </Grid>
+                    ))}
                   </Grid>
                 </Stack>
               </Card>
@@ -541,11 +484,8 @@ const SSJ = ({
         open={firstTimeUserModalOpen}
         firstName="Jane"
       />
-      <ViewResourcesModal
-        toggle={() => setViewWaysToWorkModalOpen(!viewWaysToWorkModalOpen)}
-        open={viewWaysToWorkModalOpen}
-      />
       <AddPartnerModal
+        setSubmittedPartnerRequest={setSubmittedPartnerRequest}
         toggle={() => setAddPartnerModalOpen(!addPartnerModalOpen)}
         open={addPartnerModalOpen}
       />
@@ -632,20 +572,39 @@ const ProgressBar = ({ processes }) => {
     border-radius: ${({ theme }) => theme.radius.full}px;
     /* done */
     ${(props) =>
-      props.done &&
+      props.variant === "done" &&
       css`
         background: ${props.theme.color.success.medium};
       `}
+    /* inProgress */
+    ${(props) =>
+      props.variant === "in progress" &&
+      css`
+        background: ${props.theme.color.primary.main};
+      `}
+    /* toDo */
+    ${(props) =>
+      props.variant === "to do" &&
+      css`
+        background: ${props.theme.color.primary.lightened};
+      `}
+    /* upNext */
+    ${(props) =>
+      props.variant === "up next" &&
+      css`
+        background: ${props.theme.color.neutral.main};
+      `}
   `;
+
   return (
     <Stack spacing={3}>
       <Typography variant="bodyMini" bold lightened>
-        {processes.filter((process) => process.status === "done").length} OF{" "}
-        {processes.length} MILESTONES COMPLETED
+        {processes.filter((p) => p === "done").length} OF {processes.length}{" "}
+        MILESTONES COMPLETED
       </Typography>
       <Stack spacing={1} direction="row">
-        {processes.map((t, i) => (
-          <StyledProcessIndicator key={i} done={t.status === "done"} />
+        {processes.map((p, i) => (
+          <StyledProcessIndicator key={i} variant={p} />
         ))}
       </Stack>
     </Stack>
@@ -677,7 +636,6 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
             width: "100%",
             height: "200px",
             objectFit: "cover",
-            borderRadius: "4px",
           }}
         />
         {completed ? (
@@ -696,24 +654,85 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
         hoverable
       >
         <Stack spacing={6}>
-          <Typography variant="bodyLarge" bold>
+          <Typography variant="bodyLarge" bold capitalize>
             {phase}
           </Typography>
           <ProgressBar processes={processes} />
-          <Card size="small" variant={isCurrentPhase && "lightened"}>
-            <Stack spacing={3}>
-              <DeliverableImage
-                completed={
-                  processes.filter((process) => process.status === "done")
-                    .length === processes.length
-                }
-              />
-              <Typography variant="bodyRegular">Self Assessment</Typography>
-            </Stack>
-          </Card>
+          <Stack spacing={2}>
+            <Typography variant="bodyRegular" bold>
+              Key milestone
+            </Typography>
+            <Card
+              size="small"
+              variant={isCurrentPhase && "lightened"}
+              noPadding
+              noBorder
+            >
+              <Stack>
+                <DeliverableImage
+                  completed={
+                    processes.filter((p) => p === "done").length ===
+                    processes.length
+                  }
+                />
+                <Card size="small" noBorder>
+                  <Typography variant="bodyRegular" bold>
+                    Take the phase survey
+                  </Typography>
+                </Card>
+              </Stack>
+            </Card>
+          </Stack>
         </Stack>
       </Card>
     </Link>
+  );
+};
+
+const WaysToWorkCard = ({ waysToWork }) => {
+  const [waysToWorkModalOpen, setWaysToWorkModalOpen] = useState(false);
+  return (
+    <>
+      <Card
+        variant="lightened"
+        sx={{ height: "100%" }}
+        hoverable
+        onClick={() => setWaysToWorkModalOpen(true)}
+      >
+        <Stack spacing={6}>
+          <Grid container justifyContent="space-between">
+            <Grid item>
+              <Typography variant="bodyLarge" bold>
+                {waysToWork.name}
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Icon type="chevronRight" />
+            </Grid>
+          </Grid>
+          <Stack spacing={3}>
+            {waysToWork.resources.slice(0, 3).map((r, i) => (
+              <Card size="small" noBorder key={i}>
+                <Typography variant="bodyRegular">{r.title}</Typography>
+              </Card>
+            ))}
+            <Card size="small" noBorder variant="lightened">
+              <Typography variant="bodyRegular" lightened>
+                {waysToWork.resources.length > 3
+                  ? `And ${waysToWork.resources.slice(3).length} more`
+                  : `View more`}
+              </Typography>
+            </Card>
+          </Stack>
+        </Stack>
+      </Card>
+      <WaysToWorkModal
+        toggle={() => setWaysToWorkModalOpen(!waysToWorkModalOpen)}
+        open={waysToWorkModalOpen}
+        title={waysToWork.name}
+        resources={waysToWork.resources}
+      />
+    </>
   );
 };
 
@@ -735,7 +754,7 @@ const ETLs = ({}) => {
 };
 const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
   return (
-    <Modal title="Add your open date" toggle={toggle} open={open}>
+    <Modal title="Add your anticipated open date" toggle={toggle} open={open}>
       <Stack spacing={3}>
         <Card variant="primaryLightened">
           <Stack alignItems="center" justifyContent="center" spacing={3}>
@@ -748,7 +767,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
           </Stack>
         </Card>
         <DatePicker
-          label="Your open date"
+          label="Your anticipated open date"
           value={openDate}
           onChange={handleOpenDateChange}
         />
@@ -760,7 +779,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
           </Grid>
           <Grid item>
             <Button disabled={!openDate} onClick={toggle}>
-              <Typography>Set open date</Typography>
+              <Typography>Set an anticipated open date</Typography>
             </Button>
           </Grid>
         </Grid>
@@ -788,19 +807,18 @@ const ViewEtlsModal = ({ toggle, open }) => {
     </Modal>
   );
 };
-const ViewResourcesModal = ({ toggle, open }) => {
+const WaysToWorkModal = ({ toggle, open, title, resources }) => {
   return (
-    <Modal title="Ways to work with others" toggle={toggle} open={open}>
-      <Stack spacing={3}>
-        <Card variant="lightened">
-          <Typography variant="bodyLarge">Content</Typography>
-        </Card>
-        <Card variant="lightened">
-          <Typography variant="bodyLarge">Content</Typography>
-        </Card>
-        <Card variant="lightened">
-          <Typography variant="bodyLarge">Content</Typography>
-        </Card>
+    <Modal title={title} toggle={toggle} open={open}>
+      <Stack spacing={2}>
+        {resources.map((r, i) => (
+          <Resource
+            title={r.title}
+            link={r.url}
+            description={r.description}
+            key={i}
+          />
+        ))}
       </Stack>
     </Modal>
   );
@@ -853,9 +871,7 @@ const FirstTimeUserModal = ({ toggle, open, firstName }) => {
     </Modal>
   );
 };
-const AddPartnerModal = ({ toggle, open }) => {
-  const [isAddingByEmail, setIsAddingByEmail] = useState(true);
-
+const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
   const {
     control,
     handleSubmit,
@@ -868,12 +884,31 @@ const AddPartnerModal = ({ toggle, open }) => {
       partnerMessage: "",
     },
   });
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    setSubmittedPartnerRequest(true);
+    console.log(data);
+  };
 
   return (
     <Modal title="Add a partner" toggle={toggle} open={open}>
       <Stack spacing={3}>
-        {isAddingByEmail ? (
+        {isSubmitSuccessful ? (
+          <Card variant="lightened" size="large">
+            <Stack spacing={6}>
+              <Typography variant="h4" bold>
+                Thanks for making a request to add a partner!
+              </Typography>
+              <Typography variant="bodyLarge">
+                Someone from Wildflower Schools will be in touch with you to
+                help set up your partnership shortly!
+              </Typography>
+              <Typography variant="bodyRegular" lightened>
+                In the mean time, if you have any questions or concerns, please
+                reach out to support@wildflowerschools.org
+              </Typography>
+            </Stack>
+          </Card>
+        ) : (
           <>
             <Card variant="primaryLightened">
               <Stack alignItems="center" justifyContent="center" spacing={3}>
@@ -881,23 +916,9 @@ const AddPartnerModal = ({ toggle, open }) => {
                   Add your partner via email!
                 </Typography>
                 <Typography variant="bodyRegular" highlight center>
-                  Invite your partner to work with you and join the Wildflower
-                  Network.
+                  Make a request to invite your partner to work with you and
+                  join the Wildflower Network.
                 </Typography>
-                <Stack direction="row" alignItems="center" spacing={3}>
-                  <Typography variant="bodyRegular" highlight>
-                    Are they already in the network?
-                  </Typography>
-                  <Button
-                    variant="secondary"
-                    small
-                    onClick={() => setIsAddingByEmail(false)}
-                  >
-                    <Typography variant="bodyRegular" center bold>
-                      Add via the directory
-                    </Typography>
-                  </Button>
-                </Stack>
               </Stack>
             </Card>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -994,46 +1015,6 @@ const AddPartnerModal = ({ toggle, open }) => {
               </Stack>
             </form>
           </>
-        ) : (
-          <>
-            <Card variant="primaryLightened">
-              <Stack alignItems="center" justifyContent="center" spacing={3}>
-                <Typography variant="h4" highlight bold>
-                  Add your partner
-                </Typography>
-                <Typography variant="bodyRegular" highlight center>
-                  Search for your partner below and add them to your school.
-                  They'll be notified and, when they accept, your accounts will
-                  be tied together.
-                </Typography>
-                <Stack direction="row" alignItems="center" spacing={3}>
-                  <Typography variant="bodyRegular" highlight>
-                    Not here?
-                  </Typography>
-                  <Button
-                    variant="secondary"
-                    small
-                    onClick={() => setIsAddingByEmail(true)}
-                  >
-                    <Typography variant="bodyRegular" center bold>
-                      Add via email
-                    </Typography>
-                  </Button>
-                </Stack>
-              </Stack>
-            </Card>
-            <ETLs />
-            <Grid container justifyContent="space-between">
-              <Grid item>
-                <Button variant="text">Cancel</Button>
-              </Grid>
-              <Grid item>
-                <Button>
-                  <Typography light>Invite partner</Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          </>
         )}
       </Stack>
     </Modal>
@@ -1060,7 +1041,7 @@ const UserCard = ({ firstName, lastName, role, profileImage }) => {
     </Card>
   );
 };
-const AddPartnerCard = ({ onClick }) => {
+const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
   const IconWrapper = styled(Box)`
     width: ${({ theme }) => theme.util.buffer * 12}px;
     height: ${({ theme }) => theme.util.buffer * 12}px;
@@ -1071,29 +1052,58 @@ const AddPartnerCard = ({ onClick }) => {
     justify-content: center;
   `;
   return (
-    <Card variant="primaryOutlined" size="small" hoverable onClick={onClick}>
-      <Grid container spacing={3} alignItems="center">
-        <Grid item>
-          <IconWrapper>
-            <Icon type="plus" variant="primary" />
-          </IconWrapper>
+    <Card
+      variant={submittedPartnerRequest ? "lightened" : "primaryOutlined"}
+      size="small"
+      hoverable
+      onClick={onClick}
+    >
+      {submittedPartnerRequest ? (
+        <Grid container spacing={3} alignItems="center">
+          <Grid item>
+            <IconWrapper>
+              <Icon type="check" variant="primary" />
+            </IconWrapper>
+          </Grid>
+          <Grid item flex={1}>
+            <Stack>
+              <Typography variant="bodyRegular" bold highlight>
+                We're adding your partner
+              </Typography>
+              <Typography variant="bodySmall" lightened>
+                Check back soon to work together!
+              </Typography>
+            </Stack>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Stack>
-            <Typography variant="bodyRegular" highlight bold>
-              Add a partner
-            </Typography>
-            <Typography variant="bodySmall" lightened>
-              Add a partner to collaborate
-            </Typography>
-          </Stack>
+      ) : (
+        <Grid container spacing={3} alignItems="center">
+          <Grid item>
+            <IconWrapper>
+              <Icon type="plus" variant="primary" />
+            </IconWrapper>
+          </Grid>
+          <Grid item>
+            <Stack>
+              <Typography variant="bodyRegular" highlight bold>
+                Add a partner
+              </Typography>
+              <Typography variant="bodySmall" lightened>
+                Add a partner to collaborate
+              </Typography>
+            </Stack>
+          </Grid>
         </Grid>
-      </Grid>
+      )}
     </Card>
   );
 };
 
-const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
+const AssignedTaskByMilestone = ({
+  tasksByMilestone,
+  phase,
+  includedDocuments,
+}) => {
   const [expandedTasks, setExpandedTasks] = useState(false);
   const m = tasksByMilestone;
   return (
@@ -1104,6 +1114,7 @@ const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
         title={m.attributes.title}
         effort={m.attributes.effort}
         categories={m.attributes.categories}
+        description={m.attributes.description}
         status={m.attributes.status}
         stepCount={m.attributes.stepsCount}
       />
@@ -1121,7 +1132,13 @@ const AssignedTaskByMilestone = ({ tasksByMilestone, phase }) => {
             isComplete={t.attributes.completed}
             isNext={i === 0}
             // handleCompleteMilestone={handleCompleteMilestone}
+            resources={t.relationships.documents.data}
+            includedDocuments={includedDocuments}
             categories={m.attributes.categories}
+            description={t.attributes.description}
+            worktime={
+              (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
+            }
             taskAssignee={t.attributes.assigneeInfo}
           />
         ))}
@@ -1239,6 +1256,93 @@ const FakeETLs = [
   },
 ];
 
+const waysToWorkTogether = [
+  {
+    name: "With Yourself",
+    resources: [
+      {
+        title: "Revisit your learning and growth plan",
+        url: "https://connected.wildflowerschools.org/posts/4432337-from-teacher-to-transformational-teacher-leader-recorded-etl-gathering?video_markers=learn%2Cgrowth%2Clearning+and+growth%2Clearning.%2Cgrowth%2C",
+        type: "Connected Post",
+        description:
+          'From time to time, you may want to revisit the Learning and Growth plan in your Visioning album and use it to guide you towards further learning opportunities. If you would like to make a new Learning and Growth Plan, you can use this link to access an "Emerging Teacher Leader Self-Awareness Reflective Guide" and accompanying presentation.',
+      },
+      {
+        title: "Learn about Wildflower Ways of Working",
+        url: "https://connected.wildflowerschools.org/posts/4840229-self-management-learning-series-virtual-classroom-welcome",
+        type: "Connected Post",
+        description:
+          "This resource provides six, self-guided learning modules on Wildflower Ways of Working. The six modules include; An Introduction to Self-Management and Domination Culture; The Advice Process; Roles & Responsibilities; Conflict Resolution; Radical Transparency; and Integration.",
+      },
+      {
+        title: "Learn about Liberatory Leadership",
+        url: "https://connected.wildflowerschools.org/series/4588030-series-liberatory-leadership-series",
+        type: "Connected Series",
+        description:
+          'These sessions explore our collective vision for what "Liberatory Montessori" means at Wildflower and how we support our ongoing development in service of our shared purpose for liberation in our schools and communities.',
+      },
+      {
+        title: "Engage these Tools for Resilience",
+        url: "https://connected.wildflowerschools.org/series/4687002-tools-for-resilience",
+        type: "Connected Series",
+        description:
+          "This series includes nine, self-guided modules of resilience-building and stress-reducing activities.",
+      },
+      {
+        title: "Enroll in equity training",
+        url: "https://connected.wildflowerschools.org/series/4527958-series-equity-trainings",
+        type: "Connected Series",
+        description:
+          "Wildflower Teacher Leaders commit to a lifelong journey of personal racial identity development, critical consciousness, and anti-bias anti-racist action (commonly referred to as ABAR). You can use this list of vetted equity trainings to support you along your learning journey.",
+      },
+    ],
+  },
+  {
+    name: "With Your Team",
+    resources: [
+      {
+        title: "Identify a Teacher Leader partner",
+        url: "https://docs.google.com/presentation/d/1ymc_PZDNMtAoNdIV0QHPWw5NdekQRQrdjhkT19eyivg/view",
+        type: "Google Slides",
+        description:
+          "Finding a Teacher Leader partner can be a daunting task, but there are ways to spread the word and activate your network. This resource provides reflection prompts, templates and framing to help you chart a path towards finding a supportive partnership.",
+      },
+      {
+        title: "Engage a Growth & Connectedness coach",
+        url: "https://connected.wildflowerschools.org/series/4406175-series-growth-connectedness-coaches",
+        type: "Connected Series",
+        description:
+          "Once you have identified a partner, Wildflower highly recommends investing in the wellbeing of your partnership by engaging a Growth & Connectedness coach. Growth & Connectedness coaches typically focus on leadership, identity, and teamwork development. If you have questions about how to access coaching, please contact your Operations Guide. ",
+      },
+      {
+        title: "Engage an Equity or ABAR coach",
+        url: "https://connected.wildflowerschools.org/series/4527903-series-equity-consultants",
+        type: "Connected Series",
+        description:
+          "In addition to engaging in equity or identity development trainings, many Teacher Leader teams engage an Equity coach to help them create an intentionally anti-racist, anti-bias school community.",
+      },
+    ],
+  },
+  {
+    name: "With Your Community",
+    resources: [
+      {
+        title: "Attend Wildflower Community events",
+        url: "https://connected.wildflowerschools.org/posts/4634392-wildflower-events-calendar",
+        type: "Connected Post",
+        description:
+          "As an Emerging Teacher Leader you can begin attending Wildflower events and offerings. You can use this calendar to identify upcoming opportunities. When in doubt, you can also reach out to your Operations Guide to identify upcoming opportunities.",
+      },
+      {
+        title: "Join a Pod of Wildflower Schools",
+        url: "https://connected.wildflowerschools.org/posts/4529540-essay-a-decentralized-network-by-erin-mckay",
+        type: "Connected Post",
+        description:
+          "Pods are small groupings of 5 - 7 schools that provide mutual support, accountability and community for one another. Read this first-hand account from a Teacher Leader about her experience of a Pod in a decentralized network. Schools typically connect with Pods once they have affiliated, but it is never too early to begin exploring and visit a pod meeting or two. To get connected please contact your Operations Guide.",
+      },
+    ],
+  },
+];
 export async function getServerSideProps({ params, req, res }) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
@@ -1257,15 +1361,21 @@ export async function getServerSideProps({ params, req, res }) {
     }
   });
 
+  const includedDocuments = {};
+  data.included
+    .filter((i) => i.type === "document")
+    .forEach((i) => {
+      includedDocuments[i.id] = i;
+    });
+
   data.data.forEach((milestone) => {
     milestone.relationships.steps.data.forEach((includedStep, i) => {
       milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
     });
   });
-  const MilestoneWithSelfAssignedTasks = data.data;
+  const milestonesWithSelfAssignedTasks = data.data;
 
   const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-
   const responseMilestones = await axios.get(apiRouteMilestones);
   const dataMilestones = await responseMilestones.data;
   const milestonesToDo = [];
@@ -1275,12 +1385,18 @@ export async function getServerSideProps({ params, req, res }) {
     }
   });
 
+  const apiRouteProgress = `${baseUrl}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
+  const responseProgress = await axios.get(apiRouteProgress);
+  const dataProgress = await responseProgress.data;
+
   return {
     props: {
       milestonesToDo,
+      includedDocuments,
+      dataProgress,
       data,
       phase,
-      MilestoneWithSelfAssignedTasks,
+      milestonesWithSelfAssignedTasks,
     },
   };
 }

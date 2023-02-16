@@ -84,7 +84,7 @@ const Navigation = ({}) => {
         to="/ssj"
         active={router.pathname === "/ssj"}
         label="School Startup Journey"
-        icon="bus"
+        icon="home"
       />
       {router.pathname.includes("/ssj") && <SSJNavigation />}
       {/* <NavLink
@@ -104,13 +104,6 @@ const SSJNavigation = ({}) => {
     <Box>
       <NavLink
         secondary
-        to="/ssj/view-all"
-        active={router.pathname.includes("/ssj/view-all")}
-        label="View all"
-        icon={true}
-      />
-      <NavLink
-        secondary
         to="/ssj/visioning"
         active={router.pathname.includes("/ssj/visioning")}
         label="Visioning"
@@ -128,6 +121,13 @@ const SSJNavigation = ({}) => {
         to="/ssj/startup"
         active={router.pathname.includes("/ssj/startup")}
         label="Startup"
+        icon={true}
+      />
+      <NavLink
+        secondary
+        to="/ssj/view-all"
+        active={router.pathname.includes("/ssj/view-all")}
+        label="View all"
         icon={true}
       />
     </Box>

@@ -50,6 +50,7 @@ const StyledTask = styled(Box)`
 const Task = ({
   taskId,
   title,
+  description,
   isComplete,
   notNavigable,
   isDecision,
@@ -62,13 +63,14 @@ const Task = ({
   taskAssignee,
   variant,
   resources,
+  includedDocuments,
+  worktime,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
   const [assignee, setAssignee] = useState(taskAssignee);
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
-  const [userIsUpdatingDecision, setUserIsUpdatingDecision] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
   const { currentUser } = useUserContext();
 
@@ -118,7 +120,6 @@ const Task = ({
   }
   const handleMakeDecision = () => {
     //TODO: Api call to set decision
-    setUserIsUpdatingDecision(false);
     setIsDecided(true);
   };
 
@@ -159,8 +160,8 @@ const Task = ({
               ) : (
                 <Stack direction="row" spacing={4} alignItems="center">
                   <Icon
-                    type={taskIsComplete ? "checkCircle" : "circle"}
-                    variant={taskIsComplete ? "primary" : "lightened"}
+                    type={taskIsComplete ? "checkCircle" : "circleSolid"}
+                    variant={taskIsComplete ? "primary" : "lightest"}
                   />
                   <Typography
                     variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
@@ -193,13 +194,15 @@ const Task = ({
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
         assignee={assignee}
-        about="..."
+        about={description}
         taskId={taskId}
         title={title}
         resources={resources}
         categories={categories}
+        worktime={worktime}
         isDecision={isDecision}
         isComplete={taskIsComplete}
+        includedDocuments={includedDocuments}
         actions={
           isDecision ? (
             <DecisionDrawerActions
@@ -257,7 +260,7 @@ const DecisionDrawerActions = ({
     ${(props) =>
       props.disabled &&
       css`
-        opacity: 0.5;
+        opacity: 0.7;
         pointer-events: none;
       `}
   `;
@@ -286,23 +289,46 @@ const DecisionDrawerActions = ({
         </Grid>
       ) : null}
 
-      <Grid container spacing={4}>
+      <Grid container spacing={6}>
         {assignee ? (
           isDecided ? (
             <Grid item xs={12}>
-              <Button
-                full
-                variant="secondary"
-                onClick={() => setIsDecided(false)}
-              >
-                <Typography>Change decision</Typography>
-              </Button>
+              <Card variant="lightened">
+                <Stack spacing={3}>
+                  <Stack direction="row" spacing={3} alignItems="center">
+                    <Icon type="check" variant="primary" />
+                    <Typography variant="bodyLarge" bold highlight>
+                      Decision made!
+                    </Typography>
+                  </Stack>
+                  <Typography variant="bodyRegular">
+                    You can't easily change this, but if you must, please reach
+                    out to support@wildflowerschools.org
+                  </Typography>
+                </Stack>
+              </Card>
             </Grid>
           ) : (
             <>
+              <Grid item xs={12}>
+                <Card size="small" variant="lightened">
+                  <Grid container spacing={3} alignItems="center">
+                    <Grid item>
+                      <Icon type="commentError" variant="primary" />
+                    </Grid>
+                    <Grid item flex={1}>
+                      <Typography variant="bodySmall">
+                        Changing decisions is not advised. Please take the
+                        necessary steps to be certain about your decision before
+                        making it here.
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Grid>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Unassign yourself</Typography>
+                  <Typography bold>Remove from my tasks</Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -311,7 +337,7 @@ const DecisionDrawerActions = ({
                   disabled={!decisionOption}
                   onClick={handleMakeDecision}
                 >
-                  <Typography>Decide</Typography>
+                  <Typography bold>Make final decision</Typography>
                 </Button>
               </Grid>
             </>
@@ -320,7 +346,7 @@ const DecisionDrawerActions = ({
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
               <Typography light bold>
-                Assign yourself
+                Add to my tasks
               </Typography>
             </Button>
           </Grid>
@@ -354,7 +380,7 @@ const TaskDrawerActions = ({
             <>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Unassign yourself</Typography>
+                  <Typography bold>Remove from my tasks</Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -370,7 +396,7 @@ const TaskDrawerActions = ({
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
               <Typography light bold>
-                Assign yourself
+                Add to my tasks
               </Typography>
             </Button>
           </Grid>
@@ -394,7 +420,7 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid item>
                 <Typography variant="bodySmall" lightened>
-                  TASK {isAssignToast ? "ASSIGNED" : "UNASSIGNED"}
+                  TASK {isAssignToast ? "ADDED" : "REMOVED"}
                 </Typography>
               </Grid>
               <Grid item>
@@ -409,9 +435,9 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
               <Stack direction="row" spacing={1}>
                 <Typography variant="bodySmall">You</Typography>
                 <Typography variant="bodySmall" lightened>
-                  {isAssignToast ? "assigned" : "unassigned"}
+                  {isAssignToast ? "added" : "removed"}
                 </Typography>
-                <Typography variant="bodySmall">yourself</Typography>
+                <Typography variant="bodySmall">this task</Typography>
               </Stack>
             </Stack>
           </Stack>

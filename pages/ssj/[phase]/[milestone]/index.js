@@ -24,7 +24,6 @@ import {
 } from "@ui";
 import Task from "../../../../components/Task";
 import CategoryChip from "../../../../components/CategoryChip";
-import EffortChip from "../../../../components/EffortChip";
 import PhaseChip from "../../../../components/PhaseChip";
 import StatusChip from "../../../../components/StatusChip";
 import Milestone from "../../../../components/Milestone";
@@ -39,19 +38,22 @@ const StyledMilestoneHeader = styled(Stack)`
 `;
 
 const MilestonePage = ({
-  MilestoneId,
-  MilestoneTitle,
-  MilestoneAttributes,
-  MilestoneRelationships,
-  MilestoneTasks,
+  milestoneId,
+  milestoneTitle,
+  milestoneDescription,
+  milestoneAttributes,
+  milestoneRelationships,
+  milestoneTasks,
+  milestonesToDo,
   FakeMilestoneTasks,
-  FakeAlternativeMilestones,
   sortedMilestoneTasks,
+  data,
+  includedDocuments,
 }) => {
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
-  const isUpNext = false;
+  const isUpNext = milestoneAttributes.status === "up next";
 
   const handleCompleteMilestone = () => {
     setCompleteModalOpen(true);
@@ -66,13 +68,49 @@ const MilestonePage = ({
   const { phase } = router.query;
 
   // console.log("Tasks", MilestoneTasks);
-  // console.log("MilestoneAttributes", MilestoneAttributes);
-  // console.log("Milestone Relationships", MilestoneRelationships);
+  // console.log("data", data);
+  // console.log("includedDocuments", includedDocuments);
+  // console.log("milestoneAttributes", milestoneAttributes);
+  // console.log("Milestone Relationships", milestoneRelationships);
+  // console.log("Milestones To Do", milestonesToDo);
 
   return (
     <PageContainer>
       <Stack spacing={12}>
-        <Stack spacing={6}>
+        <Stack spacing={8}>
+          {isUpNext && (
+            <Card variant="primaryOutlined">
+              <Grid container spacing={6}>
+                <Grid item xs={12}>
+                  <Stack spacing={2}>
+                    <Typography variant="h4" bold highlight>
+                      Hold up! Try something else first.
+                    </Typography>
+                    <Typography variant="bodyLarge" lightened>
+                      We don't think you're quite ready to work on this yet. Try
+                      working on these other milestones first.
+                    </Typography>
+                  </Stack>
+                </Grid>
+                <Grid item xs={12}>
+                  <Stack spacing={3}>
+                    {milestonesToDo.map((m, i) => (
+                      <Milestone
+                        link={`/ssj/${phase}/${m.id}`}
+                        key={i}
+                        title={m.attributes.title}
+                        description={m.attributes.description}
+                        effort={m.attributes.effort}
+                        categories={m.attributes.categories}
+                        status={m.attributes.status}
+                        stepCount={m.relationships.steps.data.length}
+                      />
+                    ))}
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Card>
+          )}
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
@@ -107,62 +145,34 @@ const MilestonePage = ({
               )}
             </Grid>
           </Grid>
-          {isUpNext && (
-            <Card variant="primaryOutlined">
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Stack>
-                    <Typography variant="h3" bold>
-                      Try something else first!
-                    </Typography>
-                    <Typography variant="bodyLarge" lightened>
-                      Before completing this milestone, there are a few things
-                      to work on first.
-                    </Typography>
-                  </Stack>
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={3}>
-                    {FakeAlternativeMilestones.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${phase}/${m.title}`}
-                        key={i}
-                        title={m.title}
-                        effort={m.effort}
-                        category={m.category}
-                        assignee={m.assignee}
-                        status={m.status}
-                      />
-                    ))}
-                  </Stack>
-                </Grid>
-              </Grid>
-            </Card>
-          )}
-          <StyledMilestoneHeader spacing={6} downplayed={isUpNext}>
+
+          <StyledMilestoneHeader spacing={8}>
             <Typography variant="h2" bold capitalize>
-              {MilestoneTitle}
+              {milestoneTitle}
+            </Typography>
+            <Typography variant="bodyLarge" lightened>
+              {milestoneDescription}
             </Typography>
             <Stack direction="row" spacing={6} alignItems="center">
-              {MilestoneAttributes.status ? (
+              {milestoneAttributes.status ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     STATUS
                   </Typography>
                   <StatusChip
-                    status={MilestoneAttributes.status}
+                    status={milestoneAttributes.status}
                     size="small"
                     withIcon
                   />
                 </Stack>
               ) : null}
-              {MilestoneAttributes.categories ? (
+              {milestoneAttributes.categories ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     CATEGORY
                   </Typography>
                   <Stack direction="row" spacing={2}>
-                    {MilestoneAttributes.categories.map((m, i) => (
+                    {milestoneAttributes.categories.map((m, i) => (
                       <CategoryChip
                         category={m}
                         size="small"
@@ -173,19 +183,8 @@ const MilestonePage = ({
                   </Stack>
                 </Stack>
               ) : null}
-              {MilestoneAttributes.effort ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    EFFORT
-                  </Typography>
-                  <EffortChip
-                    effort={MilestoneAttributes.effort}
-                    size="small"
-                    withIcon
-                  />
-                </Stack>
-              ) : null}
-              {MilestoneAttributes.author ? (
+
+              {milestoneAttributes.author ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     AUTHOR
@@ -213,8 +212,9 @@ const MilestonePage = ({
             sortedMilestoneTasks.map((t, i) => (
               <Task
                 taskId={t.id}
-                link={`/ssj/${phase}/${MilestoneId}/${t.id}`}
+                link={`/ssj/${phase}/${milestoneId}/${t.id}`}
                 title={t.attributes.title}
+                description={t.attributes.description}
                 key={i}
                 isDecision={t.attributes.kind === "Decision"}
                 decisionOptions={t.attributes.decisionOptions}
@@ -222,9 +222,13 @@ const MilestonePage = ({
                 isNext={isUpNext}
                 isComplete={t.attributes.completed}
                 handleCompleteMilestone={handleCompleteMilestone}
-                categories={MilestoneAttributes.categories}
+                categories={milestoneAttributes.categories}
                 taskAssignee={t.attributes.assigneeInfo}
                 resources={t.relationships.documents.data}
+                includedDocuments={includedDocuments}
+                worktime={
+                  (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
+                }
               />
             ))
           ) : (
@@ -292,7 +296,7 @@ const MilestonePage = ({
                 </Typography>
               </Stack>
               <Typography variant="h2" bold>
-                {MilestoneTitle}
+                {milestoneTitle}
               </Typography>
               <Typography variant="bodyLarge" lightened center>
                 You're making great progress!
@@ -400,20 +404,41 @@ const EditableTaskList = ({ tasks }) => {
   );
 };
 
-export async function getServerSideProps({ query, req, res }) {
-  const MilestoneId = query.milestone;
-  const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}`;
+export async function getServerSideProps({ params, query, req, res }) {
+  const milestoneId = query.milestone;
+  const apiRoute = `${baseUrl}/v1/workflow/processes/${milestoneId}`;
   setAuthHeader({ req, res });
-
   const response = await axios.get(apiRoute);
   const data = await response.data;
 
+  const { phase } = params;
+  const workflowId = "c502-4f84";
+  // const workflowId = "5947-ab7f"
+  const apiMilestonesRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const milestonesResponse = await axios.get(apiMilestonesRoute);
+  const milestonesData = await milestonesResponse.data;
+  const milestonesToDo = [];
+
+  milestonesData.data.forEach((milestone) => {
+    if (milestone.attributes.status == "to do") {
+      milestonesToDo.push(milestone);
+    }
+  });
+
+  const includedDocuments = {};
+  data.included
+    .filter((i) => i.type === "document")
+    .forEach((i) => {
+      includedDocuments[i.id] = i;
+    });
+
   const Workflow = data.included.filter((i) => i.type === "workflow");
-  const MilestoneTitle = data.data.attributes.title;
-  const MilestoneAttributes = data.data.attributes;
-  const MilestoneRelationships = data.data.relationships;
-  const MilestoneTasks = data.included.filter((i) => i.type === "step");
-  const sortedMilestoneTasks = MilestoneTasks.sort((a, b) =>
+  const milestoneTitle = data.data.attributes.title;
+  const milestoneDescription = data.data.attributes.description;
+  const milestoneAttributes = data.data.attributes;
+  const milestoneRelationships = data.data.relationships;
+  const milestoneTasks = data.included.filter((i) => i.type === "step");
+  const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
   );
 
@@ -442,32 +467,19 @@ export async function getServerSideProps({ query, req, res }) {
       isSensibleDefault: false,
     },
   ];
-  const FakeAlternativeMilestones = [
-    {
-      title: "Form your board",
-      effort: "large",
-      category: "Album Advice & Affiliation",
-      assignee: "unassigned",
-      status: "to do",
-    },
-    {
-      title: "Get incorporated",
-      effort: "large",
-      category: "Album Advice & Affiliation",
-      assignee: "unassigned",
-      status: "to do",
-    },
-  ];
 
   return {
     props: {
-      MilestoneId,
-      MilestoneTitle,
-      MilestoneAttributes,
-      MilestoneRelationships,
-      MilestoneTasks,
+      includedDocuments,
+      data,
+      milestoneId,
+      milestoneTitle,
+      milestoneDescription,
+      milestoneAttributes,
+      milestoneRelationships,
+      milestoneTasks,
+      milestonesToDo,
       FakeMilestoneTasks,
-      FakeAlternativeMilestones,
       sortedMilestoneTasks,
     },
   };

@@ -20,6 +20,7 @@ import {
   WindowClose,
   Glasses,
   CheckDouble,
+  Home,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -34,6 +35,10 @@ import {
   Zap,
   Star,
   Message,
+  CommentError,
+  RightArrowCircle as RightArrowCircleSolid,
+  Circle as CircleSolid,
+  Time,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -79,6 +84,15 @@ const StyledIcon = styled("span")`
     css`
       svg {
         color: ${props.theme.color.primary.main};
+      }
+    `}
+
+  /* Lightened */
+  ${(props) =>
+    props.variant === "lightest" &&
+    css`
+      svg {
+        color: ${props.theme.color.neutral.lightened};
       }
     `}
 
@@ -141,12 +155,14 @@ export default function Icon({ ...props }) {
     conversation: <Conversation />,
     menu: <Menu />,
     circle: <Circle />,
+    circleSolid: <CircleSolid />,
     checkCircle: <CheckCircle />,
     flag: <Flag />,
     link: <Link />,
     linkExternal: <LinkExternal />,
     category: <Category />,
     rightArrowCircle: <RightArrowCircle />,
+    rightArrowCircleSolid: <RightArrowCircleSolid />,
     label: <Label />,
     plus: <Plus />,
     pencil: <Pencil />,
@@ -163,6 +179,9 @@ export default function Icon({ ...props }) {
     windowClose: <WindowClose />,
     glasses: <Glasses />,
     checkDouble: <CheckDouble />,
+    commentError: <CommentError />,
+    home: <Home />,
+    time: <Time />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

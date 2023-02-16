@@ -1,23 +1,41 @@
 import { Grid, Card, Typography, Stack, Icon, IconButton, Link } from "./ui";
 
-const Resource = ({ title, link }) => {
+const Resource = ({ title, link, description }) => {
   return (
     <Card variant="lightened" size="small">
-      <Grid container alignItems="center" justifyContent="space-between">
-        <Grid item>
-          <Stack direction="row" spacing={4} alignItems="center">
-            <Icon type="link" variant="primary" />
-            <Typography variant="bodyLarge" bold>
-              {title}
-            </Typography>
+      <Grid
+        container
+        alignItems={description ? "flex-start" : "center"}
+        justifyContent="space-between"
+        spacing={4}
+      >
+        <Grid item flex={1}>
+          <Stack
+            direction="row"
+            spacing={4}
+            alignItems={description ? "flex-start" : "center"}
+          >
+            <Grid item>
+              <Icon type="link" variant="primary" />
+            </Grid>
+            <Stack spacing={description && 2}>
+              <Typography variant="bodyLarge" bold>
+                {title}
+              </Typography>
+              {description && (
+                <Typography variant="bodySmall" lightened>
+                  {description}
+                </Typography>
+              )}
+            </Stack>
           </Stack>
         </Grid>
         <Grid item>
-          <Link href={link}>
+          <a href={link} target="_blank">
             <IconButton>
               <Icon type="linkExternal" variant="lightened" />
             </IconButton>
-          </Link>
+          </a>
         </Grid>
       </Grid>
     </Card>

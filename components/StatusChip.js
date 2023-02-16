@@ -11,15 +11,18 @@ const StatusChip = ({ status, withIcon, ...props }) => {
                 status === "done"
                   ? "checkCircle"
                   : status === "up next"
+                  ? "circle"
+                  : status === "to do"
                   ? "rightArrowCircle"
-                  : status === "to do" && "circle"
+                  : status === "in progress" && "rightArrowCircleSolid"
               }
               variant={
                 status === "done"
                   ? "success"
                   : status === "up next"
                   ? "lightened"
-                  : status === "to do" && "primary"
+                  : (status === "to do" || status === "in progress") &&
+                    "primary"
               }
               size="small"
             />

@@ -11,33 +11,49 @@ import {
   Grid,
   Chip,
   Avatar,
+  Divider,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import Milestone from "../../components/Milestone";
+import Task from "../../components/Task";
 import Resource from "../../components/Resource";
+import setAuthHeader from "../../lib/setAuthHeader";
+import axios from "axios";
+import baseUrl from "@lib/utils/baseUrl";
 
-const DiscoveryPage = ({}) => {
+const DiscoveryPage = ({
+  data,
+  processByCategory,
+  dataResources,
+  dataAssignedSteps,
+}) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
-  const [showMilestonesByAssignee, setShowMilestonesByAssignee] =
-    useState(false);
+  const [showTasksByAssignee, setShowTasksByAssignee] = useState(false);
   const [showResourcesByCategory, setShowResourcesByCategory] = useState(false);
 
   const handleShowMilestonesByCategory = () => {
     setShowMilestonesByCategory(true);
-    setShowMilestonesByAssignee(false);
+    setShowTasksByAssignee(false);
     setShowResourcesByCategory(false);
   };
-  const handleShowMilestonesByAssignee = () => {
+  const handleShowTasksByAssignee = () => {
     setShowMilestonesByCategory(false);
-    setShowMilestonesByAssignee(true);
+    setShowTasksByAssignee(true);
     setShowResourcesByCategory(false);
   };
   const handleShowResourcesByCategory = () => {
     setShowMilestonesByCategory(false);
-    setShowMilestonesByAssignee(false);
+    setShowTasksByAssignee(false);
     setShowResourcesByCategory(true);
   };
+
+  // console.log({ data });
+  // console.log({ processByCategory });
+  // console.log({ dataResources });
+  // console.log({ dataAssignedSteps });
+
+  // console.log(Object.keys(dataResources[0])[0]);
 
   return (
     <PageContainer>
@@ -71,9 +87,9 @@ const DiscoveryPage = ({}) => {
                   onClick={handleShowMilestonesByCategory}
                 />
                 <Chip
-                  label="Milestones by Assignee"
-                  variant={showMilestonesByAssignee && "primary"}
-                  onClick={handleShowMilestonesByAssignee}
+                  label="Tasks by Assignee"
+                  variant={showTasksByAssignee && "primary"}
+                  onClick={handleShowTasksByAssignee}
                 />
                 <Chip
                   label="Resources by Category"
@@ -86,24 +102,24 @@ const DiscoveryPage = ({}) => {
         </Stack>
 
         {showMilestonesByCategory &&
-          FakeMilestonesByCategory.map((a, i) => (
+          processByCategory.map((a, i) => (
             <Card key={i}>
               <Stack spacing={6}>
                 <Stack direction="row" spacing={6} alignItems="center">
                   <CategoryChip category={a.category} size="large" withIcon />
                   <Typography variant="h4" lightened>
-                    {a.milestones.length}
+                    {a.processes.length}
                   </Typography>
                 </Stack>
                 <Stack spacing={3}>
-                  {a.milestones.map((m, i) => (
+                  {a.processes.map((m, i) => (
                     <Milestone
-                      link={null}
+                      link={`/ssj/visioning`}
                       key={i}
-                      title={m.title}
-                      effort={m.effort}
-                      phase={m.phase}
-                      assignee={m.assignee}
+                      status={m.attributes.status}
+                      categories={m.attributes.categories}
+                      title={m.attributes.title}
+                      effort={m.attributes.effort}
                     />
                   ))}
                 </Stack>
@@ -111,27 +127,43 @@ const DiscoveryPage = ({}) => {
             </Card>
           ))}
 
-        {showMilestonesByAssignee &&
-          FakeMilestonesByAssignee.map((a, i) => (
+        {showTasksByAssignee &&
+          dataAssignedSteps.map((a, i) => (
             <Card key={i}>
               <Stack spacing={6}>
                 <Stack direction="row" spacing={6} alignItems="center">
-                  <Avatar src={a.assignee.profileImage} size="sm" />
+                  <Avatar src={a.assignee_info.imageUrl} size="sm" />
                   <Typography variant="bodyLarge" bold>
-                    {a.assignee.firstName} {a.assignee.lastName}
+                    Keith Tom
                   </Typography>
                   <Typography variant="h4" lightened>
-                    {a.milestones.length}
+                    {a.steps.length}
                   </Typography>
                 </Stack>
-                <Stack spacing={3}>
-                  {a.milestones.map((m, i) => (
-                    <Milestone
+                <Stack>
+                  <Divider />
+                  {a.steps.map((t, i) => (
+                    <Task
+                      taskId={t.data.id}
+                      // link={`/ssj/${phase}/${m.id}/${t.id}`}
+                      title={t.data.attributes.title}
                       key={i}
-                      title={m.title}
-                      effort={m.effort}
-                      phase={m.phase}
-                      assignee={m.assignee}
+                      isDecision={t.data.attributes.kind === "Decision"}
+                      decisionOptions={t.data.attributes.decisionOptions}
+                      isComplete={t.data.attributes.completed}
+                      isNext={i === 0}
+                      // handleCompleteMilestone={handleCompleteMilestone}
+                      // resources={t.data.relationships.documents.data}
+                      // includedDocuments={includedDocuments}
+                      // categories={m.attributes.categories}
+                      description={t.data.attributes.description}
+                      worktime={
+                        (t.data.attributes.maxWorktime +
+                          t.data.attributes.minWorktime) /
+                        2 /
+                        60
+                      }
+                      taskAssignee={dataAssignedSteps[0].assignee_info}
                     />
                   ))}
                 </Stack>
@@ -140,29 +172,122 @@ const DiscoveryPage = ({}) => {
           ))}
 
         {showResourcesByCategory &&
-          FakeResourcesByCategory.map((a, i) => (
-            <Card key={i}>
-              <Stack spacing={6}>
-                <Stack direction="row" spacing={6} alignItems="center">
-                  <CategoryChip category={a.category} size="large" withIcon />
-                  <Typography variant="h4" lightened>
-                    {a.resources.length}
-                  </Typography>
+          dataResources.map((a, i) => {
+            const name = Object.keys(a)[0];
+            const array = Object.values(a);
+            // console.log("~~~~~~~~", array);
+            return (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={6} alignItems="center">
+                    <CategoryChip category={name} size="large" withIcon />
+                    <Typography variant="h4" lightened>
+                      {array[0].length}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={3}>
+                    {array[0].map((r, i) => (
+                      <Resource
+                        title={r.data.attributes.title}
+                        link={r.data.attributes.link}
+                        key={i}
+                      />
+                    ))}
+                  </Stack>
                 </Stack>
-                <Stack spacing={3}>
-                  {a.resources.map((r, i) => (
-                    <Resource title={r.title} link="/" key={i} />
-                  ))}
-                </Stack>
-              </Stack>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
       </Stack>
     </PageContainer>
   );
 };
 
 export default DiscoveryPage;
+
+export async function getServerSideProps({ req, res }) {
+  // const userId = query.userId;
+  // const ssjId = query.ssjId;
+
+  // const workflowId = "5947-ab7f"
+  const workflowId = "c502-4f84";
+  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes`;
+  setAuthHeader({ req, res });
+  const response = await axios.get(apiRoute);
+  const data = await response.data;
+
+  const groupedFinanceProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("Finance")
+  );
+  const groupedFacilitiesProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("Facilities")
+  );
+  const groupedGovernanceComplianceProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("Governance & Compliance")
+  );
+  const groupedHumanResourcesProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("Human Resources")
+  );
+  const groupedCommunityFamilyEngagementProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("Community & Family Engagement")
+  );
+  const groupedClassroomProgramPracticesProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("Classroom & Program Practices")
+  );
+  const groupedAlbumsProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("Albums")
+  );
+  const groupedAdviceAffiliationProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("Advice & Affiliation")
+  );
+  const groupedCommunityCultureProcesses = data.data.filter((d) =>
+    d.attributes.categories.includes("WF Community & Culture")
+  );
+
+  const processByCategory = [
+    { category: "Finance", processes: groupedFinanceProcesses },
+    { category: "Facilities", processes: groupedFacilitiesProcesses },
+    {
+      category: "Governance & Compliance",
+      processes: groupedGovernanceComplianceProcesses,
+    },
+    { category: "Human Resources", processes: groupedHumanResourcesProcesses },
+    {
+      category: "Community & Family Engagement",
+      processes: groupedCommunityFamilyEngagementProcesses,
+    },
+    {
+      category: "Classroom & Program Practices",
+      processes: groupedClassroomProgramPracticesProcesses,
+    },
+    { category: "Albums", processes: groupedAlbumsProcesses },
+    {
+      category: "Advice & Affiliation",
+      processes: groupedAdviceAffiliationProcesses,
+    },
+    {
+      category: "WF Community & Culture",
+      processes: groupedCommunityCultureProcesses,
+    },
+  ];
+
+  const apiRouteResources = `${baseUrl}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
+  const responseResources = await axios.get(apiRouteResources);
+  const dataResources = await responseResources.data;
+
+  const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
+  const dataAssignedSteps = await responseAssignedSteps.data;
+
+  return {
+    props: {
+      data: data.data,
+      processByCategory,
+      dataResources,
+      dataAssignedSteps,
+    },
+  };
+}
 
 const FakeMilestonesByCategory = [
   {
@@ -226,7 +351,7 @@ const FakeMilestonesByCategory = [
   },
 ];
 
-const FakeMilestonesByAssignee = [
+const FakeTasksByAssignee = [
   {
     assignee: {
       firstName: "Maya",

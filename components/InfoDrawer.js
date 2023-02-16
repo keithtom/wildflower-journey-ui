@@ -12,7 +12,7 @@ import {
   Divider,
   Avatar,
 } from "./ui/index";
-import EffortChip from "./EffortChip";
+import WorktimeChip from "./WorktimeChip";
 import CategoryChip from "./CategoryChip";
 import StatusChip from "./StatusChip";
 import Resource from "./Resource";
@@ -45,6 +45,8 @@ const InfoDrawer = ({
   actions,
   isDecision,
   isComplete,
+  includedDocuments,
+  worktime,
 }) => {
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
@@ -117,23 +119,27 @@ const InfoDrawer = ({
                     </Stack>
                   </Stack>
                 )}
-                {effort && (
+                {worktime && (
                   <Stack spacing={2}>
                     <Typography variant="bodyMini" lightened bold>
-                      EFFORT
+                      WORKTIME
                     </Typography>
-                    <EffortChip size="small" effort={effort} withIcon />
+                    <WorktimeChip size="small" worktime={worktime} withIcon />
                   </Stack>
                 )}
               </Stack>
             </Stack>
-            {resources && resources.data && (
+            {resources && resources.length ? (
               <Stack spacing={2}>
-                {resources.data.map((r, i) => (
-                  <Resource link={r.link} title={r.title} key={i} />
+                {resources.map((r, i) => (
+                  <Resource
+                    link={includedDocuments[r.id].attributes.link}
+                    title={includedDocuments[r.id].attributes.title}
+                    key={i}
+                  />
                 ))}
               </Stack>
-            )}
+            ) : null}
             {about && (
               <Stack spacing={4}>
                 <Stack direction="row" spacing={4}>

@@ -10,23 +10,29 @@ import {
   Link,
   Avatar,
   Button,
+  Chip,
 } from "./ui";
 import CategoryChip from "./CategoryChip";
-import EffortChip from "./EffortChip";
 import PhaseChip from "./PhaseChip";
 import InfoDrawer from "./InfoDrawer";
 
 const Milestone = ({
   link,
   title,
+  description,
   effort,
   categories,
   phase,
   status,
   stepCount,
+  stepsAssignedCount,
+  completedStepsCount,
   variant,
 }) => {
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
+
+  const remainingSteps = stepCount - completedStepsCount;
+  const assignedIncomplete = stepsAssignedCount - completedStepsCount;
 
   return (
     <>
@@ -44,9 +50,14 @@ const Milestone = ({
                   <Icon type="checkCircle" variant="success" />
                 )}
                 {status === "up next" && (
-                  <Icon type="rightArrowCircle" variant="lightened" />
+                  <Icon type="circle" variant="lightened" />
                 )}
-                {status === "to do" && <Icon type="circle" variant="primary" />}
+                {status === "in progress" && (
+                  <Icon type="rightArrowCircleSolid" variant="primary" />
+                )}
+                {status === "to do" && (
+                  <Icon type="rightArrowCircle" variant="primary" />
+                )}
                 <Typography
                   variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
                   bold
@@ -54,17 +65,32 @@ const Milestone = ({
                 >
                   {title}
                 </Typography>
+                {assignedIncomplete && remainingSteps ? (
+                  <Chip
+                    size="small"
+                    label={
+                      <Stack spacing={1} direction="row">
+                        Working on {assignedIncomplete} of {remainingSteps}{" "}
+                        remaining tasks
+                      </Stack>
+                    }
+                  />
+                ) : completedStepsCount ? (
+                  <Chip
+                    size="small"
+                    label={
+                      <Stack spacing={1} direction="row">
+                        {completedStepsCount} of {stepCount} tasks completed
+                      </Stack>
+                    }
+                  />
+                ) : null}
               </Stack>
             </Grid>
 
             <Grid item>
               <Stack direction="row" spacing={6} alignItems="center">
                 <Stack direction="row" spacing={3} alignItems="center">
-                  {effort && (
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <EffortChip size="small" effort={effort} withIcon />
-                    </Stack>
-                  )}
                   {phase && (
                     <Stack direction="row" spacing={2} alignItems="center">
                       <PhaseChip size="small" phase={phase} withIcon />
@@ -102,7 +128,7 @@ const Milestone = ({
         status={status}
         effort={effort}
         categories={categories}
-        about="..."
+        about={description}
         actions={<MilestoneDrawerActions stepCount={stepCount} link={link} />}
       />
     </>
