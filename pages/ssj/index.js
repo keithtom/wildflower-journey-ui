@@ -1106,6 +1106,7 @@ const AssignedTaskByMilestone = ({
 }) => {
   const [expandedTasks, setExpandedTasks] = useState(false);
   const m = tasksByMilestone;
+
   return (
     <>
       <Milestone
@@ -1140,6 +1141,7 @@ const AssignedTaskByMilestone = ({
               (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
             }
             taskAssignee={t.attributes.assigneeInfo}
+            clearFromListWhenComplete={true}
           />
         ))}
       {m.relationships.steps.data.length > 1 && (

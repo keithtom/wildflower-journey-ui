@@ -65,6 +65,7 @@ const Task = ({
   resources,
   includedDocuments,
   worktime,
+  clearFromListWhenComplete,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -72,6 +73,7 @@ const Task = ({
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
+  const [visible, setVisible] = useState(true);
   const { currentUser } = useUserContext();
 
   async function handleCompleteTask() {
@@ -80,6 +82,12 @@ const Task = ({
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.complete(taskId);
       setTaskIsComplete(response.data.attributes.completed);
+      setInfoDrawerOpen(false);
+      if (clearFromListWhenComplete) {
+        setTimeout(() => {
+          setVisible(false);
+        }, 1500);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -123,7 +131,7 @@ const Task = ({
     setIsDecided(true);
   };
 
-  return (
+  return visible ? (
     <>
       <StyledTask onClick={() => setInfoDrawerOpen(true)} variant={variant}>
         <Grid container alignItems="center" justifyContent="space-between">
@@ -239,7 +247,7 @@ const Task = ({
         assignee={assignee}
       />
     </>
-  );
+  ) : null;
 };
 
 export default Task;
