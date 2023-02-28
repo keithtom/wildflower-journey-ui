@@ -20,7 +20,9 @@ import {
   WindowClose,
   Glasses,
   CheckDouble,
-  Home,
+  CalendarCheck,
+  Layer,
+  FileBlank,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -39,6 +41,7 @@ import {
   RightArrowCircle as RightArrowCircleSolid,
   Circle as CircleSolid,
   Time,
+  Home,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -182,6 +185,9 @@ export default function Icon({ ...props }) {
     commentError: <CommentError />,
     home: <Home />,
     time: <Time />,
+    calendarCheck: <CalendarCheck />,
+    layer: <Layer />,
+    fileBlank: <FileBlank />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

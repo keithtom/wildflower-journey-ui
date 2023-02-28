@@ -3,7 +3,7 @@ import { ListItem } from "@mui/material";
 
 import { Typography, Grid, Link, Icon } from "./index";
 
-const NavLink = ({ to, icon, active, secondary, label }) => {
+const NavLink = ({ to, icon, active, secondary, tertiary, label }) => {
   const CustomListItem = styled(ListItem)`
     padding: ${({ theme }) => theme.util.buffer * 4}px;
     &:hover {
@@ -21,29 +21,43 @@ const NavLink = ({ to, icon, active, secondary, label }) => {
     ${(props) =>
       props.secondary &&
       css`
-        padding: ${props.theme.util.buffer * 2}px
-          ${props.theme.util.buffer * 4}px;
-        border-bottom: 1px solid ${props.theme.color.neutral.lightened};
+        padding: ${props.theme.util.buffer * 3}px 0;
+        border-top: 1px solid ${props.theme.color.neutral.lightened};
+      `}
+    //Tertiary
+    ${(props) =>
+      props.tertiary &&
+      css`
+        padding: ${props.theme.util.buffer * 2}px 0;
       `}
   `;
 
   return (
     <Link href={to}>
-      <CustomListItem button active={active} secondary={secondary}>
-        <Grid container spacing={secondary ? 5 : 3} alignItems="center">
+      <CustomListItem
+        button
+        active={active}
+        secondary={secondary}
+        tertiary={tertiary}
+      >
+        <Grid
+          container
+          spacing={3}
+          alignItems="center"
+          ml={secondary ? 10 : tertiary && 10}
+        >
           {icon && (
             <Grid item>
               <Icon
                 type={icon}
-                variant={active ? "primary" : secondary && "transparent"}
-                size={secondary && "small"}
+                variant={active ? "primary" : tertiary && "transparent"}
               />
             </Grid>
           )}
           <Grid item>
             <Typography
               highlight={active}
-              bold={!secondary}
+              bold={!tertiary}
               variant="bodyRegular"
             >
               {label}
