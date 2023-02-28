@@ -6,7 +6,16 @@ import { Drawer } from "@mui/material";
 
 import { user } from "../lib/utils/fake-data";
 import { theme } from "../styles/theme";
-import { Card, Typography, Stack, Grid, Link, Box, NavLink } from "./ui/index";
+import {
+  Card,
+  Typography,
+  Stack,
+  Grid,
+  Link,
+  Box,
+  NavLink,
+  Icon,
+} from "./ui/index";
 import Header from "./Header";
 
 // import AdviceProcessNavigation from "./page-content/advice/AdviceProcessNavigation";
@@ -48,12 +57,19 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
           <Navigation />
           <Grid container p={4}>
             <Grid item xs={12}>
-              <Link href="mailto:tech-pilot@wildflowerschools.org?subject=Directory">
+              <Link href="mailto:tech-pilot@wildflowerschools.org?subject=Wildflower Platform Feedback">
                 <Card variant="lightened" size="small" hoverable>
                   <Stack spacing={1}>
-                    <Typography variant="bodyRegular" bold highlight>
-                      We want to hear from you!
-                    </Typography>
+                    <Grid container alignItems="center">
+                      <Grid item flex={1}>
+                        <Typography variant="bodyRegular" bold highlight>
+                          We want to hear from you!
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <Icon type="chevronRight" variant="primary" />
+                      </Grid>
+                    </Grid>
                     <Typography variant="bodyRegular" lightened>
                       Click here to send us an email with any and all feedback.
                     </Typography>
@@ -104,20 +120,34 @@ const SSJNavigation = ({}) => {
     <Box>
       <NavLink
         secondary
+        to="/ssj/to-do-list"
+        active={router.pathname.includes("/ssj/to-do-list")}
+        label="Your to do list"
+        icon="calendarCheck"
+      />
+      <NavLink
+        secondary
+        to="/ssj/milestones"
+        active={router.pathname.includes("/ssj/milestones")}
+        label="Milestones"
+        icon="layer"
+      />
+      <NavLink
+        tertiary
         to="/ssj/visioning"
         active={router.pathname.includes("/ssj/visioning")}
         label="Visioning"
         icon={true}
       />
       <NavLink
-        secondary
+        tertiary
         to="/ssj/planning"
         active={router.pathname.includes("/ssj/planning")}
         label="Planning"
         icon={true}
       />
       <NavLink
-        secondary
+        tertiary
         to="/ssj/startup"
         active={router.pathname.includes("/ssj/startup")}
         label="Startup"
@@ -125,10 +155,10 @@ const SSJNavigation = ({}) => {
       />
       <NavLink
         secondary
-        to="/ssj/view-all"
-        active={router.pathname.includes("/ssj/view-all")}
-        label="View all"
-        icon={true}
+        to="/ssj/resources"
+        active={router.pathname.includes("/ssj/resources")}
+        label="Resources"
+        icon="fileBlank"
       />
     </Box>
   );
