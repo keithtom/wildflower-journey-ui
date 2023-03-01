@@ -25,4 +25,11 @@ async function setStartDate(date) {
   // if response good, great.  else.  error out?
 }
 
+async function getTeam() {
+  const response = await api.get(`/team`);
+  const data = await response.data
+  return data
+  // if response good, great.  else.  error out?
+}
+
 export default { setStartDate };
