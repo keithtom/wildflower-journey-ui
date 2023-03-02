@@ -34,7 +34,7 @@ const Resources = ({ dataResources }) => {
 
   // console.log({ data });
   // console.log({ processByCategory });
-  // console.log({ dataResources });
+  console.log({ dataResources });
   // console.log({ dataAssignedSteps });
   // console.log(Object.keys(dataResources[0])[0]);
 

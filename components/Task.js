@@ -336,7 +336,9 @@ const DecisionDrawerActions = ({
               </Grid>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Remove from my tasks</Typography>
+                  <Typography bold variant="bodyRegular">
+                    Remove from to do list
+                  </Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -345,7 +347,9 @@ const DecisionDrawerActions = ({
                   disabled={!decisionOption}
                   onClick={handleMakeDecision}
                 >
-                  <Typography bold>Make final decision</Typography>
+                  <Typography bold variant="bodyRegular">
+                    Make final decision
+                  </Typography>
                 </Button>
               </Grid>
             </>
@@ -353,8 +357,8 @@ const DecisionDrawerActions = ({
         ) : (
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
-              <Typography light bold>
-                Add to my tasks
+              <Typography light bold variant="bodyRegular">
+                Add to my to do list
               </Typography>
             </Button>
           </Grid>
@@ -388,12 +392,14 @@ const TaskDrawerActions = ({
             <>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Remove from my tasks</Typography>
+                  <Typography variant="bodyRegular" bold>
+                    Remove from to do list
+                  </Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
                 <Button full onClick={handleCompleteTask}>
-                  <Typography light bold>
+                  <Typography variant="bodyRegular" light bold>
                     Mark task complete
                   </Typography>
                 </Button>
@@ -404,7 +410,7 @@ const TaskDrawerActions = ({
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
               <Typography light bold>
-                Add to my tasks
+                Add to my to do list
               </Typography>
             </Button>
           </Grid>

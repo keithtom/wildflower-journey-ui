@@ -172,20 +172,20 @@ export async function getServerSideProps({ req, res }) {
   const processByPhaseHash = {
     visioning: [],
     planning: [],
-    startup: []
-  }
+    startup: [],
+  };
 
-  data.data.forEach(process => {
+  data.data.forEach((process) => {
     if (process.attributes.phase !== null) {
       processByPhaseHash[process.attributes.phase].push(process);
     }
   });
 
   const processByPhase = [
-    {phase: "Visioning", processes: processByPhaseHash["visioning"]},
-    {phase: "Planning", processes: processByPhaseHash["planning"]},
-    {phase: "Startup", processes: processByPhaseHash["startup"]}
-  ]
+    { phase: "Visioning", processes: processByPhaseHash["visioning"] },
+    { phase: "Planning", processes: processByPhaseHash["planning"] },
+    { phase: "Startup", processes: processByPhaseHash["startup"] },
+  ];
 
   return {
     props: {

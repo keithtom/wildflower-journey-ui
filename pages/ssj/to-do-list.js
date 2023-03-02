@@ -21,12 +21,16 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
-const ToDoList = ({ dataAssignedSteps }) => {
-  // console.log({ data });
-  // console.log({ processByCategory });
-  // console.log({ dataResources });
-  // console.log({ dataAssignedSteps });
-  // console.log(Object.keys(dataResources[0])[0]);
+const ToDoList = ({
+  includedDocuments,
+  dataAssignedSteps,
+  data,
+  milestonesWithSelfAssignedTasks,
+}) => {
+  console.log({ dataAssignedSteps });
+  console.log({ includedDocuments });
+  console.log({ data });
+  console.log({ milestonesWithSelfAssignedTasks });
 
   return (
     <PageContainer>
@@ -41,6 +45,10 @@ const ToDoList = ({ dataAssignedSteps }) => {
           </Typography>
         </Stack>
 
+        {milestonesWithSelfAssignedTasks.map((m, i) =>
+          m.relationships.steps.data.map((s, i) => <div>hi</div>)
+        )}
+
         {dataAssignedSteps.map((a, i) => (
           <Stack>
             {a.steps.map((t, i) => (
@@ -54,10 +62,10 @@ const ToDoList = ({ dataAssignedSteps }) => {
                 isComplete={t.data.attributes.completed}
                 isNext={i === 0}
                 // handleCompleteMilestone={handleCompleteMilestone}
-                // resources={t.data.relationships.documents.data}
-                // includedDocuments={includedDocuments}
                 // categories={m.attributes.categories}
                 description={t.data.attributes.description}
+                resources={t.data.relationships.documents.data}
+                includedDocuments={includedDocuments}
                 worktime={
                   (t.data.attributes.maxWorktime +
                     t.data.attributes.minWorktime) /
@@ -77,19 +85,46 @@ const ToDoList = ({ dataAssignedSteps }) => {
 export default ToDoList;
 
 export async function getServerSideProps({ req, res }) {
-  // const userId = query.userId;
-  // const ssjId = query.ssjId;
-
-  // const workflowId = "5947-ab7f"
   const workflowId = "c502-4f84";
+  const phase = "visioning";
 
   const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
   setAuthHeader({ req, res });
   const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
   const dataAssignedSteps = await responseAssignedSteps.data;
 
+  const includedDocuments = {};
+  dataAssignedSteps[0].steps.forEach((i) =>
+    i.included
+      .filter((i) => i.type === "document")
+      .forEach((i) => {
+        includedDocuments[i.id] = i;
+      })
+  );
+
+  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&self_assigned=true`;
+  const response = await axios.get(apiRoute);
+  const data = await response.data;
+  const steps = {};
+  var totalSteps = 0;
+  data.included.forEach((included) => {
+    if (included.type == "step") {
+      steps[included.id] = included;
+      totalSteps++;
+    }
+  });
+  data.data.forEach((milestone) => {
+    milestone.relationships.steps.data.forEach((includedStep, i) => {
+      milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
+    });
+  });
+  const milestonesWithSelfAssignedTasks = data.data;
+
   return {
     props: {
+      data,
+      milestonesWithSelfAssignedTasks,
+      includedDocuments,
       dataAssignedSteps,
     },
   };
