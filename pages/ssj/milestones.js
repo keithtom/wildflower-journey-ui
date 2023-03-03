@@ -21,7 +21,7 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
-const Milestones = ({ data, processByCategory }) => {
+const Milestones = ({ data, processByCategory, processByPhase }) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
 
@@ -32,7 +32,8 @@ const Milestones = ({ data, processByCategory }) => {
   };
 
   // console.log({ data });
-  // console.log({ processByCategory });
+  console.log({ processByCategory });
+  console.log({ processByPhase });
   // console.log({ dataResources });
   // console.log({ dataAssignedSteps });
 
@@ -168,10 +169,29 @@ export async function getServerSideProps({ req, res }) {
     },
   ];
 
+  const processByPhaseHash = {
+    visioning: [],
+    planning: [],
+    startup: []
+  }
+
+  data.data.forEach(process => {
+    if (process.attributes.phase !== null) {
+      processByPhaseHash[process.attributes.phase].push(process);
+    }
+  });
+
+  const processByPhase = [
+    {phase: "Visioning", processes: processByPhaseHash["visioning"]},
+    {phase: "Planning", processes: processByPhaseHash["planning"]},
+    {phase: "Startup", processes: processByPhaseHash["startup"]}
+  ]
+
   return {
     props: {
       data: data.data,
       processByCategory,
+      processByPhase,
     },
   };
 }
