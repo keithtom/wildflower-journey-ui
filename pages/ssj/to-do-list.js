@@ -17,11 +17,17 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
-const ToDoList = ({ includedDocuments, dataAssignedSteps, milestonesToDo }) => {
+const ToDoList = ({
+  includedDocuments,
+  includedProcess,
+  dataAssignedSteps,
+  milestonesToDo,
+}) => {
   const [showAssignedTasks, setShowAssignedTasks] = useState(
     dataAssignedSteps[0]?.steps.length
   );
   // console.log({ dataAssignedSteps });
+  // console.log({ includedProcess });
   // console.log({ includedDocuments });
   // console.log({ milestonesWithSelfAssignedTasks });
 
@@ -41,27 +47,31 @@ const ToDoList = ({ includedDocuments, dataAssignedSteps, milestonesToDo }) => {
         {showAssignedTasks > 0 ? (
           dataAssignedSteps.map((a, i) => (
             <Stack>
-              {a.steps.map((t, i) => (
-                <Task
-                  taskId={t.data.id}
-                  title={t.data.attributes.title}
-                  key={i}
-                  isDecision={t.data.attributes.kind === "Decision"}
-                  decisionOptions={t.data.attributes.decisionOptions}
-                  isComplete={t.data.attributes.completed}
-                  isNext={i === 0}
-                  description={t.data.attributes.description}
-                  resources={t.data.relationships.documents.data}
-                  includedDocuments={includedDocuments}
-                  worktime={
-                    (t.data.attributes.maxWorktime +
-                      t.data.attributes.minWorktime) /
-                    2 /
-                    60
-                  }
-                  taskAssignee={dataAssignedSteps[0].assignee_info}
-                />
-              ))}
+              {a.steps.map((t, i) => {
+                const processId = t.included[0].id;
+                return (
+                  <Task
+                    taskId={t.data.id}
+                    title={t.data.attributes.title}
+                    key={i}
+                    isDecision={t.data.attributes.kind === "Decision"}
+                    decisionOptions={t.data.attributes.decisionOptions}
+                    isComplete={t.data.attributes.completed}
+                    isNext={i === 0}
+                    description={t.data.attributes.description}
+                    resources={t.data.relationships.documents.data}
+                    includedDocuments={includedDocuments}
+                    processName={includedProcess[processId].attributes.title}
+                    worktime={
+                      (t.data.attributes.maxWorktime +
+                        t.data.attributes.minWorktime) /
+                      2 /
+                      60
+                    }
+                    taskAssignee={dataAssignedSteps[0].assignee_info}
+                  />
+                );
+              })}
             </Stack>
           ))
         ) : (
@@ -139,6 +149,15 @@ export async function getServerSideProps({ req, res }) {
       })
   );
 
+  const includedProcess = {};
+  dataAssignedSteps[0]?.steps.forEach((i) =>
+    i.included
+      .filter((i) => i.type === "process")
+      .forEach((i) => {
+        includedProcess[i.id] = i;
+      })
+  );
+
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&self_assigned=true`;
   const response = await axios.get(apiRoute);
   const data = await response.data;
@@ -170,6 +189,7 @@ export async function getServerSideProps({ req, res }) {
     props: {
       data,
       includedDocuments,
+      includedProcess,
       dataAssignedSteps,
       milestonesToDo,
     },
