@@ -14,6 +14,7 @@ import {
   Divider,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
+import PhaseChip from "../../components/PhaseChip";
 import Resource from "../../components/Resource";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
@@ -71,31 +72,57 @@ const Resources = ({ dataResources }) => {
           </Grid>
         </Stack>
 
-        {dataResources.map((a, i) => {
-          const name = Object.keys(a)[0];
-          const array = Object.values(a);
-          return (
-            <Card key={i}>
-              <Stack spacing={6}>
-                <Stack direction="row" spacing={6} alignItems="center">
-                  <CategoryChip category={name} size="large" withIcon />
-                  <Typography variant="h4" lightened>
-                    {array[0].length}
-                  </Typography>
-                </Stack>
-                <Stack spacing={3}>
-                  {array[0].map((r, i) => (
-                    <Resource
-                      title={r.data.attributes.title}
-                      link={r.data.attributes.link}
-                      key={i}
-                    />
-                  ))}
-                </Stack>
-              </Stack>
-            </Card>
-          );
-        })}
+        {showResourcesByCategory
+          ? dataResources.by_category.map((a, i) => {
+              const name = Object.keys(a)[0];
+              const array = Object.values(a);
+              return (
+                <Card key={i}>
+                  <Stack spacing={6}>
+                    <Stack direction="row" spacing={6} alignItems="center">
+                      <CategoryChip category={name} size="large" />
+                      <Typography variant="h4" lightened>
+                        {array[0].length}
+                      </Typography>
+                    </Stack>
+                    <Stack spacing={3}>
+                      {array[0].map((r, i) => (
+                        <Resource
+                          title={r.data.attributes.title}
+                          link={r.data.attributes.link}
+                          key={i}
+                        />
+                      ))}
+                    </Stack>
+                  </Stack>
+                </Card>
+              );
+            })
+          : dataResources.by_phase.map((a, i) => {
+              const name = Object.keys(a)[0];
+              const array = Object.values(a);
+              return (
+                <Card key={i}>
+                  <Stack spacing={6}>
+                    <Stack direction="row" spacing={6} alignItems="center">
+                      <PhaseChip phase={name} size="large" />
+                      <Typography variant="h4" lightened>
+                        {array[0].length}
+                      </Typography>
+                    </Stack>
+                    <Stack spacing={3}>
+                      {array[0].map((r, i) => (
+                        <Resource
+                          title={r.data.attributes.title}
+                          link={r.data.attributes.link}
+                          key={i}
+                        />
+                      ))}
+                    </Stack>
+                  </Stack>
+                </Card>
+              );
+            })}
       </Stack>
     </PageContainer>
   );
