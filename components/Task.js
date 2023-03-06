@@ -65,7 +65,7 @@ const Task = ({
   resources,
   includedDocuments,
   worktime,
-  clearFromListWhenComplete,
+  clearFromListWhenRemoved,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -83,7 +83,7 @@ const Task = ({
       const response = await processesApi.complete(taskId);
       setTaskIsComplete(response.data.attributes.completed);
       setInfoDrawerOpen(false);
-      if (clearFromListWhenComplete) {
+      if (clearFromListWhenRemoved) {
         setTimeout(() => {
           setVisible(false);
         }, 1500);
@@ -121,6 +121,11 @@ const Task = ({
     try {
       const response = await stepsApi.unassign(taskId);
       setAssignee(null);
+      if (clearFromListWhenRemoved) {
+        setTimeout(() => {
+          setVisible(false);
+        }, 1500);
+      }
     } catch (err) {
       console.error(err);
     }

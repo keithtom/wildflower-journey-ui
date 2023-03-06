@@ -1,17 +1,13 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import {
   PageContainer,
   Typography,
   Card,
   Stack,
   Icon,
-  IconButton,
   Link,
   Grid,
-  Chip,
-  Avatar,
-  Divider,
+  Button,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import Milestone from "../../components/Milestone";
@@ -21,16 +17,13 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
-const ToDoList = ({
-  includedDocuments,
-  dataAssignedSteps,
-  data,
-  milestonesWithSelfAssignedTasks,
-}) => {
-  console.log({ dataAssignedSteps });
-  console.log({ includedDocuments });
-  console.log({ data });
-  console.log({ milestonesWithSelfAssignedTasks });
+const ToDoList = ({ includedDocuments, dataAssignedSteps, milestonesToDo }) => {
+  const [showAssignedTasks, setShowAssignedTasks] = useState(
+    dataAssignedSteps[0]?.steps.length
+  );
+  // console.log({ dataAssignedSteps });
+  // console.log({ includedDocuments });
+  // console.log({ milestonesWithSelfAssignedTasks });
 
   return (
     <PageContainer>
@@ -41,42 +34,86 @@ const ToDoList = ({
             Your to do list
           </Typography>
           <Typography variant="h3" lightened>
-            {dataAssignedSteps[0].steps.length}
+            {dataAssignedSteps[0]?.steps.length}
           </Typography>
         </Stack>
 
-        {milestonesWithSelfAssignedTasks.map((m, i) =>
-          m.relationships.steps.data.map((s, i) => <div>hi</div>)
+        {showAssignedTasks > 0 ? (
+          dataAssignedSteps.map((a, i) => (
+            <Stack>
+              {a.steps.map((t, i) => (
+                <Task
+                  taskId={t.data.id}
+                  title={t.data.attributes.title}
+                  key={i}
+                  isDecision={t.data.attributes.kind === "Decision"}
+                  decisionOptions={t.data.attributes.decisionOptions}
+                  isComplete={t.data.attributes.completed}
+                  isNext={i === 0}
+                  description={t.data.attributes.description}
+                  resources={t.data.relationships.documents.data}
+                  includedDocuments={includedDocuments}
+                  worktime={
+                    (t.data.attributes.maxWorktime +
+                      t.data.attributes.minWorktime) /
+                    2 /
+                    60
+                  }
+                  taskAssignee={dataAssignedSteps[0].assignee_info}
+                />
+              ))}
+            </Stack>
+          ))
+        ) : (
+          <Card noPadding>
+            <Grid container spacing={24}>
+              <Grid item xs={12} sm={6}>
+                <Card size="large" noBorder noRadius sx={{ height: "100%" }}>
+                  <Stack spacing={6}>
+                    <Icon type="calendarCheck" variant="primary" />
+                    <Typography variant="h3" bold>
+                      Looks like you don't have any tasks on your to do list!
+                    </Typography>
+                    <Typography variant="bodyLarge" lightened>
+                      To start, add a task from one of these milestones. You can
+                      take them on at your own pace, according to your
+                      interests, needs, and timeline.
+                    </Typography>
+                  </Stack>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Card
+                  noBorder
+                  variant="lightened"
+                  noRadius
+                  sx={{ height: "100%" }}
+                >
+                  <Stack spacing={2}>
+                    {milestonesToDo.map((m, i) => (
+                      <Link href={`/ssj/${m.attributes.phase}/${m.id}`}>
+                        <Card variant="light" size="small" key={i} hoverable>
+                          <Stack
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                          >
+                            <Typography variant="bodyRegular" bold>
+                              {m.attributes.title}
+                            </Typography>
+                            <Button small variant="text">
+                              Start here
+                            </Button>
+                          </Stack>
+                        </Card>
+                      </Link>
+                    ))}
+                  </Stack>
+                </Card>
+              </Grid>
+            </Grid>
+          </Card>
         )}
-
-        {dataAssignedSteps.map((a, i) => (
-          <Stack>
-            {a.steps.map((t, i) => (
-              <Task
-                taskId={t.data.id}
-                // link={`/ssj/${phase}/${m.id}/${t.id}`}
-                title={t.data.attributes.title}
-                key={i}
-                isDecision={t.data.attributes.kind === "Decision"}
-                decisionOptions={t.data.attributes.decisionOptions}
-                isComplete={t.data.attributes.completed}
-                isNext={i === 0}
-                // handleCompleteMilestone={handleCompleteMilestone}
-                // categories={m.attributes.categories}
-                description={t.data.attributes.description}
-                resources={t.data.relationships.documents.data}
-                includedDocuments={includedDocuments}
-                worktime={
-                  (t.data.attributes.maxWorktime +
-                    t.data.attributes.minWorktime) /
-                  2 /
-                  60
-                }
-                taskAssignee={dataAssignedSteps[0].assignee_info}
-              />
-            ))}
-          </Stack>
-        ))}
       </Stack>
     </PageContainer>
   );
@@ -94,7 +131,7 @@ export async function getServerSideProps({ req, res }) {
   const dataAssignedSteps = await responseAssignedSteps.data;
 
   const includedDocuments = {};
-  dataAssignedSteps[0].steps.forEach((i) =>
+  dataAssignedSteps[0]?.steps.forEach((i) =>
     i.included
       .filter((i) => i.type === "document")
       .forEach((i) => {
@@ -118,14 +155,23 @@ export async function getServerSideProps({ req, res }) {
       milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
     });
   });
-  const milestonesWithSelfAssignedTasks = data.data;
+
+  const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const responseMilestones = await axios.get(apiRouteMilestones);
+  const dataMilestones = await responseMilestones.data;
+  const milestonesToDo = [];
+  dataMilestones.data.forEach((milestone) => {
+    if (milestone.attributes.status == "to do") {
+      milestonesToDo.push(milestone);
+    }
+  });
 
   return {
     props: {
       data,
-      milestonesWithSelfAssignedTasks,
       includedDocuments,
       dataAssignedSteps,
+      milestonesToDo,
     },
   };
 }
