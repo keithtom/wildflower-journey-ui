@@ -88,6 +88,7 @@ const Task = ({
           setVisible(false);
         }, 1500);
       }
+      console.log("response", response);
     } catch (err) {
       console.error(err);
     }
