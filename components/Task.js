@@ -64,6 +64,7 @@ const Task = ({
   variant,
   resources,
   includedDocuments,
+  processName,
   worktime,
   clearFromListWhenRemoved,
 }) => {
@@ -198,7 +199,9 @@ const Task = ({
             </Grid>
           )} */}
           <Grid item>
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={3} alignItems="center">
+              {processName && <Chip label={processName} size="small" />}
+
               <Avatar size="mini" src={assignee && assignee.imageUrl} />
             </Stack>
           </Grid>

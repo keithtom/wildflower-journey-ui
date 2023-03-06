@@ -1,8 +1,8 @@
 import axios from "axios";
 import apiUrl from "@lib/utils/baseUrl";
-import { getCookie } from 'cookies-next';
+import { getCookie } from "cookies-next";
 
-const token = getCookie('auth');
+const token = getCookie("auth");
 
 const api = axios.create({
   baseURL: `${apiUrl}/v1/ssj/dashboard`,
@@ -14,22 +14,24 @@ const api = axios.create({
     "Access-Control-Allow-Headers":
       "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     "Content-Type": "application/json",
-    "Authorization": token,
+    Authorization: token,
   },
 });
 
 async function setStartDate(date) {
-  const response = await api.put(`/team`, {team: { expected_start_date: date }});
-  const data = await response.data
-  return data
+  const response = await api.put(`/team`, {
+    team: { expected_start_date: date },
+  });
+  const data = await response.data;
+  return data;
   // if response good, great.  else.  error out?
 }
 
 async function getTeam() {
   const response = await api.get(`/team`);
-  const data = await response.data
-  return data
+  const data = await response.data;
+  return data;
   // if response good, great.  else.  error out?
 }
 
-export default { setStartDate };
+export default { setStartDate, getTeam };
