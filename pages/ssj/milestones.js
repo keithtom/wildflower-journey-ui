@@ -14,6 +14,7 @@ import {
   Divider,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
+import PhaseChip from "../../components/PhaseChip";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
 import Resource from "../../components/Resource";
@@ -24,16 +25,20 @@ import baseUrl from "@lib/utils/baseUrl";
 const Milestones = ({ data, processByCategory, processByPhase }) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
+  const [showMilestonesByPhase, setShowMilestonesByPhase] = useState(false);
 
   const handleShowMilestonesByCategory = () => {
     setShowMilestonesByCategory(true);
-    setShowTasksByAssignee(false);
-    setShowResourcesByCategory(false);
+    setShowMilestonesByPhase(false);
+  };
+  const handleShowMilestonesByPhase = () => {
+    setShowMilestonesByPhase(true);
+    setShowMilestonesByCategory(false);
   };
 
   // console.log({ data });
-  console.log({ processByCategory });
-  console.log({ processByPhase });
+  // console.log({ processByCategory });
+  // console.log({ processByPhase });
   // console.log({ dataResources });
   // console.log({ dataAssignedSteps });
 
@@ -64,38 +69,74 @@ const Milestones = ({ data, processByCategory, processByPhase }) => {
                 />
                 <Chip
                   label="Phase"
-                  // variant={showTasksByAssignee && "primary"}
-                  // onClick={handleShowTasksByAssignee}
+                  variant={showMilestonesByPhase && "primary"}
+                  onClick={handleShowMilestonesByPhase}
                 />
               </Stack>
             </Grid>
           </Grid>
         </Stack>
+        {showMilestonesByCategory
+          ? processByCategory.map((a, i) => (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={6} alignItems="center">
+                    <CategoryChip category={a.category} size="large" />
+                    <Typography variant="h4" lightened>
+                      {a.processes.length}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={3}>
+                    {a.processes.map((m, i) => (
+                      <Milestone
+                        link={`/ssj/${m.attributes.phase}/${m.id}`}
+                        key={i}
+                        status={m.attributes.status}
+                        description={m.attributes.description}
+                        categories={m.attributes.categories}
+                        hideCategoryChip
+                        phase={m.attributes.phase}
+                        title={m.attributes.title}
+                        effort={m.attributes.effort}
+                        stepCount={m.attributes.stepsCount}
+                      />
+                    ))}
+                  </Stack>
+                </Stack>
+              </Card>
+            ))
+          : showMilestonesByPhase &&
+            processByPhase.map((p, i) => (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={6} alignItems="center">
+                    <PhaseChip phase={p.phase} size="large" />
+                    <Typography variant="h4" lightened>
+                      {p.processes.length}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={3}>
+                    {p.processes.map((m, i) => (
+                      <Milestone
+                        link={`/ssj/${m.attributes.phase}/${m.id}`}
+                        key={i}
+                        status={m.attributes.status}
+                        description={m.attributes.description}
+                        categories={m.attributes.categories}
+                        title={m.attributes.title}
+                        effort={m.attributes.effort}
+                        stepCount={m.attributes.stepsCount}
+                      />
+                    ))}
+                  </Stack>
+                </Stack>
+              </Card>
+            ))}
 
-        {processByCategory.map((a, i) => (
-          <Card key={i}>
-            <Stack spacing={6}>
-              <Stack direction="row" spacing={6} alignItems="center">
-                <CategoryChip category={a.category} size="large" withIcon />
-                <Typography variant="h4" lightened>
-                  {a.processes.length}
-                </Typography>
-              </Stack>
-              <Stack spacing={3}>
-                {a.processes.map((m, i) => (
-                  <Milestone
-                    link={`/ssj/visioning`}
-                    key={i}
-                    status={m.attributes.status}
-                    categories={m.attributes.categories}
-                    title={m.attributes.title}
-                    effort={m.attributes.effort}
-                  />
-                ))}
-              </Stack>
-            </Stack>
-          </Card>
-        ))}
+        {/* {showMilestonesByPhase &&
+          processByPhase.map((p, i) => {
+            <div>hi</div>;
+          })} */}
       </Stack>
     </PageContainer>
   );
