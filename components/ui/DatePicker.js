@@ -6,17 +6,11 @@ import { TextField } from "./index";
 
 const CustomDatePicker = styled(MaterialDatePicker)``;
 
-export default function DatePicker({
-  id,
-  value,
-  onChange,
-  options,
-  label,
-  ...props
-}) {
+export default function DatePicker({ id, value, onChange, label, ...props }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <CustomDatePicker
+        id={id}
         label={label}
         value={value}
         onChange={onChange}

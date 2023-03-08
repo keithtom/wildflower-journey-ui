@@ -8,6 +8,7 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
+import ssjApi from "../../api/ssj";
 import { categories } from "../../lib/utils/fake-data";
 import { useUserContext } from "@lib/useUserContext";
 import Milestone from "../../components/Milestone";
@@ -78,13 +79,20 @@ const SSJ = ({
     Router.push("/ssj/visioning");
   };
 
-  const [openDate, setOpenDate] = useState("");
-  const handleOpenDateChange = (newValue) => {
-    setOpenDate(newValue);
-  };
+  const [openDate, setOpenDate] = useState();
+  const [team, setTeam] = useState();
 
-  const hasPartner = !FakePartners.length;
+  useEffect(() => {
+    const teamData = ssjApi.getTeam();
+    teamData.then(function (result) {
+      setTeam(result);
+      setOpenDate(result.expectedStartDate);
+    });
+  }, []);
 
+  const hasPartner = team?.hasPartner;
+
+  // console.log("team", team);
   // console.log({ data });
   // console.log({ dataProgress });
   // console.log({ milestonesWithSelfAssignedTasks });
@@ -501,7 +509,7 @@ const SSJ = ({
         toggle={() => setAddOpenDateModalOpen(!addOpenDateModalOpen)}
         open={addOpenDateModalOpen}
         openDate={openDate}
-        handleOpenDateChange={handleOpenDateChange}
+        setOpenDate={setOpenDate}
       />
     </>
   );
@@ -722,7 +730,17 @@ const ETLs = ({}) => {
     </Grid>
   );
 };
-const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
+const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
+  const [dateValue, setDateValue] = useState(openDate);
+  const handleDateValueChange = (newValue) => {
+    setDateValue(newValue);
+  };
+  const handleSetOpenDate = () => {
+    ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+    setOpenDate(dateValue);
+    toggle();
+  };
+
   return (
     <Modal title="Add your anticipated open date" toggle={toggle} open={open}>
       <Stack spacing={3}>
@@ -738,18 +756,21 @@ const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
         </Card>
         <DatePicker
           label="Your anticipated open date"
-          value={openDate}
-          onChange={handleOpenDateChange}
+          id="open-date"
+          value={dateValue}
+          onChange={handleDateValueChange}
         />
         <Grid container justifyContent="space-between">
           <Grid item>
             <Button variant="light" onClick={toggle}>
-              <Typography>Cancel</Typography>
+              <Typography variant="bodyRegular">Cancel</Typography>
             </Button>
           </Grid>
           <Grid item>
-            <Button disabled={!openDate} onClick={toggle}>
-              <Typography>Set an anticipated open date</Typography>
+            <Button disabled={!dateValue} onClick={handleSetOpenDate}>
+              <Typography light variant="bodyRegular">
+                Set an anticipated open date
+              </Typography>
             </Button>
           </Grid>
         </Grid>
@@ -1111,7 +1132,7 @@ const AssignedTaskByMilestone = ({
               (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
             }
             taskAssignee={t.attributes.assigneeInfo}
-            clearFromListWhenRemoved={true}
+            clearFromListWhenComplete={true}
           />
         ))}
       {m.relationships.steps.data.length > 1 && (
