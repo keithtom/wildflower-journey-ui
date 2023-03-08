@@ -26,8 +26,8 @@ const ToDoList = ({
   const [showAssignedTasks, setShowAssignedTasks] = useState(
     dataAssignedSteps[0]?.steps.length
   );
-  // console.log({ dataAssignedSteps });
-  // console.log({ includedProcess });
+  console.log({ dataAssignedSteps });
+  console.log({ includedProcess });
   // console.log({ includedDocuments });
   // console.log({ milestonesWithSelfAssignedTasks });
 
@@ -48,7 +48,9 @@ const ToDoList = ({
           dataAssignedSteps.map((a, i) => (
             <Stack>
               {a.steps.map((t, i) => {
-                const processId = t.included[0].id;
+                const processId = t.included.filter(
+                  (i) => i.type === "process"
+                )[0].id;
                 return (
                   <Task
                     taskId={t.data.id}
