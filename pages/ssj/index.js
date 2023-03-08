@@ -13,6 +13,7 @@ import { categories } from "../../lib/utils/fake-data";
 import { useUserContext } from "@lib/useUserContext";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
+import Hero from "../../components/Hero";
 
 import {
   Box,
@@ -92,6 +93,8 @@ const SSJ = ({
 
   const hasPartner = team?.hasPartner;
 
+  const hero = "/assets/images/ssj/SSJ_hero.jpg";
+
   // console.log("team", team);
   // console.log({ data });
   // console.log({ dataProgress });
@@ -132,6 +135,7 @@ const SSJ = ({
           </Grid>
         ) : (
           <Stack spacing={16}>
+            <Hero imageUrl={hero} />
             <Grid
               container
               spacing={3}
