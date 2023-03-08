@@ -16,8 +16,7 @@ import {
 import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
 import Milestone from "../../components/Milestone";
-import Task from "../../components/Task";
-import Resource from "../../components/Resource";
+import Hero from "../../components/Hero";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
@@ -44,9 +43,12 @@ const Milestones = ({ data, processByCategory, processByPhase }) => {
 
   // console.log(Object.keys(dataResources[0])[0]);
 
+  const hero = "/assets/images/ssj/wildflowerCollection.jpg";
+
   return (
     <PageContainer>
       <Stack spacing={12}>
+        <Hero imageUrl={hero} />
         <Stack spacing={2}>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>

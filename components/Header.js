@@ -38,6 +38,8 @@ const Header = ({ toggleNavOpen }) => {
 
   const { currentUser, isLoggedIn } = useUserContext();
 
+  const logo = "/assets/images/wildflower-logo.png";
+
   return (
     <CustomAppBar>
       <Grid
@@ -56,14 +58,18 @@ const Header = ({ toggleNavOpen }) => {
               >
                 <Icon type="menu" />
               </IconButton>
+              <img src={logo} style={{ height: "24px" }} />
               <Typography variant="bodyRegular" bold noWrap>
                 Wildflower Platform
               </Typography>
             </Stack>
           ) : (
-            <Typography variant="bodyLarge" bold noWrap>
-              Wildflower Platform
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={3}>
+              <img src={logo} style={{ height: "32px" }} />
+              <Typography variant="bodyLarge" bold noWrap>
+                Wildflower Platform
+              </Typography>
+            </Stack>
           )}
         </Grid>
         {isLoggedIn ? (

@@ -16,6 +16,7 @@ import {
 import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
 import Resource from "../../components/Resource";
+import Hero from "../../components/Hero";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
@@ -33,6 +34,8 @@ const Resources = ({ dataResources }) => {
     setShowResourcesByCategory(false);
   };
 
+  const hero = "/assets/images/ssj/wildflowerSystems.jpg";
+
   // console.log({ data });
   // console.log({ processByCategory });
   // console.log({ dataResources });
@@ -42,6 +45,7 @@ const Resources = ({ dataResources }) => {
   return (
     <PageContainer>
       <Stack spacing={12}>
+        <Hero imageUrl={hero} />
         <Stack spacing={2}>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>

@@ -23,6 +23,7 @@ import {
   Link,
 } from "@ui";
 import Milestone from "../../../components/Milestone";
+import Hero from "../../../components/Hero";
 
 const PhasePage = ({
   startConsideringMilestones,
@@ -40,10 +41,23 @@ const PhasePage = ({
 
   // console.log({ data });
 
+  const planningHero = "/assets/images/ssj/planning.jpg";
+  const visioningHero = "/assets/images/ssj/visioning.jpg";
+  const startupHero = "/assets/images/ssj/startup.jpg";
+
   return (
     <>
       <PageContainer>
         <Stack spacing={12}>
+          <Hero
+            imageUrl={
+              phase === "planning"
+                ? planningHero
+                : phase === "visioning"
+                ? visioningHero
+                : phase === "startup" && startupHero
+            }
+          />
           <Typography variant="h2" bold capitalize>
             {phase}
           </Typography>
