@@ -97,7 +97,6 @@ const CustomCard = styled(MaterialCard)`
     props.noRadius &&
     css`
       border-radius: 0;
-      padding: ${props.theme.util.buffer * 2}px;
     `}
 `;
 

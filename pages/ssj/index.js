@@ -8,6 +8,7 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
+import ssjApi from "../../api/ssj";
 import { categories } from "../../lib/utils/fake-data";
 import { useUserContext } from "@lib/useUserContext";
 import Milestone from "../../components/Milestone";
@@ -41,6 +42,7 @@ const SSJ = ({
   milestonesToDo,
   milestonesWithSelfAssignedTasks,
   includedDocuments,
+  totalSteps,
 }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
@@ -77,17 +79,25 @@ const SSJ = ({
     Router.push("/ssj/visioning");
   };
 
-  const [openDate, setOpenDate] = useState("");
-  const handleOpenDateChange = (newValue) => {
-    setOpenDate(newValue);
-  };
+  const [openDate, setOpenDate] = useState();
+  const [team, setTeam] = useState();
 
-  const hasPartner = !FakePartners.length;
+  useEffect(() => {
+    const teamData = ssjApi.getTeam();
+    teamData.then(function (result) {
+      setTeam(result);
+      setOpenDate(result.expectedStartDate);
+    });
+  }, []);
 
+  const hasPartner = team?.hasPartner;
+
+  // console.log("team", team);
   // console.log({ data });
   // console.log({ dataProgress });
   // console.log({ milestonesWithSelfAssignedTasks });
   // console.log({ currentUser });
+  // console.log(totalSteps);
 
   return (
     <>
@@ -121,7 +131,7 @@ const SSJ = ({
             </Grid>
           </Grid>
         ) : (
-          <Stack spacing={12}>
+          <Stack spacing={16}>
             <Grid
               container
               spacing={3}
@@ -129,9 +139,17 @@ const SSJ = ({
               alignItems="center"
             >
               <Grid item>
-                <Typography variant="h3" bold>
-                  School Startup Journey
-                </Typography>
+                <Stack direction="row" spacing={3} alignItems="center">
+                  <Avatar src={currentUser && currentUser.profileImage} />
+                  <Stack>
+                    <Typography variant="h4" bold>
+                      Welcome, {currentUser && currentUser.firstName}!
+                    </Typography>
+                    <Typography variant="bodyLarge" lightened>
+                      School Startup Journey
+                    </Typography>
+                  </Stack>
+                </Stack>
               </Grid>
               <Grid item>
                 <Stack direction="row" spacing={6} alignItems="center">
@@ -190,69 +208,66 @@ const SSJ = ({
             </Grid>
 
             {hasAssignedTasks ? (
-              <Stack spacing={6}>
-                <Stack direction="row" spacing={4} alignItems="center">
-                  <Avatar src={currentUser && currentUser.profileImage} />
-                  <Stack>
-                    <Typography variant="h4" bold>
-                      My tasks
-                    </Typography>
-                    <Typography variant="bodyRegular" lightened>
-                      Tasks from {milestonesWithSelfAssignedTasks.length}{" "}
-                      milestones
-                    </Typography>
-                  </Stack>
-                </Stack>
-                <Card noPadding>
-                  {milestonesWithSelfAssignedTasks.map((m, i) => (
-                    <AssignedTaskByMilestone
-                      includedDocuments={includedDocuments}
-                      tasksByMilestone={m}
-                      key={i}
-                      phase={phase}
-                    />
-                  ))}
-                </Card>
-              </Stack>
-            ) : (
-              <Card variant="lightened" size="large">
-                <Grid container spacing={6}>
-                  <Grid item xs={12} sm={6}>
-                    <Stack spacing={6}>
-                      <Avatar
-                        size="md"
-                        src={currentUser && currentUser.profileImage}
-                      />
-                      <Typography variant="bodyRegular" bold>
-                        Welcome, {currentUser && currentUser.firstName}!
+              <Card variant="primaryLightened">
+                <Grid container alignItems="center">
+                  <Grid item flex={1}>
+                    <Stack direction="row" spacing={2}>
+                      <Typography variant="h3" bold>
+                        You have{" "}
                       </Typography>
-                      <Typography variant="bodyLarge" bold>
-                        We invite you to begin your School Startup Journey by
-                        working towards one of these milestones.
-                      </Typography>
-                      <Typography variant="bodyLarge" lightened>
-                        Each milestone has a number of tasks that you can take
-                        on at your own pace, according to your interest, needs
-                        and timeline. Click on a milestone to begin!
+                      <Typography variant="h3" highlight bold>
+                        {totalSteps} tasks
+                      </Typography>{" "}
+                      <Typography variant="h3" bold>
+                        on your to do list
                       </Typography>
                     </Stack>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Stack spacing={6}>
-                      <Stack spacing={4}>
+                  <Grid item>
+                    <Link href="/ssj/to-do-list">
+                      <Button>
                         <Stack direction="row" spacing={2} alignItems="center">
-                          <Typography variant="bodyRegulr">
-                            You're currently in
+                          <Typography variant="bodyLarge" bold light>
+                            Start working
                           </Typography>
-                          <Link href="/ssj/visioning">
-                            <Chip label="Visioning" />
-                          </Link>
+                          <Icon type="rightArrow" variant="light" />
                         </Stack>
-
-                        <Typography variant="bodyLarge" bold>
-                          Milestones to start working on
+                      </Button>
+                    </Link>
+                  </Grid>
+                </Grid>
+              </Card>
+            ) : (
+              <Card noPadding>
+                <Grid container spacing={24}>
+                  <Grid item xs={12} sm={6}>
+                    <Card
+                      size="large"
+                      noBorder
+                      noRadius
+                      sx={{ height: "100%" }}
+                    >
+                      <Stack spacing={6}>
+                        <Icon type="calendarCheck" variant="primary" />
+                        <Typography variant="h3" bold>
+                          Looks like you don't have any tasks on your to do
+                          list!
+                        </Typography>
+                        <Typography variant="bodyLarge" lightened>
+                          To start, add a task from one of these milestones. You
+                          can take them on at your own pace, according to your
+                          interests, needs, and timeline.
                         </Typography>
                       </Stack>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Card
+                      noBorder
+                      variant="lightened"
+                      noRadius
+                      sx={{ height: "100%" }}
+                    >
                       <Stack spacing={2}>
                         {milestonesToDo.map((m, i) => (
                           <Link href={`/ssj/${phase}/${m.id}`}>
@@ -278,119 +293,118 @@ const SSJ = ({
                           </Link>
                         ))}
                       </Stack>
-                    </Stack>
+                    </Card>
                   </Grid>
                 </Grid>
               </Card>
             )}
 
-            <Card>
-              <Stack spacing={3}>
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <Typography variant="h4" bold>
-                      Your Startup Family
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <IconButton onClick={() => setAddPartnerModalOpen(true)}>
-                      <Icon type="plus" variant="lightened" />
-                    </IconButton>
-                  </Grid>
+            <Stack spacing={3}>
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Grid item>
+                  <Typography variant="h3" bold>
+                    Your Startup Family
+                  </Typography>
                 </Grid>
-                <Grid container spacing={3} alignItems="stretch">
-                  {hasPartner ? null : (
-                    <Grid item xs={12} sm={4}>
-                      <AddPartnerCard
-                        submittedPartnerRequest={submittedPartnerRequest}
-                        onClick={() => setAddPartnerModalOpen(true)}
-                      />
-                    </Grid>
-                  )}
-                  {FakeStartupFamily.map((f, i) => (
-                    <Grid item xs={12} sm={4} key={i}>
-                      <UserCard
-                        firstName={f.attributes.firstName}
-                        lastName={f.attributes.lastName}
-                        role={f.roles[0]}
-                        profileImage={f.attributes.imageUrl}
-                      />
-                    </Grid>
-                  ))}
+                <Grid item>
+                  <IconButton onClick={() => setAddPartnerModalOpen(true)}>
+                    <Icon type="plus" variant="lightened" />
+                  </IconButton>
                 </Grid>
-              </Stack>
-            </Card>
+              </Grid>
+              <Grid container spacing={3} alignItems="stretch">
+                {hasPartner ? null : (
+                  <Grid item xs={12} sm={4}>
+                    <AddPartnerCard
+                      submittedPartnerRequest={submittedPartnerRequest}
+                      onClick={() => setAddPartnerModalOpen(true)}
+                    />
+                  </Grid>
+                )}
+                {FakeStartupFamily.map((f, i) => (
+                  <Grid item xs={12} sm={4} key={i}>
+                    <UserCard
+                      firstName={f.attributes.firstName}
+                      lastName={f.attributes.lastName}
+                      role={f.roles[0]}
+                      profileImage={f.attributes.imageUrl}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Stack>
 
             {userOnboardedprogress ? (
-              <Card>
-                <Stack spacing={6}>
-                  <Stack direction="row" spacing={6}>
-                    <Typography
-                      variant="h4"
-                      bold
-                      hoverable
-                      lightened={!viewPhaseProgress}
-                      onClick={() => setViewPhaseProgress(true)}
-                    >
-                      Phases
-                    </Typography>
-                    <Typography
-                      variant="h4"
-                      bold
-                      hoverable
-                      lightened={viewPhaseProgress}
-                      onClick={() => setViewPhaseProgress(false)}
-                    >
-                      Categories
-                    </Typography>
-                  </Stack>
-
-                  {viewPhaseProgress ? (
-                    <Grid container spacing={6}>
-                      {dataProgress.by_phase.map((p, i) => (
-                        <Grid item xs={12} sm={4} key={i}>
-                          <PhaseProgressCard
-                            phase={p.name}
-                            link={`/ssj/${p.name}`}
-                            processes={p.statuses}
-                          />
-                        </Grid>
-                      ))}
-                    </Grid>
-                  ) : (
-                    <Grid container spacing={6} alignItems="stretch">
-                      {dataProgress.by_category.map((c, i) => (
-                        <Grid item xs={12} sm={4}>
-                          <Link href="/ssj/view-all">
-                            <Card
-                              key={i}
-                              style={{ height: "100%" }}
-                              hoverable
-                              variant="lightened"
-                            >
-                              <Stack spacing={6}>
-                                <Grid container>
-                                  <Grid item>
-                                    <CategoryChip
-                                      category={c.name}
-                                      size="large"
-                                    />
-                                  </Grid>
-                                </Grid>
-                                <ProgressBar processes={c.statuses} />
-                              </Stack>
-                            </Card>
-                          </Link>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  )}
+              <Stack spacing={6}>
+                <Typography variant="h3" bold>
+                  Your Progress
+                </Typography>
+                <Stack direction="row" spacing={6}>
+                  <Typography
+                    variant="bodyLarge"
+                    bold
+                    hoverable
+                    lightened={!viewPhaseProgress}
+                    onClick={() => setViewPhaseProgress(true)}
+                  >
+                    Phases
+                  </Typography>
+                  <Typography
+                    variant="bodyLarge"
+                    bold
+                    hoverable
+                    lightened={viewPhaseProgress}
+                    onClick={() => setViewPhaseProgress(false)}
+                  >
+                    Categories
+                  </Typography>
                 </Stack>
-              </Card>
+
+                {viewPhaseProgress ? (
+                  <Grid container spacing={3}>
+                    {dataProgress.by_phase.map((p, i) => (
+                      <Grid item xs={12} sm={4} key={i}>
+                        <PhaseProgressCard
+                          phase={p.name}
+                          link={`/ssj/${p.name}`}
+                          processes={p.statuses}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                ) : (
+                  <Grid container spacing={3} alignItems="stretch">
+                    {dataProgress.by_category.map((c, i) => (
+                      <Grid item xs={12} sm={4}>
+                        <Link href="/ssj/milestones">
+                          <Card
+                            key={i}
+                            style={{ height: "100%" }}
+                            hoverable
+                            variant="lightened"
+                          >
+                            <Stack spacing={6}>
+                              <Grid container>
+                                <Grid item>
+                                  <CategoryChip
+                                    category={c.name}
+                                    size="large"
+                                  />
+                                </Grid>
+                              </Grid>
+                              <ProgressBar processes={c.statuses} />
+                            </Stack>
+                          </Card>
+                        </Link>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
+              </Stack>
             ) : (
               <OnboardingCard
                 icon="category"
@@ -404,20 +418,18 @@ const SSJ = ({
             )}
 
             {userOnboardedWaysToWork ? (
-              <Card>
-                <Stack spacing={6}>
-                  <Typography variant="h4" bold>
-                    Ways to work together
-                  </Typography>
-                  <Grid container spacing={3}>
-                    {waysToWorkTogether.map((w, i) => (
-                      <Grid item xs={12} sm={4} alignItems="stretch" key={i}>
-                        <WaysToWorkCard waysToWork={w} />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Stack>
-              </Card>
+              <Stack spacing={6}>
+                <Typography variant="h3" bold>
+                  Ways to work together
+                </Typography>
+                <Grid container spacing={3}>
+                  {waysToWorkTogether.map((w, i) => (
+                    <Grid item xs={12} sm={4} alignItems="stretch" key={i}>
+                      <WaysToWorkCard waysToWork={w} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Stack>
             ) : (
               <OnboardingCard
                 icon="conversation"
@@ -497,7 +509,7 @@ const SSJ = ({
         toggle={() => setAddOpenDateModalOpen(!addOpenDateModalOpen)}
         open={addOpenDateModalOpen}
         openDate={openDate}
-        handleOpenDateChange={handleOpenDateChange}
+        setOpenDate={setOpenDate}
       />
     </>
   );
@@ -611,42 +623,9 @@ const ProgressBar = ({ processes }) => {
   );
 };
 const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
-  const DeliverableImage = ({ completed }) => {
-    const StyledDeliverableImage = styled(Box)`
-      position: relative;
-    `;
-    const StyledIcon = styled(Box)`
-      width: ${({ theme }) => theme.util.buffer * 16}px;
-      height: ${({ theme }) => theme.util.buffer * 16}px;
-      background: ${({ theme }) => theme.color.primary.main};
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: ${({ theme }) => theme.radius.full}px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    `;
-    return (
-      <StyledDeliverableImage>
-        <img
-          src="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
-          style={{
-            width: "100%",
-            height: "200px",
-            objectFit: "cover",
-          }}
-        />
-        {completed ? (
-          <StyledIcon>
-            <Icon type="check" variant="light" size="large" />
-          </StyledIcon>
-        ) : null}
-      </StyledDeliverableImage>
-    );
-  };
-
+  const visioningImg = "/assets/images/ssj/visioning.jpg";
+  const planningImg = "/assets/images/ssj/planning.jpg";
+  const startupImg = "/assets/images/ssj/startup.jpg";
   return (
     <Link href={link}>
       <Card
@@ -659,28 +638,27 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
           </Typography>
           <ProgressBar processes={processes} />
           <Stack spacing={2}>
-            <Typography variant="bodyRegular" bold>
-              Key milestone
-            </Typography>
             <Card
               size="small"
               variant={isCurrentPhase && "lightened"}
               noPadding
               noBorder
             >
-              <Stack>
-                <DeliverableImage
-                  completed={
-                    processes.filter((p) => p === "done").length ===
-                    processes.length
+              <Box sx={{ width: "100%", height: "200px" }}>
+                <img
+                  src={
+                    phase === "visioning"
+                      ? visioningImg
+                      : phase === "planning"
+                      ? planningImg
+                      : phase === "startup" && startupImg
                   }
+                  style={{
+                    width: "100%",
+                    objectFit: "contain",
+                  }}
                 />
-                <Card size="small" noBorder>
-                  <Typography variant="bodyRegular" bold>
-                    Take the phase survey
-                  </Typography>
-                </Card>
-              </Stack>
+              </Box>
             </Card>
           </Stack>
         </Stack>
@@ -752,7 +730,17 @@ const ETLs = ({}) => {
     </Grid>
   );
 };
-const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
+const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
+  const [dateValue, setDateValue] = useState(openDate);
+  const handleDateValueChange = (newValue) => {
+    setDateValue(newValue);
+  };
+  const handleSetOpenDate = () => {
+    ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+    setOpenDate(dateValue);
+    toggle();
+  };
+
   return (
     <Modal title="Add your anticipated open date" toggle={toggle} open={open}>
       <Stack spacing={3}>
@@ -768,18 +756,21 @@ const AddOpenDateModal = ({ toggle, open, openDate, handleOpenDateChange }) => {
         </Card>
         <DatePicker
           label="Your anticipated open date"
-          value={openDate}
-          onChange={handleOpenDateChange}
+          id="open-date"
+          value={dateValue}
+          onChange={handleDateValueChange}
         />
         <Grid container justifyContent="space-between">
           <Grid item>
             <Button variant="light" onClick={toggle}>
-              <Typography>Cancel</Typography>
+              <Typography variant="bodyRegular">Cancel</Typography>
             </Button>
           </Grid>
           <Grid item>
-            <Button disabled={!openDate} onClick={toggle}>
-              <Typography>Set an anticipated open date</Typography>
+            <Button disabled={!dateValue} onClick={handleSetOpenDate}>
+              <Typography light variant="bodyRegular">
+                Set an anticipated open date
+              </Typography>
             </Button>
           </Grid>
         </Grid>
@@ -1106,6 +1097,7 @@ const AssignedTaskByMilestone = ({
 }) => {
   const [expandedTasks, setExpandedTasks] = useState(false);
   const m = tasksByMilestone;
+
   return (
     <>
       <Milestone
@@ -1140,6 +1132,7 @@ const AssignedTaskByMilestone = ({
               (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
             }
             taskAssignee={t.attributes.assigneeInfo}
+            clearFromListWhenComplete={true}
           />
         ))}
       {m.relationships.steps.data.length > 1 && (
@@ -1355,9 +1348,11 @@ export async function getServerSideProps({ params, req, res }) {
   const response = await axios.get(apiRoute);
   const data = await response.data;
   const steps = {};
+  var totalSteps = 0;
   data.included.forEach((included) => {
     if (included.type == "step") {
       steps[included.id] = included;
+      totalSteps++;
     }
   });
 
@@ -1373,6 +1368,7 @@ export async function getServerSideProps({ params, req, res }) {
       milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
     });
   });
+
   const milestonesWithSelfAssignedTasks = data.data;
 
   const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
@@ -1397,6 +1393,7 @@ export async function getServerSideProps({ params, req, res }) {
       data,
       phase,
       milestonesWithSelfAssignedTasks,
+      totalSteps,
     },
   };
 }

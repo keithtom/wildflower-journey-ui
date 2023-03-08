@@ -22,6 +22,7 @@ const Milestone = ({
   description,
   effort,
   categories,
+  hideCategoryChip,
   phase,
   status,
   stepCount,
@@ -53,7 +54,7 @@ const Milestone = ({
                   <Icon type="circle" variant="lightened" />
                 )}
                 {status === "in progress" && (
-                  <Icon type="rightArrowCircleSolid" variant="primary" />
+                  <Icon type="rightArrowCircleSolid" variant="lightened" />
                 )}
                 {status === "to do" && (
                   <Icon type="rightArrowCircle" variant="primary" />
@@ -96,7 +97,7 @@ const Milestone = ({
                       <PhaseChip size="small" phase={phase} withIcon />
                     </Stack>
                   )}
-                  {categories && (
+                  {categories && !hideCategoryChip && (
                     <Stack direction="row" spacing={2} alignItems="center">
                       <Stack direction="row" spacing={2}>
                         {categories.map((m, i) => (

@@ -64,7 +64,9 @@ const Task = ({
   variant,
   resources,
   includedDocuments,
+  processName,
   worktime,
+  clearFromListWhenRemoved,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -72,6 +74,7 @@ const Task = ({
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
+  const [visible, setVisible] = useState(true);
   const { currentUser } = useUserContext();
 
   async function handleCompleteTask() {
@@ -80,6 +83,13 @@ const Task = ({
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.complete(taskId);
       setTaskIsComplete(response.data.attributes.completed);
+      setInfoDrawerOpen(false);
+      if (clearFromListWhenRemoved) {
+        setTimeout(() => {
+          setVisible(false);
+        }, 1500);
+      }
+      console.log("response", response);
     } catch (err) {
       console.error(err);
     }
@@ -113,6 +123,11 @@ const Task = ({
     try {
       const response = await stepsApi.unassign(taskId);
       setAssignee(null);
+      if (clearFromListWhenRemoved) {
+        setTimeout(() => {
+          setVisible(false);
+        }, 1500);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -123,7 +138,7 @@ const Task = ({
     setIsDecided(true);
   };
 
-  return (
+  return visible ? (
     <>
       <StyledTask onClick={() => setInfoDrawerOpen(true)} variant={variant}>
         <Grid container alignItems="center" justifyContent="space-between">
@@ -184,7 +199,9 @@ const Task = ({
             </Grid>
           )} */}
           <Grid item>
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={3} alignItems="center">
+              {processName && <Chip label={processName} size="small" />}
+
               <Avatar size="mini" src={assignee && assignee.imageUrl} />
             </Stack>
           </Grid>
@@ -239,7 +256,7 @@ const Task = ({
         assignee={assignee}
       />
     </>
-  );
+  ) : null;
 };
 
 export default Task;
@@ -328,7 +345,9 @@ const DecisionDrawerActions = ({
               </Grid>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Remove from my tasks</Typography>
+                  <Typography bold variant="bodyRegular">
+                    Remove from to do list
+                  </Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
@@ -337,7 +356,9 @@ const DecisionDrawerActions = ({
                   disabled={!decisionOption}
                   onClick={handleMakeDecision}
                 >
-                  <Typography bold>Make final decision</Typography>
+                  <Typography bold variant="bodyRegular">
+                    Make final decision
+                  </Typography>
                 </Button>
               </Grid>
             </>
@@ -345,8 +366,8 @@ const DecisionDrawerActions = ({
         ) : (
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
-              <Typography light bold>
-                Add to my tasks
+              <Typography light bold variant="bodyRegular">
+                Add to my to do list
               </Typography>
             </Button>
           </Grid>
@@ -380,12 +401,14 @@ const TaskDrawerActions = ({
             <>
               <Grid item xs={6}>
                 <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography bold>Remove from my tasks</Typography>
+                  <Typography variant="bodyRegular" bold>
+                    Remove from to do list
+                  </Typography>
                 </Button>
               </Grid>
               <Grid item xs={6}>
                 <Button full onClick={handleCompleteTask}>
-                  <Typography light bold>
+                  <Typography variant="bodyRegular" light bold>
                     Mark task complete
                   </Typography>
                 </Button>
@@ -396,7 +419,7 @@ const TaskDrawerActions = ({
           <Grid item xs={12}>
             <Button full onClick={handleAssignSelf}>
               <Typography light bold>
-                Add to my tasks
+                Add to my to do list
               </Typography>
             </Button>
           </Grid>
