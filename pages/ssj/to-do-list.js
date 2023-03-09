@@ -9,10 +9,8 @@ import {
   Grid,
   Button,
 } from "@ui";
-import CategoryChip from "../../components/CategoryChip";
-import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
-import Resource from "../../components/Resource";
+import Hero from "../../components/Hero";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
@@ -26,14 +24,18 @@ const ToDoList = ({
   const [showAssignedTasks, setShowAssignedTasks] = useState(
     dataAssignedSteps[0]?.steps.length
   );
-  console.log({ dataAssignedSteps });
-  console.log({ includedProcess });
+
+  const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
+
+  // console.log({ dataAssignedSteps });
+  // console.log({ includedProcess });
   // console.log({ includedDocuments });
   // console.log({ milestonesWithSelfAssignedTasks });
 
   return (
     <PageContainer>
       <Stack spacing={12}>
+        <Hero imageUrl={hero} />
         <Stack spacing={6} direction="row" alignItems="center">
           <Icon type="calendarCheck" variant="primary" size="large" />
           <Typography variant="h3" bold>

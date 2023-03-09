@@ -23,9 +23,9 @@ import {
   Link,
 } from "@ui";
 import Milestone from "../../../components/Milestone";
+import Hero from "../../../components/Hero";
 
 const PhasePage = ({
-  startConsideringMilestones,
   data,
   milestonesInProgress,
   milestonesToDo,
@@ -40,10 +40,23 @@ const PhasePage = ({
 
   // console.log({ data });
 
+  const planningHero = "/assets/images/ssj/planning.jpg";
+  const visioningHero = "/assets/images/ssj/visioning.jpg";
+  const startupHero = "/assets/images/ssj/startup.jpg";
+
   return (
     <>
       <PageContainer>
         <Stack spacing={12}>
+          <Hero
+            imageUrl={
+              phase === "planning"
+                ? planningHero
+                : phase === "visioning"
+                ? visioningHero
+                : phase === "startup" && startupHero
+            }
+          />
           <Typography variant="h2" bold capitalize>
             {phase}
           </Typography>
@@ -231,40 +244,6 @@ const PhasePage = ({
               </Grid>
             </Grid>
           </Card>
-
-          {startConsideringMilestones && phase !== "startup" && (
-            <>
-              <Stack direction="column">
-                <Typography variant="bodyRegular" bold lightened>
-                  Start considering
-                </Typography>
-                <Typography variant="h3" bold>
-                  {phase === "visioning"
-                    ? "Planning"
-                    : phase === "planning" && "Startup"}{" "}
-                  Milestones
-                </Typography>
-              </Stack>
-              <Card>
-                <Stack spacing={6}>
-                  <Stack spacing={3}>
-                    {startConsideringMilestones.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${m.attributes.phase}/${m.id}`}
-                        key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
-                        effort={m.attributes.effort}
-                        categories={m.attributes.categories}
-                        status={m.attributes.status}
-                        stepCount={m.relationships.steps.data.length}
-                      />
-                    ))}
-                  </Stack>
-                </Stack>
-              </Card>
-            </>
-          )}
         </Stack>
       </PageContainer>
       <AddMilestoneModal
@@ -481,9 +460,6 @@ export async function getServerSideProps({ params, req, res }) {
   const currentPhaseMilestones = data.data.filter(
     (m) => m.attributes.phase === phase
   );
-  const startConsideringMilestones = data.data.filter(
-    (m) => m.attributes.phase !== phase
-  );
 
   currentPhaseMilestones.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
@@ -499,7 +475,6 @@ export async function getServerSideProps({ params, req, res }) {
 
   return {
     props: {
-      startConsideringMilestones,
       data,
       currentPhaseMilestones,
       milestonesInProgress,
