@@ -66,7 +66,7 @@ const Task = ({
   includedDocuments,
   processName,
   worktime,
-  clearFromListWhenRemoved,
+  setRemovedTaskId,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -84,12 +84,11 @@ const Task = ({
       const response = await processesApi.complete(taskId);
       setTaskIsComplete(response.data.attributes.completed);
       setInfoDrawerOpen(false);
-      if (clearFromListWhenRemoved) {
+      if (setRemovedTaskId) {
         setTimeout(() => {
-          setVisible(false);
-        }, 1500);
+          setRemovedTaskId(taskId);
+        }, 1000);
       }
-      console.log("response", response);
     } catch (err) {
       console.error(err);
     }
@@ -123,10 +122,8 @@ const Task = ({
     try {
       const response = await stepsApi.unassign(taskId);
       setAssignee(null);
-      if (clearFromListWhenRemoved) {
-        setTimeout(() => {
-          setVisible(false);
-        }, 1500);
+      if (setRemovedTaskId) {
+        setRemovedTaskId(taskId);
       }
     } catch (err) {
       console.error(err);
@@ -138,7 +135,9 @@ const Task = ({
     setIsDecided(true);
   };
 
-  return visible ? (
+  console.log(taskId);
+
+  return (
     <>
       <StyledTask onClick={() => setInfoDrawerOpen(true)} variant={variant}>
         <Grid container alignItems="center" justifyContent="space-between">
@@ -256,7 +255,7 @@ const Task = ({
         assignee={assignee}
       />
     </>
-  ) : null;
+  );
 };
 
 export default Task;
