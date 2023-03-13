@@ -22,19 +22,18 @@ const ToDoList = ({
   milestonesToDo,
 }) => {
   const [assignedSteps, setAssignedSteps] = useState(
-    dataAssignedSteps[0].steps
+    dataAssignedSteps.length ? dataAssignedSteps[0].steps : []
   );
-  const [removedTaskId, setRemovedTaskId] = useState();
-  const removeTaskFromList = (arr, id) => {
-    const taskToRemove = arr.map((e) => e.data.id).indexOf(id);
-    // console.log("taskToRemove", taskToRemove);
-    arr.splice(taskToRemove, 1);
-    setAssignedSteps(arr);
-  };
 
-  useEffect(() => {
-    removeTaskFromList(assignedSteps, removedTaskId);
-  }, [removedTaskId]);
+  const removeStep = (taskId) => {
+    setTimeout(() => {
+      const array = assignedSteps.slice();
+      const taskToRemove = array.map((e) => e.data.id);
+      const indexTasks = taskToRemove.indexOf(taskId);
+      array.splice(indexTasks, 1);
+      setAssignedSteps(array);
+    }, 1500);
+  };
 
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 
@@ -68,7 +67,7 @@ const ToDoList = ({
                 <Task
                   taskId={t.data.id}
                   title={t.data.attributes.title}
-                  key={i}
+                  key={t.data.id}
                   isDecision={t.data.attributes.kind === "Decision"}
                   decisionOptions={t.data.attributes.decisionOptions}
                   isComplete={t.data.attributes.completed}
@@ -84,7 +83,7 @@ const ToDoList = ({
                     60
                   }
                   taskAssignee={dataAssignedSteps[0].assignee_info}
-                  setRemovedTaskId={setRemovedTaskId}
+                  removeStep={removeStep}
                 />
               );
             })}

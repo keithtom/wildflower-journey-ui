@@ -68,7 +68,7 @@ const MilestonePage = ({
   const { phase } = router.query;
 
   // console.log("Tasks", MilestoneTasks);
-  // console.log("data", data);
+  console.log("data", data);
   // console.log("includedDocuments", includedDocuments);
   // console.log("milestoneAttributes", milestoneAttributes);
   // console.log("Milestone Relationships", milestoneRelationships);

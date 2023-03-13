@@ -66,7 +66,7 @@ const Task = ({
   includedDocuments,
   processName,
   worktime,
-  setRemovedTaskId,
+  removeStep,
 }) => {
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -74,7 +74,6 @@ const Task = ({
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
-  const [visible, setVisible] = useState(true);
   const { currentUser } = useUserContext();
 
   async function handleCompleteTask() {
@@ -84,10 +83,8 @@ const Task = ({
       const response = await processesApi.complete(taskId);
       setTaskIsComplete(response.data.attributes.completed);
       setInfoDrawerOpen(false);
-      if (setRemovedTaskId) {
-        setTimeout(() => {
-          setRemovedTaskId(taskId);
-        }, 1000);
+      if (removeStep) {
+        removeStep(taskId);
       }
     } catch (err) {
       console.error(err);
@@ -122,8 +119,9 @@ const Task = ({
     try {
       const response = await stepsApi.unassign(taskId);
       setAssignee(null);
-      if (setRemovedTaskId) {
-        setRemovedTaskId(taskId);
+      setInfoDrawerOpen(false);
+      if (removeStep) {
+        removeStep(taskId);
       }
     } catch (err) {
       console.error(err);
@@ -135,7 +133,7 @@ const Task = ({
     setIsDecided(true);
   };
 
-  console.log(taskId);
+  // console.log(taskId);
 
   return (
     <>
