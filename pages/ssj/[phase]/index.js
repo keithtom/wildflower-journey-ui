@@ -218,7 +218,7 @@ const PhasePage = ({
             ) : null}
           </Stack>
 
-          <Card variant="lightened">
+          {/* <Card variant="lightened">
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
                 <Stack>
@@ -243,7 +243,7 @@ const PhasePage = ({
                 </Button>
               </Grid>
             </Grid>
-          </Card>
+          </Card> */}
         </Stack>
       </PageContainer>
       <AddMilestoneModal
