@@ -279,7 +279,7 @@ const DecisionDrawerActions = ({
       `}
   `;
   return (
-    <Stack spacing={6}>
+    <Stack spacing={4}>
       {assignee ? (
         <Grid container>
           <StyledDecisionCard
@@ -383,46 +383,44 @@ const TaskDrawerActions = ({
   handleUncompleteTask,
 }) => {
   return (
-    <>
-      <Grid container spacing={4}>
-        {assignee ? (
-          isComplete ? (
-            <>
-              <Grid item xs={12}>
-                <Button full variant="danger" onClick={handleUncompleteTask}>
-                  <Typography bold>Mark incomplete</Typography>
-                </Button>
-              </Grid>
-            </>
-          ) : (
-            <>
-              <Grid item xs={6}>
-                <Button full variant="text" onClick={handleUnassignSelf}>
-                  <Typography variant="bodyRegular" bold>
-                    Remove from to do list
-                  </Typography>
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Button full onClick={handleCompleteTask}>
-                  <Typography variant="bodyRegular" light bold>
-                    Mark task complete
-                  </Typography>
-                </Button>
-              </Grid>
-            </>
-          )
+    <Grid container spacing={4}>
+      {assignee ? (
+        isComplete ? (
+          <>
+            <Grid item xs={12}>
+              <Button full variant="danger" onClick={handleUncompleteTask}>
+                <Typography bold>Mark incomplete</Typography>
+              </Button>
+            </Grid>
+          </>
         ) : (
-          <Grid item xs={12}>
-            <Button full onClick={handleAssignSelf}>
-              <Typography light bold>
-                Add to my to do list
-              </Typography>
-            </Button>
-          </Grid>
-        )}
-      </Grid>
-    </>
+          <>
+            <Grid item xs={6}>
+              <Button full variant="text" onClick={handleUnassignSelf}>
+                <Typography variant="bodyRegular" bold>
+                  Remove from to do list
+                </Typography>
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button full onClick={handleCompleteTask}>
+                <Typography variant="bodyRegular" light bold>
+                  Mark task complete
+                </Typography>
+              </Button>
+            </Grid>
+          </>
+        )
+      ) : (
+        <Grid item xs={12}>
+          <Button full onClick={handleAssignSelf}>
+            <Typography light bold>
+              Add to my to do list
+            </Typography>
+          </Button>
+        </Grid>
+      )}
+    </Grid>
   );
 };
 
