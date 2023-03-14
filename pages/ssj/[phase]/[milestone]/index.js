@@ -68,7 +68,7 @@ const MilestonePage = ({
   const { phase } = router.query;
 
   // console.log("Tasks", MilestoneTasks);
-  // console.log("data", data);
+  console.log("data", data);
   // console.log("includedDocuments", includedDocuments);
   // console.log("milestoneAttributes", milestoneAttributes);
   // console.log("Milestone Relationships", milestoneRelationships);
@@ -122,7 +122,7 @@ const MilestonePage = ({
                 <Typography capitalize>{phase}</Typography>
               </Stack>
             </Grid>
-            <Grid item>
+            {/* <Grid item>
               {userIsEditing ? (
                 <Stack spacing={1} direction="row">
                   <Button
@@ -143,7 +143,7 @@ const MilestonePage = ({
                   </Stack>
                 </Button>
               )}
-            </Grid>
+            </Grid> */}
           </Grid>
 
           <StyledMilestoneHeader spacing={8}>

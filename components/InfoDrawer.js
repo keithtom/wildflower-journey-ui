@@ -11,6 +11,7 @@ import {
   Chip,
   Divider,
   Avatar,
+  Box,
 } from "./ui/index";
 import WorktimeChip from "./WorktimeChip";
 import CategoryChip from "./CategoryChip";
@@ -29,6 +30,22 @@ const CustomDrawer = styled(Drawer)`
     margin-top: 0;
     padding-top: ${({ theme }) => theme.util.appBarHeight}px;
   }
+`;
+
+const StyledScrollArea = styled(Box)``;
+const StyledInfoCard = styled(Card)`
+  padding-bottom: ${({ theme }) => `calc(${theme.util.buffer * 12}px)`};
+  min-height: ${(props) =>
+    props.isDecision
+      ? `calc(100vh - 331px - ${props.theme.util.appBarHeight}px)`
+      : `calc(100vh - 97px - ${props.theme.util.appBarHeight}px)`}; //TODO: Fix this hack. 331 is height of decision actions, 97 is height of task actions
+`;
+const ActionsContainer = styled(Card)`
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid ${({ theme }) => theme.color.neutral.main};
+  width: ${({ theme }) => theme.util.infoDrawerWidth}px;
+  padding: ${({ theme }) => theme.util.buffer * 6}px;
 `;
 
 const InfoDrawer = ({
@@ -50,12 +67,8 @@ const InfoDrawer = ({
 }) => {
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
-      <Stack
-        justifyContent="space-between"
-        direction="column"
-        sx={{ height: "100%" }}
-      >
-        <Card noBorder>
+      <StyledScrollArea>
+        <StyledInfoCard noBorder noRadius isDecision={isDecision}>
           <Stack spacing={12}>
             <Stack spacing={6}>
               <Grid
@@ -119,27 +132,16 @@ const InfoDrawer = ({
                     </Stack>
                   </Stack>
                 )}
-                {worktime && (
+                {worktime ? (
                   <Stack spacing={2}>
                     <Typography variant="bodyMini" lightened bold>
                       WORKTIME
                     </Typography>
                     <WorktimeChip size="small" worktime={worktime} withIcon />
                   </Stack>
-                )}
+                ) : null}
               </Stack>
             </Stack>
-            {resources && resources.length ? (
-              <Stack spacing={2}>
-                {resources.map((r, i) => (
-                  <Resource
-                    link={includedDocuments[r.id].attributes.link}
-                    title={includedDocuments[r.id].attributes.title}
-                    key={i}
-                  />
-                ))}
-              </Stack>
-            ) : null}
             {about && (
               <Stack spacing={4}>
                 <Stack direction="row" spacing={4}>
@@ -152,15 +154,23 @@ const InfoDrawer = ({
                 <Typography>{about}</Typography>
               </Stack>
             )}
+            {resources && resources.length ? (
+              <Stack spacing={2}>
+                {resources.map((r, i) => (
+                  <Resource
+                    link={includedDocuments[r.id].attributes.link}
+                    title={includedDocuments[r.id].attributes.title}
+                    key={i}
+                  />
+                ))}
+              </Stack>
+            ) : null}
           </Stack>
-        </Card>
-        <Card noBorder>
-          <Stack spacing={6}>
-            <Divider />
-            {actions}
-          </Stack>
-        </Card>
-      </Stack>
+        </StyledInfoCard>
+        <ActionsContainer noBorder noPadding noRadius>
+          {actions}
+        </ActionsContainer>
+      </StyledScrollArea>
     </CustomDrawer>
   );
 };

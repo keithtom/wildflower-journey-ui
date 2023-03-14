@@ -21,13 +21,24 @@ const ToDoList = ({
   dataAssignedSteps,
   milestonesToDo,
 }) => {
-  const [showAssignedTasks, setShowAssignedTasks] = useState(
-    dataAssignedSteps[0]?.steps.length
+  const [assignedSteps, setAssignedSteps] = useState(
+    dataAssignedSteps.length ? dataAssignedSteps[0].steps : []
   );
+
+  const removeStep = (taskId) => {
+    setTimeout(() => {
+      const array = assignedSteps.slice();
+      const taskToRemove = array.map((e) => e.data.id);
+      const indexTasks = taskToRemove.indexOf(taskId);
+      array.splice(indexTasks, 1);
+      setAssignedSteps(array);
+    }, 1500);
+  };
 
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 
   // console.log({ dataAssignedSteps });
+  // console.log({ assignedSteps });
   // console.log({ includedProcess });
   // console.log({ includedDocuments });
   // console.log({ milestonesWithSelfAssignedTasks });
@@ -42,42 +53,41 @@ const ToDoList = ({
             Your to do list
           </Typography>
           <Typography variant="h3" lightened>
-            {dataAssignedSteps[0]?.steps.length}
+            {assignedSteps.length ? assignedSteps.length : null}
           </Typography>
         </Stack>
 
-        {showAssignedTasks > 0 ? (
-          dataAssignedSteps.map((a, i) => (
-            <Stack>
-              {a.steps.map((t, i) => {
-                const processId = t.included.filter(
-                  (i) => i.type === "process"
-                )[0].id;
-                return (
-                  <Task
-                    taskId={t.data.id}
-                    title={t.data.attributes.title}
-                    key={i}
-                    isDecision={t.data.attributes.kind === "Decision"}
-                    decisionOptions={t.data.attributes.decisionOptions}
-                    isComplete={t.data.attributes.completed}
-                    isNext={i === 0}
-                    description={t.data.attributes.description}
-                    resources={t.data.relationships.documents.data}
-                    includedDocuments={includedDocuments}
-                    processName={includedProcess[processId].attributes.title}
-                    worktime={
-                      (t.data.attributes.maxWorktime +
-                        t.data.attributes.minWorktime) /
-                      2 /
-                      60
-                    }
-                    taskAssignee={dataAssignedSteps[0].assignee_info}
-                  />
-                );
-              })}
-            </Stack>
-          ))
+        {assignedSteps.length ? (
+          <Stack>
+            {assignedSteps.map((t, i) => {
+              const processId = t.included.filter(
+                (i) => i.type === "process"
+              )[0].id;
+              return (
+                <Task
+                  taskId={t.data.id}
+                  title={t.data.attributes.title}
+                  key={t.data.id}
+                  isDecision={t.data.attributes.kind === "Decision"}
+                  decisionOptions={t.data.attributes.decisionOptions}
+                  isComplete={t.data.attributes.completed}
+                  isNext={i === 0}
+                  description={t.data.attributes.description}
+                  resources={t.data.relationships.documents.data}
+                  includedDocuments={includedDocuments}
+                  processName={includedProcess[processId].attributes.title}
+                  worktime={
+                    (t.data.attributes.maxWorktime +
+                      t.data.attributes.minWorktime) /
+                    2 /
+                    60
+                  }
+                  taskAssignee={dataAssignedSteps[0].assignee_info}
+                  removeStep={removeStep}
+                />
+              );
+            })}
+          </Stack>
         ) : (
           <Card noPadding>
             <Grid container spacing={24}>
