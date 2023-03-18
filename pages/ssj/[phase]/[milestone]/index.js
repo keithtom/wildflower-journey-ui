@@ -38,10 +38,6 @@ const StyledMilestoneHeader = styled(Stack)`
 `;
 
 const MilestonePage = ({
-  milestoneId,
-  milestoneTitle,
-  milestoneDescription,
-  milestoneAttributes,
   milestoneRelationships,
   milestoneTasks,
   FakeMilestoneTasks,
@@ -51,6 +47,8 @@ const MilestonePage = ({
   includedData,
   includedDocuments,
 }) => {
+  const milestoneAttributes = milestone.attributes;
+  
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
@@ -75,7 +73,6 @@ const MilestonePage = ({
 
   // console.log("Tasks", MilestoneTasks);
   // console.log("includedDocuments", includedDocuments);
-  // console.log("milestoneAttributes", milestoneAttributes);
   // console.log("Milestone Relationships", milestoneRelationships);
   
   return (
@@ -152,10 +149,10 @@ const MilestonePage = ({
 
           <StyledMilestoneHeader spacing={8}>
             <Typography variant="h2" bold capitalize>
-              {milestoneTitle}
+              {milestone.attributes.title}
             </Typography>
             <Typography variant="bodyLarge" lightened>
-              {milestoneDescription}
+              {milestone.attributes.description}
             </Typography>
             <Stack direction="row" spacing={6} alignItems="center">
               {milestoneAttributes.status ? (
@@ -216,7 +213,7 @@ const MilestonePage = ({
             sortedMilestoneTasks.map((t, i) => (
               <Task
                 taskId={t.id}
-                link={`/ssj/${phase}/${milestoneId}/${t.id}`}
+                link={`/ssj/${phase}/${milestone.id}/${t.id}`}
                 title={t.attributes.title}
                 description={t.attributes.description}
                 key={i}
@@ -300,7 +297,7 @@ const MilestonePage = ({
                 </Typography>
               </Stack>
               <Typography variant="h2" bold>
-                {milestoneTitle}
+                {milestone.attributes.title}
               </Typography>
               <Typography variant="bodyLarge" lightened center>
                 You're making great progress!
@@ -425,9 +422,6 @@ export async function getServerSideProps({ params, query, req, res }) {
     });
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
-  const milestoneTitle = milestone.attributes.title;
-  const milestoneDescription = milestone.attributes.description;
-  const milestoneAttributes = milestone.attributes;
   const milestoneRelationships = milestone.relationships;
   const milestoneTasks = data.included.filter((i) => i.type === "step");
   const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
@@ -466,10 +460,6 @@ export async function getServerSideProps({ params, query, req, res }) {
       data,
       milestone,
       includedData,
-      milestoneId,
-      milestoneTitle,
-      milestoneDescription,
-      milestoneAttributes,
       milestoneRelationships,
       milestoneTasks,
       FakeMilestoneTasks,
