@@ -38,11 +38,8 @@ const StyledMilestoneHeader = styled(Stack)`
 `;
 
 const MilestonePage = ({
-  milestoneRelationships,
-  milestoneTasks,
   FakeMilestoneTasks,
   sortedMilestoneTasks,
-  data,
   milestone,
   includedData,
   includedDocuments,
@@ -71,10 +68,6 @@ const MilestonePage = ({
   const router = useRouter();
   const { phase } = router.query;
 
-  // console.log("Tasks", MilestoneTasks);
-  // console.log("includedDocuments", includedDocuments);
-  // console.log("Milestone Relationships", milestoneRelationships);
-  
   return (
     <PageContainer>
       <Stack spacing={12}>
@@ -408,22 +401,21 @@ const EditableTaskList = ({ tasks }) => {
 export async function getServerSideProps({ params, query, req, res }) {
   const milestoneId = query.milestone;
   const apiRoute = `${baseUrl}/v1/workflow/processes/${milestoneId}`;
+  
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
-  const data = await response.data;
+  const data = response.data;
   const milestone = data.data;
   const includedData = data.included || [];
-  
+
   const includedDocuments = {};
-  data.included
+  includedData
     .filter((i) => i.type === "document")
     .forEach((i) => {
       includedDocuments[i.id] = i;
     });
 
-  const Workflow = data.included.filter((i) => i.type === "workflow");
-  const milestoneRelationships = milestone.relationships;
-  const milestoneTasks = data.included.filter((i) => i.type === "step");
+  let milestoneTasks = includedData.filter((i) => i.type === "step");
   const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
   );
@@ -457,11 +449,8 @@ export async function getServerSideProps({ params, query, req, res }) {
   return {
     props: {
       includedDocuments,
-      data,
       milestone,
       includedData,
-      milestoneRelationships,
-      milestoneTasks,
       FakeMilestoneTasks,
       sortedMilestoneTasks,
     },
