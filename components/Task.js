@@ -332,9 +332,7 @@ const DecisionDrawerActions = ({
                     </Grid>
                     <Grid item flex={1}>
                       <Typography variant="bodySmall">
-                        Changing decisions is not advised. Please take the
-                        necessary steps to be certain about your decision before
-                        making it here.
+                        If you'd like to change this decision, please email support@wildflowerschools.org.
                       </Typography>
                     </Grid>
                   </Grid>
