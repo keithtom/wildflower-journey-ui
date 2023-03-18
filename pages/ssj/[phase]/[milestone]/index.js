@@ -39,10 +39,8 @@ const StyledMilestoneHeader = styled(Stack)`
 
 const MilestonePage = ({
   FakeMilestoneTasks,
-  sortedMilestoneTasks,
   milestone,
   includedData,
-  includedDocuments,
 }) => {
   const milestoneAttributes = milestone.attributes;
   
@@ -61,9 +59,24 @@ const MilestonePage = ({
     setUserIsEditing(false);
   };
   const includedProcesses = includedData.filter(e => e.type === "process");
-  var milestonesToDo = milestone.relationships.prerequisiteProcesses && milestone.relationships.prerequisiteProcesses.data.map((e) => {
+  var milestonePrerequisites = milestone.relationships.prerequisiteProcesses && milestone.relationships.prerequisiteProcesses.data.map((e) => {
     return includedProcesses.find((p) => p.id === e.id);
   });
+
+  const includedDocuments = {};
+  includedData
+    .filter((i) => i.type === "document")
+    .forEach((i) => {
+      includedDocuments[i.id] = i;
+    });
+
+  const includedSteps = includedData.filter(e => e.type === "step");
+  var milestoneTasks = milestone.relationships.steps && milestone.relationships.steps.data.map((e) => {
+    return includedSteps.find((s) => s.id === e.id);
+  });
+  const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
+    a.attributes.position > b.attributes.position ? 1 : -1
+  );
   
   const router = useRouter();
   const { phase } = router.query;
@@ -88,7 +101,7 @@ const MilestonePage = ({
                 </Grid>
                 <Grid item xs={12}>
                   <Stack spacing={3}>
-                    {milestonesToDo && milestonesToDo.map((m, i) => (
+                    {milestonePrerequisites && milestonePrerequisites.map((m, i) => (
                       <Milestone
                         link={`/ssj/${phase}/${m.id}`}
                         key={i}
@@ -408,18 +421,6 @@ export async function getServerSideProps({ params, query, req, res }) {
   const milestone = data.data;
   const includedData = data.included || [];
 
-  const includedDocuments = {};
-  includedData
-    .filter((i) => i.type === "document")
-    .forEach((i) => {
-      includedDocuments[i.id] = i;
-    });
-
-  let milestoneTasks = includedData.filter((i) => i.type === "step");
-  const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
-    a.attributes.position > b.attributes.position ? 1 : -1
-  );
-
   const FakeMilestoneTasks = [
     {
       title: "Complete WF School Name Research Document",
@@ -448,11 +449,9 @@ export async function getServerSideProps({ params, query, req, res }) {
 
   return {
     props: {
-      includedDocuments,
       milestone,
       includedData,
       FakeMilestoneTasks,
-      sortedMilestoneTasks,
     },
   };
 }
