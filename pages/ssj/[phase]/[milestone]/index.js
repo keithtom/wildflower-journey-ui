@@ -44,10 +44,11 @@ const MilestonePage = ({
   milestoneAttributes,
   milestoneRelationships,
   milestoneTasks,
-  milestonesToDo,
   FakeMilestoneTasks,
   sortedMilestoneTasks,
   data,
+  milestone,
+  includedData,
   includedDocuments,
 }) => {
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
@@ -58,22 +59,25 @@ const MilestonePage = ({
   const handleCompleteMilestone = () => {
     setCompleteModalOpen(true);
     //send data to backend
+    // ??? implement?
   };
   const handleSaveEditedMilestone = () => {
     //updateMilestone
     setUserIsEditing(false);
   };
-
+  const includedProcesses = includedData.filter(e => e.type === "process");
+  var milestonesToDo = milestone.relationships.prerequisiteProcesses && milestone.relationships.prerequisiteProcesses.data.map((e) => {
+    return includedProcesses.find((p) => p.id === e.id);
+  });
+  
   const router = useRouter();
   const { phase } = router.query;
 
   // console.log("Tasks", MilestoneTasks);
-  console.log("data", data);
   // console.log("includedDocuments", includedDocuments);
   // console.log("milestoneAttributes", milestoneAttributes);
   // console.log("Milestone Relationships", milestoneRelationships);
-  // console.log("Milestones To Do", milestonesToDo);
-
+  
   return (
     <PageContainer>
       <Stack spacing={12}>
@@ -94,7 +98,7 @@ const MilestonePage = ({
                 </Grid>
                 <Grid item xs={12}>
                   <Stack spacing={3}>
-                    {milestonesToDo.map((m, i) => (
+                    {milestonesToDo && milestonesToDo.map((m, i) => (
                       <Milestone
                         link={`/ssj/${phase}/${m.id}`}
                         key={i}
@@ -410,21 +414,9 @@ export async function getServerSideProps({ params, query, req, res }) {
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
   const data = await response.data;
-
-  const { phase } = params;
-  const workflowId = "c502-4f84";
-  // const workflowId = "5947-ab7f"
-  const apiMilestonesRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-  const milestonesResponse = await axios.get(apiMilestonesRoute);
-  const milestonesData = await milestonesResponse.data;
-  const milestonesToDo = [];
-
-  milestonesData.data.forEach((milestone) => {
-    if (milestone.attributes.status == "to do") {
-      milestonesToDo.push(milestone);
-    }
-  });
-
+  const milestone = data.data;
+  const includedData = data.included || [];
+  
   const includedDocuments = {};
   data.included
     .filter((i) => i.type === "document")
@@ -433,10 +425,10 @@ export async function getServerSideProps({ params, query, req, res }) {
     });
 
   const Workflow = data.included.filter((i) => i.type === "workflow");
-  const milestoneTitle = data.data.attributes.title;
-  const milestoneDescription = data.data.attributes.description;
-  const milestoneAttributes = data.data.attributes;
-  const milestoneRelationships = data.data.relationships;
+  const milestoneTitle = milestone.attributes.title;
+  const milestoneDescription = milestone.attributes.description;
+  const milestoneAttributes = milestone.attributes;
+  const milestoneRelationships = milestone.relationships;
   const milestoneTasks = data.included.filter((i) => i.type === "step");
   const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
@@ -472,13 +464,14 @@ export async function getServerSideProps({ params, query, req, res }) {
     props: {
       includedDocuments,
       data,
+      milestone,
+      includedData,
       milestoneId,
       milestoneTitle,
       milestoneDescription,
       milestoneAttributes,
       milestoneRelationships,
       milestoneTasks,
-      milestonesToDo,
       FakeMilestoneTasks,
       sortedMilestoneTasks,
     },
