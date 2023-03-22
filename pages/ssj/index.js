@@ -169,12 +169,6 @@ const SSJ = ({
                     </Typography>
                     <Typography variant="bodySmall">Boston, MA</Typography>
                   </Stack>
-                  <Stack>
-                    <Typography variant="bodyMini" bold lightened>
-                      HUB
-                    </Typography>
-                    <Typography variant="bodySmall">Massachusetts</Typography>
-                  </Stack>
                   {openDate ? (
                     <Card
                       size="small"
