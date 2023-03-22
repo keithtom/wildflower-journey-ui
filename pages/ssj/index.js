@@ -459,8 +459,8 @@ const SSJ = ({
                         There are 22 other Emerging Teacher Leaders
                       </Typography>
                       <Typography variant="bodyRegular" lightened>
-                        Get to know a growing number of ETLs, share learnings,
-                        and educate together.
+                        Get to know a growing number of Emering Teacher Leaders,
+                        share learnings, and educate together.
                       </Typography>
                     </Stack>
                   </Grid>
@@ -484,7 +484,7 @@ const SSJ = ({
               <OnboardingCard
                 icon="message"
                 title="Meet your peers"
-                description="You're not alone! There are more than 20 other Emerging Teacher Leaders (ETLs) currently working on their own journeys."
+                description="You're not alone! There are more than 20 other Emerging Teacher Leaders currently working on their own journeys."
                 action="Start by taking a peek at who else is here"
                 ctaText="Meet others"
                 img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
@@ -789,11 +789,12 @@ const ViewEtlsModal = ({ toggle, open }) => {
         <Card variant="primaryLightened">
           <Stack alignItems="center" justifyContent="center" spacing={3}>
             <Typography variant="h4" highlight bold>
-              Get to know {FakeETLs.length} other ETLs
+              Get to know {FakeETLs.length} other Emerging Teacher Leaders
             </Typography>
             <Typography variant="bodyRegular" highlight center>
               Everyone shown here has opted in to being open to connecting with
-              other ETLs such as yourself! Reach out and build your community.
+              other Emerging Teacher Leaders such as yourself! Reach out and
+              build your community.
             </Typography>
           </Stack>
         </Card>
