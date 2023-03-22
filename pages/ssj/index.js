@@ -871,7 +871,6 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
       partnerFirstName: "",
       partnerLastName: "",
       partnerEmail: "",
-      partnerMessage: "",
     },
   });
   const onSubmit = (data) => {
@@ -975,18 +974,6 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
                               errors.partnerEmail.type === "pattern" &&
                               "Please enter a valid email"
                         }
-                        {...field}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="partnerMessage"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        rows={4}
-                        label="A message to your partner"
-                        placeholder="Type something..."
                         {...field}
                       />
                     )}
