@@ -52,6 +52,7 @@ const Task = ({
   title,
   description,
   isComplete,
+  taskCompletedBy,
   notNavigable,
   isDecision,
   decisionOptions,
@@ -74,6 +75,7 @@ const Task = ({
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
+  const [completedBy, setCompletedBy] = useState(taskCompletedBy);
   const { currentUser } = useUserContext();
 
   async function handleCompleteTask() {
@@ -82,6 +84,7 @@ const Task = ({
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.complete(taskId);
       setTaskIsComplete(response.data.attributes.completed);
+      setCompletedBy(currentUser);
       setInfoDrawerOpen(false);
       if (removeStep) {
         removeStep(taskId);
@@ -216,6 +219,7 @@ const Task = ({
         worktime={worktime}
         isDecision={isDecision}
         isComplete={taskIsComplete}
+        completedBy={completedBy}
         includedDocuments={includedDocuments}
         actions={
           isDecision ? (
@@ -230,6 +234,7 @@ const Task = ({
             <TaskDrawerActions
               assignee={assignee}
               isComplete={taskIsComplete}
+              completedBy={completedBy}
               handleAssignSelf={handleAssignSelf}
               handleUnassignSelf={handleUnassignSelf}
               handleCompleteTask={handleCompleteTask}
@@ -332,7 +337,8 @@ const DecisionDrawerActions = ({
                     </Grid>
                     <Grid item flex={1}>
                       <Typography variant="bodySmall">
-                        If you'd like to change this decision, please email support@wildflowerschools.org.
+                        If you'd like to change this decision, please email
+                        support@wildflowerschools.org.
                       </Typography>
                     </Grid>
                   </Grid>
@@ -375,6 +381,8 @@ const DecisionDrawerActions = ({
 const TaskDrawerActions = ({
   assignee,
   isComplete,
+  completedBy,
+  currentUser,
   handleAssignSelf,
   handleUnassignSelf,
   handleCompleteTask,
@@ -386,8 +394,21 @@ const TaskDrawerActions = ({
         isComplete ? (
           <>
             <Grid item xs={12}>
-              <Button full variant="danger" onClick={handleUncompleteTask}>
-                <Typography bold>Mark incomplete</Typography>
+              <Button
+                full
+                variant="danger"
+                disabled={
+                  completedBy && completedBy.id === currentUser.id
+                    ? false
+                    : true
+                }
+                onClick={handleUncompleteTask}
+              >
+                <Typography bold>
+                  {completedBy && completedBy.id === currentUser.id
+                    ? "Mark incomplete"
+                    : `Completed by ${completedBy.firstName} ${completedBy.lastName}`}
+                </Typography>
               </Button>
             </Grid>
           </>

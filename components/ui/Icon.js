@@ -143,6 +143,14 @@ const StyledIcon = styled("span")`
         cursor: pointer;
       }
     `}
+
+  /* Filled */
+  ${(props) =>
+    props.filled &&
+    css`
+      background: ${props.theme.color.neutral.lightest};
+      border-radius: ${props.theme.radius.full}px;
+    `}
 `;
 
 export default function Icon({ ...props }) {

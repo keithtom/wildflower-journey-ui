@@ -12,6 +12,7 @@ import {
   Divider,
   Avatar,
   Box,
+  Badge,
 } from "./ui/index";
 import WorktimeChip from "./WorktimeChip";
 import CategoryChip from "./CategoryChip";
@@ -62,6 +63,7 @@ const InfoDrawer = ({
   actions,
   isDecision,
   isComplete,
+  completedBy,
   includedDocuments,
   worktime,
 }) => {
@@ -100,11 +102,22 @@ const InfoDrawer = ({
                     <Typography variant="bodyMini" lightened bold>
                       ASSIGNEE
                     </Typography>
-                    <Avatar
-                      size="mini"
-                      // TODO: can we get the assignee information for each task in the process serializer
-                      src={assignee && assignee.imageUrl}
-                    />
+                    <Stack spacing={2} direction="row">
+                      //TODO: map function to iterate through array of assignees
+                      <AvatarWrapper
+                        badgeContent={
+                          assignee && assignee.id === completedBy.id ? (
+                            <Icon
+                              type="checkCircle"
+                              size="small"
+                              variant="primary"
+                              filled
+                            />
+                          ) : null
+                        }
+                        src={assignee && assignee.imageUrl}
+                      />
+                    </Stack>
                   </Stack>
                 )}
                 {status && (
@@ -176,3 +189,21 @@ const InfoDrawer = ({
 };
 
 export default InfoDrawer;
+
+const AvatarWrapper = ({ badgeContent, src }) => {
+  return (
+    <div>
+      <Badge
+        badgeContent={badgeContent}
+        overlap="circular"
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Avatar
+          size="mini"
+          // TODO: can we get the assignee information for each task in the process serializer
+          src={src}
+        />
+      </Badge>
+    </div>
+  );
+};
