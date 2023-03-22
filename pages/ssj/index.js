@@ -590,19 +590,19 @@ const ProgressBar = ({ processes }) => {
     ${(props) =>
       props.variant === "done" &&
       css`
-        background: ${props.theme.color.success.medium};
+        background: ${props.theme.color.primary.main};
       `}
     /* inProgress */
     ${(props) =>
       props.variant === "in progress" &&
       css`
-        background: ${props.theme.color.primary.main};
+        background: ${props.theme.color.neutral.main};
       `}
     /* toDo */
     ${(props) =>
       props.variant === "to do" &&
       css`
-        background: ${props.theme.color.primary.lightened};
+        background: ${props.theme.color.neutral.main};
       `}
     /* upNext */
     ${(props) =>
