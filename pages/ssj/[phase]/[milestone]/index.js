@@ -233,9 +233,7 @@ const MilestonePage = ({
                 taskAssignee={t.attributes.assigneeInfo}
                 resources={t.relationships.documents.data}
                 includedDocuments={includedDocuments}
-                worktime={
-                  (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
-                }
+                worktime={t.attributes.maxWorktime}
               />
             ))
           ) : (
