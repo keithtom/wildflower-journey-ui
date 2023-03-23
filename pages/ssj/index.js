@@ -8,7 +8,7 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
-import ssjApi from "../../api/ssj";
+import ssjApi from "../../api/ssj/ssj";
 import { categories } from "../../lib/utils/fake-data";
 import { useUserContext } from "@lib/useUserContext";
 import Milestone from "../../components/Milestone";
@@ -1326,6 +1326,8 @@ export async function getServerSideProps({ params, req, res }) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
 
+  // const data = await ssj.dashboard();
+
   const phase = "visioning";
   // const workflowId = "5947-ab7f"
   const workflowId = "c502-4f84";
@@ -1370,6 +1372,8 @@ export async function getServerSideProps({ params, req, res }) {
   const apiRouteProgress = `${baseUrl}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
+
+  // dashboard needs - # of assigned tasks, phase, location, hub, open date, startup family, phase stats (# completed, # milestones,), category stats (#completed, # milestones)
 
   return {
     props: {
