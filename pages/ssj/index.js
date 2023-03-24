@@ -453,8 +453,8 @@ const SSJ = ({
                         There are 22 other Emerging Teacher Leaders
                       </Typography>
                       <Typography variant="bodyRegular" lightened>
-                        Get to know a growing number of Emering Teacher Leaders,
-                        share learnings, and educate together.
+                        Get to know a growing number of Emerging Teacher Leaders
+                        in the journey
                       </Typography>
                     </Stack>
                   </Grid>
