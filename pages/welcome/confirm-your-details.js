@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
+import { useRouter } from "next/router";
 
 import {
   Button,
@@ -24,6 +25,7 @@ const PageContent = styled(Box)`
 `;
 const ConfirmYourDetails = ({}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
+  const router = useRouter();
 
   const {
     control,
@@ -38,7 +40,10 @@ const ConfirmYourDetails = ({}) => {
       email: user.email,
     },
   });
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    router.push("/welcome/confirm-demographic-info");
+    console.log(data);
+  };
 
   const isExistingTL = false;
 
@@ -49,48 +54,48 @@ const ConfirmYourDetails = ({}) => {
         <Grid container alignItems="center" justifyContent="center">
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <Card>
-              <Stack spacing={6}>
-                <Grid container justifyContent="center">
-                  <Grid item>
-                    <Typography variant="h4" bold>
-                      Confirm your personal details
-                    </Typography>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Stack spacing={6}>
+                  <Grid container justifyContent="center">
+                    <Grid item>
+                      <Typography variant="h4" bold>
+                        Confirm your personal details
+                      </Typography>
+                    </Grid>
                   </Grid>
-                </Grid>
-                {isExistingTL ? null : (
-                  <>
-                    <Card variant="primaryLightened" size="small">
-                      <Stack direction="row" spacing={3}>
-                        <Icon type="star" variant="primary" />
-                        <Typography variant="bodySmall">
-                          This helps us understand and notify you of what
-                          support networks you can tap into and what resources
-                          are available to you.
-                        </Typography>
+                  {isExistingTL ? null : (
+                    <>
+                      <Card variant="primaryLightened" size="small">
+                        <Stack direction="row" spacing={3}>
+                          <Icon type="star" variant="primary" />
+                          <Typography variant="bodySmall">
+                            This helps us understand and notify you of what
+                            support networks you can tap into and what resources
+                            are available to you.
+                          </Typography>
+                        </Stack>
+                      </Card>
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Avatar
+                          size="sm"
+                          src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
+                        />
+                        <Stack>
+                          <Typography variant="bodySmall" bold>
+                            Mary Truman
+                          </Typography>
+                          <Typography variant="bodySmall" lightened>
+                            Operations Guide
+                          </Typography>
+                        </Stack>
                       </Stack>
-                    </Card>
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <Avatar
-                        size="sm"
-                        src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
-                      />
-                      <Stack>
-                        <Typography variant="bodySmall" bold>
-                          Mary Truman
-                        </Typography>
-                        <Typography variant="bodySmall" lightened>
-                          Operations Guide
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  </>
-                )}
-                <Card
-                  variant={userIsEditing ? null : "lightened"}
-                  sx={{ width: "100%" }}
-                  size="small"
-                >
-                  <form onSubmit={handleSubmit(onSubmit)}>
+                    </>
+                  )}
+                  <Card
+                    variant={userIsEditing ? null : "lightened"}
+                    sx={{ width: "100%" }}
+                    size="small"
+                  >
                     <Stack spacing={3}>
                       <Stack
                         justifyContent="space-between"
@@ -280,16 +285,15 @@ const ConfirmYourDetails = ({}) => {
                         </>
                       )}
                     </Stack>
-                  </form>
-                </Card>
-                <Link href="/welcome/confirm-demographic-info">
-                  <Button full disabled={userIsEditing}>
+                  </Card>
+
+                  <Button full disabled={userIsEditing} type="submit">
                     <Typography variant="bodyRegular" light>
                       Confirm
                     </Typography>
                   </Button>
-                </Link>
-              </Stack>
+                </Stack>
+              </form>
             </Card>
           </Grid>
         </Grid>

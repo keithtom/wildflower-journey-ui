@@ -127,6 +127,15 @@ const AddProfileInfo = ({}) => {
                       </Button>
                     </Link>
                   </Grid>
+                  <Grid item xs={12}>
+                    <Link href="/ssj">
+                      <Button full variant="text">
+                        <Typography variant="bodyRegular" highlight>
+                          Skip for now
+                        </Typography>
+                      </Button>
+                    </Link>
+                  </Grid>
                 </Grid>
               </Stack>
             </Card>
