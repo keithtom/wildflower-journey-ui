@@ -75,7 +75,7 @@ const ExistingTL = ({}) => {
                     journey!
                   </Typography>
 
-                  <Link href="/welcome/confirm-your-details">
+                  <Link href="/welcome/create-password">
                     <Button full>
                       <Typography variant="bodyRegular" light>
                         Get started

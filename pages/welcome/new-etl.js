@@ -107,7 +107,7 @@ const NewETL = ({}) => {
                       by confirming a few details.
                     </Typography>
                   </StyledMessage>
-                  <Link href="/welcome/confirm-your-details">
+                  <Link href="/welcome/create-password">
                     <Button full>
                       <Typography variant="bodyRegular" light>
                         Get started
