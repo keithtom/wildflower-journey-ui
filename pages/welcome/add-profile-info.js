@@ -8,6 +8,7 @@ import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+import { useRouter } from "next/router";
 
 import {
   Button,
@@ -44,10 +45,16 @@ const StyledFilePond = styled(FilePond)`
 
 const AddProfileInfo = ({}) => {
   const [profilePicture, setProfilePicture] = useState();
+  const router = useRouter();
 
-  // console.log({ profilePicture });
+  const handleSubmit = () => {
+    console.log({ profilePicture });
+    router.push("/ssj");
+  };
 
   const isExistingTL = false;
+
+  // console.log({ profilePicture });
 
   return (
     <>
@@ -120,7 +127,11 @@ const AddProfileInfo = ({}) => {
                   <Grid item xs={6}>
                     {/* TODO: Change the destination depending on existing vs new TL */}
                     <Link href="/ssj">
-                      <Button full disabled={!profilePicture}>
+                      <Button
+                        full
+                        disabled={!profilePicture}
+                        onClick={handleSubmit}
+                      >
                         <Typography variant="bodyRegular" light>
                           Confirm
                         </Typography>
