@@ -23,6 +23,7 @@ import {
   CalendarCheck,
   Layer,
   FileBlank,
+  Copy,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -188,6 +189,7 @@ export default function Icon({ ...props }) {
     calendarCheck: <CalendarCheck />,
     layer: <Layer />,
     fileBlank: <FileBlank />,
+    copy: <Copy />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

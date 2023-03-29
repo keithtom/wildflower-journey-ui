@@ -1,16 +1,21 @@
-import {
-  Modal,
-} from "@ui";
-import UserContactInfo from './UserContactInfo'
+import { Modal } from "@ui";
+import UserContactInfo from "./UserContactInfo";
 
-const UserContactModal = ({ user, open, toggle }) => {
+const UserContactModal = ({
+  firstName,
+  lastName,
+  phone,
+  email,
+  open,
+  toggle,
+}) => {
   return (
     <Modal
       open={open}
       toggle={toggle}
-      title={`Contact ${user.attributes.firstName} ${user.attributes.lastName}`}
+      title={`Contact ${firstName} ${lastName}`}
     >
-      <UserContactInfo user={user} />
+      <UserContactInfo email={email} phone={phone} />
     </Modal>
   );
 };
