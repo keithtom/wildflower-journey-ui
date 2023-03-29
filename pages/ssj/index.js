@@ -14,6 +14,7 @@ import { useUserContext } from "@lib/useUserContext";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
 import Hero from "../../components/Hero";
+import UserContactModal from "../../components/UserContactModal";
 
 import {
   Box,
@@ -91,11 +92,18 @@ const SSJ = ({
     });
   }, []);
 
-  const hasPartner = team?.hasPartner;
-
+  const partners =
+    team?.length > 1
+      ? team.team.filter((t) => t.data.id !== currentUser?.id)
+      : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
+  const opsGuide = currentUser?.attributes.ssj.opsGuide.data.attributes;
+  const regionalGrowthLead =
+    currentUser?.attributes.ssj.regionalGrowthLead.data.attributes;
+
   // console.log("team", team);
+  // console.log("partners", partners);
   // console.log({ data });
   // console.log({ dataProgress });
   // console.log({ milestonesWithSelfAssignedTasks });
@@ -144,10 +152,13 @@ const SSJ = ({
             >
               <Grid item>
                 <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar src={currentUser && currentUser.profileImage} />
+                  <Avatar
+                    src={currentUser && currentUser.attributes.imageUrl}
+                  />
                   <Stack>
                     <Typography variant="h4" bold>
-                      Welcome, {currentUser && currentUser.firstName}!
+                      Welcome, {currentUser && currentUser.attributes.firstName}
+                      !
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
                       School Startup Journey
@@ -315,24 +326,45 @@ const SSJ = ({
                 </Grid>
               </Grid>
               <Grid container spacing={3} alignItems="stretch">
-                {hasPartner ? null : (
-                  <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={4}>
+                  {partners && partners.length ? (
+                    partners.map((p) => (
+                      <UserCard
+                        key={p.data.id}
+                        firstName={p.data.attributes.firstName}
+                        lastName={p.data.attributes.lastName}
+                        email={p.data.attributes.email}
+                        phone={p.data.attributes.phone}
+                        role="Partner"
+                      />
+                    ))
+                  ) : (
                     <AddPartnerCard
                       submittedPartnerRequest={submittedPartnerRequest}
                       onClick={() => setAddPartnerModalOpen(true)}
                     />
-                  </Grid>
-                )}
-                {FakeStartupFamily.map((f, i) => (
-                  <Grid item xs={12} sm={4} key={i}>
-                    <UserCard
-                      firstName={f.attributes.firstName}
-                      lastName={f.attributes.lastName}
-                      role={f.roles[0]}
-                      profileImage={f.attributes.imageUrl}
-                    />
-                  </Grid>
-                ))}
+                  )}
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <UserCard
+                    firstName={opsGuide?.firstName}
+                    lastName={opsGuide?.lastName}
+                    email={opsGuide?.email}
+                    phone={opsGuide?.phone}
+                    profileImage={opsGuide?.imageUrl}
+                    role="Operations Guide"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <UserCard
+                    firstName={regionalGrowthLead?.firstName}
+                    lastName={regionalGrowthLead?.lastName}
+                    email={regionalGrowthLead?.email}
+                    phone={regionalGrowthLead?.phone}
+                    profileImage={regionalGrowthLead?.imageUrl}
+                    role="Regional Growth Lead"
+                  />
+                </Grid>
               </Grid>
             </Stack>
 
@@ -997,25 +1029,48 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     </Modal>
   );
 };
-const UserCard = ({ firstName, lastName, role, profileImage }) => {
+const UserCard = ({
+  firstName,
+  lastName,
+  email,
+  phone,
+  role,
+  profileImage,
+}) => {
+  const [contactModalOpen, setContactModalOpen] = useState(false);
   return (
-    <Card variant="lightened" size="small">
-      <Grid container spacing={3} alignItems="center">
-        <Grid item>
-          <Avatar src={profileImage} />
+    <>
+      <Card
+        variant="lightened"
+        size="small"
+        hoverable
+        onClick={() => setContactModalOpen(true)}
+      >
+        <Grid container spacing={3} alignItems="center">
+          <Grid item>
+            <Avatar src={profileImage} />
+          </Grid>
+          <Grid item>
+            <Stack>
+              <Typography variant="bodyRegular" bold>
+                {firstName} {lastName}
+              </Typography>
+              <Typography variant="bodySmall" lightened>
+                {role}
+              </Typography>
+            </Stack>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Stack>
-            <Typography variant="bodyRegular" bold>
-              {firstName} {lastName}
-            </Typography>
-            <Typography variant="bodySmall" lightened>
-              {role}
-            </Typography>
-          </Stack>
-        </Grid>
-      </Grid>
-    </Card>
+      </Card>
+      <UserContactModal
+        firstName={firstName}
+        lastName={lastName}
+        email={email}
+        phone={phone}
+        open={contactModalOpen}
+        toggle={() => setContactModalOpen(!contactModalOpen)}
+      />
+    </>
   );
 };
 const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
