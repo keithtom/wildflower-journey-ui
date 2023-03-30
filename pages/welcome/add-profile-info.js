@@ -8,6 +8,12 @@ import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+import { getCookie } from "cookies-next";
+import { FileChecksum } from "@lib/rails-filechecksum";
+import axios from "axios";
+import { useRouter } from "next/router";
+
+const token = getCookie("auth");
 
 import {
   Button,
@@ -27,6 +33,8 @@ import {
   Divider,
 } from "@ui";
 import Header from "@components/Header";
+import baseUrl from "@lib/utils/baseUrl";
+import { PinDropSharp } from "@mui/icons-material";
 
 const PageContent = styled(Box)`
   flex-grow: 1;
@@ -44,8 +52,22 @@ const StyledFilePond = styled(FilePond)`
 
 const AddProfileInfo = ({}) => {
   const [profilePicture, setProfilePicture] = useState();
+  const [profileImage, setProfileImage] = useState();
+  const router = useRouter();
 
-  // console.log({ profilePicture });
+  const handleSubmit = () => {
+    console.log('button clicked')
+    console.log({ profilePicture });
+    console.log({ profileImage });
+    axios.put(`${baseUrl}/v1/people/6994-b92e`, { person: { profile_image: profileImage }}) // TODO: put actual person id in here isntead of hard coding
+      .then(response => {
+        if (response.error) {
+          console.error(error)
+        } else {
+          router.push("/ssj");
+        }
+      });
+  };
 
   const isExistingTL = false;
 
@@ -103,6 +125,75 @@ const AddProfileInfo = ({}) => {
                       onupdatefiles={setProfilePicture}
                       stylePanelAspectRatio="1:1"
                       stylePanelLayout="circle"
+                      server={{
+                        process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                            FileChecksum.create(file, (checksum_error, checksum) => {
+                                if (checksum_error) { 
+                                    console.error(checksum_error);
+                                    error();
+                                };
+                                console.log("no checksum error")
+                                // this.source = axios.CancelToken(source());
+                                axios.post(`${baseUrl}/rails/active_storage/direct_uploads`, {
+                                      blob: {
+                                          filename: file.name,
+                                          content_type: file.type,
+                                          byte_size: file.size,
+                                          checksum: checksum
+                                      }
+                                })
+                                .then((response) => {
+                                  if (!response.data) {
+                                    return error;
+                                  }
+                                  const signed_id = response.data.signed_id;
+
+                                  console.log("going to PUT to this url: ", response.data.direct_upload.url);
+                                  axios.put(response.data.direct_upload.url, file, {
+                                    headers: response.data.direct_upload.headers,
+                                    onUploadProgress: (progressEvent) => {
+                                      progress(progressEvent.lengthComputable, progressEvent.loaded, progressEvent.total);
+                                    },
+                                  })
+                                  .then((response) => {
+                                    console.log("response from data url");
+                                    console.log(response);
+                                    setProfileImage(signed_id);
+                                    load(signed_id);
+                                  })
+                                  .catch((error) => {
+                                    if (!axios.isCancel(error)) {
+                                      console.error(error);
+                                      // error();
+                                    }
+                                  })
+                                  console.log(response);
+                                })
+                                .catch((error) => {
+                                  console.log(error);
+                                })
+                              })
+                              return {
+                                abort: () => {
+                                    // This function is entered if the user has tapped the cancel button
+                                    request.abort();
+                
+                                    // Let FilePond know the request has been cancelled
+                                    abort();
+                                },
+                            };
+                          },
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                        ondata: (formData) => {
+                          formData.append('blob', value);
+                          return formData;
+                        },
+                        onload: () => {
+                          props.onUploadComplete();
+                        },
+                      }}
                       credits={false}
                       labelIdle='Drag & Drop your profile picture or <span class="filepond--label-action">Browse</span>'
                     />
@@ -111,30 +202,33 @@ const AddProfileInfo = ({}) => {
                 <Divider />
                 <Grid container spacing={3} justifyContent="space-between">
                   <Grid item xs={6}>
-                    <Link href="/welcome/confirm-demographic-info">
-                      <Button full variant="secondary">
+                  <Button
+                        full
+                        variant="secondary"
+                        disabled={!profilePicture}
+                        onClick={handleSubmit}
+                      >
                         <Typography variant="bodyRegular">Back</Typography>
-                      </Button>
-                    </Link>
+                    </Button>
                   </Grid>
                   <Grid item xs={6}>
                     {/* TODO: Change the destination depending on existing vs new TL */}
-                    <Link href="/ssj">
-                      <Button full disabled={!profilePicture}>
-                        <Typography variant="bodyRegular" light>
-                          Confirm
-                        </Typography>
-                      </Button>
-                    </Link>
+                    <Button 
+                      full 
+                      disabled={!profilePicture}
+                      onClick={handleSubmit}
+                    >
+                      <Typography variant="bodyRegular" light>
+                        Confirm
+                      </Typography>
+                    </Button>
                   </Grid>
                   <Grid item xs={12}>
-                    <Link href="/ssj">
-                      <Button full variant="text">
-                        <Typography variant="bodyRegular" highlight>
-                          Skip for now
-                        </Typography>
-                      </Button>
-                    </Link>
+                    <Button full variant="text" onClick={handleSubmit} >
+                      <Typography variant="bodyRegular" highlight>
+                        Skip for now
+                      </Typography>
+                    </Button>
                   </Grid>
                 </Grid>
               </Stack>
