@@ -48,6 +48,9 @@ const Login = ({}) => {
           maxAge: 60 * 60 * 24,
         });
         const user = response.data.data.attributes;
+        setCookie("workflowId", user.ssj.workflowId, {
+          maxAge: 60 * 60 * 24,
+        });
         setCurrentUser({
           firstName: user.firstName,
           lastName: user.lastName,

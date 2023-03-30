@@ -14,6 +14,7 @@ import Hero from "../../components/Hero";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
+import { getCookie } from 'cookies-next';
 
 const ToDoList = ({
   includedDocuments,
@@ -146,7 +147,7 @@ const ToDoList = ({
 export default ToDoList;
 
 export async function getServerSideProps({ req, res }) {
-  const workflowId = "c502-4f84";
+  const workflowId = getCookie('workflowId', { req, res });
   const phase = "visioning";
 
   const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
