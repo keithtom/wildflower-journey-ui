@@ -21,17 +21,17 @@ const api = axios.create({
 // show
 // update
 
-async function token(token, redirectUrl){
-  const tokenApi = await api.post(`/token`, {
+async function tokenAuth(token, redirectUrl){
+  const response = await api.post(`/token`, {
     token: token,
   });
-  const response = await tokenApi;
-  
+  console.log("status", response.status)
   setCookie("auth", response.headers["authorization"], {
     maxAge: 60 * 60 * 24,
   });
+  
   return response;
 
 };
 
-export default { token };
+export default { tokenAuth };
