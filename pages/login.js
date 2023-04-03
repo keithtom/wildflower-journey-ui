@@ -48,6 +48,7 @@ const Login = ({}) => {
           maxAge: 60 * 60 * 24,
         });
         const user = response.data.data.attributes;
+        const personId = response.data.data.relationships.person.data.id;
         setCookie("workflowId", user.ssj.workflowId, {
           maxAge: 60 * 60 * 24,
         });
@@ -56,6 +57,7 @@ const Login = ({}) => {
           lastName: user.lastName,
           email: user.email,
           profileImage: user.imageUrl,
+          id: personId,
         });
         Router.push("/ssj");
       })

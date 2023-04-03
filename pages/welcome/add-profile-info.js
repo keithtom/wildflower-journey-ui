@@ -10,8 +10,10 @@ import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
-import axios from "axios";
 import { useRouter } from "next/router";
+import axios from "axios";
+import { useUserContext } from "@lib/useUserContext";
+import peopleApi from "../../api/people";
 
 const token = getCookie("auth");
 
@@ -54,19 +56,19 @@ const AddProfileInfo = ({}) => {
   const [profilePicture, setProfilePicture] = useState();
   const [profileImage, setProfileImage] = useState();
   const router = useRouter();
+  const { currentUser } = useUserContext();
 
   const handleSubmit = () => {
-    console.log('button clicked')
-    console.log({ profilePicture });
-    console.log({ profileImage });
-    axios.put(`${baseUrl}/v1/people/6994-b92e`, { person: { profile_image: profileImage }}) // TODO: put actual person id in here isntead of hard coding
-      .then(response => {
-        if (response.error) {
-          console.error(error)
-        } else {
-          router.push("/ssj");
-        }
-      });
+    peopleApi.update(currentUser.id, { person: { 
+      profile_image: profileImage,  
+    }})
+    .then(response => {
+      if (response.error) {
+        console.error(error)
+      } else {
+        router.push("/ssj");
+      }
+    })
   };
 
   const isExistingTL = false;
@@ -127,13 +129,12 @@ const AddProfileInfo = ({}) => {
                       stylePanelLayout="circle"
                       server={{
                         process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                            // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
                             FileChecksum.create(file, (checksum_error, checksum) => {
                                 if (checksum_error) { 
                                     console.error(checksum_error);
                                     error();
                                 };
-                                console.log("no checksum error")
-                                // this.source = axios.CancelToken(source());
                                 axios.post(`${baseUrl}/rails/active_storage/direct_uploads`, {
                                       blob: {
                                           filename: file.name,
@@ -148,7 +149,6 @@ const AddProfileInfo = ({}) => {
                                   }
                                   const signed_id = response.data.signed_id;
 
-                                  console.log("going to PUT to this url: ", response.data.direct_upload.url);
                                   axios.put(response.data.direct_upload.url, file, {
                                     headers: response.data.direct_upload.headers,
                                     onUploadProgress: (progressEvent) => {
@@ -156,8 +156,6 @@ const AddProfileInfo = ({}) => {
                                     },
                                   })
                                   .then((response) => {
-                                    console.log("response from data url");
-                                    console.log(response);
                                     setProfileImage(signed_id);
                                     load(signed_id);
                                   })
@@ -167,7 +165,6 @@ const AddProfileInfo = ({}) => {
                                       // error();
                                     }
                                   })
-                                  console.log(response);
                                 })
                                 .catch((error) => {
                                   console.log(error);

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/router";
+import { useUserContext } from "@lib/useUserContext";
+import peopleApi from "../../api/people";
 
 import {
   Button,
@@ -26,6 +28,7 @@ const PageContent = styled(Box)`
 const ConfirmYourDetails = ({}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const router = useRouter();
+  const { currentUser } = useUserContext();
 
   const {
     control,
@@ -42,9 +45,22 @@ const ConfirmYourDetails = ({}) => {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
-    // TODO: submit person information
-    router.push("/welcome/confirm-demographic-info");
+    peopleApi.update(currentUser.id, { person: { 
+      first_name: data.firstName,  
+      last_name: data.lastName,
+      email: data.email,
+      address_attributes: {
+        city: data.city,
+        state: data.state,
+      }
+    }})
+    .then(response => {
+      if (response.error) {
+        console.error(error)
+      } else {
+        router.push("/welcome/confirm-demographic-info");
+      }
+    });
   }
 
   const isExistingTL = false;
