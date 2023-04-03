@@ -56,7 +56,7 @@ const Login = ({}) => {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          profileImage: user.imageUrl,
+          profileImage: `${baseUrl}/${user.imageUrl}`,
           id: personId,
         });
         Router.push("/ssj");

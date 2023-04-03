@@ -28,7 +28,7 @@ const PageContent = styled(Box)`
 const ConfirmYourDetails = ({}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const router = useRouter();
-  const { currentUser } = useUserContext();
+  const { currentUser, setCurrentUser } = useUserContext();
 
   const {
     control,
@@ -58,6 +58,8 @@ const ConfirmYourDetails = ({}) => {
       if (response.error) {
         console.error(error)
       } else {
+        const user = response.data.attributes;
+        setCurrentUser({firstName: user.firstName, lastName: user.lastName, email: user.email})
         router.push("/welcome/confirm-demographic-info");
       }
     });

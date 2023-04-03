@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
+import baseUrl from "@lib/utils/baseUrl";
 
 const token = getCookie("auth");
 
@@ -35,7 +36,6 @@ import {
   Divider,
 } from "@ui";
 import Header from "@components/Header";
-import baseUrl from "@lib/utils/baseUrl";
 import { PinDropSharp } from "@mui/icons-material";
 
 const PageContent = styled(Box)`
@@ -66,7 +66,14 @@ const AddProfileInfo = ({}) => {
       if (response.error) {
         console.error(error)
       } else {
-        setCurrentUser({profileImage: response.data.attributes.imageUrl})
+        const person = response.data.attributes;
+        setCurrentUser({
+          firstName: person.firstName, 
+          lastName: person.lastName, 
+          email: person.email, 
+          profileImage: `${baseUrl}/${person.imageUrl}`,
+          id: response.data.id,
+        })
         router.push("/ssj");
       }
     })
@@ -174,7 +181,7 @@ const AddProfileInfo = ({}) => {
                               return {
                                 abort: () => {
                                     // This function is entered if the user has tapped the cancel button
-                                    request.abort();
+                                    // request.abort(); TODO: is there an active storage abort?
                 
                                     // Let FilePond know the request has been cancelled
                                     abort();
