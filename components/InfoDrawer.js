@@ -62,7 +62,9 @@ const InfoDrawer = ({
   effort,
   actions,
   isDecision,
-  isComplete,
+  isComplete, // TODO: remove this,  look though assignees; completers = assignees.filter(assignee => assignee.completed_at !== null); [id, person: {firstName}]; 
+  // individual task = same as current user, isComplete = assignees.find(assignee => assignee.id === currentUser.id).completed_at !== null
+  // collaborative task = show me who completed it, isComplete = !canComplete
   completedBy,
   includedDocuments,
   worktime,
