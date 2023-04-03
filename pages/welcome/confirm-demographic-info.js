@@ -49,7 +49,6 @@ const ConfirmDemographicInfo = ({}) => {
     },
   });
   const onSubmit = (data) => {
-    console.log(data);
     peopleApi.update(currentUser.id, { person: { 
       primary_language: data.language,  
       ethnicity: data.ethnicity,

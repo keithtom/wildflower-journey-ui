@@ -56,7 +56,7 @@ const AddProfileInfo = ({}) => {
   const [profilePicture, setProfilePicture] = useState();
   const [profileImage, setProfileImage] = useState();
   const router = useRouter();
-  const { currentUser } = useUserContext();
+  const { currentUser, setCurrentUser } = useUserContext();
 
   const handleSubmit = () => {
     peopleApi.update(currentUser.id, { person: { 
@@ -66,6 +66,7 @@ const AddProfileInfo = ({}) => {
       if (response.error) {
         console.error(error)
       } else {
+        setCurrentUser({profileImage: response.data.attributes.imageUrl})
         router.push("/ssj");
       }
     })
