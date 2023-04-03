@@ -47,6 +47,7 @@ const StyledTask = styled(Box)`
   }
 `;
 
+// TODO: pass in task and assignee
 const Task = ({
   taskId,
   title,
@@ -72,6 +73,7 @@ const Task = ({
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
   const [assignee, setAssignee] = useState(taskAssignee);
+  const [assignees, setAssignees] = useState(taskAssignees | []);
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
@@ -112,6 +114,8 @@ const Task = ({
   async function handleAssignSelf() {
     try {
       const response = await stepsApi.assign(taskId, currentUser.id);
+      // TODO: this api should return an array of assignees
+      // setAssignees(response.data); <--- an array of assignees
       setAssignee(response.data.attributes.assigneeInfo);
     } catch (err) {
       console.error(err);
@@ -121,6 +125,8 @@ const Task = ({
   async function handleUnassignSelf() {
     try {
       const response = await stepsApi.unassign(taskId);
+      // TODO: this api should return an array of assignees
+      // setAssignees(response.data); <--- an array of assignees
       setAssignee(null);
       setInfoDrawerOpen(false);
       if (removeStep) {
@@ -201,7 +207,7 @@ const Task = ({
           <Grid item>
             <Stack direction="row" spacing={3} alignItems="center">
               {processName && <Chip label={processName} size="small" />}
-
+              {/* // TODO: switch to mapping over assignees */}
               <Avatar size="mini" src={assignee && assignee.imageUrl} />
             </Stack>
           </Grid>
@@ -211,6 +217,7 @@ const Task = ({
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
         assignee={assignee}
+        // assignees={assignees}
         about={description}
         taskId={taskId}
         title={title}
@@ -224,6 +231,7 @@ const Task = ({
         actions={
           isDecision ? (
             <DecisionDrawerActions
+              // assignees={assignees}
               assignee={assignee}
               isDecided={isDecided}
               handleAssignSelf={handleAssignSelf}
@@ -232,6 +240,7 @@ const Task = ({
             />
           ) : (
             <TaskDrawerActions
+              // assignees={assignees}
               assignee={assignee}
               isComplete={taskIsComplete}
               completedBy={completedBy}
@@ -248,14 +257,14 @@ const Task = ({
         onClose={() => setAssignToastOpen(false)}
         isAssignToast={true}
         title={title}
-        assignee={assignee}
+        assignee={assignee} // swittch to current user
       />
       <TaskToast
         open={unassignToastOpen}
         onClose={() => setUnassignToastOpen(false)}
         isAssignToast={false}
         title={title}
-        assignee={assignee}
+        assignee={assignee} // swittch to current user
       />
     </>
   );
@@ -285,7 +294,7 @@ const DecisionDrawerActions = ({
   `;
   return (
     <Stack spacing={4}>
-      {assignee ? (
+      {assignee ? ( // Can we assign this to ourselves?  Only cares if we are currently assigned.  assignees.filter(e => e.id === currentUser.id).length === 0
         <Grid container>
           <StyledDecisionCard
             variant={isDecided ? "outlined" : "primaryOutlined"}
@@ -309,7 +318,7 @@ const DecisionDrawerActions = ({
       ) : null}
 
       <Grid container spacing={6}>
-        {assignee ? (
+        {assignee ? ( // Can we assign this to ourselves?  Only cares if we are currently assigned.  assignees.filter(e => e.id === currentUser.id).length === 0
           isDecided ? (
             <Grid item xs={12}>
               <Card variant="lightened">
@@ -390,7 +399,7 @@ const TaskDrawerActions = ({
 }) => {
   return (
     <Grid container spacing={4}>
-      {assignee ? (
+      {assignee ? ( // Can we assign this to ourselves?  Only cares if we are currently assigned.  assignees.filter(e => e.id === currentUser.id).length === 0
         isComplete ? (
           <>
             <Grid item xs={12}>
@@ -468,7 +477,8 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
               {title}
             </Typography>
             <Stack direction="row" spacing={3} alignItems="center">
-              <Avatar size="mini" src={assignee && assignee.imageUrl} />
+              {/* // TODO: becomes current user */}
+              <Avatar size="mini" src={assignee && assignee.imageUrl} /> 
               <Stack direction="row" spacing={1}>
                 <Typography variant="bodySmall">You</Typography>
                 <Typography variant="bodySmall" lightened>
