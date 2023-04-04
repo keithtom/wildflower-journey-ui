@@ -3,6 +3,7 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, FormGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
+import registrationsApi from "../../api/registrations"
 
 import {
   Button,
@@ -19,6 +20,7 @@ import {
   Checkbox,
 } from "@ui";
 import Header from "@components/Header";
+import { Router } from "@mui/icons-material";
 
 const PageContent = styled(Box)`
   flex-grow: 1;
@@ -40,9 +42,15 @@ const CreatePassword = ({}) => {
   });
   const password = useRef({});
   password.current = watch("password", "");
+
   const onSubmit = (data) => {
-    router.push("/welcome/confirm-your-details");
-    console.log(data);
+    registrationsApi.setPassword(data.password, data.confirmPassword)
+      .then(response => {
+        router.push("/welcome/confirm-your-details");
+      })
+      .catch((error) => {
+        console.error(error.message);
+      })
   };
 
   return (
