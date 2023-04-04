@@ -75,8 +75,8 @@ const Header = ({ toggleNavOpen }) => {
         {isLoggedIn ? (
           <Grid item>
             <AvatarMenu
-              avatarSrc={currentUser.profileImage}
-              userName={`${currentUser.firstName} ${currentUser.lastName}`}
+              avatarSrc={currentUser.attributes.imageUrl}
+              userName={`${currentUser.attributes.firstName} ${currentUser.attributes.lastName}`}
             />
           </Grid>
         ) : null}
