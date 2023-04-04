@@ -7,7 +7,8 @@ import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileValidateSize);
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
 import { useRouter } from "next/router";
@@ -132,6 +133,7 @@ const AddProfileInfo = ({}) => {
                       files={profilePicture}
                       allowReorder={false}
                       allowMultiple={false}
+                      maxFileSize="750KB"
                       onupdatefiles={setProfilePicture}
                       stylePanelAspectRatio="1:1"
                       stylePanelLayout="circle"
