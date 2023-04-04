@@ -5,20 +5,17 @@ import Router from "next/router";
 
 const Token = ({query}) => {
   const { currentUser, setCurrentUser } = useUserContext();
-  const { token, redirectUrl } = query;
+  const { token, redirect } = query;
   
   useEffect(() => {
     // Example link: https://platform.wildflowerschools.org/token?token=&redirect=https%3A%2F%2Fplatform.wildflowerschools.org%2Fwelcome%2Fexisting-tl    
-    usersApi.tokenAuth(token, redirectUrl).then((response) => {
-      console.log(response)
+    usersApi.tokenAuth(token, redirect).then((response) => {
       const user = response.data.data;
-      console.log("user", user)
       setCurrentUser({firstName: user.firstName, lastName: user.lastName, email: user.email, profileImage: user.imageUrl});
-      Router.push(redirectUrl);  
-      alert("success");
+      Router.push(redirect);  
     }).catch((error) => {
       // if tokenAuth fails then
-      // Router.push("/login");
+      Router.push("/login");
       alert(error.message)
     });
     

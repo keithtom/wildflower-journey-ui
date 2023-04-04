@@ -21,15 +21,16 @@ const api = axios.create({
 // show
 // update
 
-async function tokenAuth(token, redirectUrl){
-  const response = await api.post(`/login?auth_token=${token}`, {
-    token: token,
+async function setPassword(password, passwordConfirmation){
+  const response = await api.put("/signup", {
+    user: {
+        password: password,
+        password_confirmation: passwordConfirmation,
+    }
   });
-  setCookie("auth", response.headers["authorization"], {
-    maxAge: 60 * 60 * 24,
-  });
+  console.log(response);
   
   return response;
 };
 
-export default { tokenAuth };
+export default { setPassword };
