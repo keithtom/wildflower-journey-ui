@@ -30,7 +30,6 @@ const Token = ({query}) => {
 export default Token;
 
 export async function getServerSideProps({ query }) {
-  console.log(query);
   return {
     props: {
       query,

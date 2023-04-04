@@ -28,7 +28,6 @@ async function setPassword(password, passwordConfirmation){
         password_confirmation: passwordConfirmation,
     }
   });
-  console.log(response);
   
   return response;
 };

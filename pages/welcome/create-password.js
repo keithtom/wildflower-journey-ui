@@ -47,7 +47,6 @@ const CreatePassword = ({}) => {
     registrationsApi.setPassword(data.password, data.confirmPassword)
       .then(response => {
         router.push("/welcome/confirm-your-details");
-        console.log(response);
       })
       .catch((error) => {
         console.error(error.message);
