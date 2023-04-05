@@ -67,14 +67,9 @@ const AddProfileInfo = ({}) => {
       if (response.error) {
         console.error(error)
       } else {
-        const person = response.data.attributes;
-        setCurrentUser({
-          firstName: person.firstName, 
-          lastName: person.lastName, 
-          email: person.email, 
-          profileImage: `${baseUrl}/${person.imageUrl}`,
-          id: response.data.id,
-        })
+        const personAttributes = response.data.attributes;
+        currentUser.attributes.imageUrl = `${baseUrl}${personAttributes.imageUrl}`;
+        setCurrentUser(currentUser);
         router.push("/ssj");
       }
     })

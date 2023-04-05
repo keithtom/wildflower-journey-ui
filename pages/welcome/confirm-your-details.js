@@ -58,8 +58,11 @@ const ConfirmYourDetails = ({}) => {
       if (response.error) {
         console.error(error)
       } else {
-        const user = response.data.attributes;
-        setCurrentUser({firstName: user.firstName, lastName: user.lastName, email: user.email})
+        const person = response.data.attributes;
+        currentUser.attributes.firstName = person.firstName
+        currentUser.attributes.lastName = person.lastName
+        currentUser.attributes.email = person.email
+        setCurrentUser(currentUser)
         router.push("/welcome/confirm-demographic-info");
       }
     });
