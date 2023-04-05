@@ -74,6 +74,7 @@ const Task = ({
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
+  const [decisionOption, setDecisionOption] = useState();
   const { currentUser } = useUserContext();
 
   async function handleCompleteTask() {
@@ -128,12 +129,17 @@ const Task = ({
     }
     setUnassignToastOpen(true);
   }
-  const handleMakeDecision = () => {
-    //TODO: Api call to set decision
-    setIsDecided(true);
+  async function handleMakeDecision() {
+    console.log(decisionOption);
+    // try {
+    //   const response = await stepsApi.decide(taskId, decisionOption);
+    //   // console.log(response)
+    //   // if (response has a decided option to be set successfully, then)
+    //   setIsDecided(true);
+    // } catch (err) {
+    //   console.error(err);
+    // }
   };
-
-  // console.log(taskId);
 
   return (
     <>
@@ -225,6 +231,9 @@ const Task = ({
               handleAssignSelf={handleAssignSelf}
               handleUnassignSelf={handleUnassignSelf}
               handleMakeDecision={handleMakeDecision}
+              decisionOptions={decisionOptions}
+              decisionOption={decisionOption}
+              setDecisionOption={setDecisionOption}
             />
           ) : (
             <TaskDrawerActions
@@ -264,8 +273,10 @@ const DecisionDrawerActions = ({
   handleAssignSelf,
   handleUnassignSelf,
   handleMakeDecision,
+  decisionOptions,
+  decisionOption,
+  setDecisionOption,
 }) => {
-  const [decisionOption, setDecisionOption] = useState();
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };
@@ -288,12 +299,12 @@ const DecisionDrawerActions = ({
           >
             <Stack spacing={6}>
               <RadioGroup value={decisionOption} handleOptionsChange>
-                {FakeDecisionOptions.map((o, i) => (
+                {decisionOptions.map((o, i) => (
                   <FormControlLabel
                     key={i}
-                    value={o.value}
+                    value={o.data?.id}
                     control={<Radio disabled={isDecided} />}
-                    label={o.label}
+                    label={o.data?.attributes?.description}
                     onChange={handleDecisionOptionChange}
                   />
                 ))}
@@ -462,14 +473,3 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
     </Snackbar>
   );
 };
-
-const FakeDecisionOptions = [
-  {
-    value: "wildflower group exemption",
-    label: "I will apply with the Wildflower Group Exemption",
-  },
-  {
-    value: "independently with irs",
-    label: "I will apply independently using Form 1023 with the IRS",
-  },
-];

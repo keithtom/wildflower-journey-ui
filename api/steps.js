@@ -34,4 +34,9 @@ async function unassign(taskId) {
   // TODO: do something w/ the response if it's not 200
 }
 
+async function decide(taskId, decisionId) {
+  const response = await api.put(`/steps/${taskId}/decide/${decisionId}`)
+  const data = await response.data;
+  return data;
+}
 export default { assign, unassign };
