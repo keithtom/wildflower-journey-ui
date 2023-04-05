@@ -129,6 +129,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
       .then((res) => {
         // TODO: update logged out state
         deleteCookie("auth", {});
+        deleteCookie("workflowId", {});
         delete axios.defaults.headers.common["Authorization"];
 
         setCurrentUser(null);

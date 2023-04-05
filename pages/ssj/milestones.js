@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getCookie } from 'cookies-next';
 
 import {
   PageContainer,
@@ -150,8 +151,7 @@ export async function getServerSideProps({ req, res }) {
   // const userId = query.userId;
   // const ssjId = query.ssjId;
 
-  // const workflowId = "5947-ab7f"
-  const workflowId = "c502-4f84";
+  const workflowId = getCookie('workflowId', { req, res });
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);

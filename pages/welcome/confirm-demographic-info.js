@@ -3,6 +3,8 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { useRouter } from "next/router";
+import { useUserContext } from "@lib/useUserContext";
+import peopleApi from "../../api/people";
 
 import {
   Button,
@@ -30,6 +32,7 @@ const PageContent = styled(Box)`
 const ConfirmDemographicInfo = ({}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const router = useRouter();
+  const { currentUser } = useUserContext();
 
   const {
     control,
@@ -46,8 +49,21 @@ const ConfirmDemographicInfo = ({}) => {
     },
   });
   const onSubmit = (data) => {
-    router.push("/welcome/add-profile-info");
-    console.log(data);
+    peopleApi.update(currentUser.id, { person: { 
+      primary_language: data.language,  
+      ethnicity: data.ethnicity,
+      lgbtqia: data.lgbtqia,
+      genderIdentity: data.genderIdentity,
+      pronouns: data.pronouns,
+      householdIncome: data.householdIncome,
+    }})
+    .then(response => {
+      if (response.error) {
+        console.error(error)
+      } else {
+        router.push("/welcome/add-profile-info");
+      }
+    });
   };
 
   const lgbtqiaOptions = [

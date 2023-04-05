@@ -47,12 +47,16 @@ const Login = ({}) => {
         setCookie("auth", response.headers["authorization"], {
           maxAge: 60 * 60 * 24,
         });
-        const user = response.data.data.attributes;
+        const userAttributes = response.data.data.attributes;
+        userAttributes.imageUrl = `${baseUrl}${userAttributes.imageUrl}`
+        const personId = response.data.data.relationships.person.data.id;
+        setCookie("workflowId", user.ssj.workflowId, {
+          maxAge: 60 * 60 * 24,
+        });
         setCurrentUser({
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          profileImage: user.imageUrl,
+          id: personId,
+          type: response.data.data.type,
+          attributes: userAttributes,
         });
         Router.push("/ssj");
       })
