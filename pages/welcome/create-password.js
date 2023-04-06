@@ -122,7 +122,14 @@ const CreatePassword = ({}) => {
                         <FormControlLabel
                           value={value}
                           control={<Checkbox error={errors.agreeTOS} />}
-                          label="I agree to the Terms of Service"
+                          label={
+                            <Typography>
+                              I agree to the{" "}
+                              <Link href="/terms" target="_blank">
+                                Terms of Service
+                              </Link>
+                            </Typography>
+                          }
                           onChange={onChange}
                         />
                         <FormHelperText error={errors.agreeTOS}>
