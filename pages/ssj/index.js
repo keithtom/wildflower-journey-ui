@@ -7,7 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
-import { getCookie } from 'cookies-next';
+import { getCookie } from "cookies-next";
 
 import ssjApi from "../../api/ssj";
 import { categories } from "../../lib/utils/fake-data";
@@ -38,15 +38,7 @@ import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
 import { ListItemSecondaryAction } from "@mui/material";
 
-const SSJ = ({
-  phase,
-  dataProgress,
-  data,
-  milestonesToDo,
-  milestonesWithSelfAssignedTasks,
-  includedDocuments,
-  totalSteps,
-}) => {
+const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
@@ -57,7 +49,6 @@ const SSJ = ({
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
-  const hasAssignedTasks = milestonesWithSelfAssignedTasks.length;
 
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
@@ -103,17 +94,14 @@ const SSJ = ({
   const regionalGrowthLead =
     currentUser?.attributes.ssj.regionalGrowthLead.data.attributes;
 
+  // console.log({ currentUser });
   // console.log("team", team);
   // console.log("partners", partners);
-  // console.log({ data });
   // console.log({ dataProgress });
-  // console.log({ milestonesWithSelfAssignedTasks });
-  // console.log({ currentUser });
-  // console.log(totalSteps);
 
   return (
     <>
-      <PageContainer>
+      <PageContainer isLoading={!currentUser}>
         {ssjIsPaused ? (
           <Grid container alignItems="center" justifyContent="center">
             <Grid item xs={12} xs={12} sm={6} md={5} lg={4}>
@@ -217,7 +205,7 @@ const SSJ = ({
               </Grid>
             </Grid>
 
-            {hasAssignedTasks ? (
+            {dataAssignedSteps.length ? (
               <Card variant="primaryLightened">
                 <Grid container alignItems="center">
                   <Grid item flex={1}>
@@ -226,7 +214,8 @@ const SSJ = ({
                         You have{" "}
                       </Typography>
                       <Typography variant="h3" highlight bold>
-                        {totalSteps} tasks
+                        {dataAssignedSteps.length} task
+                        {dataAssignedSteps.length > 1 ? `s` : null}
                       </Typography>{" "}
                       <Typography variant="h3" bold>
                         on your to do list
@@ -1132,114 +1121,6 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
   );
 };
 
-const AssignedTaskByMilestone = ({
-  tasksByMilestone,
-  phase,
-  includedDocuments,
-}) => {
-  const [expandedTasks, setExpandedTasks] = useState(false);
-  const m = tasksByMilestone;
-
-  return (
-    <>
-      <Milestone
-        variant="small"
-        link={`/ssj/${phase}/${m.id}`}
-        title={m.attributes.title}
-        effort={m.attributes.effort}
-        categories={m.attributes.categories}
-        description={m.attributes.description}
-        status={m.attributes.status}
-        stepCount={m.attributes.stepsCount}
-      />
-      {m.relationships.steps.data
-        .slice(0, !expandedTasks ? 1 : 100)
-        .map((t, i) => (
-          <Task
-            variant="small"
-            taskId={t.id}
-            link={`/ssj/${phase}/${m.id}/${t.id}`}
-            title={t.attributes.title}
-            key={i}
-            isDecision={t.attributes.kind === "Decision"}
-            decisionOptions={t.attributes.decisionOptions}
-            isComplete={t.attributes.completed}
-            isNext={i === 0}
-            // handleCompleteMilestone={handleCompleteMilestone}
-            resources={t.relationships.documents.data}
-            includedDocuments={includedDocuments}
-            categories={m.attributes.categories}
-            description={t.attributes.description}
-            worktime={
-              (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
-            }
-            taskAssignee={t.attributes.assigneeInfo}
-            clearFromListWhenComplete={true}
-          />
-        ))}
-      {m.relationships.steps.data.length > 1 && (
-        <Card
-          noBorder
-          size="small"
-          onClick={() => setExpandedTasks(!expandedTasks)}
-          hoverable
-        >
-          <Grid container justifyContent="center">
-            <Grid item>
-              <Typography variant="bodySmall" bold highlight>
-                Show {m.relationships.steps.data.length - 1}{" "}
-                {expandedTasks ? "less" : "more"}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Card>
-      )}
-    </>
-  );
-};
-
-const FakePartners = [
-  {
-    id: "2601-8f69",
-    type: "person",
-    roles: ["Teacher Leader"],
-    attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Jaimee",
-      lastName: "Gleichner",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/men/60.jpg",
-    },
-  },
-];
-
-const FakeStartupFamily = [
-  {
-    id: "2601-8f69",
-    type: "person",
-    roles: ["Operations Guide"],
-    attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Brett",
-      lastName: "Vincent",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/men/60.jpg",
-    },
-  },
-  {
-    id: "2601-8f69",
-    type: "person",
-    roles: ["Operations Guide"],
-    attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Mary",
-      lastName: "Truman",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/women/89.jpg",
-    },
-  },
-];
-
 const FakeETLs = [
   {
     id: "2601-8f69",
@@ -1378,39 +1259,14 @@ const waysToWorkTogether = [
     ],
   },
 ];
-export async function getServerSideProps({ params, req, res }) {
-  // const userId = query.userId;
-  // const ssjId = query.ssjId;
-
-  const phase = "visioning";
-  const workflowId = getCookie('workflowId', { req, res });
-  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&self_assigned=true`;
+export async function getServerSideProps({ req, res }) {
+  const workflowId = getCookie("workflowId", { req, res });
+  const phase = getCookie("phase", { req, res });
   setAuthHeader({ req, res });
-  const response = await axios.get(apiRoute);
-  const data = await response.data;
-  const steps = {};
-  var totalSteps = 0;
-  data.included.forEach((included) => {
-    if (included.type == "step") {
-      steps[included.id] = included;
-      totalSteps++;
-    }
-  });
 
-  const includedDocuments = {};
-  data.included
-    .filter((i) => i.type === "document")
-    .forEach((i) => {
-      includedDocuments[i.id] = i;
-    });
-
-  data.data.forEach((milestone) => {
-    milestone.relationships.steps.data.forEach((includedStep, i) => {
-      milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
-    });
-  });
-
-  const milestonesWithSelfAssignedTasks = data.data;
+  const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
+  const dataAssignedSteps = await responseAssignedSteps.data;
 
   const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   const responseMilestones = await axios.get(apiRouteMilestones);
@@ -1429,12 +1285,9 @@ export async function getServerSideProps({ params, req, res }) {
   return {
     props: {
       milestonesToDo,
-      includedDocuments,
       dataProgress,
-      data,
       phase,
-      milestonesWithSelfAssignedTasks,
-      totalSteps,
+      dataAssignedSteps,
     },
   };
 }

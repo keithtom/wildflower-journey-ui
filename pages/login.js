@@ -48,9 +48,12 @@ const Login = ({}) => {
           maxAge: 60 * 60 * 24,
         });
         const userAttributes = response.data.data.attributes;
-        userAttributes.imageUrl = `${baseUrl}${userAttributes.imageUrl}`
+        userAttributes.imageUrl = `${baseUrl}${userAttributes.imageUrl}`;
         const personId = response.data.data.relationships.person.data.id;
-        setCookie("workflowId", user.ssj.workflowId, {
+        setCookie("workflowId", userAttributes.ssj.workflowId, {
+          maxAge: 60 * 60 * 24,
+        });
+        setCookie("phase", userAttributes.ssj.currentPhase, {
           maxAge: 60 * 60 * 24,
         });
         setCurrentUser({
@@ -62,8 +65,8 @@ const Login = ({}) => {
       })
       .catch(function (error) {
         // handle error
-        console.log(error.response.data); // error message
         console.log(error);
+        console.log(error.response.data); // error message
       });
   };
 

@@ -5,7 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "../../../lib/utils/baseUrl";
-import { getCookie } from 'cookies-next';
+import { getCookie } from "cookies-next";
 
 import {
   PageContainer,
@@ -27,7 +27,6 @@ import Milestone from "../../../components/Milestone";
 import Hero from "../../../components/Hero";
 
 const PhasePage = ({
-  data,
   milestonesInProgress,
   milestonesToDo,
   milestonesUpNext,
@@ -441,11 +440,8 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
 };
 
 export async function getServerSideProps({ params, req, res }) {
-  // const userId = query.userId;
-  // const ssjId = query.ssjId;
-
   const { phase } = params;
-  const workflowId = getCookie('workflowId', { req, res });
+  const workflowId = getCookie("workflowId", { req, res });
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
 
@@ -475,7 +471,6 @@ export async function getServerSideProps({ params, req, res }) {
 
   return {
     props: {
-      data,
       currentPhaseMilestones,
       milestonesInProgress,
       milestonesToDo,
