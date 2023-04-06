@@ -47,10 +47,9 @@ const StyledMessage = styled(Card)`
 `;
 
 const NewETL = ({}) => {
-  const user = false;
   return (
     <>
-      <Header user={user} />
+      <Header />
       <PageContent>
         <Grid container alignItems="center" justifyContent="center">
           <Grid item xs={12} sm={6} md={4} lg={3}>

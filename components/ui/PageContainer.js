@@ -19,7 +19,7 @@ const PageContent = styled(Box)`
   padding: ${({ theme }) => theme.util.buffer * 6}px;
 `;
 
-const PageContainer = ({ children, isLoading }) => {
+const PageContainer = ({ children, isLoading, hideNav }) => {
   //TODO: Get this data from the backend
   const SSJAbandonProcessStarted = false;
 
@@ -61,7 +61,9 @@ const PageContainer = ({ children, isLoading }) => {
         ) : (
           <>
             <Header toggleNavOpen={toggleNavOpen} user={user} />
-            <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
+            {hideNav ? null : (
+              <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
+            )}
             <PageContent>
               {isLoading ? (
                 <Box
