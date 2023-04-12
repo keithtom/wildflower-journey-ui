@@ -169,9 +169,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
             Signed in as {userName}
           </Typography>
         </StyledOption>
-        <NavLink secondary to="/user-profile" label="Your profile" />
-        <NavLink secondary to="/school-profile" label="Your school" />
-        <NavLink secondary to="/settings" label="Settings" />
+        <NavLink to="/settings" label="Settings" />
         <StyledOption onClick={handleLogOut} hoverable>
           <Typography variant="bodyRegular">Sign out</Typography>
         </StyledOption>

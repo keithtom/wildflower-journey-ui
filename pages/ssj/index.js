@@ -8,6 +8,7 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 import { getCookie } from "cookies-next";
+import { parseISO } from "date-fns";
 
 import ssjApi from "../../api/ssj";
 import { categories } from "../../lib/utils/fake-data";
@@ -98,6 +99,7 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
   // console.log("team", team);
   // console.log("partners", partners);
   // console.log({ dataProgress });
+  // console.log(openDate);
 
   return (
     <>
@@ -751,7 +753,10 @@ const ETLs = ({}) => {
   );
 };
 const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
-  const [dateValue, setDateValue] = useState(openDate);
+  const [dateValue, setDateValue] = useState();
+  useEffect(() => {
+    setDateValue(openDate);
+  });
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
   };
@@ -777,7 +782,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
         <DatePicker
           label="Your anticipated open date"
           id="open-date"
-          value={dateValue}
+          value={parseISO(dateValue)}
           onChange={handleDateValueChange}
         />
         <Grid container justifyContent="space-between">
