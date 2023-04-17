@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getCookie } from "cookies-next";
 
 import {
   PageContainer,
@@ -21,7 +22,7 @@ import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
-const Milestones = ({ data, processByCategory, processByPhase }) => {
+const Milestones = ({ processByCategory, processByPhase }) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
   const [showMilestonesByPhase, setShowMilestonesByPhase] = useState(false);
@@ -35,13 +36,8 @@ const Milestones = ({ data, processByCategory, processByPhase }) => {
     setShowMilestonesByCategory(false);
   };
 
-  // console.log({ data });
   // console.log({ processByCategory });
   // console.log({ processByPhase });
-  // console.log({ dataResources });
-  // console.log({ dataAssignedSteps });
-
-  // console.log(Object.keys(dataResources[0])[0]);
 
   const hero = "/assets/images/ssj/wildflowerCollection.jpg";
 
@@ -147,11 +143,7 @@ const Milestones = ({ data, processByCategory, processByPhase }) => {
 export default Milestones;
 
 export async function getServerSideProps({ req, res }) {
-  // const userId = query.userId;
-  // const ssjId = query.ssjId;
-
-  // const workflowId = "5947-ab7f"
-  const workflowId = "c502-4f84";
+  const workflowId = getCookie("workflowId", { req, res });
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
@@ -232,7 +224,6 @@ export async function getServerSideProps({ req, res }) {
 
   return {
     props: {
-      data: data.data,
       processByCategory,
       processByPhase,
     },

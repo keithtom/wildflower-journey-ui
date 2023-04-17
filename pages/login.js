@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
@@ -15,17 +16,13 @@ import {
   Box,
   Link,
   TextField,
+  PageContainer,
+  Icon,
 } from "@ui";
-import Header from "@components/Header";
 
 const loginRoute = `${baseUrl}/login`;
-
-const PageContent = styled(Box)`
-  flex-grow: 1;
-  margin-top: ${({ theme }) => theme.util.appBarHeight}px;
-  padding: ${({ theme }) => theme.util.buffer * 6}px;
-`;
 const Login = ({}) => {
+  const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { currentUser, setCurrentUser } = useUserContext();
   const {
     control,
@@ -47,39 +44,73 @@ const Login = ({}) => {
         setCookie("auth", response.headers["authorization"], {
           maxAge: 60 * 60 * 24,
         });
-        const user = response.data.data.attributes;
+        const userAttributes = response.data.data.attributes;
+        userAttributes.imageUrl = `${baseUrl}${userAttributes.imageUrl}`;
+        const personId = response.data.data.relationships.person.data.id;
+        setCookie("workflowId", userAttributes.ssj.workflowId, {
+          maxAge: 60 * 60 * 24,
+        });
+        setCookie("phase", userAttributes.ssj.currentPhase, {
+          maxAge: 60 * 60 * 24,
+        });
         setCurrentUser({
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          profileImage: user.imageUrl,
+          id: personId,
+          type: response.data.data.type,
+          attributes: userAttributes,
         });
         Router.push("/ssj");
       })
       .catch(function (error) {
         // handle error
         console.log(error);
+        console.log(error.response.data); // error message
       });
   };
 
-  const googleLogo = "/assets/images/google-g-logo.svg";
+  const handleRequestEmailLink = () => {
+    setSentEmailLoginRequest(true);
+    //TODO: send email login request to api
+  };
 
   return (
-    <>
-      <Header user={false} />
-      <PageContent>
-        <Grid container alignItems="center" justifyContent="center">
-          <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Card>
-              <Stack spacing={6}>
-                <Grid container justifyContent="center">
-                  <Grid item>
-                    <Typography variant="h4" bold>
-                      Log in
-                    </Typography>
-                  </Grid>
+    <PageContainer hideNav>
+      <Grid container alignItems="center" justifyContent="center">
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <Card>
+            <Stack spacing={6}>
+              <Grid container justifyContent="center">
+                <Grid item>
+                  <Typography variant="h4" bold>
+                    Log in
+                  </Typography>
                 </Grid>
+              </Grid>
 
+              {sentEmailLoginRequest ? (
+                <Stack spacing={3} container>
+                  <Card variant="lightened">
+                    <Grid container justifyContent="center">
+                      <Stack spacing={3} alignItems="center">
+                        <Icon type="checkCircle" variant="primary" />
+                        <Typography variant="h3" center bold>
+                          Check your email for a secure link to log in.
+                        </Typography>
+                        <Typography>
+                          You should recieve it within a few minutes.
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Card>
+                  <Button
+                    onClick={() => setSentEmailLoginRequest(false)}
+                    variant="text"
+                  >
+                    <Typography lightened variant="bodyRegular" center>
+                      Login with my email and password.
+                    </Typography>
+                  </Button>
+                </Stack>
+              ) : (
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <Stack spacing={6}>
                     <Stack spacing={3}>
@@ -130,15 +161,6 @@ const Login = ({}) => {
                           />
                         )}
                       />
-                      <Grid container justifyContent="flex-end">
-                        <Grid item>
-                          <Link href="/forgot-password">
-                            <Typography variant="bodySmall" lightened hoverable>
-                              Forgot password?
-                            </Typography>
-                          </Link>
-                        </Grid>
-                      </Grid>
                     </Stack>
                     <Grid container spacing={3} justifyContent="center">
                       <Grid item xs={12}>
@@ -154,28 +176,26 @@ const Login = ({}) => {
                         </Typography>
                       </Grid>
                       <Grid item xs={12}>
-                        <Button full disabled={isSubmitting} variant="light">
-                          <Stack
-                            direction="row"
-                            spacing={3}
-                            alignItems="center"
-                          >
-                            <img src={googleLogo} />
-                            <Typography variant="bodyRegular">
-                              Log in with Google
-                            </Typography>
-                          </Stack>
+                        <Button
+                          full
+                          disabled={isSubmitting}
+                          variant="text"
+                          onClick={handleRequestEmailLink}
+                        >
+                          <Typography variant="bodyRegular">
+                            Request an email link to login
+                          </Typography>
                         </Button>
                       </Grid>
                     </Grid>
                   </Stack>
                 </form>
-              </Stack>
-            </Card>
-          </Grid>
+              )}
+            </Stack>
+          </Card>
         </Grid>
-      </PageContent>
-    </>
+      </Grid>
+    </PageContainer>
   );
 };
 

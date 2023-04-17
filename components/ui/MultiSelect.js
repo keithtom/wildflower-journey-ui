@@ -22,7 +22,15 @@ const MultiSelect = ({ options, id, value, onChange, label, ...props }) => {
           value={value}
           onChange={onChange}
           input={<Input />}
-          IconComponent={() => <Icon type="expandMore" variant="lightened" />}
+          IconComponent={(props) => (
+            <Icon
+              type="expandMore"
+              variant="lightened"
+              hoverable
+              style={{ top: "auto" }}
+              {...props}
+            />
+          )}
           renderValue={(selected) => (
             <Stack direction="row" spacing={1}>
               {selected.map((value) => (

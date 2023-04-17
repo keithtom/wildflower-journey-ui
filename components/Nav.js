@@ -97,8 +97,9 @@ const Navigation = ({}) => {
         icon="bookReader"
       /> */}
       <NavLink
+        variant="primary"
         to="/ssj"
-        active={router.pathname === "/ssj"}
+        active={router.asPath === "/ssj"}
         label="School Startup Journey"
         icon="home"
       />
@@ -116,47 +117,48 @@ const Navigation = ({}) => {
 
 const SSJNavigation = ({}) => {
   const router = useRouter();
+  console.log(router.pathname);
   return (
     <Box>
       <NavLink
-        secondary
+        variant="secondary"
         to="/ssj/to-do-list"
-        active={router.pathname.includes("/ssj/to-do-list")}
+        active={router.asPath === "/ssj/to-do-list"}
         label="Your to do list"
         icon="calendarCheck"
       />
       <NavLink
-        secondary
+        variant="secondary"
         to="/ssj/milestones"
-        active={router.pathname.includes("/ssj/milestones")}
+        active={router.asPath === "/ssj/milestones"}
         label="Milestones"
         icon="layer"
       />
       <NavLink
-        tertiary
+        variant="tertiary"
         to="/ssj/visioning"
-        active={router.pathname.includes("/ssj/visioning")}
+        active={router.asPath === "/ssj/visioning"}
         label="Visioning"
         icon={true}
       />
       <NavLink
-        tertiary
+        variant="tertiary"
         to="/ssj/planning"
-        active={router.pathname.includes("/ssj/planning")}
+        active={router.asPath === "/ssj/planning"}
         label="Planning"
         icon={true}
       />
       <NavLink
-        tertiary
+        variant="tertiary"
         to="/ssj/startup"
-        active={router.pathname.includes("/ssj/startup")}
+        active={router.asPath === "/ssj/startup"}
         label="Startup"
         icon={true}
       />
       <NavLink
-        secondary
+        variant="secondary"
         to="/ssj/resources"
-        active={router.pathname.includes("/ssj/resources")}
+        active={router.asPath === "/ssj/resources"}
         label="Resources"
         icon="fileBlank"
       />

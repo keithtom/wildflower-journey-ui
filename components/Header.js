@@ -75,8 +75,8 @@ const Header = ({ toggleNavOpen }) => {
         {isLoggedIn ? (
           <Grid item>
             <AvatarMenu
-              avatarSrc={currentUser.profileImage}
-              userName={`${currentUser.firstName} ${currentUser.lastName}`}
+              avatarSrc={currentUser.attributes.imageUrl}
+              userName={`${currentUser.attributes.firstName} ${currentUser.attributes.lastName}`}
             />
           </Grid>
         ) : null}
@@ -129,6 +129,8 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
       .then((res) => {
         // TODO: update logged out state
         deleteCookie("auth", {});
+        deleteCookie("workflowId", {});
+        deleteCookie("phase", {});
         delete axios.defaults.headers.common["Authorization"];
 
         setCurrentUser(null);
@@ -167,9 +169,7 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
             Signed in as {userName}
           </Typography>
         </StyledOption>
-        <NavLink secondary to="/user-profile" label="Your profile" />
-        <NavLink secondary to="/school-profile" label="Your school" />
-        <NavLink secondary to="/settings" label="Settings" />
+        <NavLink to="/settings" label="Settings" />
         <StyledOption onClick={handleLogOut} hoverable>
           <Typography variant="bodyRegular">Sign out</Typography>
         </StyledOption>

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import { FormControlLabel, RadioGroup } from "@mui/material";
+import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
+import { useRouter } from "next/router";
+import { useUserContext } from "@lib/useUserContext";
+import peopleApi from "../../api/people";
 
 import {
   Button,
@@ -18,32 +21,62 @@ import {
   Select,
   MultiSelect,
   Radio,
+  PageContainer,
 } from "@ui";
-import Header from "@components/Header";
 
-const PageContent = styled(Box)`
-  flex-grow: 1;
-  margin-top: ${({ theme }) => theme.util.appBarHeight}px;
-  padding: ${({ theme }) => theme.util.buffer * 6}px;
-`;
 const ConfirmDemographicInfo = ({}) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
+  const router = useRouter();
+  const { currentUser } = useUserContext();
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitSuccessful, isSubmitting },
+    reset,
+    watch,
+    formState: { errors, isValid, isSubmitting },
   } = useForm({
-    defaultValues: {
-      language: user.language,
-      ethnicity: user.ethnicity,
-      lgbtqia: user.lgbtqia,
-      genderIdentity: user.genderIdentity,
-      pronouns: user.pronouns,
-      householdIncome: user.householdIncome,
-    },
+    defaultValues: {},
   });
-  const onSubmit = (data) => console.log(data);
+
+  useEffect(() => {
+    reset({
+      primary_language: currentUser?.attributes.language,
+      ethnicity: currentUser?.attributes.ethnicity
+        ? currentUser?.attributes.ethnicity
+        : [],
+      lgbtqia: currentUser?.attributes.lgbtqia,
+      genderIdentity: currentUser?.attributes.genderIdentity,
+      pronouns: currentUser?.attributes.pronouns,
+      householdIncome: currentUser?.attributes.householdIncome,
+    });
+  }, [currentUser]);
+
+  const onSubmit = (data) => {
+    peopleApi
+      .update(currentUser.id, {
+        person: {
+          primary_language: data.language,
+          ethnicity: data.ethnicity,
+          lgbtqia: data.lgbtqia,
+          genderIdentity: data.genderIdentity,
+          pronouns: data.pronouns,
+          householdIncome: data.householdIncome,
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          console.error(error);
+        } else {
+          // console.log(data);
+          setUserIsEditing(false);
+        }
+      });
+  };
+
+  const handleConfirm = () => {
+    router.push("/welcome/add-profile-info");
+  };
 
   const lgbtqiaOptions = [
     { value: true, label: "Yes" },
@@ -54,16 +87,52 @@ const ConfirmDemographicInfo = ({}) => {
     { value: 1, label: "Medium Income" },
     { value: 2, label: "Low Income" },
   ];
+  const languageOptions = [
+    { value: 0, label: "English" },
+    { value: 1, label: "Spanish" },
+  ];
+  const pronounsOptions = [
+    { value: 0, label: "ae/aer/aers" },
+    { value: 1, label: "fae/faer/faers" },
+    { value: 2, label: "he/him/his" },
+    { value: 3, label: "per/per/pers" },
+    { value: 4, label: "she/her/hers" },
+    { value: 5, label: "they/them/theirs" },
+    { value: 6, label: "ve/ver/vis" },
+    { value: 7, label: "xe/xem/xyrs" },
+    { value: 8, label: "ze/hir/hirs" },
+    { value: 9, label: "Not-listed or more specific pronouns" },
+  ];
+  const genderOptions = [
+    { value: 0, label: "Male/Man" },
+    { value: 1, label: "Female/Woman" },
+    { value: 2, label: "Gender Non-Conforming" },
+    { value: 3, label: "A not-listed or more specific gender identity" },
+  ];
 
+  const watchFields = watch();
   const isExistingTL = false;
+  const opsGuide = currentUser?.attributes.ssj.opsGuide.data.attributes;
+
+  const selectedLanguage = languageOptions.filter(
+    (l) => l.value === watchFields.primary_language
+  )[0]?.label;
+  const selectedPronouns = pronounsOptions.filter(
+    (l) => l.value === watchFields.pronouns
+  )[0]?.label;
+  const selectedGenderIdentity = genderOptions.filter(
+    (l) => l.value === watchFields.genderIdentity
+  )[0]?.label;
+  const selectedHouseholdIncome = incomeOptions.filter(
+    (l) => l.value === parseInt(watchFields.householdIncome)
+  )[0]?.label;
 
   return (
-    <>
-      <Header user={false} />
-      <PageContent>
-        <Grid container alignItems="center" justifyContent="center">
-          <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Card>
+    <PageContainer isLoading={!currentUser} hideNav>
+      <Grid container alignItems="center" justifyContent="center">
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <Card>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <Stack spacing={6}>
                 <Grid container justifyContent="center">
                   <Grid item>
@@ -76,7 +145,9 @@ const ConfirmDemographicInfo = ({}) => {
                   <>
                     <Card variant="primaryLightened" size="small">
                       <Stack direction="row" spacing={3}>
-                        <Icon type="star" variant="primary" />
+                        <Grid item>
+                          <Icon type="star" variant="primary" />
+                        </Grid>
                         <Typography variant="bodySmall">
                           This information can potentially help with finding
                           additional funding for your school or connect you with
@@ -86,13 +157,10 @@ const ConfirmDemographicInfo = ({}) => {
                       </Stack>
                     </Card>
                     <Stack direction="row" spacing={3} alignItems="center">
-                      <Avatar
-                        size="sm"
-                        src="https://images.unsplash.com/photo-1589317621382-0cbef7ffcc4c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1587&q=80"
-                      />
+                      <Avatar size="sm" src={opsGuide?.imageUrl} />
                       <Stack>
                         <Typography variant="bodySmall" bold>
-                          Mary Truman
+                          {opsGuide?.firstName} {opsGuide?.lastName}
                         </Typography>
                         <Typography variant="bodySmall" lightened>
                           Operations Guide
@@ -106,79 +174,74 @@ const ConfirmDemographicInfo = ({}) => {
                   sx={{ width: "100%" }}
                   size="small"
                 >
-                  <form onSubmit={handleSubmit(onSubmit)}>
-                    <Stack spacing={3}>
-                      <Stack
-                        justifyContent="space-between"
-                        alignItems="center"
-                        direction="row"
-                      >
-                        <Typography variant="bodyRegular" bold lightened>
-                          Your demographic info
-                        </Typography>
-                        {userIsEditing ? (
-                          <Button
-                            small
-                            onClick={() => setUserIsEditing(false)}
-                            disabled={isSubmitting}
-                            type="submit"
-                          >
-                            <Typography variant="bodySmall" bold light>
-                              Save
-                            </Typography>
-                          </Button>
-                        ) : (
-                          <IconButton onClick={() => setUserIsEditing(true)}>
-                            <Icon
-                              type="pencil"
-                              variant="primary"
-                              size="small"
-                            />
-                          </IconButton>
-                        )}
-                      </Stack>
+                  <Stack spacing={3}>
+                    <Stack
+                      justifyContent="space-between"
+                      alignItems="center"
+                      direction="row"
+                    >
+                      <Typography variant="bodyRegular" bold lightened>
+                        Your demographic info
+                      </Typography>
                       {userIsEditing ? (
-                        <>
-                          <Controller
-                            name="language"
-                            control={control}
-                            rules={{ required: true }}
-                            render={({ field }) => (
-                              <Select
-                                label="What is your primary language?"
-                                placeholder="Select a language..."
-                                options={["English", "Spanish"]}
-                                error={errors.language}
-                                helperText={
-                                  errors &&
-                                  errors.language &&
-                                  errors.language &&
-                                  "This field is required"
-                                }
-                                {...field}
-                              />
-                            )}
-                          />
-                          <Controller
-                            name="ethnicity"
-                            control={control}
-                            rules={{ required: true }}
-                            render={({ field }) => (
-                              <MultiSelect
-                                label="What is your ethnicity?"
-                                placeholder="Select as many as you like..."
-                                options={["Asian", "White"]}
-                                error={errors.ethnicity}
-                                helperText={
-                                  errors &&
-                                  errors.ethnicity &&
-                                  errors.ethnicity &&
-                                  "This field is required"
-                                }
-                                {...field}
-                              />
-                            )}
-                          />
+                        <Button small disabled={isSubmitting} type="submit">
+                          <Typography variant="bodySmall" bold light>
+                            Save
+                          </Typography>
+                        </Button>
+                      ) : (
+                        <IconButton onClick={() => setUserIsEditing(true)}>
+                          <Icon type="pencil" variant="primary" size="small" />
+                        </IconButton>
+                      )}
+                    </Stack>
+                    {userIsEditing ? (
+                      <>
+                        <Controller
+                          name="primary_language"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field }) => (
+                            <Select
+                              label="What is your primary language?"
+                              placeholder="Select a language..."
+                              options={languageOptions.map((l) => l.label)}
+                              error={errors.primary_language}
+                              helperText={
+                                errors &&
+                                errors.primary_language &&
+                                errors.primary_language &&
+                                "This field is required"
+                              }
+                              {...field}
+                            />
+                          )}
+                        />
+                        <Controller
+                          name="ethnicity"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field }) => (
+                            <MultiSelect
+                              label="What is your ethnicity?"
+                              placeholder="Select as many as you like..."
+                              options={["Asian", "White"]}
+                              error={errors.ethnicity}
+                              helperText={
+                                errors &&
+                                errors.ethnicity &&
+                                errors.ethnicity &&
+                                "This field is required"
+                              }
+                              {...field}
+                            />
+                          )}
+                        />
+                        <Stack spacing={1}>
+                          <Typography variant="bodyRegular">
+                            Do you identify as a member of the LGBTQIA
+                            community?
+                          </Typography>
                           <Controller
                             name="lgbtqia"
                             control={control}
@@ -197,62 +260,57 @@ const ConfirmDemographicInfo = ({}) => {
                               </RadioGroup>
                             )}
                           />
-                          <Controller
-                            name="genderIdentity"
-                            control={control}
-                            rules={{ required: true }}
-                            render={({ field }) => (
-                              <Select
-                                label="What is your gender identity?"
-                                placeholder="Select one..."
-                                options={[
-                                  "Male/Man",
-                                  "Female/Woman",
-                                  "Gender Non-Conforming",
-                                  "A not-listed or more specific gender identity",
-                                ]}
-                                error={errors.genderIdentity}
-                                helperText={
-                                  errors &&
-                                  errors.genderIdentity &&
-                                  errors.genderIdentity &&
-                                  "This field is required"
-                                }
-                                {...field}
-                              />
-                            )}
-                          />
-                          <Controller
-                            name="pronouns"
-                            control={control}
-                            rules={{ required: true }}
-                            render={({ field }) => (
-                              <Select
-                                label="What are your pronouns?"
-                                placeholder="Select one..."
-                                options={[
-                                  "ae/aer/aers",
-                                  "fae/faer/faers",
-                                  "he/him/his",
-                                  "per/per/pers",
-                                  "she/her/hers",
-                                  "they/them/theirs",
-                                  "ve/ver/vis",
-                                  "xe/xem/xyrs",
-                                  "ze/hir/hirs",
-                                  "Not-listed or more specific pronouns",
-                                ]}
-                                error={errors.genderIdentity}
-                                helperText={
-                                  errors &&
-                                  errors.genderIdentity &&
-                                  errors.genderIdentity &&
-                                  "This field is required"
-                                }
-                                {...field}
-                              />
-                            )}
-                          />
+                          <FormHelperText error={errors.lgbtqia}>
+                            {errors &&
+                              errors.lgbtqia &&
+                              errors.lgbtqia.type === "required" &&
+                              "This field is required"}
+                          </FormHelperText>
+                        </Stack>
+                        <Controller
+                          name="genderIdentity"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field }) => (
+                            <Select
+                              label="What is your gender identity?"
+                              placeholder="Select one..."
+                              options={genderOptions.map((l) => l.label)}
+                              error={errors.genderIdentity}
+                              helperText={
+                                errors &&
+                                errors.genderIdentity &&
+                                errors.genderIdentity &&
+                                "This field is required"
+                              }
+                              {...field}
+                            />
+                          )}
+                        />
+                        <Controller
+                          name="pronouns"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field }) => (
+                            <Select
+                              label="What are your pronouns?"
+                              placeholder="Select one..."
+                              options={pronounsOptions.map((l) => l.label)}
+                              error={errors.genderIdentity}
+                              helperText={
+                                errors &&
+                                errors.genderIdentity &&
+                                errors.genderIdentity &&
+                                "This field is required"
+                              }
+                              {...field}
+                            />
+                          )}
+                        />
+                        <Stack spacing={1}>
+                          <Typography variant="bodyRegular">
+                            What is your household income?
+                          </Typography>
                           <Controller
                             name="householdIncome"
                             control={control}
@@ -271,97 +329,113 @@ const ConfirmDemographicInfo = ({}) => {
                               </RadioGroup>
                             )}
                           />
-                        </>
-                      ) : (
-                        <>
-                          <Card size="small" noBorder>
-                            <Grid container>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodyMini" lightened>
-                                  LANGUAGE
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodySmall">
-                                  {user.language}
-                                </Typography>
-                              </Grid>
+                          <FormHelperText error={errors.lgbtqia}>
+                            {errors &&
+                              errors.lgbtqia &&
+                              errors.lgbtqia.type === "required" &&
+                              "This field is required"}
+                          </FormHelperText>
+                        </Stack>
+                      </>
+                    ) : (
+                      <>
+                        <Card size="small" noBorder>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodyMini" lightened>
+                                LANGUAGE
+                              </Typography>
                             </Grid>
-                          </Card>
-                          <Card size="small" noBorder>
-                            <Grid container>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodyMini" lightened>
-                                  ETHNICITY
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodySmall">
-                                  {user.ethnicity.map((e, i) => `${e}, `)}
-                                </Typography>
-                              </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodySmall">
+                                {selectedLanguage ? selectedLanguage : `-`}
+                              </Typography>
                             </Grid>
-                          </Card>
-                          <Card size="small" noBorder>
-                            <Grid container>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodyMini" lightened>
-                                  LGBTQIA
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodySmall">
-                                  {user.lgbtqia === true ? "Yes" : "No"}
-                                </Typography>
-                              </Grid>
+                          </Grid>
+                        </Card>
+                        <Card size="small" noBorder>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodyMini" lightened>
+                                ETHNICITY
+                              </Typography>
                             </Grid>
-                          </Card>
-                          <Card size="small" noBorder>
-                            <Grid container>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodyMini" lightened>
-                                  GENDER IDENTITY
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodySmall">
-                                  {user.genderIdentity}
-                                </Typography>
-                              </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodySmall">
+                                {watchFields.ethnicity?.length
+                                  ? watchFields.ethnicity
+                                  : `-`}
+                              </Typography>
                             </Grid>
-                          </Card>
-                          <Card size="small" noBorder>
-                            <Grid container>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodyMini" lightened>
-                                  PRONOUNS
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodySmall">
-                                  {user.pronouns}
-                                </Typography>
-                              </Grid>
+                          </Grid>
+                        </Card>
+                        <Card size="small" noBorder>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodyMini" lightened>
+                                LGBTQIA
+                              </Typography>
                             </Grid>
-                          </Card>
-                          <Card size="small" noBorder>
-                            <Grid container>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodyMini" lightened>
-                                  HOUSEHOLD INCOME
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <Typography variant="bodySmall">
-                                  {user.householdIncome}
-                                </Typography>
-                              </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodySmall">
+                                {watchFields.lgbtqia
+                                  ? watchFields.lgbtqia === "false"
+                                    ? "No"
+                                    : "Yes"
+                                  : `-`}
+                              </Typography>
                             </Grid>
-                          </Card>
-                        </>
-                      )}
-                    </Stack>
-                  </form>
+                          </Grid>
+                        </Card>
+                        <Card size="small" noBorder>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodyMini" lightened>
+                                GENDER IDENTITY
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodySmall">
+                                {selectedGenderIdentity
+                                  ? selectedGenderIdentity
+                                  : `-`}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Card>
+                        <Card size="small" noBorder>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodyMini" lightened>
+                                PRONOUNS
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodySmall">
+                                {selectedPronouns ? selectedPronouns : `-`}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Card>
+                        <Card size="small" noBorder>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodyMini" lightened>
+                                HOUSEHOLD INCOME
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography variant="bodySmall">
+                                {selectedHouseholdIncome
+                                  ? selectedHouseholdIncome
+                                  : `-`}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </Card>
+                      </>
+                    )}
+                  </Stack>
                 </Card>
                 <Typography variant="bodySmall" lightened>
                   This information is only used for anonymous reporting reasons
@@ -378,31 +452,24 @@ const ConfirmDemographicInfo = ({}) => {
                     </Link>
                   </Grid>
                   <Grid item xs={6}>
-                    <Link href="/welcome/add-profile-info">
-                      <Button full disabled={userIsEditing}>
-                        <Typography variant="bodyRegular" light>
-                          Confirm
-                        </Typography>
-                      </Button>
-                    </Link>
+                    <Button
+                      full
+                      disabled={userIsEditing || !isValid}
+                      onClick={handleConfirm}
+                    >
+                      <Typography variant="bodyRegular" light>
+                        Confirm
+                      </Typography>
+                    </Button>
                   </Grid>
                 </Grid>
               </Stack>
-            </Card>
-          </Grid>
+            </form>
+          </Card>
         </Grid>
-      </PageContent>
-    </>
+      </Grid>
+    </PageContainer>
   );
 };
 
 export default ConfirmDemographicInfo;
-
-const user = {
-  language: "English",
-  ethnicity: ["Asian", "White"],
-  lgbtqia: true,
-  genderIdentity: "Gender Non-Conforming",
-  pronouns: "They/Them/Theirs",
-  householdIncome: "Middle Income",
-};
