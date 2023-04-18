@@ -170,10 +170,9 @@ const AddProfileInfo = ({}) => {
                                   return error;
                                 }
                                 const signed_id = response.data.signed_id;
-
                                 axios
                                   .put(response.data.direct_upload.url, file, {
-                                    headers:
+                                    headers: 
                                       response.data.direct_upload.headers,
                                     onUploadProgress: (progressEvent) => {
                                       progress(
@@ -181,6 +180,11 @@ const AddProfileInfo = ({}) => {
                                         progressEvent.loaded,
                                         progressEvent.total
                                       );
+                                    },
+                                    // need to remove default Authorization header when sending to s3
+                                    transformRequest: (data, headers) => {
+                                      delete headers.common['Authorization'];
+                                      return data;
                                     },
                                   })
                                   .then((response) => {
