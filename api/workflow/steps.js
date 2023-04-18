@@ -20,6 +20,12 @@ const api = axios.create({
 
 async function index() {}
 
+// creates a custom task (TODO: not finished)
+async function create(processId, title){
+  const response = await api.post(`/${processId}/steps`, {title: title});
+  // if response good, great.  else.  error out?
+};
+
 async function assign(taskId, userId) {
   const response = await api.put(`/steps/${taskId}/assign`, {step: { assignee_id: userId }} );
   const data = await response.data

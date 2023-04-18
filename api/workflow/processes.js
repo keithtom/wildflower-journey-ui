@@ -18,6 +18,9 @@ const api = axios.create({
   },
 });
 
+// show me all milestones for a phase
+// show me all milestones that are assigned to me
+// show me all milestones that are assigned to me
 async function index() {}
 
 async function complete(taskId) {
