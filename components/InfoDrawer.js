@@ -52,7 +52,7 @@ const ActionsContainer = styled(Card)`
 const InfoDrawer = ({
   toggle,
   open,
-  assignee,
+  assignees,
   about,
   taskId,
   title,
@@ -62,13 +62,13 @@ const InfoDrawer = ({
   effort,
   actions,
   isDecision,
-  isComplete, // TODO: remove this,  look though assignees; completers = assignees.filter(assignee => assignee.completed_at !== null); [id, person: {firstName}]; 
-  // individual task = same as current user, isComplete = assignees.find(assignee => assignee.id === currentUser.id).completed_at !== null
-  // collaborative task = show me who completed it, isComplete = !canComplete
-  completedBy,
+  completionType,
+  completers,
+  isComplete,
   includedDocuments,
   worktime,
 }) => {
+
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
       <StyledScrollArea>

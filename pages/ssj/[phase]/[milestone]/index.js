@@ -222,15 +222,16 @@ const MilestonePage = ({
                 link={`/ssj/${phase}/${milestone.id}/${t.id}`}
                 title={t.attributes.title}
                 description={t.attributes.description}
+                completionType={t.attributes.completionType}
+                completers={t.relationships.completers} // TODO: make this work.
                 key={i}
                 isDecision={t.attributes.kind === "Decision"}
                 decisionOptions={t.attributes.decisionOptions}
                 isLast={i + 1 === sortedMilestoneTasks.length}
                 isNext={isUpNext}
-                isComplete={t.attributes.completed}
                 handleCompleteMilestone={handleCompleteMilestone}
                 categories={milestoneAttributes.categories}
-                taskAssignee={t.attributes.assigneeInfo}
+                taskAssignees={t.relationships.assignments}
                 resources={t.relationships.documents.data}
                 includedDocuments={includedDocuments}
                 worktime={

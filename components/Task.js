@@ -47,13 +47,12 @@ const StyledTask = styled(Box)`
   }
 `;
 
-// TODO: pass in task and assignee
 const Task = ({
   taskId,
   title,
   description,
-  isComplete,
-  taskCompletedBy,
+  completionType,
+  taskCompleters,
   notNavigable,
   isDecision,
   decisionOptions,
@@ -62,7 +61,7 @@ const Task = ({
   link,
   handleCompleteMilestone,
   categories,
-  taskAssignee,
+  taskAssignees,
   variant,
   resources,
   includedDocuments,
@@ -70,14 +69,16 @@ const Task = ({
   worktime,
   removeStep,
 }) => {
+  const isComplete = completionType === "individual" ? taskCompleters.find(e => e.id === currentUser.id ) : taskCompleters.length
+  
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
-  const [assignee, setAssignee] = useState(taskAssignee);
+  const [newAssigneeId, setNewAssigneeId] = useState(currentUser.id);
   const [assignees, setAssignees] = useState(taskAssignees | []);
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
-  const [completedBy, setCompletedBy] = useState(taskCompletedBy);
+  const [completers, setCompleters] = useState(taskCompleters);
   const { currentUser } = useUserContext();
 
   async function handleCompleteTask() {
@@ -86,7 +87,7 @@ const Task = ({
       // if checking, complete, if unchecking, uncomplete.
       const response = await processesApi.complete(taskId);
       setTaskIsComplete(response.data.attributes.completed);
-      setCompletedBy(currentUser);
+      setCompleters(completers => completers.push(currentUser));
       setInfoDrawerOpen(false);
       if (removeStep) {
         removeStep(taskId);
@@ -111,23 +112,24 @@ const Task = ({
       console.error(err);
     }
   }
-  async function handleAssignSelf() {
+  async function handleAssignUser() {
     try {
-      const response = await stepsApi.assign(taskId, currentUser.id);
-      // TODO: this api should return an array of assignees
-      // setAssignees(response.data); <--- an array of assignees
-      setAssignee(response.data.attributes.assigneeInfo);
+      const response = await stepsApi.assign(taskId, newAssigneeId);
+      step = response.data
+      setAssignees(step.relationships.assignments);
     } catch (err) {
       console.error(err);
     }
     setAssignToastOpen(true);
   }
-  async function handleUnassignSelf() {
+  async function handleUnassignUser() {
     try {
+      // TODO: update this to take a person, use newAssigneeId
       const response = await stepsApi.unassign(taskId);
-      // TODO: this api should return an array of assignees
-      // setAssignees(response.data); <--- an array of assignees
-      setAssignee(null);
+      
+      step = response.data
+      setAssignees(step.relationships.assignments);
+
       setInfoDrawerOpen(false);
       if (removeStep) {
         removeStep(taskId);
@@ -207,8 +209,9 @@ const Task = ({
           <Grid item>
             <Stack direction="row" spacing={3} alignItems="center">
               {processName && <Chip label={processName} size="small" />}
-              {/* // TODO: switch to mapping over assignees */}
-              <Avatar size="mini" src={assignee && assignee.imageUrl} />
+              { assignees && assignees.map((assignee) => (
+                <Avatar size="mini" src={assignee && assignee.imageUrl} />
+              ))}
             </Stack>
           </Grid>
         </Grid>
@@ -216,8 +219,7 @@ const Task = ({
       <InfoDrawer
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
-        assignee={assignee}
-        // assignees={assignees}
+        assignees={assignees}
         about={description}
         taskId={taskId}
         title={title}
@@ -225,27 +227,26 @@ const Task = ({
         categories={categories}
         worktime={worktime}
         isDecision={isDecision}
+        completionType={completionType}
         isComplete={taskIsComplete}
-        completedBy={completedBy}
+        completers={completers}
         includedDocuments={includedDocuments}
         actions={
           isDecision ? (
             <DecisionDrawerActions
-              // assignees={assignees}
-              assignee={assignee}
+              assignees={assignees}
               isDecided={isDecided}
-              handleAssignSelf={handleAssignSelf}
-              handleUnassignSelf={handleUnassignSelf}
+              handleAssignUser={handleAssignUser}
+              handleUnssignUser={handleUnssignUser}
               handleMakeDecision={handleMakeDecision}
             />
           ) : (
             <TaskDrawerActions
-              // assignees={assignees}
-              assignee={assignee}
+              assignees={assignees}
               isComplete={taskIsComplete}
-              completedBy={completedBy}
-              handleAssignSelf={handleAssignSelf}
-              handleUnassignSelf={handleUnassignSelf}
+              completers={completers}
+              handleAssignUser={handleAssignUser}
+              handleUnssignUser={handleUnssignUser}
               handleCompleteTask={handleCompleteTask}
               handleUncompleteTask={handleUncompleteTask}
             />
@@ -257,14 +258,14 @@ const Task = ({
         onClose={() => setAssignToastOpen(false)}
         isAssignToast={true}
         title={title}
-        assignee={assignee} // swittch to current user
+        assignee={newAssigneeId}
       />
       <TaskToast
         open={unassignToastOpen}
         onClose={() => setUnassignToastOpen(false)}
         isAssignToast={false}
         title={title}
-        assignee={assignee} // swittch to current user
+        assignee={newAssigneeId}
       />
     </>
   );
@@ -273,16 +274,20 @@ const Task = ({
 export default Task;
 
 const DecisionDrawerActions = ({
-  assignee,
+  assignees,
   isDecided,
-  handleAssignSelf,
-  handleUnassignSelf,
+  handleAssignUser,
+  handleUnssignUser,
   handleMakeDecision,
 }) => {
   const [decisionOption, setDecisionOption] = useState();
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };
+
+  const isAssignedToMe = assignees.filter(e => e.id === currentUser.id).length !== 0;
+  const showDecisionForm =  isAssignedToMe && !isDecided
+
   const StyledDecisionCard = styled(Card)`
     /* Disabled */
     ${(props) =>
@@ -294,7 +299,7 @@ const DecisionDrawerActions = ({
   `;
   return (
     <Stack spacing={4}>
-      {assignee ? ( // Can we assign this to ourselves?  Only cares if we are currently assigned.  assignees.filter(e => e.id === currentUser.id).length === 0
+      {showDecisionForm ? (
         <Grid container>
           <StyledDecisionCard
             variant={isDecided ? "outlined" : "primaryOutlined"}
@@ -318,7 +323,7 @@ const DecisionDrawerActions = ({
       ) : null}
 
       <Grid container spacing={6}>
-        {assignee ? ( // Can we assign this to ourselves?  Only cares if we are currently assigned.  assignees.filter(e => e.id === currentUser.id).length === 0
+        {isAssignedToMe ? (
           isDecided ? (
             <Grid item xs={12}>
               <Card variant="lightened">
@@ -354,7 +359,7 @@ const DecisionDrawerActions = ({
                 </Card>
               </Grid>
               <Grid item xs={6}>
-                <Button full variant="text" onClick={handleUnassignSelf}>
+                <Button full variant="text" onClick={handleUnssignUser}>
                   <Typography bold variant="bodyRegular">
                     Remove from to do list
                   </Typography>
@@ -375,7 +380,7 @@ const DecisionDrawerActions = ({
           )
         ) : (
           <Grid item xs={12}>
-            <Button full onClick={handleAssignSelf}>
+            <Button full onClick={handleAssignUser}>
               <Typography light bold variant="bodyRegular">
                 Add to my to do list
               </Typography>
@@ -388,33 +393,36 @@ const DecisionDrawerActions = ({
 };
 
 const TaskDrawerActions = ({
-  assignee,
+  assignees,
   isComplete,
-  completedBy,
+  completers,
   currentUser,
-  handleAssignSelf,
-  handleUnassignSelf,
+  handleAssignUser,
+  handleUnssignUser,
   handleCompleteTask,
   handleUncompleteTask,
 }) => {
+  const isAssignedToMe = assignees.filter(e => e.id === currentUser.id).length !== 0;
+
+  const canUncomplete = completers && completers.find(e => e.id === currentUser.id)
+  const completedBy = completers && completers.find(e => e.id !== currentUser.id)
+  
+  // NOTE: we can't uncomplete if process is complete (we should have task.milestone.isComplete
+  
   return (
     <Grid container spacing={4}>
-      {assignee ? ( // Can we assign this to ourselves?  Only cares if we are currently assigned.  assignees.filter(e => e.id === currentUser.id).length === 0
+      {isAssignedToMe ? (
         isComplete ? (
           <>
             <Grid item xs={12}>
               <Button
                 full
                 variant="danger"
-                disabled={
-                  completedBy && completedBy.id === currentUser.id
-                    ? false
-                    : true
-                }
+                disabled={!canUncomplete}
                 onClick={handleUncompleteTask}
               >
                 <Typography bold>
-                  {completedBy && completedBy.id === currentUser.id
+                  {canUncomplete
                     ? "Mark incomplete"
                     : `Completed by ${completedBy.firstName} ${completedBy.lastName}`}
                 </Typography>
@@ -424,7 +432,7 @@ const TaskDrawerActions = ({
         ) : (
           <>
             <Grid item xs={6}>
-              <Button full variant="text" onClick={handleUnassignSelf}>
+              <Button full variant="text" onClick={handleUnssignUser}>
                 <Typography variant="bodyRegular" bold>
                   Remove from to do list
                 </Typography>
@@ -439,9 +447,9 @@ const TaskDrawerActions = ({
             </Grid>
           </>
         )
-      ) : (
+      ) : ( // TODO: don't let someone assign a completed task (collaborative task)
         <Grid item xs={12}>
-          <Button full onClick={handleAssignSelf}>
+          <Button full onClick={handleAssignUser}>
             <Typography light bold>
               Add to my to do list
             </Typography>
