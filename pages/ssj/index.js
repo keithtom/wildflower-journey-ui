@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
-import Link from "next/link";
 import Router from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
@@ -34,6 +33,7 @@ import {
   DatePicker,
   TextField,
   Chip,
+  Link,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";

@@ -25,7 +25,6 @@ import {
 } from "@ui";
 
 const ConfirmDemographicInfo = ({}) => {
-  const [userIsEditing, setUserIsEditing] = useState(false);
   const router = useRouter();
   const { currentUser } = useUserContext();
 
@@ -34,7 +33,7 @@ const ConfirmDemographicInfo = ({}) => {
     handleSubmit,
     reset,
     watch,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {},
   });
@@ -69,13 +68,9 @@ const ConfirmDemographicInfo = ({}) => {
           console.error(error);
         } else {
           // console.log(data);
-          setUserIsEditing(false);
+          router.push("/welcome/add-profile-info");
         }
       });
-  };
-
-  const handleConfirm = () => {
-    router.push("/welcome/add-profile-info");
   };
 
   const lgbtqiaOptions = [
@@ -113,19 +108,6 @@ const ConfirmDemographicInfo = ({}) => {
   const watchFields = watch();
   const isExistingTL = false;
   const opsGuide = currentUser?.attributes.ssj.opsGuide.data.attributes;
-
-  const selectedLanguage = languageOptions.filter(
-    (l) => l.value === watchFields.primary_language
-  )[0]?.label;
-  const selectedPronouns = pronounsOptions.filter(
-    (l) => l.value === watchFields.pronouns
-  )[0]?.label;
-  const selectedGenderIdentity = genderOptions.filter(
-    (l) => l.value === watchFields.genderIdentity
-  )[0]?.label;
-  const selectedHouseholdIncome = incomeOptions.filter(
-    (l) => l.value === parseInt(watchFields.householdIncome)
-  )[0]?.label;
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -169,274 +151,146 @@ const ConfirmDemographicInfo = ({}) => {
                     </Stack>
                   </>
                 )}
-                <Card
-                  variant={userIsEditing ? null : "lightened"}
-                  sx={{ width: "100%" }}
-                  size="small"
-                >
-                  <Stack spacing={3}>
-                    <Stack
-                      justifyContent="space-between"
-                      alignItems="center"
-                      direction="row"
-                    >
-                      <Typography variant="bodyRegular" bold lightened>
-                        Your demographic info
-                      </Typography>
-                      {userIsEditing ? (
-                        <Button small disabled={isSubmitting} type="submit">
-                          <Typography variant="bodySmall" bold light>
-                            Save
-                          </Typography>
-                        </Button>
-                      ) : (
-                        <IconButton onClick={() => setUserIsEditing(true)}>
-                          <Icon type="pencil" variant="primary" size="small" />
-                        </IconButton>
-                      )}
-                    </Stack>
-                    {userIsEditing ? (
-                      <>
-                        <Controller
-                          name="primary_language"
-                          control={control}
-                          rules={{ required: true }}
-                          render={({ field }) => (
-                            <Select
-                              label="What is your primary language?"
-                              placeholder="Select a language..."
-                              options={languageOptions.map((l) => l.label)}
-                              error={errors.primary_language}
-                              helperText={
-                                errors &&
-                                errors.primary_language &&
-                                errors.primary_language &&
-                                "This field is required"
-                              }
-                              {...field}
-                            />
-                          )}
-                        />
-                        <Controller
-                          name="ethnicity"
-                          control={control}
-                          rules={{ required: true }}
-                          render={({ field }) => (
-                            <MultiSelect
-                              label="What is your ethnicity?"
-                              placeholder="Select as many as you like..."
-                              options={["Asian", "White"]}
-                              error={errors.ethnicity}
-                              helperText={
-                                errors &&
-                                errors.ethnicity &&
-                                errors.ethnicity &&
-                                "This field is required"
-                              }
-                              {...field}
-                            />
-                          )}
-                        />
-                        <Stack spacing={1}>
-                          <Typography variant="bodyRegular">
-                            Do you identify as a member of the LGBTQIA
-                            community?
-                          </Typography>
-                          <Controller
-                            name="lgbtqia"
-                            control={control}
-                            rules={{ required: true }}
-                            render={({ field: { onChange, value } }) => (
-                              <RadioGroup value={value} handleOptionsChange>
-                                {lgbtqiaOptions.map((o, i) => (
-                                  <FormControlLabel
-                                    key={i}
-                                    value={o.value}
-                                    control={<Radio />}
-                                    label={o.label}
-                                    onChange={onChange}
-                                  />
-                                ))}
-                              </RadioGroup>
-                            )}
+
+                <Controller
+                  name="primary_language"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      label="What is your primary language?"
+                      placeholder="Select a language..."
+                      options={languageOptions.map((l) => l.label)}
+                      error={errors.primary_language}
+                      helperText={
+                        errors &&
+                        errors.primary_language &&
+                        errors.primary_language &&
+                        "This field is required"
+                      }
+                      {...field}
+                    />
+                  )}
+                />
+                <Controller
+                  name="ethnicity"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <MultiSelect
+                      label="What is your ethnicity?"
+                      placeholder="Select as many as you like..."
+                      options={["Asian", "White"]}
+                      error={errors.ethnicity}
+                      helperText={
+                        errors &&
+                        errors.ethnicity &&
+                        errors.ethnicity &&
+                        "This field is required"
+                      }
+                      {...field}
+                    />
+                  )}
+                />
+                <Stack spacing={1}>
+                  <Typography variant="bodyRegular">
+                    Do you identify as a member of the LGBTQIA community?
+                  </Typography>
+                  <Controller
+                    name="lgbtqia"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { onChange, value } }) => (
+                      <RadioGroup value={value} handleOptionsChange>
+                        {lgbtqiaOptions.map((o, i) => (
+                          <FormControlLabel
+                            key={i}
+                            value={o.value}
+                            control={<Radio />}
+                            label={o.label}
+                            onChange={onChange}
                           />
-                          <FormHelperText error={errors.lgbtqia}>
-                            {errors &&
-                              errors.lgbtqia &&
-                              errors.lgbtqia.type === "required" &&
-                              "This field is required"}
-                          </FormHelperText>
-                        </Stack>
-                        <Controller
-                          name="genderIdentity"
-                          control={control}
-                          rules={{ required: true }}
-                          render={({ field }) => (
-                            <Select
-                              label="What is your gender identity?"
-                              placeholder="Select one..."
-                              options={genderOptions.map((l) => l.label)}
-                              error={errors.genderIdentity}
-                              helperText={
-                                errors &&
-                                errors.genderIdentity &&
-                                errors.genderIdentity &&
-                                "This field is required"
-                              }
-                              {...field}
-                            />
-                          )}
-                        />
-                        <Controller
-                          name="pronouns"
-                          control={control}
-                          rules={{ required: true }}
-                          render={({ field }) => (
-                            <Select
-                              label="What are your pronouns?"
-                              placeholder="Select one..."
-                              options={pronounsOptions.map((l) => l.label)}
-                              error={errors.genderIdentity}
-                              helperText={
-                                errors &&
-                                errors.genderIdentity &&
-                                errors.genderIdentity &&
-                                "This field is required"
-                              }
-                              {...field}
-                            />
-                          )}
-                        />
-                        <Stack spacing={1}>
-                          <Typography variant="bodyRegular">
-                            What is your household income?
-                          </Typography>
-                          <Controller
-                            name="householdIncome"
-                            control={control}
-                            rules={{ required: true }}
-                            render={({ field: { onChange, value } }) => (
-                              <RadioGroup value={value} handleOptionsChange>
-                                {incomeOptions.map((o, i) => (
-                                  <FormControlLabel
-                                    key={i}
-                                    value={o.value}
-                                    control={<Radio />}
-                                    label={o.label}
-                                    onChange={onChange}
-                                  />
-                                ))}
-                              </RadioGroup>
-                            )}
-                          />
-                          <FormHelperText error={errors.lgbtqia}>
-                            {errors &&
-                              errors.lgbtqia &&
-                              errors.lgbtqia.type === "required" &&
-                              "This field is required"}
-                          </FormHelperText>
-                        </Stack>
-                      </>
-                    ) : (
-                      <>
-                        <Card size="small" noBorder>
-                          <Grid container>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodyMini" lightened>
-                                LANGUAGE
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodySmall">
-                                {selectedLanguage ? selectedLanguage : `-`}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </Card>
-                        <Card size="small" noBorder>
-                          <Grid container>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodyMini" lightened>
-                                ETHNICITY
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodySmall">
-                                {watchFields.ethnicity?.length
-                                  ? watchFields.ethnicity
-                                  : `-`}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </Card>
-                        <Card size="small" noBorder>
-                          <Grid container>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodyMini" lightened>
-                                LGBTQIA
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodySmall">
-                                {watchFields.lgbtqia
-                                  ? watchFields.lgbtqia === "false"
-                                    ? "No"
-                                    : "Yes"
-                                  : `-`}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </Card>
-                        <Card size="small" noBorder>
-                          <Grid container>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodyMini" lightened>
-                                GENDER IDENTITY
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodySmall">
-                                {selectedGenderIdentity
-                                  ? selectedGenderIdentity
-                                  : `-`}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </Card>
-                        <Card size="small" noBorder>
-                          <Grid container>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodyMini" lightened>
-                                PRONOUNS
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodySmall">
-                                {selectedPronouns ? selectedPronouns : `-`}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </Card>
-                        <Card size="small" noBorder>
-                          <Grid container>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodyMini" lightened>
-                                HOUSEHOLD INCOME
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <Typography variant="bodySmall">
-                                {selectedHouseholdIncome
-                                  ? selectedHouseholdIncome
-                                  : `-`}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        </Card>
-                      </>
+                        ))}
+                      </RadioGroup>
                     )}
-                  </Stack>
-                </Card>
+                  />
+                  <FormHelperText error={errors.lgbtqia}>
+                    {errors &&
+                      errors.lgbtqia &&
+                      errors.lgbtqia.type === "required" &&
+                      "This field is required"}
+                  </FormHelperText>
+                </Stack>
+                <Controller
+                  name="genderIdentity"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      label="What is your gender identity?"
+                      placeholder="Select one..."
+                      options={genderOptions.map((l) => l.label)}
+                      error={errors.genderIdentity}
+                      helperText={
+                        errors &&
+                        errors.genderIdentity &&
+                        errors.genderIdentity &&
+                        "This field is required"
+                      }
+                      {...field}
+                    />
+                  )}
+                />
+                <Controller
+                  name="pronouns"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      label="What are your pronouns?"
+                      placeholder="Select one..."
+                      options={pronounsOptions.map((l) => l.label)}
+                      error={errors.genderIdentity}
+                      helperText={
+                        errors &&
+                        errors.genderIdentity &&
+                        errors.genderIdentity &&
+                        "This field is required"
+                      }
+                      {...field}
+                    />
+                  )}
+                />
+                <Stack spacing={1}>
+                  <Typography variant="bodyRegular">
+                    What is your household income?
+                  </Typography>
+                  <Controller
+                    name="householdIncome"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { onChange, value } }) => (
+                      <RadioGroup value={value} handleOptionsChange>
+                        {incomeOptions.map((o, i) => (
+                          <FormControlLabel
+                            key={i}
+                            value={o.value}
+                            control={<Radio />}
+                            label={o.label}
+                            onChange={onChange}
+                          />
+                        ))}
+                      </RadioGroup>
+                    )}
+                  />
+                  <FormHelperText error={errors.lgbtqia}>
+                    {errors &&
+                      errors.lgbtqia &&
+                      errors.lgbtqia.type === "required" &&
+                      "This field is required"}
+                  </FormHelperText>
+                </Stack>
+
                 <Typography variant="bodySmall" lightened>
                   This information is only used for anonymous reporting reasons
                   and will never be shared outside the Wildflower Schools
@@ -446,17 +300,13 @@ const ConfirmDemographicInfo = ({}) => {
                 <Grid container spacing={3} justifyContent="space-between">
                   <Grid item xs={6}>
                     <Link href="/welcome/confirm-your-details">
-                      <Button full disabled={userIsEditing} variant="secondary">
+                      <Button full variant="secondary">
                         <Typography variant="bodyRegular">Back</Typography>
                       </Button>
                     </Link>
                   </Grid>
                   <Grid item xs={6}>
-                    <Button
-                      full
-                      disabled={userIsEditing || !isValid}
-                      onClick={handleConfirm}
-                    >
+                    <Button full disabled={isSubmitting} type="submit">
                       <Typography variant="bodyRegular" light>
                         Confirm
                       </Typography>
