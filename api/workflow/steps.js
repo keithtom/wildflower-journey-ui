@@ -18,7 +18,6 @@ const api = axios.create({
   },
 });
 
-async function index() {}
 
 // creates a custom task (TODO: not finished)
 async function create(processId, title){
