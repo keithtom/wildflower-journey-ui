@@ -10,43 +10,69 @@ const CustomMultiSelect = styled(MaterialSelect)`
     ${({ theme }) => theme.util.buffer * 1}px;
 `;
 
-const MultiSelect = ({ options, id, value, onChange, label, ...props }) => {
+const MultiSelect = ({
+  options,
+  id,
+  value,
+  onChange,
+  label,
+  placeholder,
+  ...props
+}) => {
   return (
-    <FormControl fullWidth>
-      <Stack spacing={2}>
-        <Typography variant="bodyRegular">{label}</Typography>
-        <CustomMultiSelect
-          multiple
-          labelId={`${id}-label`}
-          id={id}
-          value={value}
-          onChange={onChange}
-          input={<Input />}
-          IconComponent={(props) => (
-            <Icon
-              type="expandMore"
-              variant="lightened"
-              hoverable
-              style={{ top: "auto" }}
-              {...props}
-            />
-          )}
-          renderValue={(selected) => (
+    <FormControl fullWidth={!props.autoWidth}>
+      {label ? (
+        <Typography variant="bodyRegular" sx={{ marginBottom: "8px" }}>
+          {label}
+        </Typography>
+      ) : null}
+      <CustomMultiSelect
+        multiple
+        labelId={`${id}-label`}
+        id={id}
+        value={value}
+        onChange={onChange}
+        input={<Input />}
+        displayEmpty
+        autoWidth
+        IconComponent={(props) => (
+          <Icon
+            type="expandMore"
+            variant="lightened"
+            hoverable
+            style={{ top: "auto" }}
+            {...props}
+          />
+        )}
+        renderValue={(selected) => {
+          if (selected.length === 0) {
+            return (
+              <Typography
+                variant="bodyRegular"
+                lightened
+                sx={{ marginLeft: "8px" }}
+              >
+                {placeholder}
+              </Typography>
+            );
+          }
+
+          return (
             <Stack direction="row" spacing={1}>
               {selected.map((value) => (
                 <Chip key={value} label={value} />
               ))}
             </Stack>
-          )}
-          {...props}
-        >
-          {options.map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </CustomMultiSelect>
-      </Stack>
+          );
+        }}
+        {...props}
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </CustomMultiSelect>
     </FormControl>
   );
 };

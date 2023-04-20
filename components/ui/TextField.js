@@ -18,25 +18,27 @@ export default function TextField({
   return (
     <Stack spacing={1}>
       <FormControl variant="standard">
-        <Stack spacing={2}>
-          <Typography variant="bodyRegular">{label}</Typography>
-          <Input
-            multiline={multiline}
-            inputRef={inputRef}
-            placeholder={placeholder}
-            endAdornment={endAdornment}
-            error={error}
-            {...props}
-          />
-          {(charCount || charLimit) && (
-            <Typography variant="bodySmall" lightened>
-              {charCount} / {charLimit}
-            </Typography>
-          )}
-          {helperText && (
-            <FormHelperText error={error}>{helperText}</FormHelperText>
-          )}
-        </Stack>
+        {label ? (
+          <Typography variant="bodyRegular" sx={{ marginBottom: "8px" }}>
+            {label}
+          </Typography>
+        ) : null}
+        <Input
+          multiline={multiline}
+          inputRef={inputRef}
+          placeholder={placeholder}
+          endAdornment={endAdornment}
+          error={error}
+          {...props}
+        />
+        {(charCount || charLimit) && (
+          <Typography variant="bodySmall" lightened>
+            {charCount} / {charLimit}
+          </Typography>
+        )}
+        {helperText && (
+          <FormHelperText error={error}>{helperText}</FormHelperText>
+        )}
       </FormControl>
     </Stack>
   );

@@ -8,6 +8,7 @@ const StyledInput = styled(InputBase)`
     ${({ theme }) => theme.util.buffer * 3}px;
   font-size: ${({ theme }) => theme.typography.bodyRegular.fontSize};
   min-height: ${({ theme }) => theme.util.buffer * 12}px;
+  margin-top: 0 !important;
   /* error */
   ${(props) =>
     props.error &&
