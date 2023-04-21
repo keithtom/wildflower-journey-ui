@@ -26,7 +26,7 @@ async function tokenAuth(token, redirectUrl){
     token: token,
   });
   setCookie("auth", response.headers["authorization"], {
-    maxAge: 60 * 60 * 24,
+    maxAge: 60 * 60 * 24 * 30,
   });
   
   return response;
