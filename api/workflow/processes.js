@@ -22,7 +22,7 @@ async function show(id) {
   // augment steps with assignees and completers which is a convenient short-hand for looking at assignments.
   steps.forEach((step) => {
     step.relationships["assignees"] = []; // put real data in here from assignments
-    step.relationships.["completers"] = []; 
+    step.relationships["completers"] = []; 
   });
   
   // mutate the response to be friendly to the front-end
