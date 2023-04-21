@@ -105,24 +105,21 @@ const InfoDrawer = ({
                       ASSIGNEE
                     </Typography>
                     <Stack spacing={2} direction="row">
-                      //TODO: map function to iterate through array of assignees
-                      <AvatarWrapper
-                       
-                    /*
-                      assignees = [{id:, attributes: {}, person:{}]
-                    */
-                        badgeContent={
-                          assignee && assignee.id === completedBy.id ? (
-                            <Icon
-                              type="checkCircle"
-                              size="small"
-                              variant="primary"
-                              filled
-                            />
-                          ) : null
-                        }
-                        src={assignee && assignee.imageUrl}
-                      />
+                      { assignees && assignees.map((assignee) => (
+                        <AvatarWrapper                       
+                          badgeContent={
+                            assignee && assignee.id === completedBy.id ? (
+                              <Icon
+                                type="checkCircle"
+                                size="small"
+                                variant="primary"
+                                filled
+                              />
+                            ) : null
+                          }
+                          src={assignee && assignee.imageUrl}
+                        />
+                      ))}
                     </Stack>
                   </Stack>
                 )}

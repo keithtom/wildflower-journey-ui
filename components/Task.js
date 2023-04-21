@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
-import processesApi from "../api/processes";
-import stepsApi from "../api/steps";
+import processesApi from "@api/workflow/processes";
+import stepsApi from "@api/workflow/steps";
 import { useUserContext } from "@lib/useUserContext";
 
 import {
@@ -69,17 +69,16 @@ const Task = ({
   worktime,
   removeStep,
 }) => {
+  const { currentUser } = useUserContext();
   const isComplete = completionType === "individual" ? taskCompleters.find(e => e.id === currentUser.id ) : taskCompleters.length
-  
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
-  const [newAssigneeId, setNewAssigneeId] = useState(currentUser.id);
-  const [assignees, setAssignees] = useState(taskAssignees | []);
+  const [newAssigneeId, setNewAssigneeId] = useState(); // currentUser.id);
+  const [assignees, setAssignees] = useState(taskAssignees || []);
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
   const [completers, setCompleters] = useState(taskCompleters);
-  const { currentUser } = useUserContext();
 
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
@@ -246,7 +245,7 @@ const Task = ({
               isComplete={taskIsComplete}
               completers={completers}
               handleAssignUser={handleAssignUser}
-              handleUnssignUser={handleUnssignUser}
+              handleUnssignUser={handleUnassignUser}
               handleCompleteTask={handleCompleteTask}
               handleUncompleteTask={handleUncompleteTask}
             />
@@ -402,7 +401,7 @@ const TaskDrawerActions = ({
   handleCompleteTask,
   handleUncompleteTask,
 }) => {
-  const isAssignedToMe = assignees.filter(e => e.id === currentUser.id).length !== 0;
+  const isAssignedToMe = assignees.find(e => e.id === currentUser.id);
 
   const canUncomplete = completers && completers.find(e => e.id === currentUser.id)
   const completedBy = completers && completers.find(e => e.id !== currentUser.id)
