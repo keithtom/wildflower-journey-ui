@@ -32,4 +32,12 @@ async function tokenAuth(token, redirectUrl){
   return response;
 };
 
-export default { tokenAuth };
+async function loginEmailLink(email) {
+  const response = await api.post(`/users/email_login`, {
+    email: email,
+  });
+  const result = await response.json;
+  return result;
+}
+
+export default { tokenAuth, loginEmailLink };

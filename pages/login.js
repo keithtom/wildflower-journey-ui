@@ -6,6 +6,7 @@ import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
 import baseUrl from "../lib/utils/baseUrl";
+import { loginEmailLink } from "../api/users"; 
 
 import {
   Button,
@@ -34,7 +35,7 @@ const Login = ({}) => {
   const onSubmit = (data) => {
     axios
       .post(
-        loginRoute, // TODO: set base url in some variable that switches out based on env
+        loginRoute,
         {
           user: {
             email: data.email,
@@ -69,13 +70,16 @@ const Login = ({}) => {
       });
   };
 
-  const handleRequestEmailLink = async () => {
+  async function handleRequestEmailLink() {
     const emailValid = await trigger("email");
     if (emailValid) {
-      const email = getValues("email");
-      setSentEmailLoginRequest(true);
-      // console.log(email);
-      //TODO: send email login request to api
+      try {
+        const email = getValues("email");
+        await loginEmailLink(email);
+        setSentEmailLoginRequest(true);
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
