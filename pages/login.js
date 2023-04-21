@@ -27,6 +27,8 @@ const Login = ({}) => {
   const {
     control,
     handleSubmit,
+    trigger,
+    getValues,
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm();
   const onSubmit = (data) => {
@@ -67,9 +69,14 @@ const Login = ({}) => {
       });
   };
 
-  const handleRequestEmailLink = () => {
-    setSentEmailLoginRequest(true);
-    //TODO: send email login request to api
+  const handleRequestEmailLink = async () => {
+    const emailValid = await trigger("email");
+    if (emailValid) {
+      const email = getValues("email");
+      setSentEmailLoginRequest(true);
+      // console.log(email);
+      //TODO: send email login request to api
+    }
   };
 
   return (
