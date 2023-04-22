@@ -10,8 +10,6 @@ import baseUrl from "@lib/utils/baseUrl";
 
 import ssjApi from "../../api/ssj/ssj";
 import { useUserContext } from "@lib/useUserContext";
-import Milestone from "../../components/Milestone";
-import Task from "../../components/Task";
 import Hero from "../../components/Hero";
 
 import {
@@ -94,7 +92,7 @@ const SSJ = ({
       <PageContainer>
         {ssjIsPaused ? (
           <Grid container alignItems="center" justifyContent="center">
-            <Grid item xs={12} xs={12} sm={6} md={5} lg={4}>
+            <Grid item xs={12} sm={6} md={5} lg={4}>
               <Card>
                 <Stack spacing={6}>
                   <Icon type="pause" variant="primary" size="large" />
