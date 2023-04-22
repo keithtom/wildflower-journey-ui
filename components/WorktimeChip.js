@@ -9,12 +9,12 @@ const WorktimeChip = ({ worktime, withIcon, ...props }) => {
             <Icon type="time" size="small" />
 
             <Typography variant="bodyMini" bold>
-              About {worktime} hours
+              {worktime}
             </Typography>
           </Stack>
         ) : (
           <Typography variant="bodyMini" bold>
-            About {worktime} hours
+            {worktime}
           </Typography>
         )
       }

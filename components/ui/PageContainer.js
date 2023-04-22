@@ -2,8 +2,9 @@ import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 
 import { user } from "../../lib/utils/fake-data";
+import { theme } from "../../styles/theme";
 
-import { Box, Grid, Card, Stack, Icon, Typography } from "./index";
+import { Box, Grid, Card, Stack, Icon, Typography, Spinner } from "./index";
 import Nav from "../Nav";
 import Header from "../Header";
 
@@ -18,7 +19,7 @@ const PageContent = styled(Box)`
   padding: ${({ theme }) => theme.util.buffer * 6}px;
 `;
 
-const PageContainer = ({ children }) => {
+const PageContainer = ({ children, isLoading, hideNav }) => {
   //TODO: Get this data from the backend
   const SSJAbandonProcessStarted = false;
 
@@ -60,8 +61,26 @@ const PageContainer = ({ children }) => {
         ) : (
           <>
             <Header toggleNavOpen={toggleNavOpen} user={user} />
-            <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
-            <PageContent>{children}</PageContent>
+            {hideNav ? null : (
+              <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
+            )}
+            <PageContent>
+              {isLoading ? (
+                <Box
+                  sx={{
+                    flexGrow: "1",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: `calc(100vh - ${theme.util.appBarHeight * 2}px)`,
+                  }}
+                >
+                  <Spinner />
+                </Box>
+              ) : (
+                children
+              )}
+            </PageContent>
           </>
         )}
       </PageWrapper>

@@ -3,30 +3,33 @@ import { ListItem } from "@mui/material";
 
 import { Typography, Grid, Link, Icon } from "./index";
 
-const NavLink = ({ to, icon, active, secondary, tertiary, label }) => {
+const NavLink = ({ to, icon, active, variant, label }) => {
   const CustomListItem = styled(ListItem)`
-    padding: ${({ theme }) => theme.util.buffer * 4}px;
+    padding-left: ${({ theme }) => theme.util.buffer}px;
     &:hover {
       background: ${({ theme }) => theme.color.neutral.lightened};
     }
-
     //Active
+    ${(props) => props.active && css``}
+    //Primary
     ${(props) =>
-      props.active &&
+      props.variant === "primary" &&
       css`
-        background: ${props.theme.color.neutral.lightened};
+        padding: ${props.theme.util.buffer * 3}px 0;
+        &:hover {
+          background: ${props.theme.color.neutral.lightened};
+        }
       `}
-
     //Secondary
     ${(props) =>
-      props.secondary &&
+      props.variant === "secondary" &&
       css`
         padding: ${props.theme.util.buffer * 3}px 0;
         border-top: 1px solid ${props.theme.color.neutral.lightened};
       `}
-    //Tertiary
-    ${(props) =>
-      props.tertiary &&
+      //Tertiary
+      ${(props) =>
+      props.variant === "tertiary" &&
       css`
         padding: ${props.theme.util.buffer * 2}px 0;
       `}
@@ -34,30 +37,27 @@ const NavLink = ({ to, icon, active, secondary, tertiary, label }) => {
 
   return (
     <Link href={to}>
-      <CustomListItem
-        button
-        active={active}
-        secondary={secondary}
-        tertiary={tertiary}
-      >
+      <CustomListItem active={active} variant={variant}>
         <Grid
           container
           spacing={3}
           alignItems="center"
-          ml={secondary ? 10 : tertiary && 10}
+          ml={variant === "secondary" ? 10 : variant === "tertiary" ? 10 : 0}
         >
           {icon && (
             <Grid item>
               <Icon
                 type={icon}
-                variant={active ? "primary" : tertiary && "transparent"}
+                variant={
+                  active ? "primary" : variant === "tertiary" && "transparent"
+                }
               />
             </Grid>
           )}
           <Grid item>
             <Typography
               highlight={active}
-              bold={!tertiary}
+              bold={variant === "primary" || variant === "secondary"}
               variant="bodyRegular"
             >
               {label}

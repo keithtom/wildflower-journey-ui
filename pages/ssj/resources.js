@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getCookie } from "cookies-next";
 
 import {
   PageContainer,
@@ -36,11 +37,7 @@ const Resources = ({ dataResources }) => {
 
   const hero = "/assets/images/ssj/wildflowerSystems.jpg";
 
-  // console.log({ data });
-  // console.log({ processByCategory });
   // console.log({ dataResources });
-  // console.log({ dataAssignedSteps });
-  // console.log(Object.keys(dataResources[0])[0]);
 
   return (
     <PageContainer>
@@ -135,9 +132,9 @@ const Resources = ({ dataResources }) => {
 export default Resources;
 
 export async function getServerSideProps({ req, res }) {
-  const workflowId = "c502-4f84";
-  const apiRouteResources = `${baseUrl}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
+  const workflowId = getCookie("workflowId", { req, res });
   setAuthHeader({ req, res });
+  const apiRouteResources = `${baseUrl}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
   const responseResources = await axios.get(apiRouteResources);
   const dataResources = await responseResources.data;
 

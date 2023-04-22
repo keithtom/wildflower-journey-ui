@@ -7,10 +7,13 @@ import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
+import { getCookie } from "cookies-next";
+import { parseISO } from "date-fns";
 
 import ssjApi from "../../api/ssj/ssj";
 import { useUserContext } from "@lib/useUserContext";
 import Hero from "../../components/Hero";
+import UserContactModal from "../../components/UserContactModal";
 
 import {
   Box,
@@ -32,11 +35,7 @@ import {
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
 
-const SSJ = ({
-  dataProgress,
-  milestonesToDo,
-  totalSteps,
-}) => {
+const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
@@ -47,7 +46,6 @@ const SSJ = ({
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
-  const hasAssignedTasks = totalSteps > 1;
 
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
@@ -83,13 +81,19 @@ const SSJ = ({
     });
   }, []);
 
-  const hasPartner = team?.hasPartner;
-
+  const partners =
+    team?.length > 1
+      ? team.team.filter((t) => t.data.id !== currentUser?.id)
+      : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
+
+  const opsGuide = currentUser?.attributes.ssj.opsGuide.data.attributes;
+  const regionalGrowthLead =
+    currentUser?.attributes.ssj.regionalGrowthLead.data.attributes;
 
   return (
     <>
-      <PageContainer>
+      <PageContainer isLoading={!currentUser}>
         {ssjIsPaused ? (
           <Grid container alignItems="center" justifyContent="center">
             <Grid item xs={12} sm={6} md={5} lg={4}>
@@ -129,10 +133,13 @@ const SSJ = ({
             >
               <Grid item>
                 <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar src={currentUser && currentUser.profileImage} />
+                  <Avatar
+                    src={currentUser && currentUser.attributes.imageUrl}
+                  />
                   <Stack>
                     <Typography variant="h4" bold>
-                      Welcome, {currentUser && currentUser.firstName}!
+                      Welcome, {currentUser && currentUser.attributes.firstName}
+                      !
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
                       School Startup Journey
@@ -190,7 +197,7 @@ const SSJ = ({
               </Grid>
             </Grid>
 
-            {hasAssignedTasks ? (
+            {dataAssignedSteps.length ? (
               <Card variant="primaryLightened">
                 <Grid container alignItems="center">
                   <Grid item flex={1}>
@@ -199,7 +206,8 @@ const SSJ = ({
                         You have{" "}
                       </Typography>
                       <Typography variant="h3" highlight bold>
-                        {totalSteps} tasks
+                        {dataAssignedSteps.length} task
+                        {dataAssignedSteps.length > 1 ? `s` : null}
                       </Typography>{" "}
                       <Typography variant="h3" bold>
                         on your to do list
@@ -300,24 +308,45 @@ const SSJ = ({
                 </Grid>
               </Grid>
               <Grid container spacing={3} alignItems="stretch">
-                {hasPartner ? null : (
-                  <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={4}>
+                  {partners && partners.length ? (
+                    partners.map((p) => (
+                      <UserCard
+                        key={p.data.id}
+                        firstName={p.data.attributes.firstName}
+                        lastName={p.data.attributes.lastName}
+                        email={p.data.attributes.email}
+                        phone={p.data.attributes.phone}
+                        role="Partner"
+                      />
+                    ))
+                  ) : (
                     <AddPartnerCard
                       submittedPartnerRequest={submittedPartnerRequest}
                       onClick={() => setAddPartnerModalOpen(true)}
                     />
-                  </Grid>
-                )}
-                {FakeStartupFamily.map((f, i) => (
-                  <Grid item xs={12} sm={4} key={i}>
-                    <UserCard
-                      firstName={f.attributes.firstName}
-                      lastName={f.attributes.lastName}
-                      role={f.roles[0]}
-                      profileImage={f.attributes.imageUrl}
-                    />
-                  </Grid>
-                ))}
+                  )}
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <UserCard
+                    firstName={opsGuide?.firstName}
+                    lastName={opsGuide?.lastName}
+                    email={opsGuide?.email}
+                    phone={opsGuide?.phone}
+                    profileImage={opsGuide?.imageUrl}
+                    role="Operations Guide"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <UserCard
+                    firstName={regionalGrowthLead?.firstName}
+                    lastName={regionalGrowthLead?.lastName}
+                    email={regionalGrowthLead?.email}
+                    phone={regionalGrowthLead?.phone}
+                    profileImage={regionalGrowthLead?.imageUrl}
+                    role="Regional Growth Lead"
+                  />
+                </Grid>
               </Grid>
             </Stack>
 
@@ -438,8 +467,8 @@ const SSJ = ({
                         There are 22 other Emerging Teacher Leaders
                       </Typography>
                       <Typography variant="bodyRegular" lightened>
-                        Get to know a growing number of Emering Teacher Leaders,
-                        share learnings, and educate together.
+                        Get to know a growing number of Emerging Teacher Leaders
+                        in the journey
                       </Typography>
                     </Stack>
                   </Grid>
@@ -714,7 +743,10 @@ const ETLs = ({}) => {
   );
 };
 const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
-  const [dateValue, setDateValue] = useState(openDate);
+  const [dateValue, setDateValue] = useState();
+  useEffect(() => {
+    setDateValue(openDate);
+  });
   const handleDateValueChange = (newValue) => {
     setDateValue(newValue);
   };
@@ -740,7 +772,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
         <DatePicker
           label="Your anticipated open date"
           id="open-date"
-          value={dateValue}
+          value={parseISO(dateValue)}
           onChange={handleDateValueChange}
         />
         <Grid container justifyContent="space-between">
@@ -982,25 +1014,48 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     </Modal>
   );
 };
-const UserCard = ({ firstName, lastName, role, profileImage }) => {
+const UserCard = ({
+  firstName,
+  lastName,
+  email,
+  phone,
+  role,
+  profileImage,
+}) => {
+  const [contactModalOpen, setContactModalOpen] = useState(false);
   return (
-    <Card variant="lightened" size="small">
-      <Grid container spacing={3} alignItems="center">
-        <Grid item>
-          <Avatar src={profileImage} />
+    <>
+      <Card
+        variant="lightened"
+        size="small"
+        hoverable
+        onClick={() => setContactModalOpen(true)}
+      >
+        <Grid container spacing={3} alignItems="center">
+          <Grid item>
+            <Avatar src={profileImage} />
+          </Grid>
+          <Grid item>
+            <Stack>
+              <Typography variant="bodyRegular" bold>
+                {firstName} {lastName}
+              </Typography>
+              <Typography variant="bodySmall" lightened>
+                {role}
+              </Typography>
+            </Stack>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Stack>
-            <Typography variant="bodyRegular" bold>
-              {firstName} {lastName}
-            </Typography>
-            <Typography variant="bodySmall" lightened>
-              {role}
-            </Typography>
-          </Stack>
-        </Grid>
-      </Grid>
-    </Card>
+      </Card>
+      <UserContactModal
+        firstName={firstName}
+        lastName={lastName}
+        email={email}
+        phone={phone}
+        open={contactModalOpen}
+        toggle={() => setContactModalOpen(!contactModalOpen)}
+      />
+    </>
   );
 };
 const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
@@ -1060,48 +1115,6 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
     </Card>
   );
 };
-
-const FakePartners = [
-  {
-    id: "2601-8f69",
-    type: "person",
-    roles: ["Teacher Leader"],
-    attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Jaimee",
-      lastName: "Gleichner",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/men/60.jpg",
-    },
-  },
-];
-
-const FakeStartupFamily = [
-  {
-    id: "2601-8f69",
-    type: "person",
-    roles: ["Operations Guide"],
-    attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Brett",
-      lastName: "Vincent",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/men/60.jpg",
-    },
-  },
-  {
-    id: "2601-8f69",
-    type: "person",
-    roles: ["Operations Guide"],
-    attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Mary",
-      lastName: "Truman",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/women/89.jpg",
-    },
-  },
-];
 
 const FakeETLs = [
   {
@@ -1241,12 +1254,15 @@ const waysToWorkTogether = [
     ],
   },
 ];
+
 export async function getServerSideProps({ params, req, res }) {
   // hard coded phase to visioning here... so milestones Todo won't show subsequent milestones to start.
   // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
   const phase = "visioning";  // this should be your teams current phase?
   
-  const workflowId = "c502-4f84";
+  const workflowId = getCookie("workflowId", { req, res });
+  const phase = getCookie("phase", { req, res });
+
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
@@ -1276,11 +1292,17 @@ export async function getServerSideProps({ params, req, res }) {
 
   // dashboard needs - # of assigned tasks, phase, location, hub, open date, startup family, phase stats (# completed, # milestones,), category stats (#completed, # milestones)
 
+  const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
+  const dataAssignedSteps = await responseAssignedSteps.data;
+
+
   return {
     props: {
       milestonesToDo,
       dataProgress,
-      totalSteps,
+      phase,
+      dataAssignedSteps,
     },
   };
 }

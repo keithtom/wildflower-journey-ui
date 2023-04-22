@@ -20,33 +20,31 @@ import StatusChip from "./StatusChip";
 import Resource from "./Resource";
 
 const CustomDrawer = styled(Drawer)`
-  margin: 0;
-  flex-shrink: 0;
-  width: ${({ theme }) => theme.util.infoDrawerWidth}px;
-  z-index: 1;
   .MuiDrawer-paper {
-    width: ${({ theme }) => theme.util.infoDrawerWidth}px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0;
+    flex-shrink: 0;
+    z-index: 1;
     outline: 1px solid ${({ theme }) => theme.color.neutral.main};
     border: none;
     margin-top: 0;
-    padding-top: ${({ theme }) => theme.util.appBarHeight}px;
+    width: ${({ theme }) => theme.util.infoDrawerWidth}px;
+    height: ${({ theme }) => `100vh - ${theme.util.appBarHeight}px`};
   }
 `;
 
-const StyledScrollArea = styled(Box)``;
 const StyledInfoCard = styled(Card)`
-  padding-bottom: ${({ theme }) => `calc(${theme.util.buffer * 12}px)`};
-  min-height: ${(props) =>
-    props.isDecision
-      ? `calc(100vh - 331px - ${props.theme.util.appBarHeight}px)`
-      : `calc(100vh - 97px - ${props.theme.util.appBarHeight}px)`}; //TODO: Fix this hack. 331 is height of decision actions, 97 is height of task actions
+  overflow-y: scroll;
 `;
 const ActionsContainer = styled(Card)`
   position: sticky;
   bottom: 0;
   border-top: 1px solid ${({ theme }) => theme.color.neutral.main};
-  width: ${({ theme }) => theme.util.infoDrawerWidth}px;
+  width: 100%;
   padding: ${({ theme }) => theme.util.buffer * 6}px;
+  overflow: visible;
 `;
 
 const InfoDrawer = ({
@@ -71,36 +69,31 @@ const InfoDrawer = ({
 
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
-      <StyledScrollArea>
-        <StyledInfoCard noBorder noRadius isDecision={isDecision}>
-          <Stack spacing={12}>
-            <Stack spacing={6}>
-              <Grid
-                container
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Grid item>
-                  <Chip
-                    label={
-                      isDecision ? "Decision" : taskId ? "Task" : "Milestone"
-                    }
-                    size="small"
-                  />
-                </Grid>
-                <Grid item>
-                  <IconButton onClick={toggle}>
-                    <Icon type="close" />
-                  </IconButton>
-                </Grid>
+      <StyledInfoCard noBorder noRadius>
+        <Stack spacing={12}>
+          <Stack spacing={6}>
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Grid item>
+                <Chip
+                  label={
+                    isDecision ? "Decision" : taskId ? "Task" : "Milestone"
+                  }
+                  size="small"
+                />
               </Grid>
+              <Grid item>
+                <IconButton onClick={toggle}>
+                  <Icon type="close" />
+                </IconButton>
+              </Grid>
+            </Grid>
 
               <Typography variant="bodyLarge" bold struck={isComplete}>
                 {title}
               </Typography>
               <Stack direction="row" spacing={4}>
                 {taskId && (
-                  <Stack spacing={2}>
+                  <Stack spacing={4}>
                     <Typography variant="bodyMini" lightened bold>
                       ASSIGNEE
                     </Typography>
@@ -165,28 +158,77 @@ const InfoDrawer = ({
                   <Typography variant="bodyRegular" bold>
                     About
                   </Typography>
-                </Stack>
-                <Divider />
-                <Typography>{about}</Typography>
-              </Stack>
-            )}
-            {resources && resources.length ? (
-              <Stack spacing={2}>
-                {resources.map((r, i) => (
-                  <Resource
-                    link={includedDocuments[r.id].attributes.link}
-                    title={includedDocuments[r.id].attributes.title}
-                    key={i}
+                  <Avatar
+                    size="mini"
+                    // TODO: can we get the assignee information for each task in the process serializer
+                    src={assignee && assignee.imageUrl}
                   />
-                ))}
-              </Stack>
-            ) : null}
+                </Stack>
+              )}
+              {status && (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    STATUS
+                  </Typography>
+                  <StatusChip status={status} size="small" withIcon />
+                </Stack>
+              )}
+              {categories && (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    CATEGORY
+                  </Typography>
+                  <Stack direction="row" spacing={2}>
+                    {categories.map((m, i) => (
+                      <CategoryChip
+                        category={m}
+                        size="small"
+                        withIcon
+                        key={i}
+                      />
+                    ))}
+                  </Stack>
+                </Stack>
+              )}
+              {worktime ? (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    WORKTIME
+                  </Typography>
+                  <WorktimeChip size="small" worktime={worktime} withIcon />
+                </Stack>
+              ) : null}
+            </Stack>
           </Stack>
-        </StyledInfoCard>
-        <ActionsContainer noBorder noPadding noRadius>
-          {actions}
-        </ActionsContainer>
-      </StyledScrollArea>
+          {about && (
+            <Stack spacing={4}>
+              <Stack direction="row" spacing={4}>
+                <Icon type="glasses" variant="primary" size="medium" />
+                <Typography variant="bodyRegular" bold>
+                  About
+                </Typography>
+              </Stack>
+              <Divider />
+              <Typography>{about}</Typography>
+            </Stack>
+          )}
+          {resources && resources.length ? (
+            <Stack spacing={2}>
+              {resources.map((r, i) => (
+                <Resource
+                  link={includedDocuments[r.id].attributes.link}
+                  title={includedDocuments[r.id].attributes.title}
+                  key={i}
+                />
+              ))}
+            </Stack>
+          ) : null}
+        </Stack>
+      </StyledInfoCard>
+
+      <ActionsContainer noBorder noPadding noRadius>
+        {actions}
+      </ActionsContainer>
     </CustomDrawer>
   );
 };

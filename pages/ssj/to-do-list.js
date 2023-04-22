@@ -14,6 +14,7 @@ import Hero from "../../components/Hero";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
+import { getCookie } from "cookies-next";
 
 const ToDoList = ({
   includedDocuments,
@@ -41,10 +42,16 @@ const ToDoList = ({
   // console.log({ assignedSteps });
   // console.log({ includedProcess });
   // console.log({ includedDocuments });
-  // console.log({ milestonesWithSelfAssignedTasks });
 
   return (
-    <PageContainer>
+    <PageContainer
+      isLoading={
+        !dataAssignedSteps ||
+        !milestonesToDo ||
+        !includedProcess ||
+        !includedDocuments
+      }
+    >
       <Stack spacing={12}>
         <Hero imageUrl={hero} />
         <Stack spacing={6} direction="row" alignItems="center">
@@ -146,14 +153,12 @@ const ToDoList = ({
 export default ToDoList;
 
 export async function getServerSideProps({ req, res }) {
-  const workflowId = "c502-4f84";
-  const phase = "visioning";
-
+  const workflowId = getCookie("workflowId", { req, res });
+  const phase = getCookie("phase", { req, res });
   const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
   setAuthHeader({ req, res });
   const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
   const dataAssignedSteps = await responseAssignedSteps.data;
-
   const includedDocuments = {};
   dataAssignedSteps[0]?.steps.forEach((i) =>
     i.included
@@ -162,7 +167,6 @@ export async function getServerSideProps({ req, res }) {
         includedDocuments[i.id] = i;
       })
   );
-
   const includedProcess = {};
   dataAssignedSteps[0]?.steps.forEach((i) =>
     i.included
@@ -171,23 +175,6 @@ export async function getServerSideProps({ req, res }) {
         includedProcess[i.id] = i;
       })
   );
-
-  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&self_assigned=true`;
-  const response = await axios.get(apiRoute);
-  const data = await response.data;
-  const steps = {};
-  var totalSteps = 0;
-  data.included.forEach((included) => {
-    if (included.type == "step") {
-      steps[included.id] = included;
-      totalSteps++;
-    }
-  });
-  data.data.forEach((milestone) => {
-    milestone.relationships.steps.data.forEach((includedStep, i) => {
-      milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
-    });
-  });
 
   const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   const responseMilestones = await axios.get(apiRouteMilestones);
@@ -201,7 +188,6 @@ export async function getServerSideProps({ req, res }) {
 
   return {
     props: {
-      data,
       includedDocuments,
       includedProcess,
       dataAssignedSteps,

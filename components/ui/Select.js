@@ -27,7 +27,15 @@ const Select = ({
           value={value}
           onChange={onChange}
           input={<Input />}
-          IconComponent={() => <Icon type="expandMore" variant="lightened" />}
+          IconComponent={(props) => (
+            <Icon
+              type="expandMore"
+              variant="lightened"
+              hoverable
+              style={{ top: "auto" }}
+              {...props}
+            />
+          )}
           {...props}
         >
           <MenuItem disabled value="">

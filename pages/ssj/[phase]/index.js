@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../../lib/setAuthHeader";
 import axios from "axios";
 import baseUrl from "../../../lib/utils/baseUrl";
+import { getCookie } from "cookies-next";
 
 import {
   PageContainer,
@@ -433,8 +434,7 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
 
 export async function getServerSideProps({ params, req, res }) {
   const { phase } = params;
-  const workflowId = "c502-4f84";
-  // const workflowId = "5947-ab7f"
+  const workflowId = getCookie("workflowId", { req, res });
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
 

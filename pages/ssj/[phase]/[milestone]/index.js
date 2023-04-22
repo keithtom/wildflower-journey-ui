@@ -36,13 +36,9 @@ const StyledMilestoneHeader = styled(Stack)`
     `}
 `;
 
-const MilestonePage = ({
-  FakeMilestoneTasks,
-  milestone,
-  includedData,
-}) => {
+const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
   const milestoneAttributes = milestone.attributes;
-  
+
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
@@ -57,10 +53,12 @@ const MilestonePage = ({
     //updateMilestone
     setUserIsEditing(false);
   };
-  const includedProcesses = includedData.filter(e => e.type === "process");
-  var milestonePrerequisites = milestone.relationships.prerequisiteProcesses && milestone.relationships.prerequisiteProcesses.data.map((e) => {
-    return includedProcesses.find((p) => p.id === e.id);
-  });
+  const includedProcesses = includedData.filter((e) => e.type === "process");
+  var milestonePrerequisites =
+    milestone.relationships.prerequisiteProcesses &&
+    milestone.relationships.prerequisiteProcesses.data.map((e) => {
+      return includedProcesses.find((p) => p.id === e.id);
+    });
 
   const includedDocuments = {};
   includedData
@@ -69,14 +67,16 @@ const MilestonePage = ({
       includedDocuments[i.id] = i;
     });
 
-  const includedSteps = includedData.filter(e => e.type === "step");
-  var milestoneTasks = milestone.relationships.steps && milestone.relationships.steps.data.map((e) => {
-    return includedSteps.find((s) => s.id === e.id);
-  });
+  const includedSteps = includedData.filter((e) => e.type === "step");
+  var milestoneTasks =
+    milestone.relationships.steps &&
+    milestone.relationships.steps.data.map((e) => {
+      return includedSteps.find((s) => s.id === e.id);
+    });
   const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
   );
-  
+
   const router = useRouter();
   const { phase } = router.query;
 
@@ -100,18 +100,19 @@ const MilestonePage = ({
                 </Grid>
                 <Grid item xs={12}>
                   <Stack spacing={3}>
-                    {milestonePrerequisites && milestonePrerequisites.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${phase}/${m.id}`}
-                        key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
-                        effort={m.attributes.effort}
-                        categories={m.attributes.categories}
-                        status={m.attributes.status}
-                        stepCount={m.relationships.steps.data.length}
-                      />
-                    ))}
+                    {milestonePrerequisites &&
+                      milestonePrerequisites.map((m, i) => (
+                        <Milestone
+                          link={`/ssj/${phase}/${m.id}`}
+                          key={i}
+                          title={m.attributes.title}
+                          description={m.attributes.description}
+                          effort={m.attributes.effort}
+                          categories={m.attributes.categories}
+                          status={m.attributes.status}
+                          stepCount={m.relationships.steps.data.length}
+                        />
+                      ))}
                   </Stack>
                 </Grid>
               </Grid>
@@ -233,9 +234,7 @@ const MilestonePage = ({
                 taskCompleters={t.relationships.completers}
                 resources={t.relationships.documents.data}
                 includedDocuments={includedDocuments}
-                worktime={
-                  (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
-                }
+                worktime={t.attributes.maxWorktime}
               />
             ))
           ) : (
@@ -411,9 +410,9 @@ const EditableTaskList = ({ tasks }) => {
   );
 };
 
-export async function getServerSideProps({ params, query, req, res }) {
+export async function getServerSideProps({ query, req, res }) {
   const milestoneId = query.milestone;
-  
+
   setAuthHeader({ req, res });
   const response = await processesApi.show(milestoneId)
   const data = response.data;
