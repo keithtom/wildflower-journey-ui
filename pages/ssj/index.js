@@ -35,10 +35,8 @@ import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
 
 const SSJ = ({
-  phase,
   dataProgress,
   milestonesToDo,
-  milestonesWithSelfAssignedTasks,
   totalSteps,
 }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
@@ -51,7 +49,7 @@ const SSJ = ({
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
-  const hasAssignedTasks = milestonesWithSelfAssignedTasks.length;
+  const hasAssignedTasks = totalSteps > 1;
 
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
@@ -90,13 +88,6 @@ const SSJ = ({
   const hasPartner = team?.hasPartner;
 
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
-
-  // console.log("team", team);
-  // console.log({ data });
-  // console.log({ dataProgress });
-  // console.log({ milestonesWithSelfAssignedTasks });
-  // console.log({ currentUser });
-  // console.log(totalSteps);
 
   return (
     <>
@@ -264,7 +255,7 @@ const SSJ = ({
                     >
                       <Stack spacing={2}>
                         {milestonesToDo.map((m, i) => (
-                          <Link href={`/ssj/${phase}/${m.id}`}>
+                          <Link href={`/ssj/${m.attributes.phase}/${m.id}`}>
                             <Card
                               variant="light"
                               size="small"
@@ -1072,72 +1063,6 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
   );
 };
 
-const AssignedTaskByMilestone = ({
-  tasksByMilestone,
-  phase,
-  includedDocuments,
-}) => {
-  const [expandedTasks, setExpandedTasks] = useState(false);
-  const m = tasksByMilestone;
-
-  return (
-    <>
-      <Milestone
-        variant="small"
-        link={`/ssj/${phase}/${m.id}`}
-        title={m.attributes.title}
-        effort={m.attributes.effort}
-        categories={m.attributes.categories}
-        description={m.attributes.description}
-        status={m.attributes.status}
-        stepCount={m.attributes.stepsCount}
-      />
-      {m.relationships.steps.data
-        .slice(0, !expandedTasks ? 1 : 100)
-        .map((t, i) => (
-          <Task
-            variant="small"
-            taskId={t.id}
-            link={`/ssj/${phase}/${m.id}/${t.id}`}
-            title={t.attributes.title}
-            key={i}
-            isDecision={t.attributes.kind === "Decision"}
-            decisionOptions={t.attributes.decisionOptions}
-            isComplete={t.attributes.completed}
-            isNext={i === 0}
-            // handleCompleteMilestone={handleCompleteMilestone}
-            resources={t.relationships.documents.data}
-            includedDocuments={includedDocuments}
-            categories={m.attributes.categories}
-            description={t.attributes.description}
-            worktime={
-              (t.attributes.maxWorktime + t.attributes.minWorktime) / 2 / 60
-            }
-            taskAssignee={t.attributes.assigneeInfo}
-            clearFromListWhenComplete={true}
-          />
-        ))}
-      {m.relationships.steps.data.length > 1 && (
-        <Card
-          noBorder
-          size="small"
-          onClick={() => setExpandedTasks(!expandedTasks)}
-          hoverable
-        >
-          <Grid container justifyContent="center">
-            <Grid item>
-              <Typography variant="bodySmall" bold highlight>
-                Show {m.relationships.steps.data.length - 1}{" "}
-                {expandedTasks ? "less" : "more"}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Card>
-      )}
-    </>
-  );
-};
-
 const FakePartners = [
   {
     id: "2601-8f69",
@@ -1319,50 +1244,34 @@ const waysToWorkTogether = [
   },
 ];
 export async function getServerSideProps({ params, req, res }) {
+  // hard coded phase to visioning here... so milestones Todo won't show subsequent milestones to start.
+  // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
+  const phase = "visioning";  // this should be your teams current phase?
   
-  // const data = await ssj.dashboard();
-
-  const phase = "visioning";
-  // const workflowId = "5947-ab7f"
   const workflowId = "c502-4f84";
-  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&self_assigned=true`;
+  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
-  const data = await response.data;
-  const steps = {};
-  var totalSteps = 0;
+  const data = response.data;
+  
+  // want to know how many assigned tasks there are.
+  var totalSteps = 0; // rename to total assigned steps.; numMyAssignedTasks
   data.included.forEach((included) => {
     if (included.type == "step") {
-      steps[included.id] = included;
       totalSteps++;
     }
   });
 
-  const includedDocuments = {};
-  data.included
-    .filter((i) => i.type === "document")
-    .forEach((i) => {
-      includedDocuments[i.id] = i;
-    });
-
-  data.data.forEach((milestone) => {
-    milestone.relationships.steps.data.forEach((includedStep, i) => {
-      milestone.relationships.steps.data.splice(i, 1, steps[includedStep.id]);
-    });
-  });
-
-  const milestonesWithSelfAssignedTasks = data.data;
-
-  const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-  const responseMilestones = await axios.get(apiRouteMilestones);
-  const dataMilestones = await responseMilestones.data;
+  // suggests potential milestones to start if no tasks assigned.
   const milestonesToDo = [];
-  dataMilestones.data.forEach((milestone) => {
+  data.data.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
       milestonesToDo.push(milestone);
     }
   });
 
+  // const data = await ssj.dashboard();
+// put assigned tasks in this api call?
   const apiRouteProgress = `${baseUrl}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
@@ -1372,11 +1281,7 @@ export async function getServerSideProps({ params, req, res }) {
   return {
     props: {
       milestonesToDo,
-      includedDocuments,
       dataProgress,
-      data,
-      phase,
-      milestonesWithSelfAssignedTasks,
       totalSteps,
     },
   };
