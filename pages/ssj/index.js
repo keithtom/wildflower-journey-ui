@@ -9,7 +9,6 @@ import axios from "axios";
 import baseUrl from "@lib/utils/baseUrl";
 
 import ssjApi from "../../api/ssj/ssj";
-import { categories } from "../../lib/utils/fake-data";
 import { useUserContext } from "@lib/useUserContext";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
@@ -34,15 +33,12 @@ import {
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
-import { ListItemSecondaryAction } from "@mui/material";
 
 const SSJ = ({
   phase,
   dataProgress,
-  data,
   milestonesToDo,
   milestonesWithSelfAssignedTasks,
-  includedDocuments,
   totalSteps,
 }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
@@ -1323,9 +1319,7 @@ const waysToWorkTogether = [
   },
 ];
 export async function getServerSideProps({ params, req, res }) {
-  // const userId = query.userId;
-  // const ssjId = query.ssjId;
-
+  
   // const data = await ssj.dashboard();
 
   const phase = "visioning";

@@ -12,8 +12,6 @@ import {
   Stack,
   Button,
   Icon,
-  Link,
-  IconButton,
   Chip,
   Avatar,
   Snackbar,
@@ -403,9 +401,8 @@ const TaskDrawerActions = ({
 }) => {
   const isAssignedToMe = assignees.find(e => e.id === currentUser.id);
 
-  const canUncomplete = completers && completers.find(e => e.id === currentUser.id)
-  const completedBy = completers && completers.find(e => e.id !== currentUser.id)
-  
+  const canUncomplete = completers && completers.find(e => e.id === currentUser.id)  // ideally comes from the backend.
+  const completedBy = completers && completers.find(e => e.id !== currentUser.id)  // ideally comes from the backend.
   // NOTE: we can't uncomplete if process is complete (we should have task.milestone.isComplete
   
   return (

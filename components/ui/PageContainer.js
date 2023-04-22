@@ -6,7 +6,6 @@ import { user } from "../../lib/utils/fake-data";
 import { Box, Grid, Card, Stack, Icon, Typography } from "./index";
 import Nav from "../Nav";
 import Header from "../Header";
-import InfoDrawer from "../InfoDrawer";
 
 // NOTE: This is not included in storybook
 
