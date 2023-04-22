@@ -97,11 +97,23 @@ const InfoDrawer = ({
                   <Typography variant="bodyMini" lightened bold>
                     ASSIGNEE
                   </Typography>
-                  <Avatar
-                    size="mini"
-                    // TODO: can we get the assignee information for each task in the process serializer
-                    src={assignee && assignee.imageUrl}
-                  />
+                  <Stack spacing={2} direction="row">
+                    { assignees.map((assignee) => (
+                      <AvatarWrapper                       
+                        badgeContent={
+                          assignee.attributes.completedAt && (
+                            <Icon
+                              type="checkCircle"
+                              size="small"
+                              variant="primary"
+                              filled
+                            />
+                          )
+                        }
+                        src={assignee && assignee.imageUrl}
+                      />
+                    ))}
+                  </Stack>
                 </Stack>
               )}
               {status && (
