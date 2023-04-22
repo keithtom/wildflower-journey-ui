@@ -23,7 +23,6 @@ import {
 } from "@ui";
 import Task from "../../../../components/Task";
 import CategoryChip from "../../../../components/CategoryChip";
-import PhaseChip from "../../../../components/PhaseChip";
 import StatusChip from "../../../../components/StatusChip";
 import Milestone from "../../../../components/Milestone";
 
@@ -53,26 +52,10 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
     //updateMilestone
     setUserIsEditing(false);
   };
-  const includedProcesses = includedData.filter((e) => e.type === "process");
-  var milestonePrerequisites =
-    milestone.relationships.prerequisiteProcesses &&
-    milestone.relationships.prerequisiteProcesses.data.map((e) => {
-      return includedProcesses.find((p) => p.id === e.id);
-    });
 
-  const includedDocuments = {};
-  includedData
-    .filter((i) => i.type === "document")
-    .forEach((i) => {
-      includedDocuments[i.id] = i;
-    });
-
-  const includedSteps = includedData.filter((e) => e.type === "step");
-  var milestoneTasks =
-    milestone.relationships.steps &&
-    milestone.relationships.steps.data.map((e) => {
-      return includedSteps.find((s) => s.id === e.id);
-    });
+  var milestonePrerequisites = milestone.relationships.prerequisiteProcesses.data
+  var milestoneTasks = milestone.relationships.steps.data
+  
   const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
   );
@@ -233,7 +216,6 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
                 completionType={t.attributes.completionType}
                 taskCompleters={t.relationships.completers}
                 resources={t.relationships.documents.data}
-                includedDocuments={includedDocuments}
                 worktime={t.attributes.maxWorktime}
               />
             ))

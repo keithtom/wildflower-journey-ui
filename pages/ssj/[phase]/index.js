@@ -450,6 +450,7 @@ export async function getServerSideProps({ params, req, res }) {
     (m) => m.attributes.phase === phase
   );
 
+  // pull me into API
   currentPhaseMilestones.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
       milestonesToDo.push(milestone);

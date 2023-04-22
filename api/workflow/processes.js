@@ -15,8 +15,9 @@ async function show(id) {
   var responseData = wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
   
   var steps = response.data.data.relationships.steps.data;
-  
+
   // augment steps with assignees and completers which is a convenient short-hand for looking at assignments since the UI cares about the information this way.
+  var steps = response.data.data.relationships.steps.data;
   steps.forEach((step) => {
     let assignments = wildflowerApi.loadRelationshipsFromIncluded(step.relationships.assignments.data, response.data.included);
     let assignees = assignments.map((e) => {
@@ -42,10 +43,17 @@ async function show(id) {
       return assignee;
     });
     
-    step.relationships["assignees"] = assignees;
+    step.relationships["assignees"] = assignees; // this should be { data: assignees } to match.
     step.relationships["completers"] = completers;
-  });// when ID isn't found in included, it returns undefined.
-  
+  });
+
+  // load secondary relationship milestone.steps.documents
+  steps.forEach((step) => {
+    let documents = wildflowerApi.loadRelationshipsFromIncluded(step.relationships.documents.data, response.data.included);
+
+    step.relationships.documents.data = documents;
+  });
+
   // mutate the response to be friendly to the front-end
   response.data.data.relationships.steps.data = steps;
   return response;

@@ -57,13 +57,11 @@ const InfoDrawer = ({
   status,
   resources,
   categories,
-  effort,
   actions,
   isDecision,
   completionType,
   completers,
   isComplete,
-  includedDocuments,
   worktime,
 }) => {
 
@@ -167,9 +165,9 @@ const InfoDrawer = ({
             <Stack spacing={2}>
               {resources.map((r, i) => (
                 <Resource
-                  link={includedDocuments[r.id].attributes.link}
-                  title={includedDocuments[r.id].attributes.title}
-                  key={i}
+                  link={r.attributes.link}
+                  title={r.attributes.title}
+                  key={r.id}
                 />
               ))}
             </Stack>

@@ -51,18 +51,13 @@ const Task = ({
   description,
   completionType,
   taskCompleters,
-  notNavigable,
   isDecision,
-  decisionOptions,
-  isNext,
   isLast,
-  link,
   handleCompleteMilestone,
   categories,
   taskAssignees,
   variant,
   resources,
-  includedDocuments,
   processName,
   worktime,
   removeStep,
@@ -227,7 +222,6 @@ const Task = ({
         completionType={completionType}
         isComplete={taskIsComplete}
         completers={completers}
-        includedDocuments={includedDocuments}
         actions={
           isDecision ? (
             <DecisionDrawerActions
