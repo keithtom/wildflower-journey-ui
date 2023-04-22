@@ -1,6 +1,7 @@
 import wildflowerApi from "@api/base";
 
-const workflowsApi = wildflowerApi.register("/v1/workflow", { noAuth: true });
+const workflowsApiNoAuth = wildflowerApi.register("/v1/workflow", { noAuth: true });
+const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 
 // show me all milestones for a phase
 // show me all milestones that are assigned to me
@@ -14,7 +15,7 @@ async function show(id) {
   // we need to update it so each step sees assinees and completers
   // TODO: update the response such that it response to t.relationships.completers 
   // and t.relationships.assignees
-  var response = await workflowsApi.get(`/processes/${id}`);
+  var response = await workflowsApiNoAuth.get(`/processes/${id}`);
   
   var responseData = wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
   var steps = response.data.data.relationships.steps.data;
@@ -33,7 +34,7 @@ async function show(id) {
 
 // move to steps.js
 async function complete(taskId) {
-  const response = await api.put(`/steps/${taskId}/complete`);
+  const response = await workflowsApi.put(`/steps/${taskId}/complete`);
   const data = await response.data
   return data
   // if response good, great.  else.  error out?
@@ -41,7 +42,7 @@ async function complete(taskId) {
 
 // move to steps.js
 async function uncomplete(taskId) {
-  const response = await api.put(`/steps/${taskId}/uncomplete`);
+  const response = await workflowsApi.put(`/steps/${taskId}/uncomplete`);
   const data = await response.data
   return data
   // TODO: do something w/ the response if it's not 200

@@ -7,7 +7,7 @@ import { getCookie } from 'cookies-next';
 const token = getCookie('auth');
 
 // baseUrl: e.g. '/v1/workflow/'
-function register(baseUrl, { noAuth }) {
+function register(baseUrl, options) {
   let config = {
     baseURL: `${apiUrl}${baseUrl}`,
     timeout: 3000,
@@ -20,7 +20,7 @@ function register(baseUrl, { noAuth }) {
       "Content-Type": "application/json",
     },
   }
-  if (!noAuth) {
+  if (!options.noAuth) {
     config.headers["Authorization"] = token;
   }
   return axios.create(config);

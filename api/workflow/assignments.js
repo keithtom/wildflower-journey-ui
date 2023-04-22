@@ -3,7 +3,7 @@ import wildflowerApi from "@api/base";
 assignmentsApi = wildflowerApi.register("/v1/ssj/dashboard/assigned_steps");
 
 async function index() {
-  const response = await assignmentsApi.get(`/`);
+  const response = await assignmentsApi.get(`/`, {});
   const assignments = response.data
 
   // assignments have completed_at and who
