@@ -1256,13 +1256,10 @@ const waysToWorkTogether = [
 ];
 
 export async function getServerSideProps({ params, req, res }) {
-  // hard coded phase to visioning here... so milestones Todo won't show subsequent milestones to start.
-  // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-  const phase = "visioning";  // this should be your teams current phase?
-  
   const workflowId = getCookie("workflowId", { req, res });
-  const phase = getCookie("phase", { req, res });
+  const phase = getCookie("phase", { req, res });  // this should be your teams current phase?
 
+  // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
