@@ -105,17 +105,17 @@ const InfoDrawer = ({
                       ASSIGNEE
                     </Typography>
                     <Stack spacing={2} direction="row">
-                      { assignees && assignees.map((assignee) => (
+                      { assignees.map((assignee) => (
                         <AvatarWrapper                       
                           badgeContent={
-                            assignee && assignee.id === completedBy.id ? (
+                            assignee.attributes.completedAt && (
                               <Icon
                                 type="checkCircle"
                                 size="small"
                                 variant="primary"
                                 filled
                               />
-                            ) : null
+                            )
                           }
                           src={assignee && assignee.imageUrl}
                         />

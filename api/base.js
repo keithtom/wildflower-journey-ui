@@ -46,8 +46,8 @@ function register(baseUrl, options) {
 function loadRelationshipsFromIncluded(relationshipData, included){
   let loadedData;
   if (Array.isArray(relationshipData)){
-    loadedData = relationshipData.map(e => lookupIncluded(included, e.id, e.type));
-  }
+    loadedData = relationshipData.map(e => lookupIncluded(included, e.id, e.type) || e); // if we don't find it in included, just keep the same element.
+  } 
   // Is an object literal? https://www.w3docs.com/snippets/javascript/how-to-check-if-a-value-is-an-object-in-javascript.html
   else if (typeof(relationshipData) === 'object' && relationshipData.constructor === Object) {
     loadedData = lookupIncluded(included, relationshipData.id, relationshipData.type);
@@ -76,4 +76,4 @@ function lookupIncluded(included, id, type){
 }
 
 
-export default { register, loadRelationshipsFromIncluded, loadAllRelationshipsFromIncluded };
+export default { register, loadRelationshipsFromIncluded, loadAllRelationshipsFromIncluded, lookupIncluded};

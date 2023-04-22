@@ -10,21 +10,41 @@ async function index() {}
 
 // look at an individual process/milestone
 async function show(id) {
-  // we look at a process, and see its steps.
-  // and for each step, there can be many assignments
-  // we need to update it so each step sees assinees and completers
-  // TODO: update the response such that it response to t.relationships.completers 
-  // and t.relationships.assignees
   var response = await workflowsApiNoAuth.get(`/processes/${id}`);
   
   var responseData = wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
+  
   var steps = response.data.data.relationships.steps.data;
   
-  // augment steps with assignees and completers which is a convenient short-hand for looking at assignments.
+  // augment steps with assignees and completers which is a convenient short-hand for looking at assignments since the UI cares about the information this way.
   steps.forEach((step) => {
-    step.relationships["assignees"] = []; // put real data in here from assignments
-    step.relationships["completers"] = []; 
-  });
+    let assignments = wildflowerApi.loadRelationshipsFromIncluded(step.relationships.assignments.data, response.data.included);
+    let assignees = assignments.map((e) => {
+      // load assignee from included
+      let relationshipAssignee = e.relationships.assignee.data;
+      let assignee = wildflowerApi.lookupIncluded(responseData.included, relationshipAssignee.id, relationshipAssignee.type);
+      
+      // augment the assignee with completedAt/assignedAt from assignment
+      assignee.attributes.assignedAt = e.attributes.assignedAt;
+      assignee.attributes.completedAt = e.attributes.completedAt;
+      
+      return assignee;
+    });
+    let completers = assignments.filter(e => e.completedAt).map((e) => {
+      // load assignee from included
+      let relationshipAssignee = e.relationships.assignee.data;
+      let assignee = wildflowerApi.lookupIncluded(responseData.included, relationshipAssignee.id, relationshipAssignee.type);
+      
+      // augment the assignee with completedAt/assignedAt
+      assignee.attributes.assignedAt = e.attributes.assignedAt;
+      assignee.attributes.completedAt = e.attributes.completedAt;
+      
+      return assignee;
+    });
+    
+    step.relationships["assignees"] = assignees;
+    step.relationships["completers"] = completers;
+  });// when ID isn't found in included, it returns undefined.
   
   // mutate the response to be friendly to the front-end
   response.data.data.relationships.steps.data = steps;
