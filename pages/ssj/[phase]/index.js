@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../../lib/setAuthHeader";
 import axios from "axios";
@@ -14,19 +13,14 @@ import {
   Icon,
   Grid,
   Modal,
-  IconButton,
   TextField,
   Select,
-  Radio,
   Button,
-  Divider,
-  Link,
 } from "@ui";
 import Milestone from "../../../components/Milestone";
 import Hero from "../../../components/Hero";
 
 const PhasePage = ({
-  data,
   milestonesInProgress,
   milestonesToDo,
   milestonesUpNext,
@@ -37,8 +31,6 @@ const PhasePage = ({
 
   const router = useRouter();
   const { phase } = router.query;
-
-  // console.log({ data });
 
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
@@ -440,9 +432,6 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
 };
 
 export async function getServerSideProps({ params, req, res }) {
-  // const userId = query.userId;
-  // const ssjId = query.ssjId;
-
   const { phase } = params;
   const workflowId = "c502-4f84";
   // const workflowId = "5947-ab7f"
@@ -475,7 +464,6 @@ export async function getServerSideProps({ params, req, res }) {
 
   return {
     props: {
-      data,
       currentPhaseMilestones,
       milestonesInProgress,
       milestonesToDo,

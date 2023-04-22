@@ -6,12 +6,8 @@ import {
   Card,
   Stack,
   Icon,
-  IconButton,
-  Link,
   Grid,
   Chip,
-  Avatar,
-  Divider,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
