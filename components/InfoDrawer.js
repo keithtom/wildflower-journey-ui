@@ -88,75 +88,14 @@ const InfoDrawer = ({
               </Grid>
             </Grid>
 
-              <Typography variant="bodyLarge" bold struck={isComplete}>
-                {title}
-              </Typography>
-              <Stack direction="row" spacing={4}>
-                {taskId && (
-                  <Stack spacing={4}>
-                    <Typography variant="bodyMini" lightened bold>
-                      ASSIGNEE
-                    </Typography>
-                    <Stack spacing={2} direction="row">
-                      { assignees.map((assignee) => (
-                        <AvatarWrapper                       
-                          badgeContent={
-                            assignee.attributes.completedAt && (
-                              <Icon
-                                type="checkCircle"
-                                size="small"
-                                variant="primary"
-                                filled
-                              />
-                            )
-                          }
-                          src={assignee && assignee.imageUrl}
-                        />
-                      ))}
-                    </Stack>
-                  </Stack>
-                )}
-                {status && (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      STATUS
-                    </Typography>
-                    <StatusChip status={status} size="small" withIcon />
-                  </Stack>
-                )}
-                {categories && (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      CATEGORY
-                    </Typography>
-                    <Stack direction="row" spacing={2}>
-                      {categories.map((m, i) => (
-                        <CategoryChip
-                          category={m}
-                          size="small"
-                          withIcon
-                          key={i}
-                        />
-                      ))}
-                    </Stack>
-                  </Stack>
-                )}
-                {worktime ? (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      WORKTIME
-                    </Typography>
-                    <WorktimeChip size="small" worktime={worktime} withIcon />
-                  </Stack>
-                ) : null}
-              </Stack>
-            </Stack>
-            {about && (
-              <Stack spacing={4}>
-                <Stack direction="row" spacing={4}>
-                  <Icon type="glasses" variant="primary" size="medium" />
-                  <Typography variant="bodyRegular" bold>
-                    About
+            <Typography variant="bodyLarge" bold struck={isComplete}>
+              {title}
+            </Typography>
+            <Stack direction="row" spacing={4}>
+              {taskId && (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    ASSIGNEE
                   </Typography>
                   <Avatar
                     size="mini"
