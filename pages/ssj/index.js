@@ -91,9 +91,9 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
-  const opsGuide = currentUser?.attributes.ssj.opsGuide.data.attributes;
+  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
   const regionalGrowthLead =
-    currentUser?.attributes.ssj.regionalGrowthLead.data.attributes;
+    currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
   // console.log({ currentUser });
   // console.log("team", team);
@@ -337,26 +337,30 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
                     />
                   )}
                 </Grid>
-                <Grid item xs={12} sm={4}>
-                  <UserCard
-                    firstName={opsGuide?.firstName}
-                    lastName={opsGuide?.lastName}
-                    email={opsGuide?.email}
-                    phone={opsGuide?.phone}
-                    profileImage={opsGuide?.imageUrl}
-                    role="Operations Guide"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <UserCard
-                    firstName={regionalGrowthLead?.firstName}
-                    lastName={regionalGrowthLead?.lastName}
-                    email={regionalGrowthLead?.email}
-                    phone={regionalGrowthLead?.phone}
-                    profileImage={regionalGrowthLead?.imageUrl}
-                    role="Regional Growth Lead"
-                  />
-                </Grid>
+                {opsGuide ? (
+                  <Grid item xs={12} sm={4}>
+                    <UserCard
+                      firstName={opsGuide?.firstName}
+                      lastName={opsGuide?.lastName}
+                      email={opsGuide?.email}
+                      phone={opsGuide?.phone}
+                      profileImage={opsGuide?.imageUrl}
+                      role="Operations Guide"
+                    />
+                  </Grid>
+                ) : null}
+                {regionalGrowthLead ? (
+                  <Grid item xs={12} sm={4}>
+                    <UserCard
+                      firstName={regionalGrowthLead?.firstName}
+                      lastName={regionalGrowthLead?.lastName}
+                      email={regionalGrowthLead?.email}
+                      phone={regionalGrowthLead?.phone}
+                      profileImage={regionalGrowthLead?.imageUrl}
+                      role="Regional Growth Lead"
+                    />
+                  </Grid>
+                ) : null}
               </Grid>
             </Stack>
 
