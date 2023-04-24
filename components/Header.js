@@ -18,7 +18,7 @@ import {
 } from "./ui/index";
 import baseUrl from "../lib/utils/baseUrl";
 
-const logoutRoute = `${baseUrl}/logout`;
+const logoutRoute = `${process.env.API_URL}/logout`;
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
