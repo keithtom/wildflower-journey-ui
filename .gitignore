@@ -8,5 +8,6 @@ yarn-error.log
 
 /.next/
 /out/
-
 .vercel
+
+.env.local

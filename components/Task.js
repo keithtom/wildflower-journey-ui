@@ -72,6 +72,7 @@ const Task = ({
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
   const [completers, setCompleters] = useState(taskCompleters);
+  const [decisionOption, setDecisionOption] = useState()
 
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
@@ -131,12 +132,10 @@ const Task = ({
     }
     setUnassignToastOpen(true);
   }
-  const handleMakeDecision = () => {
-    //TODO: Api call to set decision
+  async function handleMakeDecision() {
+    const response = await stepsApi.selectOption(decisionOption);
     setIsDecided(true);
   };
-
-  // console.log(taskId);
 
   return (
     <>
@@ -227,8 +226,10 @@ const Task = ({
             <DecisionDrawerActions
               assignees={assignees}
               isDecided={isDecided}
-              handleAssignUser={handleAssignUser}
-              handleUnssignUser={handleUnssignUser}
+              decisionOption={decisionOption}
+              setDecisionOption={setDecisionOption}
+              handleAssignSelf={handleAssignSelf}
+              handleUnassignSelf={handleUnassignSelf}
               handleMakeDecision={handleMakeDecision}
             />
           ) : (
@@ -267,11 +268,10 @@ export default Task;
 const DecisionDrawerActions = ({
   assignees,
   isDecided,
-  handleAssignUser,
-  handleUnssignUser,
+  decisionOption,
+  setDecisionOption,
   handleMakeDecision,
 }) => {
-  const [decisionOption, setDecisionOption] = useState();
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };

@@ -5,7 +5,7 @@ import { getCookie } from "cookies-next";
 const token = getCookie("auth");
 
 const api = axios.create({
-  baseURL: `${apiUrl}/v1/ssj/dashboard`,
+  baseURL: `${process.env.API_URL}/v1/ssj/dashboard`,
   timeout: 3000,
   mode: "no-cors",
   headers: {
