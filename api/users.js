@@ -26,10 +26,18 @@ async function tokenAuth(token, redirectUrl){
     token: token,
   });
   setCookie("auth", response.headers["authorization"], {
-    maxAge: 60 * 60 * 24,
+    maxAge: 60 * 60 * 24 * 30,
   });
   
   return response;
 };
 
-export default { tokenAuth };
+async function loginEmailLink(email) {
+  const response = await api.post(`/users/email_login`, {
+    email: email,
+  });
+  const result = await response.json;
+  return result;
+}
+
+export default { tokenAuth, loginEmailLink };

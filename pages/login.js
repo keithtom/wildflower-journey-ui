@@ -6,6 +6,7 @@ import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
 import baseUrl from "../lib/utils/baseUrl";
+import usersApi from "../api/users"; 
 
 import {
   Button,
@@ -34,7 +35,7 @@ const Login = ({}) => {
   const onSubmit = (data) => {
     axios
       .post(
-        loginRoute, // TODO: set base url in some variable that switches out based on env
+        loginRoute,
         {
           user: {
             email: data.email,
@@ -44,16 +45,16 @@ const Login = ({}) => {
       )
       .then(function (response) {
         setCookie("auth", response.headers["authorization"], {
-          maxAge: 60 * 60 * 24,
+          maxAge: 60 * 60 * 24 * 30,
         });
         const userAttributes = response.data.data.attributes;
         userAttributes.imageUrl = `${baseUrl}${userAttributes.imageUrl}`;
         const personId = response.data.data.relationships.person.data.id;
         setCookie("workflowId", userAttributes.ssj.workflowId, {
-          maxAge: 60 * 60 * 24,
+          maxAge: 60 * 60 * 24 * 30,
         });
         setCookie("phase", userAttributes.ssj.currentPhase, {
-          maxAge: 60 * 60 * 24,
+          maxAge: 60 * 60 * 24 * 30,
         });
         setCurrentUser({
           id: personId,
@@ -69,13 +70,16 @@ const Login = ({}) => {
       });
   };
 
-  const handleRequestEmailLink = async () => {
+  async function handleRequestEmailLink() {
     const emailValid = await trigger("email");
     if (emailValid) {
-      const email = getValues("email");
-      setSentEmailLoginRequest(true);
-      // console.log(email);
-      //TODO: send email login request to api
+      try {
+        const email = getValues("email");
+        await usersApi.loginEmailLink(email);
+        setSentEmailLoginRequest(true);
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
