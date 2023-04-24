@@ -155,7 +155,7 @@ export default ToDoList;
 export async function getServerSideProps({ req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
   const phase = getCookie("phase", { req, res });
-  const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const apiRouteAssignedSteps = `${process.env.API_URL}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
   setAuthHeader({ req, res });
   const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
   const dataAssignedSteps = await responseAssignedSteps.data;
@@ -176,7 +176,7 @@ export async function getServerSideProps({ req, res }) {
       })
   );
 
-  const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   const responseMilestones = await axios.get(apiRouteMilestones);
   const dataMilestones = await responseMilestones.data;
   const milestonesToDo = [];

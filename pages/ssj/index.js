@@ -1269,11 +1269,11 @@ export async function getServerSideProps({ req, res }) {
   const phase = getCookie("phase", { req, res });
   setAuthHeader({ req, res });
 
-  const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const apiRouteAssignedSteps = `${process.env.API_URL}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
   const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
   const dataAssignedSteps = await responseAssignedSteps.data;
 
-  const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   const responseMilestones = await axios.get(apiRouteMilestones);
   const dataMilestones = await responseMilestones.data;
   const milestonesToDo = [];
@@ -1283,7 +1283,7 @@ export async function getServerSideProps({ req, res }) {
     }
   });
 
-  const apiRouteProgress = `${baseUrl}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
+  const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
 
