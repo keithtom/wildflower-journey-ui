@@ -6,7 +6,7 @@ import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
 import baseUrl from "../lib/utils/baseUrl";
-import { loginEmailLink } from "../api/users"; 
+import usersApi from "../api/users"; 
 
 import {
   Button,
@@ -75,7 +75,7 @@ const Login = ({}) => {
     if (emailValid) {
       try {
         const email = getValues("email");
-        await loginEmailLink(email);
+        await usersApi.loginEmailLink(email);
         setSentEmailLoginRequest(true);
       } catch (error) {
         console.error(error);
