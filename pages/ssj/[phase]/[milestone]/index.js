@@ -35,7 +35,7 @@ const StyledMilestoneHeader = styled(Stack)`
     `}
 `;
 
-const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
+const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
   const milestoneAttributes = milestone.attributes;
 
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
@@ -54,9 +54,9 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
   };
 
   var milestonePrerequisites = milestone.relationships.prerequisiteProcesses.data
-  var milestoneTasks = milestone.relationships.steps.data
   
-  const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
+  const sortedMilestoneTasks = milestone.relationships.steps.data
+  .sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
   );
 
@@ -205,8 +205,8 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
                 link={`/ssj/${phase}/${milestone.id}/${t.id}`}
                 title={t.attributes.title}
                 description={t.attributes.description}
-                key={i}
-                isDecision={t.attributes.kind === "Decision"}
+                key={t.id}
+                isDecision={t.attributes.isDecision}
                 decisionOptions={t.attributes.decisionOptions}
                 isLast={i + 1 === sortedMilestoneTasks.length}
                 isNext={isUpNext}
@@ -399,8 +399,7 @@ export async function getServerSideProps({ query, req, res }) {
   const response = await processesApi.show(milestoneId)
   const data = response.data;
   const milestone = data.data;
-  const includedData = data.included || [];
-
+  
   const FakeMilestoneTasks = [
     {
       title: "Complete WF School Name Research Document",
@@ -430,7 +429,6 @@ export async function getServerSideProps({ query, req, res }) {
   return {
     props: {
       milestone,
-      includedData,
       FakeMilestoneTasks,
     },
   };

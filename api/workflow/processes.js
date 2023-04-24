@@ -10,14 +10,11 @@ async function index() {}
 
 // look at an individual process/milestone
 async function show(id) {
-  var response = await workflowsApiNoAuth.get(`/processes/${id}`);
-  
+  var response = await workflowsApiNoAuth.get(`/processes/${id}`);  
   var responseData = wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
   
-  var steps = response.data.data.relationships.steps.data;
-
   // augment steps with assignees and completers which is a convenient short-hand for looking at assignments since the UI cares about the information this way.
-  var steps = response.data.data.relationships.steps.data;
+  var steps = responseData.data.relationships.steps.data;
   steps.forEach((step) => {
     let assignments = wildflowerApi.loadRelationshipsFromIncluded(step.relationships.assignments.data, response.data.included);
     let assignees = assignments.map((e) => {
@@ -31,7 +28,7 @@ async function show(id) {
       
       return assignee;
     });
-    let completers = assignments.filter(e => e.completedAt).map((e) => {
+    let completers = assignments.filter(e => e.attributes.completedAt).map((e) => {
       // load assignee from included
       let relationshipAssignee = e.relationships.assignee.data;
       let assignee = wildflowerApi.lookupIncluded(responseData.included, relationshipAssignee.id, relationshipAssignee.type);
