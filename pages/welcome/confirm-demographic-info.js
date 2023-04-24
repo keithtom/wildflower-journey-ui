@@ -40,14 +40,14 @@ const ConfirmDemographicInfo = ({}) => {
 
   useEffect(() => {
     reset({
-      primary_language: currentUser?.attributes.language,
-      ethnicity: currentUser?.attributes.ethnicity
-        ? currentUser?.attributes.ethnicity
+      primary_language: currentUser?.attributes?.language,
+      ethnicity: currentUser?.attributes?.ethnicity
+        ? currentUser?.attributes?.ethnicity
         : [],
-      lgbtqia: currentUser?.attributes.lgbtqia,
-      genderIdentity: currentUser?.attributes.genderIdentity,
-      pronouns: currentUser?.attributes.pronouns,
-      householdIncome: currentUser?.attributes.householdIncome,
+      lgbtqia: currentUser?.attributes?.lgbtqia,
+      genderIdentity: currentUser?.attributes?.genderIdentity,
+      pronouns: currentUser?.attributes?.pronouns,
+      householdIncome: currentUser?.attributes?.householdIncome,
     });
   }, [currentUser]);
 
