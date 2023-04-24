@@ -80,6 +80,8 @@ const Login = ({}) => {
     }
   }
 
+  // console.log(process.env.API_URL);
+
   return (
     <PageContainer hideNav>
       <Grid container alignItems="center" justifyContent="center">
