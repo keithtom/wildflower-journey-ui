@@ -1,11 +1,11 @@
 import axios from "axios";
 import apiUrl from "@lib/utils/baseUrl";
-import { getCookie } from 'cookies-next';
+import { getCookie } from "cookies-next";
 
-const token = getCookie('auth');
+const token = getCookie("auth");
 
 const api = axios.create({
-  baseURL: `${apiUrl}/v1/people`,
+  baseURL: `${process.env.API_URL}/v1/people`,
   timeout: 3000,
   mode: "no-cors",
   headers: {
@@ -14,14 +14,14 @@ const api = axios.create({
     "Access-Control-Allow-Headers":
       "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     "Content-Type": "application/json",
-    "Authorization": token,
+    Authorization: token,
   },
 });
 
 async function update(personId, personParams) {
   const response = await api.put(`/${personId}`, personParams);
-  const data = await response.data
-  return data
+  const data = await response.data;
+  return data;
   // TODO: do something w/ the response if it's not 200
 }
 

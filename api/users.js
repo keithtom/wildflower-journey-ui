@@ -3,7 +3,7 @@ import apiUrl from "@lib/utils/baseUrl";
 import { setCookie } from "cookies-next";
 
 const api = axios.create({
-  baseURL: `${apiUrl}`,
+  baseURL: `${process.env.API_URL}`,
   timeout: 30000,
   mode: "no-cors",
   headers: {
@@ -21,16 +21,16 @@ const api = axios.create({
 // show
 // update
 
-async function tokenAuth(token, redirectUrl){
+async function tokenAuth(token, redirectUrl) {
   const response = await api.post(`/login?auth_token=${token}`, {
     token: token,
   });
   setCookie("auth", response.headers["authorization"], {
     maxAge: 60 * 60 * 24 * 30,
   });
-  
+
   return response;
-};
+}
 
 async function loginEmailLink(email) {
   const response = await api.post(`/users/email_login`, {

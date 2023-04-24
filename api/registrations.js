@@ -5,7 +5,7 @@ import { getCookie } from "cookies-next";
 const token = getCookie("auth");
 
 const api = axios.create({
-  baseURL: `${apiUrl}`,
+  baseURL: `${process.env.API_URL}`,
   timeout: 30000,
   mode: "no-cors",
   headers: {
@@ -24,15 +24,15 @@ const api = axios.create({
 // show
 // update
 
-async function setPassword(password, passwordConfirmation){
+async function setPassword(password, passwordConfirmation) {
   const response = await api.put("/signup", {
     user: {
-        password: password,
-        password_confirmation: passwordConfirmation,
-    }
+      password: password,
+      password_confirmation: passwordConfirmation,
+    },
   });
-  
+
   return response;
-};
+}
 
 export default { setPassword };

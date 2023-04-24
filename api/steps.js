@@ -1,11 +1,11 @@
 import axios from "axios";
 import apiUrl from "@lib/utils/baseUrl";
-import { getCookie } from 'cookies-next';
+import { getCookie } from "cookies-next";
 
-const token = getCookie('auth');
+const token = getCookie("auth");
 
 const api = axios.create({
-  baseURL: `${apiUrl}/v1/workflow/`,
+  baseURL: `${process.env.API_URL}/v1/workflow/`,
   timeout: 3000,
   mode: "no-cors",
   headers: {
@@ -14,30 +14,32 @@ const api = axios.create({
     "Access-Control-Allow-Headers":
       "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     "Content-Type": "application/json",
-    "Authorization": token,
+    Authorization: token,
   },
 });
 
 async function index() {}
 
 async function assign(taskId, userId) {
-  const response = await api.put(`/steps/${taskId}/assign`, {step: { assignee_id: userId }} );
-  const data = await response.data
-  return data
+  const response = await api.put(`/steps/${taskId}/assign`, {
+    step: { assignee_id: userId },
+  });
+  const data = await response.data;
+  return data;
   // if response good, great.  else.  error out?
 }
 
 async function unassign(taskId) {
   const response = await api.put(`/steps/${taskId}/unassign`);
-  const data = await response.data
-  return data
+  const data = await response.data;
+  return data;
   // TODO: do something w/ the response if it's not 200
 }
 
 async function selectOption(optionId) {
   const response = await api.put(`/steps/${optionId}/select_option`);
-  const data = await response.data
-  return data
+  const data = await response.data;
+  return data;
 }
 
 export default { assign, unassign, selectOption };
