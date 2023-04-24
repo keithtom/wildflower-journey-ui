@@ -34,4 +34,10 @@ async function unassign(taskId) {
   // TODO: do something w/ the response if it's not 200
 }
 
-export default { assign, unassign };
+async function selectOption(optionId) {
+  const response = await api.put(`/steps/${optionId}/select_option`);
+  const data = await response.data
+  return data
+}
+
+export default { assign, unassign, selectOption };
