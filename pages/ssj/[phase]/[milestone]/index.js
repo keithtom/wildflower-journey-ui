@@ -412,7 +412,7 @@ const EditableTaskList = ({ tasks }) => {
 
 export async function getServerSideProps({ query, req, res }) {
   const milestoneId = query.milestone;
-  const apiRoute = `${baseUrl}/v1/workflow/processes/${milestoneId}`;
+  const apiRoute = `${process.env.API_URL}/v1/workflow/processes/${milestoneId}`;
 
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);

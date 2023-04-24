@@ -71,7 +71,7 @@ const AddProfileInfo = ({}) => {
           console.error(error);
         } else {
           const personAttributes = response.data.attributes;
-          currentUser.attributes.imageUrl = `${baseUrl}${personAttributes.imageUrl}`;
+          currentUser.attributes.imageUrl = `${process.env.API_URL}${personAttributes.imageUrl}`;
           setCurrentUser(currentUser);
           router.push("/ssj");
         }
@@ -155,7 +155,7 @@ const AddProfileInfo = ({}) => {
                             }
                             axios
                               .post(
-                                `${baseUrl}/rails/active_storage/direct_uploads`,
+                                `${process.env.API_URL}/rails/active_storage/direct_uploads`,
                                 {
                                   blob: {
                                     filename: file.name,
@@ -172,7 +172,7 @@ const AddProfileInfo = ({}) => {
                                 const signed_id = response.data.signed_id;
                                 axios
                                   .put(response.data.direct_upload.url, file, {
-                                    headers: 
+                                    headers:
                                       response.data.direct_upload.headers,
                                     onUploadProgress: (progressEvent) => {
                                       progress(
@@ -183,7 +183,7 @@ const AddProfileInfo = ({}) => {
                                     },
                                     // need to remove default Authorization header when sending to s3
                                     transformRequest: (data, headers) => {
-                                      delete headers.common['Authorization'];
+                                      delete headers.common["Authorization"];
                                       return data;
                                     },
                                   })
