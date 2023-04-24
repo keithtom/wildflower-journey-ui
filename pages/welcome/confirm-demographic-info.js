@@ -107,7 +107,7 @@ const ConfirmDemographicInfo = ({}) => {
 
   const watchFields = watch();
   const isExistingTL = false;
-  const opsGuide = currentUser?.attributes.ssj.opsGuide.data.attributes;
+  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -138,17 +138,19 @@ const ConfirmDemographicInfo = ({}) => {
                         </Typography>
                       </Stack>
                     </Card>
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <Avatar size="sm" src={opsGuide?.imageUrl} />
-                      <Stack>
-                        <Typography variant="bodySmall" bold>
-                          {opsGuide?.firstName} {opsGuide?.lastName}
-                        </Typography>
-                        <Typography variant="bodySmall" lightened>
-                          Operations Guide
-                        </Typography>
+                    {opsGuide ? (
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Avatar size="sm" src={opsGuide?.imageUrl} />
+                        <Stack>
+                          <Typography variant="bodySmall" bold>
+                            {opsGuide?.firstName} {opsGuide?.lastName}
+                          </Typography>
+                          <Typography variant="bodySmall" lightened>
+                            Operations Guide
+                          </Typography>
+                        </Stack>
                       </Stack>
-                    </Stack>
+                    ) : null}
                   </>
                 )}
 
