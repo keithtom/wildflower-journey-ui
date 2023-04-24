@@ -1257,14 +1257,14 @@ const waysToWorkTogether = [
 
 export async function getServerSideProps({ params, req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
-  const phase = getCookie("phase", { req, res });  // this should be your teams current phase?
+  const phase = getCookie("phase", { req, res }); // this should be your teams current phase?
 
   // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
   const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
   const data = response.data;
-  
+
   // want to know how many assigned tasks there are.
   var totalSteps = 0; // rename to total assigned steps.; numMyAssignedTasks
   data.included.forEach((included) => {
@@ -1282,7 +1282,7 @@ export async function getServerSideProps({ params, req, res }) {
   });
 
   // const data = await ssj.dashboard();
-// put assigned tasks in this api call?
+  // put assigned tasks in this api call?
   const apiRouteProgress = `${baseUrl}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
@@ -1292,7 +1292,6 @@ export async function getServerSideProps({ params, req, res }) {
   const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
   const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
   const dataAssignedSteps = await responseAssignedSteps.data;
-
 
   return {
     props: {
