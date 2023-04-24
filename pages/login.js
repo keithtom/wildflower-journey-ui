@@ -6,7 +6,7 @@ import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
 import baseUrl from "../lib/utils/baseUrl";
-import usersApi from "../api/users"; 
+import usersApi from "../api/users";
 
 import {
   Button,
@@ -21,7 +21,7 @@ import {
   Icon,
 } from "@ui";
 
-const loginRoute = `${baseUrl}/login`;
+const loginRoute = `${process.env.API_URL}/login`;
 const Login = ({}) => {
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { currentUser, setCurrentUser } = useUserContext();
@@ -34,21 +34,18 @@ const Login = ({}) => {
   } = useForm();
   const onSubmit = (data) => {
     axios
-      .post(
-        loginRoute,
-        {
-          user: {
-            email: data.email,
-            password: data.password,
-          },
-        }
-      )
+      .post(loginRoute, {
+        user: {
+          email: data.email,
+          password: data.password,
+        },
+      })
       .then(function (response) {
         setCookie("auth", response.headers["authorization"], {
           maxAge: 60 * 60 * 24 * 30,
         });
         const userAttributes = response.data.data.attributes;
-        userAttributes.imageUrl = `${baseUrl}${userAttributes.imageUrl}`;
+        userAttributes.imageUrl = `${process.env.API_URL}${userAttributes.imageUrl}`;
         const personId = response.data.data.relationships.person.data.id;
         setCookie("workflowId", userAttributes.ssj.workflowId, {
           maxAge: 60 * 60 * 24 * 30,
@@ -81,7 +78,9 @@ const Login = ({}) => {
         console.error(error);
       }
     }
-  };
+  }
+
+  // console.log(process.env.API_URL);
 
   return (
     <PageContainer hideNav>

@@ -91,9 +91,9 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
-  const opsGuide = currentUser?.attributes.ssj.opsGuide.data.attributes;
+  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
   const regionalGrowthLead =
-    currentUser?.attributes.ssj.regionalGrowthLead.data.attributes;
+    currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
   // console.log({ currentUser });
   // console.log("team", team);
@@ -337,26 +337,30 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
                     />
                   )}
                 </Grid>
-                <Grid item xs={12} sm={4}>
-                  <UserCard
-                    firstName={opsGuide?.firstName}
-                    lastName={opsGuide?.lastName}
-                    email={opsGuide?.email}
-                    phone={opsGuide?.phone}
-                    profileImage={opsGuide?.imageUrl}
-                    role="Operations Guide"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <UserCard
-                    firstName={regionalGrowthLead?.firstName}
-                    lastName={regionalGrowthLead?.lastName}
-                    email={regionalGrowthLead?.email}
-                    phone={regionalGrowthLead?.phone}
-                    profileImage={regionalGrowthLead?.imageUrl}
-                    role="Regional Growth Lead"
-                  />
-                </Grid>
+                {opsGuide ? (
+                  <Grid item xs={12} sm={4}>
+                    <UserCard
+                      firstName={opsGuide?.firstName}
+                      lastName={opsGuide?.lastName}
+                      email={opsGuide?.email}
+                      phone={opsGuide?.phone}
+                      profileImage={opsGuide?.imageUrl}
+                      role="Operations Guide"
+                    />
+                  </Grid>
+                ) : null}
+                {regionalGrowthLead ? (
+                  <Grid item xs={12} sm={4}>
+                    <UserCard
+                      firstName={regionalGrowthLead?.firstName}
+                      lastName={regionalGrowthLead?.lastName}
+                      email={regionalGrowthLead?.email}
+                      phone={regionalGrowthLead?.phone}
+                      profileImage={regionalGrowthLead?.imageUrl}
+                      role="Regional Growth Lead"
+                    />
+                  </Grid>
+                ) : null}
               </Grid>
             </Stack>
 
@@ -1269,11 +1273,11 @@ export async function getServerSideProps({ req, res }) {
   const phase = getCookie("phase", { req, res });
   setAuthHeader({ req, res });
 
-  const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const apiRouteAssignedSteps = `${process.env.API_URL}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
   const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
   const dataAssignedSteps = await responseAssignedSteps.data;
 
-  const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   const responseMilestones = await axios.get(apiRouteMilestones);
   const dataMilestones = await responseMilestones.data;
   const milestonesToDo = [];
@@ -1283,7 +1287,7 @@ export async function getServerSideProps({ req, res }) {
     }
   });
 
-  const apiRouteProgress = `${baseUrl}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
+  const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
 

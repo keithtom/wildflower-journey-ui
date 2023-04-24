@@ -134,7 +134,7 @@ export default Resources;
 export async function getServerSideProps({ req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
   setAuthHeader({ req, res });
-  const apiRouteResources = `${baseUrl}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
+  const apiRouteResources = `${process.env.API_URL}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
   const responseResources = await axios.get(apiRouteResources);
   const dataResources = await responseResources.data;
 
