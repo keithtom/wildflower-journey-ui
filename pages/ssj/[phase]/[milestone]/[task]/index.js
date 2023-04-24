@@ -3,8 +3,8 @@ import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import setAuthHeader from "../../../../../lib/setAuthHeader"
-import baseUrl from "../../../../../lib/utils/baseUrl"
+import setAuthHeader from "../../../../../lib/setAuthHeader";
+import baseUrl from "../../../../../lib/utils/baseUrl";
 import axios from "axios";
 
 import {
@@ -317,8 +317,8 @@ const DecisionForm = ({ options, disabled }) => {
 export async function getServerSideProps({ query, req, res }) {
   const MilestoneId = query.milestone;
   const TaskId = query.task;
-  const apiRoute = `${baseUrl}/v1/workflow/processes/${MilestoneId}/steps/${TaskId}`;
-  setAuthHeader({req, res});
+  const apiRoute = `${process.env.API_URL}/v1/workflow/processes/${MilestoneId}/steps/${TaskId}`;
+  setAuthHeader({ req, res });
 
   const response = await axios.get(apiRoute);
   const data = await response.data;

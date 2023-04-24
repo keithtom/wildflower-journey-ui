@@ -75,34 +75,36 @@ const Milestones = ({ processByCategory, processByPhase }) => {
           </Grid>
         </Stack>
         {showMilestonesByCategory
-          ? processByCategory.map((a, i) => (
-              <Card key={i}>
-                <Stack spacing={6}>
-                  <Stack direction="row" spacing={6} alignItems="center">
-                    <CategoryChip category={a.category} size="large" />
-                    <Typography variant="h4" lightened>
-                      {a.processes.length}
-                    </Typography>
+          ? processByCategory.map((a, i) =>
+              a.processes.length ? (
+                <Card key={i}>
+                  <Stack spacing={6}>
+                    <Stack direction="row" spacing={6} alignItems="center">
+                      <CategoryChip category={a.category} size="large" />
+                      <Typography variant="h4" lightened>
+                        {a.processes.length}
+                      </Typography>
+                    </Stack>
+                    <Stack spacing={3}>
+                      {a.processes.map((m, i) => (
+                        <Milestone
+                          link={`/ssj/${m.attributes.phase}/${m.id}`}
+                          key={i}
+                          status={m.attributes.status}
+                          description={m.attributes.description}
+                          categories={m.attributes.categories}
+                          hideCategoryChip
+                          phase={m.attributes.phase}
+                          title={m.attributes.title}
+                          effort={m.attributes.effort}
+                          stepCount={m.attributes.stepsCount}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
-                  <Stack spacing={3}>
-                    {a.processes.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${m.attributes.phase}/${m.id}`}
-                        key={i}
-                        status={m.attributes.status}
-                        description={m.attributes.description}
-                        categories={m.attributes.categories}
-                        hideCategoryChip
-                        phase={m.attributes.phase}
-                        title={m.attributes.title}
-                        effort={m.attributes.effort}
-                        stepCount={m.attributes.stepsCount}
-                      />
-                    ))}
-                  </Stack>
-                </Stack>
-              </Card>
-            ))
+                </Card>
+              ) : null
+            )
           : showMilestonesByPhase &&
             processByPhase.map((p, i) => (
               <Card key={i}>
@@ -144,7 +146,7 @@ export default Milestones;
 
 export async function getServerSideProps({ req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
-  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes`;
+  const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
   const data = await response.data;

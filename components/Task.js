@@ -74,6 +74,7 @@ const Task = ({
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   const [isDecided, setIsDecided] = useState(false);
+  const [decisionOption, setDecisionOption] = useState()
   const { currentUser } = useUserContext();
 
   async function handleCompleteTask() {
@@ -128,12 +129,10 @@ const Task = ({
     }
     setUnassignToastOpen(true);
   }
-  const handleMakeDecision = () => {
-    //TODO: Api call to set decision
+  async function handleMakeDecision() {
+    const response = await stepsApi.selectOption(decisionOption);
     setIsDecided(true);
   };
-
-  // console.log(taskId);
 
   return (
     <>
@@ -222,6 +221,8 @@ const Task = ({
             <DecisionDrawerActions
               assignee={assignee}
               isDecided={isDecided}
+              decisionOption={decisionOption}
+              setDecisionOption={setDecisionOption}
               handleAssignSelf={handleAssignSelf}
               handleUnassignSelf={handleUnassignSelf}
               handleMakeDecision={handleMakeDecision}
@@ -261,11 +262,12 @@ export default Task;
 const DecisionDrawerActions = ({
   assignee,
   isDecided,
+  decisionOption,
+  setDecisionOption,
   handleAssignSelf,
   handleUnassignSelf,
   handleMakeDecision,
 }) => {
-  const [decisionOption, setDecisionOption] = useState();
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };

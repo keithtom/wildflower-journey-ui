@@ -77,7 +77,7 @@ const Resources = ({ dataResources }) => {
           ? dataResources.by_category.map((a, i) => {
               const name = Object.keys(a)[0];
               const array = Object.values(a);
-              return (
+              return array[0]?.length ? (
                 <Card key={i}>
                   <Stack spacing={6}>
                     <Stack direction="row" spacing={6} alignItems="center">
@@ -97,7 +97,7 @@ const Resources = ({ dataResources }) => {
                     </Stack>
                   </Stack>
                 </Card>
-              );
+              ) : null;
             })
           : dataResources.by_phase.map((a, i) => {
               const name = Object.keys(a)[0];
@@ -134,7 +134,7 @@ export default Resources;
 export async function getServerSideProps({ req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
   setAuthHeader({ req, res });
-  const apiRouteResources = `${baseUrl}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
+  const apiRouteResources = `${process.env.API_URL}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
   const responseResources = await axios.get(apiRouteResources);
   const dataResources = await responseResources.data;
 

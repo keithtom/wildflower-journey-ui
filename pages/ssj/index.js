@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
-import Link from "next/link";
 import Router from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
@@ -34,6 +33,7 @@ import {
   DatePicker,
   TextField,
   Chip,
+  Link,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
@@ -91,9 +91,9 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
-  const opsGuide = currentUser?.attributes.ssj.opsGuide.data.attributes;
+  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
   const regionalGrowthLead =
-    currentUser?.attributes.ssj.regionalGrowthLead.data.attributes;
+    currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
   // console.log({ currentUser });
   // console.log("team", team);
@@ -337,26 +337,30 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
                     />
                   )}
                 </Grid>
-                <Grid item xs={12} sm={4}>
-                  <UserCard
-                    firstName={opsGuide?.firstName}
-                    lastName={opsGuide?.lastName}
-                    email={opsGuide?.email}
-                    phone={opsGuide?.phone}
-                    profileImage={opsGuide?.imageUrl}
-                    role="Operations Guide"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <UserCard
-                    firstName={regionalGrowthLead?.firstName}
-                    lastName={regionalGrowthLead?.lastName}
-                    email={regionalGrowthLead?.email}
-                    phone={regionalGrowthLead?.phone}
-                    profileImage={regionalGrowthLead?.imageUrl}
-                    role="Regional Growth Lead"
-                  />
-                </Grid>
+                {opsGuide ? (
+                  <Grid item xs={12} sm={4}>
+                    <UserCard
+                      firstName={opsGuide?.firstName}
+                      lastName={opsGuide?.lastName}
+                      email={opsGuide?.email}
+                      phone={opsGuide?.phone}
+                      profileImage={opsGuide?.imageUrl}
+                      role="Operations Guide"
+                    />
+                  </Grid>
+                ) : null}
+                {regionalGrowthLead ? (
+                  <Grid item xs={12} sm={4}>
+                    <UserCard
+                      firstName={regionalGrowthLead?.firstName}
+                      lastName={regionalGrowthLead?.lastName}
+                      email={regionalGrowthLead?.email}
+                      phone={regionalGrowthLead?.phone}
+                      profileImage={regionalGrowthLead?.imageUrl}
+                      role="Regional Growth Lead"
+                    />
+                  </Grid>
+                ) : null}
               </Grid>
             </Stack>
 
@@ -1186,21 +1190,21 @@ const waysToWorkTogether = [
         url: "https://connected.wildflowerschools.org/posts/4432337-from-teacher-to-transformational-teacher-leader-recorded-etl-gathering?video_markers=learn%2Cgrowth%2Clearning+and+growth%2Clearning.%2Cgrowth%2C",
         type: "Connected Post",
         description:
-          'From time to time, you may want to revisit the Learning and Growth plan in your Visioning album and use it to guide you towards further learning opportunities. If you would like to make a new Learning and Growth Plan, you can use this link to access an "Emerging Teacher Leader Self-Awareness Reflective Guide" and accompanying presentation.',
+          'From time to time, you may want to revisit the Learning and Growth plan in your Visioning album and use it to guide you towards additional learning opportunities. If you would like to make a new Learning and Growth Plan, you can use this link to access the "Emerging Teacher Leader Self-Awareness Reflective Guide" and accompanying presentation.',
       },
       {
         title: "Learn about Wildflower Ways of Working",
         url: "https://connected.wildflowerschools.org/posts/4840229-self-management-learning-series-virtual-classroom-welcome",
         type: "Connected Post",
         description:
-          "This resource provides six, self-guided learning modules on Wildflower Ways of Working. The six modules include; An Introduction to Self-Management and Domination Culture; The Advice Process; Roles & Responsibilities; Conflict Resolution; Radical Transparency; and Integration.",
+          "This resource provides six, self-guided learning modules on Wildflower Ways of Working. The six modules include; An Introduction to Self-Management and Domination Culture; The Advice Process; Roles & Responsibilities; Conflict Resolution; Radical Transparency; and Integration. ",
       },
       {
         title: "Learn about Liberatory Leadership",
         url: "https://connected.wildflowerschools.org/series/4588030-series-liberatory-leadership-series",
         type: "Connected Series",
         description:
-          'These sessions explore our collective vision for what "Liberatory Montessori" means at Wildflower and how we support our ongoing development in service of our shared purpose for liberation in our schools and communities.',
+          "These sessions explore our collective vision for what ‘Liberatory Montessori’ means at Wildflower and how we support our ongoing development in service of our shared purpose for liberation in our schools and communities. ",
       },
       {
         title: "Engage these Tools for Resilience",
@@ -1214,7 +1218,7 @@ const waysToWorkTogether = [
         url: "https://connected.wildflowerschools.org/series/4527958-series-equity-trainings",
         type: "Connected Series",
         description:
-          "Wildflower Teacher Leaders commit to a lifelong journey of personal racial identity development, critical consciousness, and anti-bias anti-racist action (commonly referred to as ABAR). You can use this list of vetted equity trainings to support you along your learning journey.",
+          "Wildflower Teacher Leaders and Foundation partners commit to a lifelong journey of personal racial identity development, critical consciousness, and anti-bias anti-racist action (commonly referred to as ABAR). You can use this list of vetted equity trainings to support you along your learning journey.",
       },
     ],
   },
@@ -1233,14 +1237,14 @@ const waysToWorkTogether = [
         url: "https://connected.wildflowerschools.org/series/4406175-series-growth-connectedness-coaches",
         type: "Connected Series",
         description:
-          "Once you have identified a partner, Wildflower highly recommends investing in the wellbeing of your partnership by engaging a Growth & Connectedness coach. Growth & Connectedness coaches typically focus on leadership, identity, and teamwork development. If you have questions about how to access coaching, please contact your Operations Guide. ",
+          "Once you have identified a partner, Wildflower highly recommends investing in your partnership by engaging a Growth & Connectedness coach. Growth & Connectedness coaches typically focus on leadership, identity, and teamwork development. If you have questions about how to access coaching, please contact your Operations Guide.",
       },
       {
         title: "Engage an Equity or ABAR coach",
         url: "https://connected.wildflowerschools.org/series/4527903-series-equity-consultants",
         type: "Connected Series",
         description:
-          "In addition to engaging in equity or identity development trainings, many Teacher Leader teams engage an Equity coach to help them create an intentionally anti-racist, anti-bias school community.",
+          "In addition to attending equity trainings, some Teacher Leaders engage an equity or ABAR coach to support their ongoing racial-identity work. This work is critical to creating an intentionally anti-racist, anti-bias school community.",
       },
     ],
   },
@@ -1248,18 +1252,18 @@ const waysToWorkTogether = [
     name: "With Your Community",
     resources: [
       {
-        title: "Attend Wildflower Community events",
+        title: "Attend Wildflower community events",
         url: "https://connected.wildflowerschools.org/posts/4634392-wildflower-events-calendar",
         type: "Connected Post",
         description:
           "As an Emerging Teacher Leader you can begin attending Wildflower events and offerings. You can use this calendar to identify upcoming opportunities. When in doubt, you can also reach out to your Operations Guide to identify upcoming opportunities.",
       },
       {
-        title: "Join a Pod of Wildflower Schools",
+        title: "Learn about Wildflower school pods",
         url: "https://connected.wildflowerschools.org/posts/4529540-essay-a-decentralized-network-by-erin-mckay",
         type: "Connected Post",
         description:
-          "Pods are small groupings of 5 - 7 schools that provide mutual support, accountability and community for one another. Read this first-hand account from a Teacher Leader about her experience of a Pod in a decentralized network. Schools typically connect with Pods once they have affiliated, but it is never too early to begin exploring and visit a pod meeting or two. To get connected please contact your Operations Guide.",
+          "Pods are small groupings of 5 - 7 schools that provide mutual support, accountability and community for one another. Read this first-hand account from a Teacher Leader about her experience of a Pod in a decentralized network. Schools typically join a Pod once they have signed a Membership Agreement with Wildflower, however it is never too early to begin learning about pods or even observe a pod meeting. To get connected, please contact your Operations Guide.",
       },
     ],
   },
@@ -1269,11 +1273,11 @@ export async function getServerSideProps({ req, res }) {
   const phase = getCookie("phase", { req, res });
   setAuthHeader({ req, res });
 
-  const apiRouteAssignedSteps = `${baseUrl}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const apiRouteAssignedSteps = `${process.env.API_URL}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
   const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
   const dataAssignedSteps = await responseAssignedSteps.data;
 
-  const apiRouteMilestones = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   const responseMilestones = await axios.get(apiRouteMilestones);
   const dataMilestones = await responseMilestones.data;
   const milestonesToDo = [];
@@ -1283,7 +1287,7 @@ export async function getServerSideProps({ req, res }) {
     }
   });
 
-  const apiRouteProgress = `${baseUrl}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
+  const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
 

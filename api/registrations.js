@@ -1,6 +1,8 @@
 import axios from "axios";
 import apiUrl from "@lib/utils/baseUrl";
-import { setCookie } from "cookies-next";
+import { getCookie } from "cookies-next";
+
+const token = getCookie("auth");
 
 const api = axios.create({
   baseURL: `${apiUrl}`,
@@ -12,6 +14,7 @@ const api = axios.create({
     "Access-Control-Allow-Headers":
       "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     "Content-Type": "application/json",
+    Authorization: token,
   },
 });
 
