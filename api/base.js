@@ -9,6 +9,11 @@ axios.interceptors.request.use(request => {
   return request
 })
 
+// axios.interceptors.response.use(response => {
+//   console.log('Response:', response.data)
+//   return response
+// })
+
 // path: e.g. '/v1/workflow/'
 function register(path, options) {
   let config = {

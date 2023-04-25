@@ -117,7 +117,6 @@ const Navigation = ({}) => {
 
 const SSJNavigation = ({}) => {
   const router = useRouter();
-  console.log(router.pathname);
   return (
     <Box>
       <NavLink

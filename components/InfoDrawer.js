@@ -64,7 +64,6 @@ const InfoDrawer = ({
   isComplete,
   worktime,
 }) => {
-
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
       <StyledInfoCard noBorder noRadius>

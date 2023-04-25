@@ -17,7 +17,6 @@ async function show(id) {
   var included = responseData.included;
   
   var steps = responseData.data.relationships.steps.data;
-  console.log("steps", steps);
   steps.forEach((step) => {
     step = stepsApi.augmentStep(step, included);
 
