@@ -1,7 +1,7 @@
 import wildflowerApi from "@api/base";
 import stepsApi from "@api/workflow/steps";
 
-const workflowsApiNoAuth = wildflowerApi.register("/v1/workflow", { noAuth: true });
+// const workflowsApiNoAuth = wildflowerApi.register("/v1/workflow", { noAuth: true });
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 
 
@@ -13,7 +13,7 @@ async function index() {
 
 // look at an individual process/milestone
 async function show(id) {
-  const response = await workflowsApiNoAuth.get(`/processes/${id}`);  
+  const response = await workflowsApi.get(`/processes/${id}`);  
   const included = response.data.included;
   
   wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
