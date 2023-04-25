@@ -96,11 +96,11 @@ const Task = ({
       setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
       setCanAssignTask(step.attributes.canAssign);
       setCanUnassignTask(step.attributes.canUnassign);
-      
+      setTaskAssignees(step.relationships.assignees || []);
+ 
       setTaskIsComplete(step.attributes.isComplete);
       setCanCompleteTask(step.attributes.canComplete);
       setCanUncompleteTask(step.attributes.canUncomplete);
-      
       setTaskCompleters(step.relationships.completers || []);
       
       setInfoDrawerOpen(false);
@@ -126,7 +126,8 @@ const Task = ({
       setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
       setCanAssignTask(step.attributes.canAssign);
       setCanUnassignTask(step.attributes.canUnassign);
-      
+      setTaskAssignees(step.relationships.assignees || []); // we use assignee.attributes.completedAt in InfoDrawer for the checkmark
+
       setTaskIsComplete(step.attributes.isComplete);
       setCanCompleteTask(step.attributes.canComplete);
       setCanUncompleteTask(step.attributes.canUncomplete);

@@ -59,8 +59,6 @@ const InfoDrawer = ({
   categories,
   actions,
   isDecision,
-  completionType,
-  completers,
   isComplete,
   worktime,
 }) => {
