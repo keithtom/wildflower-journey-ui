@@ -1,9 +1,7 @@
 import wildflowerApi from "@api/base";
 import stepsApi from "@api/workflow/steps";
 
-// const workflowsApiNoAuth = wildflowerApi.register("/v1/workflow", { noAuth: true });
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
-
 
 // show me all milestones for a phase
 async function index() {

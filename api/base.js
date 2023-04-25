@@ -26,11 +26,12 @@ function register(path, options) {
       "Access-Control-Allow-Headers":
         "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
       "Content-Type": "application/json",
+      "Authorization": token,
     },
   }
-  if (!options.noAuth) {
-    config.headers["Authorization"] = token;
-  }
+  // if (!options.noAuth) {
+  //   config.headers["Authorization"] = token;
+  // }
   return axios.create(config);
 };
 
