@@ -1,5 +1,4 @@
 import axios from "axios";
-import apiUrl from "@lib/utils/baseUrl";
 import { getCookie } from "cookies-next";
 
 const token = getCookie("auth");

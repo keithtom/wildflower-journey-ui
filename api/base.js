@@ -1,15 +1,13 @@
 // boiler plate for API calls to api.wildflowerschools.org
-
 import axios from "axios";
-import apiUrl from "@lib/utils/baseUrl";
 import { getCookie } from 'cookies-next';
 
 const token = getCookie('auth');
 
-// baseUrl: e.g. '/v1/workflow/'
-function register(baseUrl, options) {
+// path: e.g. '/v1/workflow/'
+function register(path, options) {
   let config = {
-    baseURL: `${apiUrl}${baseUrl}`,
+    baseURL: `${process.env.API_URL}${path}`,
     timeout: 3000,
     mode: "no-cors",
     headers: {

@@ -16,7 +16,6 @@ import {
   Icon,
   NavLink,
 } from "./ui/index";
-import baseUrl from "../lib/utils/baseUrl";
 
 const logoutRoute = `${process.env.API_URL}/logout`;
 

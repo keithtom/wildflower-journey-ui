@@ -7,12 +7,8 @@ import {
   Card,
   Stack,
   Icon,
-  IconButton,
-  Link,
   Grid,
   Chip,
-  Avatar,
-  Divider,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
@@ -20,7 +16,6 @@ import Resource from "../../components/Resource";
 import Hero from "../../components/Hero";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
-import baseUrl from "@lib/utils/baseUrl";
 
 const Resources = ({ dataResources }) => {
   const [showResourcesByCategory, setShowResourcesByCategory] = useState(true);

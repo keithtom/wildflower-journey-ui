@@ -13,7 +13,6 @@ import Task from "../../components/Task";
 import Hero from "../../components/Hero";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
-import baseUrl from "@lib/utils/baseUrl";
 import { getCookie } from "cookies-next";
 
 const ToDoList = ({

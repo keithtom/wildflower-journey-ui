@@ -5,7 +5,6 @@ import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
-import baseUrl from "@lib/utils/baseUrl";
 import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
 
@@ -1264,7 +1263,7 @@ export async function getServerSideProps({ params, req, res }) {
   const phase = getCookie("phase", { req, res });  // this should be your teams current phase?
 
   // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-  const apiRoute = `${baseUrl}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
   const data = response.data;

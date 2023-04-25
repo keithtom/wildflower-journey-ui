@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
-import baseUrl from "../lib/utils/baseUrl";
 import usersApi from "../api/users";
 
 import {
