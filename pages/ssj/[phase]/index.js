@@ -1,10 +1,8 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { RadioGroup, FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../../lib/setAuthHeader";
 import axios from "axios";
-import baseUrl from "../../../lib/utils/baseUrl";
 import { getCookie } from "cookies-next";
 
 import {
@@ -15,13 +13,9 @@ import {
   Icon,
   Grid,
   Modal,
-  IconButton,
   TextField,
   Select,
-  Radio,
   Button,
-  Divider,
-  Link,
 } from "@ui";
 import Milestone from "../../../components/Milestone";
 import Hero from "../../../components/Hero";
@@ -37,8 +31,6 @@ const PhasePage = ({
 
   const router = useRouter();
   const { phase } = router.query;
-
-  // console.log({ data });
 
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
@@ -457,6 +449,7 @@ export async function getServerSideProps({ params, req, res }) {
     (m) => m.attributes.phase === phase
   );
 
+  // pull me into API
   currentPhaseMilestones.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
       milestonesToDo.push(milestone);

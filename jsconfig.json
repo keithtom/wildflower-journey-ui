@@ -5,7 +5,8 @@
       "@ui": ["components/ui"],
       "@components/*": ["components/*"],
       "@lib/*": ["lib/*"],
-      "@adviceModals": ["components/adviceModals"]
+      "@adviceModals": ["components/adviceModals"],
+      "@api/*": ["api/*"],
     }
   }
 }

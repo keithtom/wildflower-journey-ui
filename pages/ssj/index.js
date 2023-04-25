@@ -5,15 +5,11 @@ import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
 import setAuthHeader from "../../lib/setAuthHeader";
 import axios from "axios";
-import baseUrl from "@lib/utils/baseUrl";
 import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
 
-import ssjApi from "../../api/ssj";
-import { categories } from "../../lib/utils/fake-data";
+import ssjApi from "../../api/ssj/ssj";
 import { useUserContext } from "@lib/useUserContext";
-import Milestone from "../../components/Milestone";
-import Task from "../../components/Task";
 import Hero from "../../components/Hero";
 import UserContactModal from "../../components/UserContactModal";
 
@@ -37,7 +33,6 @@ import {
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
-import { ListItemSecondaryAction } from "@mui/material";
 
 const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
@@ -95,18 +90,12 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
-  // console.log({ currentUser });
-  // console.log("team", team);
-  // console.log("partners", partners);
-  // console.log({ dataProgress });
-  // console.log(openDate);
-
   return (
     <>
       <PageContainer isLoading={!currentUser}>
         {ssjIsPaused ? (
           <Grid container alignItems="center" justifyContent="center">
-            <Grid item xs={12} xs={12} sm={6} md={5} lg={4}>
+            <Grid item xs={12} sm={6} md={5} lg={4}>
               <Card>
                 <Stack spacing={6}>
                   <Icon type="pause" variant="primary" size="large" />
@@ -271,7 +260,7 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
                     >
                       <Stack spacing={2}>
                         {milestonesToDo.map((m, i) => (
-                          <Link href={`/ssj/${phase}/${m.id}`}>
+                          <Link href={`/ssj/${m.attributes.phase}/${m.id}`}>
                             <Card
                               variant="light"
                               size="small"
@@ -1268,20 +1257,28 @@ const waysToWorkTogether = [
     ],
   },
 ];
-export async function getServerSideProps({ req, res }) {
+
+export async function getServerSideProps({ params, req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
-  const phase = getCookie("phase", { req, res });
+  const phase = getCookie("phase", { req, res });  // this should be your teams current phase?
+
+  // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
+  const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   setAuthHeader({ req, res });
+  const response = await axios.get(apiRoute);
+  const data = response.data;
+  
+  // want to know how many assigned tasks there are.
+  var totalSteps = 0; // rename to total assigned steps.; numMyAssignedTasks
+  data.included.forEach((included) => {
+    if (included.type == "step") {
+      totalSteps++;
+    }
+  });
 
-  const apiRouteAssignedSteps = `${process.env.API_URL}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
-  const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
-  const dataAssignedSteps = await responseAssignedSteps.data;
-
-  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-  const responseMilestones = await axios.get(apiRouteMilestones);
-  const dataMilestones = await responseMilestones.data;
+  // suggests potential milestones to start if no tasks assigned.
   const milestonesToDo = [];
-  dataMilestones.data.forEach((milestone) => {
+  data.data.forEach((milestone) => {
     if (milestone.attributes.status == "to do") {
       milestonesToDo.push(milestone);
     }
@@ -1290,6 +1287,13 @@ export async function getServerSideProps({ req, res }) {
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
+
+  // dashboard needs - # of assigned tasks, phase, location, hub, open date, startup family, phase stats (# completed, # milestones,), category stats (#completed, # milestones)
+
+  const apiRouteAssignedSteps = `${process.env.API_URL}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
+  const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
+  const dataAssignedSteps = await responseAssignedSteps.data;
+
 
   return {
     props: {

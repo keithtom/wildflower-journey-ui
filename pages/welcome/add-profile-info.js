@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
-import { styled, css } from "@mui/material/styles";
-import { useForm, Controller } from "react-hook-form";
-import { FormControlLabel, RadioGroup } from "@mui/material";
-import { FilePond, File, registerPlugin } from "react-filepond";
+import { useState } from "react";
+import { styled } from "@mui/material/styles";
+import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
@@ -19,7 +17,6 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
-import baseUrl from "@lib/utils/baseUrl";
 
 const token = getCookie("auth");
 
@@ -29,7 +26,6 @@ import {
   Stack,
   Typography,
   Card,
-  Box,
   Icon,
   Avatar,
   Link,
