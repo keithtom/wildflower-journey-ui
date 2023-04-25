@@ -1,5 +1,4 @@
 import axios from "axios";
-import apiUrl from "@lib/utils/baseUrl";
 import { setCookie } from "cookies-next";
 
 const api = axios.create({

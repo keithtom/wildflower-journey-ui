@@ -8,7 +8,6 @@ import {
   Icon,
   IconButton,
   Link,
-  Avatar,
   Button,
   Chip,
 } from "./ui";

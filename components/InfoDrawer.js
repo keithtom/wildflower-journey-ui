@@ -12,6 +12,7 @@ import {
   Divider,
   Avatar,
   Box,
+  Badge,
 } from "./ui/index";
 import WorktimeChip from "./WorktimeChip";
 import CategoryChip from "./CategoryChip";
@@ -49,18 +50,18 @@ const ActionsContainer = styled(Card)`
 const InfoDrawer = ({
   toggle,
   open,
-  assignee,
+  assignees,
   about,
   taskId,
   title,
   status,
   resources,
   categories,
-  effort,
   actions,
   isDecision,
+  completionType,
+  completers,
   isComplete,
-  includedDocuments,
   worktime,
 }) => {
   return (
@@ -93,11 +94,23 @@ const InfoDrawer = ({
                   <Typography variant="bodyMini" lightened bold>
                     ASSIGNEE
                   </Typography>
-                  <Avatar
-                    size="mini"
-                    // TODO: can we get the assignee information for each task in the process serializer
-                    src={assignee && assignee.imageUrl}
-                  />
+                  <Stack spacing={2} direction="row">
+                    { assignees.map((assignee) => (
+                      <AvatarWrapper                       
+                        badgeContent={
+                          assignee.attributes.completedAt && (
+                            <Icon
+                              type="checkCircle"
+                              size="small"
+                              variant="primary"
+                              filled
+                            />
+                          )
+                        }
+                        src={assignee && assignee.imageUrl}
+                      />
+                    ))}
+                  </Stack>
                 </Stack>
               )}
               {status && (
@@ -151,9 +164,9 @@ const InfoDrawer = ({
             <Stack spacing={2}>
               {resources.map((r, i) => (
                 <Resource
-                  link={includedDocuments[r.id].attributes.link}
-                  title={includedDocuments[r.id].attributes.title}
-                  key={i}
+                  link={r.attributes.link}
+                  title={r.attributes.title}
+                  key={r.id}
                 />
               ))}
             </Stack>
@@ -169,3 +182,21 @@ const InfoDrawer = ({
 };
 
 export default InfoDrawer;
+
+const AvatarWrapper = ({ badgeContent, src }) => {
+  return (
+    <div>
+      <Badge
+        badgeContent={badgeContent}
+        overlap="circular"
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Avatar
+          size="mini"
+          // TODO: can we get the assignee information for each task in the process serializer
+          src={src}
+        />
+      </Badge>
+    </div>
+  );
+};
