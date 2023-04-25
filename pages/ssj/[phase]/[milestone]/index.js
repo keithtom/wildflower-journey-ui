@@ -201,22 +201,28 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
           ) : sortedMilestoneTasks ? (
             sortedMilestoneTasks.map((t, i) => (
               <Task
+                key={t.id}
                 taskId={t.id}
                 link={`/ssj/${phase}/${milestone.id}/${t.id}`}
                 title={t.attributes.title}
                 description={t.attributes.description}
-                key={t.id}
                 isDecision={t.attributes.isDecision}
                 decisionOptions={t.attributes.decisionOptions}
                 isLast={i + 1 === sortedMilestoneTasks.length}
                 isNext={isUpNext}
                 handleCompleteMilestone={handleCompleteMilestone}
                 categories={milestoneAttributes.categories}
-                taskAssignees={t.relationships.assignees}
                 completionType={t.attributes.completionType}
-                taskCompleters={t.relationships.completers}
                 resources={t.relationships.documents.data}
                 worktime={t.attributes.maxWorktime}
+                isAssignedToMe={t.attributes.isAssignedToMe}
+                canAssign={t.attributes.canAssign}
+                canUnassign={t.attributes.canUnassign}
+                taskAssignees={t.relationships.assignees}
+                isComplete={t.attributes.isComplete}
+                canComplete={t.attributes.canComplete}
+                canUncomplete={t.attributes.canUncomplete}
+                taskCompleters={t.relationships.completers}
               />
             ))
           ) : (

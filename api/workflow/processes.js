@@ -1,7 +1,9 @@
 import wildflowerApi from "@api/base";
+import stepsApi from "@api/workflow/steps";
 
 const workflowsApiNoAuth = wildflowerApi.register("/v1/workflow", { noAuth: true });
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
+
 
 // show me all milestones for a phase
 // show me all milestones that are assigned to me
@@ -12,42 +14,15 @@ async function index() {}
 async function show(id) {
   var response = await workflowsApiNoAuth.get(`/processes/${id}`);  
   var responseData = wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
+  var included = responseData.included;
   
-  // augment steps with assignees and completers which is a convenient short-hand for looking at assignments since the UI cares about the information this way.
   var steps = responseData.data.relationships.steps.data;
+  console.log("steps", steps);
   steps.forEach((step) => {
-    let assignments = wildflowerApi.loadRelationshipsFromIncluded(step.relationships.assignments.data, response.data.included);
-    let assignees = assignments.map((e) => {
-      // load assignee from included
-      let relationshipAssignee = e.relationships.assignee.data;
-      let assignee = wildflowerApi.lookupIncluded(responseData.included, relationshipAssignee.id, relationshipAssignee.type);
-      
-      // augment the assignee with completedAt/assignedAt from assignment
-      assignee.attributes.assignedAt = e.attributes.assignedAt;
-      assignee.attributes.completedAt = e.attributes.completedAt;
-      
-      return assignee;
-    });
-    let completers = assignments.filter(e => e.attributes.completedAt).map((e) => {
-      // load assignee from included
-      let relationshipAssignee = e.relationships.assignee.data;
-      let assignee = wildflowerApi.lookupIncluded(responseData.included, relationshipAssignee.id, relationshipAssignee.type);
-      
-      // augment the assignee with completedAt/assignedAt
-      assignee.attributes.assignedAt = e.attributes.assignedAt;
-      assignee.attributes.completedAt = e.attributes.completedAt;
-      
-      return assignee;
-    });
-    
-    step.relationships["assignees"] = assignees; // this should be { data: assignees } to match.
-    step.relationships["completers"] = completers;
-  });
+    step = stepsApi.augmentStep(step, included);
 
-  // load secondary relationship milestone.steps.documents
-  steps.forEach((step) => {
-    let documents = wildflowerApi.loadRelationshipsFromIncluded(step.relationships.documents.data, response.data.included);
-
+    // load secondary relationship milestone.steps.documents
+    let documents = wildflowerApi.loadRelationshipsFromIncluded(step.relationships.documents.data, included);
     step.relationships.documents.data = documents;
   });
 
@@ -57,20 +32,5 @@ async function show(id) {
 }
 
 
-// move to steps.js
-async function complete(taskId) {
-  const response = await workflowsApi.put(`/steps/${taskId}/complete`);
-  const data = await response.data
-  return data
-  // if response good, great.  else.  error out?
-}
 
-// move to steps.js
-async function uncomplete(taskId) {
-  const response = await workflowsApi.put(`/steps/${taskId}/uncomplete`);
-  const data = await response.data
-  return data
-  // TODO: do something w/ the response if it's not 200
-}
-
-export default { index, show, complete, uncomplete };
+export default { index, show };

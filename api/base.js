@@ -4,6 +4,11 @@ import { getCookie } from 'cookies-next';
 
 const token = getCookie('auth');
 
+axios.interceptors.request.use(request => {
+  console.log('Starting Request', request.url)
+  return request
+})
+
 // path: e.g. '/v1/workflow/'
 function register(path, options) {
   let config = {
