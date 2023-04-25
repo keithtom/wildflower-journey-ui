@@ -28,13 +28,12 @@ import {
   Modal,
   DatePicker,
   TextField,
-  Chip,
   Link,
 } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
 
-const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
+const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
@@ -196,7 +195,7 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
               </Grid>
             </Grid>
 
-            {dataAssignedSteps.length ? (
+            {numAssignedSteps > 0 ? (
               <Card variant="primaryLightened">
                 <Grid container alignItems="center">
                   <Grid item flex={1}>
@@ -205,8 +204,8 @@ const SSJ = ({ phase, dataProgress, milestonesToDo, dataAssignedSteps }) => {
                         You have{" "}
                       </Typography>
                       <Typography variant="h3" highlight bold>
-                        {dataAssignedSteps.length} task
-                        {dataAssignedSteps.length > 1 ? `s` : null}
+                        {numAssignedSteps} task
+                        {numAssignedSteps > 1 ? `s` : null}
                       </Typography>{" "}
                       <Typography variant="h3" bold>
                         on your to do list
@@ -1260,47 +1259,37 @@ const waysToWorkTogether = [
 
 export async function getServerSideProps({ params, req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
-  const phase = getCookie("phase", { req, res });  // this should be your teams current phase?
-
-  // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-  const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-  setAuthHeader({ req, res });
-  const response = await axios.get(apiRoute);
-  const data = response.data;
   
-  // want to know how many assigned tasks there are.
-  var totalSteps = 0; // rename to total assigned steps.; numMyAssignedTasks
-  data.included.forEach((included) => {
-    if (included.type == "step") {
-      totalSteps++;
-    }
-  });
-
-  // suggests potential milestones to start if no tasks assigned.
-  const milestonesToDo = [];
-  data.data.forEach((milestone) => {
-    if (milestone.attributes.status == "to do") {
-      milestonesToDo.push(milestone);
-    }
-  });
-
+  // turn this in to a catch all api for the ssj/dashboard
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
-
-  // dashboard needs - # of assigned tasks, phase, location, hub, open date, startup family, phase stats (# completed, # milestones,), category stats (#completed, # milestones)
-
-  const apiRouteAssignedSteps = `${process.env.API_URL}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
-  const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
-  const dataAssignedSteps = await responseAssignedSteps.data;
-
+ 
+  // want to know how many assigned tasks there are.
+  var numAssignedSteps = dataProgress.assigned_steps;
+  
+  // suggests potential milestones to start if no tasks assigned.
+  const milestonesToDo = [];
+  if (numAssignedSteps == 0) {
+    const phase = getCookie("phase", { req, res });  // this should be your teams current phase?
+    // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
+    const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+    setAuthHeader({ req, res });
+    const response = await axios.get(apiRoute);
+    const data = response.data;
+    
+    data.data.forEach((milestone) => {
+      if (milestone.attributes.status == "to do") {
+        milestonesToDo.push(milestone);
+      }
+    });
+  }
 
   return {
     props: {
       milestonesToDo,
       dataProgress,
-      phase,
-      dataAssignedSteps,
+      numAssignedSteps,
     },
   };
 }
