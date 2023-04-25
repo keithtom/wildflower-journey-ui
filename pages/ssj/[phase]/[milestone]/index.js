@@ -4,7 +4,7 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
-import setAuthHeader from "../../../../lib/setAuthHeader";
+import setAuthHeader from "@lib/setAuthHeader";
 import processesApi from "@api/workflow/processes";
 
 import {
@@ -21,10 +21,10 @@ import {
   Grid,
   TextField,
 } from "@ui";
-import Task from "../../../../components/Task";
-import CategoryChip from "../../../../components/CategoryChip";
-import StatusChip from "../../../../components/StatusChip";
-import Milestone from "../../../../components/Milestone";
+import Task from "@components/Task";
+import CategoryChip from "@components/CategoryChip";
+import StatusChip from "@components/StatusChip";
+import Milestone from "@components/Milestone";
 
 const StyledMilestoneHeader = styled(Stack)`
   /* downplayed */
@@ -218,11 +218,11 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
                 isAssignedToMe={t.attributes.isAssignedToMe}
                 canAssign={t.attributes.canAssign}
                 canUnassign={t.attributes.canUnassign}
-                taskAssignees={t.relationships.assignees}
+                assignees={t.relationships.assignees}
                 isComplete={t.attributes.isComplete}
                 canComplete={t.attributes.canComplete}
                 canUncomplete={t.attributes.canUncomplete}
-                taskCompleters={t.relationships.completers}
+                completers={t.relationships.completers}
               />
             ))
           ) : (

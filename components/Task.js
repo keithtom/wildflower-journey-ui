@@ -61,23 +61,23 @@ const Task = ({
   isAssignedToMe,
   canAssign,
   canUnassign,
-  taskAssignees,
+  assignees,
   isComplete,
   canComplete,
   canUncomplete,
-  taskCompleters,
+  completers,
 }) => {
   const { currentUser } = useUserContext(); // why doesn't this work?
   
   const [taskIsAssignedToMe, setTaskIsAssignedToMe] = useState(isAssignedToMe);
   const [canAssignTask, setCanAssignTask] = useState(canAssign);
   const [canUnassignTask, setCanUnassignTask] = useState(canUnassign);
-  const [assignees, setAssignees] = useState(taskAssignees || []);
+  const [taskAssignees, setTaskAssignees] = useState(assignees || []);
   
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
   const [canCompleteTask, setCanCompleteTask] = useState(canComplete);
   const [canUncompleteTask, setCanUncompleteTask] = useState(canUncomplete);
-  const [completers, setCompleters] = useState(taskCompleters);
+  const [taskCompleters, setTaskCompleters] = useState(completers);
     
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
   const [assignToastOpen, setAssignToastOpen] = useState(false);
@@ -96,12 +96,12 @@ const Task = ({
       setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
       setCanAssignTask(step.attributes.canAssign);
       setCanUnassignTask(step.attributes.canUnassign);
-      
+      setTaskAssignees(step.relationships.assignees || []);
+ 
       setTaskIsComplete(step.attributes.isComplete);
       setCanCompleteTask(step.attributes.canComplete);
       setCanUncompleteTask(step.attributes.canUncomplete);
-      
-      setCompleters(step.relationships.completers.data || []);
+      setTaskCompleters(step.relationships.completers || []);
       
       setInfoDrawerOpen(false);
       if (removeStep) {
@@ -126,12 +126,12 @@ const Task = ({
       setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
       setCanAssignTask(step.attributes.canAssign);
       setCanUnassignTask(step.attributes.canUnassign);
-      
+      setTaskAssignees(step.relationships.assignees || []); // we use assignee.attributes.completedAt in InfoDrawer for the checkmark
+
       setTaskIsComplete(step.attributes.isComplete);
       setCanCompleteTask(step.attributes.canComplete);
       setCanUncompleteTask(step.attributes.canUncomplete);
-      
-      setCompleters(step.relationships.completers.data || []);
+      setTaskCompleters(step.relationships.completers || []);
     } catch (err) {
       console.error(err);
     }
@@ -145,8 +145,7 @@ const Task = ({
       setCanAssignTask(step.attributes.canAssign);
       setCanUnassignTask(step.attributes.canUnassign);
       
-      
-      setAssignees(step.relationships.assignees.data || []);
+      setTaskAssignees(step.relationships.assignees || []);
     } catch (err) {
       console.error(err);
     }
@@ -160,7 +159,7 @@ const Task = ({
       setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
       setCanAssignTask(step.attributes.canAssign);
       setCanUnassignTask(step.attributes.canUnassign);
-      setAssignees(step.relationships.assignees.data || []);
+      setTaskAssignees(step.relationships.assignees || []);
 
       setInfoDrawerOpen(false);
       
@@ -240,7 +239,7 @@ const Task = ({
           <Grid item>
             <Stack direction="row" spacing={3} alignItems="center">
               {processName && <Chip label={processName} size="small" />}
-              { assignees && assignees.map((assignee) => (
+              { taskAssignees && taskAssignees.map((assignee) => (
                 <Avatar size="mini" src={assignee && assignee.imageUrl} />
               ))}
             </Stack>
@@ -250,7 +249,7 @@ const Task = ({
       <InfoDrawer
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
-        assignees={assignees}
+        assignees={taskAssignees}
         about={description}
         taskId={taskId}
         title={title}
@@ -260,7 +259,7 @@ const Task = ({
         isDecision={isDecision}
         completionType={completionType}
         taskIsComplete={taskIsComplete}
-        completers={completers}
+        completers={taskCompleters}
         actions={
           isDecision ? (
             <DecisionDrawerActions
@@ -268,8 +267,8 @@ const Task = ({
               isDecided={isDecided}
               decisionOption={decisionOption}
               setDecisionOption={setDecisionOption}
-              handleAssignSelf={handleAssignSelf}
-              handleUnassignSelf={handleUnassignSelf}
+              handleAssignSelf={handleAssignUser}
+              handleUnassignSelf={handleUnassignUser}
               handleMakeDecision={handleMakeDecision}
             />
           ) : (
@@ -280,7 +279,7 @@ const Task = ({
               canUnassignTask={canUnassignTask}
               canCompleteTask={canCompleteTask}
               canUncompleteTask={canUncompleteTask}
-              completers={taskCompleters}
+              taskCompleters={taskCompleters}
               handleAssignUser={handleAssignUser}
               handleUnassignUser={handleUnassignUser}
               handleCompleteTask={handleCompleteTask}
@@ -437,13 +436,13 @@ const TaskDrawerActions = ({
   canUnassignTask,
   canCompleteTask,
   canUncompleteTask,
-  completers,
+  taskCompleters,
   handleAssignUser,
   handleUnassignUser,
   handleCompleteTask,
   handleUncompleteTask,
 }) => {
-  const completedBy = completers[0]; // just take the first since only used when its not me
+  const completedBy = taskCompleters[0]; // just take the first since only used when its not me
   // NOTE: canUncompleteTask is not the same as "Completed by me" because sometimes we can't uncomplete a step because the process is completed even though we completed the step.
   
   // is it assigned ot me, 
@@ -462,7 +461,7 @@ const TaskDrawerActions = ({
                 <Typography bold>
                   {canUncompleteTask
                     ? "Mark incomplete"
-                    : `Completed by ${completedBy.firstName} ${completedBy.lastName}`}
+                    : `Completed by ${completedBy && completedBy.attributes.firstName} ${completedBy && completedBy.attributes.lastName}`}
                 </Typography>
               </Button>
             </Grid>
