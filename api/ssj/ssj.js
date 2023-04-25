@@ -1,5 +1,4 @@
 import axios from "axios";
-import apiUrl from "@lib/utils/baseUrl";
 import { getCookie } from "cookies-next";
 
 const token = getCookie("auth");
@@ -17,6 +16,15 @@ const api = axios.create({
     Authorization: token,
   },
 });
+
+// have one function that gets a data structure used for entire dashboard
+
+async function dashboard() {
+  // hit API end point that returns
+  // dashboard needs - # of assigned tasks, phase, location, hub, open date, startup family, phase stats (# completed, # milestones,), category stats (#completed, # milestones)
+  // API should return the data in whatever structure the backend wants
+  // we can massage the response here into a data structure the frontend wants
+}
 
 async function setStartDate(date) {
   const response = await api.put(`/team`, {

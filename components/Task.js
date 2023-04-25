@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
-import processesApi from "../api/processes";
-import stepsApi from "../api/steps";
+import stepsApi from "@api/workflow/steps";
 import { useUserContext } from "@lib/useUserContext";
 
 import {
@@ -12,8 +11,6 @@ import {
   Stack,
   Button,
   Icon,
-  Link,
-  IconButton,
   Chip,
   Avatar,
   Snackbar,
@@ -51,38 +48,61 @@ const Task = ({
   taskId,
   title,
   description,
-  isComplete,
-  notNavigable,
+  completionType,
   isDecision,
-  decisionOptions,
-  isNext,
   isLast,
-  link,
   handleCompleteMilestone,
   categories,
-  taskAssignee,
   variant,
   resources,
-  includedDocuments,
   processName,
   worktime,
   removeStep,
+  isAssignedToMe,
+  canAssign,
+  canUnassign,
+  taskAssignees,
+  isComplete,
+  canComplete,
+  canUncomplete,
+  taskCompleters,
 }) => {
+  const { currentUser } = useUserContext(); // why doesn't this work?
+  
+  const [taskIsAssignedToMe, setTaskIsAssignedToMe] = useState(isAssignedToMe);
+  const [canAssignTask, setCanAssignTask] = useState(canAssign);
+  const [canUnassignTask, setCanUnassignTask] = useState(canUnassign);
+  const [assignees, setAssignees] = useState(taskAssignees || []);
+  
   const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
+  const [canCompleteTask, setCanCompleteTask] = useState(canComplete);
+  const [canUncompleteTask, setCanUncompleteTask] = useState(canUncomplete);
+  const [completers, setCompleters] = useState(taskCompleters);
+    
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
-  const [assignee, setAssignee] = useState(taskAssignee);
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
+  
   const [isDecided, setIsDecided] = useState(false);
-  const [decisionOption, setDecisionOption] = useState()
-  const { currentUser } = useUserContext();
+  const [decisionOption, setDecisionOption] = useState();
 
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
     try {
       // if checking, complete, if unchecking, uncomplete.
-      const response = await processesApi.complete(taskId);
-      setTaskIsComplete(response.data.attributes.completed);
+      const response = await stepsApi.complete(taskId);
+      const step = response.data.data
+      
+      setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
+      setCanAssignTask(step.attributes.canAssign);
+      setCanUnassignTask(step.attributes.canUnassign);
+      
+      setTaskIsComplete(step.attributes.isComplete);
+      setCanCompleteTask(step.attributes.canComplete);
+      setCanUncompleteTask(step.attributes.canUncomplete);
+      
+      setCompleters(step.relationships.completers.data || []);
+      
       setInfoDrawerOpen(false);
       if (removeStep) {
         removeStep(taskId);
@@ -100,27 +120,50 @@ const Task = ({
     // api call, backend determiens state. needs spinner and error management.
     try {
       // if checking, complete, if unchecking, uncomplete.
-      const response = await processesApi.uncomplete(taskId);
-
-      setTaskIsComplete(response.data.attributes.completed);
+      const response = await stepsApi.uncomplete(taskId);
+      const step = response.data.data
+      
+      setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
+      setCanAssignTask(step.attributes.canAssign);
+      setCanUnassignTask(step.attributes.canUnassign);
+      
+      setTaskIsComplete(step.attributes.isComplete);
+      setCanCompleteTask(step.attributes.canComplete);
+      setCanUncompleteTask(step.attributes.canUncomplete);
+      
+      setCompleters(step.relationships.completers.data || []);
     } catch (err) {
       console.error(err);
     }
   }
-  async function handleAssignSelf() {
+  async function handleAssignUser() {
     try {
-      const response = await stepsApi.assign(taskId, currentUser.id);
-      setAssignee(response.data.attributes.assigneeInfo);
+      const response = await stepsApi.assign(taskId);
+      const step = response.data.data
+      
+      setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
+      setCanAssignTask(step.attributes.canAssign);
+      setCanUnassignTask(step.attributes.canUnassign);
+      
+      
+      setAssignees(step.relationships.assignees.data || []);
     } catch (err) {
       console.error(err);
     }
     setAssignToastOpen(true);
   }
-  async function handleUnassignSelf() {
+  async function handleUnassignUser() {
     try {
       const response = await stepsApi.unassign(taskId);
-      setAssignee(null);
+      const step = response.data.data
+      
+      setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
+      setCanAssignTask(step.attributes.canAssign);
+      setCanUnassignTask(step.attributes.canUnassign);
+      setAssignees(step.relationships.assignees.data || []);
+
       setInfoDrawerOpen(false);
+      
       if (removeStep) {
         removeStep(taskId);
       }
@@ -132,7 +175,7 @@ const Task = ({
   async function handleMakeDecision() {
     const response = await stepsApi.selectOption(decisionOption);
     setIsDecided(true);
-  };
+  }
 
   return (
     <>
@@ -197,8 +240,9 @@ const Task = ({
           <Grid item>
             <Stack direction="row" spacing={3} alignItems="center">
               {processName && <Chip label={processName} size="small" />}
-
-              <Avatar size="mini" src={assignee && assignee.imageUrl} />
+              { assignees && assignees.map((assignee) => (
+                <Avatar size="mini" src={assignee && assignee.imageUrl} />
+              ))}
             </Stack>
           </Grid>
         </Grid>
@@ -206,7 +250,7 @@ const Task = ({
       <InfoDrawer
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}
-        assignee={assignee}
+        assignees={assignees}
         about={description}
         taskId={taskId}
         title={title}
@@ -214,12 +258,13 @@ const Task = ({
         categories={categories}
         worktime={worktime}
         isDecision={isDecision}
-        isComplete={taskIsComplete}
-        includedDocuments={includedDocuments}
+        completionType={completionType}
+        taskIsComplete={taskIsComplete}
+        completers={completers}
         actions={
           isDecision ? (
             <DecisionDrawerActions
-              assignee={assignee}
+              taskIsAssignedToMe={taskIsAssignedToMe}
               isDecided={isDecided}
               decisionOption={decisionOption}
               setDecisionOption={setDecisionOption}
@@ -229,10 +274,15 @@ const Task = ({
             />
           ) : (
             <TaskDrawerActions
-              assignee={assignee}
-              isComplete={taskIsComplete}
-              handleAssignSelf={handleAssignSelf}
-              handleUnassignSelf={handleUnassignSelf}
+              taskIsAssignedToMe={taskIsAssignedToMe}
+              taskIsComplete={taskIsComplete}
+              canAssignTask={canAssignTask}
+              canUnassignTask={canUnassignTask}
+              canCompleteTask={canCompleteTask}
+              canUncompleteTask={canUncompleteTask}
+              completers={taskCompleters}
+              handleAssignUser={handleAssignUser}
+              handleUnassignUser={handleUnassignUser}
               handleCompleteTask={handleCompleteTask}
               handleUncompleteTask={handleUncompleteTask}
             />
@@ -244,14 +294,16 @@ const Task = ({
         onClose={() => setAssignToastOpen(false)}
         isAssignToast={true}
         title={title}
-        assignee={assignee}
+        imageUrl={null}
+        // imageUrl={currentUser&.imageUrl}
       />
       <TaskToast
         open={unassignToastOpen}
         onClose={() => setUnassignToastOpen(false)}
         isAssignToast={false}
         title={title}
-        assignee={assignee}
+        imageUrl={null}
+        // imageUrl={currentUser&.imageUrl}
       />
     </>
   );
@@ -260,17 +312,20 @@ const Task = ({
 export default Task;
 
 const DecisionDrawerActions = ({
-  assignee,
+  taskIsAssignedToMe,
   isDecided,
   decisionOption,
   setDecisionOption,
-  handleAssignSelf,
-  handleUnassignSelf,
+  canAssignTask,
+  canUnassignTask,
   handleMakeDecision,
 }) => {
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };
+
+  const showDecisionForm =  taskIsAssignedToMe && !isDecided
+
   const StyledDecisionCard = styled(Card)`
     /* Disabled */
     ${(props) =>
@@ -282,7 +337,7 @@ const DecisionDrawerActions = ({
   `;
   return (
     <Stack spacing={4}>
-      {assignee ? (
+      {showDecisionForm ? (
         <Grid container>
           <StyledDecisionCard
             variant={isDecided ? "outlined" : "primaryOutlined"}
@@ -306,7 +361,7 @@ const DecisionDrawerActions = ({
       ) : null}
 
       <Grid container spacing={6}>
-        {assignee ? (
+        {taskIsAssignedToMe ? (
           isDecided ? (
             <Grid item xs={12}>
               <Card variant="lightened">
@@ -334,14 +389,15 @@ const DecisionDrawerActions = ({
                     </Grid>
                     <Grid item flex={1}>
                       <Typography variant="bodySmall">
-                        If you'd like to change this decision, please email support@wildflowerschools.org.
+                        If you'd like to change this decision, please email
+                        support@wildflowerschools.org.
                       </Typography>
                     </Grid>
                   </Grid>
                 </Card>
               </Grid>
               <Grid item xs={6}>
-                <Button full variant="text" onClick={handleUnassignSelf}>
+                <Button full variant="text" disabled={!canUnassignTask} onClick={handleUnassignUser}>
                   <Typography bold variant="bodyRegular">
                     Remove from to do list
                   </Typography>
@@ -362,7 +418,7 @@ const DecisionDrawerActions = ({
           )
         ) : (
           <Grid item xs={12}>
-            <Button full onClick={handleAssignSelf}>
+            <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
               <Typography light bold variant="bodyRegular">
                 Add to my to do list
               </Typography>
@@ -375,35 +431,53 @@ const DecisionDrawerActions = ({
 };
 
 const TaskDrawerActions = ({
-  assignee,
-  isComplete,
-  handleAssignSelf,
-  handleUnassignSelf,
+  taskIsAssignedToMe,
+  taskIsComplete,
+  canAssignTask,
+  canUnassignTask,
+  canCompleteTask,
+  canUncompleteTask,
+  completers,
+  handleAssignUser,
+  handleUnassignUser,
   handleCompleteTask,
   handleUncompleteTask,
 }) => {
+  const completedBy = completers[0]; // just take the first since only used when its not me
+  // NOTE: canUncompleteTask is not the same as "Completed by me" because sometimes we can't uncomplete a step because the process is completed even though we completed the step.
+  
+  // is it assigned ot me, 
   return (
     <Grid container spacing={4}>
-      {assignee ? (
-        isComplete ? (
+      {taskIsAssignedToMe ? (
+        taskIsComplete ? (
           <>
             <Grid item xs={12}>
-              <Button full variant="danger" onClick={handleUncompleteTask}>
-                <Typography bold>Mark incomplete</Typography>
+              <Button
+                full
+                variant="danger"
+                disabled={!canUncompleteTask}
+                onClick={handleUncompleteTask}
+              >
+                <Typography bold>
+                  {canUncompleteTask
+                    ? "Mark incomplete"
+                    : `Completed by ${completedBy.firstName} ${completedBy.lastName}`}
+                </Typography>
               </Button>
             </Grid>
           </>
         ) : (
           <>
             <Grid item xs={6}>
-              <Button full variant="text" onClick={handleUnassignSelf}>
+              <Button full variant="text" disabled={!canUnassignTask} onClick={handleUnassignUser}>
                 <Typography variant="bodyRegular" bold>
                   Remove from to do list
                 </Typography>
               </Button>
             </Grid>
             <Grid item xs={6}>
-              <Button full onClick={handleCompleteTask}>
+              <Button full disabled={!canCompleteTask} onClick={handleCompleteTask}>
                 <Typography variant="bodyRegular" light bold>
                   Mark task complete
                 </Typography>
@@ -411,9 +485,9 @@ const TaskDrawerActions = ({
             </Grid>
           </>
         )
-      ) : (
+      ) : ( // TODO: don't let someone assign a completed task (collaborative task)
         <Grid item xs={12}>
-          <Button full onClick={handleAssignSelf}>
+          <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
             <Typography light bold>
               Add to my to do list
             </Typography>
@@ -424,7 +498,7 @@ const TaskDrawerActions = ({
   );
 };
 
-const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
+const TaskToast = ({ isAssignToast, open, onClose, title, imageUrl }) => {
   return (
     <Snackbar
       open={open}
@@ -449,7 +523,8 @@ const TaskToast = ({ isAssignToast, open, onClose, title, assignee }) => {
               {title}
             </Typography>
             <Stack direction="row" spacing={3} alignItems="center">
-              <Avatar size="mini" src={assignee && assignee.imageUrl} />
+              {/* // TODO: becomes current user */}
+              <Avatar size="mini" src={imageUrl} /> 
               <Stack direction="row" spacing={1}>
                 <Typography variant="bodySmall">You</Typography>
                 <Typography variant="bodySmall" lightened>

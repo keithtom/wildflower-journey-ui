@@ -4,9 +4,8 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
-import axios from "axios";
 import setAuthHeader from "../../../../lib/setAuthHeader";
-import baseUrl from "../../../../lib/utils/baseUrl";
+import processesApi from "@api/workflow/processes";
 
 import {
   Avatar,
@@ -24,7 +23,6 @@ import {
 } from "@ui";
 import Task from "../../../../components/Task";
 import CategoryChip from "../../../../components/CategoryChip";
-import PhaseChip from "../../../../components/PhaseChip";
 import StatusChip from "../../../../components/StatusChip";
 import Milestone from "../../../../components/Milestone";
 
@@ -37,7 +35,7 @@ const StyledMilestoneHeader = styled(Stack)`
     `}
 `;
 
-const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
+const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
   const milestoneAttributes = milestone.attributes;
 
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
@@ -54,27 +52,11 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
     //updateMilestone
     setUserIsEditing(false);
   };
-  const includedProcesses = includedData.filter((e) => e.type === "process");
-  var milestonePrerequisites =
-    milestone.relationships.prerequisiteProcesses &&
-    milestone.relationships.prerequisiteProcesses.data.map((e) => {
-      return includedProcesses.find((p) => p.id === e.id);
-    });
 
-  const includedDocuments = {};
-  includedData
-    .filter((i) => i.type === "document")
-    .forEach((i) => {
-      includedDocuments[i.id] = i;
-    });
-
-  const includedSteps = includedData.filter((e) => e.type === "step");
-  var milestoneTasks =
-    milestone.relationships.steps &&
-    milestone.relationships.steps.data.map((e) => {
-      return includedSteps.find((s) => s.id === e.id);
-    });
-  const sortedMilestoneTasks = milestoneTasks.sort((a, b) =>
+  var milestonePrerequisites = milestone.relationships.prerequisiteProcesses.data
+  
+  const sortedMilestoneTasks = milestone.relationships.steps.data
+  .sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
   );
 
@@ -219,22 +201,28 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone, includedData }) => {
           ) : sortedMilestoneTasks ? (
             sortedMilestoneTasks.map((t, i) => (
               <Task
+                key={t.id}
                 taskId={t.id}
                 link={`/ssj/${phase}/${milestone.id}/${t.id}`}
                 title={t.attributes.title}
                 description={t.attributes.description}
-                key={i}
-                isDecision={t.attributes.kind === "Decision"}
+                isDecision={t.attributes.isDecision}
                 decisionOptions={t.attributes.decisionOptions}
                 isLast={i + 1 === sortedMilestoneTasks.length}
                 isNext={isUpNext}
-                isComplete={t.attributes.completed}
                 handleCompleteMilestone={handleCompleteMilestone}
                 categories={milestoneAttributes.categories}
-                taskAssignee={t.attributes.assigneeInfo}
+                completionType={t.attributes.completionType}
                 resources={t.relationships.documents.data}
-                includedDocuments={includedDocuments}
                 worktime={t.attributes.maxWorktime}
+                isAssignedToMe={t.attributes.isAssignedToMe}
+                canAssign={t.attributes.canAssign}
+                canUnassign={t.attributes.canUnassign}
+                taskAssignees={t.relationships.assignees}
+                isComplete={t.attributes.isComplete}
+                canComplete={t.attributes.canComplete}
+                canUncomplete={t.attributes.canUncomplete}
+                taskCompleters={t.relationships.completers}
               />
             ))
           ) : (
@@ -412,14 +400,12 @@ const EditableTaskList = ({ tasks }) => {
 
 export async function getServerSideProps({ query, req, res }) {
   const milestoneId = query.milestone;
-  const apiRoute = `${process.env.API_URL}/v1/workflow/processes/${milestoneId}`;
 
   setAuthHeader({ req, res });
-  const response = await axios.get(apiRoute);
+  const response = await processesApi.show(milestoneId)
   const data = response.data;
   const milestone = data.data;
-  const includedData = data.included || [];
-
+  
   const FakeMilestoneTasks = [
     {
       title: "Complete WF School Name Research Document",
@@ -449,7 +435,6 @@ export async function getServerSideProps({ query, req, res }) {
   return {
     props: {
       milestone,
-      includedData,
       FakeMilestoneTasks,
     },
   };

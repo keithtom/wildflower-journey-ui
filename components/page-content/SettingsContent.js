@@ -33,8 +33,6 @@ const SettingsContent = ({}) => {
   const [SSJAbandonProcessStarted, setSSJAbandonProcessStarted] =
     useState(false);
 
-  console.log({ SSJPaused });
-
   return (
     <>
       <Stack spacing={12}>
