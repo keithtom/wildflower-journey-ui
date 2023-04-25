@@ -6,17 +6,19 @@ const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 
 
 // show me all milestones for a phase
-// show me all milestones that are assigned to me
-// show me all milestones that are assigned to me
-async function index() {}
+async function index() {
+  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+  const responseMilestones = await axios.get(apiRouteMilestones);
+}
 
 // look at an individual process/milestone
 async function show(id) {
-  var response = await workflowsApiNoAuth.get(`/processes/${id}`);  
-  var responseData = wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
-  var included = responseData.included;
+  const response = await workflowsApiNoAuth.get(`/processes/${id}`);  
+  const included = response.data.included;
   
-  var steps = responseData.data.relationships.steps.data;
+  wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
+  
+  var steps = response.data.data.relationships.steps.data;
   steps.forEach((step) => {
     step = stepsApi.augmentStep(step, included);
 
