@@ -48,7 +48,6 @@ const Task = ({
   taskId,
   title,
   description,
-  completionType,
   isDecision,
   isLast,
   handleCompleteMilestone,
@@ -257,7 +256,6 @@ const Task = ({
         categories={categories}
         worktime={worktime}
         isDecision={isDecision}
-        completionType={completionType}
         taskIsComplete={taskIsComplete}
         completers={taskCompleters}
         actions={

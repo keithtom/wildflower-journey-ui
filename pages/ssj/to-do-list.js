@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import axios from "axios";
+import { useState } from "react";
 import {
   PageContainer,
   Typography,
@@ -9,47 +10,29 @@ import {
   Grid,
   Button,
 } from "@ui";
-import Task from "../../components/Task";
-import Hero from "../../components/Hero";
-import setAuthHeader from "../../lib/setAuthHeader";
-import axios from "axios";
+import Task from "@components/Task";
+import Hero from "@components/Hero";
+import setAuthHeader from "@lib/setAuthHeader";
 import { getCookie } from "cookies-next";
+import assignmentsApi from "@api/workflow/assignments";
 
 const ToDoList = ({
-  includedDocuments,
-  includedProcess,
-  dataAssignedSteps,
+  steps,
   milestonesToDo,
 }) => {
-  const [assignedSteps, setAssignedSteps] = useState(
-    dataAssignedSteps.length ? dataAssignedSteps[0].steps : []
-  );
+  const [assignedSteps, setAssignedSteps] = useState(steps);
 
   const removeStep = (taskId) => {
     setTimeout(() => {
-      const array = assignedSteps.slice();
-      const taskToRemove = array.map((e) => e.data.id);
-      const indexTasks = taskToRemove.indexOf(taskId);
-      array.splice(indexTasks, 1);
-      setAssignedSteps(array);
+      setAssignedSteps(assignedSteps.filter(step => step.id !== taskId))
     }, 1500);
   };
 
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 
-  // console.log({ dataAssignedSteps });
-  // console.log({ assignedSteps });
-  // console.log({ includedProcess });
-  // console.log({ includedDocuments });
-
   return (
     <PageContainer
-      isLoading={
-        !dataAssignedSteps ||
-        !milestonesToDo ||
-        !includedProcess ||
-        !includedDocuments
-      }
+      isLoading={false}
     >
       <Stack spacing={12}>
         <Hero imageUrl={hero} />
@@ -65,31 +48,28 @@ const ToDoList = ({
 
         {assignedSteps.length ? (
           <Stack>
-            {assignedSteps.map((t, i) => {
-              const processId = t.included.filter(
-                (i) => i.type === "process"
-              )[0].id;
+            {assignedSteps.map((step, i) => {
               return (
                 <Task
-                  taskId={t.data.id}
-                  title={t.data.attributes.title}
-                  key={t.data.id}
-                  isDecision={t.data.attributes.kind === "Decision"}
-                  decisionOptions={t.data.attributes.decisionOptions}
-                  isComplete={t.data.attributes.completed}
+                  key={step.id}
+                  taskId={step.id}
+                  title={step.attributes.title}
+                  description={step.attributes.description}
+                  isDecision={step.attributes.kind === "Decision"}
+                  decisionOptions={step.attributes.decisionOptions}
                   isNext={i === 0}
-                  description={t.data.attributes.description}
-                  resources={t.data.relationships.documents.data}
-                  includedDocuments={includedDocuments}
-                  processName={includedProcess[processId].attributes.title}
-                  worktime={
-                    (t.data.attributes.maxWorktime +
-                      t.data.attributes.minWorktime) /
-                    2 /
-                    60
-                  }
-                  taskAssignee={dataAssignedSteps[0].assignee_info}
+                  resources={step.relationships.documents.data}
+                  processName={step.relationships.process.data.attributes.title}
+                  worktime={step.attributes.maxWorktime}
                   removeStep={removeStep}
+                  isAssignedToMe={step.attributes.isAssignedToMe}
+                  canAssign={step.attributes.canAssign}
+                  canUnassign={step.attributes.canUnassign}
+                  assignees={step.relationships.assignees}
+                  isComplete={step.attributes.isComplete}
+                  canComplete={step.attributes.canComplete}
+                  canUncomplete={step.attributes.canUncomplete}
+                  completers={step.relationships.completers}
                 />
               );
             })}
@@ -152,44 +132,27 @@ const ToDoList = ({
 export default ToDoList;
 
 export async function getServerSideProps({ req, res }) {
-  const workflowId = getCookie("workflowId", { req, res });
-  const phase = getCookie("phase", { req, res });
-  const apiRouteAssignedSteps = `${process.env.API_URL}/v1/ssj/dashboard/assigned_steps?workflow_id=${workflowId}`;
   setAuthHeader({ req, res });
-  const responseAssignedSteps = await axios.get(apiRouteAssignedSteps);
-  const dataAssignedSteps = await responseAssignedSteps.data;
-  const includedDocuments = {};
-  dataAssignedSteps[0]?.steps.forEach((i) =>
-    i.included
-      .filter((i) => i.type === "document")
-      .forEach((i) => {
-        includedDocuments[i.id] = i;
-      })
-  );
-  const includedProcess = {};
-  dataAssignedSteps[0]?.steps.forEach((i) =>
-    i.included
-      .filter((i) => i.type === "process")
-      .forEach((i) => {
-        includedProcess[i.id] = i;
-      })
-  );
+  
+  const phase = getCookie("phase", { req, res });
+  const workflowId = getCookie("workflowId", { req, res });
+  const response = await assignmentsApi.index(workflowId);
+  
+  let steps = response.data.data
+  console.log("steps", steps)
 
-  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-  const responseMilestones = await axios.get(apiRouteMilestones);
-  const dataMilestones = await responseMilestones.data;
-  const milestonesToDo = [];
-  dataMilestones.data.forEach((milestone) => {
-    if (milestone.attributes.status == "to do") {
-      milestonesToDo.push(milestone);
-    }
-  });
-
+  let milestonesToDo = [];
+  // if no assigned steps, load milestones todos so we can suggest to user.
+  if (!steps.length) {
+    const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+    const responseMilestones = await axios.get(apiRouteMilestones);
+    
+    milestonesToDo = responseMilestones.data.data.filter(milestone => milestone.attributes.status == "to do");
+  }
+  
   return {
     props: {
-      includedDocuments,
-      includedProcess,
-      dataAssignedSteps,
+      steps,
       milestonesToDo,
     },
   };

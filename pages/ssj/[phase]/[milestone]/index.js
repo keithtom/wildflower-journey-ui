@@ -212,7 +212,6 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
                 isNext={isUpNext}
                 handleCompleteMilestone={handleCompleteMilestone}
                 categories={milestoneAttributes.categories}
-                completionType={t.attributes.completionType}
                 resources={t.relationships.documents.data}
                 worktime={t.attributes.maxWorktime}
                 isAssignedToMe={t.attributes.isAssignedToMe}

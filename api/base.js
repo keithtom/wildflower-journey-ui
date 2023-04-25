@@ -50,6 +50,51 @@ function register(path, options) {
 //       }
 
 
+// Loads the relationships from the included array.  Does not recursively load relationships.
+// So if an included object has relationships, those relationships need to be pulled out of the included array.
+// Modifies data object.
+function loadAllRelationshipsFromIncluded(data){
+  const arrayOrObject = data.data;
+  const included = data.included;
+  if (Array.isArray(arrayOrObject)){
+    arrayOrObject.forEach((e) => {
+      loadAllRelationships(e, included);
+    });
+  }
+  else if (typeof(arrayOrObject) === 'object' && arrayOrObject.constructor === Object) {
+    loadAllRelationships(arrayOrObject, included);
+  }
+};
+
+// recursively loads relationship data.  side effect: modifies objectWithRelationships
+// never go more than 2 deep to avoid circular dependencies; most relationships will never need more
+function loadAllRelationships(objectWithRelationships, included, depth=0){
+  // console.log("depth", depth);
+   if (depth > 1) return;
+   if (!objectWithRelationships.relationships) return;
+  
+  const relationshipKeys = Object.keys(objectWithRelationships.relationships);
+  relationshipKeys.forEach((relationshipKey) => {
+    console.log("relationship", relationshipKey);
+    let relationshipData = objectWithRelationships.relationships[relationshipKey].data;
+    let loadedData = loadRelationshipsFromIncluded(relationshipData, included);
+    
+    console.log("loadedData", loadedData);
+    // recursively load relationships from new data.
+    if (Array.isArray(loadedData)){
+      loadedData.forEach((e) => {
+        loadAllRelationships(e, included, depth+1);
+      });
+    }
+    else if (loadedData && typeof(loadedData) === 'object' && loadedData.constructor === Object) {
+      loadAllRelationships(loadedData, included, depth+1);
+    }
+
+    // put this back into the data key, side effect
+    objectWithRelationships.relationships[relationshipKey].data = loadedData;
+  });  
+}
+
 // returns same relationshipData but augmented with data from included; no side effects
 function loadRelationshipsFromIncluded(relationshipData, included){
   let loadedData;
@@ -57,25 +102,10 @@ function loadRelationshipsFromIncluded(relationshipData, included){
     loadedData = relationshipData.map(e => lookupIncluded(included, e.id, e.type) || e); // if we don't find it in included, just keep the same element.
   } 
   // Is an object literal? https://www.w3docs.com/snippets/javascript/how-to-check-if-a-value-is-an-object-in-javascript.html
-  else if (typeof(relationshipData) === 'object' && relationshipData.constructor === Object) {
-    loadedData = lookupIncluded(included, relationshipData.id, relationshipData.type);
+  else if (relationshipData && typeof(relationshipData) === 'object' && relationshipData.constructor === Object) {
+    loadedData = lookupIncluded(included, relationshipData.id, relationshipData.type) || relationshipData; 
   }
   return loadedData;
-};
-
-// Loads the relationships from the included array.  Does not recursively load relationships.
-// So if an included object has relationships, those relationships need to be pulled out of the included array.
-// Modifies data object.
-function loadAllRelationshipsFromIncluded(data){
-  const included = data.included;
-  const relationshipKeys = Object.keys(data.data.relationships);
-  relationshipKeys.forEach((relationshipKey) => {
-    let relationshipData = data.data.relationships[relationshipKey].data;
-    let loadedData = loadRelationshipsFromIncluded(relationshipData, included);
-    // put this back into the data key, side effect
-    data.data.relationships[relationshipKey].data = loadedData;
-  });
-  return data;
 };
 
 
