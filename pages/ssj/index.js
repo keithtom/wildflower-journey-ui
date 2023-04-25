@@ -898,9 +898,11 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
       partnerEmail: "",
     },
   });
-  const onSubmit = (data) => {
-    setSubmittedPartnerRequest(true);
-    console.log(data);
+  async function onSubmit(data) {
+    const response = await ssjApi.addPartner(data);
+    if (response.status === 200) {
+      setSubmittedPartnerRequest(true);
+    }
   };
 
   return (

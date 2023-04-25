@@ -42,4 +42,15 @@ async function getTeam() {
   // if response good, great.  else.  error out?
 }
 
-export default { setStartDate, getTeam };
+async function invitePartner(data) {
+  const response = await api.put(`/invite_team`, {
+    person: {
+      first_name: data.partnerFirstName,
+      last_name: data.partnerLastName,
+      email: data.partnerEmail,
+    },
+  });
+  return response;
+}
+
+export default { setStartDate, getTeam, invitePartner };
