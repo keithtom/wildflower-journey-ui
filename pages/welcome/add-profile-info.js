@@ -228,14 +228,11 @@ const AddProfileInfo = ({}) => {
               <Divider />
               <Grid container spacing={3} justifyContent="space-between">
                 <Grid item xs={6}>
-                  <Button
-                    full
-                    variant="secondary"
-                    disabled={!profilePicture}
-                    onClick={handleSubmit}
-                  >
-                    <Typography variant="bodyRegular">Back</Typography>
-                  </Button>
+                  <Link href="/welcome/confirm-demographic-info">
+                    <Button full variant="secondary">
+                      <Typography variant="bodyRegular">Back</Typography>
+                    </Button>
+                  </Link>
                 </Grid>
                 <Grid item xs={6}>
                   {/* TODO: Change the destination depending on existing vs new TL */}
@@ -250,11 +247,13 @@ const AddProfileInfo = ({}) => {
                   </Button>
                 </Grid>
                 <Grid item xs={12}>
-                  <Button full variant="text" onClick={handleSubmit}>
-                    <Typography variant="bodyRegular" highlight>
-                      Skip for now
-                    </Typography>
-                  </Button>
+                  <Link href="/ssj">
+                    <Button full variant="text">
+                      <Typography variant="bodyRegular" highlight>
+                        Skip for now
+                      </Typography>
+                    </Button>
+                  </Link>
                 </Grid>
               </Grid>
             </Stack>
