@@ -746,15 +746,20 @@ const ETLs = ({}) => {
 };
 const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
   const [dateValue, setDateValue] = useState();
+  const [changedDateValue, setChangedDateValue] = useState(false);
   useEffect(() => {
-    setDateValue(openDate);
+    if (!changedDateValue) {
+      setDateValue(openDate);
+    }
   });
   const handleDateValueChange = (newValue) => {
-    setDateValue(newValue);
+    setDateValue(moment(newValue).format("YYYY-MM-DD"));
+    setChangedDateValue(true);
   };
   const handleSetOpenDate = () => {
     ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
-    setOpenDate(dateValue);
+    setOpenDate(moment(dateValue).format("YYYY-MM-DD"));
+    setChangedDateValue(false);
     toggle();
   };
 
@@ -774,6 +779,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
         <DatePicker
           label="Your anticipated open date"
           id="open-date"
+          disablePast
           value={parseISO(dateValue)}
           onChange={handleDateValueChange}
         />
@@ -784,7 +790,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
             </Button>
           </Grid>
           <Grid item>
-            <Button disabled={!dateValue} onClick={handleSetOpenDate}>
+            <Button disabled={!changedDateValue} onClick={handleSetOpenDate}>
               <Typography light variant="bodyRegular">
                 Set an anticipated open date
               </Typography>
@@ -1260,24 +1266,24 @@ const waysToWorkTogether = [
 export async function getServerSideProps({ params, req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
   setAuthHeader({ req, res });
-    
+
   // turn this in to a catch all api for the ssj/dashboard
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
- 
+
   // want to know how many assigned tasks there are.
   var numAssignedSteps = dataProgress.assigned_steps;
-  
+
   // suggests potential milestones to start if no tasks assigned.
   const milestonesToDo = [];
   if (numAssignedSteps == 0) {
-    const phase = getCookie("phase", { req, res });  // this should be your teams current phase?
+    const phase = getCookie("phase", { req, res }); // this should be your teams current phase?
     // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
     const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
     const response = await axios.get(apiRoute);
     const data = response.data;
-    
+
     data.data.forEach((milestone) => {
       if (milestone.attributes.status == "to do") {
         milestonesToDo.push(milestone);
