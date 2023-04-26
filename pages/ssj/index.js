@@ -33,7 +33,8 @@ import {
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
 
-const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps, invitedPartner }) => {
+
+const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
@@ -75,6 +76,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps, invitedPartner })
     const teamData = ssjApi.getTeam();
     teamData.then(function (result) {
       setTeam(result);
+      setSubmittedPartnerRequest(result.invitedPartner);
       setOpenDate(result.expectedStartDate);
     });
   }, []);
@@ -1273,9 +1275,6 @@ export async function getServerSideProps({ params, req, res }) {
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
-  const teamData = await ssjApi.getTeam();
-  const invitedPartner = teamData.invitedPartner;
- 
   // want to know how many assigned tasks there are.
   console.log(dataProgress);
   var numAssignedSteps = dataProgress.assigned_steps;
@@ -1301,7 +1300,6 @@ export async function getServerSideProps({ params, req, res }) {
       milestonesToDo,
       dataProgress,
       numAssignedSteps,
-      invitedPartner,
     },
   };
 }
