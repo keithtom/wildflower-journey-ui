@@ -20,11 +20,18 @@ const api = axios.create({
 // show
 // update
 
-async function tokenAuth(token, redirectUrl) {
+async function tokenAuth(token) {
   const response = await api.post(`/login?auth_token=${token}`, {
     token: token,
   });
   setCookie("auth", response.headers["authorization"], {
+    maxAge: 60 * 60 * 24 * 30,
+  });
+  const userAttributes = response.data.data.attributes;
+  setCookie("workflowId", userAttributes.ssj.workflowId, {
+    maxAge: 60 * 60 * 24 * 30,
+  });
+  setCookie("phase", userAttributes.ssj.currentPhase, {
     maxAge: 60 * 60 * 24 * 30,
   });
 
