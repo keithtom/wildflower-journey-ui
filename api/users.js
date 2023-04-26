@@ -20,7 +20,7 @@ const api = axios.create({
 // show
 // update
 
-async function tokenAuth(token, redirectUrl) {
+async function tokenAuth(token) {
   const response = await api.post(`/login?auth_token=${token}`, {
     token: token,
   });
