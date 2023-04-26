@@ -33,12 +33,12 @@ import {
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
 
-const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
+const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps, invitedPartner }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
   const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
-  const [submittedPartnerRequest, setSubmittedPartnerRequest] = useState(false);
+  const [submittedPartnerRequest, setSubmittedPartnerRequest] = useState(invitedPartner);
   const { currentUser } = useUserContext();
 
   //TODO: Get this data from the backend
@@ -898,9 +898,11 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
       partnerEmail: "",
     },
   });
-  const onSubmit = (data) => {
-    setSubmittedPartnerRequest(true);
-    console.log(data);
+  async function onSubmit(data) {
+    const response = await ssjApi.invitePartner(data);
+    if (response.status === 200) {
+      setSubmittedPartnerRequest(true);
+    }
   };
 
   return (
@@ -1271,8 +1273,11 @@ export async function getServerSideProps({ params, req, res }) {
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
-
+  const teamData = await ssjApi.getTeam();
+  const invitedPartner = teamData.invitedPartner;
+ 
   // want to know how many assigned tasks there are.
+  console.log(dataProgress);
   var numAssignedSteps = dataProgress.assigned_steps;
 
   // suggests potential milestones to start if no tasks assigned.
@@ -1280,7 +1285,7 @@ export async function getServerSideProps({ params, req, res }) {
   if (numAssignedSteps == 0) {
     const phase = getCookie("phase", { req, res }); // this should be your teams current phase?
     // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-    const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
+    const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&omit_include=true`;
     const response = await axios.get(apiRoute);
     const data = response.data;
 
@@ -1296,6 +1301,7 @@ export async function getServerSideProps({ params, req, res }) {
       milestonesToDo,
       dataProgress,
       numAssignedSteps,
+      invitedPartner,
     },
   };
 }
