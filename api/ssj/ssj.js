@@ -1,21 +1,6 @@
-import axios from "axios";
-import { getCookie } from "cookies-next";
+import wildflowerApi from "@api/base";
 
-const token = getCookie("auth");
-
-const api = axios.create({
-  baseURL: `${process.env.API_URL}/v1/ssj/dashboard`,
-  timeout: 3000,
-  mode: "no-cors",
-  headers: {
-    "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-      "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
-    "Content-Type": "application/json",
-    Authorization: token,
-  },
-});
+const workflowsApi = wildflowerApi.register("/v1/ssj/dashboard", {});
 
 // have one function that gets a data structure used for entire dashboard
 
@@ -27,7 +12,7 @@ async function dashboard() {
 }
 
 async function setStartDate(date) {
-  const response = await api.put(`/team`, {
+  const response = await workflowsApi.put(`/team`, {
     team: { expected_start_date: date },
   });
   const data = await response.data;
@@ -36,14 +21,14 @@ async function setStartDate(date) {
 }
 
 async function getTeam() {
-  const response = await api.get(`/team`);
+  const response = await workflowsApi.get(`/team`);
   const data = await response.data;
   return data;
   // if response good, great.  else.  error out?
 }
 
 async function invitePartner(data) {
-  const response = await api.put(`/invite_team`, {
+  const response = await workflowsApi.put(`/invite_partner`, {
     person: {
       first_name: data.partnerFirstName,
       last_name: data.partnerLastName,

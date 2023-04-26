@@ -899,7 +899,7 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     },
   });
   async function onSubmit(data) {
-    const response = await ssjApi.addPartner(data);
+    const response = await ssjApi.invitePartner(data);
     if (response.status === 200) {
       setSubmittedPartnerRequest(true);
     }
@@ -1273,8 +1273,11 @@ export async function getServerSideProps({ params, req, res }) {
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress);
   const dataProgress = await responseProgress.data;
-
+  const teamData = await ssjApi.getTeam();
+  console.log("teamData", teamData);
+ 
   // want to know how many assigned tasks there are.
+  console.log(dataProgress);
   var numAssignedSteps = dataProgress.assigned_steps;
 
   // suggests potential milestones to start if no tasks assigned.
