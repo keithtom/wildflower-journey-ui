@@ -33,7 +33,6 @@ import {
 import CategoryChip from "../../components/CategoryChip";
 import Resource from "../../components/Resource";
 
-
 const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
