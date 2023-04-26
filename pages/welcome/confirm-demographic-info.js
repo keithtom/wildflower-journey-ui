@@ -84,7 +84,45 @@ const ConfirmDemographicInfo = ({}) => {
   ];
   const languageOptions = [
     { value: 0, label: "English" },
-    { value: 1, label: "Spanish" },
+    { value: 1, label: "Spanish - Español" },
+    { value: 2, label: "French - Français" },
+    { value: 3, label: "Mandarin - 中文" },
+    { value: 4, label: "Arabic - العَرَبِيَّة" },
+    { value: 5, label: "Armenian - Հայերեն" },
+    { value: 6, label: "Bantu (including Swahili) - Kiswahili" },
+    { value: 7, label: "Bengali - বাংলা" },
+    { value: 8, label: "Burmese - မြန်မာစာ" },
+    { value: 9, label: "Cantonese - Gwóngdūng wá" },
+    { value: 10, label: "German - Deutsch" },
+    { value: 11, label: "Greek - ελληνικά" },
+    { value: 12, label: "Gujarati - ગુજરાતી" },
+    { value: 13, label: "Haitian Creole - Kreyol Ayisyen" },
+    { value: 14, label: "Hebrew - עברית" },
+    { value: 15, label: "Hindi - हिन्दी" },
+    { value: 16, label: "Hmong - Hmoob" },
+    { value: 17, label: "Italian - Italiano" },
+    { value: 18, label: "Japanese - 日本語" },
+    { value: 19, label: "Karen" },
+    { value: 20, label: "Khmer - ខ្មែរ," },
+    { value: 21, label: "Korean - 한국어" },
+    { value: 22, label: "Navajo - Diné bizaad" },
+    { value: 23, label: "Persian (including Farsi and Dari) - فارسی" },
+    { value: 24, label: "Polish - Polski" },
+    { value: 25, label: "Portuguese - Português" },
+    { value: 26, label: "Punjabi - ਪੰਜਾਬੀ" },
+    { value: 27, label: "Russian - русский язык" },
+    {
+      value: 28,
+      label:
+        "Serbo-Croatian (including Bosnian, Croatian, Montenegrin and Serbian) - Bosanski Jezik / Hrvatski Jezik / српски језик",
+    },
+    { value: 29, label: "Tagalog - ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔" },
+    { value: 30, label: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ" },
+    { value: 31, label: "Tami - தமிழ்" },
+    { value: 32, label: "Telugu - తెలుగు" },
+    { value: 33, label: "Urdu - اُردُو" },
+    { value: 34, label: "Vietnamese - Tiếng Việt" },
+    { value: 35, label: "Other" },
   ];
   const pronounsOptions = [
     { value: 0, label: "ae/aer/aers" },
@@ -104,10 +142,22 @@ const ConfirmDemographicInfo = ({}) => {
     { value: 2, label: "Gender Non-Conforming" },
     { value: 3, label: "A not-listed or more specific gender identity" },
   ];
+  const ethnicityOptions = [
+    { value: 0, label: "American Indian or Alaska Native" },
+    { value: 1, label: "Asian" },
+    { value: 2, label: "Black or African American" },
+    { value: 3, label: "Hispanic, Latinx, or Spanish Origin" },
+    { value: 4, label: "Native Hawaiian or Other Pacific Islander" },
+    { value: 5, label: "Middle Eastern or North African" },
+    { value: 6, label: "White" },
+    { value: 7, label: "A not-listed or more specific gender identity" },
+  ];
 
   const watchFields = watch();
   const isExistingTL = false;
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+
+  console.log({ currentUser });
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -182,7 +232,7 @@ const ConfirmDemographicInfo = ({}) => {
                     <MultiSelect
                       label="What is your ethnicity?"
                       placeholder="Select as many as you like..."
-                      options={["Asian", "White"]}
+                      options={ethnicityOptions.map((l) => l.label)}
                       error={errors.ethnicity}
                       helperText={
                         errors &&
