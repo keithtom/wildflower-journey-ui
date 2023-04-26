@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import Router from "next/router";
+import FormHelperText from "@mui/material/FormHelperText";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
 import usersApi from "../api/users";
@@ -26,6 +27,7 @@ const Login = ({}) => {
     handleSubmit,
     trigger,
     getValues,
+    setError,
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm();
   const onSubmit = (data) => {
@@ -60,6 +62,16 @@ const Login = ({}) => {
         // handle error
         console.log(error);
         console.log(error.response.data); // error message
+        if (error.response.status === 401) {
+          setError("email", {
+            type: "invalid",
+            message: error.response.data,
+          });
+          setError("password", {
+            type: "invalid",
+            message: error.response.data,
+          });
+        }
       });
   };
 
@@ -158,13 +170,19 @@ const Login = ({}) => {
                             helperText={
                               errors &&
                               errors.password &&
-                              errors.password &&
+                              errors.password.type === "required" &&
                               "This field is required"
                             }
                             {...field}
                           />
                         )}
                       />
+                      {(errors?.email?.type === "invalid" ||
+                        errors?.password?.type === "invalid") && (
+                        <FormHelperText error={true}>
+                          Email or password is invalid
+                        </FormHelperText>
+                      )}
                     </Stack>
                     <Grid container spacing={3} justifyContent="center">
                       <Grid item xs={12}>
