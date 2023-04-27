@@ -38,7 +38,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
   const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
-  const [submittedPartnerRequest, setSubmittedPartnerRequest] = useState(invitedPartner);
+  const [submittedPartnerRequest, setSubmittedPartnerRequest] = useState();
   const { currentUser } = useUserContext();
 
   //TODO: Get this data from the backend
@@ -456,7 +456,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 setUnlocked={toggleOnboardingWaysToWork}
               />
             )}
-            {userOnboardedPeers ? (
+            {/* {userOnboardedPeers ? (
               <Card variant="lightened" size="large">
                 <Grid
                   container
@@ -501,7 +501,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
                 setUnlocked={toggleOnboardingPeers}
               />
-            )}
+            )} */}
           </Stack>
         )}
       </PageContainer>
@@ -904,7 +904,7 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     if (response.status === 200) {
       setSubmittedPartnerRequest(true);
     }
-  };
+  }
 
   return (
     <Modal title="Add a partner" toggle={toggle} open={open}>
