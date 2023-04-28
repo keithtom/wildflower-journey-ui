@@ -64,10 +64,10 @@ const AddProfileInfo = ({}) => {
       })
       .then((response) => {
         if (response.error) {
-          console.error(error);
+          console.error(response.error);
         } else {
           const personAttributes = response.data.attributes;
-          currentUser.attributes.imageUrl = `${process.env.API_URL}${personAttributes.imageUrl}`;
+          currentUser.attributes.imageUrl = personAttributes.imageUrl;
           setCurrentUser(currentUser);
           router.push("/ssj");
         }

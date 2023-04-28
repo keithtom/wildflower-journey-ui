@@ -133,11 +133,11 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
               <Grid item>
                 <Stack direction="row" spacing={3} alignItems="center">
                   <Avatar
-                    src={currentUser && currentUser.attributes.imageUrl}
+                    src={currentUser?.attributes.imageUrl}
                   />
                   <Stack>
                     <Typography variant="h4" bold>
-                      Welcome, {currentUser && currentUser.attributes.firstName}
+                      Welcome, {currentUser?.attributes?.firstName}
                       !
                     </Typography>
                     <Typography variant="bodyLarge" lightened>

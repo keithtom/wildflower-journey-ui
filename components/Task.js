@@ -254,7 +254,7 @@ const Task = ({
             <Stack direction="row" spacing={3} alignItems="center">
               {processName && <Chip label={processName} size="small" />}
               { taskAssignees && taskAssignees.map((assignee) => (
-                <Avatar key={assignee.id} size="mini" src={assignee && assignee.imageUrl} />
+                <Avatar key={assignee.id} size="mini" src={assignee?.imageUrl} />
               ))}
             </Stack>
           </Grid>
@@ -309,16 +309,14 @@ const Task = ({
         onClose={() => setAssignToastOpen(false)}
         isAssignToast={true}
         title={title}
-        imageUrl={null}
-        // imageUrl={currentUser&.imageUrl}
+        imageUrl={currentUser?.imageUrl}
       />
       <TaskToast
         open={unassignToastOpen}
         onClose={() => setUnassignToastOpen(false)}
         isAssignToast={false}
         title={title}
-        imageUrl={null}
-        // imageUrl={currentUser&.imageUrl}
+        imageUrl={currentUser?.imageUrl}
       />
     </>
   );
