@@ -319,7 +319,6 @@ export async function getServerSideProps({ query, req, res }) {
   const milestone = data.included.filter((e) => e.type == "process")[0];
   const MilestoneTitle = milestone.attributes.title;
   const TaskTitle = data.data.attributes.title;
-  ];
 
   return {
     props: {
