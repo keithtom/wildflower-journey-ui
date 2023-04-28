@@ -96,10 +96,8 @@ const TaskPage = ({
           </Grid>
           <StyledTaskHeader downplayed={isUpNext}>
             <Task
-              taskId={taskId}
+              task={task}
               notNavigable
-              title={TaskTitle}
-              isDecision={isDecision}
               isNext={true}
             />
           </StyledTaskHeader>

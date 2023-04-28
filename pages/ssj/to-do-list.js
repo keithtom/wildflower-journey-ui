@@ -52,24 +52,10 @@ const ToDoList = ({
               return (
                 <Task
                   key={step.id}
-                  taskId={step.id}
-                  title={step.attributes.title}
-                  description={step.attributes.description}
-                  isDecision={step.attributes.kind === "Decision"}
-                  decisionOptions={step.attributes.decisionOptions}
+                  task={step}
+                  processName={step.relationships.process.attributes.title}
                   isNext={i === 0}
-                  resources={step.relationships.documents.data}
-                  processName={step.relationships.process.data.attributes.title}
-                  worktime={step.attributes.maxWorktime}
                   removeStep={removeStep}
-                  isAssignedToMe={step.attributes.isAssignedToMe}
-                  canAssign={step.attributes.canAssign}
-                  canUnassign={step.attributes.canUnassign}
-                  assignees={step.relationships.assignees}
-                  isComplete={step.attributes.isComplete}
-                  canComplete={step.attributes.canComplete}
-                  canUncomplete={step.attributes.canUncomplete}
-                  completers={step.relationships.completers}
                 />
               );
             })}

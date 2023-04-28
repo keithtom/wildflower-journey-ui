@@ -45,62 +45,65 @@ const StyledTask = styled(Box)`
 `;
 
 const Task = ({
-  taskId,
-  title,
-  description,
-  isDecision,
+  task,
   isLast,
   handleCompleteMilestone,
   categories,
   variant,
-  resources,
-  processName,
-  worktime,
   removeStep,
-  isAssignedToMe,
-  canAssign,
-  canUnassign,
-  assignees,
-  isComplete,
-  canComplete,
-  canUncomplete,
-  completers,
+  processName
 }) => {
   const { currentUser } = useUserContext(); // why doesn't this work?
+  console.log("currentUser", currentUser);
+
+  // Common interface that all invokations of Task should use.
+  // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
+  // If you have props that depend on where they are being called from, put them as inputs for Task
   
-  const [taskIsAssignedToMe, setTaskIsAssignedToMe] = useState(isAssignedToMe);
-  const [canAssignTask, setCanAssignTask] = useState(canAssign);
-  const [canUnassignTask, setCanUnassignTask] = useState(canUnassign);
-  const [taskAssignees, setTaskAssignees] = useState(assignees || []);
+  const taskId = task.id;
+  const title = task.attributes.title;
+  const description = task.attributes.description;
+  const worktime = task.attributes.maxWorktime;
+
+  const resources = task.relationships.documents.data;
+
+  const [taskIsAssignedToMe, setTaskIsAssignedToMe] = useState(task.attributes.isAssignedToMe);
+  const [canAssignTask, setCanAssignTask] = useState(task.attributes.canAssign);
+  const [canUnassignTask, setCanUnassignTask] = useState(task.attributes.canUnassign);
+  const [taskAssignees, setTaskAssignees] = useState(task.relationships.assignees.data || []);
   
-  const [taskIsComplete, setTaskIsComplete] = useState(isComplete);
-  const [canCompleteTask, setCanCompleteTask] = useState(canComplete);
-  const [canUncompleteTask, setCanUncompleteTask] = useState(canUncomplete);
-  const [taskCompleters, setTaskCompleters] = useState(completers);
+  const [taskIsComplete, setTaskIsComplete] = useState(task.attributes.isComplete);
+  const [canCompleteTask, setCanCompleteTask] = useState(task.attributes.canComplete);
+  const [canUncompleteTask, setCanUncompleteTask] = useState(task.attributes.canUncomplete);
+  const [taskCompleters, setTaskCompleters] = useState(task.relationships.completers.data || []);
     
+  // default to a selected option if selected in assignments.
+  const isDecision = task.attributes.isDecision;
+  const decisionOptions = task.relationships.decisionOptions?.data || [];
+  const [isDecided, setIsDecided] = useState(task.attributes.isComplete);
+  const [selectedDecisionOption, setDecisionOption] = useState(task.attributes.selectedOption); // your selection
+  
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
   
-  const [isDecided, setIsDecided] = useState(false);
-  const [decisionOption, setDecisionOption] = useState();
-
+  
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
     try {
       // if checking, complete, if unchecking, uncomplete.
       const response = await stepsApi.complete(taskId);
-      const step = response.data.data
+      const task = response.data.data
       
-      setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
-      setCanAssignTask(step.attributes.canAssign);
-      setCanUnassignTask(step.attributes.canUnassign);
-      setTaskAssignees(step.relationships.assignees || []);
+      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
+      setCanAssignTask(task.attributes.canAssign);
+      setCanUnassignTask(task.attributes.canUnassign);
+      setTaskAssignees(task.relationships.assignees || []);
  
-      setTaskIsComplete(step.attributes.isComplete);
-      setCanCompleteTask(step.attributes.canComplete);
-      setCanUncompleteTask(step.attributes.canUncomplete);
-      setTaskCompleters(step.relationships.completers || []);
+      setTaskIsComplete(task.attributes.isComplete);
+      setCanCompleteTask(task.attributes.canComplete);
+      setCanUncompleteTask(task.attributes.canUncomplete);
+      setTaskCompleters(task.relationships.completers || []);
       
       setInfoDrawerOpen(false);
       if (removeStep) {
@@ -120,17 +123,17 @@ const Task = ({
     try {
       // if checking, complete, if unchecking, uncomplete.
       const response = await stepsApi.uncomplete(taskId);
-      const step = response.data.data
+      const task = response.data.data
       
-      setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
-      setCanAssignTask(step.attributes.canAssign);
-      setCanUnassignTask(step.attributes.canUnassign);
-      setTaskAssignees(step.relationships.assignees || []); // we use assignee.attributes.completedAt in InfoDrawer for the checkmark
+      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
+      setCanAssignTask(task.attributes.canAssign);
+      setCanUnassignTask(task.attributes.canUnassign);
+      setTaskAssignees(task.relationships.assignees || []); // we use assignee.attributes.completedAt in InfoDrawer for the checkmark
 
-      setTaskIsComplete(step.attributes.isComplete);
-      setCanCompleteTask(step.attributes.canComplete);
-      setCanUncompleteTask(step.attributes.canUncomplete);
-      setTaskCompleters(step.relationships.completers || []);
+      setTaskIsComplete(task.attributes.isComplete);
+      setCanCompleteTask(task.attributes.canComplete);
+      setCanUncompleteTask(task.attributes.canUncomplete);
+      setTaskCompleters(task.relationships.completers || []);
     } catch (err) {
       console.error(err);
     }
@@ -138,13 +141,13 @@ const Task = ({
   async function handleAssignUser() {
     try {
       const response = await stepsApi.assign(taskId);
-      const step = response.data.data
+      const task = response.data.data
       
-      setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
-      setCanAssignTask(step.attributes.canAssign);
-      setCanUnassignTask(step.attributes.canUnassign);
+      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
+      setCanAssignTask(task.attributes.canAssign);
+      setCanUnassignTask(task.attributes.canUnassign);
       
-      setTaskAssignees(step.relationships.assignees || []);
+      setTaskAssignees(task.relationships.assignees || []);
     } catch (err) {
       console.error(err);
     }
@@ -153,12 +156,12 @@ const Task = ({
   async function handleUnassignUser() {
     try {
       const response = await stepsApi.unassign(taskId);
-      const step = response.data.data
+      const task = response.data.data
       
-      setTaskIsAssignedToMe(step.attributes.isAssignedToMe);
-      setCanAssignTask(step.attributes.canAssign);
-      setCanUnassignTask(step.attributes.canUnassign);
-      setTaskAssignees(step.relationships.assignees || []);
+      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
+      setCanAssignTask(task.attributes.canAssign);
+      setCanUnassignTask(task.attributes.canUnassign);
+      setTaskAssignees(task.relationships.assignees || []);
 
       setInfoDrawerOpen(false);
       
@@ -171,7 +174,19 @@ const Task = ({
     setUnassignToastOpen(true);
   }
   async function handleMakeDecision() {
-    const response = await stepsApi.selectOption(decisionOption);
+    const response = await stepsApi.selectOption(taskId, selectedDecisionOption);
+    const task = response.data.data
+
+    setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
+    setCanAssignTask(task.attributes.canAssign);
+    setCanUnassignTask(task.attributes.canUnassign);
+    setTaskAssignees(task.relationships.assignees || []);
+
+    setTaskIsComplete(task.attributes.isComplete);
+    setCanCompleteTask(task.attributes.canComplete);
+    setCanUncompleteTask(task.attributes.canUncomplete);
+    setTaskCompleters(task.relationships.completers || []);
+
     setIsDecided(true);
   }
 
@@ -239,7 +254,7 @@ const Task = ({
             <Stack direction="row" spacing={3} alignItems="center">
               {processName && <Chip label={processName} size="small" />}
               { taskAssignees && taskAssignees.map((assignee) => (
-                <Avatar size="mini" src={assignee && assignee.imageUrl} />
+                <Avatar key={assignee.id} size="mini" src={assignee && assignee.imageUrl} />
               ))}
             </Stack>
           </Grid>
@@ -263,10 +278,13 @@ const Task = ({
             <DecisionDrawerActions
               taskIsAssignedToMe={taskIsAssignedToMe}
               isDecided={isDecided}
-              decisionOption={decisionOption}
+              decisionOptions={decisionOptions}
+              selectedDecisionOption={selectedDecisionOption}
               setDecisionOption={setDecisionOption}
-              handleAssignSelf={handleAssignUser}
-              handleUnassignSelf={handleUnassignUser}
+              canAssignTask={canAssignTask}
+              canUnassignTask={canUnassignTask}
+              handleAssignUser={handleAssignUser}
+              handleUnassignUser={handleUnassignUser}
               handleMakeDecision={handleMakeDecision}
             />
           ) : (
@@ -311,17 +329,22 @@ export default Task;
 const DecisionDrawerActions = ({
   taskIsAssignedToMe,
   isDecided,
-  decisionOption,
+  decisionOptions,
+  selectedDecisionOption,
   setDecisionOption,
   canAssignTask,
   canUnassignTask,
+  handleAssignUser,
+  handleUnassignUser,
   handleMakeDecision,
 }) => {
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
   };
 
-  const showDecisionForm =  taskIsAssignedToMe && !isDecided
+  // what are the options for the step.  show that.
+  // show hte currently selected decision?
+  const showDecisionForm =  taskIsAssignedToMe
 
   const StyledDecisionCard = styled(Card)`
     /* Disabled */
@@ -341,13 +364,13 @@ const DecisionDrawerActions = ({
             disabled={isDecided}
           >
             <Stack spacing={6}>
-              <RadioGroup value={decisionOption} handleOptionsChange>
-                {FakeDecisionOptions.map((o, i) => (
+              <RadioGroup value={selectedDecisionOption} handleOptionsChange>
+                {decisionOptions.map((o, i) => (
                   <FormControlLabel
-                    key={i}
-                    value={o.value}
+                    key={o.id}
+                    value={o.id}
                     control={<Radio disabled={isDecided} />}
-                    label={o.label}
+                    label={o.attributes.description}
                     onChange={handleDecisionOptionChange}
                   />
                 ))}
@@ -403,7 +426,7 @@ const DecisionDrawerActions = ({
               <Grid item xs={6}>
                 <Button
                   full
-                  disabled={!decisionOption}
+                  disabled={!selectedDecisionOption}
                   onClick={handleMakeDecision}
                 >
                   <Typography bold variant="bodyRegular">
