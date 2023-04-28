@@ -140,9 +140,10 @@ const Milestones = ({ processByCategory, processByPhase }) => {
 export default Milestones;
 
 export async function getServerSideProps({ req, res }) {
+  setAuthHeader({ req, res });
+  
   const workflowId = getCookie("workflowId", { req, res });
   const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes`;
-  setAuthHeader({ req, res });
   const response = await axios.get(apiRoute);
   const data = await response.data;
 
