@@ -79,6 +79,7 @@ const Task = ({
     
   // default to a selected option if selected in assignments.
   const isDecision = task.attributes.isDecision;
+  const decisionQuestion = task.attributes.decisionQuestion;
   const decisionOptions = task.relationships.decisionOptions?.data || [];
   const [isDecided, setIsDecided] = useState(task.attributes.isComplete);
   const [selectedDecisionOption, setDecisionOption] = useState(task.attributes.selectedOption); // your selection
@@ -278,6 +279,7 @@ const Task = ({
             <DecisionDrawerActions
               taskIsAssignedToMe={taskIsAssignedToMe}
               isDecided={isDecided}
+              decisionQuestion={decisionQuestion}
               decisionOptions={decisionOptions}
               selectedDecisionOption={selectedDecisionOption}
               setDecisionOption={setDecisionOption}
@@ -327,6 +329,7 @@ export default Task;
 const DecisionDrawerActions = ({
   taskIsAssignedToMe,
   isDecided,
+  decisionQuestion,
   decisionOptions,
   selectedDecisionOption,
   setDecisionOption,
@@ -362,6 +365,9 @@ const DecisionDrawerActions = ({
             disabled={isDecided}
           >
             <Stack spacing={6}>
+              <Typography variant="bodyRegular" bold>
+                {decisionQuestion}
+              </Typography>
               <RadioGroup value={selectedDecisionOption} handleOptionsChange>
                 {decisionOptions.map((o, i) => (
                   <FormControlLabel
