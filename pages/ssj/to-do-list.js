@@ -53,7 +53,7 @@ const ToDoList = ({
                 <Task
                   key={step.id}
                   task={step}
-                  processName={step.relationships.process.attributes.title}
+                  processName={step.relationships.process.data.attributes.title}
                   isNext={i === 0}
                   removeStep={removeStep}
                 />
