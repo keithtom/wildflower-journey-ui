@@ -30,8 +30,8 @@ function augmentStep(step, included){
     return assignee;
   });
   
-  step.relationships["assignees"] = assignees; // this should be { data: assignees } to match.
-  step.relationships["completers"] = completers;
+  step.relationships["assignees"] = { data: assignees }; // this should be { data: assignees } to match.
+  step.relationships["completers"] = { data: completers };
 
   return step;
 };
