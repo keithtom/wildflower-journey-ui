@@ -70,10 +70,11 @@ async function uncomplete(taskId) {
   return response
 }
 
-async function selectOption(optionId) {
-  const response = await workflowsApi.put(`/steps/${optionId}/select_option`);
-  const data = await response.data;
-  return data;
+async function selectOption(taskId, optionId) {
+  const response = await workflowsApi.put(`/steps/${taskId}/select_option`, { selected_option_id: optionId });
+  response.data.data = augmentStep(response.data.data, response.data.included);
+  
+  return response;
 }
 
 export default { assign, unassign, complete, uncomplete, selectOption, augmentStep};

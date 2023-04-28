@@ -43,9 +43,6 @@ const StyledTaskResources = styled(Card)`
 const TaskPage = ({
   MilestoneId,
   MilestoneTitle,
-  TaskTitle,
-  FakeDecisionOptions,
-  FakeResources,
 }) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
@@ -96,10 +93,8 @@ const TaskPage = ({
           </Grid>
           <StyledTaskHeader downplayed={isUpNext}>
             <Task
-              taskId={taskId}
+              task={task}
               notNavigable
-              title={TaskTitle}
-              isDecision={isDecision}
               isNext={true}
             />
           </StyledTaskHeader>
@@ -107,7 +102,6 @@ const TaskPage = ({
 
         {isDecision ? (
           <DecisionForm
-            options={FakeDecisionOptions}
             disabled={userIsEditing}
           />
         ) : null}
@@ -325,21 +319,6 @@ export async function getServerSideProps({ query, req, res }) {
   const milestone = data.included.filter((e) => e.type == "process")[0];
   const MilestoneTitle = milestone.attributes.title;
   const TaskTitle = data.data.attributes.title;
-  const FakeDecisionOptions = [
-    {
-      value: "wildflower group exemption",
-      label: "I will apply with the Wildflower Group Exemption",
-    },
-    {
-      value: "independently with irs",
-      label: "I will apply independently using Form 1023 with the IRS",
-    },
-  ];
-  const FakeResources = [
-    {
-      title: "School name research document",
-      link: "/",
-    },
   ];
 
   return {
@@ -348,8 +327,6 @@ export async function getServerSideProps({ query, req, res }) {
       TaskId,
       MilestoneTitle,
       TaskTitle,
-      FakeDecisionOptions,
-      FakeResources,
     },
   };
 }
