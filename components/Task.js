@@ -99,12 +99,12 @@ const Task = ({
       setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
       setCanAssignTask(task.attributes.canAssign);
       setCanUnassignTask(task.attributes.canUnassign);
-      setTaskAssignees(task.relationships.assignees || []);
+      setTaskAssignees(task.relationships.assignees.data || []);
  
       setTaskIsComplete(task.attributes.isComplete);
       setCanCompleteTask(task.attributes.canComplete);
       setCanUncompleteTask(task.attributes.canUncomplete);
-      setTaskCompleters(task.relationships.completers || []);
+      setTaskCompleters(task.relationships.completers.data || []);
       
       setInfoDrawerOpen(false);
       if (removeStep) {
@@ -129,12 +129,12 @@ const Task = ({
       setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
       setCanAssignTask(task.attributes.canAssign);
       setCanUnassignTask(task.attributes.canUnassign);
-      setTaskAssignees(task.relationships.assignees || []); // we use assignee.attributes.completedAt in InfoDrawer for the checkmark
+      setTaskAssignees(task.relationships.assignees.data || []); // we use assignee.attributes.completedAt in InfoDrawer for the checkmark
 
       setTaskIsComplete(task.attributes.isComplete);
       setCanCompleteTask(task.attributes.canComplete);
       setCanUncompleteTask(task.attributes.canUncomplete);
-      setTaskCompleters(task.relationships.completers || []);
+      setTaskCompleters(task.relationships.completers.data || []);
     } catch (err) {
       console.error(err);
     }
@@ -148,7 +148,7 @@ const Task = ({
       setCanAssignTask(task.attributes.canAssign);
       setCanUnassignTask(task.attributes.canUnassign);
       
-      setTaskAssignees(task.relationships.assignees || []);
+      setTaskAssignees(task.relationships.assignees.data || []);
     } catch (err) {
       console.error(err);
     }
@@ -162,7 +162,7 @@ const Task = ({
       setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
       setCanAssignTask(task.attributes.canAssign);
       setCanUnassignTask(task.attributes.canUnassign);
-      setTaskAssignees(task.relationships.assignees || []);
+      setTaskAssignees(task.relationships.assignees.data || []);
 
       setInfoDrawerOpen(false);
       
@@ -181,12 +181,12 @@ const Task = ({
     setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
     setCanAssignTask(task.attributes.canAssign);
     setCanUnassignTask(task.attributes.canUnassign);
-    setTaskAssignees(task.relationships.assignees || []);
+    setTaskAssignees(task.relationships.assignees.data || []);
 
     setTaskIsComplete(task.attributes.isComplete);
     setCanCompleteTask(task.attributes.canComplete);
     setCanUncompleteTask(task.attributes.canUncomplete);
-    setTaskCompleters(task.relationships.completers || []);
+    setTaskCompleters(task.relationships.completers.data || []);
 
     setIsDecided(true);
   }
