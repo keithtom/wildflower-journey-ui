@@ -34,9 +34,7 @@ const ConfirmDemographicInfo = ({}) => {
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm({
-    defaultValues: {},
-  });
+  } = useForm();
 
   useEffect(() => {
     reset({
@@ -234,6 +232,7 @@ const ConfirmDemographicInfo = ({}) => {
                       placeholder="Select as many as you like..."
                       options={ethnicityOptions.map((l) => l.label)}
                       error={errors.ethnicity}
+                      defaultValue={[]}
                       helperText={
                         errors &&
                         errors.ethnicity &&
