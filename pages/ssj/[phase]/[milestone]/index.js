@@ -385,7 +385,8 @@ const EditableTaskList = ({ tasks }) => {
 export async function getServerSideProps({ query, req, res }) {
   const milestoneId = query.milestone;
 
-  setAuthHeader({ req, res });
+  const apis = [processesApi];
+  setAuthHeader({ req, res, apis });
   const response = await processesApi.show(milestoneId)
   const data = response.data;
   const milestone = data.data;

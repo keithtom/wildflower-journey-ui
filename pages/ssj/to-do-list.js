@@ -118,7 +118,7 @@ const ToDoList = ({
 export default ToDoList;
 
 export async function getServerSideProps({ req, res }) {
-  setAuthHeader({ req, res });
+  setAuthHeader({ req, res }, [assignmentsApi]);
   
   const phase = getCookie("phase", { req, res });
   const workflowId = getCookie("workflowId", { req, res });

@@ -1270,7 +1270,7 @@ const waysToWorkTogether = [
 
 export async function getServerSideProps({ params, req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
-  setAuthHeader({ req, res });
+  setAuthHeader({ req, res }, []);
 
   // turn this in to a catch all api for the ssj/dashboard
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
