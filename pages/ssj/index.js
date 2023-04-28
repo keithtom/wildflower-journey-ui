@@ -81,8 +81,10 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   }, []);
 
   const partners =
-    team?.length > 1
-      ? team.team.filter((t) => t.data.id !== currentUser?.id)
+    team?.team.data.length > 1
+      ? team.team.data.filter((t) => {
+        return t.id !== currentUser?.id && t.attributes.roleList[0] === "partner";
+      })
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
@@ -311,11 +313,11 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                   {partners && partners.length ? (
                     partners.map((p) => (
                       <UserCard
-                        key={p.data.id}
-                        firstName={p.data.attributes.firstName}
-                        lastName={p.data.attributes.lastName}
-                        email={p.data.attributes.email}
-                        phone={p.data.attributes.phone}
+                        key={p.id}
+                        firstName={p.attributes.firstName}
+                        lastName={p.attributes.lastName}
+                        email={p.attributes.email}
+                        phone={p.attributes.phone}
                         role="Partner"
                       />
                     ))
