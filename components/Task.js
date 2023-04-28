@@ -344,7 +344,7 @@ const DecisionDrawerActions = ({
 
   // what are the options for the step.  show that.
   // show hte currently selected decision?
-  const showDecisionForm =  taskIsAssignedToMe
+  const showDecisionForm =  taskIsAssignedToMe;
 
   const StyledDecisionCard = styled(Card)`
     /* Disabled */
@@ -559,14 +559,3 @@ const TaskToast = ({ isAssignToast, open, onClose, title, imageUrl }) => {
     </Snackbar>
   );
 };
-
-const FakeDecisionOptions = [
-  {
-    value: "wildflower group exemption",
-    label: "I will apply with the Wildflower Group Exemption",
-  },
-  {
-    value: "independently with irs",
-    label: "I will apply independently using Form 1023 with the IRS",
-  },
-];
