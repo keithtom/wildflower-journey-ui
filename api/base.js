@@ -70,8 +70,8 @@ function loadAllRelationshipsFromIncluded(data){
 // never go more than 2 deep to avoid circular dependencies; most relationships will never need more
 function loadAllRelationships(objectWithRelationships, included, depth=0){
   // console.log("depth", depth);
-   if (depth > 1) return;
-   if (!objectWithRelationships.relationships) return;
+  if (depth > 2) return;
+  if (!objectWithRelationships.relationships) return;
   
   const relationshipKeys = Object.keys(objectWithRelationships.relationships);
   relationshipKeys.forEach((relationshipKey) => {
