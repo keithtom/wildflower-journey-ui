@@ -34,20 +34,34 @@ const ConfirmDemographicInfo = ({}) => {
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({defaultValues: { 
+    primaryLanguage: "",
+    primaryLanguageOther: "",
+    raceEthnicity: [],
+    raceEthnicityOther: "",
+    lgbtqia: "",
+    gender: "",
+    genderOther: "",
+    pronouns: "", 
+    pronounsOther: "",
+    householdIncome: "",
+    montessoriCertified: "",
+    montessoriCertifiedLevels: [],
+    classroomAge: [],
+  }});
 
   useEffect(() => {
     if (currentUser) {
       peopleApi.show(currentUser.id).then((response) => {
-        const person = response.data.data.relationships?.person?.data;
+        const person = response.data.data;
         console.log("person", person);
         // SAVEPOINT this request is working.  need to make sure data is persisted and returned
         // and then loaded into form.  then we are done here.
         reset({
           primaryLanguage: person?.attributes?.primaryLanguage,
           primaryLanguageOther: person?.attributes?.primaryLanguageOther,
-          raceEthnicity: person?.attributes?.raceEthnicity || [],
-          raceEthnicityOther: person?.attributes?.raceEthnicityOther || [],
+          raceEthnicity: person?.attributes?.raceEthnicityList || [],
+          raceEthnicityOther: person?.attributes?.raceEthnicityOther,
           lgbtqia: person?.attributes?.lgbtqia,
           gender: person?.attributes?.gender,
           genderOther: person?.attributes?.genderOther,
@@ -56,14 +70,15 @@ const ConfirmDemographicInfo = ({}) => {
           householdIncome: person?.attributes?.householdIncome,
           montessoriCertified: person?.attributes?.montessoriCertified,
           montessoriCertifiedLevels:
-            person?.attributes?.montessoriCertifiedLevels || [],
-          classroomAge: person?.attributes?.classroomAge || [],
+            person?.attributes?.montessoriCertifiedLevelList || [],
+          classroomAge: person?.attributes?.classroomAgeList || [],
         });
       });
     }
   }, [currentUser]);
 
   const onSubmit = (data) => {
+    console.log("classroomAge: ", data.classroomAge);
     peopleApi
       .update(currentUser.id, {
         person: {
@@ -77,9 +92,9 @@ const ConfirmDemographicInfo = ({}) => {
           pronouns: data.pronouns,
           pronouns_other: data.pronounsOther,
           household_income: data.householdIncome,
-          montssori_certified: data.montessoriCertified,
-          montssori_certified_levels: data.montessoriCertifiedLevels,
-          classroom_age: data.classroomAge,
+          montessori_certified: data.montessoriCertified,
+          montessori_certified_level_list: data.montessoriCertifiedLevels,
+          classroom_age_list: data.classroomAge,
         },
       })
       .then((response) => {
