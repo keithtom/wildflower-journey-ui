@@ -19,10 +19,6 @@ async function show(id) {
   var steps = response.data.data.relationships.steps.data;
   steps.forEach((step) => {
     step = stepsApi.augmentStep(step, included);
-
-    // load secondary relationship milestone.steps.documents
-    let documents = wildflowerApi.loadRelationshipsFromIncluded(step.relationships.documents.data, included);
-    step.relationships.documents.data = documents;
   });
 
   // mutate the response to be friendly to the front-end
