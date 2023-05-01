@@ -40,16 +40,24 @@ const ConfirmDemographicInfo = ({}) => {
     if (currentUser) {
       peopleApi.show(currentUser.id).then((response) => {
         const person = response.data.data.relationships?.person?.data;
-        console.log("person", person)
+        console.log("person", person);
         // SAVEPOINT this request is working.  need to make sure data is persisted and returned
         // and then loaded into form.  then we are done here.
         reset({
-          primary_language: person?.attributes?.primaryLanguage,
-          ethnicity: person?.attributes?.raceEthnicity || [], // add raceEthinicityOther
+          primaryLanguage: person?.attributes?.primaryLanguage,
+          primaryLanguageOther: person?.attributes?.primaryLanguageOther,
+          raceEthnicity: person?.attributes?.raceEthnicity || [],
+          raceEthnicityOther: person?.attributes?.raceEthnicityOther || [],
           lgbtqia: person?.attributes?.lgbtqia,
-          genderIdentity: person?.attributes?.gender, // add genderOther
-          pronouns: person?.attributes?.pronouns, // add pronounsOther
+          gender: person?.attributes?.gender,
+          genderOther: person?.attributes?.genderOther,
+          pronouns: person?.attributes?.pronouns,
+          pronounsOther: person?.attributes?.pronounsOther,
           householdIncome: person?.attributes?.householdIncome,
+          montessoriCertified: person?.attributes?.montessoriCertified,
+          montessoriCertifiedLevels:
+            person?.attributes?.montessoriCertifiedLevels || [],
+          classroomAge: person?.attributes?.classroomAge || [],
         });
       });
     }
@@ -59,14 +67,19 @@ const ConfirmDemographicInfo = ({}) => {
     peopleApi
       .update(currentUser.id, {
         person: {
-          primary_language: data.language,
-          race_ethnicity: data.ethnicity,  // FIX: multi select with other, it uses tags, how is this sent when multiple options?
+          primary_language: data.primaryLanguage,
+          primary_language_other: data.primaryLanguageOther,
+          race_ethnicity_list: data.raceEthnicity, // FIX: multi select with other, it uses tags, how is this sent when multiple options?
+          race_ethnicity_other: data.raceEthnicityOther,
           lgbtqia: data.lgbtqia,
-          gender: data.genderIdentity,
-          gender_other: null, // add to form.
+          gender: data.gender,
+          gender_other: data.genderOther,
           pronouns: data.pronouns,
-          pronouns_other: null, // add to form
+          pronouns_other: data.pronounsOther,
           household_income: data.householdIncome,
+          montssori_certified: data.montessoriCertified,
+          montssori_certified_levels: data.montessoriCertifiedLevels,
+          classroom_age: data.classroomAge,
         },
       })
       .then((response) => {
@@ -82,6 +95,33 @@ const ConfirmDemographicInfo = ({}) => {
     { value: true, label: "Yes" },
     { value: false, label: "No" },
   ];
+  const montessoriCertificationOptions = [
+    { value: "Yes", label: "Yes" },
+    { value: "No", label: "No" },
+    {
+      value: "Currently Seeking Certification",
+      label: "Currently Seeking Certification",
+    },
+  ];
+  const levelsOfMontessoriCertification = [
+    { value: "Infant/Toddler", label: "Infant/Toddler" },
+    { value: "Primary/Early Childhood", label: "Primary/Early Childhood" },
+    { value: "6-9 ELementary", label: "6-9 Elementary" },
+    { value: "6-12 Elementary", label: "6-12 Elementary" },
+    { value: "12-15 Secondary", label: "12-15 Secondary" },
+    { value: "15-18 Secondary", label: "15-18 Secondary" },
+    { value: "Administrator", label: "Administrator" },
+    { value: "Leadership", label: "Leadership" },
+  ];
+  const ageClassroomsInterestedInOffering = [
+    { value: "Infants", label: "Infants" },
+    { value: "Toddlers", label: "Toddlers" },
+    { value: "Primary", label: "Primary" },
+    { value: "Lower Elementary", label: "Lower Elementary" },
+    { value: "Upper Elementary", label: "Upper Elementary" },
+    { value: "Adolescent", label: "Adolescent" },
+    { value: "High School", label: "High School" },
+  ];
   const incomeOptions = [
     { value: "High Income", label: "High Income" },
     { value: "Medium Income", label: "Medium Income" },
@@ -94,14 +134,20 @@ const ConfirmDemographicInfo = ({}) => {
     { value: "Mandarin - 中文", label: "Mandarin - 中文" },
     { value: "Arabic - العَرَبِيَّة", label: "Arabic - العَرَبِيَّة" },
     { value: "Armenian - Հայերեն", label: "Armenian - Հայերեն" },
-    { value: "Bantu (including Swahili) - Kiswahili", label: "Bantu (including Swahili) - Kiswahili" },
+    {
+      value: "Bantu (including Swahili) - Kiswahili",
+      label: "Bantu (including Swahili) - Kiswahili",
+    },
     { value: "Bengali - বাংলা", label: "Bengali - বাংলা" },
     { value: "Burmese - မြန်မာစာ", label: "Burmese - မြန်မာစာ" },
     { value: "Cantonese - Gwóngdūng wá", label: "Cantonese - Gwóngdūng wá" },
     { value: "German - Deutsch", label: "German - Deutsch" },
     { value: "Greek - ελληνικά", label: "Greek - ελληνικά" },
-    { value: "Gujarati - ગુજરાતી" , label: "Gujarati - ગુજરાતી" },
-    { value: "Haitian Creole - Kreyol Ayisyen", label: "Haitian Creole - Kreyol Ayisyen" },
+    { value: "Gujarati - ગુજરાતી", label: "Gujarati - ગુજરાતી" },
+    {
+      value: "Haitian Creole - Kreyol Ayisyen",
+      label: "Haitian Creole - Kreyol Ayisyen",
+    },
     { value: "Hebrew - עברית", label: "Hebrew - עברית" },
     { value: "Hindi - हिन्दी", label: "Hindi - हिन्दी" },
     { value: "Hmong - Hmoob", label: "Hmong - Hmoob" },
@@ -111,26 +157,33 @@ const ConfirmDemographicInfo = ({}) => {
     { value: "Khmer - ខ្មែរ,", label: "Khmer - ខ្មែរ," },
     { value: "Korean - 한국어", label: "Korean - 한국어" },
     { value: "Navajo - Diné bizaad", label: "Navajo - Diné bizaad" },
-    { value: "Persian (including Farsi and Dari) - فارسی", label: "Persian (including Farsi and Dari) - فارسی" },
+    {
+      value: "Persian (including Farsi and Dari) - فارسی",
+      label: "Persian (including Farsi and Dari) - فارسی",
+    },
     { value: "Polish - Polski", label: "Polish - Polski" },
     { value: "Portuguese - Português", label: "Portuguese - Português" },
     { value: "Punjabi - ਪੰਜਾਬੀ", label: "Punjabi - ਪੰਜਾਬੀ" },
     { value: "Russian - русский язык", label: "Russian - русский язык" },
     {
-      value: "Serbo-Croatian (including Bosnian, Croatian, Montenegrin and Serbian) - Bosanski Jezik / Hrvatski Jezik / српски језик",
+      value:
+        "Serbo-Croatian (including Bosnian, Croatian, Montenegrin and Serbian) - Bosanski Jezik / Hrvatski Jezik / српски језик",
       label:
         "Serbo-Croatian (including Bosnian, Croatian, Montenegrin and Serbian) - Bosanski Jezik / Hrvatski Jezik / српски језик",
     },
     { value: "Tagalog - ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔", label: "Tagalog - ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔" },
-    { value: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ", label: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ" },
+    {
+      value: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ",
+      label: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ",
+    },
     { value: "Tami - தமிழ்", label: "Tami - தமிழ்" },
     { value: "Telugu - తెలుగు", label: "Telugu - తెలుగు" },
-    { value:  "Urdu - اُردُو", label: "Urdu - اُردُو" },
+    { value: "Urdu - اُردُو", label: "Urdu - اُردُو" },
     { value: "Vietnamese - Tiếng Việt", label: "Vietnamese - Tiếng Việt" },
     { value: "Other", label: "Other" },
   ];
   const pronounsOptions = [
-    { value:  "ae/aer/aers", label: "ae/aer/aers" },
+    { value: "ae/aer/aers", label: "ae/aer/aers" },
     { value: "fae/faer/faers", label: "fae/faer/faers" },
     { value: "he/him/his", label: "he/him/his" },
     { value: "per/per/pers", label: "per/per/pers" },
@@ -139,30 +192,62 @@ const ConfirmDemographicInfo = ({}) => {
     { value: "ve/ver/vis", label: "ve/ver/vis" },
     { value: "xe/xem/xyrs", label: "xe/xem/xyrs" },
     { value: "ze/hir/hirs", label: "ze/hir/hirs" },
-    { value: "Other", label: "Not-listed or more specific pronouns" },
+    {
+      value: "Not-listed or more specific pronouns",
+      label: "Not-listed or more specific pronouns",
+    },
   ];
   const genderOptions = [
     { value: "Male", label: "Male/Man" },
     { value: "Female", label: "Female/Woman" },
     { value: "Gender Non-Conforming", label: "Gender Non-Conforming" },
-    { value: "Other", label: "A not-listed or more specific gender identity" },
+    {
+      value: "A not-listed or more specific gender identity",
+      label: "A not-listed or more specific gender identity",
+    },
   ];
   const ethnicityOptions = [
-    { value: 0, label: "American Indian or Alaska Native" },
-    { value: 1, label: "Asian" },
-    { value: 2, label: "Black or African American" },
-    { value: 3, label: "Hispanic, Latinx, or Spanish Origin" },
-    { value: 4, label: "Native Hawaiian or Other Pacific Islander" },
-    { value: 5, label: "Middle Eastern or North African" },
-    { value: 6, label: "White" },
-    { value: 7, label: "A not-listed or more specific gender identity" },
+    {
+      value: "American Indian or Alaska Native",
+      label: "American Indian or Alaska Native",
+    },
+    { value: "Asian", label: "Asian" },
+    { value: "Black or African American", label: "Black or African American" },
+    {
+      value: "Hispanic, Latinx, or Spanish Origin",
+      label: "Hispanic, Latinx, or Spanish Origin",
+    },
+    {
+      value: "Native Hawaiian or Other Pacific Islander",
+      label: "Native Hawaiian or Other Pacific Islander",
+    },
+    {
+      value: "Middle Eastern or North African",
+      label: "Middle Eastern or North African",
+    },
+    { value: "White", label: "White" },
+    {
+      value: "A not-listed or more specific ethnicity",
+      label: "A not-listed or more specific ethnicity",
+    },
   ];
 
   const watchFields = watch();
   const isExistingTL = false;
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  const isCertifiedOrSeeking =
+    watchFields.montessoriCertified === "Yes" ||
+    watchFields.montessoriCertified === "Currently Seeking Certification";
+  const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
+    "A not-listed or more specific ethnicity"
+  );
+  const showCustomLanguageField = watchFields.primaryLanguage === "Other";
+  const showCustomGenderField =
+    watchFields.gender === "A not-listed or more specific gender identity";
+  const showCustomPronounsField =
+    watchFields.pronouns === "Not-listed or more specific pronouns";
 
-  console.log({ currentUser });
+  // console.log({ watchFields });
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -210,7 +295,7 @@ const ConfirmDemographicInfo = ({}) => {
                 )}
 
                 <Controller
-                  name="primary_language"
+                  name="primaryLanguage"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
@@ -218,19 +303,42 @@ const ConfirmDemographicInfo = ({}) => {
                       label="What is your primary language?"
                       placeholder="Select a language..."
                       options={languageOptions.map((l) => l.label)}
-                      error={errors.primary_language}
+                      error={errors.primaryLanguage}
                       helperText={
                         errors &&
-                        errors.primary_language &&
-                        errors.primary_language &&
+                        errors.primaryLanguage &&
+                        errors.primaryLanguage.type === "required" &&
                         "This field is required"
                       }
                       {...field}
                     />
                   )}
                 />
+                {showCustomLanguageField ? (
+                  <Controller
+                    name="primaryLanguageOther"
+                    control={control}
+                    rules={{
+                      required: showCustomLanguageField ? true : false,
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Other language"
+                        placeholder="e.g. Your language"
+                        error={errors.primaryLanguageOther}
+                        helperText={
+                          errors &&
+                          errors.primaryLanguageOther &&
+                          errors.primaryLanguageOther.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                ) : null}
                 <Controller
-                  name="ethnicity"
+                  name="raceEthnicity"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
@@ -238,18 +346,41 @@ const ConfirmDemographicInfo = ({}) => {
                       label="What is your ethnicity?"
                       placeholder="Select as many as you like..."
                       options={ethnicityOptions.map((l) => l.label)}
-                      error={errors.ethnicity}
+                      error={errors.raceEthnicity}
                       defaultValue={[]}
                       helperText={
                         errors &&
-                        errors.ethnicity &&
-                        errors.ethnicity &&
+                        errors.raceEthnicity &&
+                        errors.raceEthnicity.type === "required" &&
                         "This field is required"
                       }
                       {...field}
                     />
                   )}
                 />
+                {showCustomEthnicityField ? (
+                  <Controller
+                    name="raceEthnicityOther"
+                    control={control}
+                    rules={{
+                      required: showCustomEthnicityField ? true : false,
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Other ethnicity"
+                        placeholder="e.g. Your ethnicity"
+                        error={errors.raceEthnicityOther}
+                        helperText={
+                          errors &&
+                          errors.raceEthnicityOther &&
+                          errors.raceEthnicityOther.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                ) : null}
                 <Stack spacing={1}>
                   <Typography variant="bodyRegular">
                     Do you identify as a member of the LGBTQIA community?
@@ -280,7 +411,7 @@ const ConfirmDemographicInfo = ({}) => {
                   </FormHelperText>
                 </Stack>
                 <Controller
-                  name="genderIdentity"
+                  name="gender"
                   control={control}
                   rules={{ required: true }}
                   render={({ field }) => (
@@ -288,17 +419,40 @@ const ConfirmDemographicInfo = ({}) => {
                       label="What is your gender identity?"
                       placeholder="Select one..."
                       options={genderOptions.map((l) => l.label)}
-                      error={errors.genderIdentity}
+                      error={errors.gender}
                       helperText={
                         errors &&
-                        errors.genderIdentity &&
-                        errors.genderIdentity &&
+                        errors.gender &&
+                        errors.gender.type === "required" &&
                         "This field is required"
                       }
                       {...field}
                     />
                   )}
                 />
+                {showCustomGenderField ? (
+                  <Controller
+                    name="genderOther"
+                    control={control}
+                    rules={{
+                      required: showCustomGenderField ? true : false,
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Other gender"
+                        placeholder="e.g. Your gender"
+                        error={errors.genderOther}
+                        helperText={
+                          errors &&
+                          errors.genderOther &&
+                          errors.genderOther.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                ) : null}
                 <Controller
                   name="pronouns"
                   control={control}
@@ -308,17 +462,40 @@ const ConfirmDemographicInfo = ({}) => {
                       label="What are your pronouns?"
                       placeholder="Select one..."
                       options={pronounsOptions.map((l) => l.label)}
-                      error={errors.genderIdentity}
+                      error={errors.pronouns}
                       helperText={
                         errors &&
-                        errors.genderIdentity &&
-                        errors.genderIdentity &&
+                        errors.pronouns &&
+                        errors.pronouns.type === "required" &&
                         "This field is required"
                       }
                       {...field}
                     />
                   )}
                 />
+                {showCustomPronounsField ? (
+                  <Controller
+                    name="pronounsOther"
+                    control={control}
+                    rules={{
+                      required: showCustomPronounsField ? true : false,
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Other pronouns"
+                        placeholder="e.g. Your pronouns"
+                        error={errors.pronounsOther}
+                        helperText={
+                          errors &&
+                          errors.pronounsOther &&
+                          errors.pronounsOther.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                ) : null}
                 <Stack spacing={1}>
                   <Typography variant="bodyRegular">
                     What is your household income?
@@ -348,6 +525,84 @@ const ConfirmDemographicInfo = ({}) => {
                       "This field is required"}
                   </FormHelperText>
                 </Stack>
+                <Stack spacing={1}>
+                  <Typography variant="bodyRegular">
+                    Are you Montessori Certified?
+                  </Typography>
+                  <Controller
+                    name="montessoriCertified"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { onChange, value } }) => (
+                      <RadioGroup value={value} handleOptionsChange>
+                        {montessoriCertificationOptions.map((o, i) => (
+                          <FormControlLabel
+                            key={i}
+                            value={o.value}
+                            control={<Radio />}
+                            label={o.label}
+                            onChange={onChange}
+                          />
+                        ))}
+                      </RadioGroup>
+                    )}
+                  />
+                  <FormHelperText error={errors.montessoriCertified}>
+                    {errors &&
+                      errors.montessoriCertified &&
+                      errors.montessoriCertified.type === "required" &&
+                      "This field is required"}
+                  </FormHelperText>
+                </Stack>
+                {isCertifiedOrSeeking ? (
+                  <Controller
+                    name="montessoriCertifiedLevels"
+                    control={control}
+                    rules={{ required: isCertifiedOrSeeking ? true : false }}
+                    render={({ field }) => (
+                      <MultiSelect
+                        label="What Levels are you certified (or seeking certification) for?"
+                        placeholder="Select as many as you like..."
+                        options={levelsOfMontessoriCertification.map(
+                          (l) => l.label
+                        )}
+                        error={errors.montessoriCertifiedLevels}
+                        defaultValue={[]}
+                        helperText={
+                          errors &&
+                          errors.montessoriCertifiedLevels &&
+                          errors.montessoriCertifiedLevels.type ===
+                            "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                ) : null}
+                <Controller
+                  name="classroomAge"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <MultiSelect
+                      label="What Age Classrooms are you interested in offering?"
+                      placeholder="Select as many as you like..."
+                      options={ageClassroomsInterestedInOffering.map(
+                        (l) => l.label
+                      )}
+                      error={errors.classroomAge}
+                      defaultValue={[]}
+                      helperText={
+                        errors &&
+                        errors.classroomAge &&
+                        errors.classroomAge.type === "required" &&
+                        "This field is required"
+                      }
+                      {...field}
+                    />
+                  )}
+                />
 
                 <Typography variant="bodySmall" lightened>
                   This information is only used for anonymous reporting reasons

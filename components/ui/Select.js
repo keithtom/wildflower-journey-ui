@@ -42,7 +42,7 @@ const Select = ({
             {placeholder}
           </MenuItem>
           {options.map((option, i) => (
-            <MenuItem key={i} value={i}>
+            <MenuItem key={i} value={option}>
               {option}
             </MenuItem>
           ))}
