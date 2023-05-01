@@ -20,4 +20,8 @@ async function index(workflowId) {
   return response
 }
 
-export default { index };
+function setAuthHeader(token) {
+  workflowsApi.defaults.headers.common.Authorization = token;
+}
+
+export default { index, setauthHeader };

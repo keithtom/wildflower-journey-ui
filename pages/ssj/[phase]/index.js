@@ -432,6 +432,7 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
 };
 
 export async function getServerSideProps({ params, req, res }) {
+  console.log("inside getserversideprops of milestone page")
   const { phase } = params;
   const workflowId = getCookie("workflowId", { req, res });
   const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;

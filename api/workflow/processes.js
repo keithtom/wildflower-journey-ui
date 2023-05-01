@@ -26,6 +26,9 @@ async function show(id) {
   return response;
 }
 
+// Needs to be called from getServerSideProps. Instance of axios is already instantiated when getServerSideProps is called.
+function setAuthHeader(token) {
+  workflowsApi.defaults.headers.common.Authorization = token;
+}
 
-
-export default { index, show };
+export default { index, show, setAuthHeader };

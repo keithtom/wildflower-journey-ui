@@ -38,4 +38,9 @@ async function invitePartner(data) {
   return response;
 }
 
-export default { setStartDate, getTeam, invitePartner };
+// Needs to be called from getServerSideProps. Instance of axios is already instantiated when getServerSideProps is called.
+function setAuthHeader(token) {
+  workflowsApi.defaults.headers.common.Authorization = token;
+}
+
+export default { setStartDate, getTeam, invitePartner, setAuthHeader };
