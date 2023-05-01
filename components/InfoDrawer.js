@@ -105,7 +105,7 @@ const InfoDrawer = ({
                             />
                           )
                         }
-                        src={assignee?.imageUrl}
+                        src={assignee?.attributes?.imageUrl}
                       />
                     ))}
                   </Stack>

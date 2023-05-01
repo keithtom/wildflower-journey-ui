@@ -54,8 +54,7 @@ const Task = ({
   processName
 }) => {
   const { currentUser } = useUserContext(); // why doesn't this work?
-  console.log("currentUser", currentUser);
-
+  
   // Common interface that all invokations of Task should use.
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
   // If you have props that depend on where they are being called from, put them as inputs for Task
@@ -255,7 +254,7 @@ const Task = ({
             <Stack direction="row" spacing={3} alignItems="center">
               {processName && <Chip label={processName} size="small" />}
               { taskAssignees && taskAssignees.map((assignee) => (
-                <Avatar key={assignee.id} size="mini" src={assignee?.imageUrl} />
+                <Avatar key={assignee.id} size="mini" src={assignee?.attributes?.imageUrl} />
               ))}
             </Stack>
           </Grid>
@@ -311,14 +310,14 @@ const Task = ({
         onClose={() => setAssignToastOpen(false)}
         isAssignToast={true}
         title={title}
-        imageUrl={currentUser?.imageUrl}
+        imageUrl={currentUser?.attributes?.imageUrl}
       />
       <TaskToast
         open={unassignToastOpen}
         onClose={() => setUnassignToastOpen(false)}
         isAssignToast={false}
         title={title}
-        imageUrl={currentUser?.imageUrl}
+        imageUrl={currentUser?.attributes?.imageUrl}
       />
     </>
   );
