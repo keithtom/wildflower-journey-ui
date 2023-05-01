@@ -125,7 +125,7 @@ export async function getServerSideProps({ req, res }) {
   const response = await assignmentsApi.index(workflowId);
   
   let steps = response.data.data
-  console.log("steps", steps)
+  // console.log("steps", steps)
 
   let milestonesToDo = [];
   // if no assigned steps, load milestones todos so we can suggest to user.

@@ -1,13 +1,14 @@
 // boiler plate for API calls to api.wildflowerschools.org
 import axios from "axios";
 import { getCookie } from 'cookies-next';
+import jwt_decode from "jwt-decode";
 
 const token = getCookie('auth');
 
-axios.interceptors.request.use(request => {
-  console.log('Starting Request', request.url)
-  return request
-})
+// axios.interceptors.request.use(request => {
+//   console.log('Starting Request', request.url)
+//   return request
+// })
 
 // axios.interceptors.response.use(response => {
 //   console.log('Response:', response.data)
@@ -25,14 +26,22 @@ function register(path, options) {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers":
         "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+      'Accept': 'application/json',
       "Content-Type": "application/json",
     },
   }
   if (token) {
+    console.log("token from cookies", jwt_decode(token).sub)
     config.headers["Authorization"] = token;
+  }
+  else if (axios.defaults.headers.common['Authorization']) {
+    console.log("token set from axios global", jwt_decode(axios.defaults.headers.common['Authorization']).sub);
   }
   return axios.create(config);
 };
+
+// const api = axios.create();
+// export it
 
 // api.wildflowerschools.org follows the JSON API spec, which means that
 // we often have to rehydrate the relationships with the included objects.
@@ -75,11 +84,11 @@ function loadAllRelationships(objectWithRelationships, included, depth=0){
   
   const relationshipKeys = Object.keys(objectWithRelationships.relationships);
   relationshipKeys.forEach((relationshipKey) => {
-    console.log("relationship", relationshipKey);
+    // console.log("relationship", relationshipKey);
     let relationshipData = objectWithRelationships.relationships[relationshipKey].data;
     let loadedData = loadRelationshipsFromIncluded(relationshipData, included);
     
-    console.log("loadedData", loadedData);
+    // console.log("loadedData", loadedData);
     // recursively load relationships from new data.
     if (Array.isArray(loadedData)){
       loadedData.forEach((e) => {
