@@ -10,8 +10,8 @@ async function index() {
 }
 
 // look at an individual process/milestone
-async function show(id) {
-  const response = await workflowsApi.get(`/processes/${id}`);  
+async function show(id, config) {
+  const response = await workflowsApi.get(`/processes/${id}`, config);  
   const included = response.data.included;
   
   wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
@@ -26,9 +26,4 @@ async function show(id) {
   return response;
 }
 
-// Needs to be called from getServerSideProps. Instance of axios is already instantiated when getServerSideProps is called.
-function setAuthHeader(token) {
-  workflowsApi.defaults.headers.common.Authorization = token;
-}
-
-export default { index, show, setAuthHeader };
+export default { index, show };

@@ -14,7 +14,7 @@ import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
 import Milestone from "../../components/Milestone";
 import Hero from "../../components/Hero";
-import setAuthHeader from "../../lib/setAuthHeader";
+import getAuthHeader from "../../lib/getAuthHeader";
 import axios from "axios";
 
 const Milestones = ({ processByCategory, processByPhase }) => {
@@ -140,11 +140,11 @@ const Milestones = ({ processByCategory, processByPhase }) => {
 export default Milestones;
 
 export async function getServerSideProps({ req, res }) {
-  setAuthHeader({ req, res });
+  const config = getAuthHeader({ req, res });
   
   const workflowId = getCookie("workflowId", { req, res });
   const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes`;
-  const response = await axios.get(apiRoute);
+  const response = await axios.get(apiRoute, config);
   const data = await response.data;
 
   const groupedFinanceProcesses = data.data.filter((d) =>

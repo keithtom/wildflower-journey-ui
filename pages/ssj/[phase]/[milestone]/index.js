@@ -4,7 +4,7 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
-import setAuthHeader from "@lib/setAuthHeader";
+import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
 
 import {
@@ -385,9 +385,8 @@ const EditableTaskList = ({ tasks }) => {
 export async function getServerSideProps({ query, req, res }) {
   const milestoneId = query.milestone;
 
-  const apiSetAuthHeaderFuncs = [processesApi.setAuthHeader]
-  setAuthHeader({ req, res, apiSetAuthHeaderFuncs });
-  const response = await processesApi.show(milestoneId)
+  const config = getAuthHeader({ req, res });
+  const response = await processesApi.show(milestoneId, config)
   const data = response.data;
   const milestone = data.data;
   

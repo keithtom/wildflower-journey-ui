@@ -6,8 +6,8 @@ import stepsApi from "@api/workflow/steps";
 const assignmentsApi = wildflowerApi.register(`/v1/ssj/dashboard/assigned_steps`, {noAuth: true});
 
 // this is really /workflows/id/steps/assigned
-async function index(workflowId) {
-  const response = await assignmentsApi.get(`?workflow_id=${workflowId}`);
+async function index(workflowId, config) {
+  const response = await assignmentsApi.get(`?workflow_id=${workflowId}`, config);
   const included = response.data.included;
   
   wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
@@ -20,8 +20,4 @@ async function index(workflowId) {
   return response
 }
 
-function setAuthHeader(token) {
-  workflowsApi.defaults.headers.common.Authorization = token;
-}
-
-export default { index, setauthHeader };
+export default { index };
