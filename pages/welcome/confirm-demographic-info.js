@@ -37,16 +37,22 @@ const ConfirmDemographicInfo = ({}) => {
   } = useForm();
 
   useEffect(() => {
-    reset({
-      primary_language: currentUser?.attributes?.language,
-      ethnicity: currentUser?.attributes?.ethnicity
-        ? currentUser?.attributes?.ethnicity
-        : [],
-      lgbtqia: currentUser?.attributes?.lgbtqia,
-      genderIdentity: currentUser?.attributes?.genderIdentity,
-      pronouns: currentUser?.attributes?.pronouns,
-      householdIncome: currentUser?.attributes?.householdIncome,
-    });
+    if (currentUser) {
+      peopleApi.show(currentUser.id).then((response) => {
+        const person = response.data.data.relationships?.person?.data;
+        console.log("person", person)
+        // SAVEPOINT this request is working.  need to make sure data is persisted and returned
+        // and then loaded into form.  then we are done here.
+        reset({
+          primary_language: person?.attributes?.primaryLanguage,
+          ethnicity: person?.attributes?.raceEthnicity || [], // add raceEthinicityOther
+          lgbtqia: person?.attributes?.lgbtqia,
+          genderIdentity: person?.attributes?.gender, // add genderOther
+          pronouns: person?.attributes?.pronouns, // add pronounsOther
+          householdIncome: person?.attributes?.householdIncome,
+        });
+      });
+    }
   }, [currentUser]);
 
   const onSubmit = (data) => {
@@ -54,18 +60,19 @@ const ConfirmDemographicInfo = ({}) => {
       .update(currentUser.id, {
         person: {
           primary_language: data.language,
-          ethnicity: data.ethnicity,
+          race_ethnicity: data.ethnicity,  // FIX: multi select with other, it uses tags, how is this sent when multiple options?
           lgbtqia: data.lgbtqia,
-          genderIdentity: data.genderIdentity,
+          gender: data.genderIdentity,
+          gender_other: null, // add to form.
           pronouns: data.pronouns,
-          householdIncome: data.householdIncome,
+          pronouns_other: null, // add to form
+          household_income: data.householdIncome,
         },
       })
       .then((response) => {
         if (response.error) {
           console.error(error);
         } else {
-          // console.log(data);
           router.push("/welcome/add-profile-info");
         }
       });
@@ -76,69 +83,69 @@ const ConfirmDemographicInfo = ({}) => {
     { value: false, label: "No" },
   ];
   const incomeOptions = [
-    { value: 0, label: "High Income" },
-    { value: 1, label: "Medium Income" },
-    { value: 2, label: "Low Income" },
+    { value: "High Income", label: "High Income" },
+    { value: "Medium Income", label: "Medium Income" },
+    { value: "Low Income", label: "Low Income" },
   ];
   const languageOptions = [
-    { value: 0, label: "English" },
-    { value: 1, label: "Spanish - Español" },
-    { value: 2, label: "French - Français" },
-    { value: 3, label: "Mandarin - 中文" },
-    { value: 4, label: "Arabic - العَرَبِيَّة" },
-    { value: 5, label: "Armenian - Հայերեն" },
-    { value: 6, label: "Bantu (including Swahili) - Kiswahili" },
-    { value: 7, label: "Bengali - বাংলা" },
-    { value: 8, label: "Burmese - မြန်မာစာ" },
-    { value: 9, label: "Cantonese - Gwóngdūng wá" },
-    { value: 10, label: "German - Deutsch" },
-    { value: 11, label: "Greek - ελληνικά" },
-    { value: 12, label: "Gujarati - ગુજરાતી" },
-    { value: 13, label: "Haitian Creole - Kreyol Ayisyen" },
-    { value: 14, label: "Hebrew - עברית" },
-    { value: 15, label: "Hindi - हिन्दी" },
-    { value: 16, label: "Hmong - Hmoob" },
-    { value: 17, label: "Italian - Italiano" },
-    { value: 18, label: "Japanese - 日本語" },
-    { value: 19, label: "Karen" },
-    { value: 20, label: "Khmer - ខ្មែរ," },
-    { value: 21, label: "Korean - 한국어" },
-    { value: 22, label: "Navajo - Diné bizaad" },
-    { value: 23, label: "Persian (including Farsi and Dari) - فارسی" },
-    { value: 24, label: "Polish - Polski" },
-    { value: 25, label: "Portuguese - Português" },
-    { value: 26, label: "Punjabi - ਪੰਜਾਬੀ" },
-    { value: 27, label: "Russian - русский язык" },
+    { value: "English", label: "English" },
+    { value: "Spanish - Español", label: "Spanish - Español" },
+    { value: "French - Français", label: "French - Français" },
+    { value: "Mandarin - 中文", label: "Mandarin - 中文" },
+    { value: "Arabic - العَرَبِيَّة", label: "Arabic - العَرَبِيَّة" },
+    { value: "Armenian - Հայերեն", label: "Armenian - Հայերեն" },
+    { value: "Bantu (including Swahili) - Kiswahili", label: "Bantu (including Swahili) - Kiswahili" },
+    { value: "Bengali - বাংলা", label: "Bengali - বাংলা" },
+    { value: "Burmese - မြန်မာစာ", label: "Burmese - မြန်မာစာ" },
+    { value: "Cantonese - Gwóngdūng wá", label: "Cantonese - Gwóngdūng wá" },
+    { value: "German - Deutsch", label: "German - Deutsch" },
+    { value: "Greek - ελληνικά", label: "Greek - ελληνικά" },
+    { value: "Gujarati - ગુજરાતી" , label: "Gujarati - ગુજરાતી" },
+    { value: "Haitian Creole - Kreyol Ayisyen", label: "Haitian Creole - Kreyol Ayisyen" },
+    { value: "Hebrew - עברית", label: "Hebrew - עברית" },
+    { value: "Hindi - हिन्दी", label: "Hindi - हिन्दी" },
+    { value: "Hmong - Hmoob", label: "Hmong - Hmoob" },
+    { value: "Italian - Italiano", label: "Italian - Italiano" },
+    { value: "Japanese - 日本語", label: "Japanese - 日本語" },
+    { value: "Karen", label: "Karen" },
+    { value: "Khmer - ខ្មែរ,", label: "Khmer - ខ្មែរ," },
+    { value: "Korean - 한국어", label: "Korean - 한국어" },
+    { value: "Navajo - Diné bizaad", label: "Navajo - Diné bizaad" },
+    { value: "Persian (including Farsi and Dari) - فارسی", label: "Persian (including Farsi and Dari) - فارسی" },
+    { value: "Polish - Polski", label: "Polish - Polski" },
+    { value: "Portuguese - Português", label: "Portuguese - Português" },
+    { value: "Punjabi - ਪੰਜਾਬੀ", label: "Punjabi - ਪੰਜਾਬੀ" },
+    { value: "Russian - русский язык", label: "Russian - русский язык" },
     {
-      value: 28,
+      value: "Serbo-Croatian (including Bosnian, Croatian, Montenegrin and Serbian) - Bosanski Jezik / Hrvatski Jezik / српски језик",
       label:
         "Serbo-Croatian (including Bosnian, Croatian, Montenegrin and Serbian) - Bosanski Jezik / Hrvatski Jezik / српски језик",
     },
-    { value: 29, label: "Tagalog - ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔" },
-    { value: 30, label: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ" },
-    { value: 31, label: "Tami - தமிழ்" },
-    { value: 32, label: "Telugu - తెలుగు" },
-    { value: 33, label: "Urdu - اُردُو" },
-    { value: 34, label: "Vietnamese - Tiếng Việt" },
-    { value: 35, label: "Other" },
+    { value: "Tagalog - ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔", label: "Tagalog - ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔" },
+    { value: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ", label: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ" },
+    { value: "Tami - தமிழ்", label: "Tami - தமிழ்" },
+    { value: "Telugu - తెలుగు", label: "Telugu - తెలుగు" },
+    { value:  "Urdu - اُردُو", label: "Urdu - اُردُو" },
+    { value: "Vietnamese - Tiếng Việt", label: "Vietnamese - Tiếng Việt" },
+    { value: "Other", label: "Other" },
   ];
   const pronounsOptions = [
-    { value: 0, label: "ae/aer/aers" },
-    { value: 1, label: "fae/faer/faers" },
-    { value: 2, label: "he/him/his" },
-    { value: 3, label: "per/per/pers" },
-    { value: 4, label: "she/her/hers" },
-    { value: 5, label: "they/them/theirs" },
-    { value: 6, label: "ve/ver/vis" },
-    { value: 7, label: "xe/xem/xyrs" },
-    { value: 8, label: "ze/hir/hirs" },
-    { value: 9, label: "Not-listed or more specific pronouns" },
+    { value:  "ae/aer/aers", label: "ae/aer/aers" },
+    { value: "fae/faer/faers", label: "fae/faer/faers" },
+    { value: "he/him/his", label: "he/him/his" },
+    { value: "per/per/pers", label: "per/per/pers" },
+    { value: "she/her/hers", label: "she/her/hers" },
+    { value: "they/them/theirs", label: "they/them/theirs" },
+    { value: "ve/ver/vis", label: "ve/ver/vis" },
+    { value: "xe/xem/xyrs", label: "xe/xem/xyrs" },
+    { value: "ze/hir/hirs", label: "ze/hir/hirs" },
+    { value: "Other", label: "Not-listed or more specific pronouns" },
   ];
   const genderOptions = [
-    { value: 0, label: "Male/Man" },
-    { value: 1, label: "Female/Woman" },
-    { value: 2, label: "Gender Non-Conforming" },
-    { value: 3, label: "A not-listed or more specific gender identity" },
+    { value: "Male", label: "Male/Man" },
+    { value: "Female", label: "Female/Woman" },
+    { value: "Gender Non-Conforming", label: "Gender Non-Conforming" },
+    { value: "Other", label: "A not-listed or more specific gender identity" },
   ];
   const ethnicityOptions = [
     { value: 0, label: "American Indian or Alaska Native" },
