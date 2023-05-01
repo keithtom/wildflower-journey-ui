@@ -12,7 +12,7 @@ import {
 } from "@ui";
 import Task from "@components/Task";
 import Hero from "@components/Hero";
-import setAuthHeader from "@lib/setAuthHeader";
+import getAuthHeader from "@lib/getAuthHeader";
 import { getCookie } from "cookies-next";
 import assignmentsApi from "@api/workflow/assignments";
 
@@ -118,20 +118,20 @@ const ToDoList = ({
 export default ToDoList;
 
 export async function getServerSideProps({ req, res }) {
-  setAuthHeader({ req, res });
+  const config = getAuthHeader({ req, res });
   
   const phase = getCookie("phase", { req, res });
   const workflowId = getCookie("workflowId", { req, res });
-  const response = await assignmentsApi.index(workflowId);
+  const response = await assignmentsApi.index(workflowId, config);
   
   let steps = response.data.data
-  console.log("steps", steps)
+  // console.log("steps", steps)
 
   let milestonesToDo = [];
   // if no assigned steps, load milestones todos so we can suggest to user.
   if (!steps.length) {
     const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&omit_include=true`;
-    const responseMilestones = await axios.get(apiRouteMilestones);
+    const responseMilestones = await axios.get(apiRouteMilestones, config);
     
     milestonesToDo = responseMilestones.data.data.filter(milestone => milestone.attributes.status == "to do");
   }

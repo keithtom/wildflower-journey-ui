@@ -14,7 +14,7 @@ import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
 import Resource from "../../components/Resource";
 import Hero from "../../components/Hero";
-import setAuthHeader from "../../lib/setAuthHeader";
+import getAuthHeader from "../../lib/getAuthHeader";
 import axios from "axios";
 
 const Resources = ({ dataResources }) => {
@@ -128,9 +128,9 @@ export default Resources;
 
 export async function getServerSideProps({ req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
-  setAuthHeader({ req, res });
+  const config = getAuthHeader({ req, res });
   const apiRouteResources = `${process.env.API_URL}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
-  const responseResources = await axios.get(apiRouteResources);
+  const responseResources = await axios.get(apiRouteResources, config);
   const dataResources = await responseResources.data;
 
   return {

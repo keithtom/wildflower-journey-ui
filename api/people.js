@@ -17,6 +17,10 @@ const api = axios.create({
   },
 });
 
+function show(personId) {
+  return api.get(`/${personId}`);
+}
+
 async function update(personId, personParams) {
   const response = await api.put(`/${personId}`, personParams);
   const data = await response.data;
@@ -24,4 +28,4 @@ async function update(personId, personParams) {
   // TODO: do something w/ the response if it's not 200
 }
 
-export default { update };
+export default { show, update };

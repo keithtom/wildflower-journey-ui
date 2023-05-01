@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import setAuthHeader from "../../../lib/setAuthHeader";
+import getAuthHeader from "../../../lib/getAuthHeader";
 import axios from "axios";
 import { getCookie } from "cookies-next";
 
@@ -432,12 +432,13 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
 };
 
 export async function getServerSideProps({ params, req, res }) {
+  console.log("inside getserversideprops of milestone page")
   const { phase } = params;
   const workflowId = getCookie("workflowId", { req, res });
   const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-  setAuthHeader({ req, res });
+  const config = getAuthHeader({ req, res });
 
-  const response = await axios.get(apiRoute);
+  const response = await axios.get(apiRoute, config);
   const data = await response.data;
 
   const milestonesInProgress = [];

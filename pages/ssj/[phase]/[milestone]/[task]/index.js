@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import setAuthHeader from "../../../../../lib/setAuthHeader";
+import getAuthHeader from "../../../../../lib/getAuthHeader";
 import axios from "axios";
 
 import {
@@ -311,9 +311,9 @@ export async function getServerSideProps({ query, req, res }) {
   const MilestoneId = query.milestone;
   const TaskId = query.task;
   const apiRoute = `${process.env.API_URL}/v1/workflow/processes/${MilestoneId}/steps/${TaskId}`;
-  setAuthHeader({ req, res });
+  const config = getAuthHeader({ req, res });
 
-  const response = await axios.get(apiRoute);
+  const response = await axios.get(apiRoute, config);
   const data = await response.data;
 
   const milestone = data.included.filter((e) => e.type == "process")[0];
