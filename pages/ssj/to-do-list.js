@@ -128,13 +128,11 @@ export async function getServerSideProps({ req, res }) {
   // console.log("steps", steps)
 
   let milestonesToDo = [];
-  // if no assigned steps, load milestones todos so we can suggest to user.
-  if (!steps.length) {
-    const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&omit_include=true`;
-    const responseMilestones = await axios.get(apiRouteMilestones, config);
-    
-    milestonesToDo = responseMilestones.data.data.filter(milestone => milestone.attributes.status == "to do");
-  }
+  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&omit_include=true`;
+  const responseMilestones = await axios.get(apiRouteMilestones, config);
+  
+  milestonesToDo = responseMilestones.data.data.filter(milestone => milestone.attributes.status == "to do");
+
   
   return {
     props: {
