@@ -6,7 +6,7 @@ import stepsApi from "@api/workflow/steps";
 const assignmentsApi = wildflowerApi.register(`/v1/ssj/dashboard/assigned_steps`, {noAuth: true});
 
 // this is really /workflows/id/steps/assigned
-async function index(workflowId, config) {
+async function index(workflowId, config = {}) {
   const response = await assignmentsApi.get(`?workflow_id=${workflowId}`, config);
   const included = response.data.included;
   

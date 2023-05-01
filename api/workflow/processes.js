@@ -10,7 +10,7 @@ async function index() {
 }
 
 // look at an individual process/milestone
-async function show(id, config) {
+async function show(id, config = {}) {
   const response = await workflowsApi.get(`/processes/${id}`, config);  
   const included = response.data.included;
   
