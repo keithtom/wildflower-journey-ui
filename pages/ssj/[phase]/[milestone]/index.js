@@ -90,7 +90,6 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
                           key={i}
                           title={m.attributes.title}
                           description={m.attributes.description}
-                          effort={m.attributes.effort}
                           categories={m.attributes.categories}
                           status={m.attributes.status}
                           stepCount={m.relationships.steps.data.length}

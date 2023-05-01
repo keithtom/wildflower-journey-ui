@@ -19,7 +19,6 @@ const Milestone = ({
   link,
   title,
   description,
-  effort,
   categories,
   hideCategoryChip,
   phase,
@@ -126,7 +125,6 @@ const Milestone = ({
         link={link}
         title={title}
         status={status}
-        effort={effort}
         categories={categories}
         about={description}
         actions={<MilestoneDrawerActions stepCount={stepCount} link={link} />}
