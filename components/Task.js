@@ -287,6 +287,7 @@ const Task = ({
               handleAssignUser={handleAssignUser}
               handleUnassignUser={handleUnassignUser}
               handleMakeDecision={handleMakeDecision}
+              taskCompleters={taskCompleters}
             />
           ) : (
             <TaskDrawerActions
@@ -337,6 +338,7 @@ const DecisionDrawerActions = ({
   handleAssignUser,
   handleUnassignUser,
   handleMakeDecision,
+  taskCompleters,
 }) => {
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
@@ -345,6 +347,8 @@ const DecisionDrawerActions = ({
   // what are the options for the step.  show that.
   // show hte currently selected decision?
   const showDecisionForm =  taskIsAssignedToMe;
+  // TODO: get task completers
+  const completedBy = taskCompleters[0]; // just take the first since only used when its not me
 
   const StyledDecisionCard = styled(Card)`
     /* Disabled */
@@ -441,11 +445,19 @@ const DecisionDrawerActions = ({
           )
         ) : (
           <Grid item xs={12}>
-            <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
-              <Typography light bold variant="bodyRegular">
-                Add to my to do list
-              </Typography>
-            </Button>
+            { isDecided ? (
+              <Button full disabled={true}>
+                <Typography bold>
+                  Decided by {completedBy?.attributes?.firstName} {completedBy?.attributes?.lastName}
+                </Typography>
+              </Button>
+           ) : (
+              <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
+                <Typography light bold>
+                  Add to my to do list
+                </Typography>
+              </Button>
+            )}
           </Grid>
         )}
       </Grid>
@@ -510,11 +522,19 @@ const TaskDrawerActions = ({
         )
       ) : ( // TODO: don't let someone assign a completed task (collaborative task)
         <Grid item xs={12}>
-          <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
-            <Typography light bold>
-              Add to my to do list
-            </Typography>
-          </Button>
+            { taskIsComplete ? (
+              <Button full disabled={true}>
+                <Typography bold>
+                  Completed by {completedBy?.attributes?.firstName} {completedBy?.attributes?.lastName}
+                </Typography>
+              </Button>
+           ) : (
+              <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
+                <Typography light bold>
+                  Add to my to do list
+                </Typography>
+              </Button>
+            )}
         </Grid>
       )}
     </Grid>
