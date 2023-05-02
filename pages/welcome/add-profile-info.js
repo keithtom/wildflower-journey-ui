@@ -6,7 +6,7 @@ import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 registerPlugin(
   FilePondPluginImageExifOrientation,
   FilePondPluginImagePreview,
@@ -38,6 +38,7 @@ import {
   Radio,
   Divider,
   PageContainer,
+  Alert,
 } from "@ui";
 import Header from "@components/Header";
 import { PinDropSharp } from "@mui/icons-material";
@@ -54,6 +55,7 @@ const StyledFilePond = styled(FilePond)`
 const AddProfileInfo = ({}) => {
   const [profilePicture, setProfilePicture] = useState();
   const [profileImage, setProfileImage] = useState();
+  const [showError, setShowError] = useState();
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
 
@@ -77,7 +79,13 @@ const AddProfileInfo = ({}) => {
   };
 
   const handleFileError = (error) => {
-    alert(`Error: ${error.main}. ${error.sub}`);
+    // alert(`Error: ${error.main}. ${error.sub}`);
+    setShowError(error);
+  };
+
+  const handleSetProfilePiture = () => {
+    setProfilePicture();
+    setShowError(false);
   };
 
   const isExistingTL = false;
@@ -126,7 +134,20 @@ const AddProfileInfo = ({}) => {
               )}
 
               <Divider />
-
+              {showError ? (
+                <Grid container>
+                  <Grid item xs={12}>
+                    <Alert severity="error">
+                      <Stack>
+                        {showError.main}
+                        <Typography variant="bodySmall" error>
+                          {showError.sub}
+                        </Typography>
+                      </Stack>
+                    </Alert>
+                  </Grid>
+                </Grid>
+              ) : null}
               <Grid container justifyContent="center">
                 <Grid item xs={12} sm={8} md={6}>
                   <StyledFilePond
@@ -134,8 +155,8 @@ const AddProfileInfo = ({}) => {
                     allowReorder={false}
                     allowMultiple={false}
                     maxFileSize="5MB"
-                    acceptedFileTypes={['image/*']}
-                    onupdatefiles={setProfilePicture}
+                    acceptedFileTypes={["image/*"]}
+                    onupdatefiles={handleSetProfilePiture}
                     stylePanelAspectRatio="1:1"
                     onerror={handleFileError}
                     stylePanelLayout="circle"
