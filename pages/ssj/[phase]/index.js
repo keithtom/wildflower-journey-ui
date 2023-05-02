@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import getAuthHeader from "../../../lib/getAuthHeader";
 import axios from "axios";
 import { getCookie } from "cookies-next";
+import ssj_categories from "@lib/ssj/categories";
 
 import {
   PageContainer,
@@ -363,17 +364,7 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
                   <Select
                     label="Category"
                     placeholder="Select a category..."
-                    options={[
-                      "Finance",
-                      "Facilities",
-                      "Governance & Compliance",
-                      "Human Resources",
-                      "Community & Family Engagement",
-                      "Classroom & Program Practices",
-                      "Albums",
-                      "Advice & Affiliation",
-                      "WF Community & Culture",
-                    ]}
+                    options={Object.values(ssj_categories)}
                     error={errors.category}
                     helperText={
                       errors &&

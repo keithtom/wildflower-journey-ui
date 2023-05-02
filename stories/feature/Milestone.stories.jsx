@@ -1,5 +1,6 @@
 import React from "react";
 import Milestone from "../../components/Milestone";
+import ssj_categories from "@lib/ssj/categories"
 
 export default {
   title: "Feature/Milestone",
@@ -14,16 +15,7 @@ export default {
       control: { type: "select" },
     },
     category: {
-      options: [
-        "Finance",
-        "Facilities",
-        "Governance & Compliance",
-        "Human Resources",
-        "Community & Family Engagement",
-        "Classroom & Program Practices",
-        "Album Advice & Affiliation",
-        "WF Community & Culture",
-      ],
+      options: Object.values(ssj_categories),
       control: { type: "select" },
     },
     assignee: {

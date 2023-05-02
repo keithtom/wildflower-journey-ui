@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { getCookie } from "cookies-next";
+import ssj_categories from "@lib/ssj/categories"
 
 import {
   PageContainer,
@@ -146,57 +147,55 @@ export async function getServerSideProps({ req, res }) {
   const data = await response.data;
 
   const groupedFinanceProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("Finance")
+    d.attributes.categories.includes(ssj_categories.FINANCE)
   );
   const groupedFacilitiesProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("Facilities")
+    d.attributes.categories.includes(ssj_categories.FACILITIES)
   );
   const groupedGovernanceComplianceProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("Governance & Compliance")
+    d.attributes.categories.includes(ssj_categories.GOVERNANCE_COMPLIANCE)
   );
   const groupedHumanResourcesProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("Human Resources")
+    d.attributes.categories.includes(ssj_categories.HUMAN_RESOURCES)
   );
   const groupedCommunityFamilyEngagementProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("Community & Family Engagement")
+    d.attributes.categories.includes(ssj_categories.COMMUNITY_FAMILY_ENGAGEMENT)
   );
   const groupedClassroomProgramPracticesProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("Classroom & Program Practices")
+    d.attributes.categories.includes(ssj_categories.CLASSROOM_PROGRAM_PRACTICES)
   );
   const groupedAlbumsProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("Albums")
+    d.attributes.categories.includes(ssj_categories.ALBUMS_ADVICE)
   );
-  const groupedAdviceAffiliationProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("Advice & Affiliation")
-  );
-  const groupedCommunityCultureProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes("WF Community & Culture")
-  );
-
+  
   const processByCategory = [
-    { category: "Finance", processes: groupedFinanceProcesses },
-    { category: "Facilities", processes: groupedFacilitiesProcesses },
+    { 
+      category: ssj_categories.FINANCE,
+      processes:groupedFinanceProcesses
+    },
+    { 
+      category: ssj_categories.FACILITIES,
+      processes: groupedFacilitiesProcesses
+    },
     {
-      category: "Governance & Compliance",
+      category: ssj_categories.GOVERNANCE_COMPLIANCE,
       processes: groupedGovernanceComplianceProcesses,
     },
-    { category: "Human Resources", processes: groupedHumanResourcesProcesses },
+    { 
+      category: ssj_categories.HUMAN_RESOURCES,
+      processes: groupedHumanResourcesProcesses
+    },
     {
-      category: "Community & Family Engagement",
+      category: ssj_categories.COMMUNITY_FAMILY_ENGAGEMENT,
       processes: groupedCommunityFamilyEngagementProcesses,
     },
     {
-      category: "Classroom & Program Practices",
+      category: ssj_categories.CLASSROOM_PROGRAM_PRACTICES,
       processes: groupedClassroomProgramPracticesProcesses,
     },
-    { category: "Albums", processes: groupedAlbumsProcesses },
-    {
-      category: "Advice & Affiliation",
-      processes: groupedAdviceAffiliationProcesses,
-    },
-    {
-      category: "WF Community & Culture",
-      processes: groupedCommunityCultureProcesses,
+    { 
+      category: ssj_categories.ALBUMS_ADVICE,
+      processes: groupedAlbumsProcesses
     },
   ];
 
