@@ -76,7 +76,7 @@ const AddProfileInfo = ({}) => {
       });
   };
 
-  const handleError = (error) => {
+  const handleFileError = (error) => {
     alert(`Error: ${error.main}. ${error.sub}`);
   };
 
@@ -137,7 +137,7 @@ const AddProfileInfo = ({}) => {
                     acceptedFileTypes={['image/*']}
                     onupdatefiles={setProfilePicture}
                     stylePanelAspectRatio="1:1"
-                    onerror={handleError}
+                    onerror={handleFileError}
                     stylePanelLayout="circle"
                     server={{
                       process: (
