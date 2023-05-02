@@ -6,10 +6,12 @@ import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 registerPlugin(
   FilePondPluginImageExifOrientation,
   FilePondPluginImagePreview,
-  FilePondPluginFileValidateSize
+  FilePondPluginFileValidateSize,
+  FilePondPluginFileValidateType
 );
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
@@ -132,6 +134,7 @@ const AddProfileInfo = ({}) => {
                     allowReorder={false}
                     allowMultiple={false}
                     maxFileSize="5MB"
+                    acceptedFileTypes={['image/*']}
                     onupdatefiles={setProfilePicture}
                     stylePanelAspectRatio="1:1"
                     onerror={handleError}
