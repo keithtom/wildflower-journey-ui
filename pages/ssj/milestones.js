@@ -91,7 +91,6 @@ const Milestones = ({ processByCategory, processByPhase }) => {
                           hideCategoryChip
                           phase={m.attributes.phase}
                           title={m.attributes.title}
-                          effort={m.attributes.effort}
                           stepCount={m.attributes.stepsCount}
                         />
                       ))}
@@ -119,7 +118,6 @@ const Milestones = ({ processByCategory, processByPhase }) => {
                         description={m.attributes.description}
                         categories={m.attributes.categories}
                         title={m.attributes.title}
-                        effort={m.attributes.effort}
                         stepCount={m.attributes.stepsCount}
                       />
                     ))}
