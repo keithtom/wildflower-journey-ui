@@ -79,13 +79,7 @@ const AddProfileInfo = ({}) => {
   };
 
   const handleFileError = (error) => {
-    // alert(`Error: ${error.main}. ${error.sub}`);
     setShowError(error);
-  };
-
-  const handleSetProfilePiture = () => {
-    setProfilePicture();
-    setShowError(false);
   };
 
   const isExistingTL = false;
@@ -156,7 +150,8 @@ const AddProfileInfo = ({}) => {
                     allowMultiple={false}
                     maxFileSize="5MB"
                     acceptedFileTypes={["image/*"]}
-                    onupdatefiles={handleSetProfilePiture}
+                    onupdatefiles={setProfilePicture}
+                    onaddfilestart={() => setShowError(false)}
                     stylePanelAspectRatio="1:1"
                     onerror={handleFileError}
                     stylePanelLayout="circle"
@@ -210,7 +205,9 @@ const AddProfileInfo = ({}) => {
                                     },
                                     // need to remove default Authorization header when sending to s3
                                     transformRequest: (data, headers) => {
-                                      delete headers.common["Authorization"];
+                                      if (process.env !== "local") {
+                                        delete headers.common["Authorization"];
+                                      }
                                       return data;
                                     },
                                   })
