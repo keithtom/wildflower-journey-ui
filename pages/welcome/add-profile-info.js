@@ -74,6 +74,10 @@ const AddProfileInfo = ({}) => {
       });
   };
 
+  const handleError = (error) => {
+    alert(`Error: ${error.main}. ${error.sub}`);
+  };
+
   const isExistingTL = false;
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
 
@@ -127,9 +131,10 @@ const AddProfileInfo = ({}) => {
                     files={profilePicture}
                     allowReorder={false}
                     allowMultiple={false}
-                    maxFileSize="750KB"
+                    maxFileSize="5MB"
                     onupdatefiles={setProfilePicture}
                     stylePanelAspectRatio="1:1"
+                    onerror={handleError}
                     stylePanelLayout="circle"
                     server={{
                       process: (
