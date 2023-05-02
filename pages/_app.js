@@ -12,6 +12,7 @@ import { ErrorBoundary } from '@highlight-run/react';
 
 
 if (process.env.NODE_ENV === 'production') {
+  console.log("enabling highlight.io")
   H.init(process.env.HIGHLIGHT_SECRET, {
     tracingOrigins: true,
     networkRecording: {
@@ -23,13 +24,6 @@ if (process.env.NODE_ENV === 'production') {
     },
   });
 }
-
-// H.identify('jay@highlight.io', {
-//   id: 'very-secure-id',
-//   phone: '867-5309',
-//   bestFriend: 'jenny'
-// });
-
 
 function MyApp({ Component, pageProps }) {
   const [isLoading, setIsLoading] = useState(false);
