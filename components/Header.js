@@ -5,7 +5,7 @@ import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
 import axios from "axios";
 import { useUserContext } from "../lib/useUserContext";
-import { clearLoggedInState as clearLoggedInState } from "../lib/handleLogout";
+import { clearLoggedInState } from "../lib/handleLogout";
 import { theme } from "../styles/theme";
 import {
   Avatar,
@@ -32,15 +32,10 @@ const CustomAppBar = styled(AppBar)`
   display: flex;
 `;
 
-const Header = ({ user, toggleNavOpen }) => {
+const Header = ({ toggleNavOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
 
-  let currentUser, isLoggedIn;
-  if (!user) {
-    currentUser = useUserContext.currentUser;
-    isLoggedIn = useUserContext.isLoggedIn;
-    // { currentUser, isLoggedIn } = (useUserContext());
-  }
+  const { currentUser, isLoggedIn } = useUserContext();
 
   const logo = "/assets/images/wildflower-logo.png";
 
@@ -136,9 +131,14 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
     axios
       .delete(logoutRoute) // TODO: set base url in some variable that switches out based on env
       .then((res) => {
+        console.log(res);
         // TODO: update logged out state
+        console.log("logged out from server side")
+        console.log("calling clearLoggedInState")
         clearLoggedInState();
+        console.log("clearing setcurrent user")
         setCurrentUser(null);
+        console.log("trying to redirect")
         Router.push("/logged-out");
       })
       .catch((err) => console.error(err));

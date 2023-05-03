@@ -80,6 +80,13 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
       setTeam(result);
       setSubmittedPartnerRequest(result.invitedPartner);
       setOpenDate(result.expectedStartDate);
+    })
+    .catch(function (error) {
+      if (error?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(error);
+      }
     });
   }, []);
 

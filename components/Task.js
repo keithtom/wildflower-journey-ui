@@ -3,6 +3,7 @@ import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import stepsApi from "@api/workflow/steps";
 import { useUserContext } from "@lib/useUserContext";
+import Router from "next/router";
 
 import {
   Typography,
@@ -125,8 +126,12 @@ const Task = ({
       if (removeStep) {
         removeStep(taskId);
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(error);
+      }
     }
 
     if (isLast) {

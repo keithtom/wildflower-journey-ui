@@ -50,6 +50,9 @@ function register(path, options) {
         deleteCookie("workflowId", {});
         deleteCookie("phase", {});
         delete axios.defaults.headers.common["Authorization"];
+        if (typeof window !== 'undefined') {
+          Router.put("/login");
+        }
         return Promise.reject(error);
       } else {
         return Promise.reject(error);
