@@ -4,8 +4,8 @@ import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
 import axios from "axios";
-import { getCookie, deleteCookie } from "cookies-next";
 import { useUserContext } from "../lib/useUserContext";
+import { clearLoggedInState as clearLoggedInState } from "../lib/handleLogout";
 import { theme } from "../styles/theme";
 import {
   Avatar,
@@ -32,10 +32,15 @@ const CustomAppBar = styled(AppBar)`
   display: flex;
 `;
 
-const Header = ({ toggleNavOpen }) => {
+const Header = ({ user, toggleNavOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
 
-  const { currentUser, isLoggedIn } = useUserContext();
+  let currentUser, isLoggedIn;
+  if (!user) {
+    currentUser = useUserContext.currentUser;
+    isLoggedIn = useUserContext.isLoggedIn;
+    // { currentUser, isLoggedIn } = (useUserContext());
+  }
 
   const logo = "/assets/images/wildflower-logo.png";
 
@@ -132,13 +137,8 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
       .delete(logoutRoute) // TODO: set base url in some variable that switches out based on env
       .then((res) => {
         // TODO: update logged out state
-        deleteCookie("auth", {});
-        deleteCookie("workflowId", {});
-        deleteCookie("phase", {});
-        delete axios.defaults.headers.common["Authorization"];
-
+        clearLoggedInState();
         setCurrentUser(null);
-
         Router.push("/logged-out");
       })
       .catch((err) => console.error(err));

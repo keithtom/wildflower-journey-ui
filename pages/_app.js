@@ -30,6 +30,9 @@ if (process.env.NODE_ENV === 'production') {
 function MyApp({ Component, pageProps }) {
   const [isLoading, setIsLoading] = useState(false);
   const Router = useRouter();
+  // const isLoginPage =  Router.asPath === "/login"
+  const isLoggedOutPage =  Router.asPath === "/logged-out"
+
   useEffect(() => {
     NProgress.configure({ showSpinner: false, color: "#00A69C" });
 
@@ -50,9 +53,12 @@ function MyApp({ Component, pageProps }) {
     <ErrorBoundary>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        {isLoggedOutPage ? 
+        <Component {...pageProps} /> : 
         <UserProvider>
           <Component {...pageProps} />
         </UserProvider>
+        }
       </ThemeProvider>
     </ErrorBoundary>
   );

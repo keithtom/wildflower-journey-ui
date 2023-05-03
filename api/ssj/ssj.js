@@ -12,30 +12,38 @@ async function dashboard() {
 }
 
 async function setStartDate(date) {
-  const response = await workflowsApi.put(`/team`, {
-    team: { expected_start_date: date },
-  });
+  let response;
+  try {
+    response = await workflowsApi.put(`/team`, {
+      team: { expected_start_date: date },
+    });
+  } catch (error) {
+    return Promise.reject(error);
+  }
   const data = await response.data;
   return data;
-  // if response good, great.  else.  error out?
 }
 
 async function getTeam() {
-  const response = await workflowsApi.get(`/team`);
+  let response;
+  try {
+    response = await workflowsApi.get(`/team`);
+  } catch (error) {
+    return Promise.reject(error);
+  }
   const data = await response.data;
   return data;
   // if response good, great.  else.  error out?
 }
 
 async function invitePartner(data) {
-  const response = await workflowsApi.put(`/invite_partner`, {
+  return await workflowsApi.put(`/invite_partner`, {
     person: {
       first_name: data.partnerFirstName,
       last_name: data.partnerLastName,
       email: data.partnerEmail,
     },
   });
-  return response;
 }
 
 export default { setStartDate, getTeam, invitePartner };

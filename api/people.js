@@ -22,7 +22,12 @@ function show(personId, params={}) {
 }
 
 async function update(personId, personParams) {
-  const response = await api.put(`/${personId}`, personParams);
+  let response;
+  try {
+    response = await api.put(`/${personId}`, personParams);
+  } catch (error) {
+    return Promise.reject(error);
+  }
   const data = await response.data;
   return data;
   // TODO: do something w/ the response if it's not 200

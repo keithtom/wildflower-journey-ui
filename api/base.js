@@ -1,6 +1,6 @@
 // boiler plate for API calls to api.wildflowerschools.org
 import axios from "axios";
-import { getCookie } from 'cookies-next';
+import { getCookie, deleteCookie } from 'cookies-next';
 import jwt_decode from "jwt-decode";
 
 const token = getCookie('auth');
@@ -37,7 +37,26 @@ function register(path, options) {
   else if (axios.defaults.headers.common['Authorization']) {
     console.log("token set from axios global", jwt_decode(axios.defaults.headers.common['Authorization']).sub);
   }
-  return axios.create(config);
+  const client = axios.create(config);
+
+  client.interceptors.response.use(
+    (response) => {
+      return response;
+    },  
+    (error) => {
+      if (error.response?.status === 401) {
+        // Unfortunately we do not have access to the context req/res objects here for deleteCookie to work on the server side.
+        deleteCookie("auth", {});
+        deleteCookie("workflowId", {});
+        deleteCookie("phase", {});
+        delete axios.defaults.headers.common["Authorization"];
+        return Promise.reject(error);
+      } else {
+        return Promise.reject(error);
+      }
+    });
+
+  return client;
 };
 
 // const api = axios.create();

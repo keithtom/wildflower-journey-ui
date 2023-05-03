@@ -127,10 +127,25 @@ const Resources = ({ dataResources }) => {
 export default Resources;
 
 export async function getServerSideProps({ req, res }) {
-  const workflowId = getCookie("workflowId", { req, res });
   const config = getAuthHeader({ req, res });
+  if (!config) {
+    console.log("no token found, redirecting to login")
+    return redirectLoginProps();
+  }
+
+  const workflowId = getCookie("workflowId", { req, res });
   const apiRouteResources = `${process.env.API_URL}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
-  const responseResources = await axios.get(apiRouteResources, config);
+  let responseResources;
+  try {
+    responseResources = await axios.get(apiRouteResources, config);
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      clearLoggedInState({req, res});
+      return redirectLoginProps();
+    } else {
+      console.error(error);
+    }
+  }
   const dataResources = await responseResources.data;
 
   return {

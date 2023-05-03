@@ -8,7 +8,12 @@ const assignmentsApi = wildflowerApi.register(`/v1/ssj/dashboard/assigned_steps`
 // sohuld be moved to steps.
 // this is really /workflows/id/steps/assigned
 async function index(workflowId, config = {}) {
-  const response = await assignmentsApi.get(`?workflow_id=${workflowId}`, config);
+  let response;
+  try {
+    response = await assignmentsApi.get(`?workflow_id=${workflowId}`, config);
+  } catch(error) {
+    return Promise.reject(error);
+  }
   const included = response.data.included;
   
   wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
