@@ -10,8 +10,10 @@ import { parseISO } from "date-fns";
 
 import ssjApi from "@api/ssj/ssj";
 import { useUserContext } from "@lib/useUserContext";
-import Hero from "@components/Hero";
-import UserContactModal from "@components/UserContactModal";
+import Milestone from "../../components/Milestone";
+import Task from "../../components/Task";
+import Hero from "../../components/Hero";
+import UserCard from "../../components/UserCard";
 
 import {
   Box,
@@ -83,8 +85,10 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const partners =
     team?.team.data.length > 1
       ? team.team.data.filter((t) => {
-        return t.id !== currentUser?.id && t.attributes.roleList[0] === "partner";
-      })
+          return (
+            t.id !== currentUser?.id && t.attributes.roleList[0] === "partner"
+          );
+        })
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
@@ -134,13 +138,10 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
             >
               <Grid item>
                 <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar
-                    src={currentUser?.attributes.imageUrl}
-                  />
+                  <Avatar src={currentUser?.attributes.imageUrl} />
                   <Stack>
                     <Typography variant="h4" bold>
-                      Welcome, {currentUser?.attributes?.firstName}
-                      !
+                      Welcome, {currentUser?.attributes?.firstName}!
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
                       School Startup Journey
@@ -1027,50 +1028,7 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     </Modal>
   );
 };
-const UserCard = ({
-  firstName,
-  lastName,
-  email,
-  phone,
-  role,
-  profileImage,
-}) => {
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-  return (
-    <>
-      <Card
-        variant="lightened"
-        size="small"
-        hoverable
-        onClick={() => setContactModalOpen(true)}
-      >
-        <Grid container spacing={3} alignItems="center">
-          <Grid item>
-            <Avatar src={profileImage} />
-          </Grid>
-          <Grid item>
-            <Stack>
-              <Typography variant="bodyRegular" bold>
-                {firstName} {lastName}
-              </Typography>
-              <Typography variant="bodySmall" lightened>
-                {role}
-              </Typography>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Card>
-      <UserContactModal
-        firstName={firstName}
-        lastName={lastName}
-        email={email}
-        phone={phone}
-        open={contactModalOpen}
-        toggle={() => setContactModalOpen(!contactModalOpen)}
-      />
-    </>
-  );
-};
+
 const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
   const IconWrapper = styled(Box)`
     width: ${({ theme }) => theme.util.buffer * 12}px;
