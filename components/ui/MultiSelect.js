@@ -2,12 +2,20 @@ import { default as MaterialSelect } from "@mui/material/Select";
 import { styled, css } from "@mui/material/styles";
 
 import { FormControl, MenuItem } from "@mui/material";
-import { Chip, Icon, Input, Stack, Typography } from "./index";
+import { Chip, Icon, Input, Stack, Typography, Checkbox } from "./index";
 
 const CustomMultiSelect = styled(MaterialSelect)`
   border-radius: ${({ theme }) => theme.radius.md}px;
   padding: 0 ${({ theme }) => theme.util.buffer * 3}px 0
     ${({ theme }) => theme.util.buffer * 1}px;
+  /* disabled */
+  ${(props) =>
+    props.disabled &&
+    css`
+      background: ${props.theme.color.neutral.lightened};
+      border: none;
+      opacity: 0.6;
+    `}
 `;
 
 const MultiSelect = ({
@@ -17,6 +25,7 @@ const MultiSelect = ({
   onChange,
   label,
   placeholder,
+  withCheckbox,
   ...props
 }) => {
   return (
@@ -69,6 +78,9 @@ const MultiSelect = ({
       >
         {options.map((option) => (
           <MenuItem key={option} value={option}>
+            {withCheckbox ? (
+              <Checkbox checked={value.indexOf(option) > -1} />
+            ) : null}
             {option}
           </MenuItem>
         ))}

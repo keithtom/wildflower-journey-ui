@@ -5,19 +5,14 @@ import Masonry from "@mui/lab/Masonry";
 
 import useSearch from "../../hooks/useSearch";
 import {
-  Box,
   PageContainer,
-  Button,
   Grid,
   Typography,
   Stack,
   Card,
   Avatar,
   AvatarGroup,
-  IconButton,
   Icon,
-  Modal,
-  DatePicker,
   TextField,
   Chip,
   Link,
@@ -25,43 +20,18 @@ import {
   MultiSelect,
 } from "@ui";
 
-const Network = () => {
+const Network = ({ FakeSchools, FakeTeachers }) => {
   const { query, setQuery, results } = useSearch();
   const [category, setCategory] = useState("people");
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
   };
 
+  // console.log({ results });
+
   return (
     <>
-      <Head>
-        <title>Wildflower Schools Directory | Search</title>
-        <meta name="title" content="Wildflower Schools Directory" />
-        <meta
-          property="og:site_name"
-          content="Wildflower Schools Directory"
-          key="og_wf_site_name"
-        />
-        <meta name="description" content="Wildflower Schools Directory" />
-        <meta
-          name="keywords"
-          content="Wildflower, Schools, Directory, Montessori"
-        />
-        <meta
-          property="og:title"
-          content="Wildflower Schools Directory"
-          key="og_wf_site_title"
-        />
-        <meta
-          property="og:description"
-          content="Wildflower Schools Directory"
-          key="og_wf_site_description"
-        />
-      </Head>
-
       <PageContainer>
-        {/* <NetworkContent /> */}
-
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} sm={8}>
             <Typography variant="h4" bold>
@@ -80,7 +50,7 @@ const Network = () => {
           </Grid>
         </Grid>
 
-        <Grid container alignItems="center">
+        <Grid container alignItems="center" mb={2}>
           <Grid item xs={12} sm={1}>
             <Typography lightened>Show</Typography>
           </Grid>
@@ -101,6 +71,7 @@ const Network = () => {
             </RadioGroup>
           </Grid>
         </Grid>
+
         <Grid container>
           <Grid item xs={12} sm={1}>
             <Typography lightened>Filter by</Typography>
@@ -109,30 +80,45 @@ const Network = () => {
             <Grid container spacing={2}>
               {FakeFilters.map((f, i) => (
                 <Grid item key={i}>
-                  <MultiSelect
-                    autoWidth
-                    options={f.options.map((o) => o.label)}
-                    value={[]}
-                    placeholder={f.title}
+                  <FilterMultiSelect
+                    filter={f}
+                    disabled={f.doNotDisplayFor === category}
                   />
                 </Grid>
               ))}
             </Grid>
           </Grid>
         </Grid>
+
         <Grid container mt={12}>
           <Masonry columns={3} spacing={6}>
-            {FakeTeachers.map((f, i) => (
-              <UserCard
-                src={f.attributes.imageSrc}
-                firstName={f.attributes.firstName}
-                lastName={f.attributes.lastName}
-                role={f.attributes.role}
-                location={f.attributes.location}
-                trainingLevel={f.attributes.trainingLevel}
-                key={i}
-              />
-            ))}
+            {category === "people"
+              ? FakeTeachers.map((f) => (
+                  <PersonResultItem
+                    personLink={`/network/people/${f.attributes.id}`}
+                    profileImg={f.attributes.imageSrc}
+                    firstName={f.attributes.firstName}
+                    lastName={f.attributes.lastName}
+                    role={f.attributes.role}
+                    location={f.attributes.location}
+                    trainingLevel={f.attributes.trainingLevel}
+                    schoolLogo={f.attributes.school.logoUrl}
+                    schoolLink={`/network/schools/${f.attributes.school.id}`}
+                    key={f.id}
+                  />
+                ))
+              : FakeSchools.map((f) => (
+                  <SchoolResultItem
+                    schoolLink={`/network/schools/${f.attributes.id}`}
+                    heroImg={f.attributes.heroUrl}
+                    logoImg={f.attributes.logoUrl}
+                    name={f.attributes.name}
+                    location={f.attributes.location}
+                    program={f.attributes.program}
+                    leaders={f.attributes.leaders}
+                    key={f.id}
+                  />
+                ))}
           </Masonry>
         </Grid>
       </PageContainer>
@@ -142,47 +128,138 @@ const Network = () => {
 
 export default Network;
 
-const UserCard = ({
-  src,
+const FilterMultiSelect = ({ filter, disabled }) => {
+  const [filterValue, setFilterValue] = useState([]);
+  const handleValueChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setFilterValue(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value
+    );
+  };
+  // console.log(filterValue);
+  return (
+    <MultiSelect
+      disabled={disabled}
+      withCheckbox
+      autoWidth
+      options={filter.options.map((o) => o.label)}
+      value={filterValue}
+      onChange={handleValueChange}
+      placeholder={filter.title}
+    />
+  );
+};
+
+const PersonResultItem = ({
+  personLink,
+  profileImg,
   firstName,
   lastName,
   role,
   location,
   trainingLevel,
+  schoolLogo,
+  schoolLink,
 }) => {
   return (
-    <Card noPadding>
-      <Stack>
-        <img src={src} style={{ width: "100%" }} />
-        <Card size="small" noBorder>
-          <Stack spacing={3}>
-            <Grid container justifyContent="space-between">
-              <Grid item flex={1}>
-                <Stack>
-                  <Typography variant="bodyRegular" bold>
-                    {firstName} {lastName}
-                  </Typography>
-                  <Typography lightened variant="bodySmall">
-                    {role}
-                  </Typography>
-                </Stack>
+    <Link href={personLink}>
+      <Card noPadding hoverable>
+        <Stack>
+          <img src={profileImg} style={{ width: "100%" }} />
+          <Card size="small" noBorder>
+            <Stack spacing={3}>
+              <Grid container justifyContent="space-between">
+                <Grid item flex={1}>
+                  <Stack>
+                    <Typography variant="bodyRegular" bold>
+                      {firstName} {lastName}
+                    </Typography>
+                    <Typography lightened variant="bodySmall">
+                      {role}
+                    </Typography>
+                  </Stack>
+                </Grid>
+                <Grid item>
+                  <Link href={schoolLink}>
+                    <Avatar src={schoolLogo} size="sm" />
+                  </Link>
+                </Grid>
               </Grid>
-              <Grid item>
-                <Avatar src="" size="sm" />
+              <Grid container spacing={2}>
+                <Grid item>
+                  <Chip label={location} size="small" />
+                </Grid>
+                <Grid item>
+                  <Chip label={trainingLevel} size="small" />
+                </Grid>
               </Grid>
-            </Grid>
-            <Grid container spacing={2}>
-              <Grid item>
-                <Chip label={location} />
-              </Grid>
-              <Grid item>
-                <Chip label={trainingLevel} />
-              </Grid>
-            </Grid>
+            </Stack>
+          </Card>
+        </Stack>
+      </Card>
+    </Link>
+  );
+};
+
+const SchoolResultItem = ({
+  schoolLink,
+  heroImg,
+  logoImg,
+  name,
+  location,
+  program,
+  leaders,
+}) => {
+  return (
+    <Link href={schoolLink}>
+      <Card noPadding hoverable>
+        <Stack>
+          <Stack
+            p={6}
+            justifyContent="space-between"
+            alignItems="flex-start"
+            sx={{
+              backgroundImage: `url(${heroImg})`,
+              backgroundSize: "cover",
+              minHeight: "240px",
+            }}
+          >
+            <Avatar src={logoImg} />
+            <AvatarGroup>
+              {leaders.map((l) => (
+                <Avatar src={l.imageSrc} size="sm" />
+              ))}
+            </AvatarGroup>
           </Stack>
-        </Card>
-      </Stack>
-    </Card>
+          <Card size="small" noBorder>
+            <Stack spacing={3}>
+              <Grid container justifyContent="space-between">
+                <Grid item flex={1}>
+                  <Stack>
+                    <Typography variant="bodyRegular" bold>
+                      {name}
+                    </Typography>
+                    <Typography lightened variant="bodySmall">
+                      {location}
+                    </Typography>
+                  </Stack>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2}>
+                {program.map((p, i) => (
+                  <Grid item key={i}>
+                    <Chip label={p} size="small" />
+                  </Grid>
+                ))}
+              </Grid>
+            </Stack>
+          </Card>
+        </Stack>
+      </Card>
+    </Link>
   );
 };
 
@@ -207,7 +284,7 @@ const FakeFilters = [
   },
   {
     title: "Open Date",
-    displayIf: "school",
+    doNotDisplayFor: "people",
     options: [
       { label: "Within a month", value: "Within a month" },
       { label: "Within 6 months", value: "Within 6 months" },
@@ -217,7 +294,7 @@ const FakeFilters = [
   },
   {
     title: "Program",
-    displayIf: "school",
+    doNotDisplayFor: "people",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -227,7 +304,7 @@ const FakeFilters = [
   },
   {
     title: "Student age",
-    displayIf: "school",
+    doNotDisplayFor: "people",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -237,7 +314,7 @@ const FakeFilters = [
   },
   {
     title: "Capacity",
-    displayIf: "school",
+    doNotDisplayFor: "people",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -255,8 +332,18 @@ const FakeFilters = [
     ],
   },
   {
+    title: "Governance",
+    doNotDisplayFor: "people",
+    options: [
+      { label: "1", value: "1" },
+      { label: "2", value: "2" },
+      { label: "3", value: "3" },
+      { label: "4", value: "4" },
+    ],
+  },
+  {
     title: "Affinity groups",
-    displayIf: "people",
+    doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -266,7 +353,7 @@ const FakeFilters = [
   },
   {
     title: "Pronouns",
-    displayIf: "people",
+    doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -277,17 +364,7 @@ const FakeFilters = [
 
   {
     title: "Ethnicity",
-    displayIf: "people",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
-  {
-    title: "Governance",
-    displayIf: "school",
+    doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -297,7 +374,7 @@ const FakeFilters = [
   },
   {
     title: "Gender identity",
-    displayIf: "people",
+    doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -307,159 +384,397 @@ const FakeFilters = [
   },
 ];
 
-const FakeTeachers = [
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+export async function getServerSideProps({ params, req, res }) {
+  const FakeTeachers = [
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-  {
-    attributes: {
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    {
+      attributes: {
+        id: "abab-1212",
+        firstName: "Taylor",
+        lastName: "Zanke",
+        role: "Teacher Leader",
+        location: "Los Angeles",
+        trainingLevel: "Primary Trained",
+        school: {
+          name: "Pasadena Montessori",
+          logoUrl:
+            "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+          location: "Pasadena, CA",
+          id: "aaaa-1111",
+        },
+        imageSrc:
+          "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+      },
     },
-  },
-];
+  ];
+
+  const FakeSchools = [
+    {
+      attributes: {
+        name: "Pasadena Montessori",
+        logoUrl:
+          "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+        location: "Pasadena, CA",
+        id: "aaaa-1111",
+        heroUrl:
+          "https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80",
+        program: ["Primary"],
+        leaders: [
+          {
+            firstName: "Taylor",
+            lastName: "Zanke",
+            role: "Teacher Leader",
+            location: "Los Angeles",
+            trainingLevel: "Primary Trained",
+            email: "taylor@montessori.com",
+            phone: "123-456-7890",
+            imageSrc:
+              "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+          },
+          {
+            firstName: "Taylor",
+            lastName: "Zanke",
+            role: "Teacher Leader",
+            location: "Los Angeles",
+            trainingLevel: "Primary Trained",
+            email: "taylor@montessori.com",
+            phone: "123-456-7890",
+            imageSrc:
+              "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+          },
+        ],
+      },
+    },
+    {
+      attributes: {
+        name: "Pasadena Montessori",
+        logoUrl:
+          "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+        location: "Pasadena, CA",
+        id: "aaaa-1111",
+        heroUrl:
+          "https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80",
+        program: ["Primary"],
+        leaders: [
+          {
+            firstName: "Taylor",
+            lastName: "Zanke",
+            role: "Teacher Leader",
+            location: "Los Angeles",
+            trainingLevel: "Primary Trained",
+            email: "taylor@montessori.com",
+            phone: "123-456-7890",
+            imageSrc:
+              "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+          },
+          {
+            firstName: "Taylor",
+            lastName: "Zanke",
+            role: "Teacher Leader",
+            location: "Los Angeles",
+            trainingLevel: "Primary Trained",
+            email: "taylor@montessori.com",
+            phone: "123-456-7890",
+            imageSrc:
+              "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+          },
+        ],
+      },
+    },
+    {
+      attributes: {
+        name: "Pasadena Montessori",
+        logoUrl:
+          "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+        location: "Pasadena, CA",
+        id: "aaaa-1111",
+        heroUrl:
+          "https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80",
+        program: ["Primary"],
+        leaders: [
+          {
+            firstName: "Taylor",
+            lastName: "Zanke",
+            role: "Teacher Leader",
+            location: "Los Angeles",
+            trainingLevel: "Primary Trained",
+            email: "taylor@montessori.com",
+            phone: "123-456-7890",
+            imageSrc:
+              "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+          },
+          {
+            firstName: "Taylor",
+            lastName: "Zanke",
+            role: "Teacher Leader",
+            location: "Los Angeles",
+            trainingLevel: "Primary Trained",
+            email: "taylor@montessori.com",
+            phone: "123-456-7890",
+            imageSrc:
+              "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+          },
+        ],
+      },
+    },
+  ];
+  return {
+    props: {
+      FakeSchools,
+      FakeTeachers,
+    },
+  };
+}

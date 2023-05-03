@@ -90,12 +90,13 @@ const Navigation = ({}) => {
   const router = useRouter();
   return (
     <Box>
-      {/* <NavLink
+      <NavLink
+        variant="primary"
         to="/network"
         active={router.pathname.includes("/network")}
         label="Network"
         icon="bookReader"
-      /> */}
+      />
       <NavLink
         variant="primary"
         to="/ssj"

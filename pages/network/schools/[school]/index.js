@@ -21,125 +21,91 @@ import {
   MultiSelect,
 } from "@ui";
 import Hero from "@components/Hero";
-import UserProfileSummary from "@components/UserProfileSummary";
-import SchoolResultItem from "@components/SchoolResultItem";
-import EditUserProfile from "@components/EditUserProfile";
+import AttributesCard from "@components/AttributesCard";
 import UserCard from "@components/UserCard";
 
-import { user } from "@lib/utils/fake-data";
 const School = ({}) => {
   return (
     <>
-      <Head>
-        <title>Wildflower Schools Directory | Search</title>
-        <meta name="title" content="Wildflower Schools Directory" />
-        <meta
-          property="og:site_name"
-          content="Wildflower Schools Directory"
-          key="og_wf_site_name"
-        />
-        <meta name="description" content="Wildflower Schools Directory" />
-        <meta
-          name="keywords"
-          content="Wildflower, Schools, Directory, Montessori"
-        />
-        <meta
-          property="og:title"
-          content="Wildflower Schools Directory"
-          key="og_wf_site_title"
-        />
-        <meta
-          property="og:description"
-          content="Wildflower Schools Directory"
-          key="og_wf_site_description"
-        />
-      </Head>
       <PageContainer>
         <Stack spacing={6}>
-          <Hero imageUrl={""} />
+          <Hero imageUrl={FakeSchool.heroUrl} />
 
-          <Grid container spacing={8}>
+          <Grid container spacing={8} justifyContent="space-between">
             <Grid item>
-              <img src="" />
+              <Stack spacing={3}>
+                <img
+                  src={FakeSchool.logoUrl}
+                  style={{
+                    objectFit: "contain",
+                    maxWidth: "200px",
+                    maxHeight: "96px",
+                    width: "100%",
+                  }}
+                />
+                <Typography variant="bodyRegular">{FakeSchool.name}</Typography>
+              </Stack>
             </Grid>
             <Grid item>
-              <UserCard />
+              <Stack direction="row" spacing={6}>
+                {FakeLeaders.map((f, i) => (
+                  <UserCard
+                    link={`/network/people/${f.attributes.id}`}
+                    firstName={f.attributes.firstName}
+                    lastName={f.attributes.lastName}
+                    email={f.attributes.email}
+                    phone={f.attributes.phone}
+                    role={f.attributes.role}
+                    profileImage={f.attributes.imageSrc}
+                  />
+                ))}
+              </Stack>
             </Grid>
           </Grid>
 
           <Grid container spacing={8}>
             <Grid item xs={12} sm={3}>
-              <UserProfileSummary user={user} />
+              <AttributesCard attributes={FakeSchool.attributes} />
             </Grid>
             <Grid item xs={12} sm={9}>
               <Stack spacing={12}>
                 <Stack spacing={3}>
                   <Typography variant="h4" bold>
-                    About me
+                    Our School
                   </Typography>
                   <Typography variant="bodyLarge">
-                    Hi there! I decided to pursue being a teacher leader 3 years
-                    ago when my son needed to sed ut perspiciatis unde omnis
-                    iste natus error sit voluptatem accusantium doloremque
-                    laudantium, totam rem aperiam, eaque ipsa quae ab illo
-                    inventore veritatis et quasi architecto beatae vitae dicta
-                    sunt explicabo.{" "}
+                    At Wild Rose our goal is to follow authentic Montessori
+                    practice creating environments for children in the process
+                    of doing the important work of developing independence. We
+                    aim to create an experience for children at Wild Rose that
+                    supports a sense of wonder, love of learning, and
+                    appreciation of interdependence within a joyful learning
+                    community. As a small school we have the opportunity to
+                    prioritize these goals and provide a uniquely tailored
+                    experience for your individual child. At Wild Rose we each
+                    child’s Montessori experience our primary focus.
                   </Typography>
                 </Stack>
+
                 <Grid container>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="h4" bold>
-                      Roles and responsibilities
+                      School Board
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Stack spacing={3}>
-                      <Typography variant="bodyLarge">
-                        Finance + Bookkeeping
-                      </Typography>
-                      <Typography variant="bodyLarge">
-                        Community + Outreach management
-                      </Typography>
-                      <Typography variant="bodyLarge">
-                        Facility management
-                      </Typography>
-                    </Stack>
-                  </Grid>
-                </Grid>
-                <Grid container>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="h4" bold>
-                      Board member
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Stack spacing={3}>
-                      <Card size="small">
-                        <Stack spacing={3} direction="row" alignItems="center">
-                          <Avatar size="sm" />
-                          <Stack>
-                            <Typography variant="bodyRegular" bold>
-                              Aster Montessori
-                            </Typography>
-                            <Typography variant="bodySmall" lightened>
-                              Cambridge, MA
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                      </Card>
-                      <Card size="small">
-                        <Stack spacing={3} direction="row" alignItems="center">
-                          <Avatar size="sm" />
-                          <Stack>
-                            <Typography variant="bodyRegular" bold>
-                              Aster Montessori
-                            </Typography>
-                            <Typography variant="bodySmall" lightened>
-                              Cambridge, MA
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                      </Card>
+                      {FakeBoardMembers.map((f, i) => (
+                        <UserCard
+                          link={`/network/people/${f.attributes.id}`}
+                          firstName={f.attributes.firstName}
+                          lastName={f.attributes.lastName}
+                          email={f.attributes.email}
+                          phone={f.attributes.phone}
+                          role={f.attributes.role}
+                          profileImage={f.attributes.imageSrc}
+                        />
+                      ))}
                     </Stack>
                   </Grid>
                 </Grid>
@@ -154,17 +120,95 @@ const School = ({}) => {
 
 export default School;
 
-const UserAction = ({ user }) => {
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const toggleEditModal = () => setEditModalOpen(!editModalOpen);
-  return (
-    <>
-      <Button variant="outlined" onClick={() => setEditModalOpen(true)}>
-        Edit profile
-      </Button>
-      <Modal open={editModalOpen} toggle={toggleEditModal} title="Edit Profile">
-        <EditUserProfile user={user} toggle={toggleEditModal} />
-      </Modal>
-    </>
-  );
+const FakeLeaders = [
+  {
+    attributes: {
+      id: "aaaa-bbbb",
+      firstName: "Taylor",
+      lastName: "Zanke",
+      role: "Teacher Leader",
+      location: "Los Angeles",
+      trainingLevel: "Primary Trained",
+      email: "taylor@montessori.com",
+      phone: "123-456-7890",
+      imageSrc:
+        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    },
+  },
+  {
+    attributes: {
+      id: "aaaa-bbbb",
+      firstName: "Taylor",
+      lastName: "Zanke",
+      role: "Teacher Leader",
+      location: "Los Angeles",
+      trainingLevel: "Primary Trained",
+      email: "taylor@montessori.com",
+      phone: "123-456-7890",
+      imageSrc:
+        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    },
+  },
+];
+const FakeBoardMembers = [
+  {
+    attributes: {
+      id: "aaaa-bbbb",
+      firstName: "Taylor",
+      lastName: "Zanke",
+      role: "Teacher Leader",
+      location: "Los Angeles",
+      trainingLevel: "Primary Trained",
+      email: "taylor@montessori.com",
+      phone: "123-456-7890",
+      imageSrc:
+        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    },
+  },
+  {
+    attributes: {
+      id: "aaaa-bbbb",
+      firstName: "Taylor",
+      lastName: "Zanke",
+      role: "Teacher Leader",
+      location: "Los Angeles",
+      trainingLevel: "Primary Trained",
+      email: "taylor@montessori.com",
+      phone: "123-456-7890",
+      imageSrc:
+        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
+    },
+  },
+];
+
+const FakeSchool = {
+  name: "Pasadena Montessori",
+  logoUrl:
+    "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
+  heroUrl:
+    "https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80",
+  location: "Pasadena, CA",
+  id: "aaaa-1111",
+  attributes: [
+    {
+      name: "Hub",
+      values: ["Massachusetts"],
+    },
+    {
+      name: "Open Date",
+      values: ["Fall 2014"],
+    },
+    {
+      name: "Program",
+      values: ["Primary", "Elementary"],
+    },
+    {
+      name: "Capacity",
+      values: ["50+ Students"],
+    },
+    {
+      name: "Languages",
+      values: ["English", "Spanish"],
+    },
+  ],
 };

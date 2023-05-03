@@ -13,7 +13,15 @@ import {
   Icon,
 } from "@ui";
 
-const ProfileHero = ({ profileImage, name, action }) => {
+const ProfileHero = ({
+  profileImage,
+  firstName,
+  lastName,
+  role,
+  school,
+  schoolLogo,
+  location,
+}) => {
   return (
     <Card variant="lightened" size="large">
       <Grid container spacing={8}>
@@ -28,20 +36,25 @@ const ProfileHero = ({ profileImage, name, action }) => {
               <Grid item>
                 <Stack>
                   <Typography variant="h2" bold>
-                    {name}
+                    {firstName} {lastName}
                   </Typography>
                   <Typography variant="h3" lightened>
-                    Teacher Leader
+                    {role}
                   </Typography>
                 </Stack>
               </Grid>
               <Grid item>
-                <Typography variant="bodyLarge" lightened>
-                  Wild Rose Montessori
-                </Typography>
-                <Typography variant="bodyRegular" lightened>
-                  Cambridge, MA
-                </Typography>
+                <Stack direction="row" spacing={6}>
+                  <Stack alignItems="flex-end">
+                    <Typography variant="bodyLarge" lightened>
+                      {school}
+                    </Typography>
+                    <Typography variant="bodyRegular" lightened>
+                      {location}
+                    </Typography>
+                  </Stack>
+                  <Avatar src={schoolLogo} />
+                </Stack>
               </Grid>
             </Grid>
             <Grid container spacing={6}>
@@ -57,7 +70,7 @@ const ProfileHero = ({ profileImage, name, action }) => {
                         <Typography variant="bodyMini" bold lightened>
                           EMAIL
                         </Typography>
-                        <Typography variant="bodyLarge">
+                        <Typography variant="bodyRegular">
                           katelyn@wildrosemontessori.com
                         </Typography>
                       </Stack>
@@ -84,7 +97,7 @@ const ProfileHero = ({ profileImage, name, action }) => {
                         <Typography variant="bodyMini" bold lightened>
                           PHONE
                         </Typography>
-                        <Typography variant="bodyLarge">
+                        <Typography variant="bodyRegular">
                           (123) 456 7891
                         </Typography>
                       </Stack>
@@ -102,7 +115,6 @@ const ProfileHero = ({ profileImage, name, action }) => {
             </Grid>
           </Stack>
         </Grid>
-        {/* {action && <Grid item>{action}</Grid>} */}
       </Grid>
     </Card>
   );
