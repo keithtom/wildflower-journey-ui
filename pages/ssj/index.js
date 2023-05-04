@@ -1276,8 +1276,8 @@ export async function getServerSideProps({ params, req, res }) {
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress, config);
   const dataProgress = await responseProgress.data;
+  
   // want to know how many assigned tasks there are.
-  console.log(dataProgress);
   var numAssignedSteps = dataProgress.assigned_steps;
 
   // suggests potential milestones to start if no tasks assigned.
