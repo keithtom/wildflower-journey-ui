@@ -43,8 +43,13 @@ const CreatePassword = ({}) => {
       .then((response) => {
         router.push("/welcome/confirm-your-details");
       })
-      .catch((error) => {
-        console.error(error.message);
+      .catch((err) => {
+        if (err?.response?.status === 401) {
+          router.push("/login");
+        } else {
+          console.error(err);
+        }
+        console.error(err.message);
       });
   };
 

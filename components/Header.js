@@ -3,9 +3,9 @@ import { useMediaQuery } from "react-responsive";
 import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
-import axios from "axios";
 import { useUserContext } from "../lib/useUserContext";
 import { clearLoggedInState } from "../lib/handleLogout";
+import registrationsAPI from "../api/registrations";
 import { theme } from "../styles/theme";
 import {
   Avatar,
@@ -16,8 +16,6 @@ import {
   Icon,
   NavLink,
 } from "./ui/index";
-
-const logoutRoute = `${process.env.API_URL}/logout`;
 
 const CustomAppBar = styled(AppBar)`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -127,16 +125,20 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
     }
   `;
 
-  const handleLogOut = () => {
-    axios
-      .delete(logoutRoute) // TODO: set base url in some variable that switches out based on env
-      .then((res) => {
-        console.log(res);
+  async function handleLogOut() {
+    try {
+      const res = await registrationsAPI.logout();
+      console.log(res);
+      clearLoggedInState({});
+      setCurrentUser(null);
+      Router.push("/logged-out");
+    } catch (err) {
+      if (err?.response?.status === 401) {
         clearLoggedInState({});
         setCurrentUser(null);
         Router.push("/logged-out");
-      })
-      .catch((err) => console.error(err));
+      }
+    }
   };
 
   return (

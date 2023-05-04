@@ -786,7 +786,15 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
     setChangedDateValue(true);
   };
   const handleSetOpenDate = () => {
-    ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+    try {
+      ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
+    }
     setOpenDate(moment(dateValue).format("YYYY-MM-DD"));
     setChangedDateValue(false);
     toggle();
@@ -927,9 +935,17 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     },
   });
   async function onSubmit(data) {
-    const response = await ssjApi.invitePartner(data);
-    if (response.status === 200) {
-      setSubmittedPartnerRequest(true);
+    try {
+      const response = await ssjApi.invitePartner(data);
+      if (response.status === 200) {
+        setSubmittedPartnerRequest(true);
+      }
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
     }
   }
 

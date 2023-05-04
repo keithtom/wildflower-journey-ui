@@ -19,8 +19,8 @@ A. Deleting the cookies.
   2. On the server side, if we catch a 401 status error, we explicitly delete the logged in cookies.
 
 B. For the redirect to login page, we handle it in two ways:
-  1. If the request is made on the client side, we can call `Router.push('/login')`.
-  2. If the request is made on the server side, we return a redirect object as props in the `getServerSideProps` function.
+  1. If the unauthorized request is made on the client side, we can call `Router.push('/login')`.
+  2. If the unauthorized request is made on the server side, we return a redirect object as props in the `getServerSideProps` function.
   ```
     return {
         redirect: {
@@ -29,9 +29,3 @@ B. For the redirect to login page, we handle it in two ways:
         },
       };
   ```
-3. 
-
-
-# TODO:
-1. Can you go to the login page if you have a token?
-2. When i'm on the login page.... do not check for user....
