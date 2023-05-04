@@ -156,7 +156,11 @@ const Task = ({
       setCanUncompleteTask(task.attributes.canUncomplete);
       setTaskCompleters(task.relationships.completers.data || []);
     } catch (err) {
-      console.error(err);
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
     }
   }
   async function handleAssignUser() {
@@ -170,7 +174,11 @@ const Task = ({
 
       setTaskAssignees(task.relationships.assignees.data || []);
     } catch (err) {
-      console.error(err);
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
     }
     setAssignToastOpen(true);
   }
@@ -190,28 +198,40 @@ const Task = ({
         removeStep(taskId);
       }
     } catch (err) {
-      console.error(err);
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
     }
     setUnassignToastOpen(true);
   }
   async function handleMakeDecision() {
-    const response = await stepsApi.selectOption(
-      taskId,
-      selectedDecisionOption
-    );
-    const task = response.data.data;
+    try {
+      const response = await stepsApi.selectOption(
+        taskId,
+        selectedDecisionOption
+      );
+      const task = response.data.data;
 
-    setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
-    setCanAssignTask(task.attributes.canAssign);
-    setCanUnassignTask(task.attributes.canUnassign);
-    setTaskAssignees(task.relationships.assignees.data || []);
+      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
+      setCanAssignTask(task.attributes.canAssign);
+      setCanUnassignTask(task.attributes.canUnassign);
+      setTaskAssignees(task.relationships.assignees.data || []);
 
-    setTaskIsComplete(task.attributes.isComplete);
-    setCanCompleteTask(task.attributes.canComplete);
-    setCanUncompleteTask(task.attributes.canUncomplete);
-    setTaskCompleters(task.relationships.completers.data || []);
+      setTaskIsComplete(task.attributes.isComplete);
+      setCanCompleteTask(task.attributes.canComplete);
+      setCanUncompleteTask(task.attributes.canUncomplete);
+      setTaskCompleters(task.relationships.completers.data || []);
 
-    setIsDecided(true);
+      setIsDecided(true);
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
+    }
   }
 
   return (

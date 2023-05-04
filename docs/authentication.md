@@ -30,3 +30,8 @@ B. For the redirect to login page, we handle it in two ways:
       };
   ```
 3. 
+
+
+# TODO:
+1. Can you go to the login page if you have a token?
+2. When i'm on the login page.... do not check for user....

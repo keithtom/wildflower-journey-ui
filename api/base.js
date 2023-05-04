@@ -1,6 +1,7 @@
 // boiler plate for API calls to api.wildflowerschools.org
+import { clearLoggedInState } from "@lib/handleLogout";
 import axios from "axios";
-import { getCookie, deleteCookie } from 'cookies-next';
+import { getCookie } from 'cookies-next';
 import jwt_decode from "jwt-decode";
 
 const token = getCookie('auth');
@@ -45,14 +46,7 @@ function register(path, options) {
     },  
     (error) => {
       if (error.response?.status === 401) {
-        // Unfortunately we do not have access to the context req/res objects here for deleteCookie to work on the server side.
-        deleteCookie("auth", {});
-        deleteCookie("workflowId", {});
-        deleteCookie("phase", {});
-        delete axios.defaults.headers.common["Authorization"];
-        if (typeof window !== 'undefined') {
-          Router.put("/login");
-        }
+        clearLoggedInState({});
         return Promise.reject(error);
       } else {
         return Promise.reject(error);

@@ -3,7 +3,8 @@ import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import getAuthHeader from "../../../../../lib/getAuthHeader";
+import getAuthHeader from "@lib/getAuthHeader";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import axios from "axios";
 
 import {

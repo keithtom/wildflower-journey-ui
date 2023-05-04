@@ -15,6 +15,7 @@ import PhaseChip from "../../components/PhaseChip";
 import Resource from "../../components/Resource";
 import Hero from "../../components/Hero";
 import getAuthHeader from "../../lib/getAuthHeader";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import axios from "axios";
 
 const Resources = ({ dataResources }) => {

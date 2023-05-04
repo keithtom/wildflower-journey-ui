@@ -132,13 +132,8 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
       .delete(logoutRoute) // TODO: set base url in some variable that switches out based on env
       .then((res) => {
         console.log(res);
-        // TODO: update logged out state
-        console.log("logged out from server side")
-        console.log("calling clearLoggedInState")
-        clearLoggedInState();
-        console.log("clearing setcurrent user")
+        clearLoggedInState({});
         setCurrentUser(null);
-        console.log("trying to redirect")
         Router.push("/logged-out");
       })
       .catch((err) => console.error(err));
