@@ -6,10 +6,12 @@ import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 registerPlugin(
   FilePondPluginImageExifOrientation,
   FilePondPluginImagePreview,
-  FilePondPluginFileValidateSize
+  FilePondPluginFileValidateSize,
+  FilePondPluginFileValidateType
 );
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
@@ -36,6 +38,7 @@ import {
   Radio,
   Divider,
   PageContainer,
+  Alert,
 } from "@ui";
 import Header from "@components/Header";
 import { PinDropSharp } from "@mui/icons-material";
@@ -52,6 +55,7 @@ const StyledFilePond = styled(FilePond)`
 const AddProfileInfo = ({}) => {
   const [profilePicture, setProfilePicture] = useState();
   const [profileImage, setProfileImage] = useState();
+  const [showError, setShowError] = useState();
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
 
@@ -72,6 +76,10 @@ const AddProfileInfo = ({}) => {
           router.push("/ssj");
         }
       });
+  };
+
+  const handleFileError = (error) => {
+    setShowError(error);
   };
 
   const isExistingTL = false;
@@ -120,16 +128,32 @@ const AddProfileInfo = ({}) => {
               )}
 
               <Divider />
-
+              {showError ? (
+                <Grid container>
+                  <Grid item xs={12}>
+                    <Alert severity="error">
+                      <Stack>
+                        {showError.main}
+                        <Typography variant="bodySmall" error>
+                          {showError.sub}
+                        </Typography>
+                      </Stack>
+                    </Alert>
+                  </Grid>
+                </Grid>
+              ) : null}
               <Grid container justifyContent="center">
                 <Grid item xs={12} sm={8} md={6}>
                   <StyledFilePond
                     files={profilePicture}
                     allowReorder={false}
                     allowMultiple={false}
-                    maxFileSize="750KB"
+                    maxFileSize="5MB"
+                    acceptedFileTypes={["image/*"]}
                     onupdatefiles={setProfilePicture}
+                    onaddfilestart={() => setShowError(false)}
                     stylePanelAspectRatio="1:1"
+                    onerror={handleFileError}
                     stylePanelLayout="circle"
                     server={{
                       process: (
@@ -181,7 +205,9 @@ const AddProfileInfo = ({}) => {
                                     },
                                     // need to remove default Authorization header when sending to s3
                                     transformRequest: (data, headers) => {
-                                      delete headers.common["Authorization"];
+                                      if (process.env !== "local") {
+                                        delete headers.common["Authorization"];
+                                      }
                                       return data;
                                     },
                                   })
