@@ -1410,6 +1410,11 @@
   resolved "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.2.tgz"
   integrity sha512-82cpyJyKRoQoRi+14ibCeGPu0CwypgtBAdBhq1WfvagpCZNKqwXbKwXllYSMG91DhmG4jt9gN8eP6lGOtozuaw==
 
+"@highlight-run/react@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@highlight-run/react/-/react-3.0.0.tgz#a138f61a3fe9e90d0c7f0a6799c8c859d28451cc"
+  integrity sha512-9uAUsWrI6N0zm5oa9LUStx+jXnNSNUIGR9Vs18a1AFK09mhQmCIVLgCJ2/h9AJ7r+hZYn6cZCvjhv4FMm/N/QQ==
+
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
   resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.5.0.tgz"
@@ -6722,6 +6727,11 @@ highlight.js@^10.1.1, highlight.js@~10.7.0:
   version "10.7.3"
   resolved "https://registry.npmjs.org/highlight.js/-/highlight.js-10.7.3.tgz"
   integrity sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==
+
+highlight.run@^6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/highlight.run/-/highlight.run-6.0.3.tgz#8269ac33a3c4ea1ceb10ee88336356e5c598e8f1"
+  integrity sha512-IbHHK479+XPfHH4vHMdSYv0oX07BmOob25+nGcyPyOdc4uw0+rojHYVH9y5zAofok8oAiZYaIWC/yeENc7GGeA==
 
 history@5.0.0:
   version "5.0.0"

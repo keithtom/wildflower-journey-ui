@@ -7,6 +7,24 @@ import { useRouter } from "next/router";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 
+import { H } from 'highlight.run';
+import { ErrorBoundary } from '@highlight-run/react';
+
+
+if (process.env.NODE_ENV === 'production') {
+  console.log("enabling highlight.io", process.env)
+  H.init(process.env.HIGHLIGHT_SECRET, {
+    tracingOrigins: true,
+    networkRecording: {
+      enabled: true,
+      recordHeadersAndBody: true,
+      urlBlocklist: [
+        // insert full or partial urls that you don't want to record here
+      ],
+    },
+  });
+}
+
 function MyApp({ Component, pageProps }) {
   const [isLoading, setIsLoading] = useState(false);
   const Router = useRouter();
@@ -27,12 +45,14 @@ function MyApp({ Component, pageProps }) {
     });
   }, [Router]);
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <UserProvider>
-        <Component {...pageProps} />
-      </UserProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <UserProvider>
+          <Component {...pageProps} />
+        </UserProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

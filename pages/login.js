@@ -43,7 +43,6 @@ const Login = ({}) => {
           maxAge: 60 * 60 * 24 * 30,
         });
         const userAttributes = response.data.data.attributes;
-        userAttributes.imageUrl = `${process.env.API_URL}${userAttributes.imageUrl}`;
         const personId = response.data.data.relationships.person.data.id;
         setCookie("workflowId", userAttributes.ssj.workflowId, {
           maxAge: 60 * 60 * 24 * 30,
