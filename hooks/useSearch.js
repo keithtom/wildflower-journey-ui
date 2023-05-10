@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import search from "../api/search";
+import searchApi from "@api/search";
 
 const useSearch = () => {
   const [query, setQuery] = useState('');
@@ -14,9 +14,8 @@ const useSearch = () => {
         // api call w/ query to update results
         const fetch = async () => {
           try {
-            // reusable for multiple searches...
             // add url params or attach params for query and data...
-            const response = await search.get(`?search%5Bq%5D=${query}`);
+            const response = await searchApi.search(query);
             setResults(response.data.data);
           } catch (err) {
             console.error(err);

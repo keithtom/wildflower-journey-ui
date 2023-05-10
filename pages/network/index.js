@@ -26,9 +26,7 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
   };
-
-  // console.log({ results });
-
+  
   return (
     <>
       <PageContainer>
@@ -93,17 +91,17 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
         <Grid container mt={12}>
           <Masonry columns={3} spacing={6}>
             {category === "people"
-              ? FakeTeachers.map((f) => (
+              ? results.map((f) => (
                   <PersonResultItem
-                    personLink={`/network/people/${f.attributes.id}`}
-                    profileImg={f.attributes.imageSrc}
+                    personLink={`/network/people/${f.id}`}
+                    profileImg={f.attributes.imageUrl}
                     firstName={f.attributes.firstName}
                     lastName={f.attributes.lastName}
-                    role={f.attributes.role}
+                    role={f.attributes.roleList}
                     location={f.attributes.location}
                     trainingLevel={f.attributes.trainingLevel}
-                    schoolLogo={f.attributes.school.logoUrl}
-                    schoolLink={`/network/schools/${f.attributes.school.id}`}
+                    schoolLogo={f.attributes.school?.logoUrl}
+                    schoolLink={`/network/schools/${f.attributes.school?.id}`}
                     key={f.id}
                   />
                 ))
