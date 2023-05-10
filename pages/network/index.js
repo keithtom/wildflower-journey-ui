@@ -103,7 +103,6 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
                     location={f.attributes.location}
                     trainingLevel={f.attributes.trainingLevel}
                     schoolLogo={f.attributes.school.logoUrl}
-                    schoolLink={`/network/schools/${f.attributes.school.id}`}
                     key={f.id}
                   />
                 ))
@@ -162,10 +161,9 @@ const PersonResultItem = ({
   location,
   trainingLevel,
   schoolLogo,
-  schoolLink,
 }) => {
   return (
-    <Link href={personLink}>
+    <Link href={personLink && personLink}>
       <Card noPadding hoverable>
         <Stack>
           <img src={profileImg} style={{ width: "100%" }} />
@@ -182,10 +180,8 @@ const PersonResultItem = ({
                     </Typography>
                   </Stack>
                 </Grid>
-                <Grid item>
-                  <Link href={schoolLink}>
-                    <Avatar src={schoolLogo} size="sm" />
-                  </Link>
+                <Grid item style={{ pointerEvents: "none" }}>
+                  <Avatar src={schoolLogo} size="sm" />
                 </Grid>
               </Grid>
               <Grid container spacing={2}>
@@ -214,7 +210,7 @@ const SchoolResultItem = ({
   leaders,
 }) => {
   return (
-    <Link href={schoolLink}>
+    <Link href={schoolLink && schoolLink}>
       <Card noPadding hoverable>
         <Stack>
           <Stack
