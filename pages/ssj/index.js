@@ -673,7 +673,9 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
                   }
                   style={{
                     width: "100%",
-                    objectFit: "contain",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center",
                   }}
                 />
               </Box>
@@ -1234,7 +1236,7 @@ export async function getServerSideProps({ params, req, res }) {
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress, config);
   const dataProgress = await responseProgress.data;
-  
+
   // want to know how many assigned tasks there are.
   var numAssignedSteps = dataProgress.assigned_steps;
 
