@@ -1,5 +1,6 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import {
   Box,
   PageContainer,
@@ -23,20 +24,42 @@ import {
 import ProfileHero from "@components/ProfileHero";
 import AttributesCard from "@components/AttributesCard";
 import SchoolCard from "@components/SchoolCard";
+import peopleApi from "@api/people";
 
 const Person = ({}) => {
-  return (
+  const [isLoading, setIsLoading] = useState(true);
+  const [person, setPerson] = useState({});
+
+  const router = useRouter()
+  const { personId } = router.query
+  
+  useEffect(() => {
+    if (personId) {
+      peopleApi.show(personId).then((response) => {
+        setPerson(response.data.data);
+        setIsLoading(false);
+        console.log(response.data)
+      });
+    }
+  }, []);
+
+  // format PersonAttributes.
+  
+  return (isLoading) ?
+    <Typography>
+      Loading
+    </Typography> : (
     <>
       <PageContainer>
         <Stack spacing={6}>
           <ProfileHero
-            profileImage={FakePerson.attributes.imageSrc}
-            firstName={FakePerson.attributes.firstName}
-            lastName={FakePerson.attributes.lastName}
-            role={FakePerson.attributes.role}
-            school={FakePerson.attributes.school.name}
-            schoolLogo={FakePerson.attributes.school.logoUrl}
-            location={FakePerson.attributes.location}
+            profileImage={person.attributes?.imageUrl}
+            firstName={person.attributes.firstName}
+            lastName={person.attributes.lastName}
+            role={person.attributes.role}
+            school={person.attributes.school?.name}
+            schoolLogo={person.attributes.school?.logoUrl}
+            location={person.attributes.location}
           />
 
           <Grid container spacing={8}>
