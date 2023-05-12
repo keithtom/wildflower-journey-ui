@@ -258,11 +258,9 @@ const ConfirmDemographicInfo = ({}) => {
   const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
     "A not-listed or more specific ethnicity"
   );
-  const showCustomLanguageField = watchFields.primaryLanguage === "Other";
-  const showCustomGenderField =
-    watchFields.gender === "A not-listed or more specific gender identity";
-  const showCustomPronounsField =
-    watchFields.pronouns === "Not-listed or more specific pronouns";
+  const showCustomLanguageField = watchFields.primaryLanguage === 35;
+  const showCustomGenderField = watchFields.gender === 3;
+  const showCustomPronounsField = watchFields.pronouns === 9;
 
   console.log({ watchFields });
 
