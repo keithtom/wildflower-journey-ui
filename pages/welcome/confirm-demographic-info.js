@@ -34,21 +34,23 @@ const ConfirmDemographicInfo = ({}) => {
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm({defaultValues: { 
-    primaryLanguage: "",
-    primaryLanguageOther: "",
-    raceEthnicity: [],
-    raceEthnicityOther: "",
-    lgbtqia: "",
-    gender: "",
-    genderOther: "",
-    pronouns: "", 
-    pronounsOther: "",
-    householdIncome: "",
-    montessoriCertified: "",
-    montessoriCertifiedLevels: [],
-    classroomAge: [],
-  }});
+  } = useForm({
+    defaultValues: {
+      primaryLanguage: "",
+      primaryLanguageOther: "",
+      raceEthnicity: [],
+      raceEthnicityOther: "",
+      lgbtqia: "",
+      gender: "",
+      genderOther: "",
+      pronouns: "",
+      pronounsOther: "",
+      householdIncome: "",
+      montessoriCertified: "",
+      montessoriCertifiedLevels: [],
+      classroomAge: [],
+    },
+  });
 
   useEffect(() => {
     if (currentUser) {
@@ -58,17 +60,17 @@ const ConfirmDemographicInfo = ({}) => {
         // SAVEPOINT this request is working.  need to make sure data is persisted and returned
         // and then loaded into form.  then we are done here.
         reset({
-          primaryLanguage: person?.attributes?.primaryLanguage,
-          primaryLanguageOther: person?.attributes?.primaryLanguageOther,
+          primaryLanguage: person?.attributes?.primaryLanguage || "",
+          primaryLanguageOther: person?.attributes?.primaryLanguageOther || "",
           raceEthnicity: person?.attributes?.raceEthnicityList || [],
-          raceEthnicityOther: person?.attributes?.raceEthnicityOther,
-          lgbtqia: person?.attributes?.lgbtqia,
-          gender: person?.attributes?.gender,
-          genderOther: person?.attributes?.genderOther,
-          pronouns: person?.attributes?.pronouns,
-          pronounsOther: person?.attributes?.pronounsOther,
-          householdIncome: person?.attributes?.householdIncome,
-          montessoriCertified: person?.attributes?.montessoriCertified,
+          raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
+          lgbtqia: person?.attributes?.lgbtqia || "",
+          gender: person?.attributes?.gender || "",
+          genderOther: person?.attributes?.genderOther || "",
+          pronouns: person?.attributes?.pronouns || "",
+          pronounsOther: person?.attributes?.pronounsOther || "",
+          householdIncome: person?.attributes?.householdIncome || "",
+          montessoriCertified: person?.attributes?.montessoriCertified || "",
           montessoriCertifiedLevels:
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
@@ -262,7 +264,7 @@ const ConfirmDemographicInfo = ({}) => {
   const showCustomPronounsField =
     watchFields.pronouns === "Not-listed or more specific pronouns";
 
-  // console.log({ watchFields });
+  console.log({ watchFields });
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -358,6 +360,7 @@ const ConfirmDemographicInfo = ({}) => {
                   rules={{ required: true }}
                   render={({ field }) => (
                     <MultiSelect
+                      withCheckbox
                       label="What is your ethnicity?"
                       placeholder="Select as many as you like..."
                       options={ethnicityOptions.map((l) => l.label)}
