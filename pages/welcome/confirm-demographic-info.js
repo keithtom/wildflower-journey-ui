@@ -336,7 +336,7 @@ const ConfirmDemographicInfo = ({}) => {
                     name="primaryLanguageOther"
                     control={control}
                     rules={{
-                      required: showCustomLanguageField ? true : false,
+                      required: false,
                     }}
                     render={({ field }) => (
                       <TextField
@@ -381,7 +381,7 @@ const ConfirmDemographicInfo = ({}) => {
                     name="raceEthnicityOther"
                     control={control}
                     rules={{
-                      required: showCustomEthnicityField ? true : false,
+                      required: false,
                     }}
                     render={({ field }) => (
                       <TextField
@@ -453,7 +453,7 @@ const ConfirmDemographicInfo = ({}) => {
                     name="genderOther"
                     control={control}
                     rules={{
-                      required: showCustomGenderField ? true : false,
+                      required: false,
                     }}
                     render={({ field }) => (
                       <TextField
@@ -496,7 +496,7 @@ const ConfirmDemographicInfo = ({}) => {
                     name="pronounsOther"
                     control={control}
                     rules={{
-                      required: showCustomPronounsField ? true : false,
+                      required: false,
                     }}
                     render={({ field }) => (
                       <TextField
@@ -579,6 +579,7 @@ const ConfirmDemographicInfo = ({}) => {
                     rules={{ required: isCertifiedOrSeeking ? true : false }}
                     render={({ field }) => (
                       <MultiSelect
+                        withCheckbox
                         label="What Levels are you certified (or seeking certification) for?"
                         placeholder="Select as many as you like..."
                         options={levelsOfMontessoriCertification.map(
@@ -604,6 +605,7 @@ const ConfirmDemographicInfo = ({}) => {
                   rules={{ required: true }}
                   render={({ field }) => (
                     <MultiSelect
+                      withCheckbox
                       label="What Age Classrooms are you interested in offering?"
                       placeholder="Select as many as you like..."
                       options={ageClassroomsInterestedInOffering.map(
