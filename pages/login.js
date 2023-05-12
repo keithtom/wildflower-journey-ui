@@ -183,32 +183,27 @@ const Login = ({}) => {
                         </FormHelperText>
                       )}
                     </Stack>
-                    <Grid container spacing={3} justifyContent="center">
-                      <Grid item xs={12}>
-                        <Button full disabled={isSubmitting} type="submit">
-                          <Typography variant="bodyRegular" light>
-                            Log in
-                          </Typography>
-                        </Button>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="bodyMini" bold lightened>
-                          OR
+                    <Stack alignItems="center" spacing={3}>
+                      <Button full disabled={isSubmitting} type="submit">
+                        <Typography variant="bodyRegular" light>
+                          Log in
                         </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Button
-                          full
-                          disabled={isSubmitting}
-                          variant="text"
-                          onClick={handleRequestEmailLink}
-                        >
-                          <Typography variant="bodyRegular">
-                            Request an email link to login
-                          </Typography>
-                        </Button>
-                      </Grid>
-                    </Grid>
+                      </Button>
+                      <Typography variant="bodyMini" bold lightened>
+                        OR
+                      </Typography>
+
+                      <Button
+                        full
+                        disabled={isSubmitting}
+                        variant="text"
+                        onClick={handleRequestEmailLink}
+                      >
+                        <Typography variant="bodyRegular">
+                          Request an email link to login
+                        </Typography>
+                      </Button>
+                    </Stack>
                   </Stack>
                 </form>
               )}
