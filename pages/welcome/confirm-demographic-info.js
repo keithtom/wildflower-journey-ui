@@ -262,7 +262,7 @@ const ConfirmDemographicInfo = ({}) => {
   const showCustomGenderField = watchFields.gender === 3;
   const showCustomPronounsField = watchFields.pronouns === 9;
 
-  console.log({ watchFields });
+  // console.log({ watchFields });
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
