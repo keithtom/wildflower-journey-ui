@@ -17,6 +17,7 @@ const PageContent = styled(Box)`
   flex-grow: 1;
   margin-top: ${({ theme }) => theme.util.appBarHeight}px;
   padding: ${({ theme }) => theme.util.buffer * 6}px;
+  overflow-y: hidden;
 `;
 
 const PageContainer = ({ children, isLoading, hideNav }) => {
