@@ -11,6 +11,7 @@ const ModalCard = styled(Card)`
   width: 600px;
   max-height: 640px;
   overflow: auto;
+  max-width: 90%;
 `;
 
 export default function Modal({

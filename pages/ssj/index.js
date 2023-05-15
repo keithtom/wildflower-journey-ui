@@ -150,52 +150,58 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Grid>
               <Grid item>
-                <Stack direction="row" spacing={6} alignItems="center">
-                  <Stack>
+                <Grid container spacing={6}>
+                  <Grid item>
                     <Typography variant="bodyMini" bold lightened>
                       PHASE
                     </Typography>
                     <Typography variant="bodySmall">Visioning</Typography>
-                  </Stack>
-                  <Stack>
+                  </Grid>
+                  <Grid item>
                     <Typography variant="bodyMini" bold lightened>
                       LOCATION
                     </Typography>
                     <Typography variant="bodySmall">Boston, MA</Typography>
-                  </Stack>
-                  {openDate ? (
-                    <Card
-                      size="small"
-                      hoverable
-                      onClick={() => setAddOpenDateModalOpen(true)}
-                    >
-                      <Stack direction="row" spacing={6}>
-                        <Stack>
-                          <Typography variant="bodyMini" bold lightened>
-                            OPEN DATE
-                          </Typography>
-                          <Typography variant="bodySmall">
-                            {moment(openDate).format("MMMM D, YYYY")}
+                  </Grid>
+                  <Grid item>
+                    {openDate ? (
+                      <Card
+                        size="small"
+                        hoverable
+                        onClick={() => setAddOpenDateModalOpen(true)}
+                      >
+                        <Stack direction="row" spacing={6}>
+                          <Stack>
+                            <Typography variant="bodyMini" bold lightened>
+                              OPEN DATE
+                            </Typography>
+                            <Typography variant="bodySmall">
+                              {moment(openDate).format("MMMM D, YYYY")}
+                            </Typography>
+                          </Stack>
+                          <Icon
+                            type="pencil"
+                            size="small"
+                            variant="lightened"
+                          />
+                        </Stack>
+                      </Card>
+                    ) : (
+                      <Button
+                        variant="light"
+                        small
+                        onClick={() => setAddOpenDateModalOpen(true)}
+                      >
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Icon type="plus" />
+                          <Typography variant="bodyRegular">
+                            Add your anticipated open date
                           </Typography>
                         </Stack>
-                        <Icon type="pencil" size="small" variant="lightened" />
-                      </Stack>
-                    </Card>
-                  ) : (
-                    <Button
-                      variant="light"
-                      small
-                      onClick={() => setAddOpenDateModalOpen(true)}
-                    >
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Icon type="plus" />
-                        <Typography variant="bodyRegular">
-                          Add your anticipated open date
-                        </Typography>
-                      </Stack>
-                    </Button>
-                  )}
-                </Stack>
+                      </Button>
+                    )}
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
 
@@ -292,7 +298,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
               </Card>
             )}
 
-            <Stack spacing={3}>
+            <Stack spacing={3} sx={{ width: "100%" }}>
               <Grid
                 container
                 justifyContent="space-between"

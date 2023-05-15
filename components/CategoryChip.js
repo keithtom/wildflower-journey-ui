@@ -1,6 +1,6 @@
-import { Icon, Chip, Stack } from "./ui";
+import { Icon, Chip, Stack, Typography } from "./ui";
 import { theme } from "../styles/theme";
-import ssj_categories from "@lib/ssj/categories"
+import ssj_categories from "@lib/ssj/categories";
 
 const CategoryChip = ({ category, withIcon, ...props }) => {
   const categories = {
@@ -19,7 +19,9 @@ const CategoryChip = ({ category, withIcon, ...props }) => {
         withIcon ? (
           <Stack spacing={2} direction="row" alignItems="center">
             <Icon type="category" size="small" />
-            <span>{category}</span>
+            <Typography noWrap variant="bodyMini" bold>
+              {category}
+            </Typography>
           </Stack>
         ) : (
           category
