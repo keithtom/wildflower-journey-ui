@@ -34,21 +34,23 @@ const ConfirmDemographicInfo = ({}) => {
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm({defaultValues: { 
-    primaryLanguage: "",
-    primaryLanguageOther: "",
-    raceEthnicity: [],
-    raceEthnicityOther: "",
-    lgbtqia: "",
-    gender: "",
-    genderOther: "",
-    pronouns: "", 
-    pronounsOther: "",
-    householdIncome: "",
-    montessoriCertified: "",
-    montessoriCertifiedLevels: [],
-    classroomAge: [],
-  }});
+  } = useForm({
+    defaultValues: {
+      primaryLanguage: "",
+      primaryLanguageOther: "",
+      raceEthnicity: [],
+      raceEthnicityOther: "",
+      lgbtqia: "",
+      gender: "",
+      genderOther: "",
+      pronouns: "",
+      pronounsOther: "",
+      householdIncome: "",
+      montessoriCertified: "",
+      montessoriCertifiedLevels: [],
+      classroomAge: [],
+    },
+  });
 
   useEffect(() => {
     if (currentUser) {
@@ -58,17 +60,17 @@ const ConfirmDemographicInfo = ({}) => {
         // SAVEPOINT this request is working.  need to make sure data is persisted and returned
         // and then loaded into form.  then we are done here.
         reset({
-          primaryLanguage: person?.attributes?.primaryLanguage,
-          primaryLanguageOther: person?.attributes?.primaryLanguageOther,
+          primaryLanguage: person?.attributes?.primaryLanguage || "",
+          primaryLanguageOther: person?.attributes?.primaryLanguageOther || "",
           raceEthnicity: person?.attributes?.raceEthnicityList || [],
-          raceEthnicityOther: person?.attributes?.raceEthnicityOther,
-          lgbtqia: person?.attributes?.lgbtqia,
-          gender: person?.attributes?.gender,
-          genderOther: person?.attributes?.genderOther,
-          pronouns: person?.attributes?.pronouns,
-          pronounsOther: person?.attributes?.pronounsOther,
-          householdIncome: person?.attributes?.householdIncome,
-          montessoriCertified: person?.attributes?.montessoriCertified,
+          raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
+          lgbtqia: person?.attributes?.lgbtqia || "",
+          gender: person?.attributes?.gender || "",
+          genderOther: person?.attributes?.genderOther || "",
+          pronouns: person?.attributes?.pronouns || "",
+          pronounsOther: person?.attributes?.pronounsOther || "",
+          householdIncome: person?.attributes?.householdIncome || "",
+          montessoriCertified: person?.attributes?.montessoriCertified || "",
           montessoriCertifiedLevels:
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
@@ -256,11 +258,9 @@ const ConfirmDemographicInfo = ({}) => {
   const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
     "A not-listed or more specific ethnicity"
   );
-  const showCustomLanguageField = watchFields.primaryLanguage === "Other";
-  const showCustomGenderField =
-    watchFields.gender === "A not-listed or more specific gender identity";
-  const showCustomPronounsField =
-    watchFields.pronouns === "Not-listed or more specific pronouns";
+  const showCustomLanguageField = watchFields.primaryLanguage === 35;
+  const showCustomGenderField = watchFields.gender === 3;
+  const showCustomPronounsField = watchFields.pronouns === 9;
 
   // console.log({ watchFields });
 
@@ -334,7 +334,7 @@ const ConfirmDemographicInfo = ({}) => {
                     name="primaryLanguageOther"
                     control={control}
                     rules={{
-                      required: showCustomLanguageField ? true : false,
+                      required: false,
                     }}
                     render={({ field }) => (
                       <TextField
@@ -358,6 +358,7 @@ const ConfirmDemographicInfo = ({}) => {
                   rules={{ required: true }}
                   render={({ field }) => (
                     <MultiSelect
+                      withCheckbox
                       label="What is your ethnicity?"
                       placeholder="Select as many as you like..."
                       options={ethnicityOptions.map((l) => l.label)}
@@ -378,7 +379,7 @@ const ConfirmDemographicInfo = ({}) => {
                     name="raceEthnicityOther"
                     control={control}
                     rules={{
-                      required: showCustomEthnicityField ? true : false,
+                      required: false,
                     }}
                     render={({ field }) => (
                       <TextField
@@ -450,7 +451,7 @@ const ConfirmDemographicInfo = ({}) => {
                     name="genderOther"
                     control={control}
                     rules={{
-                      required: showCustomGenderField ? true : false,
+                      required: false,
                     }}
                     render={({ field }) => (
                       <TextField
@@ -493,7 +494,7 @@ const ConfirmDemographicInfo = ({}) => {
                     name="pronounsOther"
                     control={control}
                     rules={{
-                      required: showCustomPronounsField ? true : false,
+                      required: false,
                     }}
                     render={({ field }) => (
                       <TextField
@@ -576,6 +577,7 @@ const ConfirmDemographicInfo = ({}) => {
                     rules={{ required: isCertifiedOrSeeking ? true : false }}
                     render={({ field }) => (
                       <MultiSelect
+                        withCheckbox
                         label="What Levels are you certified (or seeking certification) for?"
                         placeholder="Select as many as you like..."
                         options={levelsOfMontessoriCertification.map(
@@ -601,6 +603,7 @@ const ConfirmDemographicInfo = ({}) => {
                   rules={{ required: true }}
                   render={({ field }) => (
                     <MultiSelect
+                      withCheckbox
                       label="What Age Classrooms are you interested in offering?"
                       placeholder="Select as many as you like..."
                       options={ageClassroomsInterestedInOffering.map(
