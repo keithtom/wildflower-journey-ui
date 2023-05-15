@@ -96,6 +96,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
+  console.log({ currentUser });
+
   return (
     <>
       <PageContainer isLoading={!currentUser}>
@@ -126,6 +128,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Card>
             </Grid>
+            B
           </Grid>
         ) : (
           <Stack spacing={16}>
@@ -161,7 +164,10 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                     <Typography variant="bodyMini" bold lightened>
                       LOCATION
                     </Typography>
-                    <Typography variant="bodySmall">Boston, MA</Typography>
+                    <Typography variant="bodySmall">
+                      {currentUser.personAddress.city},{" "}
+                      {currentUser.personAddress.state}
+                    </Typography>
                   </Grid>
                   <Grid item>
                     {openDate ? (
