@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { getScreenSize } from "../hooks/react-responsive";
 import {
   Grid,
   Card,
@@ -28,6 +29,8 @@ const Milestone = ({
   completedStepsCount,
   variant,
 }) => {
+  const { screenSize } = getScreenSize();
+
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
 
   const remainingSteps = stepCount - completedStepsCount;
@@ -42,30 +45,45 @@ const Milestone = ({
           size="small"
           noRadius={variant === "small" ? true : false}
         >
-          <Grid container alignItems="center" justifyContent="space-between">
-            <Grid item>
+          <Grid
+            container
+            spacing={3}
+            alignItems="center"
+            justifyContent="space-between"
+            flexWrap="noWrap"
+          >
+            <Grid item xs={10} sm={8} md={7}>
               <Stack direction="row" spacing={3} alignItems="center">
-                {status === "done" && (
-                  <Icon type="checkCircle" variant="success" />
-                )}
-                {status === "up next" && (
-                  <Icon type="circle" variant="lightened" />
-                )}
-                {status === "in progress" && (
-                  <Icon type="rightArrowCircleSolid" variant="lightened" />
-                )}
-                {status === "to do" && (
-                  <Icon type="rightArrowCircle" variant="primary" />
-                )}
+                <Grid item>
+                  {status === "done" && (
+                    <Icon type="checkCircle" variant="success" />
+                  )}
+                  {status === "up next" && (
+                    <Icon type="circle" variant="lightened" />
+                  )}
+                  {status === "in progress" && (
+                    <Icon type="rightArrowCircleSolid" variant="lightened" />
+                  )}
+                  {status === "to do" && (
+                    <Icon type="rightArrowCircle" variant="primary" />
+                  )}
+                </Grid>
                 <Typography
                   variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
                   bold
                   lightened={status === "up next"}
+                  noWrap
                 >
                   {title}
                 </Typography>
-                {assignedIncomplete && remainingSteps ? (
+                {screenSize.isMd ? null : assignedIncomplete &&
+                  remainingSteps ? (
                   <Chip
+                    sx={{
+                      "&:hover": {
+                        zIndex: 1,
+                      },
+                    }}
                     size="small"
                     label={
                       <Stack spacing={1} direction="row">
@@ -76,6 +94,11 @@ const Milestone = ({
                   />
                 ) : completedStepsCount ? (
                   <Chip
+                    sx={{
+                      "&:hover": {
+                        zIndex: 1,
+                      },
+                    }}
                     size="small"
                     label={
                       <Stack spacing={1} direction="row">
@@ -87,33 +110,40 @@ const Milestone = ({
               </Stack>
             </Grid>
 
-            <Grid item>
-              <Stack direction="row" spacing={6} alignItems="center">
-                <Stack direction="row" spacing={3} alignItems="center">
-                  {phase && (
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <PhaseChip size="small" phase={phase} withIcon />
+            <Grid item xs={2} sm={4} md={5}>
+              <Grid
+                container
+                justifyContent="flex-end"
+                alignItems="center"
+                spacing={3}
+                flexWrap="noWrap"
+              >
+                {screenSize.isSm ? null : (
+                  <Grid item>
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      {phase && (
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <PhaseChip size="small" phase={phase} withIcon />
+                        </Stack>
+                      )}
+                      {categories && !hideCategoryChip && (
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Stack direction="row" spacing={2}>
+                            {categories.map((m, i) => (
+                              <CategoryChip category={m} size="small" key={i} />
+                            ))}
+                          </Stack>
+                        </Stack>
+                      )}
                     </Stack>
-                  )}
-                  {categories && !hideCategoryChip && (
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Stack direction="row" spacing={2}>
-                        {categories.map((m, i) => (
-                          <CategoryChip
-                            category={m}
-                            size="small"
-                            withIcon
-                            key={i}
-                          />
-                        ))}
-                      </Stack>
-                    </Stack>
-                  )}
+                  </Grid>
+                )}
+                <Grid item>
                   <IconButton onMouseDown={() => setInfoDrawerOpen(true)}>
                     <Icon type="dotsVertical" variant="lightened" />
                   </IconButton>
-                </Stack>
-              </Stack>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Card>

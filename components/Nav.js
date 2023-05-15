@@ -38,6 +38,8 @@ const CustomDrawer = styled(Drawer)`
   }
 `;
 
+const showNetwork = false;
+
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
 
@@ -90,12 +92,15 @@ const Navigation = ({}) => {
   const router = useRouter();
   return (
     <Box>
-      {/* <NavLink
-        to="/network"
-        active={router.pathname.includes("/network")}
-        label="Network"
-        icon="bookReader"
-      /> */}
+      {showNetwork ? (
+        <NavLink
+          variant="primary"
+          to="/network"
+          active={router.pathname.includes("/network")}
+          label="Network"
+          icon="bookReader"
+        />
+      ) : null}
       <NavLink
         variant="primary"
         to="/ssj"

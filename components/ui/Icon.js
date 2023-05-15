@@ -24,6 +24,7 @@ import {
   Layer,
   FileBlank,
   Copy,
+  Search,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -198,6 +199,7 @@ export default function Icon({ ...props }) {
     layer: <Layer />,
     fileBlank: <FileBlank />,
     copy: <Copy />,
+    search: <Search />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

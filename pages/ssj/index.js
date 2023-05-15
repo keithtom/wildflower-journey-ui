@@ -10,8 +10,10 @@ import { parseISO } from "date-fns";
 
 import ssjApi from "@api/ssj/ssj";
 import { useUserContext } from "@lib/useUserContext";
-import Hero from "@components/Hero";
-import UserContactModal from "@components/UserContactModal";
+import Milestone from "../../components/Milestone";
+import Task from "../../components/Task";
+import Hero from "../../components/Hero";
+import UserCard from "../../components/UserCard";
 
 import {
   Box,
@@ -83,14 +85,18 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const partners =
     team?.team.data.length > 1
       ? team.team.data.filter((t) => {
-        return t.id !== currentUser?.id && t.attributes.roleList[0] === "partner";
-      })
+          return (
+            t.id !== currentUser?.id && t.attributes.roleList[0] === "partner"
+          );
+        })
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
+
+  console.log({ currentUser });
 
   return (
     <>
@@ -122,6 +128,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Card>
             </Grid>
+            B
           </Grid>
         ) : (
           <Stack spacing={16}>
@@ -134,13 +141,10 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
             >
               <Grid item>
                 <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar
-                    src={currentUser?.attributes.imageUrl}
-                  />
+                  <Avatar src={currentUser?.attributes.imageUrl} />
                   <Stack>
                     <Typography variant="h4" bold>
-                      Welcome, {currentUser?.attributes?.firstName}
-                      !
+                      Welcome, {currentUser?.attributes?.firstName}!
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
                       School Startup Journey
@@ -149,52 +153,61 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Grid>
               <Grid item>
-                <Stack direction="row" spacing={6} alignItems="center">
-                  <Stack>
+                <Grid container spacing={6}>
+                  <Grid item>
                     <Typography variant="bodyMini" bold lightened>
                       PHASE
                     </Typography>
                     <Typography variant="bodySmall">Visioning</Typography>
-                  </Stack>
-                  <Stack>
+                  </Grid>
+                  <Grid item>
                     <Typography variant="bodyMini" bold lightened>
                       LOCATION
                     </Typography>
-                    <Typography variant="bodySmall">Boston, MA</Typography>
-                  </Stack>
-                  {openDate ? (
-                    <Card
-                      size="small"
-                      hoverable
-                      onClick={() => setAddOpenDateModalOpen(true)}
-                    >
-                      <Stack direction="row" spacing={6}>
-                        <Stack>
-                          <Typography variant="bodyMini" bold lightened>
-                            OPEN DATE
-                          </Typography>
-                          <Typography variant="bodySmall">
-                            {moment(openDate).format("MMMM D, YYYY")}
+                    <Typography variant="bodySmall">
+                      {currentUser.personAddress.city},{" "}
+                      {currentUser.personAddress.state}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    {openDate ? (
+                      <Card
+                        size="small"
+                        hoverable
+                        onClick={() => setAddOpenDateModalOpen(true)}
+                      >
+                        <Stack direction="row" spacing={6}>
+                          <Stack>
+                            <Typography variant="bodyMini" bold lightened>
+                              OPEN DATE
+                            </Typography>
+                            <Typography variant="bodySmall">
+                              {moment(openDate).format("MMMM D, YYYY")}
+                            </Typography>
+                          </Stack>
+                          <Icon
+                            type="pencil"
+                            size="small"
+                            variant="lightened"
+                          />
+                        </Stack>
+                      </Card>
+                    ) : (
+                      <Button
+                        variant="light"
+                        small
+                        onClick={() => setAddOpenDateModalOpen(true)}
+                      >
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Icon type="plus" />
+                          <Typography variant="bodyRegular">
+                            Add your anticipated open date
                           </Typography>
                         </Stack>
-                        <Icon type="pencil" size="small" variant="lightened" />
-                      </Stack>
-                    </Card>
-                  ) : (
-                    <Button
-                      variant="light"
-                      small
-                      onClick={() => setAddOpenDateModalOpen(true)}
-                    >
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Icon type="plus" />
-                        <Typography variant="bodyRegular">
-                          Add your anticipated open date
-                        </Typography>
-                      </Stack>
-                    </Button>
-                  )}
-                </Stack>
+                      </Button>
+                    )}
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
 
@@ -291,7 +304,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
               </Card>
             )}
 
-            <Stack spacing={3}>
+            <Stack spacing={3} sx={{ width: "100%" }}>
               <Grid
                 container
                 justifyContent="space-between"
@@ -672,7 +685,9 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
                   }
                   style={{
                     width: "100%",
-                    objectFit: "contain",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center",
                   }}
                 />
               </Box>
@@ -1027,50 +1042,7 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     </Modal>
   );
 };
-const UserCard = ({
-  firstName,
-  lastName,
-  email,
-  phone,
-  role,
-  profileImage,
-}) => {
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-  return (
-    <>
-      <Card
-        variant="lightened"
-        size="small"
-        hoverable
-        onClick={() => setContactModalOpen(true)}
-      >
-        <Grid container spacing={3} alignItems="center">
-          <Grid item>
-            <Avatar src={profileImage} />
-          </Grid>
-          <Grid item>
-            <Stack>
-              <Typography variant="bodyRegular" bold>
-                {firstName} {lastName}
-              </Typography>
-              <Typography variant="bodySmall" lightened>
-                {role}
-              </Typography>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Card>
-      <UserContactModal
-        firstName={firstName}
-        lastName={lastName}
-        email={email}
-        phone={phone}
-        open={contactModalOpen}
-        toggle={() => setContactModalOpen(!contactModalOpen)}
-      />
-    </>
-  );
-};
+
 const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
   const IconWrapper = styled(Box)`
     width: ${({ theme }) => theme.util.buffer * 12}px;
@@ -1276,7 +1248,7 @@ export async function getServerSideProps({ params, req, res }) {
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   const responseProgress = await axios.get(apiRouteProgress, config);
   const dataProgress = await responseProgress.data;
-  
+
   // want to know how many assigned tasks there are.
   var numAssignedSteps = dataProgress.assigned_steps;
 

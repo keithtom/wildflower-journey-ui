@@ -87,30 +87,31 @@ const InfoDrawer = ({
               {title}
             </Typography>
             <Stack direction="row" spacing={4}>
-              {taskId && (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    ASSIGNEE
-                  </Typography>
-                  <Stack spacing={2} direction="row">
-                    { assignees.map((assignee) => (
-                      <AvatarWrapper                       
-                        badgeContent={
-                          assignee.attributes.completedAt && (
-                            <Icon
-                              type="checkCircle"
-                              size="small"
-                              variant="primary"
-                              filled
-                            />
-                          )
-                        }
-                        src={assignee?.attributes?.imageUrl}
-                      />
-                    ))}
+              {taskId &&
+                (assignees.length ? (
+                  <Stack spacing={2}>
+                    <Typography variant="bodyMini" lightened bold>
+                      ASSIGNEE
+                    </Typography>
+                    <Stack spacing={2} direction="row">
+                      {assignees.map((assignee) => (
+                        <AvatarWrapper
+                          badgeContent={
+                            assignee.attributes.completedAt && (
+                              <Icon
+                                type="checkCircle"
+                                size="small"
+                                variant="primary"
+                                filled
+                              />
+                            )
+                          }
+                          src={assignee?.attributes?.imageUrl}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
-                </Stack>
-              )}
+                ) : null)}
               {status && (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
