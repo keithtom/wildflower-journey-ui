@@ -165,8 +165,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                       LOCATION
                     </Typography>
                     <Typography variant="bodySmall">
-                      {currentUser.personAddress.city},{" "}
-                      {currentUser.personAddress.state}
+                      {currentUser.personAddress?.city},{" "}
+                      {currentUser.personAddress?.state}
                     </Typography>
                   </Grid>
                   <Grid item>
