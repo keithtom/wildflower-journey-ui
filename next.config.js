@@ -4,6 +4,6 @@ module.exports = {
     API_URL: process.env.API_URL,
     ENV: process.env.VERCEL_ENV,
     APP_ENV: process.env.APP_ENV,
-    HIGHLIGHT_SECRET: process.env.HIGHLIGHT_SECRET,
+    NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID: process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID,
   },
 };
