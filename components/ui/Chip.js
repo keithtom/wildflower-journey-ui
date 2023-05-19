@@ -50,10 +50,17 @@ const CustomChip = styled(MaterialChip)`
     `}
 `;
 
-const Chip = ({ ...props }) => {
-  console.log("Chip props", props)
-  
-  return <CustomChip {...props} />;
+const Chip = ({ variant, size, label, ...props }) => {
+  // console.log("Chip props", props);
+
+  return (
+    <CustomChip
+      variant={variant ? variant : "lightened"}
+      size={size}
+      label={label}
+      {...props}
+    />
+  );
 };
 
 export default Chip;
