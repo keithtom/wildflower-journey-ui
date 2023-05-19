@@ -233,7 +233,7 @@ const Task = ({
                   <Chip
                     label={isDecided ? "Decided" : "Decision"}
                     size="small"
-                    variant={isDecided && "primary"}
+                    variant={isDecided && "primary" || "lightened"}
                   />
                   <Typography
                     variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
