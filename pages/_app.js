@@ -14,6 +14,8 @@ import { ErrorBoundary } from '@highlight-run/react';
 if (process.env.NODE_ENV === 'production') {
   console.log("enabling highlight.io", process.env)
   H.init(process.env.HIGHLIGHT_SECRET, {
+    environment: process.env.APP_ENV,
+    enableStrictPrivacy: false,
     tracingOrigins: true,
     networkRecording: {
       enabled: true,
