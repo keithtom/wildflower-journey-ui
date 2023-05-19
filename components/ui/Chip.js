@@ -51,6 +51,8 @@ const CustomChip = styled(MaterialChip)`
 `;
 
 const Chip = ({ ...props }) => {
+  console.log("Chip props", props)
+  
   return <CustomChip {...props} />;
 };
 
