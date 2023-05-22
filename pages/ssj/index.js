@@ -160,15 +160,18 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                     </Typography>
                     <Typography variant="bodySmall">Visioning</Typography>
                   </Grid>
-                  <Grid item>
-                    <Typography variant="bodyMini" bold lightened>
-                      LOCATION
-                    </Typography>
-                    <Typography variant="bodySmall">
-                      {currentUser?.personAddress?.city},{" "}
-                      {currentUser?.personAddress?.state}
-                    </Typography>
-                  </Grid>
+                  {currentUser?.personAddress?.city &&
+                  currentUser?.personAddress?.state ? (
+                    <Grid item>
+                      <Typography variant="bodyMini" bold lightened>
+                        LOCATION
+                      </Typography>
+                      <Typography variant="bodySmall">
+                        {currentUser?.personAddress?.city},{" "}
+                        {currentUser?.personAddress?.state}
+                      </Typography>
+                    </Grid>
+                  ) : null}
                   <Grid item>
                     {openDate ? (
                       <Card
