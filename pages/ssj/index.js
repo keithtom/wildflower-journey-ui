@@ -85,9 +85,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const partners =
     team?.team.data.length > 1
       ? team.team.data.filter((t) => {
-          return (
-            t.id !== currentUser?.id
-          );
+          return t.id !== currentUser?.id;
         })
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
@@ -325,9 +323,9 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Grid>
               </Grid>
               <Grid container spacing={3} alignItems="stretch">
-                <Grid item xs={12} sm={4}>
-                  {partners && partners.length ? (
-                    partners.map((p) => (
+                {partners && partners.length ? (
+                  partners.map((p) => (
+                    <Grid item xs={12} sm={4}>
                       <UserCard
                         key={p.id}
                         firstName={p.attributes.firstName}
@@ -336,14 +334,16 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                         phone={p.attributes.phone}
                         role="Partner"
                       />
-                    ))
-                  ) : (
+                    </Grid>
+                  ))
+                ) : (
+                  <Grid item xs={12} sm={4}>
                     <AddPartnerCard
                       submittedPartnerRequest={submittedPartnerRequest}
                       onClick={() => setAddPartnerModalOpen(true)}
                     />
-                  )}
-                </Grid>
+                  </Grid>
+                )}
                 {opsGuide ? (
                   <Grid item xs={12} sm={4}>
                     <UserCard
