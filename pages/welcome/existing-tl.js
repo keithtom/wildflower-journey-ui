@@ -53,7 +53,7 @@ const ExistingTL = ({}) => {
                     <Icon type="palette" variant="light" />
                   </Stack>
                   <Typography variant="h4" bold light center>
-                    It's time to join the Wildflower Platform!
+                    It's time to join My Wildflower!
                   </Typography>
                 </Stack>
               </StyledHeroText>

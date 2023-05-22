@@ -874,10 +874,9 @@ const FirstTimeUserModal = ({ toggle, open, firstName }) => {
               <Typography variant="bodyRegular">
                 {firstName}, welcome to the home base for your journey into
                 becoming a montessori educator! Again, we're so excited you're
-                here. This is Wildflower Platform, a tool we created to
-                centralize all of the support and resources we have to offer,
-                and to make it easier for you to make progress toward your
-                goals.
+                here. This is My Wildflower, a tool we created to centralize all
+                of the support and resources we have to offer, and to make it
+                easier for you to make progress toward your goals.
               </Typography>
               <Typography variant="bodyRegular">
                 Poke around! I'd start by completing the actions on your
