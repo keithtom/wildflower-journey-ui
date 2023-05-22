@@ -59,6 +59,7 @@
     "@storybook/react": "^6.4.9",
     "babel-loader": "^8.2.3",
     "babel-plugin-styled-components": "^2.0.2",
+    "cypress": "^12.12.0",
     "eslint": "7",
     "eslint-config-next": "12.0.3"
   }
