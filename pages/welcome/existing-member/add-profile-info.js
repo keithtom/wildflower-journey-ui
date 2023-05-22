@@ -18,7 +18,7 @@ import { FileChecksum } from "@lib/rails-filechecksum";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { useUserContext } from "@lib/useUserContext";
-import peopleApi from "../../api/people";
+import peopleApi from "../../../api/people";
 
 const token = getCookie("auth");
 
@@ -96,7 +96,7 @@ const AddProfileInfo = ({}) => {
           const personAttributes = response.data.attributes;
           currentUser.attributes.imageUrl = personAttributes.imageUrl;
           setCurrentUser(currentUser);
-          router.push("/ssj");
+          router.push("/network");
         }
       });
   };
@@ -279,7 +279,7 @@ const AddProfileInfo = ({}) => {
               <Divider />
               <Grid container spacing={3} justifyContent="space-between">
                 <Grid item xs={6}>
-                  <Link href="/welcome/confirm-demographic-info">
+                  <Link href="/welcome/existing-member/confirm-demographic-info">
                     <Button full variant="secondary">
                       <Typography variant="bodyRegular">Back</Typography>
                     </Button>
