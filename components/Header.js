@@ -59,14 +59,14 @@ const Header = ({ toggleNavOpen }) => {
               </IconButton>
               <img src={logo} style={{ height: "24px" }} />
               <Typography variant="bodyRegular" bold noWrap>
-                Wildflower Platform
+                My Wildflower
               </Typography>
             </Stack>
           ) : (
             <Stack direction="row" alignItems="center" spacing={3}>
               <img src={logo} style={{ height: "32px" }} />
               <Typography variant="bodyLarge" bold noWrap>
-                Wildflower Platform
+                My Wildflower
               </Typography>
             </Stack>
           )}
