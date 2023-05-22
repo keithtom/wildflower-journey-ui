@@ -325,20 +325,24 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 <Grid item xs={12} sm={4}>
                   {partners && partners.length ? (
                     partners.map((p) => (
-                      <UserCard
-                        key={p.id}
-                        firstName={p.attributes.firstName}
-                        lastName={p.attributes.lastName}
-                        email={p.attributes.email}
-                        phone={p.attributes.phone}
-                        role="Partner"
-                      />
+                      <Grid item xs={12} sm={4}>
+                        <UserCard
+                          key={p.id}
+                          firstName={p.attributes.firstName}
+                          lastName={p.attributes.lastName}
+                          email={p.attributes.email}
+                          phone={p.attributes.phone}
+                          role="Partner"
+                        />
+                      </Grid>
                     ))
                   ) : (
-                    <AddPartnerCard
-                      submittedPartnerRequest={submittedPartnerRequest}
-                      onClick={() => setAddPartnerModalOpen(true)}
-                    />
+                    <Grid item xs={12} sm={4}>
+                      <AddPartnerCard
+                        submittedPartnerRequest={submittedPartnerRequest}
+                        onClick={() => setAddPartnerModalOpen(true)}
+                      />
+                    </Grid>
                   )}
                 </Grid>
                 {opsGuide ? (
