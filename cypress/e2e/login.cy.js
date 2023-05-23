@@ -1,6 +1,6 @@
 const { EqualOff } = require("styled-icons/fluentui-system-filled")
 
-describe.skip('login spec', () => {
+describe('login spec', () => {
   beforeEach(() => {
     cy.visit("/login");
   });

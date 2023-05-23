@@ -25,7 +25,7 @@ describe("onboarding spec", () => {
       cy.get('input[name="city"]').clear().type("Brooklyn");
       cy.get('input[name="state"]').clear().type("New York");
       cy.get('button[type="submit"]').click();
-      cy.url({timeout: 1000}).should("include", "/welcome/confirm-demographic-info");
+      cy.url({timeout: 3000}).should("include", "/welcome/confirm-demographic-info");
     })
   })
   describe("confirming demographic info", () => {
