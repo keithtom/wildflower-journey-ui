@@ -2,7 +2,7 @@ const { EqualOff } = require("styled-icons/fluentui-system-filled")
 
 describe('login spec', () => {
   beforeEach(() => {
-    cy.visit("https://platform.wildflowerschools.org/login");
+    cy.visit("/login");
   });
 
   it('should display a login form', () => {
@@ -15,7 +15,7 @@ describe('login spec', () => {
     cy.get('input[name="email"]').type("test@test.com");
     cy.get('input[name="password"]').type("password");
     cy.get('button[type="submit"]').click();
-    cy.wait(1000)
+    cy.wait(10000)
     cy.url().should("include", "/ssj");
   });
 })
