@@ -23,3 +23,19 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('login', () => {
+  cy.request({
+    method: "POST",
+    url: `${Cypress.env("apiUrl")}/login`,
+    body: {
+      user: {
+        email: 'test@test.com',
+        password: 'password',
+      }
+    }
+  })
+  .then((resp) => {
+    window.cookieStore.set('auth', resp.headers.authorization);
+  });
+})
