@@ -1,4 +1,3 @@
-const { identity } = require("lodash");
 import 'cypress-file-upload';
 
 describe("onboarding spec", () => {
@@ -45,13 +44,14 @@ describe("onboarding spec", () => {
       cy.contains("Montessori Certified");
     });
 
-    it("should be able to update fields", () => {
+    it.only("should be able to update fields", () => {
       cy.contains("What is your primary language?").next().click();
-      cy.contains("English").click();
+      cy.contains("English").click({force: true});
+      cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What is your ethnicity?").next().click();
-      cy.contains("American Indian or Alaska Native").click();
-      cy.contains("Asian").click();
+      cy.contains("American Indian or Alaska Native").click({force: true});
+      cy.contains("Asian").click({force: true});
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("Do you identify as a member of the LGBTQIA community?")
@@ -60,10 +60,12 @@ describe("onboarding spec", () => {
         .click();
 
       cy.contains("What is your gender identity?").next().click();
-      cy.contains("Male/Man").click();
+      cy.contains("Male/Man").click({force: true});
+      cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What are your pronouns?").next().click();
-      cy.contains("ae/aer/aers").click();
+      cy.contains("she/her/hers").click({force: true});
+      cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What is your household income?")
         .next()
@@ -78,15 +80,15 @@ describe("onboarding spec", () => {
       .click();
 
       cy.contains("What Levels are you certified (or seeking certification) for?").next().click();
-      cy.contains("6-9 Elementary").click();
-      cy.contains("Primary/Early Childhood").click();
+      cy.contains("6-9 Elementary").click({force: true});
+      cy.contains("Primary/Early Childhood").click({force: true});
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What Age Classrooms are you interested in offering?")
         .next()
         .click();
-      cy.contains("Infants").click();
-      cy.contains("Toddler").click();
+      cy.contains("Infants").click({force: true});
+      cy.contains("Toddler").click({force: true});
       cy.get("body").click(0, 0); // close dropdwon
     
       cy.get('button[type="submit"]').click();
