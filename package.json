@@ -26,6 +26,7 @@
     "array-move": "^4.0.0",
     "axios": "^0.26.1",
     "cookies-next": "^2.1.1",
+    "cypress-file-upload": "^5.0.8",
     "date-fns": "^2.28.0",
     "filepond": "^4.30.4",
     "filepond-plugin-file-validate-size": "^2.2.8",

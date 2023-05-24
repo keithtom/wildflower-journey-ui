@@ -37,5 +37,8 @@ Cypress.Commands.add('login', () => {
   })
   .then((resp) => {
     window.cookieStore.set('auth', resp.headers.authorization);
+    console.log(resp.body.data);
+    window.cookieStore.set('workflowId', resp.body.data.attributes.ssj.workflowId);
+    window.cookieStore.set('phase', resp.body.data.attributes.ssj.currentPhase);
   });
 })

@@ -1,4 +1,5 @@
 const { identity } = require("lodash");
+import 'cypress-file-upload';
 
 describe("onboarding spec", () => {
   beforeEach(() => {
@@ -28,6 +29,7 @@ describe("onboarding spec", () => {
       cy.url({timeout: 10000}).should("include", "/welcome/confirm-demographic-info");
     })
   })
+
   describe("confirming demographic info", () => {
     beforeEach(() => {
       cy.visit("/welcome/confirm-demographic-info")
@@ -43,8 +45,74 @@ describe("onboarding spec", () => {
       cy.contains("Montessori Certified");
     });
 
-    // it("should be able to update fields", () => {
-      
-    // });
+    it("should be able to update fields", () => {
+      cy.contains("What is your primary language?").next().click();
+      cy.contains("English").click();
+
+      cy.contains("What is your ethnicity?").next().click();
+      cy.contains("American Indian or Alaska Native").click();
+      cy.contains("Asian").click();
+      cy.get("body").click(0, 0); // close dropdwon
+
+      cy.contains("Do you identify as a member of the LGBTQIA community?")
+        .get("label")
+        .first()
+        .click();
+
+      cy.contains("What is your gender identity?").next().click();
+      cy.contains("Male/Man").click();
+
+      cy.contains("What are your pronouns?").next().click();
+      cy.contains("ae/aer/aers").click();
+
+      cy.contains("What is your household income?")
+        .next()
+        .children()
+        .first()
+        .click();
+
+      cy.contains("Are you Montessori Certified?")
+      .next()
+      .children()
+      .first()
+      .click();
+
+      cy.contains("What Levels are you certified (or seeking certification) for?").next().click();
+      cy.contains("6-9 Elementary").click();
+      cy.contains("Primary/Early Childhood").click();
+      cy.get("body").click(0, 0); // close dropdwon
+
+      cy.contains("What Age Classrooms are you interested in offering?")
+        .next()
+        .click();
+      cy.contains("Infants").click();
+      cy.contains("Toddler").click();
+      cy.get("body").click(0, 0); // close dropdwon
+    
+      cy.get('button[type="submit"]').click();
+      cy.url({ timeout: 10000 }).should(
+        "include",
+        "/welcome/add-profile-info"
+      );
+    });
+  });
+
+  describe("add-profile-info", () => {
+    beforeEach(() => {
+      cy.visit("/welcome/add-profile-info")
+    })
+
+    it("uploads a file", () => {
+      cy.fixture("test_profile_picture.jpg").then((filecontent) => {
+        cy.get('input[type="file"]').attachFile({
+          fileContent: filecontent.toString(),
+          fileName: "test_profile_picture.jpg",
+          mimeType: "image/jpg",
+        });
+      });
+      cy.wait(5000);
+      cy.contains('Confirm').click();
+      cy.url({timeout: 10000}).should("include", "/ssj");
+    });
   });
 });
