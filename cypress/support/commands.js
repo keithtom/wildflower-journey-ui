@@ -42,3 +42,10 @@ Cypress.Commands.add('login', () => {
     window.cookieStore.set('phase', resp.body.data.attributes.ssj.currentPhase);
   });
 })
+
+Cypress.Commands.add('resetFixtures', () => {
+  cy.request({
+    method: "PUT",
+    url: `${Cypress.env("apiUrl")}/reset_fixtures`,
+  });
+})
