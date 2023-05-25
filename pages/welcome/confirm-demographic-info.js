@@ -163,9 +163,21 @@ const ConfirmDemographicInfo = ({}) => {
     { value: "High School", label: "High School" },
   ];
   const incomeOptions = [
-    { value: "High Income", label: "High Income" },
-    { value: "Medium Income", label: "Medium Income" },
-    { value: "Low Income", label: "Low Income" },
+    {
+      value: "High Income",
+      label:
+        "High Income (ex. I did not, or would not, qualify for financial aid in college.)",
+    },
+    {
+      value: "Medium Income",
+      label:
+        "Middle Income (ex. I did, or would, qualify for financial aid in college.)",
+    },
+    {
+      value: "Low Income",
+      label:
+        "Low Income (ex. My family was eligible for food subsidies at school.)",
+    },
   ];
   const languageOptions = [
     { value: "English", label: "English" },
@@ -537,7 +549,12 @@ const ConfirmDemographicInfo = ({}) => {
                 ) : null}
                 <Stack spacing={1}>
                   <Typography variant="bodyRegular">
-                    What is your household income?
+                    How would you describe the economic situation in your
+                    household while you were growing up?
+                  </Typography>
+                  <Typography variant="bodyRegular" lightened>
+                    As a reference point, today a family of four with a family
+                    income of $47,638/year is the limit to receive subsidies.
                   </Typography>
                   <Controller
                     name="householdIncome"
@@ -557,10 +574,10 @@ const ConfirmDemographicInfo = ({}) => {
                       </RadioGroup>
                     )}
                   />
-                  <FormHelperText error={errors.lgbtqia}>
+                  <FormHelperText error={errors.householdIncome}>
                     {errors &&
-                      errors.lgbtqia &&
-                      errors.lgbtqia.type === "required" &&
+                      errors.householdIncome &&
+                      errors.householdIncome.type === "required" &&
                       "This field is required"}
                   </FormHelperText>
                 </Stack>

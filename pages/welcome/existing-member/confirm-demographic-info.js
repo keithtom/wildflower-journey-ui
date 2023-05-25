@@ -583,10 +583,10 @@ const ConfirmDemographicInfo = ({}) => {
                       </RadioGroup>
                     )}
                   />
-                  <FormHelperText error={errors.lgbtqia}>
+                  <FormHelperText error={errors.householdIncome}>
                     {errors &&
-                      errors.lgbtqia &&
-                      errors.lgbtqia.type === "required" &&
+                      errors.householdIncome &&
+                      errors.householdIncome.type === "required" &&
                       "This field is required"}
                   </FormHelperText>
                 </Stack>
