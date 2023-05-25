@@ -37,6 +37,7 @@ const Person = ({}) => {
             school={FakePerson.attributes.school.name}
             schoolLogo={FakePerson.attributes.school.logoUrl}
             location={FakePerson.attributes.location}
+            schoolLink={`/network/schools/${FakePerson.attributes.school.id}`}
           />
 
           <Grid container spacing={8}>

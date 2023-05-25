@@ -11,6 +11,7 @@ import {
   Stack,
   IconButton,
   Icon,
+  Link,
 } from "@ui";
 
 const ProfileHero = ({
@@ -21,6 +22,7 @@ const ProfileHero = ({
   school,
   schoolLogo,
   location,
+  schoolLink,
 }) => {
   return (
     <Card variant="lightened" size="large">
@@ -44,17 +46,19 @@ const ProfileHero = ({
                 </Stack>
               </Grid>
               <Grid item>
-                <Stack direction="row" spacing={6}>
-                  <Stack alignItems="flex-end">
-                    <Typography variant="bodyLarge" lightened>
-                      {school}
-                    </Typography>
-                    <Typography variant="bodyRegular" lightened>
-                      {location}
-                    </Typography>
+                <Link href={schoolLink}>
+                  <Stack direction="row" spacing={6}>
+                    <Stack alignItems="flex-end">
+                      <Typography variant="bodyLarge" lightened>
+                        {school}
+                      </Typography>
+                      <Typography variant="bodyRegular" lightened>
+                        {location}
+                      </Typography>
+                    </Stack>
+                    <Avatar src={schoolLogo} />
                   </Stack>
-                  <Avatar src={schoolLogo} />
-                </Stack>
+                </Link>
               </Grid>
             </Grid>
             <Grid container spacing={6}>
