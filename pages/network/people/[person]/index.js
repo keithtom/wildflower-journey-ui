@@ -1,5 +1,7 @@
 import Head from "next/head";
 import { useState } from "react";
+
+import { useUserContext } from "@lib/useUserContext";
 import {
   Box,
   PageContainer,
@@ -25,9 +27,12 @@ import AttributesCard from "@components/AttributesCard";
 import SchoolCard from "@components/SchoolCard";
 
 const Person = ({}) => {
+  const { currentUser } = useUserContext();
+  const isMyProfile = currentUser?.id === FakePerson.id;
+  // console.log({ currentUser });
   return (
     <>
-      <PageContainer>
+      <PageContainer isLoading={!currentUser}>
         <Stack spacing={6}>
           <ProfileHero
             profileImage={FakePerson.attributes.imageSrc}
@@ -42,7 +47,22 @@ const Person = ({}) => {
 
           <Grid container spacing={8}>
             <Grid item xs={12} sm={3}>
-              <AttributesCard attributes={FakePersonAttributes} />
+              <Stack spacing={6}>
+                <AttributesCard attributes={FakePersonAttributes} />
+                {isMyProfile ? (
+                  // TODO: Should direct to existing-members flow
+                  <Link href="/welcome/confirm-your-details">
+                    <Button variant="lightened" full>
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Icon type="pencil" size="small" />
+                        <Typography variant="bodyRegular" bold>
+                          Edit profile
+                        </Typography>
+                      </Stack>
+                    </Button>
+                  </Link>
+                ) : null}
+              </Stack>
             </Grid>
             <Grid item xs={12} sm={9}>
               <Stack spacing={12}>
@@ -103,6 +123,7 @@ const Person = ({}) => {
 export default Person;
 
 const FakePerson = {
+  id: "6273-fe51",
   attributes: {
     firstName: "Taylor",
     lastName: "Zanke",
