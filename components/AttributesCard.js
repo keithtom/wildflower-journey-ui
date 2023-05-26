@@ -6,7 +6,7 @@ const AttributesCard = ({ attributes }) => {
       <Stack spacing={4}>
         {attributes.map((a, i) => (
           <Stack spacing={2} key={i}>
-            <Typography variant="bodySmall" lightened>
+            <Typography variant="bodySmall" lightened uppercase bold>
               {a.name}
             </Typography>
             <Grid container spacing={1}>

@@ -50,17 +50,34 @@ const Person = ({}) => {
               <Stack spacing={6}>
                 <AttributesCard attributes={FakePersonAttributes} />
                 {isMyProfile ? (
-                  // TODO: Should direct to existing-members flow
-                  <Link href="/welcome/confirm-your-details">
-                    <Button variant="lightened" full>
-                      <Stack direction="row" spacing={3} alignItems="center">
-                        <Icon type="pencil" size="small" />
-                        <Typography variant="bodyRegular" bold>
-                          Edit profile
+                  <Card>
+                    <Stack spacing={4}>
+                      <Stack spacing={2}>
+                        <Typography variant="bodyLarge" bold>
+                          Editing your profile is under construction
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          In the mean time, if you wish to update any of your
+                          personal or demographic information we've made it
+                          possible to use the onboarding flow.
                         </Typography>
                       </Stack>
-                    </Button>
-                  </Link>
+                      <Link href="/welcome/existing-member/confirm-your-details">
+                        <Button variant="lightened" full>
+                          <Stack
+                            direction="row"
+                            spacing={3}
+                            alignItems="center"
+                          >
+                            <Icon type="pencil" size="small" />
+                            <Typography variant="bodyRegular" bold>
+                              Edit profile
+                            </Typography>
+                          </Stack>
+                        </Button>
+                      </Link>
+                    </Stack>
+                  </Card>
                 ) : null}
               </Stack>
             </Grid>
