@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import getAuthHeader from "../../../lib/getAuthHeader";
-import axios from "axios";
+import workflowApi from "@api/workflow/processes";
 import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 
@@ -422,11 +422,10 @@ export async function getServerSideProps({ params, req, res }) {
   console.log("inside getserversideprops of milestone page");
   const { phase } = params;
   const workflowId = getCookie("workflowId", { req, res });
-  const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
   const config = getAuthHeader({ req, res });
 
-  const response = await axios.get(apiRoute, config);
-  const data = await response.data;
+  const response = await workflowApi.index(workflowId, phase, config);
+  const data = response.data;
 
   const milestonesInProgress = [];
   const milestonesToDo = [];
