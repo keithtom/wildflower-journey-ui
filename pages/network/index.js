@@ -27,6 +27,7 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
     setCategory(e.target.value);
   };
 
+  // console.log({ results });
   return (
     <>
       <PageContainer>
@@ -91,35 +92,61 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
         </Grid>
 
         <Grid container mt={12}>
-          <Masonry columns={3} spacing={6}>
-            {category === "people"
-              ? results.map((f) => (
-                  <PersonResultItem
-                    personLink={`/network/people/${f.id}`}
-                    profileImg={f.attributes.imageUrl}
-                    firstName={f.attributes.firstName}
-                    lastName={f.attributes.lastName}
-                    role={f.attributes.roleList}
-                    location={f.attributes.location}
-                    trainingLevel={f.attributes.trainingLevel}
-                    schoolLogo={f.attributes.school?.logoUrl}
-                    schoolLink={`/network/schools/${f.attributes.school?.id}`}
-                    key={f.id}
-                  />
-                ))
-              : FakeSchools.map((f) => (
-                  <SchoolResultItem
-                    schoolLink={`/network/schools/${f.attributes.id}`}
-                    heroImg={f.attributes.heroUrl}
-                    logoImg={f.attributes.logoUrl}
-                    name={f.attributes.name}
-                    location={f.attributes.location}
-                    program={f.attributes.program}
-                    leaders={f.attributes.leaders}
-                    key={f.id}
-                  />
-                ))}
-          </Masonry>
+          {results.length ? (
+            <Masonry columns={3} spacing={6}>
+              {category === "people"
+                ? results.map((f) => (
+                    <PersonResultItem
+                      personLink={`/network/people/${f.id}`}
+                      profileImg={f.attributes.imageUrl}
+                      firstName={f.attributes.firstName}
+                      lastName={f.attributes.lastName}
+                      role={f.attributes.roleList}
+                      location={f.attributes.location}
+                      trainingLevel={f.attributes.trainingLevel}
+                      schoolLogo={f.attributes.school?.logoUrl}
+                      schoolLink={`/network/schools/${f.attributes.school?.id}`}
+                      key={f.id}
+                    />
+                  ))
+                : FakeSchools.map((f) => (
+                    <SchoolResultItem
+                      schoolLink={`/network/schools/${f.attributes.id}`}
+                      heroImg={f.attributes.heroUrl}
+                      logoImg={f.attributes.logoUrl}
+                      name={f.attributes.name}
+                      location={f.attributes.location}
+                      program={f.attributes.program}
+                      leaders={f.attributes.leaders}
+                      key={f.id}
+                    />
+                  ))}
+            </Masonry>
+          ) : (
+            <Grid item xs={12}>
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="center"
+                mt={24}
+              >
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  <Card size="large">
+                    <Stack spacing={3}>
+                      <Icon type="search" size="large" variant="primary" />
+                      <Typography variant="bodyLarge" bold>
+                        You haven't searched for anything yet!
+                      </Typography>
+                      <Typography variant="bodyLarge" lightened>
+                        Search for people or for schools above to see results
+                        from the My Wildflower directory!
+                      </Typography>
+                    </Stack>
+                  </Card>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
         </Grid>
       </PageContainer>
     </>

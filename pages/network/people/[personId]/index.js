@@ -45,8 +45,10 @@ const Person = ({}) => {
   const person = data.data;
 
   const { currentUser } = useUserContext();
-  const isMyProfile = currentUser?.id === FakePerson.id;
-  // console.log({ currentUser });
+  const isMyProfile = currentUser?.id === personId;
+
+  // console.log({ person });
+
   return (
     <>
       <PageContainer isLoading={!currentUser}>
@@ -59,7 +61,7 @@ const Person = ({}) => {
             school={person.attributes.school?.name}
             schoolLogo={person.attributes.school?.logoUrl}
             location={person.attributes.location}
-            schoolLink={`/network/schools/${FakePerson.attributes.school.id}`}
+            // schoolLink={`/network/schools/${FakePerson.attributes.school.id}`}
           />
 
           <Grid container spacing={8}>
