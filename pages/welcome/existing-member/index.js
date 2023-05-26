@@ -24,7 +24,7 @@ const StyledInviteHero = styled(Box)`
 `;
 const StyledHeroText = styled(Box)`
   position: absolute;
-  padding: ${({ theme }) => theme.util.buffer * 24}px;
+  padding: ${({ theme }) => theme.util.buffer * 8}px;
 `;
 
 const ExistingTL = ({}) => {
@@ -66,10 +66,10 @@ const ExistingTL = ({}) => {
                 </Typography>
                 <Typography variant="bodyRegular">
                   We've been hard at work building tools for you. Get ready for
-                  more support and connection you on your teaching journey!
+                  more support and connection on your teaching journey!
                 </Typography>
 
-                <Link href="/welcome/create-password">
+                <Link href="/welcome/existing-member/create-password">
                   <Button full>
                     <Typography variant="bodyRegular" light>
                       Get started
