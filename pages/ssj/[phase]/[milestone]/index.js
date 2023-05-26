@@ -155,7 +155,7 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
                   />
                 </Stack>
               ) : null}
-              {milestoneAttributes.categories ? (
+              {milestoneAttributes.categories.length && false ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     CATEGORY

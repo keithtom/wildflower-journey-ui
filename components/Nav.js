@@ -59,7 +59,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
           <Navigation />
           <Grid container p={4}>
             <Grid item xs={12}>
-              <Link href="mailto:support@wildflowerschools.org?subject=Wildflower Platform Feedback">
+              <Link href="mailto:support@wildflowerschools.org?subject=My Wildflower Feedback">
                 <Card variant="lightened" size="small" hoverable>
                   <Stack spacing={1}>
                     <Grid container alignItems="center">

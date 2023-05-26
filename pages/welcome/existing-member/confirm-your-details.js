@@ -3,7 +3,7 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
-import peopleApi from "../../api/people";
+import peopleApi from "../../../api/people";
 
 import {
   Button,
@@ -87,7 +87,7 @@ const ConfirmYourDetails = ({}) => {
           currentUser.attributes.lastName = person.lastName;
           currentUser.attributes.email = person.email;
           setCurrentUser(currentUser);
-          router.push("/welcome/confirm-demographic-info");
+          router.push("/welcome/existing-member/confirm-demographic-info");
         }
       });
   };

@@ -1,6 +1,7 @@
 import { Icon, Chip, Stack, Typography } from "./ui";
 
 const StatusChip = ({ status, withIcon, ...props }) => {
+  console.log("Status chip props", status, withIcon, props)
   return (
     <Chip
       label={

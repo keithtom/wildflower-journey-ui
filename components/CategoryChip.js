@@ -1,8 +1,10 @@
-import { Icon, Chip, Stack } from "./ui";
+import { Icon, Chip, Stack, Typography } from "./ui";
 import { theme } from "../styles/theme";
-import ssj_categories from "@lib/ssj/categories"
+import ssj_categories from "@lib/ssj/categories";
 
 const CategoryChip = ({ category, withIcon, ...props }) => {
+  console.log("Category chip props", category, withIcon, props)
+  
   const categories = {
     [ssj_categories.ALBUMS_ADVICE]: theme.color.highlights.pink,
     [ssj_categories.FINANCE]: theme.color.highlights.brown,
@@ -19,7 +21,9 @@ const CategoryChip = ({ category, withIcon, ...props }) => {
         withIcon ? (
           <Stack spacing={2} direction="row" alignItems="center">
             <Icon type="category" size="small" />
-            <span>{category}</span>
+            <Typography noWrap variant="bodyMini" bold>
+              {category}
+            </Typography>
           </Stack>
         ) : (
           category

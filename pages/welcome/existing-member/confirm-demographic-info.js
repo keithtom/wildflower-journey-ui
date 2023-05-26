@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
-import peopleApi from "../../api/people";
+import peopleApi from "../../../api/people";
 
 import {
   Button,
@@ -72,6 +72,8 @@ const ConfirmDemographicInfo = ({}) => {
       montessoriCertified: "",
       montessoriCertifiedLevels: [],
       classroomAge: [],
+      //TODO: hook up to BE
+      // role: "",
     },
   });
 
@@ -97,6 +99,8 @@ const ConfirmDemographicInfo = ({}) => {
           montessoriCertifiedLevels:
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
+          //TODO: hook up to BE
+          // role: person?.attributes?.role || "",
         });
       });
     }
@@ -120,13 +124,15 @@ const ConfirmDemographicInfo = ({}) => {
           montessori_certified: data.montessoriCertified,
           montessori_certified_level_list: data.montessoriCertifiedLevels,
           classroom_age_list: data.classroomAge,
+          //TODO: hook up to BE
+          // role: data.role,
         },
       })
       .then((response) => {
         if (response.error) {
           console.error(error);
         } else {
-          router.push("/welcome/add-profile-info");
+          router.push("/welcome/existing-member/add-profile-info");
         }
       });
   };
@@ -152,15 +158,6 @@ const ConfirmDemographicInfo = ({}) => {
     { value: "15-18 Secondary", label: "15-18 Secondary" },
     { value: "Administrator", label: "Administrator" },
     { value: "Leadership", label: "Leadership" },
-  ];
-  const ageClassroomsInterestedInOffering = [
-    { value: "Infants", label: "Infants" },
-    { value: "Toddlers", label: "Toddlers" },
-    { value: "Primary", label: "Primary" },
-    { value: "Lower Elementary", label: "Lower Elementary" },
-    { value: "Upper Elementary", label: "Upper Elementary" },
-    { value: "Adolescent", label: "Adolescent" },
-    { value: "High School", label: "High School" },
   ];
   const incomeOptions = [
     {
@@ -281,6 +278,18 @@ const ConfirmDemographicInfo = ({}) => {
     {
       value: "A not-listed or more specific ethnicity",
       label: "A not-listed or more specific ethnicity",
+    },
+  ];
+  const roleOptions = [
+    {
+      value: "Teacher Leader",
+      label: "Teacher Leader",
+    },
+    { value: "Emerging Teacher Leader", label: "Emerging Teacher Leader" },
+    { value: "Foundation Partner", label: "Foundation Partner" },
+    {
+      value: "Charter Staff",
+      label: "Charter Staff",
     },
   ];
 
@@ -637,30 +646,35 @@ const ConfirmDemographicInfo = ({}) => {
                     )}
                   />
                 ) : null}
-                <Controller
-                  name="classroomAge"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <MultiSelect
-                      withCheckbox
-                      label="What Age Classrooms are you interested in offering?"
-                      placeholder="Select as many as you like..."
-                      options={ageClassroomsInterestedInOffering.map(
-                        (l) => l.label
-                      )}
-                      error={errors.classroomAge}
-                      defaultValue={[]}
-                      helperText={
-                        errors &&
-                        errors.classroomAge &&
-                        errors.classroomAge.type === "required" &&
-                        "This field is required"
-                      }
-                      {...field}
-                    />
-                  )}
-                />
+                <Stack spacing={1}>
+                  <Typography variant="bodyRegular">
+                    What is your role at Wildflower Schools?
+                  </Typography>
+                  <Controller
+                    name="role"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { onChange, value } }) => (
+                      <RadioGroup value={value} handleOptionsChange>
+                        {roleOptions.map((o, i) => (
+                          <FormControlLabel
+                            key={i}
+                            value={o.value}
+                            control={<Radio />}
+                            label={o.label}
+                            onChange={onChange}
+                          />
+                        ))}
+                      </RadioGroup>
+                    )}
+                  />
+                  <FormHelperText error={errors.role}>
+                    {errors &&
+                      errors.role &&
+                      errors.role.type === "required" &&
+                      "This field is required"}
+                  </FormHelperText>
+                </Stack>
 
                 <Typography variant="bodySmall" lightened>
                   This information is only used for anonymous reporting reasons
@@ -670,7 +684,7 @@ const ConfirmDemographicInfo = ({}) => {
 
                 <Grid container spacing={3} justifyContent="space-between">
                   <Grid item xs={6}>
-                    <Link href="/welcome/confirm-your-details">
+                    <Link href="/welcome/existing-member/confirm-your-details">
                       <Button full variant="secondary">
                         <Typography variant="bodyRegular">Back</Typography>
                       </Button>

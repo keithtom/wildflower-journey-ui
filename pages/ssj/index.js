@@ -85,9 +85,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const partners =
     team?.team.data.length > 1
       ? team.team.data.filter((t) => {
-          return (
-            t.id !== currentUser?.id && t.attributes.roleList[0] === "partner"
-          );
+          return t.id !== currentUser?.id;
         })
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
@@ -95,6 +93,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
+
+  console.log({ currentUser });
 
   return (
     <>
@@ -126,6 +126,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Card>
             </Grid>
+            B
           </Grid>
         ) : (
           <Stack spacing={16}>
@@ -150,52 +151,64 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Grid>
               <Grid item>
-                <Stack direction="row" spacing={6} alignItems="center">
-                  <Stack>
+                <Grid container spacing={6}>
+                  <Grid item>
                     <Typography variant="bodyMini" bold lightened>
                       PHASE
                     </Typography>
                     <Typography variant="bodySmall">Visioning</Typography>
-                  </Stack>
-                  <Stack>
-                    <Typography variant="bodyMini" bold lightened>
-                      LOCATION
-                    </Typography>
-                    <Typography variant="bodySmall">Boston, MA</Typography>
-                  </Stack>
-                  {openDate ? (
-                    <Card
-                      size="small"
-                      hoverable
-                      onClick={() => setAddOpenDateModalOpen(true)}
-                    >
-                      <Stack direction="row" spacing={6}>
-                        <Stack>
-                          <Typography variant="bodyMini" bold lightened>
-                            OPEN DATE
-                          </Typography>
-                          <Typography variant="bodySmall">
-                            {moment(openDate).format("MMMM D, YYYY")}
+                  </Grid>
+                  {currentUser?.personAddress?.city &&
+                  currentUser?.personAddress?.state ? (
+                    <Grid item>
+                      <Typography variant="bodyMini" bold lightened>
+                        LOCATION
+                      </Typography>
+                      <Typography variant="bodySmall">
+                        {currentUser?.personAddress?.city},{" "}
+                        {currentUser?.personAddress?.state}
+                      </Typography>
+                    </Grid>
+                  ) : null}
+                  <Grid item>
+                    {openDate ? (
+                      <Card
+                        size="small"
+                        hoverable
+                        onClick={() => setAddOpenDateModalOpen(true)}
+                      >
+                        <Stack direction="row" spacing={6}>
+                          <Stack>
+                            <Typography variant="bodyMini" bold lightened>
+                              OPEN DATE
+                            </Typography>
+                            <Typography variant="bodySmall">
+                              {moment(openDate).format("MMMM D, YYYY")}
+                            </Typography>
+                          </Stack>
+                          <Icon
+                            type="pencil"
+                            size="small"
+                            variant="lightened"
+                          />
+                        </Stack>
+                      </Card>
+                    ) : (
+                      <Button
+                        variant="light"
+                        small
+                        onClick={() => setAddOpenDateModalOpen(true)}
+                      >
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Icon type="plus" />
+                          <Typography variant="bodyRegular">
+                            Add your anticipated open date
                           </Typography>
                         </Stack>
-                        <Icon type="pencil" size="small" variant="lightened" />
-                      </Stack>
-                    </Card>
-                  ) : (
-                    <Button
-                      variant="light"
-                      small
-                      onClick={() => setAddOpenDateModalOpen(true)}
-                    >
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Icon type="plus" />
-                        <Typography variant="bodyRegular">
-                          Add your anticipated open date
-                        </Typography>
-                      </Stack>
-                    </Button>
-                  )}
-                </Stack>
+                      </Button>
+                    )}
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
 
@@ -292,7 +305,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
               </Card>
             )}
 
-            <Stack spacing={3}>
+            <Stack spacing={3} sx={{ width: "100%" }}>
               <Grid
                 container
                 justifyContent="space-between"
@@ -310,9 +323,9 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Grid>
               </Grid>
               <Grid container spacing={3} alignItems="stretch">
-                <Grid item xs={12} sm={4}>
-                  {partners && partners.length ? (
-                    partners.map((p) => (
+                {partners && partners.length ? (
+                  partners.map((p) => (
+                    <Grid item xs={12} sm={4}>
                       <UserCard
                         key={p.id}
                         firstName={p.attributes.firstName}
@@ -321,14 +334,16 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                         phone={p.attributes.phone}
                         role="Partner"
                       />
-                    ))
-                  ) : (
+                    </Grid>
+                  ))
+                ) : (
+                  <Grid item xs={12} sm={4}>
                     <AddPartnerCard
                       submittedPartnerRequest={submittedPartnerRequest}
                       onClick={() => setAddPartnerModalOpen(true)}
                     />
-                  )}
-                </Grid>
+                  </Grid>
+                )}
                 {opsGuide ? (
                   <Grid item xs={12} sm={4}>
                     <UserCard
@@ -862,10 +877,9 @@ const FirstTimeUserModal = ({ toggle, open, firstName }) => {
               <Typography variant="bodyRegular">
                 {firstName}, welcome to the home base for your journey into
                 becoming a montessori educator! Again, we're so excited you're
-                here. This is Wildflower Platform, a tool we created to
-                centralize all of the support and resources we have to offer,
-                and to make it easier for you to make progress toward your
-                goals.
+                here. This is My Wildflower, a tool we created to centralize all
+                of the support and resources we have to offer, and to make it
+                easier for you to make progress toward your goals.
               </Typography>
               <Typography variant="bodyRegular">
                 Poke around! I'd start by completing the actions on your

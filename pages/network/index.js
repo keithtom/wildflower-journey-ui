@@ -26,7 +26,7 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
   };
-  
+
   return (
     <>
       <PageContainer>
@@ -76,14 +76,16 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
           </Grid>
           <Grid item flex={1}>
             <Grid container spacing={2}>
-              {FakeFilters.map((f, i) => (
-                <Grid item key={i}>
-                  <FilterMultiSelect
-                    filter={f}
-                    disabled={f.doNotDisplayFor === category}
-                  />
-                </Grid>
-              ))}
+              {FakeFilters.map((f, i) =>
+                f.doNotDisplayFor === category ? null : (
+                  <Grid item key={i}>
+                    <FilterMultiSelect
+                      filter={f}
+                      // disabled={f.doNotDisplayFor === category}
+                    />
+                  </Grid>
+                )
+              )}
             </Grid>
           </Grid>
         </Grid>
@@ -126,7 +128,7 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
 
 export default Network;
 
-const FilterMultiSelect = ({ filter, disabled }) => {
+const FilterMultiSelect = ({ filter }) => {
   const [filterValue, setFilterValue] = useState([]);
   const handleValueChange = (event) => {
     const {
@@ -140,7 +142,6 @@ const FilterMultiSelect = ({ filter, disabled }) => {
   // console.log(filterValue);
   return (
     <MultiSelect
-      disabled={disabled}
       withCheckbox
       autoWidth
       options={filter.options.map((o) => o.label)}
@@ -160,10 +161,9 @@ const PersonResultItem = ({
   location,
   trainingLevel,
   schoolLogo,
-  schoolLink,
 }) => {
   return (
-    <Link href={personLink}>
+    <Link href={personLink && personLink}>
       <Card noPadding hoverable>
         <Stack>
           <img src={profileImg} style={{ width: "100%" }} />
@@ -180,10 +180,8 @@ const PersonResultItem = ({
                     </Typography>
                   </Stack>
                 </Grid>
-                <Grid item>
-                  <Link href={schoolLink}>
-                    <Avatar src={schoolLogo} size="sm" />
-                  </Link>
+                <Grid item style={{ pointerEvents: "none" }}>
+                  <Avatar src={schoolLogo} size="sm" />
                 </Grid>
               </Grid>
               <Grid container spacing={2}>
@@ -212,7 +210,7 @@ const SchoolResultItem = ({
   leaders,
 }) => {
   return (
-    <Link href={schoolLink}>
+    <Link href={schoolLink && schoolLink}>
       <Card noPadding hoverable>
         <Stack>
           <Stack
@@ -263,7 +261,7 @@ const SchoolResultItem = ({
 
 const FakeFilters = [
   {
-    title: "Hub",
+    title: "State",
     options: [
       { label: "Massachusetts", value: "Massachusetts" },
       { label: "New York", value: "New York" },
@@ -272,12 +270,12 @@ const FakeFilters = [
     ],
   },
   {
-    title: "Location",
+    title: "City",
     options: [
-      { label: "Boston, MA", value: "Boston, MA" },
-      { label: "New York City, NY", value: "New York City, NY" },
-      { label: "Detroit, MI", value: "Detroit, MI" },
-      { label: "Los Angeles, CA", value: "Los Angeles, CA" },
+      { label: "Boston", value: "Boston" },
+      { label: "New York City", value: "New York City" },
+      { label: "Detroit", value: "Detroit" },
+      { label: "Los Angeles", value: "Los Angeles" },
     ],
   },
   {
@@ -290,8 +288,18 @@ const FakeFilters = [
       { label: "In more than 1 year", value: "In more than 1 year" },
     ],
   },
+  // {
+  //   title: "Program",
+  //   doNotDisplayFor: "people",
+  //   options: [
+  //     { label: "1", value: "1" },
+  //     { label: "2", value: "2" },
+  //     { label: "3", value: "3" },
+  //     { label: "4", value: "4" },
+  //   ],
+  // },
   {
-    title: "Program",
+    title: "Age level",
     doNotDisplayFor: "people",
     options: [
       { label: "1", value: "1" },
@@ -300,28 +308,19 @@ const FakeFilters = [
       { label: "4", value: "4" },
     ],
   },
-  {
-    title: "Student age",
-    doNotDisplayFor: "people",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
-  {
-    title: "Capacity",
-    doNotDisplayFor: "people",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
+  // {
+  //   title: "Capacity",
+  //   doNotDisplayFor: "people",
+  //   options: [
+  //     { label: "1", value: "1" },
+  //     { label: "2", value: "2" },
+  //     { label: "3", value: "3" },
+  //     { label: "4", value: "4" },
+  //   ],
+  // },
   {
     title: "Language",
+    doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -349,16 +348,16 @@ const FakeFilters = [
       { label: "4", value: "4" },
     ],
   },
-  {
-    title: "Pronouns",
-    doNotDisplayFor: "schools",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
+  // {
+  //   title: "Pronouns",
+  //   doNotDisplayFor: "schools",
+  //   options: [
+  //     { label: "1", value: "1" },
+  //     { label: "2", value: "2" },
+  //     { label: "3", value: "3" },
+  //     { label: "4", value: "4" },
+  //   ],
+  // },
 
   {
     title: "Ethnicity",
@@ -378,6 +377,16 @@ const FakeFilters = [
       { label: "2", value: "2" },
       { label: "3", value: "3" },
       { label: "4", value: "4" },
+    ],
+  },
+  {
+    title: "Role",
+    doNotDisplayFor: "schools",
+    options: [
+      { label: "Teacher Leader", value: "Teacher Leader" },
+      { label: "Emerging Teacher Leader", value: "Emerging Teacher Leader" },
+      { label: "Foundation Partner", value: "Foundation Partner" },
+      { label: "Charter Staff", value: "Charter Staff" },
     ],
   },
 ];

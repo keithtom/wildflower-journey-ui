@@ -39,6 +39,8 @@ const Header = ({ toggleNavOpen }) => {
 
   const logo = "/assets/images/wildflower-logo.png";
 
+  const showNetwork = false;
+
   return (
     <CustomAppBar>
       <Grid
@@ -59,14 +61,14 @@ const Header = ({ toggleNavOpen }) => {
               </IconButton>
               <img src={logo} style={{ height: "24px" }} />
               <Typography variant="bodyRegular" bold noWrap>
-                Wildflower Platform
+                My Wildflower
               </Typography>
             </Stack>
           ) : (
             <Stack direction="row" alignItems="center" spacing={3}>
               <img src={logo} style={{ height: "32px" }} />
               <Typography variant="bodyLarge" bold noWrap>
-                Wildflower Platform
+                My Wildflower
               </Typography>
             </Stack>
           )}
@@ -74,6 +76,9 @@ const Header = ({ toggleNavOpen }) => {
         {isLoggedIn ? (
           <Grid item>
             <AvatarMenu
+              myProfileLink={
+                showNetwork ? `/network/people/${currentUser.id}` : null
+              }
               avatarSrc={currentUser.attributes.imageUrl}
               userName={`${currentUser.attributes.firstName} ${currentUser.attributes.lastName}`}
             />
@@ -86,7 +91,7 @@ const Header = ({ toggleNavOpen }) => {
 
 export default Header;
 
-const AvatarMenu = ({ avatarSrc, userName }) => {
+const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
   const [profileNavOpen, setProfileNavOpen] = useState(false);
   const handleOpen = (event) => {
     setProfileNavOpen(event.currentTarget);
@@ -168,6 +173,9 @@ const AvatarMenu = ({ avatarSrc, userName }) => {
             Signed in as {userName}
           </Typography>
         </StyledOption>
+        {myProfileLink ? (
+          <NavLink to={myProfileLink} label="My Profile" />
+        ) : null}
         <NavLink to="/settings" label="Settings" />
         <StyledOption onClick={handleLogOut} hoverable>
           <Typography variant="bodyRegular">Sign out</Typography>

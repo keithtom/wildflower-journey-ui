@@ -35,8 +35,8 @@ const LoggedOut = ({}) => {
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="bodyRegular">
-                      Thanks for using the Wildflower Platform! We will see you
-                      again soon!
+                      Thanks for using My Wildflower! We will see you again
+                      soon!
                     </Typography>
                   </Grid>
                 </Grid>

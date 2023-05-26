@@ -33,11 +33,11 @@ const Select = ({
         input={<Input />}
         displayEmpty={true}
         renderValue={(value) =>
-          value?.length ? (
+          value?.length !== 0 ? (
             Array.isArray(value) ? (
               value.join(", ")
             ) : (
-              value
+              options[value]
             )
           ) : (
             <Typography variant="bodyRegular" lightened>

@@ -3,7 +3,7 @@ import { styled, css } from "@mui/material/styles";
 
 const CustomChip = styled(MaterialChip)`
   border-radius: ${({ theme }) => theme.radius.md}px;
-  background: ${({ theme }) => theme.color.transparent.main};
+  background: ${({ theme }) => theme.color.neutral.main};
 
   /* Small */
   ${(props) =>
@@ -50,8 +50,17 @@ const CustomChip = styled(MaterialChip)`
     `}
 `;
 
-const Chip = ({ ...props }) => {
-  return <CustomChip {...props} />;
+const Chip = ({ variant, size, label, ...props }) => {
+  // console.log("Chip props", props);
+
+  return (
+    <CustomChip
+      variant={variant ? variant : "lightened"}
+      size={size}
+      label={label}
+      {...props}
+    />
+  );
 };
 
 export default Chip;
