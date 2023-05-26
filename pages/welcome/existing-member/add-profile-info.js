@@ -299,7 +299,7 @@ const AddProfileInfo = ({}) => {
                   </Button>
                 </Grid>
                 <Grid item xs={12}>
-                  <Link href="/ssj">
+                  <Link href="/network">
                     <Button full variant="text">
                       <Typography variant="bodyRegular" highlight>
                         Skip for now
