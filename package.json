@@ -48,7 +48,8 @@
     "storybook-addon-styled-component-theme": "^2.0.0",
     "styled-components": "^5.3.3",
     "styled-icons": "^10.45.0",
-    "styled-react-modal": "^2.1.0"
+    "styled-react-modal": "^2.1.0",
+    "swr": "^2.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.16.5",

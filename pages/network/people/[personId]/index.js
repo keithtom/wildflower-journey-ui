@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
+import useSWR from 'swr'
 import { useRouter } from "next/router";
 import {
   Box,
@@ -27,28 +28,19 @@ import SchoolCard from "@components/SchoolCard";
 import peopleApi from "@api/people";
 
 const Person = ({}) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [person, setPerson] = useState({});
-
   const router = useRouter()
   const { personId } = router.query
-  
-  useEffect(() => {
-    if (personId) {
-      peopleApi.show(personId).then((response) => {
-        setPerson(response.data.data);
-        setIsLoading(false);
-        console.log(response.data)
-      });
-    }
-  }, []);
 
-  // format PersonAttributes.
+  // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
+  const { data, error, isLoading } = useSWR(`/api/person/${personId}`, () => peopleApi.show(personId).then(res => res.data))
+
+  if (error) return <div>failed to load</div>
+  if (isLoading) return <div>loading...</div>
+  if (!data.data) return <div>loading...</div>
+
+  const person = data.data
   
-  return (isLoading) ?
-    <Typography>
-      Loading
-    </Typography> : (
+  return (
     <>
       <PageContainer>
         <Stack spacing={6}>
@@ -73,7 +65,7 @@ const Person = ({}) => {
                     About me
                   </Typography>
                   <Typography variant="bodyLarge">
-                    {FakePerson.attributes.about}
+                    {person.attributes.about}
                   </Typography>
                 </Stack>
                 <Grid container>
