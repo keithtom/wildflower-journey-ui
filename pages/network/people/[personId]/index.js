@@ -1,5 +1,7 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { useRouter } from "next/router";
 
 import { useUserContext } from "@lib/useUserContext";
 import {
@@ -25,24 +27,41 @@ import {
 import ProfileHero from "@components/ProfileHero";
 import AttributesCard from "@components/AttributesCard";
 import SchoolCard from "@components/SchoolCard";
+import peopleApi from "@api/people";
 
 const Person = ({}) => {
+  const router = useRouter();
+  const { personId } = router.query;
+
+  // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
+  const { data, error, isLoading } = useSWR(`/api/person/${personId}`, () =>
+    peopleApi.show(personId).then((res) => res.data)
+  );
+
+  if (error) return <div>failed to load</div>;
+  if (isLoading) return <div>loading...</div>;
+  if (!data.data) return <div>loading...</div>;
+
+  const person = data.data;
+
   const { currentUser } = useUserContext();
-  const isMyProfile = currentUser?.id === FakePerson.id;
-  // console.log({ currentUser });
+  const isMyProfile = currentUser?.id === personId;
+
+  // console.log({ person });
+
   return (
     <>
       <PageContainer isLoading={!currentUser}>
         <Stack spacing={6}>
           <ProfileHero
-            profileImage={FakePerson.attributes.imageSrc}
-            firstName={FakePerson.attributes.firstName}
-            lastName={FakePerson.attributes.lastName}
-            role={FakePerson.attributes.role}
-            school={FakePerson.attributes.school.name}
-            schoolLogo={FakePerson.attributes.school.logoUrl}
-            location={FakePerson.attributes.location}
-            schoolLink={`/network/schools/${FakePerson.attributes.school.id}`}
+            profileImage={person.attributes?.imageUrl}
+            firstName={person.attributes.firstName}
+            lastName={person.attributes.lastName}
+            role={person.attributes.role}
+            school={person.attributes.school?.name}
+            schoolLogo={person.attributes.school?.logoUrl}
+            location={person.attributes.location}
+            // schoolLink={`/network/schools/${FakePerson.attributes.school.id}`}
           />
 
           <Grid container spacing={8}>
@@ -88,7 +107,7 @@ const Person = ({}) => {
                     About me
                   </Typography>
                   <Typography variant="bodyLarge">
-                    {FakePerson.attributes.about}
+                    {person.attributes.about}
                   </Typography>
                 </Stack>
                 <Grid container>
