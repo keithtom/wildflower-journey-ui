@@ -46,7 +46,7 @@ describe("onboarding spec", () => {
 
     it.only("should be able to update fields", () => {
       cy.contains("What is your primary language?").next().click();
-      cy.contains("English").click({force: true});
+      cy.contains("English").click();
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What is your ethnicity?").next().click();

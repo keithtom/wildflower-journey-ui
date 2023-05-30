@@ -12,7 +12,7 @@ describe('login spec', () => {
   })
 
   it("should log in successfully", () => {
-    cy.get('input[name="email"]').type("test@test.com");
+    cy.get('input[name="email"]').type("cypress_test@test.com");
     cy.get('input[name="password"]').type("password");
     cy.get('button[type="submit"]').click();
     cy.url({timeout: 60000}).should("include", "/ssj");

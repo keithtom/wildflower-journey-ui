@@ -6,6 +6,10 @@ describe("dashboard spec", () => {
     cy.visit("/ssj", {timeout: 60000})
   });
 
+  it("should display dashboard", () => {
+    cy.contains("Ways to work together")
+  });
+
   describe("update anticipated open date", () => {
     it("should update anticipated open date", () => {
       cy.contains("open date", { matchCase: false, timeout: 60000 }).click();

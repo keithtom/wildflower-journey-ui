@@ -30,7 +30,7 @@ Cypress.Commands.add('login', () => {
     url: `${Cypress.env("apiUrl")}/login`,
     body: {
       user: {
-        email: 'test@test.com',
+        email: 'cypress_test@test.com',
         password: 'password',
       }
     }
