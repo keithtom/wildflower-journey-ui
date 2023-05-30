@@ -20,7 +20,7 @@ import {
   MultiSelect,
 } from "@ui";
 
-const Network = ({ FakeSchools }) => {
+const Network = () => {
   const { query, setQuery, filters, setFilters, results, isSearching, error } = useSearch();
   const [category, setCategory] = useState("people");
   const handleCategoryChange = (e) => {
@@ -49,6 +49,7 @@ const Network = ({ FakeSchools }) => {
               onChange={(e) => {
                 setQuery(e.target.value);
               }}
+              value={query}
             />
           </Grid>
         </Grid>
