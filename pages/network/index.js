@@ -99,7 +99,7 @@ const Network = ({ FakeSchools }) => {
           {results.length ? (
             <Masonry columns={3} spacing={6}>
               {category === "people"
-                ? results.length ? results.map((f) => (
+                ? results.map((f) => (
                     <PersonResultItem
                       personLink={`/network/people/${f.id}`}
                       profileImg={f.attributes.imageUrl}
@@ -112,12 +112,8 @@ const Network = ({ FakeSchools }) => {
                       schoolLink={`/network/schools/${f.attributes.school?.id}`}
                       key={f.id}
                     />
-                  )) : (
-                    <Typography variant="h5" bold>
-                      No results found.
-                    </Typography>
-                  )
-                : results.length ? results.map((f) => (
+                  ))
+                : results.map((f) => (
                     <SchoolResultItem
                       schoolLink={`/network/schools/${f.id}`}
                       heroImg={f.attributes.heroUrl}
@@ -128,11 +124,7 @@ const Network = ({ FakeSchools }) => {
                       leaders={f.attributes.leaders || []}
                       key={f.id}
                     />
-                  ))}  : (
-                    <Typography variant="h5" bold>
-                      No results found.
-                    </Typography>
-                  )}
+                  ))}
             </Masonry>
           ) : (
             <Grid item xs={12}>
