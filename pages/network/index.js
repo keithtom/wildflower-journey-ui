@@ -29,8 +29,7 @@ const Network = () => {
   };
 
   if (error) return <div>failed to load</div>;
-  if (isSearching) return <div>searching</div>;
-  // if (!results.length) return <div>no search results</div>;
+  // if (isSearching) return <div>searching</div>;
   
   return (
     <>
@@ -87,6 +86,7 @@ const Network = () => {
                   <Grid item key={i}>
                     <FilterMultiSelect
                       filter={f}
+                      setFilters={setFilters}
                       // disabled={f.doNotDisplayFor === category}
                     />
                   </Grid>
@@ -160,7 +160,7 @@ const Network = () => {
 
 export default Network;
 
-const FilterMultiSelect = ({ filter }) => {
+const FilterMultiSelect = ({ filter, setFilters }) => {
   const [filterValue, setFilterValue] = useState([]);
   const handleValueChange = (event) => {
     const {
@@ -170,6 +170,9 @@ const FilterMultiSelect = ({ filter }) => {
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
     );
+    setFilters((filters) => {
+      return {...filters, [filter.param]: value}
+    });
   };
   // console.log(filterValue);
   return (
@@ -294,6 +297,7 @@ const SchoolResultItem = ({
 const FakeFilters = [
   {
     title: "State",
+    param: "people_filters[address_state]",
     options: [
       { label: "Massachusetts", value: "Massachusetts" },
       { label: "New York", value: "New York" },
@@ -302,16 +306,8 @@ const FakeFilters = [
     ],
   },
   {
-    title: "City",
-    options: [
-      { label: "Boston", value: "Boston" },
-      { label: "New York City", value: "New York City" },
-      { label: "Detroit", value: "Detroit" },
-      { label: "Los Angeles", value: "Los Angeles" },
-    ],
-  },
-  {
     title: "Open Date",
+    param: "school_filters[open_date]",
     doNotDisplayFor: "people",
     options: [
       { label: "Within a month", value: "Within a month" },
@@ -332,6 +328,7 @@ const FakeFilters = [
   // },
   {
     title: "Age level",
+    param: "school_filters[age_levels]",
     doNotDisplayFor: "people",
     options: [
       { label: "1", value: "1" },
@@ -352,16 +349,18 @@ const FakeFilters = [
   // },
   {
     title: "Language",
+    param: "people_filters[primary_language]",
     doNotDisplayFor: "schools",
     options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
+      { label: "English", value: "english" },
+      { label: "Spanish", value: "spanish" },
+      { label: "French", value: "french" },
+      { label: "Chinese", value: "chinese" },
     ],
   },
   {
     title: "Governance",
+    param: "school_filters[governance]",
     doNotDisplayFor: "people",
     options: [
       { label: "1", value: "1" },
@@ -393,6 +392,7 @@ const FakeFilters = [
 
   {
     title: "Ethnicity",
+    param: "people_filters[race_ethinicity]",
     doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
@@ -403,6 +403,7 @@ const FakeFilters = [
   },
   {
     title: "Gender identity",
+    param: "people_filters[gender]",
     doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
@@ -413,6 +414,7 @@ const FakeFilters = [
   },
   {
     title: "Role",
+    param: "people_filters[role_list]",
     doNotDisplayFor: "schools",
     options: [
       { label: "Teacher Leader", value: "Teacher Leader" },
