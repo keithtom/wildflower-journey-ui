@@ -7,9 +7,7 @@ async function index() {
 }
 
 async function show(id, config = {}) {
-  return workflowsApi.get(`/${id}`, config).then((response) => {
-    wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
-  });  
+  return schoolsApi.get(`/${id}`, config)
 }
 
 export default { index, show };

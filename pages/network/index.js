@@ -20,14 +20,18 @@ import {
   MultiSelect,
 } from "@ui";
 
-const Network = ({ FakeSchools, FakeTeachers }) => {
-  const { query, setQuery, results } = useSearch();
+const Network = ({ FakeSchools }) => {
+  const { query, setQuery, filters, setFilters, results, isSearching, error } = useSearch();
   const [category, setCategory] = useState("people");
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
+    setFilters({ ...filters, models: e.target.value });
   };
 
-  // console.log({ results });
+  if (error) return <div>failed to load</div>;
+  if (isSearching) return <div>searching</div>;
+  // if (!results.length) return <div>no search results</div>;
+  
   return (
     <>
       <PageContainer>
@@ -95,7 +99,7 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
           {results.length ? (
             <Masonry columns={3} spacing={6}>
               {category === "people"
-                ? results.map((f) => (
+                ? results.length ? results.map((f) => (
                     <PersonResultItem
                       personLink={`/network/people/${f.id}`}
                       profileImg={f.attributes.imageUrl}
@@ -108,19 +112,27 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
                       schoolLink={`/network/schools/${f.attributes.school?.id}`}
                       key={f.id}
                     />
-                  ))
-                : FakeSchools.map((f) => (
+                  )) : (
+                    <Typography variant="h5" bold>
+                      No results found.
+                    </Typography>
+                  )
+                : results.length ? results.map((f) => (
                     <SchoolResultItem
-                      schoolLink={`/network/schools/${f.attributes.id}`}
+                      schoolLink={`/network/schools/${f.id}`}
                       heroImg={f.attributes.heroUrl}
                       logoImg={f.attributes.logoUrl}
                       name={f.attributes.name}
                       location={f.attributes.location}
-                      program={f.attributes.program}
-                      leaders={f.attributes.leaders}
+                      program={f.attributes.program || []}
+                      leaders={f.attributes.leaders || []}
                       key={f.id}
                     />
-                  ))}
+                  ))}  : (
+                    <Typography variant="h5" bold>
+                      No results found.
+                    </Typography>
+                  )}
             </Masonry>
           ) : (
             <Grid item xs={12}>

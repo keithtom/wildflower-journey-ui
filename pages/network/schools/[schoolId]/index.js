@@ -1,5 +1,8 @@
 import Head from "next/head";
 import { useState } from "react";
+import useSWR from 'swr'
+import { useRouter } from "next/router";
+import schoolApi from "@api/schools";
 import {
   Box,
   PageContainer,
@@ -25,6 +28,18 @@ import AttributesCard from "@components/AttributesCard";
 import UserCard from "@components/UserCard";
 
 const School = ({}) => {
+  const router = useRouter()
+  const { schoolId } = router.query
+  console.log("schoolId", schoolId)
+  
+  // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
+  const { data, error, isLoading } = useSWR(`/api/school/${schoolId}`, () => schoolApi.show(schoolId).then(res => res.data))
+
+  if (error) return <div>failed to load ${error.message}</div>
+  if (isLoading || !data) return <div>loading...</div>
+  console.log("about to render", data.data  )
+  const school = data.data
+  
   return (
     <>
       <PageContainer>
@@ -35,7 +50,7 @@ const School = ({}) => {
             <Grid item>
               <Stack spacing={3}>
                 <img
-                  src={FakeSchool.logoUrl}
+                  src={school.attributes.logoUrl}
                   style={{
                     objectFit: "contain",
                     maxWidth: "200px",
@@ -43,7 +58,7 @@ const School = ({}) => {
                     width: "100%",
                   }}
                 />
-                <Typography variant="bodyRegular">{FakeSchool.name}</Typography>
+                <Typography variant="bodyRegular">{school.attributes.name}</Typography>
               </Stack>
             </Grid>
             <Grid item>
@@ -65,7 +80,7 @@ const School = ({}) => {
 
           <Grid container spacing={8}>
             <Grid item xs={12} sm={3}>
-              <AttributesCard attributes={FakeSchool.attributes} />
+              <AttributesCard attributes={[]} />
             </Grid>
             <Grid item xs={12} sm={9}>
               <Stack spacing={12}>
