@@ -297,7 +297,7 @@ const SchoolResultItem = ({
 const FakeFilters = [
   {
     title: "State",
-    param: "people_filters[address_state]",
+    param: "people_filters[address_states]",
     options: [
       { label: "Massachusetts", value: "Massachusetts" },
       { label: "New York", value: "New York" },
@@ -306,14 +306,14 @@ const FakeFilters = [
     ],
   },
   {
-    title: "Open Date",
+    title: "Opened",
     param: "school_filters[open_date]",
     doNotDisplayFor: "people",
     options: [
-      { label: "Within a month", value: "Within a month" },
-      { label: "Within 6 months", value: "Within 6 months" },
-      { label: "Within 1 year", value: "Within 1 year" },
-      { label: "In more than 1 year", value: "In more than 1 year" },
+      { label: "Not open", value: "Not open" },
+      { label: "Within 0-2 years", value: "Within 0-2 years" },
+      { label: "Within 2-4 years", value: "Within 2-4 years" },
+      { label: "More than 5 years", value: "More than 5 years" },
     ],
   },
   // {
@@ -349,7 +349,7 @@ const FakeFilters = [
   // },
   {
     title: "Language",
-    param: "people_filters[primary_language]",
+    param: "people_filters[primary_languages]",
     doNotDisplayFor: "schools",
     options: [
       { label: "English", value: "english" },
@@ -392,7 +392,7 @@ const FakeFilters = [
 
   {
     title: "Ethnicity",
-    param: "people_filters[race_ethinicity]",
+    param: "people_filters[race_ethinicities]",
     doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
@@ -403,7 +403,7 @@ const FakeFilters = [
   },
   {
     title: "Gender identity",
-    param: "people_filters[gender]",
+    param: "people_filters[genders]",
     doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
@@ -414,7 +414,7 @@ const FakeFilters = [
   },
   {
     title: "Role",
-    param: "people_filters[role_list]",
+    param: "people_filters[roles]",
     doNotDisplayFor: "schools",
     options: [
       { label: "Teacher Leader", value: "Teacher Leader" },
