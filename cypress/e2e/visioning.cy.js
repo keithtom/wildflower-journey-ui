@@ -96,7 +96,7 @@ describe("visioning spec", () => {
   });
 
   describe("decision steps", () => {
-    it.only("should allow a decision to be selected and submitted", () => {
+    it("should allow a decision to be selected and submitted", () => {
       cy.contains("Visioning").click();
       cy.contains("Milestone B-1").click();
       cy.contains("Decision Step 1").click();
