@@ -47,11 +47,11 @@ const Person = ({}) => {
   const { currentUser } = useUserContext();
   const isMyProfile = currentUser?.id === personId;
 
-  // console.log({ person });
+  console.log({ person });
 
   return (
     <>
-      <PageContainer isLoading={!currentUser}>
+      <PageContainer isLoading={isLoading || !currentUser}>
         <Stack spacing={6}>
           <ProfileHero
             profileImage={person.attributes?.imageUrl}
@@ -67,7 +67,17 @@ const Person = ({}) => {
           <Grid container spacing={8}>
             <Grid item xs={12} sm={3}>
               <Stack spacing={6}>
-                <AttributesCard attributes={FakePersonAttributes} />
+                <AttributesCard
+                  state={person.relationships.address.data}
+                  language={person.attributes.primaryLanguage}
+                  affinityGroups={person.attributes.affinityGroups}
+                  ethnicity={person.attributes.raceEthnicityList}
+                  role={person.attributes.roleList}
+                  pronouns={person.attributes.pronouns}
+                  montessoriCertification={
+                    person.attributes.montessoriCertifiedLevelList
+                  }
+                />
                 {isMyProfile ? (
                   <Card>
                     <Stack spacing={4}>
@@ -102,51 +112,55 @@ const Person = ({}) => {
             </Grid>
             <Grid item xs={12} sm={9}>
               <Stack spacing={12}>
-                <Stack spacing={3}>
-                  <Typography variant="h4" bold>
-                    About me
-                  </Typography>
-                  <Typography variant="bodyLarge">
-                    {person.attributes.about}
-                  </Typography>
-                </Stack>
-                <Grid container>
-                  <Grid item xs={12} sm={6}>
+                {person?.attributes?.about ? (
+                  <Stack spacing={3}>
                     <Typography variant="h4" bold>
-                      Roles and responsibilities
+                      About me
                     </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Stack spacing={3}>
-                      {FakePerson.attributes.rolesResonsibilities.map(
-                        (r, i) => (
+                    <Typography variant="bodyLarge">
+                      {person.attributes.about}
+                    </Typography>
+                  </Stack>
+                ) : null}
+                {person?.attributes?.rolesResonsibilities ? (
+                  <Grid container>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="h4" bold>
+                        Roles and responsibilities
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={3}>
+                        {person.attributes.rolesResonsibilities.map((r, i) => (
                           <Typography variant="bodyLarge" key={i}>
                             {r}
                           </Typography>
-                        )
-                      )}
-                    </Stack>
+                        ))}
+                      </Stack>
+                    </Grid>
                   </Grid>
-                </Grid>
-                <Grid container>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="h4" bold>
-                      Board member
-                    </Typography>
+                ) : null}
+                {person?.attributes?.boardMemberOf ? (
+                  <Grid container>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="h4" bold>
+                        Board member
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={3}>
+                        {person.attributes.boardMemberOf.map((b, i) => (
+                          <SchoolCard
+                            schoolName={b.name}
+                            logo={b.logoUrl}
+                            location={b.location}
+                            link={`/network/schools/${b.id}`}
+                          />
+                        ))}
+                      </Stack>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Stack spacing={3}>
-                      {FakePerson.attributes.boardMemberOf.map((b, i) => (
-                        <SchoolCard
-                          schoolName={b.name}
-                          logo={b.logoUrl}
-                          location={b.location}
-                          link={`/network/schools/${b.id}`}
-                        />
-                      ))}
-                    </Stack>
-                  </Grid>
-                </Grid>
+                ) : null}
               </Stack>
             </Grid>
           </Grid>

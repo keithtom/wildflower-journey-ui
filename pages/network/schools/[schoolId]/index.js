@@ -1,7 +1,8 @@
 import Head from "next/head";
 import { useState } from "react";
-import useSWR from 'swr'
+import useSWR from "swr";
 import { useRouter } from "next/router";
+
 import schoolApi from "@api/schools";
 import {
   Box,
@@ -28,18 +29,22 @@ import AttributesCard from "@components/AttributesCard";
 import UserCard from "@components/UserCard";
 
 const School = ({}) => {
-  const router = useRouter()
-  const { schoolId } = router.query
-  console.log("schoolId", schoolId)
-  
-  // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
-  const { data, error, isLoading } = useSWR(`/api/school/${schoolId}`, () => schoolApi.show(schoolId).then(res => res.data))
+  const router = useRouter();
+  const { schoolId } = router.query;
+  console.log("schoolId", schoolId);
 
-  if (error) return <div>failed to load ${error.message}</div>
-  if (isLoading || !data) return <div>loading...</div>
-  console.log("about to render", data.data  )
-  const school = data.data
-  
+  // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
+  const { data, error, isLoading } = useSWR(`/api/school/${schoolId}`, () =>
+    schoolApi.show(schoolId).then((res) => res.data)
+  );
+
+  if (error) return <div>failed to load ${error.message}</div>;
+  if (isLoading || !data) return <div>loading...</div>;
+  console.log("about to render", data.data);
+  const school = data.data;
+
+  console.log({ school });
+
   return (
     <>
       <PageContainer>
@@ -58,7 +63,9 @@ const School = ({}) => {
                     width: "100%",
                   }}
                 />
-                <Typography variant="bodyRegular">{school.attributes.name}</Typography>
+                <Typography variant="bodyRegular">
+                  {school.attributes.name}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item>
@@ -80,7 +87,13 @@ const School = ({}) => {
 
           <Grid container spacing={8}>
             <Grid item xs={12} sm={3}>
-              <AttributesCard attributes={[]} />
+              <AttributesCard
+                state={school.relationships.address.data}
+                openDate={school.attributes.openedOn}
+                agesServed={school.attributes.agesServedList}
+                governance={school.attributes.governanceType}
+                maxEnrollment={school.attributes.maxEnrollment}
+              />
             </Grid>
             <Grid item xs={12} sm={9}>
               <Stack spacing={12}>
@@ -102,7 +115,7 @@ const School = ({}) => {
                   </Typography>
                 </Stack>
 
-                <Grid container>
+                {/* <Grid container>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="h4" bold>
                       School Board
@@ -123,7 +136,7 @@ const School = ({}) => {
                       ))}
                     </Stack>
                   </Grid>
-                </Grid>
+                </Grid> */}
               </Stack>
             </Grid>
           </Grid>
@@ -201,7 +214,7 @@ const FakeSchool = {
   logoUrl:
     "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
   heroUrl:
-    "https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80",
+    "https://plus.unsplash.com/premium_photo-1667502842264-9cdcdac36086?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1422&q=80",
   location: "Pasadena, CA",
   id: "aaaa-1111",
   attributes: [

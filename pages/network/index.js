@@ -18,10 +18,12 @@ import {
   Link,
   Radio,
   MultiSelect,
+  Spinner,
 } from "@ui";
 
 const Network = () => {
-  const { query, setQuery, filters, setFilters, results, isSearching, error } = useSearch();
+  const { query, setQuery, filters, setFilters, results, isSearching, error } =
+    useSearch();
   const [category, setCategory] = useState("people");
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
@@ -30,7 +32,9 @@ const Network = () => {
 
   if (error) return <div>failed to load</div>;
   // if (isSearching) return <div>searching</div>;
-  
+  const noResults = query && results.length === 0;
+  console.log({ results });
+
   return (
     <>
       <PageContainer>
@@ -98,7 +102,7 @@ const Network = () => {
 
         <Grid container mt={12}>
           {results.length ? (
-            <Masonry columns={3} spacing={6}>
+            <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={6}>
               {category === "people"
                 ? results.map((f) => (
                     <PersonResultItem
@@ -133,21 +137,41 @@ const Network = () => {
                 container
                 alignItems="center"
                 justifyContent="center"
-                mt={24}
+                mt={16}
               >
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                  <Card size="large">
-                    <Stack spacing={3}>
-                      <Icon type="search" size="large" variant="primary" />
-                      <Typography variant="bodyLarge" bold>
-                        You haven't searched for anything yet!
-                      </Typography>
-                      <Typography variant="bodyLarge" lightened>
-                        Search for people or for schools above to see results
-                        from the My Wildflower directory!
-                      </Typography>
-                    </Stack>
-                  </Card>
+                  {isSearching ? (
+                    <Grid container justifyContent="center">
+                      <Grid item>
+                        <Spinner />
+                      </Grid>
+                    </Grid>
+                  ) : noResults ? (
+                    <Card size="large">
+                      <Stack spacing={3}>
+                        <Icon type="flag" size="large" variant="primary" />
+                        <Typography variant="bodyLarge" bold>
+                          Oops! Looks like there's nothing here
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          Try a different search term or more general query!
+                        </Typography>
+                      </Stack>
+                    </Card>
+                  ) : (
+                    <Card size="large">
+                      <Stack spacing={3}>
+                        <Icon type="search" size="large" variant="primary" />
+                        <Typography variant="bodyLarge" bold>
+                          You haven't searched for anything yet!
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          Search for people or for schools above to see results
+                          from the My Wildflower directory!
+                        </Typography>
+                      </Stack>
+                    </Card>
+                  )}
                 </Grid>
               </Grid>
             </Grid>
@@ -171,7 +195,7 @@ const FilterMultiSelect = ({ filter, setFilters }) => {
       typeof value === "string" ? value.split(",") : value
     );
     setFilters((filters) => {
-      return {...filters, [filter.param]: value}
+      return { ...filters, [filter.param]: value };
     });
   };
   // console.log(filterValue);
