@@ -123,7 +123,7 @@ describe("onboarding spec", () => {
 });
 
 describe("visiting website for the first time via email link", () => {
-  it.only("should authenticate and redirect to onboarding", () => {
+  it("should authenticate and redirect to onboarding", () => {
     cy.request({
       method: "GET",
       url: `${Cypress.env("apiUrl")}/invite_email_link`,

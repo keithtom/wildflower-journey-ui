@@ -28,7 +28,7 @@ describe("dashboard spec", () => {
     });
   });
 
-  describe.only("inviting partner", () => {
+  describe("inviting partner", () => {
     it("should send invite to partner", () => {
       cy.contains("Add a partner", {timeout: 60000}).click();
       cy.get('input[name="partnerFirstName"]').clear().type("Donna");
