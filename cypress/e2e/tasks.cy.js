@@ -58,8 +58,6 @@ describe("visioning spec", () => {
 
       cy.contains("Visioning").click();
       cy.contains("2 of 3 tasks completed").should("be.visible");
-      // uncomplete a task and unassign it
-      // check that everything looks right
       cy.visit("/ssj", { timeout: 60000 });
       cy.contains(
         "Looks like you don't have any tasks on your to do list!"
@@ -90,8 +88,36 @@ describe("visioning spec", () => {
       cy.contains("Step 2").click();
       cy.contains("Mark incomplete").click();
       cy.contains("Remove from to do list").click();
+    });
 
-      // TODO: Go back to the milestone from “up next” that said “Hold up”, complete all its prerequisite milestones and check that the milestone is now in “Todo”
+    it("should allow uncompleting and unassigning a step", () => {
+      cy.contains("Visioning").click();
+      cy.contains("Milestone A").click();
+      cy.contains("Step 1").click();
+      cy.contains("Add to my to do list").click();
+      cy.contains("Mark task complete").click();
+      cy.contains("Step 1").click();
+      cy.contains("Mark incomplete").click();
+      cy.contains("Remove from to do list").click();
+      cy.get('span[type="checkCircle"]').should("not.exist");
+    });
+
+    it("should move a milestone from Up Next to To Do when prerequisites are complete", () => {
+      cy.contains("Visioning").click();
+      cy.contains("Up Next").should("be.visible");
+      cy.contains("Milestone B-2").click();
+      cy.contains("Hold up!").should("be.visible");
+      cy.contains("Milestone B-1").click();
+      cy.contains("Milestone B-2").should("not.exist");
+      cy.contains("Milestone B-1").click();
+      cy.contains("Step 1").click();
+      cy.contains("Add to my to do list").click();
+      cy.contains("Option 1").click();
+      cy.contains("Make final decision").click();
+      cy.get("span[type='close']").first().click();
+      cy.contains("Visioning").click();
+      // Milestone B-2 should now be in the To Do section
+      cy.contains("Milestone B-2").prev().get("span[type='rightArrowCircle']").should("be.visible");
     });
   });
 
