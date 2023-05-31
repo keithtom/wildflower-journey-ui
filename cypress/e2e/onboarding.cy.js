@@ -40,11 +40,11 @@ describe("onboarding spec", () => {
       cy.contains("LGBTQIA");
       cy.contains("gender identity");
       cy.contains("pronouns");
-      cy.contains("household income");
+      cy.contains("economic situation in your household");
       cy.contains("Montessori Certified");
     });
 
-    it.only("should be able to update fields", () => {
+    it("should be able to update fields", () => {
       cy.contains("What is your primary language?").next().click();
       cy.contains("English").click();
       cy.get("body").click(0, 0); // close dropdwon
@@ -67,7 +67,10 @@ describe("onboarding spec", () => {
       cy.contains("she/her/hers").click({force: true});
       cy.get("body").click(0, 0); // close dropdwon
 
-      cy.contains("What is your household income?")
+      cy.contains(
+        "How would you describe the economic situation in your household while you were growing up"
+      )
+        .next()
         .next()
         .children()
         .first()
