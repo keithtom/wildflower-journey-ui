@@ -1,3 +1,4 @@
+import { useUserContext } from "@lib/useUserContext";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { useMediaQuery } from "react-responsive";
@@ -38,10 +39,12 @@ const CustomDrawer = styled(Drawer)`
   }
 `;
 
-const showNetwork = false;
 
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
+  const { currentUser } = useUserContext();
+  const showNetwork = currentUser.person.showNetwork;
+  const showSSJ = currentUser.person.showSsj;
 
   return (
     <StyledNav sx={{ display: "flex" }}>

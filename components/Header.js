@@ -39,8 +39,6 @@ const Header = ({ toggleNavOpen }) => {
 
   const logo = "/assets/images/wildflower-logo.png";
 
-  const showNetwork = false;
-
   return (
     <CustomAppBar>
       <Grid
@@ -76,9 +74,7 @@ const Header = ({ toggleNavOpen }) => {
         {isLoggedIn ? (
           <Grid item>
             <AvatarMenu
-              myProfileLink={
-                showNetwork ? `/network/people/${currentUser.id}` : null
-              }
+              myProfileLink={`/network/people/${currentUser.id}`}
               avatarSrc={currentUser.attributes.imageUrl}
               userName={`${currentUser.attributes.firstName} ${currentUser.attributes.lastName}`}
             />
