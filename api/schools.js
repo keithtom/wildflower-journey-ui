@@ -6,8 +6,8 @@ async function index() {
   return schoolsApi.get();
 }
 
-async function show(id, config = {}) {
-  return schoolsApi.get(`/${id}`, config)
+async function show(id, params = {}) {
+  return schoolsApi.get(`/${id}`, params)
 }
 
 export default { index, show };
