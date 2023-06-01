@@ -17,8 +17,8 @@ const api = axios.create({
   },
 });
 
-function show(personId) {
-  return api.get(`/${personId}`);
+function show(personId, params={}) {
+  return api.get(`/${personId}`, params);
 }
 
 async function update(personId, personParams) {

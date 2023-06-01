@@ -35,7 +35,7 @@ const School = ({}) => {
 
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
   const { data, error, isLoading } = useSWR(`/api/school/${schoolId}`, () =>
-    schoolApi.show(schoolId).then((res) => res.data)
+    schoolApi.show(schoolId, { network: true }).then((res) => res.data)
   );
 
   if (error) return <div>failed to load ${error.message}</div>;
