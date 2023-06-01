@@ -239,17 +239,23 @@ const PersonResultItem = ({
                     </Typography>
                   </Stack>
                 </Grid>
-                <Grid item style={{ pointerEvents: "none" }}>
-                  <Avatar src={schoolLogo} size="sm" />
-                </Grid>
+                { schoolLogo && (
+                  <Grid item style={{ pointerEvents: "none" }}>
+                    <Avatar src={schoolLogo} size="sm" />
+                  </Grid>
+                )}
               </Grid>
               <Grid container spacing={2}>
-                <Grid item>
-                  <Chip label={location} size="small" />
-                </Grid>
-                <Grid item>
-                  <Chip label={trainingLevel} size="small" />
-                </Grid>
+                { location && (
+                  <Grid item>
+                    <Chip label={location} size="small" />
+                  </Grid>
+                )}
+                { trainingLevel && (
+                  <Grid item>
+                    <Chip label={trainingLevel} size="small" />
+                  </Grid>
+                )}
               </Grid>
             </Stack>
           </Card>
