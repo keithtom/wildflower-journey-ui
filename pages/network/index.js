@@ -283,12 +283,14 @@ const SchoolResultItem = ({
             justifyContent="space-between"
             alignItems="flex-start"
             sx={{
-              backgroundImage: `url(${heroImg})`,
+              backgroundImage: `url(${heroImg || logoImg })`,
               backgroundSize: "cover",
               minHeight: "240px",
             }}
           >
-            <Avatar src={logoImg} />
+            { heroImg && (
+              <Avatar src={logoImg} />
+            )}
             <AvatarGroup>
               {leaders.map((l) => (
                 <Avatar src={l.imageSrc} size="sm" />
