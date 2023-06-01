@@ -33,7 +33,11 @@ const ProfileHero = ({
           </Grid>
         )}
         <Grid item flex={1}>
-          <Stack style={{ height: "100%" }} justifyContent="space-between">
+          <Stack
+            style={{ height: "100%" }}
+            justifyContent="space-between"
+            spacing={6}
+          >
             <Grid container justifyContent="space-between">
               <Grid item>
                 <Stack>
