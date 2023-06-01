@@ -104,13 +104,15 @@ const Navigation = ({}) => {
           icon="bookReader"
         />
       ) : null}
-      <NavLink
-        variant="primary"
-        to="/ssj"
-        active={router.asPath === "/ssj"}
-        label="School Startup Journey"
-        icon="home"
-      />
+      { showSsj ? (
+        <NavLink
+          variant="primary"
+          to="/ssj"
+          active={router.asPath === "/ssj"}
+          label="School Startup Journey"
+          icon="home"
+        />
+      ) : null}
       {router.pathname.includes("/ssj") && <SSJNavigation />}
       {/* <NavLink
         to="/advice"
