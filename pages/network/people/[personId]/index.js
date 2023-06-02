@@ -65,12 +65,11 @@ const Person = ({}) => {
           />
 
           <Grid container spacing={8}>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={12} sm={4}>
               <Stack spacing={6}>
                 <AttributesCard
                   state={person.relationships.address.data}
                   language={person.attributes.primaryLanguage}
-                  affinityGroups={person.attributes.affinityGroups}
                   ethnicity={person.attributes.raceEthnicityList}
                   role={person.attributes.roleList}
                   pronouns={person.attributes.pronouns}
@@ -110,7 +109,7 @@ const Person = ({}) => {
                 ) : null}
               </Stack>
             </Grid>
-            <Grid item xs={12} sm={9}>
+            <Grid item xs={12} sm={8}>
               <Stack spacing={12}>
                 {person?.attributes?.about ? (
                   <Stack spacing={3}>

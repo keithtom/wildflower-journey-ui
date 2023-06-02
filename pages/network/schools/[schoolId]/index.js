@@ -49,7 +49,13 @@ const School = ({}) => {
     <>
       <PageContainer>
         <Stack spacing={6}>
-          <Hero imageUrl={FakeSchool.heroUrl} />
+          <Hero
+            imageUrl={
+              school.attributes.heroUrl
+                ? school.attributes.heroUrl
+                : FakeSchool.heroUrl
+            }
+          />
 
           <Grid container spacing={8} justifyContent="space-between">
             <Grid item>
@@ -58,8 +64,8 @@ const School = ({}) => {
                   src={school.attributes.logoUrl}
                   style={{
                     objectFit: "contain",
-                    maxWidth: "200px",
-                    maxHeight: "96px",
+                    maxWidth: "240px",
+                    maxHeight: "120px",
                     width: "100%",
                   }}
                 />
@@ -68,25 +74,28 @@ const School = ({}) => {
                 </Typography>
               </Stack>
             </Grid>
-            <Grid item>
-              <Stack direction="row" spacing={6}>
-                {FakeLeaders.map((f, i) => (
-                  <UserCard
-                    link={`/network/people/${f.attributes.id}`}
-                    firstName={f.attributes.firstName}
-                    lastName={f.attributes.lastName}
-                    email={f.attributes.email}
-                    phone={f.attributes.phone}
-                    role={f.attributes.role}
-                    profileImage={f.attributes.imageSrc}
-                  />
-                ))}
-              </Stack>
-            </Grid>
+            {school.attributes.leaders ? (
+              <Grid item>
+                <Stack direction="row" spacing={6}>
+                  {school.attributes.leaders.map((l, i) => (
+                    <UserCard
+                      key={i}
+                      link={`/network/people/${l.attributes.id}`}
+                      firstName={l.attributes.firstName}
+                      lastName={l.attributes.lastName}
+                      email={l.attributes.email}
+                      phone={l.attributes.phone}
+                      role={l.attributes.role}
+                      profileImage={l.attributes.imageSrc}
+                    />
+                  ))}
+                </Stack>
+              </Grid>
+            ) : null}
           </Grid>
 
           <Grid container spacing={8}>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={12} sm={4}>
               <AttributesCard
                 state={school.relationships.address.data}
                 openDate={school.attributes.openedOn}
@@ -95,25 +104,27 @@ const School = ({}) => {
                 maxEnrollment={school.attributes.maxEnrollment}
               />
             </Grid>
-            <Grid item xs={12} sm={9}>
+            <Grid item xs={12} sm={8}>
               <Stack spacing={12}>
-                <Stack spacing={3}>
-                  <Typography variant="h4" bold>
-                    Our School
-                  </Typography>
-                  <Typography variant="bodyLarge">
-                    At Wild Rose our goal is to follow authentic Montessori
-                    practice creating environments for children in the process
-                    of doing the important work of developing independence. We
-                    aim to create an experience for children at Wild Rose that
-                    supports a sense of wonder, love of learning, and
-                    appreciation of interdependence within a joyful learning
-                    community. As a small school we have the opportunity to
-                    prioritize these goals and provide a uniquely tailored
-                    experience for your individual child. At Wild Rose we each
-                    child’s Montessori experience our primary focus.
-                  </Typography>
-                </Stack>
+                {school.attributes.about ? (
+                  <Stack spacing={3}>
+                    <Typography variant="h4" bold>
+                      Our School
+                    </Typography>
+                    <Typography variant="bodyLarge">
+                      At Wild Rose our goal is to follow authentic Montessori
+                      practice creating environments for children in the process
+                      of doing the important work of developing independence. We
+                      aim to create an experience for children at Wild Rose that
+                      supports a sense of wonder, love of learning, and
+                      appreciation of interdependence within a joyful learning
+                      community. As a small school we have the opportunity to
+                      prioritize these goals and provide a uniquely tailored
+                      experience for your individual child. At Wild Rose we each
+                      child's Montessori experience our primary focus.
+                    </Typography>
+                  </Stack>
+                ) : null}
 
                 {/* <Grid container>
                   <Grid item xs={12} sm={6}>

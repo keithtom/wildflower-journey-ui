@@ -107,10 +107,14 @@ const Network = () => {
                 ? results.map((f) => (
                     <PersonResultItem
                       personLink={`/network/people/${f.id}`}
-                      profileImg={f.attributes.imageUrl}
+                      profileImg={
+                        f.attributes.imageUrl
+                          ? f.attributes.imageUrl
+                          : "https://images.unsplash.com/photo-1629654858857-615c2c8be8a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1494&q=80"
+                      }
                       firstName={f.attributes.firstName}
                       lastName={f.attributes.lastName}
-                      role={f.attributes.roleList}
+                      roleList={f.attributes.roleList}
                       location={f.attributes.location}
                       trainingLevel={f.attributes.trainingLevel}
                       schoolLogo={f.attributes.school?.logoUrl}
@@ -121,11 +125,15 @@ const Network = () => {
                 : results.map((f) => (
                     <SchoolResultItem
                       schoolLink={`/network/schools/${f.id}`}
-                      heroImg={f.attributes.heroUrl}
+                      heroImg={
+                        f.attributes.heroUrl
+                          ? f.attributes.heroUrl
+                          : "https://plus.unsplash.com/premium_photo-1667502842264-9cdcdac36086?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1422&q=80"
+                      }
                       logoImg={f.attributes.logoUrl}
                       name={f.attributes.name}
                       location={f.attributes.location}
-                      program={f.attributes.program || []}
+                      agesServed={f.attributes.agesServedList}
                       leaders={f.attributes.leaders || []}
                       key={f.id}
                     />
@@ -216,7 +224,7 @@ const PersonResultItem = ({
   profileImg,
   firstName,
   lastName,
-  role,
+  roleList,
   location,
   trainingLevel,
   schoolLogo,
@@ -231,32 +239,42 @@ const PersonResultItem = ({
               <Grid container justifyContent="space-between">
                 <Grid item flex={1}>
                   <Stack>
-                    <Typography variant="bodyRegular" bold>
+                    <Typography variant="bodyLarge" bold>
                       {firstName} {lastName}
                     </Typography>
-                    <Typography lightened variant="bodySmall">
-                      {role}
-                    </Typography>
+                    <Grid container spacing={2}>
+                      {roleList &&
+                        roleList.map((r, i) => (
+                          <Grid item key={i}>
+                            <Typography lightened variant="bodyRegular">
+                              {r} {i === roleList.length - 1 ? null : "•"}
+                            </Typography>
+                          </Grid>
+                        ))}
+                    </Grid>
                   </Stack>
                 </Grid>
-                { schoolLogo && (
+                {schoolLogo && (
                   <Grid item style={{ pointerEvents: "none" }}>
                     <Avatar src={schoolLogo} size="sm" />
                   </Grid>
                 )}
               </Grid>
-              <Grid container spacing={2}>
-                { location && (
-                  <Grid item>
-                    <Chip label={location} size="small" />
-                  </Grid>
-                )}
-                { trainingLevel && (
-                  <Grid item>
-                    <Chip label={trainingLevel} size="small" />
-                  </Grid>
-                )}
-              </Grid>
+              {location || trainingLevel ? (
+                <Grid container spacing={2}>
+                  {location && (
+                    <Grid item>
+                      <Chip label={location} size="small" />
+                    </Grid>
+                  )}
+                  {trainingLevel &&
+                    trainingLevel.map((t, i) => (
+                      <Grid item key={i}>
+                        <Chip label={t} size="small" />
+                      </Grid>
+                    ))}
+                </Grid>
+              ) : null}
             </Stack>
           </Card>
         </Stack>
@@ -271,7 +289,7 @@ const SchoolResultItem = ({
   logoImg,
   name,
   location,
-  program,
+  agesServed,
   leaders,
 }) => {
   return (
@@ -283,14 +301,14 @@ const SchoolResultItem = ({
             justifyContent="space-between"
             alignItems="flex-start"
             sx={{
-              backgroundImage: `url(${heroImg || logoImg })`,
-              backgroundSize: "cover",
+              backgroundImage: `url(${logoImg ? logoImg : heroImg})`,
+              backgroundSize: `${logoImg ? "contain" : "cover"}`,
+              backgroundRepeat: `${logoImg ? "no-repeat" : null}`,
+              backgroundPosition: `${logoImg ? "center" : null}`,
               minHeight: "240px",
             }}
           >
-            { heroImg && (
-              <Avatar src={logoImg} />
-            )}
+            {/* {logoImg && <Avatar src={logoImg} />} */}
             <AvatarGroup>
               {leaders.map((l) => (
                 <Avatar src={l.imageSrc} size="sm" />
@@ -302,21 +320,22 @@ const SchoolResultItem = ({
               <Grid container justifyContent="space-between">
                 <Grid item flex={1}>
                   <Stack>
-                    <Typography variant="bodyRegular" bold>
+                    <Typography variant="bodyLarge" bold>
                       {name}
                     </Typography>
-                    <Typography lightened variant="bodySmall">
+                    <Typography lightened variant="bodyRegular">
                       {location}
                     </Typography>
                   </Stack>
                 </Grid>
               </Grid>
               <Grid container spacing={2}>
-                {program.map((p, i) => (
-                  <Grid item key={i}>
-                    <Chip label={p} size="small" />
-                  </Grid>
-                ))}
+                {agesServed &&
+                  agesServed.map((a, i) => (
+                    <Grid item key={i}>
+                      <Chip label={a} size="small" />
+                    </Grid>
+                  ))}
               </Grid>
             </Stack>
           </Card>
