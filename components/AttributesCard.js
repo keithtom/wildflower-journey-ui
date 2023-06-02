@@ -14,7 +14,6 @@ const AttributesCard = ({
   maxEnrollment,
   affinityGroups,
   genderIdentity,
-  role,
 }) => {
   return (
     <Card>
@@ -75,13 +74,13 @@ const AttributesCard = ({
             <Typography variant="bodySmall" lightened uppercase bold>
               Ethnicity
             </Typography>
-            {ethnicity.map((e, i) => (
-              <Grid container spacing={3} key={i}>
-                <Grid item>
+            <Grid container spacing={2}>
+              {ethnicity.map((e, i) => (
+                <Grid item key={i}>
                   <Chip label={e} size="small" />
                 </Grid>
-              </Grid>
-            ))}
+              ))}
+            </Grid>
           </Stack>
         ) : null}
         {agesServed?.length ? (
@@ -89,29 +88,16 @@ const AttributesCard = ({
             <Typography variant="bodySmall" lightened uppercase bold>
               Ages Served
             </Typography>
-            {agesServed.map((a, i) => (
-              <Grid container spacing={3} key={i}>
-                <Grid item>
+            <Grid container spacing={2}>
+              {agesServed.map((a, i) => (
+                <Grid item key={i}>
                   <Chip label={a} size="small" />
                 </Grid>
-              </Grid>
-            ))}
+              ))}
+            </Grid>
           </Stack>
         ) : null}
-        {role?.length ? (
-          <Stack spacing={2}>
-            <Typography variant="bodySmall" lightened uppercase bold>
-              Role
-            </Typography>
-            {role.map((r, i) => (
-              <Grid container spacing={3} key={i}>
-                <Grid item>
-                  <Chip label={r} size="small" />
-                </Grid>
-              </Grid>
-            ))}
-          </Stack>
-        ) : null}
+
         {language ? (
           <Stack spacing={2}>
             <Typography variant="bodySmall" lightened uppercase bold>
@@ -141,13 +127,13 @@ const AttributesCard = ({
             <Typography variant="bodySmall" lightened uppercase bold>
               Montessori Certification
             </Typography>
-            {montessoriCertification.map((m, i) => (
-              <Grid container spacing={3} key={i}>
-                <Grid item>
+            <Grid container spacing={2}>
+              {montessoriCertification.map((m, i) => (
+                <Grid item key={i}>
                   <Chip label={m} size="small" />
                 </Grid>
-              </Grid>
-            ))}
+              ))}
+            </Grid>
           </Stack>
         ) : null}
       </Stack>

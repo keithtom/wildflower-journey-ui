@@ -302,11 +302,13 @@ const ConfirmDemographicInfo = ({}) => {
   const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
     "A not-listed or more specific ethnicity"
   );
-  const showCustomLanguageField = watchFields.primaryLanguage === 35;
-  const showCustomGenderField = watchFields.gender === 3;
-  const showCustomPronounsField = watchFields.pronouns === 9;
+  const showCustomLanguageField = watchFields.primaryLanguage === "other";
+  const showCustomGenderField =
+    watchFields.gender === "A not-listed or more specific gender identity";
+  const showCustomPronounsField =
+    watchFields.pronouns === "Not-listed or more specific pronouns";
 
-  // console.log({ watchFields });
+  console.log({ watchFields });
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -529,6 +531,7 @@ const ConfirmDemographicInfo = ({}) => {
                         errors.pronouns.type === "required" &&
                         "This field is required"
                       }
+                      value={field.value}
                       {...field}
                     />
                   )}

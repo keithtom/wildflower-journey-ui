@@ -39,7 +39,7 @@ const Header = ({ toggleNavOpen }) => {
 
   const logo = "/assets/images/wildflower-logo.png";
 
-  const showNetwork = false;
+  const showNetwork = true;
 
   return (
     <CustomAppBar>
