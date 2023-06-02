@@ -24,11 +24,12 @@ import {
   Radio,
   MultiSelect,
 } from "@ui";
-import Hero from "@components/Hero";
+import SchoolHero from "@components/SchoolHero";
 import AttributesCard from "@components/AttributesCard";
 import UserCard from "@components/UserCard";
 
 const School = ({}) => {
+  const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const router = useRouter();
   const { schoolId } = router.query;
   console.log("schoolId", schoolId);
@@ -43,38 +44,35 @@ const School = ({}) => {
   console.log("about to render", data.data);
   const school = data.data;
 
-  console.log({ school });
+  const hasInfo = school.attributes.about;
+  const hasLeadership = school.attributes.leaders;
+  const hasAttributes =
+    school.relationships.address.data ||
+    school.attributes.openedOn ||
+    school.attributes.agesServedList ||
+    school.attributes.governanceType ||
+    school.attributes.maxEnrollment;
+  const isMySchool = false; //TODO: If currentUser id matches any of relationships.people of type TL then true
+
+  // console.log({ school });
 
   return (
     <>
       <PageContainer>
         <Stack spacing={6}>
-          <Hero
-            imageUrl={
+          <SchoolHero
+            schoolName={school.attributes.name}
+            schoolLocation={school.attributes.location}
+            heroImg={
               school.attributes.heroUrl
                 ? school.attributes.heroUrl
-                : FakeSchool.heroUrl
+                : "https://images.unsplash.com/photo-1629654857513-1136aef1b10f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1403&q=80"
             }
+            logoImg={school.attributes.logoUrl}
           />
 
-          <Grid container spacing={8} justifyContent="space-between">
-            <Grid item>
-              <Stack spacing={3}>
-                <img
-                  src={school.attributes.logoUrl}
-                  style={{
-                    objectFit: "contain",
-                    maxWidth: "240px",
-                    maxHeight: "120px",
-                    width: "100%",
-                  }}
-                />
-                <Typography variant="bodyRegular">
-                  {school.attributes.name}
-                </Typography>
-              </Stack>
-            </Grid>
-            {school.attributes.leaders ? (
+          {school.attributes.leaders ? (
+            <Grid container spacing={8} justifyContent="space-between">
               <Grid item>
                 <Stack direction="row" spacing={6}>
                   {school.attributes.leaders.map((l, i) => (
@@ -91,42 +89,72 @@ const School = ({}) => {
                   ))}
                 </Stack>
               </Grid>
-            ) : null}
-          </Grid>
+            </Grid>
+          ) : null}
 
           <Grid container spacing={8}>
-            <Grid item xs={12} sm={4}>
-              <AttributesCard
-                state={school.relationships.address.data}
-                openDate={school.attributes.openedOn}
-                agesServed={school.attributes.agesServedList}
-                governance={school.attributes.governanceType}
-                maxEnrollment={school.attributes.maxEnrollment}
-              />
-            </Grid>
-            <Grid item xs={12} sm={8}>
-              <Stack spacing={12}>
-                {school.attributes.about ? (
-                  <Stack spacing={3}>
-                    <Typography variant="h4" bold>
-                      Our School
-                    </Typography>
-                    <Typography variant="bodyLarge">
-                      At Wild Rose our goal is to follow authentic Montessori
-                      practice creating environments for children in the process
-                      of doing the important work of developing independence. We
-                      aim to create an experience for children at Wild Rose that
-                      supports a sense of wonder, love of learning, and
-                      appreciation of interdependence within a joyful learning
-                      community. As a small school we have the opportunity to
-                      prioritize these goals and provide a uniquely tailored
-                      experience for your individual child. At Wild Rose we each
-                      child's Montessori experience our primary focus.
-                    </Typography>
-                  </Stack>
+            <Grid item sm={12} md={hasInfo ? 4 : 12}>
+              <Stack spacing={6}>
+                {hasLeadership ? (
+                  <Card>
+                    <Stack container spacing={3}>
+                      {school.attributes.leaders.map((l, i) => (
+                        <Grid item>
+                          <UserCard
+                            key={i}
+                            link={`/network/people/${l.attributes.id}`}
+                            firstName={l.attributes.firstName}
+                            lastName={l.attributes.lastName}
+                            email={l.attributes.email}
+                            phone={l.attributes.phone}
+                            role={l.attributes.role}
+                            profileImage={l.attributes.imageSrc}
+                          />
+                        </Grid>
+                      ))}
+                    </Stack>
+                  </Card>
                 ) : null}
+                {hasAttributes ? (
+                  <AttributesCard
+                    state={school.relationships.address.data}
+                    openDate={school.attributes.openedOn}
+                    agesServed={school.attributes.agesServedList}
+                    governance={school.attributes.governanceType}
+                    maxEnrollment={school.attributes.maxEnrollment}
+                  />
+                ) : null}
+                {isMySchool ? (
+                  <Button
+                    variant="lightened"
+                    full
+                    onClick={() => setEditProfileModalOpen(true)}
+                  >
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Icon type="pencil" size="small" />
+                      <Typography variant="bodyRegular" bold>
+                        Edit school profile
+                      </Typography>
+                    </Stack>
+                  </Button>
+                ) : null}
+              </Stack>
+            </Grid>
+            {hasInfo ? (
+              <Grid item xs={12} sm={8}>
+                <Stack spacing={12}>
+                  {school.attributes.about ? (
+                    <Stack spacing={3}>
+                      <Typography variant="h4" bold>
+                        Our School
+                      </Typography>
+                      <Typography variant="bodyLarge">
+                        {school.attributes.about}
+                      </Typography>
+                    </Stack>
+                  ) : null}
 
-                {/* <Grid container>
+                  {/* <Grid container>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="h4" bold>
                       School Board
@@ -148,106 +176,35 @@ const School = ({}) => {
                     </Stack>
                   </Grid>
                 </Grid> */}
-              </Stack>
-            </Grid>
+                </Stack>
+              </Grid>
+            ) : null}
           </Grid>
         </Stack>
       </PageContainer>
+      <Modal
+        toggle={() => setEditProfileModalOpen(!editProfileModalOpen)}
+        open={editProfileModalOpen}
+        title="Edit school profile"
+      >
+        <Card variant="lightened">
+          <Stack spacing={6}>
+            <Icon type="wrench" variant="primary" />
+            <Stack spacing={2}>
+              <Typography variant="bodyLarge" bold>
+                Editing your school profiles is under construction
+              </Typography>
+              <Typography variant="bodyRegular" lightened>
+                We're hard at work to ensure you'll soon be able to edit this
+                page. Please bear with us as we continue to develop this
+                feature.
+              </Typography>
+            </Stack>
+          </Stack>
+        </Card>
+      </Modal>
     </>
   );
 };
 
 export default School;
-
-const FakeLeaders = [
-  {
-    attributes: {
-      id: "aaaa-bbbb",
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      email: "taylor@montessori.com",
-      phone: "123-456-7890",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
-    },
-  },
-  {
-    attributes: {
-      id: "aaaa-bbbb",
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      email: "taylor@montessori.com",
-      phone: "123-456-7890",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
-    },
-  },
-];
-const FakeBoardMembers = [
-  {
-    attributes: {
-      id: "aaaa-bbbb",
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      email: "taylor@montessori.com",
-      phone: "123-456-7890",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
-    },
-  },
-  {
-    attributes: {
-      id: "aaaa-bbbb",
-      firstName: "Taylor",
-      lastName: "Zanke",
-      role: "Teacher Leader",
-      location: "Los Angeles",
-      trainingLevel: "Primary Trained",
-      email: "taylor@montessori.com",
-      phone: "123-456-7890",
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2369&q=80",
-    },
-  },
-];
-
-const FakeSchool = {
-  name: "Pasadena Montessori",
-  logoUrl:
-    "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1365&q=80",
-  heroUrl:
-    "https://plus.unsplash.com/premium_photo-1667502842264-9cdcdac36086?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1422&q=80",
-  location: "Pasadena, CA",
-  id: "aaaa-1111",
-  attributes: [
-    {
-      name: "Hub",
-      values: ["Massachusetts"],
-    },
-    {
-      name: "Open Date",
-      values: ["Fall 2014"],
-    },
-    {
-      name: "Program",
-      values: ["Primary", "Elementary"],
-    },
-    {
-      name: "Capacity",
-      values: ["50+ Students"],
-    },
-    {
-      name: "Languages",
-      values: ["English", "Spanish"],
-    },
-  ],
-};

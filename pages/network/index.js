@@ -114,7 +114,7 @@ const Network = () => {
                       }
                       firstName={f.attributes.firstName}
                       lastName={f.attributes.lastName}
-                      roleList={f.attributes.roleList}
+                      roles={f.attributes.roleList}
                       location={f.attributes.location}
                       trainingLevel={f.attributes.trainingLevel}
                       schoolLogo={f.attributes.school?.logoUrl}
@@ -224,7 +224,7 @@ const PersonResultItem = ({
   profileImg,
   firstName,
   lastName,
-  roleList,
+  roles,
   location,
   trainingLevel,
   schoolLogo,
@@ -243,11 +243,11 @@ const PersonResultItem = ({
                       {firstName} {lastName}
                     </Typography>
                     <Grid container spacing={2}>
-                      {roleList &&
-                        roleList.map((r, i) => (
+                      {roles &&
+                        roles.map((r, i) => (
                           <Grid item key={i}>
                             <Typography lightened variant="bodyRegular">
-                              {r} {i === roleList.length - 1 ? null : "•"}
+                              {r} {i === roles.length - 1 ? null : "•"}
                             </Typography>
                           </Grid>
                         ))}
@@ -420,16 +420,16 @@ const FakeFilters = [
       { label: "4", value: "4" },
     ],
   },
-  {
-    title: "Affinity groups",
-    doNotDisplayFor: "schools",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
+  // {
+  //   title: "Affinity groups",
+  //   doNotDisplayFor: "schools",
+  //   options: [
+  //     { label: "1", value: "1" },
+  //     { label: "2", value: "2" },
+  //     { label: "3", value: "3" },
+  //     { label: "4", value: "4" },
+  //   ],
+  // },
   // {
   //   title: "Pronouns",
   //   doNotDisplayFor: "schools",

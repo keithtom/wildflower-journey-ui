@@ -37,7 +37,7 @@ const Select = ({
             Array.isArray(value) ? (
               value.join(", ")
             ) : (
-              options[value]
+              value
             )
           ) : (
             <Typography variant="bodyRegular" lightened>
@@ -57,7 +57,7 @@ const Select = ({
         {...props}
       >
         {options.map((option, i) => (
-          <MenuItem key={i} value={i}>
+          <MenuItem key={i} value={option}>
             {option}
           </MenuItem>
         ))}
