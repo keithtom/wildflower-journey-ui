@@ -40,9 +40,10 @@ const Person = ({}) => {
     peopleApi.show(personId, { network: true }).then((res) => res.data)
   );
 
-  if (error) return <div>failed to load</div>;
-  if (isLoading) return <div>loading...</div>;
-  if (!data.data) return <div>loading...</div>;
+  if (error)
+    return <PageContainer>failed to load ${error.message}</PageContainer>;
+  if (isLoading || !data) return <PageContainer isLoading={true} />;
+  // if (!data.data) return <div>loading...</div>;
 
   const person = data.data;
 
@@ -69,11 +70,7 @@ const Person = ({}) => {
       <PageContainer isLoading={isLoading || !currentUser}>
         <Stack spacing={6}>
           <ProfileHero
-            profileImage={
-              person.attributes?.imageUrl
-                ? person.attributes?.imageUrl
-                : "https://images.unsplash.com/photo-1629654858857-615c2c8be8a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1494&q=80"
-            }
+            profileImage={person.attributes?.imageUrl}
             firstName={person.attributes?.firstName}
             lastName={person.attributes?.lastName}
             roles={person.attributes?.roleList}
@@ -84,7 +81,7 @@ const Person = ({}) => {
           />
 
           <Grid container spacing={8}>
-            <Grid item sm={12} md={hasInfo ? 4 : 12}>
+            <Grid item xs={12} md={hasInfo ? 4 : 12}>
               <Stack spacing={6}>
                 {hasSchool ? (
                   schoolLink ? (
@@ -115,23 +112,23 @@ const Person = ({}) => {
                 {hasContact ? (
                   <Card>
                     <Stack spacing={2}>
-                      {person.attributes.email ? (
+                      {person?.attributes?.email ? (
                         <Stack spacing={1}>
                           <Typography variant="bodySmall" bold lightened>
                             EMAIL
                           </Typography>
                           <Typography variant="bodyRegular">
-                            {person.attributes.email}
+                            {person?.attributes?.email}
                           </Typography>
                         </Stack>
                       ) : null}
-                      {person.attributes.phone ? (
+                      {person?.attributes?.phone ? (
                         <Stack spacing={1}>
                           <Typography variant="bodySmall" bold lightened>
                             PHONE
                           </Typography>
                           <Typography variant="bodyRegular">
-                            {person.attributes.phone}
+                            {person?.attributes?.phone}
                           </Typography>
                         </Stack>
                       ) : null}
@@ -140,12 +137,12 @@ const Person = ({}) => {
                 ) : null}
                 {hasAttributes ? (
                   <AttributesCard
-                    state={person.relationships.address.data.state}
-                    language={person.attributes.primaryLanguage}
-                    ethnicity={person.attributes.raceEthnicityList}
-                    pronouns={person.attributes.pronouns}
+                    state={person?.relationships?.address?.data?.state}
+                    language={person?.attributes?.primaryLanguage}
+                    ethnicity={person?.attributes?.raceEthnicityList}
+                    pronouns={person?.attributes?.pronouns}
                     montessoriCertification={
-                      person.attributes.montessoriCertifiedLevelList
+                      person?.attributes?.montessoriCertifiedLevelList
                     }
                   />
                 ) : null}

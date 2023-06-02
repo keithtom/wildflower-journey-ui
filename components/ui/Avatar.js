@@ -4,6 +4,7 @@ import { styled, css } from "@mui/material/styles";
 const CustomAvatar = styled(MaterialAvatar)`
   width: ${({ theme }) => theme.util.buffer * 12}px;
   height: ${({ theme }) => theme.util.buffer * 12}px;
+  background: ${({ theme }) => theme.color.primary.main};
 
   /* mini */
   ${(props) =>
@@ -55,7 +56,12 @@ const CustomAvatar = styled(MaterialAvatar)`
 `;
 
 const Avatar = ({ ...props }) => {
-  return <CustomAvatar {...props} />;
+  const fallback = "/assets/images/avatar-fallback.svg";
+  return (
+    <CustomAvatar {...props}>
+      <img src={fallback} style={{ width: "100%" }} />
+    </CustomAvatar>
+  );
 };
 
 export default Avatar;

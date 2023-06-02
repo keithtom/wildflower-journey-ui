@@ -30,9 +30,12 @@ const Network = () => {
     setFilters({ ...filters, models: e.target.value });
   };
 
-  if (error) return <div>failed to load</div>;
-  // if (isSearching) return <div>searching</div>;
+  if (error) return <PageContainer>failed to load</PageContainer>;
   const noResults = query && results.length === 0;
+
+  const profileFallback = "/assets/images/avatar-fallback.svg";
+  const schoolFallback = "/assets/images/school-placeholder.png";
+
   console.log({ results });
 
   return (
@@ -110,7 +113,7 @@ const Network = () => {
                       profileImg={
                         f.attributes.imageUrl
                           ? f.attributes.imageUrl
-                          : "https://images.unsplash.com/photo-1629654858857-615c2c8be8a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1494&q=80"
+                          : profileFallback
                       }
                       firstName={f.attributes.firstName}
                       lastName={f.attributes.lastName}
@@ -128,7 +131,7 @@ const Network = () => {
                       heroImg={
                         f.attributes.heroUrl
                           ? f.attributes.heroUrl
-                          : "https://plus.unsplash.com/premium_photo-1667502842264-9cdcdac36086?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1422&q=80"
+                          : schoolFallback
                       }
                       logoImg={f.attributes.logoUrl}
                       name={f.attributes.name}

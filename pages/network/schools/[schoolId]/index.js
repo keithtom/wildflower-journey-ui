@@ -39,10 +39,13 @@ const School = ({}) => {
     schoolApi.show(schoolId, { network: true }).then((res) => res.data)
   );
 
-  if (error) return <div>failed to load ${error.message}</div>;
-  if (isLoading || !data) return <div>loading...</div>;
-  console.log("about to render", data.data);
+  if (error)
+    return <PageContainer>failed to load ${error.message}</PageContainer>;
+  if (isLoading || !data) return <PageContainer isLoading={true} />;
+  // console.log("about to render", data.data);
   const school = data.data;
+
+  const schoolFallback = "/assets/images/school-placeholder.png";
 
   const hasInfo = school.attributes.about;
   const hasLeadership = school.attributes.leaders;
@@ -61,30 +64,34 @@ const School = ({}) => {
       <PageContainer>
         <Stack spacing={6}>
           <SchoolHero
-            schoolName={school.attributes.name}
-            schoolLocation={school.attributes.location}
+            schoolName={school?.attributes?.name}
+            schoolLocation={school?.attributes?.location}
             heroImg={
-              school.attributes.heroUrl
-                ? school.attributes.heroUrl
-                : "https://images.unsplash.com/photo-1629654857513-1136aef1b10f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1403&q=80"
+              school?.attributes?.heroUrl
+                ? school?.attributes?.heroUrl
+                : "https://images.unsplash.com/photo-1629654858857-615c2c8be8a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1494&q=80"
             }
-            logoImg={school.attributes.logoUrl}
+            logoImg={
+              school?.attributes?.logoUrl
+                ? school?.attributes?.logoUrl
+                : schoolFallback
+            }
           />
 
-          {school.attributes.leaders ? (
+          {school?.attributes?.leaders ? (
             <Grid container spacing={8} justifyContent="space-between">
               <Grid item>
                 <Stack direction="row" spacing={6}>
-                  {school.attributes.leaders.map((l, i) => (
+                  {school?.attributes?.leaders.map((l, i) => (
                     <UserCard
                       key={i}
-                      link={`/network/people/${l.attributes.id}`}
-                      firstName={l.attributes.firstName}
-                      lastName={l.attributes.lastName}
-                      email={l.attributes.email}
-                      phone={l.attributes.phone}
-                      role={l.attributes.role}
-                      profileImage={l.attributes.imageSrc}
+                      link={`/network/people/${l?.attributes?.id}`}
+                      firstName={l?.attributes?.firstName}
+                      lastName={l?.attributes?.lastName}
+                      email={l?.attributes?.email}
+                      phone={l?.attributes?.phone}
+                      role={l?.attributes?.role}
+                      profileImage={l?.attributes?.imageSrc}
                     />
                   ))}
                 </Stack>
@@ -93,22 +100,22 @@ const School = ({}) => {
           ) : null}
 
           <Grid container spacing={8}>
-            <Grid item sm={12} md={hasInfo ? 4 : 12}>
+            <Grid item xs={12} md={hasInfo ? 4 : 12}>
               <Stack spacing={6}>
                 {hasLeadership ? (
                   <Card>
                     <Stack container spacing={3}>
-                      {school.attributes.leaders.map((l, i) => (
+                      {school?.attributes?.leaders.map((l, i) => (
                         <Grid item>
                           <UserCard
                             key={i}
-                            link={`/network/people/${l.attributes.id}`}
-                            firstName={l.attributes.firstName}
-                            lastName={l.attributes.lastName}
-                            email={l.attributes.email}
-                            phone={l.attributes.phone}
-                            role={l.attributes.role}
-                            profileImage={l.attributes.imageSrc}
+                            link={`/network/people/${l?.attributes?.id}`}
+                            firstName={l?.attributes?.firstName}
+                            lastName={l?.attributes?.lastName}
+                            email={l?.attributes?.email}
+                            phone={l?.attributes?.phone}
+                            role={l?.attributes?.role}
+                            profileImage={l?.attributes?.imageSrc}
                           />
                         </Grid>
                       ))}
@@ -117,11 +124,11 @@ const School = ({}) => {
                 ) : null}
                 {hasAttributes ? (
                   <AttributesCard
-                    state={school.relationships.address.data}
-                    openDate={school.attributes.openedOn}
-                    agesServed={school.attributes.agesServedList}
-                    governance={school.attributes.governanceType}
-                    maxEnrollment={school.attributes.maxEnrollment}
+                    state={school?.relationships?.address?.data}
+                    openDate={school?.attributes?.openedOn}
+                    agesServed={school?.attributes?.agesServedList}
+                    governance={school?.attributes?.governanceType}
+                    maxEnrollment={school?.attributes?.maxEnrollment}
                   />
                 ) : null}
                 {isMySchool ? (
@@ -143,13 +150,13 @@ const School = ({}) => {
             {hasInfo ? (
               <Grid item xs={12} sm={8}>
                 <Stack spacing={12}>
-                  {school.attributes.about ? (
+                  {school?.attributes?.about ? (
                     <Stack spacing={3}>
                       <Typography variant="h4" bold>
                         Our School
                       </Typography>
                       <Typography variant="bodyLarge">
-                        {school.attributes.about}
+                        {school?.attributes?.about}
                       </Typography>
                     </Stack>
                   ) : null}
