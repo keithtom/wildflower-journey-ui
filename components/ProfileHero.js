@@ -49,21 +49,23 @@ const ProfileHero = ({
                   </Typography>
                 </Stack>
               </Grid>
-              <Grid item>
-                <Link href={schoolLink}>
-                  <Stack direction="row" spacing={6}>
-                    <Stack alignItems="flex-end">
-                      <Typography variant="bodyLarge" lightened>
-                        {school}
-                      </Typography>
-                      <Typography variant="bodyRegular" lightened>
-                        {location}
-                      </Typography>
+              {schoolLink ? (
+                <Grid item>
+                  <Link href={schoolLink}>
+                    <Stack direction="row" spacing={6}>
+                      <Stack alignItems="flex-end">
+                        <Typography variant="bodyLarge" lightened>
+                          {school}
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          {location}
+                        </Typography>
+                      </Stack>
+                      <Avatar src={schoolLogo} />
                     </Stack>
-                    <Avatar src={schoolLogo} />
-                  </Stack>
-                </Link>
-              </Grid>
+                  </Link>
+                </Grid>
+              ) : null}
             </Grid>
             <Grid container spacing={6}>
               <Grid item xs={12} sm={6}>

@@ -1,4 +1,4 @@
-import { Card } from "./ui/index";
+import { Card, Typography } from "./ui/index";
 
 const Hero = ({ imageUrl }) => {
   return (
