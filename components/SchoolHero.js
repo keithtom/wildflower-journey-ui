@@ -17,12 +17,13 @@ import {
 const StyledLogo = styled(Box)`
   background: ${({ theme }) => theme.color.neutral.lightest};
   border: 2px solid white;
-  transform: translateY(calc(-50% - 48px));
+  transform: translateY(calc(-50% - 24px));
   border-radius: ${({ theme }) => theme.radius.lg}px;
   width: 200px;
   height: 200px;
   box-shadow: ${({ theme }) => theme.shadow.small.main};
-  margin-bottom: -148px;
+  margin-bottom: -124px;
+  overflow: hidden;
 `;
 
 const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
@@ -31,7 +32,6 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
       <Grid container justifyContent="center" spacing={6}>
         <Grid item xs={12} sx={{ width: "100%" }}>
           <Card
-            full
             noBorder
             size="large"
             sx={{

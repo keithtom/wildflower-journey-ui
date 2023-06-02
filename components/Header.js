@@ -79,7 +79,7 @@ const Header = ({ toggleNavOpen }) => {
               myProfileLink={
                 showNetwork ? `/network/people/${currentUser.id}` : null
               }
-              avatarSrc={currentUser.attributes.imageUrl}
+              avatarSrc={currentUser?.attributes?.imageUrl}
               userName={`${currentUser.attributes.firstName} ${currentUser.attributes.lastName}`}
             />
           </Grid>
@@ -147,6 +147,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
   return (
     <>
       <Avatar
+        alt={userName}
         hoverable
         size="sm"
         onClick={handleOpen}
