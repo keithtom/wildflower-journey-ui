@@ -11,3 +11,6 @@ yarn-error.log
 .vercel
 
 .env.local
+
+cypress/videos
+cypress/screenshots

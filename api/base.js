@@ -19,7 +19,7 @@ const token = getCookie('auth');
 function register(path, options) {
   let config = {
     baseURL: `${process.env.API_URL}${path}`,
-    timeout: 3000,
+    timeout: 5000,
     mode: "no-cors",
     headers: {
       "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
