@@ -13,6 +13,7 @@ import {
 import Task from "@components/Task";
 import Hero from "@components/Hero";
 import getAuthHeader from "@lib/getAuthHeader";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import { getCookie } from "cookies-next";
 import assignmentsApi from "@api/workflow/assignments";
 
@@ -119,10 +120,25 @@ export default ToDoList;
 
 export async function getServerSideProps({ req, res }) {
   const config = getAuthHeader({ req, res });
+  if (!config) {
+    console.log("no token found, redirecting to login")
+    return redirectLoginProps();
+  }
   
   const phase = getCookie("phase", { req, res });
   const workflowId = getCookie("workflowId", { req, res });
-  const response = await assignmentsApi.index(workflowId, config);
+
+  let response;
+  try {
+    response = await assignmentsApi.index(workflowId, config);
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      clearLoggedInState({req, res});
+      return redirectLoginProps();
+    } else {
+      console.error(error);
+    }
+  }
   
   let steps = response.data.data
   // console.log("steps", steps)

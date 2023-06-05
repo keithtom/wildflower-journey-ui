@@ -1,4 +1,5 @@
 // boiler plate for API calls to api.wildflowerschools.org
+import { clearLoggedInState } from "@lib/handleLogout";
 import axios from "axios";
 import { getCookie } from 'cookies-next';
 import jwt_decode from "jwt-decode";
@@ -37,7 +38,22 @@ function register(path, options) {
   else if (axios.defaults.headers.common['Authorization']) {
     console.log("token set from axios global", jwt_decode(axios.defaults.headers.common['Authorization']).sub);
   }
-  return axios.create(config);
+  const client = axios.create(config);
+
+  client.interceptors.response.use(
+    (response) => {
+      return response;
+    },  
+    (error) => {
+      if (error.response?.status === 401) {
+        clearLoggedInState({});
+        return Promise.reject(error);
+      } else {
+        return Promise.reject(error);
+      }
+    });
+
+  return client;
 };
 
 // const api = axios.create();

@@ -10,6 +10,7 @@ import { parseISO } from "date-fns";
 
 import ssjApi from "@api/ssj/ssj";
 import { useUserContext } from "@lib/useUserContext";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
 import Hero from "../../components/Hero";
@@ -79,6 +80,13 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
       setTeam(result);
       setSubmittedPartnerRequest(result.invitedPartner);
       setOpenDate(result.expectedStartDate);
+    })
+    .catch(function (error) {
+      if (error?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(error);
+      }
     });
   }, []);
 
@@ -778,7 +786,15 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
     setChangedDateValue(true);
   };
   const handleSetOpenDate = () => {
-    ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+    try {
+      ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
+    }
     setOpenDate(moment(dateValue).format("YYYY-MM-DD"));
     setChangedDateValue(false);
     toggle();
@@ -919,9 +935,17 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     },
   });
   async function onSubmit(data) {
-    const response = await ssjApi.invitePartner(data);
-    if (response.status === 200) {
-      setSubmittedPartnerRequest(true);
+    try {
+      const response = await ssjApi.invitePartner(data);
+      if (response.status === 200) {
+        setSubmittedPartnerRequest(true);
+      }
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
     }
   }
 
@@ -1243,12 +1267,27 @@ const waysToWorkTogether = [
 ];
 
 export async function getServerSideProps({ params, req, res }) {
-  const workflowId = getCookie("workflowId", { req, res });
   const config = getAuthHeader({ req, res });
+  if (!config) {
+    console.log("no token found, redirecting to login")
+    return redirectLoginProps();
+  }
+
+  const workflowId = getCookie("workflowId", { req, res });
 
   // turn this in to a catch all api for the ssj/dashboard
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
-  const responseProgress = await axios.get(apiRouteProgress, config);
+  let responseProgress;
+  try {
+    responseProgress = await axios.get(apiRouteProgress, config);
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      clearLoggedInState({req, res});
+      return redirectLoginProps();
+    } else {
+      console.error(error);
+    }
+  }
   const dataProgress = await responseProgress.data;
 
   // want to know how many assigned tasks there are.

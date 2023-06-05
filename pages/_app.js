@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { theme } from "../styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+console.log()
 import { UserProvider } from "../lib/useUserContext";
 import { useRouter } from "next/router";
 import NProgress from "nprogress";
@@ -30,6 +31,7 @@ if (process.env.NODE_ENV === 'production') {
 function MyApp({ Component, pageProps }) {
   const [isLoading, setIsLoading] = useState(false);
   const Router = useRouter();
+
   useEffect(() => {
     NProgress.configure({ showSpinner: false, color: "#00A69C" });
 

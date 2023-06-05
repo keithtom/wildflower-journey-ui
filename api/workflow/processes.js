@@ -10,7 +10,12 @@ async function index(workflowId, phase, config={}) {
 
 // look at an individual process/milestone
 async function show(id, config = {}) {
-  const response = await workflowsApi.get(`/processes/${id}`, config);  
+  let response;
+  try {
+    response = await workflowsApi.get(`/processes/${id}`, config);  
+  } catch (error) {
+    return Promise.reject(error);
+  }
   const included = response.data.included;
   
   wildflowerApi.loadAllRelationshipsFromIncluded(response.data);

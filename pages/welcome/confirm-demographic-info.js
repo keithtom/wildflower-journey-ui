@@ -98,6 +98,13 @@ const ConfirmDemographicInfo = ({}) => {
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
         });
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
       });
     }
   }, [currentUser]);
@@ -127,6 +134,13 @@ const ConfirmDemographicInfo = ({}) => {
           console.error(error);
         } else {
           router.push("/welcome/add-profile-info");
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          router.push("/login");
+        } else {
+          console.error(error);
         }
       });
   };

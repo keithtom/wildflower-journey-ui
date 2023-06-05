@@ -6,6 +6,7 @@ import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
 import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
 import {
   Avatar,
@@ -382,10 +383,24 @@ const EditableTaskList = ({ tasks }) => {
 };
 
 export async function getServerSideProps({ query, req, res }) {
-  const milestoneId = query.milestone;
-
   const config = getAuthHeader({ req, res });
-  const response = await processesApi.show(milestoneId, config)
+  if (!config) {
+    console.log("no token found, redirecting to login")
+    return redirectLoginProps();
+  }
+
+  const milestoneId = query.milestone;
+  let response;
+  try {
+    response = await processesApi.show(milestoneId, config)
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      clearLoggedInState({req, res});
+      return redirectLoginProps();
+    } else {
+      console.error(error);
+    }
+  }
   const data = response.data;
   const milestone = data.data;
   
