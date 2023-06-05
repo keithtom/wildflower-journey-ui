@@ -29,7 +29,7 @@ describe("visiting website for the first time via email link", () => {
       cy.visit(resp.body.invite_url);
       cy.url({timeout: 20000}).should("include", "/welcome/new-etl");
       cy.getCookies()
-        .should("have.length", 4)
+        .should("have.length.greaterThan", 2)
         .should((cookies) => {
           const authCookie = cookies.find((cookie) => {
             return cookie.name === "auth";

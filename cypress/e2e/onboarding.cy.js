@@ -111,7 +111,7 @@ describe("onboarding spec", () => {
           mimeType: "image/jpg",
         });
       });
-      cy.wait(20000);
+      cy.wait(5000);
       cy.contains('Confirm').click();
       cy.url({timeout: 10000}).should("include", "/ssj");
     });
