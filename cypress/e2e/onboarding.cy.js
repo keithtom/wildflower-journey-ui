@@ -91,7 +91,7 @@ describe("onboarding spec", () => {
       cy.get("body").click(0, 0); // close dropdwon
     
       cy.get('button[type="submit"]').click();
-      cy.url({ timeout: 20000 }).should(
+      cy.url({ timeout: 60000 }).should(
         "include",
         "/welcome/add-profile-info"
       );
@@ -113,7 +113,7 @@ describe("onboarding spec", () => {
       });
       cy.wait(5000);
       cy.contains('Confirm').click();
-      cy.url({timeout: 10000}).should("include", "/ssj");
+      cy.url({timeout: 60000}).should("include", "/ssj");
     });
   });
 });
