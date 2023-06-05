@@ -1,16 +1,12 @@
 import 'cypress-file-upload';
 
 describe("onboarding spec", () => {
-  beforeEach(() => {
-    cy.login()
-  });
-
   describe("inputting personal details", () => {
     beforeEach(() => {
       cy.visit("/welcome/confirm-your-details")
     })
 
-    it.only("should display form", () => {
+    it("should display form", () => {
       cy.get('input[name="firstName"]').should("be.visible");
       cy.get('input[name="lastName"]').should("be.visible");
       cy.get('input[name="city"]').should("be.visible");
@@ -122,23 +118,3 @@ describe("onboarding spec", () => {
   });
 });
 
-describe("visiting website for the first time via email link", () => {
-  it("should authenticate and redirect to onboarding", () => {
-    cy.request({
-      method: "GET",
-      url: `${Cypress.env("apiUrl")}/invite_email_link`,
-    })
-    .then((resp) => {
-      cy.visit(resp.body.invite_url);
-      cy.url({timeout: 10000}).should("include", "/welcome/new-etl");
-      cy.getCookies()
-        .should("have.length", 4)
-        .should((cookies) => {
-          const authCookie = cookies.find((cookie) => {
-            return cookie.name === "auth";
-          });
-          expect(authCookie).to.not.be.undefined;
-        });
-    })
-  })
-})

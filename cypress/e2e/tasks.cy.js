@@ -1,6 +1,5 @@
 describe("visioning spec", () => {
   beforeEach(() => {
-    cy.login();
     cy.visit("/ssj", { timeout: 60000 });
     cy.viewport(1280, 832);
   });

@@ -2,7 +2,6 @@ const { Cytoscapedotjs } = require("styled-icons/simple-icons");
 
 describe("dashboard spec", () => {
   beforeEach(() => {
-    cy.login()
     cy.visit("/ssj", {timeout: 60000})
   });
 
