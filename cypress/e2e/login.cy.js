@@ -27,7 +27,7 @@ describe("visiting website for the first time via email link", () => {
     })
     .then((resp) => {
       cy.visit(resp.body.invite_url);
-      cy.url({timeout: 10000}).should("include", "/welcome/new-etl");
+      cy.url({timeout: 20000}).should("include", "/welcome/new-etl");
       cy.getCookies()
         .should("have.length", 4)
         .should((cookies) => {

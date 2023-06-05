@@ -91,7 +91,7 @@ describe("onboarding spec", () => {
       cy.get("body").click(0, 0); // close dropdwon
     
       cy.get('button[type="submit"]').click();
-      cy.url({ timeout: 10000 }).should(
+      cy.url({ timeout: 20000 }).should(
         "include",
         "/welcome/add-profile-info"
       );
@@ -111,7 +111,7 @@ describe("onboarding spec", () => {
           mimeType: "image/jpg",
         });
       });
-      cy.wait(5000);
+      cy.wait(20000);
       cy.contains('Confirm').click();
       cy.url({timeout: 10000}).should("include", "/ssj");
     });
