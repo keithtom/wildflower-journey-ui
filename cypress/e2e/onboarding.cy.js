@@ -10,7 +10,7 @@ describe("onboarding spec", () => {
       cy.visit("/welcome/confirm-your-details")
     })
 
-    it("should display form", () => {
+    it.only("should display form", () => {
       cy.get('input[name="firstName"]').should("be.visible");
       cy.get('input[name="lastName"]').should("be.visible");
       cy.get('input[name="city"]').should("be.visible");
