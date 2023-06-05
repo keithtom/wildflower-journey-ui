@@ -24,6 +24,9 @@ describe("visiting website for the first time via email link", () => {
     cy.request({
       method: "GET",
       url: `${Cypress.env("apiUrl")}/invite_email_link`,
+      body: {
+        email: `cypress_test_${Date.now()}@test.com`
+      }
     })
     .then((resp) => {
       cy.visit(resp.body.invite_url);
