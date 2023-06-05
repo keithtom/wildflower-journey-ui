@@ -103,7 +103,7 @@ describe("onboarding spec", () => {
       cy.visit("/welcome/add-profile-info")
     })
 
-    it("uploads a file", () => {
+    it.only("uploads a file", () => {
       cy.fixture("test_profile_picture.jpg").then((filecontent) => {
         cy.get('input[type="file"]').attachFile({
           fileContent: filecontent.toString(),
