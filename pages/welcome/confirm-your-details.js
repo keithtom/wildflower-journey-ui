@@ -20,6 +20,29 @@ import {
   PageContainer,
 } from "@ui";
 
+const StyledChatBubble = styled(Box)`
+  padding: ${({ theme }) => theme.util.buffer * 4}px;
+  background-color: ${({ theme }) => theme.color.primary.lightest};
+  border-radius: ${({ theme }) => theme.radius.md}px;
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  height: auto;
+  &:after {
+    content: " ";
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: 16px;
+    right: auto;
+    top: auto;
+    bottom: -16px;
+    border: 20px solid;
+    border-color: transparent transparent transparent
+      ${({ theme }) => theme.color.primary.lightest};
+  }
+`;
+
 const ConfirmYourDetails = ({}) => {
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
@@ -66,6 +89,13 @@ const ConfirmYourDetails = ({}) => {
           setCurrentUser(currentUser);
           router.push("/welcome/confirm-demographic-info");
         }
+      })
+      .catch(function (error) {
+        if (error?.response?.status === 401) {
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
       });
   };
 
@@ -91,7 +121,7 @@ const ConfirmYourDetails = ({}) => {
                 </Grid>
                 {isExistingTL ? null : (
                   <>
-                    <Card variant="primaryLightened" size="small">
+                    <StyledChatBubble>
                       <Stack direction="row" spacing={3}>
                         <Grid item>
                           <Icon type="star" variant="primary" />
@@ -102,7 +132,7 @@ const ConfirmYourDetails = ({}) => {
                           are available to you.
                         </Typography>
                       </Stack>
-                    </Card>
+                    </StyledChatBubble>
                     {opsGuide ? (
                       <Stack direction="row" spacing={3} alignItems="center">
                         <Avatar size="sm" src={opsGuide?.imageUrl} />

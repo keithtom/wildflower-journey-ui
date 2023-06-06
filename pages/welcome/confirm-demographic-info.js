@@ -24,6 +24,29 @@ import {
   PageContainer,
 } from "@ui";
 
+const StyledChatBubble = styled(Box)`
+  padding: ${({ theme }) => theme.util.buffer * 4}px;
+  background-color: ${({ theme }) => theme.color.primary.lightest};
+  border-radius: ${({ theme }) => theme.radius.md}px;
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  height: auto;
+  &:after {
+    content: " ";
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: 16px;
+    right: auto;
+    top: auto;
+    bottom: -16px;
+    border: 20px solid;
+    border-color: transparent transparent transparent
+      ${({ theme }) => theme.color.primary.lightest};
+  }
+`;
+
 const ConfirmDemographicInfo = ({}) => {
   const router = useRouter();
   const { currentUser } = useUserContext();
@@ -75,6 +98,13 @@ const ConfirmDemographicInfo = ({}) => {
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
         });
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
       });
     }
   }, [currentUser]);
@@ -104,6 +134,13 @@ const ConfirmDemographicInfo = ({}) => {
           console.error(error);
         } else {
           router.push("/welcome/add-profile-info");
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          router.push("/login");
+        } else {
+          console.error(error);
         }
       });
   };
@@ -140,9 +177,21 @@ const ConfirmDemographicInfo = ({}) => {
     { value: "High School", label: "High School" },
   ];
   const incomeOptions = [
-    { value: "High Income", label: "High Income" },
-    { value: "Medium Income", label: "Medium Income" },
-    { value: "Low Income", label: "Low Income" },
+    {
+      value: "High Income",
+      label:
+        "High Income (ex. I did not, or would not, qualify for financial aid in college.)",
+    },
+    {
+      value: "Medium Income",
+      label:
+        "Middle Income (ex. I did, or would, qualify for financial aid in college.)",
+    },
+    {
+      value: "Low Income",
+      label:
+        "Low Income (ex. My family was eligible for food subsidies at school.)",
+    },
   ];
   const languageOptions = [
     { value: "English", label: "English" },
@@ -258,9 +307,11 @@ const ConfirmDemographicInfo = ({}) => {
   const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
     "A not-listed or more specific ethnicity"
   );
-  const showCustomLanguageField = watchFields.primaryLanguage === 35;
-  const showCustomGenderField = watchFields.gender === 3;
-  const showCustomPronounsField = watchFields.pronouns === 9;
+  const showCustomLanguageField = watchFields.primaryLanguage === "other";
+  const showCustomGenderField =
+    watchFields.gender === "A not-listed or more specific gender identity";
+  const showCustomPronounsField =
+    watchFields.pronouns === "Not-listed or more specific pronouns";
 
   // console.log({ watchFields });
 
@@ -280,7 +331,7 @@ const ConfirmDemographicInfo = ({}) => {
                 </Grid>
                 {isExistingTL ? null : (
                   <>
-                    <Card variant="primaryLightened" size="small">
+                    <StyledChatBubble>
                       <Stack direction="row" spacing={3}>
                         <Grid item>
                           <Icon type="star" variant="primary" />
@@ -292,7 +343,7 @@ const ConfirmDemographicInfo = ({}) => {
                           support.
                         </Typography>
                       </Stack>
-                    </Card>
+                    </StyledChatBubble>
                     {opsGuide ? (
                       <Stack direction="row" spacing={3} alignItems="center">
                         <Avatar size="sm" src={opsGuide?.imageUrl} />
@@ -514,7 +565,12 @@ const ConfirmDemographicInfo = ({}) => {
                 ) : null}
                 <Stack spacing={1}>
                   <Typography variant="bodyRegular">
-                    What is your household income?
+                    How would you describe the economic situation in your
+                    household while you were growing up?
+                  </Typography>
+                  <Typography variant="bodyRegular" lightened>
+                    As a reference point, today a family of four with a family
+                    income of $47,638/year is the limit to receive subsidies.
                   </Typography>
                   <Controller
                     name="householdIncome"
@@ -534,10 +590,10 @@ const ConfirmDemographicInfo = ({}) => {
                       </RadioGroup>
                     )}
                   />
-                  <FormHelperText error={errors.lgbtqia}>
+                  <FormHelperText error={errors.householdIncome}>
                     {errors &&
-                      errors.lgbtqia &&
-                      errors.lgbtqia.type === "required" &&
+                      errors.householdIncome &&
+                      errors.householdIncome.type === "required" &&
                       "This field is required"}
                   </FormHelperText>
                 </Stack>
