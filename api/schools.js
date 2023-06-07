@@ -1,3 +1,13 @@
-// index
-// show
-// update
+import wildflowerApi from "@api/base";
+
+const schoolsApi = wildflowerApi.register("/v1/schools", {});
+
+async function index() {
+  return schoolsApi.get();
+}
+
+async function show(id, params = {}) {
+  return schoolsApi.get(`/${id}`, params)
+}
+
+export default { index, show };

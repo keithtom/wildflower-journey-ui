@@ -10,6 +10,7 @@ import { parseISO } from "date-fns";
 
 import ssjApi from "@api/ssj/ssj";
 import { useUserContext } from "@lib/useUserContext";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
 import Hero from "../../components/Hero";
@@ -79,15 +80,20 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
       setTeam(result);
       setSubmittedPartnerRequest(result.invitedPartner);
       setOpenDate(result.expectedStartDate);
+    })
+    .catch(function (error) {
+      if (error?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(error);
+      }
     });
   }, []);
 
   const partners =
     team?.team.data.length > 1
       ? team.team.data.filter((t) => {
-          return (
-            t.id !== currentUser?.id && t.attributes.roleList[0] === "partner"
-          );
+          return t.id !== currentUser?.id;
         })
       : null;
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
@@ -160,15 +166,18 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                     </Typography>
                     <Typography variant="bodySmall">Visioning</Typography>
                   </Grid>
-                  <Grid item>
-                    <Typography variant="bodyMini" bold lightened>
-                      LOCATION
-                    </Typography>
-                    <Typography variant="bodySmall">
-                      {currentUser?.personAddress?.city},{" "}
-                      {currentUser?.personAddress?.state}
-                    </Typography>
-                  </Grid>
+                  {currentUser?.personAddress?.city &&
+                  currentUser?.personAddress?.state ? (
+                    <Grid item>
+                      <Typography variant="bodyMini" bold lightened>
+                        LOCATION
+                      </Typography>
+                      <Typography variant="bodySmall">
+                        {currentUser?.personAddress?.city},{" "}
+                        {currentUser?.personAddress?.state}
+                      </Typography>
+                    </Grid>
+                  ) : null}
                   <Grid item>
                     {openDate ? (
                       <Card
@@ -322,29 +331,27 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Grid>
               </Grid>
               <Grid container spacing={3} alignItems="stretch">
-                <Grid item xs={12} sm={4}>
-                  {partners && partners.length ? (
-                    partners.map((p) => (
-                      <Grid item xs={12} sm={4}>
-                        <UserCard
-                          key={p.id}
-                          firstName={p.attributes.firstName}
-                          lastName={p.attributes.lastName}
-                          email={p.attributes.email}
-                          phone={p.attributes.phone}
-                          role="Partner"
-                        />
-                      </Grid>
-                    ))
-                  ) : (
+                {partners && partners.length ? (
+                  partners.map((p) => (
                     <Grid item xs={12} sm={4}>
-                      <AddPartnerCard
-                        submittedPartnerRequest={submittedPartnerRequest}
-                        onClick={() => setAddPartnerModalOpen(true)}
+                      <UserCard
+                        key={p.id}
+                        firstName={p.attributes.firstName}
+                        lastName={p.attributes.lastName}
+                        email={p.attributes.email}
+                        phone={p.attributes.phone}
+                        role="Partner"
                       />
                     </Grid>
-                  )}
-                </Grid>
+                  ))
+                ) : (
+                  <Grid item xs={12} sm={4}>
+                    <AddPartnerCard
+                      submittedPartnerRequest={submittedPartnerRequest}
+                      onClick={() => setAddPartnerModalOpen(true)}
+                    />
+                  </Grid>
+                )}
                 {opsGuide ? (
                   <Grid item xs={12} sm={4}>
                     <UserCard
@@ -779,7 +786,15 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
     setChangedDateValue(true);
   };
   const handleSetOpenDate = () => {
-    ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+    try {
+      ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
+    }
     setOpenDate(moment(dateValue).format("YYYY-MM-DD"));
     setChangedDateValue(false);
     toggle();
@@ -878,10 +893,9 @@ const FirstTimeUserModal = ({ toggle, open, firstName }) => {
               <Typography variant="bodyRegular">
                 {firstName}, welcome to the home base for your journey into
                 becoming a montessori educator! Again, we're so excited you're
-                here. This is Wildflower Platform, a tool we created to
-                centralize all of the support and resources we have to offer,
-                and to make it easier for you to make progress toward your
-                goals.
+                here. This is My Wildflower, a tool we created to centralize all
+                of the support and resources we have to offer, and to make it
+                easier for you to make progress toward your goals.
               </Typography>
               <Typography variant="bodyRegular">
                 Poke around! I'd start by completing the actions on your
@@ -921,9 +935,17 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
     },
   });
   async function onSubmit(data) {
-    const response = await ssjApi.invitePartner(data);
-    if (response.status === 200) {
-      setSubmittedPartnerRequest(true);
+    try {
+      const response = await ssjApi.invitePartner(data);
+      if (response.status === 200) {
+        setSubmittedPartnerRequest(true);
+      }
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        Router.push("/login");
+      } else {
+        console.error(err);
+      }
     }
   }
 
@@ -1245,12 +1267,27 @@ const waysToWorkTogether = [
 ];
 
 export async function getServerSideProps({ params, req, res }) {
-  const workflowId = getCookie("workflowId", { req, res });
   const config = getAuthHeader({ req, res });
+  if (!config) {
+    console.log("no token found, redirecting to login")
+    return redirectLoginProps();
+  }
+
+  const workflowId = getCookie("workflowId", { req, res });
 
   // turn this in to a catch all api for the ssj/dashboard
   const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
-  const responseProgress = await axios.get(apiRouteProgress, config);
+  let responseProgress;
+  try {
+    responseProgress = await axios.get(apiRouteProgress, config);
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      clearLoggedInState({req, res});
+      return redirectLoginProps();
+    } else {
+      console.error(error);
+    }
+  }
   const dataProgress = await responseProgress.data;
 
   // want to know how many assigned tasks there are.

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import {
   Avatar,
@@ -11,106 +10,43 @@ import {
   Stack,
   IconButton,
   Icon,
+  Link,
 } from "@ui";
 
 const ProfileHero = ({
   profileImage,
   firstName,
   lastName,
-  role,
+  roles,
   school,
   schoolLogo,
   location,
+  schoolLink,
 }) => {
   return (
     <Card variant="lightened" size="large">
-      <Grid container spacing={8}>
-        {profileImage && (
-          <Grid item>
-            <Avatar size="xl" src={profileImage} />
-          </Grid>
-        )}
+      <Grid container spacing={12} alignItems="center">
+        <Grid item>
+          <Avatar size="lg" src={profileImage} />
+        </Grid>
         <Grid item flex={1}>
-          <Stack style={{ height: "100%" }} justifyContent="space-between">
+          <Stack
+            style={{ height: "100%" }}
+            justifyContent="space-between"
+            spacing={6}
+          >
             <Grid container justifyContent="space-between">
               <Grid item>
-                <Stack>
+                <Stack spacing={2}>
                   <Typography variant="h2" bold>
                     {firstName} {lastName}
                   </Typography>
-                  <Typography variant="h3" lightened>
-                    {role}
-                  </Typography>
-                </Stack>
-              </Grid>
-              <Grid item>
-                <Stack direction="row" spacing={6}>
-                  <Stack alignItems="flex-end">
-                    <Typography variant="bodyLarge" lightened>
-                      {school}
+                  {roles.map((r, i) => (
+                    <Typography variant="h4" lightened key={i}>
+                      {r} {i === roles.length - 1 ? null : "•"}
                     </Typography>
-                    <Typography variant="bodyRegular" lightened>
-                      {location}
-                    </Typography>
-                  </Stack>
-                  <Avatar src={schoolLogo} />
+                  ))}
                 </Stack>
-              </Grid>
-            </Grid>
-            <Grid container spacing={6}>
-              <Grid item xs={12} sm={6}>
-                <Card size="small">
-                  <Grid
-                    container
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Grid item>
-                      <Stack spacing={1}>
-                        <Typography variant="bodyMini" bold lightened>
-                          EMAIL
-                        </Typography>
-                        <Typography variant="bodyRegular">
-                          katelyn@wildrosemontessori.com
-                        </Typography>
-                      </Stack>
-                    </Grid>
-                    <Grid item>
-                      <CopyToClipboard text="katelyn@wildrosemontessori.com">
-                        <IconButton>
-                          <Icon type="copy" />
-                        </IconButton>
-                      </CopyToClipboard>
-                    </Grid>
-                  </Grid>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Card size="small">
-                  <Grid
-                    container
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Grid item>
-                      <Stack spacing={1}>
-                        <Typography variant="bodyMini" bold lightened>
-                          PHONE
-                        </Typography>
-                        <Typography variant="bodyRegular">
-                          (123) 456 7891
-                        </Typography>
-                      </Stack>
-                    </Grid>
-                    <Grid item>
-                      <CopyToClipboard text="1234567891">
-                        <IconButton>
-                          <Icon type="copy" />
-                        </IconButton>
-                      </CopyToClipboard>
-                    </Grid>
-                  </Grid>
-                </Card>
               </Grid>
             </Grid>
           </Stack>

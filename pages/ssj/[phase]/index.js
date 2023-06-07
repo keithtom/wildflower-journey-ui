@@ -2,9 +2,10 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import getAuthHeader from "../../../lib/getAuthHeader";
-import axios from "axios";
+import workflowApi from "@api/workflow/processes";
 import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
 import {
   PageContainer,
@@ -419,13 +420,25 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
 };
 
 export async function getServerSideProps({ params, req, res }) {
-  console.log("inside getserversideprops of milestone page");
+  const config = getAuthHeader({ req, res });
+  if (!config) {
+    console.log("no token found, redirecting to login")
+    return redirectLoginProps();
+  }
   const { phase } = params;
   const workflowId = getCookie("workflowId", { req, res });
-  const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}`;
-  const config = getAuthHeader({ req, res });
 
-  const response = await axios.get(apiRoute, config);
+  let response;
+  try {
+    response = await workflowApi.index(workflowId, phase, config);
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      clearLoggedInState({req, res});
+      return redirectLoginProps();
+    } else {
+      console.error(error);
+    }
+  }
   const data = await response.data;
 
   const milestonesInProgress = [];

@@ -38,19 +38,29 @@ function augmentStep(step, included){
 
 // creates a custom task (TODO: not finished)
 async function create(processId, title){
-  const response = await workflowsApi.post(`/processes/${processId}/steps`, {title: title});
+  return await workflowsApi.post(`/processes/${processId}/steps`, {title: title});
   // if response good, great.  else.  error out?
 };
 
 async function assign(taskId) {
-  const response = await workflowsApi.put(`/steps/${taskId}/assign`);
+  let response;
+  try {
+    response = await workflowsApi.put(`/steps/${taskId}/assign`);
+  } catch (error) {
+    return Promise.reject(error);
+  }
   response.data.data = augmentStep(response.data.data, response.data.included);
   return response
   // if response good, great.  else.  error out?
 }
 
 async function unassign(taskId) {
-  const response = await workflowsApi.put(`/steps/${taskId}/unassign`);
+  let response;
+  try {
+    response = await workflowsApi.put(`/steps/${taskId}/unassign`);
+  } catch (error) {
+    return Promise.reject(error);
+  }
   response.data.data = augmentStep(response.data.data, response.data.included);
   return response
   // TODO: do something w/ the response if it's not 200
@@ -58,20 +68,35 @@ async function unassign(taskId) {
 
 // if response good, great.  else.  error out?
 async function complete(taskId) {
-  const response = await workflowsApi.put(`/steps/${taskId}/complete`);
+  let response;
+  try {
+    response = await workflowsApi.put(`/steps/${taskId}/complete`);
+  } catch (error) {
+    return Promise.reject(error);
+  }
   response.data.data = augmentStep(response.data.data, response.data.included);
   return response
 }
 
 // TODO: do something w/ the response if it's not 200
 async function uncomplete(taskId) {
-  const response = await workflowsApi.put(`/steps/${taskId}/uncomplete`);
+  let response;
+  try {
+    response = await workflowsApi.put(`/steps/${taskId}/uncomplete`);
+  } catch (error) {
+    return Promise.reject(error);
+  }
   response.data.data = augmentStep(response.data.data, response.data.included);
   return response
 }
 
 async function selectOption(taskId, optionId) {
-  const response = await workflowsApi.put(`/steps/${taskId}/select_option`, { selected_option_id: optionId });
+  let response;
+  try {
+    response = await workflowsApi.put(`/steps/${taskId}/select_option`, { selected_option_id: optionId });
+  } catch (error) {
+    return Promise.reject(error);
+  }
   response.data.data = augmentStep(response.data.data, response.data.included);
   
   return response;

@@ -3,7 +3,8 @@ import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import getAuthHeader from "../../../../../lib/getAuthHeader";
+import getAuthHeader from "@lib/getAuthHeader";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import axios from "axios";
 
 import {
@@ -308,12 +309,27 @@ const DecisionForm = ({ options, disabled }) => {
 };
 
 export async function getServerSideProps({ query, req, res }) {
+  const config = getAuthHeader({ req, res });
+  if (!config) {
+    console.log("no token found, redirecting to login")
+    return redirectLoginProps();
+  }
+
   const MilestoneId = query.milestone;
   const TaskId = query.task;
   const apiRoute = `${process.env.API_URL}/v1/workflow/processes/${MilestoneId}/steps/${TaskId}`;
-  const config = getAuthHeader({ req, res });
 
-  const response = await axios.get(apiRoute, config);
+  let response;
+  try {
+    response = await axios.get(apiRoute, config);
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      clearLoggedInState({req, res});
+      return redirectLoginProps();
+    } else {
+      console.error(error);
+    }
+  }
   const data = await response.data;
 
   const milestone = data.included.filter((e) => e.type == "process")[0];

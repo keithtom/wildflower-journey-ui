@@ -16,6 +16,7 @@ import PhaseChip from "../../components/PhaseChip";
 import Milestone from "../../components/Milestone";
 import Hero from "../../components/Hero";
 import getAuthHeader from "../../lib/getAuthHeader";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import axios from "axios";
 
 const Milestones = ({ processByCategory, processByPhase }) => {
@@ -140,10 +141,24 @@ export default Milestones;
 
 export async function getServerSideProps({ req, res }) {
   const config = getAuthHeader({ req, res });
+  if (!config) {
+    console.log("no token found, redirecting to login")
+    return redirectLoginProps();
+  }
   
   const workflowId = getCookie("workflowId", { req, res });
   const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes`;
-  const response = await axios.get(apiRoute, config);
+  let response;
+  try {
+    response = await axios.get(apiRoute, config);
+  } catch (error) {
+    if (error?.response?.status === 401) {
+      clearLoggedInState({req, res});
+      return redirectLoginProps();
+    } else {
+      console.error(error);
+    }
+  }
   const data = await response.data;
 
   const groupedFinanceProcesses = data.data.filter((d) =>

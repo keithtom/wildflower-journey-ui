@@ -34,4 +34,8 @@ async function setPassword(password, passwordConfirmation) {
   return response;
 }
 
-export default { setPassword };
+async function logout() {
+  return await api.delete("/logout");
+}
+
+export default { setPassword, logout };

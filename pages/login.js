@@ -21,7 +21,11 @@ import {
 const loginRoute = `${process.env.API_URL}/login`;
 const Login = ({}) => {
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
-  const { currentUser, setCurrentUser } = useUserContext();
+  const { setCurrentUser, isLoggedIn } = useUserContext();
+  if (isLoggedIn) {
+    Router.push("/ssj");
+  }
+
   const {
     control,
     handleSubmit,

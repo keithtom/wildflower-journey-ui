@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { getScreenSize } from "../hooks/react-responsive";
 import {
@@ -35,6 +35,11 @@ const Milestone = ({
 
   const remainingSteps = stepCount - completedStepsCount;
   const assignedIncomplete = stepsAssignedCount - completedStepsCount;
+
+  const [isMedium, setIsMedium] = useState(false);
+  // During hydration `useEffect` is called. `window` is available in `useEffect`. In this case because we know we're in the browser checking for window is not needed. If you need to read something from window that is fine.
+  // By calling `setColor` in `useEffect` a render is triggered after hydrating, this causes the "browser specific" value to be available. In this case 'red'.
+  useEffect(() => setIsMedium(screenSize.isMd), []);
 
   return (
     <>
@@ -76,8 +81,7 @@ const Milestone = ({
                 >
                   {title}
                 </Typography>
-                {screenSize.isMd ? null : assignedIncomplete &&
-                  remainingSteps ? (
+                {isMedium ? null : assignedIncomplete && remainingSteps ? (
                   <Chip
                     sx={{
                       "&:hover": {
