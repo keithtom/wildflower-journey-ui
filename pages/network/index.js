@@ -18,16 +18,25 @@ import {
   Link,
   Radio,
   MultiSelect,
+  Spinner,
 } from "@ui";
 
-const Network = ({ FakeSchools, FakeTeachers }) => {
-  const { query, setQuery, results } = useSearch();
+const Network = () => {
+  const { query, setQuery, filters, setFilters, results, isSearching, error } =
+    useSearch();
   const [category, setCategory] = useState("people");
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
+    setFilters({ ...filters, models: e.target.value });
   };
 
-  // console.log({ results });
+  if (error) return <PageContainer>failed to load</PageContainer>;
+  const noResults = query && results.length === 0;
+
+  const profileFallback = "/assets/images/avatar-fallback.svg";
+  const schoolFallback = "/assets/images/school-placeholder.png";
+
+  console.log({ results });
 
   return (
     <>
@@ -46,6 +55,7 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
               onChange={(e) => {
                 setQuery(e.target.value);
               }}
+              value={query}
             />
           </Grid>
         </Grid>
@@ -78,47 +88,105 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
           </Grid>
           <Grid item flex={1}>
             <Grid container spacing={2}>
-              {FakeFilters.map((f, i) => (
-                <Grid item key={i}>
-                  <FilterMultiSelect
-                    filter={f}
-                    disabled={f.doNotDisplayFor === category}
-                  />
-                </Grid>
-              ))}
+              {FakeFilters.map((f, i) =>
+                f.doNotDisplayFor === category ? null : (
+                  <Grid item key={i}>
+                    <FilterMultiSelect
+                      filter={f}
+                      setFilters={setFilters}
+                      // disabled={f.doNotDisplayFor === category}
+                    />
+                  </Grid>
+                )
+              )}
             </Grid>
           </Grid>
         </Grid>
 
         <Grid container mt={12}>
-          <Masonry columns={3} spacing={6}>
-            {category === "people"
-              ? FakeTeachers.map((f) => (
-                  <PersonResultItem
-                    personLink={`/network/people/${f.attributes.id}`}
-                    profileImg={f.attributes.imageSrc}
-                    firstName={f.attributes.firstName}
-                    lastName={f.attributes.lastName}
-                    role={f.attributes.role}
-                    location={f.attributes.location}
-                    trainingLevel={f.attributes.trainingLevel}
-                    schoolLogo={f.attributes.school.logoUrl}
-                    key={f.id}
-                  />
-                ))
-              : FakeSchools.map((f) => (
-                  <SchoolResultItem
-                    schoolLink={`/network/schools/${f.attributes.id}`}
-                    heroImg={f.attributes.heroUrl}
-                    logoImg={f.attributes.logoUrl}
-                    name={f.attributes.name}
-                    location={f.attributes.location}
-                    program={f.attributes.program}
-                    leaders={f.attributes.leaders}
-                    key={f.id}
-                  />
-                ))}
-          </Masonry>
+          {results.length ? (
+            <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={6}>
+              {category === "people"
+                ? results.map((f) => (
+                    <PersonResultItem
+                      personLink={`/network/people/${f.id}`}
+                      profileImg={
+                        f.attributes.imageUrl
+                          ? f.attributes.imageUrl
+                          : profileFallback
+                      }
+                      firstName={f.attributes.firstName}
+                      lastName={f.attributes.lastName}
+                      roles={f.attributes.roleList}
+                      location={f.attributes.location}
+                      trainingLevel={f.attributes.trainingLevel}
+                      schoolLogo={f.attributes.school?.logoUrl}
+                      schoolLink={`/network/schools/${f.attributes.school?.id}`}
+                      key={f.id}
+                    />
+                  ))
+                : results.map((f) => (
+                    <SchoolResultItem
+                      schoolLink={`/network/schools/${f.id}`}
+                      heroImg={
+                        f.attributes.heroUrl
+                          ? f.attributes.heroUrl
+                          : schoolFallback
+                      }
+                      logoImg={f.attributes.logoUrl}
+                      name={f.attributes.name}
+                      location={f.attributes.location}
+                      agesServed={f.attributes.agesServedList}
+                      leaders={f.attributes.leaders || []}
+                      key={f.id}
+                    />
+                  ))}
+            </Masonry>
+          ) : (
+            <Grid item xs={12}>
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="center"
+                mt={16}
+              >
+                <Grid item xs={12} sm={6} md={4} lg={3}>
+                  {isSearching ? (
+                    <Grid container justifyContent="center">
+                      <Grid item>
+                        <Spinner />
+                      </Grid>
+                    </Grid>
+                  ) : noResults ? (
+                    <Card size="large">
+                      <Stack spacing={3}>
+                        <Icon type="flag" size="large" variant="primary" />
+                        <Typography variant="bodyLarge" bold>
+                          Oops! Looks like there's nothing here
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          Try a different search term or more general query!
+                        </Typography>
+                      </Stack>
+                    </Card>
+                  ) : (
+                    <Card size="large">
+                      <Stack spacing={3}>
+                        <Icon type="search" size="large" variant="primary" />
+                        <Typography variant="bodyLarge" bold>
+                          You haven't searched for anything yet!
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          Search for people or for schools above to see results
+                          from the My Wildflower directory!
+                        </Typography>
+                      </Stack>
+                    </Card>
+                  )}
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
         </Grid>
       </PageContainer>
     </>
@@ -127,7 +195,7 @@ const Network = ({ FakeSchools, FakeTeachers }) => {
 
 export default Network;
 
-const FilterMultiSelect = ({ filter, disabled }) => {
+const FilterMultiSelect = ({ filter, setFilters }) => {
   const [filterValue, setFilterValue] = useState([]);
   const handleValueChange = (event) => {
     const {
@@ -137,11 +205,13 @@ const FilterMultiSelect = ({ filter, disabled }) => {
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
     );
+    setFilters((filters) => {
+      return { ...filters, [filter.param]: value };
+    });
   };
   // console.log(filterValue);
   return (
     <MultiSelect
-      disabled={disabled}
       withCheckbox
       autoWidth
       options={filter.options.map((o) => o.label)}
@@ -157,7 +227,7 @@ const PersonResultItem = ({
   profileImg,
   firstName,
   lastName,
-  role,
+  roles,
   location,
   trainingLevel,
   schoolLogo,
@@ -172,26 +242,42 @@ const PersonResultItem = ({
               <Grid container justifyContent="space-between">
                 <Grid item flex={1}>
                   <Stack>
-                    <Typography variant="bodyRegular" bold>
+                    <Typography variant="bodyLarge" bold>
                       {firstName} {lastName}
                     </Typography>
-                    <Typography lightened variant="bodySmall">
-                      {role}
-                    </Typography>
+                    <Grid container spacing={2}>
+                      {roles &&
+                        roles.map((r, i) => (
+                          <Grid item key={i}>
+                            <Typography lightened variant="bodyRegular">
+                              {r} {i === roles.length - 1 ? null : "•"}
+                            </Typography>
+                          </Grid>
+                        ))}
+                    </Grid>
                   </Stack>
                 </Grid>
-                <Grid item style={{ pointerEvents: "none" }}>
-                  <Avatar src={schoolLogo} size="sm" />
-                </Grid>
+                {schoolLogo && (
+                  <Grid item style={{ pointerEvents: "none" }}>
+                    <Avatar src={schoolLogo} size="sm" />
+                  </Grid>
+                )}
               </Grid>
-              <Grid container spacing={2}>
-                <Grid item>
-                  <Chip label={location} size="small" />
+              {location || trainingLevel ? (
+                <Grid container spacing={2}>
+                  {location && (
+                    <Grid item>
+                      <Chip label={location} size="small" />
+                    </Grid>
+                  )}
+                  {trainingLevel &&
+                    trainingLevel.map((t, i) => (
+                      <Grid item key={i}>
+                        <Chip label={t} size="small" />
+                      </Grid>
+                    ))}
                 </Grid>
-                <Grid item>
-                  <Chip label={trainingLevel} size="small" />
-                </Grid>
-              </Grid>
+              ) : null}
             </Stack>
           </Card>
         </Stack>
@@ -206,7 +292,7 @@ const SchoolResultItem = ({
   logoImg,
   name,
   location,
-  program,
+  agesServed,
   leaders,
 }) => {
   return (
@@ -218,12 +304,14 @@ const SchoolResultItem = ({
             justifyContent="space-between"
             alignItems="flex-start"
             sx={{
-              backgroundImage: `url(${heroImg})`,
-              backgroundSize: "cover",
+              backgroundImage: `url(${logoImg ? logoImg : heroImg})`,
+              backgroundSize: `${logoImg ? "contain" : "cover"}`,
+              backgroundRepeat: `${logoImg ? "no-repeat" : null}`,
+              backgroundPosition: `${logoImg ? "center" : null}`,
               minHeight: "240px",
             }}
           >
-            <Avatar src={logoImg} />
+            {/* {logoImg && <Avatar src={logoImg} />} */}
             <AvatarGroup>
               {leaders.map((l) => (
                 <Avatar src={l.imageSrc} size="sm" />
@@ -235,21 +323,22 @@ const SchoolResultItem = ({
               <Grid container justifyContent="space-between">
                 <Grid item flex={1}>
                   <Stack>
-                    <Typography variant="bodyRegular" bold>
+                    <Typography variant="bodyLarge" bold>
                       {name}
                     </Typography>
-                    <Typography lightened variant="bodySmall">
+                    <Typography lightened variant="bodyRegular">
                       {location}
                     </Typography>
                   </Stack>
                 </Grid>
               </Grid>
               <Grid container spacing={2}>
-                {program.map((p, i) => (
-                  <Grid item key={i}>
-                    <Chip label={p} size="small" />
-                  </Grid>
-                ))}
+                {agesServed &&
+                  agesServed.map((a, i) => (
+                    <Grid item key={i}>
+                      <Chip label={a} size="small" />
+                    </Grid>
+                  ))}
               </Grid>
             </Stack>
           </Card>
@@ -261,7 +350,8 @@ const SchoolResultItem = ({
 
 const FakeFilters = [
   {
-    title: "Hub",
+    title: "State",
+    param: "people_filters[address_states]",
     options: [
       { label: "Massachusetts", value: "Massachusetts" },
       { label: "New York", value: "New York" },
@@ -270,36 +360,29 @@ const FakeFilters = [
     ],
   },
   {
-    title: "Location",
-    options: [
-      { label: "Boston, MA", value: "Boston, MA" },
-      { label: "New York City, NY", value: "New York City, NY" },
-      { label: "Detroit, MI", value: "Detroit, MI" },
-      { label: "Los Angeles, CA", value: "Los Angeles, CA" },
-    ],
-  },
-  {
-    title: "Open Date",
+    title: "Opened",
+    param: "school_filters[open_date]",
     doNotDisplayFor: "people",
     options: [
-      { label: "Within a month", value: "Within a month" },
-      { label: "Within 6 months", value: "Within 6 months" },
-      { label: "Within 1 year", value: "Within 1 year" },
-      { label: "In more than 1 year", value: "In more than 1 year" },
+      { label: "Not open", value: "Not open" },
+      { label: "Within 0-2 years", value: "Within 0-2 years" },
+      { label: "Within 2-4 years", value: "Within 2-4 years" },
+      { label: "More than 5 years", value: "More than 5 years" },
     ],
   },
+  // {
+  //   title: "Program",
+  //   doNotDisplayFor: "people",
+  //   options: [
+  //     { label: "1", value: "1" },
+  //     { label: "2", value: "2" },
+  //     { label: "3", value: "3" },
+  //     { label: "4", value: "4" },
+  //   ],
+  // },
   {
-    title: "Program",
-    doNotDisplayFor: "people",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
-  {
-    title: "Student age",
+    title: "Age level",
+    param: "school_filters[age_levels]",
     doNotDisplayFor: "people",
     options: [
       { label: "1", value: "1" },
@@ -308,27 +391,30 @@ const FakeFilters = [
       { label: "4", value: "4" },
     ],
   },
-  {
-    title: "Capacity",
-    doNotDisplayFor: "people",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
+  // {
+  //   title: "Capacity",
+  //   doNotDisplayFor: "people",
+  //   options: [
+  //     { label: "1", value: "1" },
+  //     { label: "2", value: "2" },
+  //     { label: "3", value: "3" },
+  //     { label: "4", value: "4" },
+  //   ],
+  // },
   {
     title: "Language",
+    param: "people_filters[primary_languages]",
+    doNotDisplayFor: "schools",
     options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
+      { label: "English", value: "english" },
+      { label: "Spanish", value: "spanish" },
+      { label: "French", value: "french" },
+      { label: "Chinese", value: "chinese" },
     ],
   },
   {
     title: "Governance",
+    param: "school_filters[governance]",
     doNotDisplayFor: "people",
     options: [
       { label: "1", value: "1" },
@@ -337,29 +423,30 @@ const FakeFilters = [
       { label: "4", value: "4" },
     ],
   },
-  {
-    title: "Affinity groups",
-    doNotDisplayFor: "schools",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
-  {
-    title: "Pronouns",
-    doNotDisplayFor: "schools",
-    options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
-    ],
-  },
+  // {
+  //   title: "Affinity groups",
+  //   doNotDisplayFor: "schools",
+  //   options: [
+  //     { label: "1", value: "1" },
+  //     { label: "2", value: "2" },
+  //     { label: "3", value: "3" },
+  //     { label: "4", value: "4" },
+  //   ],
+  // },
+  // {
+  //   title: "Pronouns",
+  //   doNotDisplayFor: "schools",
+  //   options: [
+  //     { label: "1", value: "1" },
+  //     { label: "2", value: "2" },
+  //     { label: "3", value: "3" },
+  //     { label: "4", value: "4" },
+  //   ],
+  // },
 
   {
     title: "Ethnicity",
+    param: "people_filters[race_ethinicities]",
     doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
@@ -370,12 +457,24 @@ const FakeFilters = [
   },
   {
     title: "Gender identity",
+    param: "people_filters[genders]",
     doNotDisplayFor: "schools",
     options: [
       { label: "1", value: "1" },
       { label: "2", value: "2" },
       { label: "3", value: "3" },
       { label: "4", value: "4" },
+    ],
+  },
+  {
+    title: "Role",
+    param: "people_filters[roles]",
+    doNotDisplayFor: "schools",
+    options: [
+      { label: "Teacher Leader", value: "Teacher Leader" },
+      { label: "Emerging Teacher Leader", value: "Emerging Teacher Leader" },
+      { label: "Foundation Partner", value: "Foundation Partner" },
+      { label: "Charter Staff", value: "Charter Staff" },
     ],
   },
 ];

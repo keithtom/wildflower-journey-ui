@@ -44,6 +44,7 @@ import {
   Circle as CircleSolid,
   Time,
   Home,
+  Wrench,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -200,6 +201,7 @@ export default function Icon({ ...props }) {
     fileBlank: <FileBlank />,
     copy: <Copy />,
     search: <Search />,
+    wrench: <Wrench />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

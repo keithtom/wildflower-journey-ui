@@ -39,9 +39,33 @@ import {
   Divider,
   PageContainer,
   Alert,
+  Box,
 } from "@ui";
 import Header from "@components/Header";
 import { PinDropSharp } from "@mui/icons-material";
+
+const StyledChatBubble = styled(Box)`
+  padding: ${({ theme }) => theme.util.buffer * 4}px;
+  background-color: ${({ theme }) => theme.color.primary.lightest};
+  border-radius: ${({ theme }) => theme.radius.md}px;
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  height: auto;
+  &:after {
+    content: " ";
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: 16px;
+    right: auto;
+    top: auto;
+    bottom: -16px;
+    border: 20px solid;
+    border-color: transparent transparent transparent
+      ${({ theme }) => theme.color.primary.lightest};
+  }
+`;
 
 const StyledFilePond = styled(FilePond)`
   .filepond--root {
@@ -75,6 +99,13 @@ const AddProfileInfo = ({}) => {
           setCurrentUser(currentUser);
           router.push("/ssj");
         }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
       });
   };
 
@@ -100,7 +131,7 @@ const AddProfileInfo = ({}) => {
               </Grid>
               {isExistingTL ? null : (
                 <>
-                  <Card variant="primaryLightened" size="small">
+                  <StyledChatBubble>
                     <Stack direction="row" spacing={3}>
                       <Grid item>
                         <Icon type="star" variant="primary" />
@@ -110,7 +141,7 @@ const AddProfileInfo = ({}) => {
                         network better connect with you!
                       </Typography>
                     </Stack>
-                  </Card>
+                  </StyledChatBubble>
                   {opsGuide ? (
                     <Stack direction="row" spacing={3} alignItems="center">
                       <Avatar size="sm" src={opsGuide?.imageUrl} />
