@@ -36,7 +36,7 @@ const Network = () => {
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
 
-  console.log({ results });
+  // console.log({ results });
 
   return (
     <>
