@@ -76,18 +76,19 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
 
   useEffect(() => {
     const teamData = ssjApi.getTeam();
-    teamData.then(function (result) {
-      setTeam(result);
-      setSubmittedPartnerRequest(result.invitedPartner);
-      setOpenDate(result.expectedStartDate);
-    })
-    .catch(function (error) {
-      if (error?.response?.status === 401) {
-        Router.push("/login");
-      } else {
-        console.error(error);
-      }
-    });
+    teamData
+      .then(function (result) {
+        setTeam(result);
+        setSubmittedPartnerRequest(result.invitedPartner);
+        setOpenDate(result.expectedStartDate);
+      })
+      .catch(function (error) {
+        if (error?.response?.status === 401) {
+          Router.push("/login");
+        } else {
+          console.error(error);
+        }
+      });
   }, []);
 
   const partners =
@@ -159,23 +160,27 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Grid>
               <Grid item>
-                <Grid container spacing={6}>
+                <Grid container spacing={3} alignItems="center">
                   <Grid item>
-                    <Typography variant="bodyMini" bold lightened>
-                      PHASE
-                    </Typography>
-                    <Typography variant="bodySmall">Visioning</Typography>
+                    <Card size="small">
+                      <Typography variant="bodyMini" bold lightened>
+                        PHASE
+                      </Typography>
+                      <Typography variant="bodySmall">Visioning</Typography>
+                    </Card>
                   </Grid>
                   {currentUser?.personAddress?.city &&
                   currentUser?.personAddress?.state ? (
                     <Grid item>
-                      <Typography variant="bodyMini" bold lightened>
-                        LOCATION
-                      </Typography>
-                      <Typography variant="bodySmall">
-                        {currentUser?.personAddress?.city},{" "}
-                        {currentUser?.personAddress?.state}
-                      </Typography>
+                      <Card size="small">
+                        <Typography variant="bodyMini" bold lightened>
+                          LOCATION
+                        </Typography>
+                        <Typography variant="bodySmall">
+                          {currentUser?.personAddress?.city},{" "}
+                          {currentUser?.personAddress?.state}
+                        </Typography>
+                      </Card>
                     </Grid>
                   ) : null}
                   <Grid item>
@@ -185,7 +190,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                         hoverable
                         onClick={() => setAddOpenDateModalOpen(true)}
                       >
-                        <Stack direction="row" spacing={6}>
+                        <Stack direction="row" spacing={3} alignItems="center">
                           <Stack>
                             <Typography variant="bodyMini" bold lightened>
                               OPEN DATE
@@ -194,17 +199,18 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                               {moment(openDate).format("MMMM D, YYYY")}
                             </Typography>
                           </Stack>
-                          <Icon
-                            type="pencil"
-                            size="small"
-                            variant="lightened"
-                          />
+                          <IconButton>
+                            <Icon
+                              type="pencil"
+                              size="small"
+                              variant="lightened"
+                            />
+                          </IconButton>
                         </Stack>
                       </Card>
                     ) : (
                       <Button
-                        variant="light"
-                        small
+                        variant="lightened"
                         onClick={() => setAddOpenDateModalOpen(true)}
                       >
                         <Stack direction="row" spacing={2} alignItems="center">
@@ -1269,7 +1275,7 @@ const waysToWorkTogether = [
 export async function getServerSideProps({ params, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
-    console.log("no token found, redirecting to login")
+    console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
@@ -1282,7 +1288,7 @@ export async function getServerSideProps({ params, req, res }) {
     responseProgress = await axios.get(apiRouteProgress, config);
   } catch (error) {
     if (error?.response?.status === 401) {
-      clearLoggedInState({req, res});
+      clearLoggedInState({ req, res });
       return redirectLoginProps();
     } else {
       console.error(error);

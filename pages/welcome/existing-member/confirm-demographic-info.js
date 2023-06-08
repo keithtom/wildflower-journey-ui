@@ -295,7 +295,7 @@ const ConfirmDemographicInfo = ({}) => {
 
   const watchFields = watch();
   const isExistingTL = false;
-  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  const introducerProfilePic = "/assets/images/placeholder-flower.png";
   const isCertifiedOrSeeking =
     watchFields.montessoriCertified === "Yes" ||
     watchFields.montessoriCertified === "Currently Seeking Certification";
@@ -308,7 +308,7 @@ const ConfirmDemographicInfo = ({}) => {
   const showCustomPronounsField =
     watchFields.pronouns === "Not-listed or more specific pronouns";
 
-  console.log({ watchFields });
+  // console.log({ watchFields });
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -339,19 +339,17 @@ const ConfirmDemographicInfo = ({}) => {
                         </Typography>
                       </Stack>
                     </StyledChatBubble>
-                    {opsGuide ? (
-                      <Stack direction="row" spacing={3} alignItems="center">
-                        <Avatar size="sm" src={opsGuide?.imageUrl} />
-                        <Stack>
-                          <Typography variant="bodySmall" bold>
-                            {opsGuide?.firstName} {opsGuide?.lastName}
-                          </Typography>
-                          <Typography variant="bodySmall" lightened>
-                            Operations Guide
-                          </Typography>
-                        </Stack>
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Avatar size="sm" src={introducerProfilePic} />
+                      <Stack>
+                        <Typography variant="bodySmall" bold>
+                          Katelyn + Cam
+                        </Typography>
+                        <Typography variant="bodySmall" lightened>
+                          Foundation Partners
+                        </Typography>
                       </Stack>
-                    ) : null}
+                    </Stack>
                   </>
                 )}
 

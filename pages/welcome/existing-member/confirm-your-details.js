@@ -93,7 +93,7 @@ const ConfirmYourDetails = ({}) => {
   };
 
   const isExistingTL = false;
-  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  const introducerProfilePic = "/assets/images/placeholder-flower.png";
 
   // console.log({ errors });
   // console.log({ currentUser });
@@ -126,19 +126,17 @@ const ConfirmYourDetails = ({}) => {
                         </Typography>
                       </Stack>
                     </StyledChatBubble>
-                    {opsGuide ? (
-                      <Stack direction="row" spacing={3} alignItems="center">
-                        <Avatar size="sm" src={opsGuide?.imageUrl} />
-                        <Stack>
-                          <Typography variant="bodySmall" bold>
-                            {opsGuide?.firstName} {opsGuide?.lastName}
-                          </Typography>
-                          <Typography variant="bodySmall" lightened>
-                            Operations Guide
-                          </Typography>
-                        </Stack>
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Avatar size="sm" src={introducerProfilePic} />
+                      <Stack>
+                        <Typography variant="bodySmall" bold>
+                          Katelyn + Cam
+                        </Typography>
+                        <Typography variant="bodySmall" lightened>
+                          Foundation Partners
+                        </Typography>
                       </Stack>
-                    ) : null}
+                    </Stack>
                   </>
                 )}
                 <Stack spacing={3}>
