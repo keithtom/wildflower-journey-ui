@@ -35,10 +35,10 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
             noBorder
             size="large"
             sx={{
-              height: "240px",
+              height: "320px",
               backgroundImage: `url(${heroImg})`,
               backgroundSize: "cover",
-              backgroundPosition: "bottom center",
+              backgroundPosition: "center center",
             }}
           />
         </Grid>

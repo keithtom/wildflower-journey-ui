@@ -17,24 +17,21 @@ import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import { getCookie } from "cookies-next";
 import assignmentsApi from "@api/workflow/assignments";
 
-const ToDoList = ({
-  steps,
-  milestonesToDo,
-}) => {
+const ToDoList = ({ steps, milestonesToDo }) => {
   const [assignedSteps, setAssignedSteps] = useState(steps);
 
   const removeStep = (taskId) => {
     setTimeout(() => {
-      setAssignedSteps(assignedSteps.filter(step => step.id !== taskId))
+      setAssignedSteps(assignedSteps.filter((step) => step.id !== taskId));
     }, 1500);
   };
 
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 
+  console.log({ assignedSteps });
+
   return (
-    <PageContainer
-      isLoading={false}
-    >
+    <PageContainer isLoading={false}>
       <Stack spacing={12}>
         <Hero imageUrl={hero} />
         <Stack spacing={6} direction="row" alignItems="center">
@@ -121,10 +118,10 @@ export default ToDoList;
 export async function getServerSideProps({ req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
-    console.log("no token found, redirecting to login")
+    console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
-  
+
   const phase = getCookie("phase", { req, res });
   const workflowId = getCookie("workflowId", { req, res });
 
@@ -133,23 +130,24 @@ export async function getServerSideProps({ req, res }) {
     response = await assignmentsApi.index(workflowId, config);
   } catch (error) {
     if (error?.response?.status === 401) {
-      clearLoggedInState({req, res});
+      clearLoggedInState({ req, res });
       return redirectLoginProps();
     } else {
       console.error(error);
     }
   }
-  
-  let steps = response.data.data
+
+  let steps = response.data.data;
   // console.log("steps", steps)
 
   let milestonesToDo = [];
   const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&omit_include=true`;
   const responseMilestones = await axios.get(apiRouteMilestones, config);
-  
-  milestonesToDo = responseMilestones.data.data.filter(milestone => milestone.attributes.status == "to do");
 
-  
+  milestonesToDo = responseMilestones.data.data.filter(
+    (milestone) => milestone.attributes.status == "to do"
+  );
+
   return {
     props: {
       steps,

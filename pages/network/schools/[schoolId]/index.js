@@ -57,7 +57,7 @@ const School = ({}) => {
     school.attributes.maxEnrollment;
   const isMySchool = false; //TODO: If currentUser id matches any of relationships.people of type TL then true
 
-  // console.log({ school });
+  console.log({ school });
 
   return (
     <>
@@ -67,8 +67,8 @@ const School = ({}) => {
             schoolName={school?.attributes?.name}
             schoolLocation={school?.attributes?.location}
             heroImg={
-              school?.attributes?.heroUrl
-                ? school?.attributes?.heroUrl
+              school?.attributes?.heroImageUrl
+                ? school?.attributes?.heroImageUrl
                 : "https://images.unsplash.com/photo-1629654858857-615c2c8be8a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1494&q=80"
             }
             logoImg={

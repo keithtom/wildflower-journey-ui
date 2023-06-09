@@ -52,7 +52,7 @@ const Person = ({}) => {
   const hasSchool = person.relationships.schools.length;
   const hasContact = person.attributes.email || person.attributes.phone;
   const hasAttributes =
-    person.relationships.address.data ||
+    person.attributes.location ||
     person.attributes.primaryLanguage ||
     person.attributes.raceEthnicityList.length ||
     person.attributes.pronouns ||
@@ -62,7 +62,7 @@ const Person = ({}) => {
     person.attributes.rolesResonsibilities ||
     person.attributes.boardMemberOf;
 
-  // console.log({ person });
+  console.log({ person });
   // console.log({ currentUser });
 
   return (
@@ -74,8 +74,8 @@ const Person = ({}) => {
             firstName={person.attributes?.firstName}
             lastName={person.attributes?.lastName}
             roles={person.attributes?.roleList}
-            school={person.attributes.school?.name}
-            schoolLogo={person.attributes.school?.logoUrl}
+            school={person.attributes?.school?.name}
+            schoolLogo={person.attributes?.school?.logoUrl}
             location={person.attributes?.location}
             // schoolLink={`/network/schools/${FakePerson.attributes.school.id}`}
           />
@@ -137,7 +137,7 @@ const Person = ({}) => {
                 ) : null}
                 {hasAttributes ? (
                   <AttributesCard
-                    state={person?.relationships?.address?.data?.state}
+                    state={person?.attributes?.location}
                     language={person?.attributes?.primaryLanguage}
                     ethnicity={person?.attributes?.raceEthnicityList}
                     pronouns={person?.attributes?.pronouns}
