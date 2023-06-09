@@ -55,7 +55,7 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
           </StyledLogo>
         </Grid>
         <Grid item flex={1}>
-          <Stack spacing={2}>
+          <Stack>
             <Typography variant="h2" bold>
               {schoolName}
             </Typography>

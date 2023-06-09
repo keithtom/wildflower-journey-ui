@@ -57,7 +57,7 @@ const School = ({}) => {
     school.attributes.maxEnrollment;
   const isMySchool = false; //TODO: If currentUser id matches any of relationships.people of type TL then true
 
-  console.log({ school });
+  // console.log({ school });
 
   return (
     <>
