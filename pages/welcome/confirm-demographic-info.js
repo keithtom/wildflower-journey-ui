@@ -77,35 +77,38 @@ const ConfirmDemographicInfo = ({}) => {
 
   useEffect(() => {
     if (currentUser) {
-      peopleApi.show(currentUser.id).then((response) => {
-        const person = response.data.data;
-        console.log("person", person);
-        // SAVEPOINT this request is working.  need to make sure data is persisted and returned
-        // and then loaded into form.  then we are done here.
-        reset({
-          primaryLanguage: person?.attributes?.primaryLanguage || "",
-          primaryLanguageOther: person?.attributes?.primaryLanguageOther || "",
-          raceEthnicity: person?.attributes?.raceEthnicityList || [],
-          raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
-          lgbtqia: person?.attributes?.lgbtqia || "",
-          gender: person?.attributes?.gender || "",
-          genderOther: person?.attributes?.genderOther || "",
-          pronouns: person?.attributes?.pronouns || "",
-          pronounsOther: person?.attributes?.pronounsOther || "",
-          householdIncome: person?.attributes?.householdIncome || "",
-          montessoriCertified: person?.attributes?.montessoriCertified || "",
-          montessoriCertifiedLevels:
-            person?.attributes?.montessoriCertifiedLevelList || [],
-          classroomAge: person?.attributes?.classroomAgeList || [],
+      peopleApi
+        .show(currentUser.id)
+        .then((response) => {
+          const person = response.data.data;
+          console.log("person", person);
+          // SAVEPOINT this request is working.  need to make sure data is persisted and returned
+          // and then loaded into form.  then we are done here.
+          reset({
+            primaryLanguage: person?.attributes?.primaryLanguage || "",
+            primaryLanguageOther:
+              person?.attributes?.primaryLanguageOther || "",
+            raceEthnicity: person?.attributes?.raceEthnicityList || [],
+            raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
+            lgbtqia: person?.attributes?.lgbtqia || "",
+            gender: person?.attributes?.gender || "",
+            genderOther: person?.attributes?.genderOther || "",
+            pronouns: person?.attributes?.pronouns || "",
+            pronounsOther: person?.attributes?.pronounsOther || "",
+            householdIncome: person?.attributes?.householdIncome || "",
+            montessoriCertified: person?.attributes?.montessoriCertified || "",
+            montessoriCertifiedLevels:
+              person?.attributes?.montessoriCertifiedLevelList || [],
+            classroomAge: person?.attributes?.classroomAgeList || [],
+          });
+        })
+        .catch((error) => {
+          if (error?.response?.status === 401) {
+            router.push("/login");
+          } else {
+            console.error(error);
+          }
         });
-      })
-      .catch((error) => {
-        if (error?.response?.status === 401) {
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
-      });
     }
   }, [currentUser]);
 

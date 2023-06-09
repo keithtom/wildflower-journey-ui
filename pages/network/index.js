@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
 
@@ -35,6 +35,13 @@ const Network = () => {
 
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
+
+  //FOR DEMO
+  useEffect(() => {
+    category === "people"
+      ? setQuery("foundation partner")
+      : setQuery("montessori");
+  }, [category]);
 
   // console.log({ results });
 
@@ -245,10 +252,10 @@ const PersonResultItem = ({
                     <Typography variant="bodyLarge" bold>
                       {firstName} {lastName}
                     </Typography>
-                    <Grid container spacing={2}>
+                    <Grid container>
                       {roles &&
                         roles.map((r, i) => (
-                          <Grid item key={i}>
+                          <Grid item key={i} pr={i === i.length ? 0 : 1}>
                             <Typography lightened variant="bodyRegular">
                               {r} {i === roles.length - 1 ? null : "•"}
                             </Typography>
@@ -353,14 +360,60 @@ const FakeFilters = [
     title: "State",
     param: "people_filters[address_states]",
     options: [
-      { label: "Massachusetts", value: "Massachusetts" },
-      { label: "New York", value: "New York" },
-      { label: "Michigan", value: "Michigan" },
+      { label: "Alabama", value: "Alabama" },
+      { label: "Alaska", value: "Alaska" },
+      { label: "Arizona", value: "Arizona" },
+      { label: "Arkansas", value: "Arkansas" },
       { label: "California", value: "California" },
+      { label: "Colorado", value: "Colorado" },
+      { label: "Connecticut", value: "Connecticut" },
+      { label: "Delaware", value: "Delaware" },
+      { label: "Florida", value: "Florida" },
+      { label: "Georgia", value: "Georgia" },
+      { label: "Hawaii", value: "Hawaii" },
+      { label: "Idaho", value: "Idaho" },
+      { label: "Illinois", value: "Illinois" },
+      { label: "Indiana", value: "Indiana" },
+      { label: "Iowa", value: "Iowa" },
+      { label: "Kansas", value: "Kansas" },
+      { label: "Kentucky", value: "Kentucky" },
+      { label: "Louisiana", value: "Louisiana" },
+      { label: "Maine", value: "Maine" },
+      { label: "Maryland", value: "Maryland" },
+      { label: "Massachusetts", value: "Massachusetts" },
+      { label: "Michigan", value: "Michigan" },
+      { label: "Minnesota", value: "Minnesota" },
+      { label: "Mississippi", value: "Mississippi" },
+      { label: "Missouri", value: "Missouri" },
+      { label: "Montana", value: "Montana" },
+      { label: "Nebraska", value: "Nebraska" },
+      { label: "Nevada", value: "Nevada" },
+      { label: "New Hampshire", value: "New Hampshire" },
+      { label: "New Jersey", value: "New Jersey" },
+      { label: "New Mexico", value: "New Mexico" },
+      { label: "New York", value: "New York" },
+      { label: "North Carolina", value: "North Carolina" },
+      { label: "North Dakota", value: "North Dakota" },
+      { label: "Ohio", value: "Ohio" },
+      { label: "Oklahoma", value: "Oklahoma" },
+      { label: "Oregon", value: "Oregon" },
+      { label: "Pennsylvania", value: "Pennsylvania" },
+      { label: "Rhode Island", value: "Rhode Island" },
+      { label: "South Carolina", value: "South Carolina" },
+      { label: "South Dakota", value: "South Dakota" },
+      { label: "Tennessee", value: "Tennessee" },
+      { label: "Texas", value: "Texas" },
+      { label: "Utah", value: "Utah" },
+      { label: "Vermont", value: "Vermont" },
+      { label: "Virginia", value: "Virginia" },
+      { label: "Washington", value: "Washington" },
+      { label: "West Virginia", value: "West Virginia" },
+      { label: "Wisconsin", value: "Wisconsin" },
+      { label: "Wyoming", value: "Wyoming" },
     ],
   },
   {
-    title: "Opened",
+    title: "Date opened",
     param: "school_filters[open_date]",
     doNotDisplayFor: "people",
     options: [
@@ -385,10 +438,13 @@ const FakeFilters = [
     param: "school_filters[age_levels]",
     doNotDisplayFor: "people",
     options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
+      { value: "Infants", label: "Infants" },
+      { value: "Toddlers", label: "Toddlers" },
+      { value: "Primary", label: "Primary" },
+      { value: "Lower Elementary", label: "Lower Elementary" },
+      { value: "Upper Elementary", label: "Upper Elementary" },
+      { value: "Adolescent", label: "Adolescent" },
+      { value: "High School", label: "High School" },
     ],
   },
   // {
@@ -406,10 +462,59 @@ const FakeFilters = [
     param: "people_filters[primary_languages]",
     doNotDisplayFor: "schools",
     options: [
-      { label: "English", value: "english" },
-      { label: "Spanish", value: "spanish" },
-      { label: "French", value: "french" },
-      { label: "Chinese", value: "chinese" },
+      { value: "English", label: "English" },
+      { value: "Spanish - Español", label: "Spanish - Español" },
+      { value: "French - Français", label: "French - Français" },
+      { value: "Mandarin - 中文", label: "Mandarin - 中文" },
+      { value: "Arabic - العَرَبِيَّة", label: "Arabic - العَرَبِيَّة" },
+      { value: "Armenian - Հայերեն", label: "Armenian - Հայերեն" },
+      {
+        value: "Bantu (including Swahili) - Kiswahili",
+        label: "Bantu (including Swahili) - Kiswahili",
+      },
+      { value: "Bengali - বাংলা", label: "Bengali - বাংলা" },
+      { value: "Burmese - မြန်မာစာ", label: "Burmese - မြန်မာစာ" },
+      { value: "Cantonese - Gwóngdūng wá", label: "Cantonese - Gwóngdūng wá" },
+      { value: "German - Deutsch", label: "German - Deutsch" },
+      { value: "Greek - ελληνικά", label: "Greek - ελληνικά" },
+      { value: "Gujarati - ગુજરાતી", label: "Gujarati - ગુજરાતી" },
+      {
+        value: "Haitian Creole - Kreyol Ayisyen",
+        label: "Haitian Creole - Kreyol Ayisyen",
+      },
+      { value: "Hebrew - עברית", label: "Hebrew - עברית" },
+      { value: "Hindi - हिन्दी", label: "Hindi - हिन्दी" },
+      { value: "Hmong - Hmoob", label: "Hmong - Hmoob" },
+      { value: "Italian - Italiano", label: "Italian - Italiano" },
+      { value: "Japanese - 日本語", label: "Japanese - 日本語" },
+      { value: "Karen", label: "Karen" },
+      { value: "Khmer - ខ្មែរ,", label: "Khmer - ខ្មែរ," },
+      { value: "Korean - 한국어", label: "Korean - 한국어" },
+      { value: "Navajo - Diné bizaad", label: "Navajo - Diné bizaad" },
+      {
+        value: "Persian (including Farsi and Dari) - فارسی",
+        label: "Persian (including Farsi and Dari) - فارسی",
+      },
+      { value: "Polish - Polski", label: "Polish - Polski" },
+      { value: "Portuguese - Português", label: "Portuguese - Português" },
+      { value: "Punjabi - ਪੰਜਾਬੀ", label: "Punjabi - ਪੰਜਾਬੀ" },
+      { value: "Russian - русский язык", label: "Russian - русский язык" },
+      {
+        value:
+          "Serbo-Croatian (including Bosnian, Croatian, Montenegrin and Serbian) - Bosanski Jezik / Hrvatski Jezik / српски језик",
+        label:
+          "Serbo-Croatian (including Bosnian, Croatian, Montenegrin and Serbian) - Bosanski Jezik / Hrvatski Jezik / српски језик",
+      },
+      { value: "Tagalog - ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔", label: "Tagalog - ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔" },
+      {
+        value: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ",
+        label: "Tai-Kadai (including Thai and Lao) - ไทย / ພາສາລາວ",
+      },
+      { value: "Tami - தமிழ்", label: "Tami - தமிழ்" },
+      { value: "Telugu - తెలుగు", label: "Telugu - తెలుగు" },
+      { value: "Urdu - اُردُو", label: "Urdu - اُردُو" },
+      { value: "Vietnamese - Tiếng Việt", label: "Vietnamese - Tiếng Việt" },
+      { value: "Other", label: "Other" },
     ],
   },
   {
@@ -417,10 +522,9 @@ const FakeFilters = [
     param: "school_filters[governance]",
     doNotDisplayFor: "people",
     options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
+      { label: "Independent", value: "Independent" },
+      { label: "Charter", value: "Charter" },
+      { label: "District", value: "District" },
     ],
   },
   // {
@@ -449,10 +553,32 @@ const FakeFilters = [
     param: "people_filters[race_ethinicities]",
     doNotDisplayFor: "schools",
     options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
+      {
+        value: "American Indian or Alaska Native",
+        label: "American Indian or Alaska Native",
+      },
+      { value: "Asian", label: "Asian" },
+      {
+        value: "Black or African American",
+        label: "Black or African American",
+      },
+      {
+        value: "Hispanic, Latinx, or Spanish Origin",
+        label: "Hispanic, Latinx, or Spanish Origin",
+      },
+      {
+        value: "Native Hawaiian or Other Pacific Islander",
+        label: "Native Hawaiian or Other Pacific Islander",
+      },
+      {
+        value: "Middle Eastern or North African",
+        label: "Middle Eastern or North African",
+      },
+      { value: "White", label: "White" },
+      {
+        value: "A not-listed or more specific ethnicity",
+        label: "A not-listed or more specific ethnicity",
+      },
     ],
   },
   {
@@ -460,10 +586,13 @@ const FakeFilters = [
     param: "people_filters[genders]",
     doNotDisplayFor: "schools",
     options: [
-      { label: "1", value: "1" },
-      { label: "2", value: "2" },
-      { label: "3", value: "3" },
-      { label: "4", value: "4" },
+      { value: "Male", label: "Male/Man" },
+      { value: "Female", label: "Female/Woman" },
+      { value: "Gender Non-Conforming", label: "Gender Non-Conforming" },
+      {
+        value: "A not-listed or more specific gender identity",
+        label: "A not-listed or more specific gender identity",
+      },
     ],
   },
   {
