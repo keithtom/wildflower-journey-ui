@@ -41,11 +41,15 @@ const ProfileHero = ({
                   <Typography variant="h2" bold>
                     {firstName} {lastName}
                   </Typography>
-                  {roles.map((r, i) => (
-                    <Typography variant="h4" lightened key={i}>
-                      {r} {i === roles.length - 1 ? null : "•"}
-                    </Typography>
-                  ))}
+                  <Grid container>
+                    {roles.map((r, i) => (
+                      <Grid item key={i} pr={i === i.length ? 0 : 1}>
+                        <Typography variant="h4" lightened>
+                          {r} {i === roles.length - 1 ? null : "•"}
+                        </Typography>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </Stack>
               </Grid>
             </Grid>

@@ -35,10 +35,10 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
             noBorder
             size="large"
             sx={{
-              height: "240px",
+              height: "320px",
               backgroundImage: `url(${heroImg})`,
               backgroundSize: "cover",
-              backgroundPosition: "bottom center",
+              backgroundPosition: "center center",
             }}
           />
         </Grid>
@@ -55,7 +55,7 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
           </StyledLogo>
         </Grid>
         <Grid item flex={1}>
-          <Stack spacing={2}>
+          <Stack>
             <Typography variant="h2" bold>
               {schoolName}
             </Typography>
