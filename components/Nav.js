@@ -38,7 +38,7 @@ const CustomDrawer = styled(Drawer)`
   }
 `;
 
-const showNetwork = true;
+const showNetwork = false;
 
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
