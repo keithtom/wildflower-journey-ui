@@ -124,7 +124,7 @@ const School = ({}) => {
                 ) : null}
                 {hasAttributes ? (
                   <AttributesCard
-                    state={school?.relationships?.address?.data}
+                    state={school?.relationships?.address?.data?.state}
                     openDate={school?.attributes?.openedOn}
                     agesServed={school?.attributes?.agesServedList}
                     governance={school?.attributes?.governanceType}
