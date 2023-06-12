@@ -225,6 +225,9 @@ const Task = ({
       setTaskCompleters(task.relationships.completers.data || []);
 
       setIsDecided(true);
+      if (removeStep) {
+        removeStep(taskId);
+      }
     } catch (err) {
       if (err?.response?.status === 401) {
         Router.push("/login");
