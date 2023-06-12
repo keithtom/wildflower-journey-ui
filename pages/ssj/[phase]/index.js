@@ -422,7 +422,7 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
 export async function getServerSideProps({ params, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
-    console.log("no token found, redirecting to login")
+    console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
   const { phase } = params;
@@ -433,13 +433,13 @@ export async function getServerSideProps({ params, req, res }) {
     response = await workflowApi.index(workflowId, phase, config);
   } catch (error) {
     if (error?.response?.status === 401) {
-      clearLoggedInState({req, res});
+      clearLoggedInState({ req, res });
       return redirectLoginProps();
     } else {
       console.error(error);
     }
   }
-  const data = await response.data;
+  const data = await response?.data;
 
   const milestonesInProgress = [];
   const milestonesToDo = [];

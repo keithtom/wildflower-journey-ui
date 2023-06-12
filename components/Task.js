@@ -225,6 +225,10 @@ const Task = ({
       setTaskCompleters(task.relationships.completers.data || []);
 
       setIsDecided(true);
+      setInfoDrawerOpen(false);
+      if (removeStep) {
+        removeStep(taskId);
+      }
     } catch (err) {
       if (err?.response?.status === 401) {
         Router.push("/login");
@@ -409,13 +413,14 @@ const DecisionDrawerActions = ({
   const completedBy = taskCompleters[0]; // just take the first since only used when its not me
 
   const StyledDecisionCard = styled(Card)`
+    width: 100%;
     /* Disabled */
     ${(props) =>
       props.disabled &&
       css`
         opacity: 0.7;
         pointer-events: none;
-      `}
+      `};
   `;
   return (
     <Stack spacing={4}>
