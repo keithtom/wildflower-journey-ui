@@ -200,7 +200,7 @@ describe("tasks", () => {
       cy.logout();
     });
 
-    it("can be marked complete/incomplete by both partners", () => {
+    it("can be marked complete by both partners", () => {
       // login as partner 1 and assign and complete task
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
@@ -350,7 +350,7 @@ describe("tasks", () => {
       });
     });
 
-    it("can be assigned to only one partner", () => {
+    it("can be assigned to both partners", () => {
       // login as partner 1 and assign task to themselves. check that avatar icon appears
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
@@ -420,7 +420,7 @@ describe("tasks", () => {
       cy.contains("Mark incomplete").should("not.exist");
       cy.logout();
 
-      //login as partner 1 and incomplete it
+      //login as partner 1 and incomplete and unassign it
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
