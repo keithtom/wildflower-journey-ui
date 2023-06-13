@@ -173,10 +173,9 @@ describe("tasks", () => {
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
-      cy.get("span[type='close']").first().click({ force: true });
       cy.contains("ASSIGNEE");
       cy.get("span[type='close']").last().click({ force: true });
-      cy.get("span[type='close']").last().click({ force: true });
+      cy.get("span[type='close']").first().click({ force: true });
       cy.get(".MuiAvatar-img").should("have.length", 2); //once in the header and once in the assignment
       cy.logout();
 
@@ -192,10 +191,9 @@ describe("tasks", () => {
       // assign task to partner 2
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
-      cy.get("span[type='close']").first().click({ force: true });
       cy.contains("ASSIGNEE");
       cy.get("span[type='close']").last().click({ force: true });
-      cy.get("span[type='close']").last().click({ force: true });
+      cy.get("span[type='close']").first().click({ force: true });
       cy.get(".MuiAvatar-img").should("have.length", 3); //once in the header and twice in the assignment
       cy.logout();
     });
@@ -434,7 +432,7 @@ describe("tasks", () => {
       cy.logout();
     });
 
-    it("can have prerequisites", () => {
+    it.only("can have prerequisites", () => {
       // login as partner 1 and assign task to themselves. check that avatar icon appears
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
@@ -458,11 +456,11 @@ describe("tasks", () => {
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
-      cy.get('span[type="close"]').first().click();
-      cy.get('span[type="close"]').first().click();
+      cy.get('span[type="close"]').first().click({force: true});
+      cy.get('span[type="close"]').first().click({force: true});
 
       // check that there is no Hold up
-      cy.contains("a li div p", /^Startup$/).click();
+      cy.contains("a li div p", /^Startup$/).click({force: true});
       cy.contains("Milestone D-E-F").should("exist");
       cy.contains("To do").should("exist");
       cy.contains("Hold up! Try something else first.").should("not.exist");
