@@ -448,7 +448,7 @@ describe("tasks", () => {
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
       cy.get('span[type="close"]').first().click();
-      cy.get('span[type="close"]').first().click();
+      cy.get('span[type="close"]').last().click();
 
       // complete second prerequisite
       cy.contains("a li div p", /^Startup$/).click();
@@ -457,7 +457,7 @@ describe("tasks", () => {
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
       cy.get('span[type="close"]').first().click({force: true});
-      cy.get('span[type="close"]').first().click({force: true});
+      cy.get('span[type="close"]').last().click({force: true});
 
       // check that there is no Hold up
       cy.contains("a li div p", /^Startup$/).click({force: true});
