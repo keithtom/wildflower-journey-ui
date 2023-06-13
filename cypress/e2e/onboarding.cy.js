@@ -111,7 +111,7 @@ describe("onboarding spec", () => {
       cy.visit("/welcome/add-profile-info", { responseTimeout: 60000 });
     });
 
-    it.only("uploads a file", () => {
+    it("uploads a file", () => {
       cy.intercept("PUT", /\/active_storage\//).as("upload");
 
       cy.fixture("test_profile_picture.jpg").then((filecontent) => {
