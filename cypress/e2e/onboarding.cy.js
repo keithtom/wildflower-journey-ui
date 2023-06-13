@@ -112,7 +112,7 @@ describe("onboarding spec", () => {
     });
 
     it("uploads a file", () => {
-      cy.intercept("PUT", /\/active_storage\//).as("upload");
+      cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as("upload");
 
       cy.fixture("test_profile_picture.jpg").then((filecontent) => {
         cy.get('input[type="file"]').attachFile({
