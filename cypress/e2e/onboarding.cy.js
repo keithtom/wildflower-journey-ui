@@ -1,6 +1,10 @@
 import 'cypress-file-upload';
 
 describe("onboarding spec", () => {
+  beforeEach(() => {
+    cy.resetFixturesAndLogin();
+  })
+
   describe("inputting personal details", () => {
     beforeEach(() => {
       cy.visit("/welcome/confirm-your-details")
