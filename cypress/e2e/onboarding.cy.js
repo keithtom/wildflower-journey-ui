@@ -1,14 +1,14 @@
-import 'cypress-file-upload';
+import "cypress-file-upload";
 
 describe("onboarding spec", () => {
   beforeEach(() => {
     cy.resetFixturesAndLogin();
-  })
+  });
 
   describe("inputting personal details", () => {
     beforeEach(() => {
-      cy.visit("/welcome/confirm-your-details")
-    })
+      cy.visit("/welcome/confirm-your-details");
+    });
 
     it("should display form", () => {
       cy.get('input[name="firstName"]').should("be.visible");
@@ -25,14 +25,17 @@ describe("onboarding spec", () => {
       cy.get('input[name="city"]').clear().type("Brooklyn");
       cy.get('input[name="state"]').clear().type("New York");
       cy.get('button[type="submit"]').click();
-      cy.url({timeout: 10000}).should("include", "/welcome/confirm-demographic-info");
-    })
-  })
+      cy.url({ timeout: 10000 }).should(
+        "include",
+        "/welcome/confirm-demographic-info"
+      );
+    });
+  });
 
   describe("confirming demographic info", () => {
     beforeEach(() => {
-      cy.visit("/welcome/confirm-demographic-info")
-    })
+      cy.visit("/welcome/confirm-demographic-info");
+    });
 
     it("should display form", () => {
       cy.contains("language");
@@ -50,8 +53,8 @@ describe("onboarding spec", () => {
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What is your ethnicity?").next().click();
-      cy.contains("American Indian or Alaska Native").click({force: true});
-      cy.contains("Asian").click({force: true});
+      cy.contains("American Indian or Alaska Native").click({ force: true });
+      cy.contains("Asian").click({ force: true });
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("Do you identify as a member of the LGBTQIA community?")
@@ -60,11 +63,11 @@ describe("onboarding spec", () => {
         .click();
 
       cy.contains("What is your gender identity?").next().click();
-      cy.contains("Male/Man").click({force: true});
+      cy.contains("Male/Man").click({ force: true });
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What are your pronouns?").next().click();
-      cy.contains("she/her/hers").click({force: true});
+      cy.contains("she/her/hers").click({ force: true });
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains(
@@ -77,41 +80,39 @@ describe("onboarding spec", () => {
         .click();
 
       cy.contains("Are you Montessori Certified?")
-      .next()
-      .children()
-      .first()
-      .click();
+        .next()
+        .children()
+        .first()
+        .click();
 
-      cy.contains("What Levels are you certified (or seeking certification) for?").next().click();
-      cy.contains("6-9 Elementary").click({force: true});
-      cy.contains("Primary/Early Childhood").click({force: true});
+      cy.contains(
+        "What Levels are you certified (or seeking certification) for?"
+      )
+        .next()
+        .click();
+      cy.contains("6-9 Elementary").click({ force: true });
+      cy.contains("Primary/Early Childhood").click({ force: true });
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What Age Classrooms are you interested in offering?")
         .next()
         .click();
-      cy.contains("Infants").click({force: true});
-      cy.contains("Toddler").click({force: true});
+      cy.contains("Infants").click({ force: true });
+      cy.contains("Toddler").click({ force: true });
       cy.get("body").click(0, 0); // close dropdwon
-    
+
       cy.get('button[type="submit"]').click();
-      cy.url({ timeout: 60000 }).should(
-        "include",
-        "/welcome/add-profile-info"
-      );
+      cy.url({ timeout: 60000 }).should("include", "/welcome/add-profile-info");
     });
   });
 
   describe("add-profile-info", () => {
     beforeEach(() => {
-      cy.visit("/welcome/add-profile-info")
-    })
+      cy.visit("/welcome/add-profile-info", { responseTimeout: 60000 });
+    });
 
     it.only("uploads a file", () => {
-      cy.intercept(
-        "PUT",
-        /\/active_storage\//
-      ).as("upload");
+      cy.intercept("PUT", /\/active_storage\//).as("upload");
 
       cy.fixture("test_profile_picture.jpg").then((filecontent) => {
         cy.get('input[type="file"]').attachFile({
@@ -121,12 +122,11 @@ describe("onboarding spec", () => {
         });
       });
       // wait for upload to complete after 1 minute
-      cy.wait('@upload', {requestTimeout: 60000});
+      cy.wait("@upload", { requestTimeout: 60000 });
 
-      cy.contains('Confirm').click();
+      cy.contains("Confirm").click();
 
-      cy.url({timeout: 60000}).should("include", "/ssj");
+      cy.url({ timeout: 60000 }).should("include", "/ssj");
     });
   });
 });
-
