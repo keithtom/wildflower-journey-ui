@@ -432,7 +432,7 @@ describe("tasks", () => {
       cy.logout();
     });
 
-    it.only("can have prerequisites", () => {
+    it("can have prerequisites", () => {
       // login as partner 1 and assign task to themselves. check that avatar icon appears
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
