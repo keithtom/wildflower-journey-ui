@@ -129,11 +129,22 @@ describe("tasks", () => {
     });
 
     describe("decision tasks", () => {
-      it("should allow a decision to be selected and submitted", () => {
+      it.only("should allow a decision to be selected and submitted", () => {
         cy.contains("Visioning").click();
         cy.contains("Milestone B-1").click();
         cy.contains("Decision Step 1").click();
         cy.contains("Add to my to do list").click();
+        cy.get("span[type='close']").first().click();
+
+        // Check that you can access decision in the to do list
+        cy.contains("Your to do list").click();
+        cy.contains("Decision Step 1").click();
+        cy.get("span[type='close']").first().click();
+
+        // Check that you can select an option and submit
+        cy.contains("Visioning").click();
+        cy.contains("Milestone B-1").click();
+        cy.contains("Decision Step 1").click();
         cy.contains("Option 1").click();
         cy.contains("Make final decision").click();
         cy.contains("Decision made").should("be.visible");
