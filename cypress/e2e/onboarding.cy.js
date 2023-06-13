@@ -107,7 +107,12 @@ describe("onboarding spec", () => {
       cy.visit("/welcome/add-profile-info")
     })
 
-    it("uploads a file", () => {
+    it.only("uploads a file", () => {
+      cy.intercept(
+        "PUT",
+        /\/active_storage\//
+      ).as("upload");
+
       cy.fixture("test_profile_picture.jpg").then((filecontent) => {
         cy.get('input[type="file"]').attachFile({
           fileContent: filecontent.toString(),
@@ -115,8 +120,11 @@ describe("onboarding spec", () => {
           mimeType: "image/jpg",
         });
       });
-      cy.wait(5000);
+      // wait for upload to complete after 1 minute
+      cy.wait('@upload', {requestTimeout: 60000});
+
       cy.contains('Confirm').click();
+
       cy.url({timeout: 60000}).should("include", "/ssj");
     });
   });
