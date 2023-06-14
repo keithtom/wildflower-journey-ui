@@ -76,6 +76,7 @@ Cypress.Commands.add('resetFixtures', () => {
   cy.wrap(resetFixtures());
 })
 
+// Used with tests that are testing partner workflows
 Cypress.Commands.add('resetPartnerFixtures', () => {
   cy.wrap(resetPartnerFixtures());
 })
