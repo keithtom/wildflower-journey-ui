@@ -3,7 +3,20 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/router";
+import { useForm, Controller } from "react-hook-form";
+import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 
+import {
+  lgbtqiaOptions,
+  montessoriCertificationOptions,
+  levelsOfMontessoriCertification,
+  incomeOptions,
+  languageOptions,
+  pronounsOptions,
+  genderOptions,
+  ethnicityOptions,
+  roleOptions,
+} from "../../../../lib/utils/demographic-options";
 import { useUserContext } from "@lib/useUserContext";
 import {
   Box,
@@ -24,6 +37,8 @@ import {
   Link,
   Radio,
   MultiSelect,
+  Select,
+  Spinner,
 } from "@ui";
 import ProfileHero from "@components/ProfileHero";
 import AttributesCard from "@components/AttributesCard";
@@ -36,8 +51,9 @@ const Person = ({}) => {
   const { personId } = router.query;
 
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
-  const { data, error, isLoading } = useSWR(`/api/person/${personId}`, () =>
-    peopleApi.show(personId, { network: true }).then((res) => res.data)
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    `/api/person/${personId}`,
+    () => peopleApi.show(personId, { network: true }).then((res) => res.data)
   );
 
   if (error)
@@ -62,7 +78,7 @@ const Person = ({}) => {
     person.attributes.rolesResonsibilities ||
     person.attributes.boardMemberOf;
 
-  console.log({ person });
+  // console.log({ person });
   // console.log({ currentUser });
 
   return (
@@ -222,37 +238,641 @@ const Person = ({}) => {
           </Grid>
         </Stack>
       </PageContainer>
-      <Modal
+      <EditProfileModal
         toggle={() => setEditProfileModalOpen(!editProfileModalOpen)}
         open={editProfileModalOpen}
-        title="Edit your profile"
-      >
-        <Card variant="lightened">
-          <Stack spacing={6}>
-            <Icon type="wrench" variant="primary" />
-            <Stack spacing={2}>
-              <Typography variant="bodyLarge" bold>
-                Editing your profile is under construction
-              </Typography>
-              <Typography variant="bodyRegular" lightened>
-                In the mean time, if you wish to update any of your personal or
-                demographic information we've made it possible to use the
-                onboarding flow.
-              </Typography>
-            </Stack>
-
-            <Link href="/welcome/existing-member/confirm-your-details">
-              <Button variant="light">
-                <Typography variant="bodyRegular" bold>
-                  Edit via onboarding
-                </Typography>
-              </Button>
-            </Link>
-          </Stack>
-        </Card>
-      </Modal>
+        setEditProfileModalOpen={setEditProfileModalOpen}
+        mutate={mutate}
+      />
     </>
   );
 };
 
 export default Person;
+
+const EditProfileModal = ({
+  mutate,
+  setEditProfileModalOpen,
+  toggle,
+  open,
+}) => {
+  // general
+  // - about
+  // - responsibilities
+  // - board member of ... QUESTION: what is the workflow for linking schools to people? ie: "claiming a school"
+  // - email
+  // - phone
+
+  // demographic
+  // - roles
+  // - location
+  // - language
+  // - race/ethnicity
+  // - pronouns
+  // - montessori certification level
+
+  const [isEditingGeneral, setIsEditingGeneral] = useState(true);
+
+  const { currentUser, setCurrentUser } = useUserContext();
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      city: "",
+      state: "",
+      email: "",
+      primaryLanguage: "",
+      primaryLanguageOther: "",
+      raceEthnicity: [],
+      raceEthnicityOther: "",
+      lgbtqia: "",
+      gender: "",
+      genderOther: "",
+      pronouns: "",
+      pronounsOther: "",
+      householdIncome: "",
+      montessoriCertified: "",
+      montessoriCertifiedLevels: [],
+      classroomAge: [],
+      //TODO: hook up to BE
+      // role: "",
+      // about: "",
+    },
+  });
+
+  useEffect(() => {
+    if (currentUser) {
+      peopleApi.show(currentUser.id).then((response) => {
+        const person = response.data.data;
+
+        // SAVEPOINT this request is working.  need to make sure data is persisted and returned
+        // and then loaded into form.  then we are done here.
+        reset({
+          firstName: currentUser?.attributes.firstName,
+          lastName: currentUser?.attributes.lastName,
+          city: currentUser?.personAddress.city,
+          state: currentUser?.personAddress.state,
+          email: currentUser?.attributes.email,
+          primaryLanguage: person?.attributes?.primaryLanguage || "",
+          primaryLanguageOther: person?.attributes?.primaryLanguageOther || "",
+          raceEthnicity: person?.attributes?.raceEthnicityList || [],
+          raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
+          lgbtqia: person?.attributes?.lgbtqia || "",
+          gender: person?.attributes?.gender || "",
+          genderOther: person?.attributes?.genderOther || "",
+          pronouns: person?.attributes?.pronouns || "",
+          pronounsOther: person?.attributes?.pronounsOther || "",
+          householdIncome: person?.attributes?.householdIncome || "",
+          montessoriCertified: person?.attributes?.montessoriCertified || "",
+          montessoriCertifiedLevels:
+            person?.attributes?.montessoriCertifiedLevelList || [],
+          classroomAge: person?.attributes?.classroomAgeList || [],
+          //TODO: hook up to BE
+          // role: person?.attributes?.role || "",
+          // about: person?.attributes?.about || "",
+        });
+      });
+    }
+  }, [currentUser]);
+
+  const onSubmit = (data) => {
+    peopleApi
+      .update(currentUser.id, {
+        person: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          address_attributes: {
+            city: data.city,
+            state: data.state,
+          },
+          primary_language: data.primaryLanguage,
+          primary_language_other: data.primaryLanguageOther,
+          race_ethnicity_list: data.raceEthnicity, // FIX: multi select with other, it uses tags, how is this sent when multiple options?
+          race_ethnicity_other: data.raceEthnicityOther,
+          lgbtqia: data.lgbtqia,
+          gender: data.gender,
+          gender_other: data.genderOther,
+          pronouns: data.pronouns,
+          pronouns_other: data.pronounsOther,
+          household_income: data.householdIncome,
+          montessori_certified: data.montessoriCertified,
+          montessori_certified_level_list: data.montessoriCertifiedLevels,
+          classroom_age_list: data.classroomAge,
+          //TODO: hook up to BE
+          // role: ... ,
+          // about: ...
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          console.error(error);
+        } else {
+          const person = response.data.attributes;
+          currentUser.attributes.firstName = person.firstName;
+          currentUser.attributes.lastName = person.lastName;
+          currentUser.attributes.email = person.email;
+          setCurrentUser(currentUser);
+          setEditProfileModalOpen(false);
+          mutate();
+        }
+      });
+  };
+
+  const watchFields = watch();
+  const isCertifiedOrSeeking =
+    watchFields.montessoriCertified === "Yes" ||
+    watchFields.montessoriCertified === "Currently Seeking Certification";
+  const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
+    "A not-listed or more specific ethnicity"
+  );
+  const showCustomLanguageField = watchFields.primaryLanguage === "other";
+  const showCustomGenderField =
+    watchFields.gender === "A not-listed or more specific gender identity";
+  const showCustomPronounsField =
+    watchFields.pronouns === "Not-listed or more specific pronouns";
+
+  return (
+    <Modal toggle={toggle} open={open} title="Edit your profile">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card
+          noBorder
+          noRadius
+          sx={{ position: "sticky", top: -24, zIndex: 2, paddingLeft: 0 }}
+        >
+          <Button small disabled={isSubmitting} type="submit">
+            <Typography variant="bodyRegular" bold>
+              Save
+            </Typography>
+          </Button>
+        </Card>
+
+        <Stack spacing={6}>
+          <Controller
+            name="firstName"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                label="First name"
+                placeholder="e.g. Jane"
+                error={errors.firstName}
+                helperText={
+                  errors &&
+                  errors.firstName &&
+                  errors.firstName.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="lastName"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                label="Last name"
+                placeholder="e.g. Smith"
+                error={errors.lastName}
+                helperText={
+                  errors &&
+                  errors.lastName &&
+                  errors.lastName.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="city"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                label="City"
+                placeholder="e.g. Boston"
+                error={errors.city}
+                helperText={
+                  errors &&
+                  errors.city &&
+                  errors.city.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="state"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                label="State"
+                placeholder="e.g. Massachusetts"
+                error={errors.state}
+                helperText={
+                  errors &&
+                  errors.state &&
+                  errors.state.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="email"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                label="Email"
+                placeholder="e.g. jane.smith@gmail.com"
+                error={errors.email}
+                helperText={
+                  errors &&
+                  errors.email &&
+                  errors.email.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="phone"
+            control={control}
+            rules={{ required: false }}
+            render={({ field }) => (
+              <TextField
+                label="Phone"
+                placeholder="e.g. (123) 456 7890"
+                error={errors.phone}
+                helperText={
+                  errors &&
+                  errors.phone &&
+                  errors.phone.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="about"
+            control={control}
+            rules={{ required: false }}
+            render={({ field }) => (
+              <TextField
+                label="About"
+                placeholder="e.g. Your bio"
+                multiline={true}
+                rows={4}
+                error={errors.about}
+                helperText={
+                  errors &&
+                  errors.about &&
+                  errors.about.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+
+          <Controller
+            name="primaryLanguage"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Select
+                label="What is your primary language?"
+                placeholder="Select a language..."
+                options={languageOptions.map((l) => l.label)}
+                error={errors.primaryLanguage}
+                helperText={
+                  errors &&
+                  errors.primaryLanguage &&
+                  errors.primaryLanguage.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          {showCustomLanguageField ? (
+            <Controller
+              name="primaryLanguageOther"
+              control={control}
+              rules={{
+                required: false,
+              }}
+              render={({ field }) => (
+                <TextField
+                  label="Other language"
+                  placeholder="e.g. Your language"
+                  error={errors.primaryLanguageOther}
+                  helperText={
+                    errors &&
+                    errors.primaryLanguageOther &&
+                    errors.primaryLanguageOther.type === "required" &&
+                    "This field is required"
+                  }
+                  {...field}
+                />
+              )}
+            />
+          ) : null}
+          <Controller
+            name="raceEthnicity"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <MultiSelect
+                withCheckbox
+                label="What is your ethnicity?"
+                placeholder="Select as many as you like..."
+                options={ethnicityOptions.map((l) => l.label)}
+                error={errors.raceEthnicity}
+                defaultValue={[]}
+                helperText={
+                  errors &&
+                  errors.raceEthnicity &&
+                  errors.raceEthnicity.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          {showCustomEthnicityField ? (
+            <Controller
+              name="raceEthnicityOther"
+              control={control}
+              rules={{
+                required: false,
+              }}
+              render={({ field }) => (
+                <TextField
+                  label="Other ethnicity"
+                  placeholder="e.g. Your ethnicity"
+                  error={errors.raceEthnicityOther}
+                  helperText={
+                    errors &&
+                    errors.raceEthnicityOther &&
+                    errors.raceEthnicityOther.type === "required" &&
+                    "This field is required"
+                  }
+                  {...field}
+                />
+              )}
+            />
+          ) : null}
+          <Stack spacing={1}>
+            <Typography variant="bodyRegular">
+              Do you identify as a member of the LGBTQIA community?
+            </Typography>
+            <Controller
+              name="lgbtqia"
+              control={control}
+              rules={{ required: false }}
+              render={({ field: { onChange, value } }) => (
+                <RadioGroup value={value} handleOptionsChange>
+                  {lgbtqiaOptions.map((o, i) => (
+                    <FormControlLabel
+                      key={i}
+                      value={o.value}
+                      control={<Radio />}
+                      label={o.label}
+                      onChange={onChange}
+                    />
+                  ))}
+                </RadioGroup>
+              )}
+            />
+            <FormHelperText error={errors.lgbtqia}>
+              {errors &&
+                errors.lgbtqia &&
+                errors.lgbtqia.type === "required" &&
+                "This field is required"}
+            </FormHelperText>
+          </Stack>
+          <Controller
+            name="gender"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Select
+                label="What is your gender identity?"
+                placeholder="Select one..."
+                options={genderOptions.map((l) => l.label)}
+                error={errors.gender}
+                helperText={
+                  errors &&
+                  errors.gender &&
+                  errors.gender.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          {showCustomGenderField ? (
+            <Controller
+              name="genderOther"
+              control={control}
+              rules={{
+                required: false,
+              }}
+              render={({ field }) => (
+                <TextField
+                  label="Other gender"
+                  placeholder="e.g. Your gender"
+                  error={errors.genderOther}
+                  helperText={
+                    errors &&
+                    errors.genderOther &&
+                    errors.genderOther.type === "required" &&
+                    "This field is required"
+                  }
+                  {...field}
+                />
+              )}
+            />
+          ) : null}
+          <Controller
+            name="pronouns"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Select
+                label="What are your pronouns?"
+                placeholder="Select one..."
+                options={pronounsOptions.map((l) => l.label)}
+                error={errors.pronouns}
+                helperText={
+                  errors &&
+                  errors.pronouns &&
+                  errors.pronouns.type === "required" &&
+                  "This field is required"
+                }
+                value={field.value}
+                {...field}
+              />
+            )}
+          />
+          {showCustomPronounsField ? (
+            <Controller
+              name="pronounsOther"
+              control={control}
+              rules={{
+                required: false,
+              }}
+              render={({ field }) => (
+                <TextField
+                  label="Other pronouns"
+                  placeholder="e.g. Your pronouns"
+                  error={errors.pronounsOther}
+                  helperText={
+                    errors &&
+                    errors.pronounsOther &&
+                    errors.pronounsOther.type === "required" &&
+                    "This field is required"
+                  }
+                  {...field}
+                />
+              )}
+            />
+          ) : null}
+          <Stack spacing={1}>
+            <Typography variant="bodyRegular">
+              How would you describe the economic situation in your household
+              while you were growing up?
+            </Typography>
+            <Typography variant="bodyRegular" lightened>
+              As a reference point, today a family of four with a family income
+              of $47,638/year is the limit to receive subsidies.
+            </Typography>
+            <Controller
+              name="householdIncome"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <RadioGroup value={value} handleOptionsChange>
+                  {incomeOptions.map((o, i) => (
+                    <FormControlLabel
+                      key={i}
+                      value={o.value}
+                      control={<Radio />}
+                      label={o.label}
+                      onChange={onChange}
+                    />
+                  ))}
+                </RadioGroup>
+              )}
+            />
+            <FormHelperText error={errors.householdIncome}>
+              {errors &&
+                errors.householdIncome &&
+                errors.householdIncome.type === "required" &&
+                "This field is required"}
+            </FormHelperText>
+          </Stack>
+          <Stack spacing={1}>
+            <Typography variant="bodyRegular">
+              Are you Montessori Certified?
+            </Typography>
+            <Controller
+              name="montessoriCertified"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <RadioGroup value={value} handleOptionsChange>
+                  {montessoriCertificationOptions.map((o, i) => (
+                    <FormControlLabel
+                      key={i}
+                      value={o.value}
+                      control={<Radio />}
+                      label={o.label}
+                      onChange={onChange}
+                    />
+                  ))}
+                </RadioGroup>
+              )}
+            />
+            <FormHelperText error={errors.montessoriCertified}>
+              {errors &&
+                errors.montessoriCertified &&
+                errors.montessoriCertified.type === "required" &&
+                "This field is required"}
+            </FormHelperText>
+          </Stack>
+          {isCertifiedOrSeeking ? (
+            <Controller
+              name="montessoriCertifiedLevels"
+              control={control}
+              rules={{ required: isCertifiedOrSeeking ? true : false }}
+              render={({ field }) => (
+                <MultiSelect
+                  withCheckbox
+                  label="What Levels are you certified (or seeking certification) for?"
+                  placeholder="Select as many as you like..."
+                  options={levelsOfMontessoriCertification.map((l) => l.label)}
+                  error={errors.montessoriCertifiedLevels}
+                  defaultValue={[]}
+                  helperText={
+                    errors &&
+                    errors.montessoriCertifiedLevels &&
+                    errors.montessoriCertifiedLevels.type === "required" &&
+                    "This field is required"
+                  }
+                  {...field}
+                />
+              )}
+            />
+          ) : null}
+          <Stack spacing={1}>
+            <Typography variant="bodyRegular">
+              What is your role at Wildflower Schools?
+            </Typography>
+            <Controller
+              name="role"
+              control={control}
+              rules={{ required: false }}
+              render={({ field: { onChange, value } }) => (
+                <RadioGroup value={value} handleOptionsChange>
+                  {roleOptions.map((o, i) => (
+                    <FormControlLabel
+                      key={i}
+                      value={o.value}
+                      control={<Radio />}
+                      label={o.label}
+                      onChange={onChange}
+                    />
+                  ))}
+                </RadioGroup>
+              )}
+            />
+            <FormHelperText error={errors.role}>
+              {errors &&
+                errors.role &&
+                errors.role.type === "required" &&
+                "This field is required"}
+            </FormHelperText>
+          </Stack>
+        </Stack>
+      </form>
+    </Modal>
+  );
+};
