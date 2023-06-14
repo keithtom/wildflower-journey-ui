@@ -301,9 +301,9 @@ const EditProfileModal = ({
       montessoriCertified: "",
       montessoriCertifiedLevels: [],
       classroomAge: [],
-      //TODO: hook up to BE
-      // role: "",
-      // about: "",
+      role: [],
+      about: "",
+      phone: "",
     },
   });
 
@@ -334,9 +334,9 @@ const EditProfileModal = ({
           montessoriCertifiedLevels:
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
-          //TODO: hook up to BE
-          // role: person?.attributes?.role || "",
-          // about: person?.attributes?.about || "",
+          role: person?.attributes?.roleList || [],
+          about: person?.attributes?.about || "",
+          phone: person?.attributes?.phone || "",
         });
       });
     }
@@ -366,9 +366,9 @@ const EditProfileModal = ({
           montessori_certified: data.montessoriCertified,
           montessori_certified_level_list: data.montessoriCertifiedLevels,
           classroom_age_list: data.classroomAge,
-          //TODO: hook up to BE
-          // role: ... ,
-          // about: ...
+          role_list: [data.role],
+          about: data.about,
+          phone: data.phone,
         },
       })
       .then((response) => {

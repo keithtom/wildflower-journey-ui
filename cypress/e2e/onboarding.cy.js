@@ -129,4 +129,86 @@ describe("onboarding spec", () => {
       cy.url({ timeout: 60000 }).should("include", "/ssj");
     });
   });
+
+  describe("existing member", () => {
+    describe("confirming demographic info", () => {
+      beforeEach(() => {
+        cy.visit("/welcome/existing-member/confirm-demographic-info");
+      });
+
+      it.only("should display form", () => {
+        cy.contains("language");
+        cy.contains("ethnicity");
+        cy.contains("LGBTQIA");
+        cy.contains("gender identity");
+        cy.contains("pronouns");
+        cy.contains("economic situation in your household");
+        cy.contains("Montessori Certified");
+        cy.contains("What is your role at Wildflower Schools?");
+      });
+
+      it("should be able to update fields", () => {
+        cy.contains("What is your primary language?").next().click();
+        cy.contains("English").click();
+        cy.get("body").click(0, 0); // close dropdwon
+
+        cy.contains("What is your ethnicity?").next().click();
+        cy.contains("American Indian or Alaska Native").click({ force: true });
+        cy.contains("Asian").click({ force: true });
+        cy.get("body").click(0, 0); // close dropdwon
+
+        cy.contains("Do you identify as a member of the LGBTQIA community?")
+          .get("label")
+          .first()
+          .click();
+
+        cy.contains("What is your gender identity?").next().click();
+        cy.contains("Male/Man").click({ force: true });
+        cy.get("body").click(0, 0); // close dropdwon
+
+        cy.contains("What are your pronouns?").next().click();
+        cy.contains("she/her/hers").click({ force: true });
+        cy.get("body").click(0, 0); // close dropdwon
+
+        cy.contains(
+          "How would you describe the economic situation in your household while you were growing up"
+        )
+          .next()
+          .next()
+          .children()
+          .first()
+          .click();
+
+        cy.contains("Are you Montessori Certified?")
+          .next()
+          .children()
+          .first()
+          .click();
+
+        cy.contains(
+          "What Levels are you certified (or seeking certification) for?"
+        )
+          .next()
+          .click();
+        cy.contains("6-9 Elementary").click({ force: true });
+        cy.contains("Primary/Early Childhood").click({ force: true });
+        cy.get("body").click(0, 0); // close dropdwon
+
+        cy.contains("What Age Classrooms are you interested in offering?")
+          .next()
+          .click();
+        cy.contains("Infants").click({ force: true });
+        cy.contains("Toddler").click({ force: true });
+        cy.get("body").click(0, 0); // close dropdwon
+
+        cy.contains("Emerging Teacher Leader").click();
+
+        cy.get('button[type="submit"]').click();
+        cy.url({ timeout: 60000 }).should(
+          "include",
+          "/welcome/add-profile-info"
+        );
+      });
+    });
+  });
 });

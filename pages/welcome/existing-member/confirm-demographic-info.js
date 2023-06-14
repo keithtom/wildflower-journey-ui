@@ -83,8 +83,7 @@ const ConfirmDemographicInfo = ({}) => {
       montessoriCertified: "",
       montessoriCertifiedLevels: [],
       classroomAge: [],
-      //TODO: hook up to BE
-      // role: "",
+      role: [],
     },
   });
 
@@ -110,8 +109,7 @@ const ConfirmDemographicInfo = ({}) => {
           montessoriCertifiedLevels:
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
-          //TODO: hook up to BE
-          // role: person?.attributes?.role || "",
+          role: person?.attributes?.roleList || [],
         });
       });
     }
@@ -135,8 +133,7 @@ const ConfirmDemographicInfo = ({}) => {
           montessori_certified: data.montessoriCertified,
           montessori_certified_level_list: data.montessoriCertifiedLevels,
           classroom_age_list: data.classroomAge,
-          //TODO: hook up to BE
-          // role: data.role,
+          role_list: [data.role],
         },
       })
       .then((response) => {
