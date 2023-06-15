@@ -6,6 +6,27 @@ import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 
+import { styled } from "@mui/material/styles";
+import { FilePond, registerPlugin } from "react-filepond";
+import "filepond/dist/filepond.min.css";
+import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+registerPlugin(
+  FilePondPluginImageExifOrientation,
+  FilePondPluginImagePreview,
+  FilePondPluginFileValidateSize,
+  FilePondPluginFileValidateType
+);
+import { getCookie } from "cookies-next";
+import { FileChecksum } from "@lib/rails-filechecksum";
+
+import axios from "axios";
+
+const token = getCookie("auth");
+
 import {
   lgbtqiaOptions,
   montessoriCertificationOptions,
@@ -19,6 +40,7 @@ import {
 } from "../../../../lib/utils/demographic-options";
 import { useUserContext } from "@lib/useUserContext";
 import {
+  Divider,
   Box,
   PageContainer,
   Button,
@@ -51,7 +73,7 @@ const Person = ({}) => {
   const { personId } = router.query;
 
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
-  const { data, error, isLoading, isValidating, mutate } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     `/api/person/${personId}`,
     () => peopleApi.show(personId, { network: true }).then((res) => res.data)
   );
@@ -250,12 +272,29 @@ const Person = ({}) => {
 
 export default Person;
 
+const StyledFilePond = styled(FilePond)`
+  .filepond--root {
+    font-family: ${({ theme }) => theme.typography.family};
+  }
+  .filepond--panel-root {
+    background-color: ${({ theme }) => theme.color.neutral.lightened};
+  }
+`;
+
 const EditProfileModal = ({
   mutate,
   setEditProfileModalOpen,
   toggle,
   open,
 }) => {
+  const { currentUser, setCurrentUser } = useUserContext();
+  const [profilePicture, setProfilePicture] = useState();
+  const [profileImage, setProfileImage] = useState();
+  const [showError, setShowError] = useState();
+  const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
+  const handleFileError = (error) => {
+    setShowError(error);
+  };
   // general
   // - about
   // - responsibilities
@@ -270,10 +309,6 @@ const EditProfileModal = ({
   // - race/ethnicity
   // - pronouns
   // - montessori certification level
-
-  const [isEditingGeneral, setIsEditingGeneral] = useState(true);
-
-  const { currentUser, setCurrentUser } = useUserContext();
 
   const {
     control,
@@ -369,19 +404,29 @@ const EditProfileModal = ({
           role_list: [data.role],
           about: data.about,
           phone: data.phone,
+          profile_image: profileImage,
         },
       })
       .then((response) => {
         if (response.error) {
           console.error(error);
         } else {
-          const person = response.data.attributes;
-          currentUser.attributes.firstName = person.firstName;
-          currentUser.attributes.lastName = person.lastName;
-          currentUser.attributes.email = person.email;
+          // const person = response.data.attributes;
+          // currentUser.attributes.firstName = person.firstName;
+          // currentUser.attributes.lastName = person.lastName;
+          // currentUser.attributes.email = person.email;
+          // currentUser.attributes.imageUrl = person.attributes.imageUrl;
+          setProfilePicture(null);
           setCurrentUser(currentUser);
-          setEditProfileModalOpen(false);
           mutate();
+          setEditProfileModalOpen(false);
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          router.push("/login");
+        } else {
+          console.error(error);
         }
       });
   };
@@ -402,18 +447,6 @@ const EditProfileModal = ({
   return (
     <Modal toggle={toggle} open={open} title="Edit your profile">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Card
-          noBorder
-          noRadius
-          sx={{ position: "sticky", top: -24, zIndex: 2, paddingLeft: 0 }}
-        >
-          <Button small disabled={isSubmitting} type="submit">
-            <Typography variant="bodyRegular" bold>
-              Save
-            </Typography>
-          </Button>
-        </Card>
-
         <Stack spacing={6}>
           <Controller
             name="firstName"
@@ -871,7 +904,140 @@ const EditProfileModal = ({
                 "This field is required"}
             </FormHelperText>
           </Stack>
+          <Divider />
+          <Typography variant="bodyRegular">Add a new profile image</Typography>
+          <Grid container justifyContent="center">
+            <Grid item xs={4}>
+              <StyledFilePond
+                files={profilePicture}
+                allowReorder={false}
+                allowMultiple={false}
+                maxFileSize="5MB"
+                acceptedFileTypes={["image/*"]}
+                onupdatefiles={setProfilePicture}
+                onaddfilestart={() => setIsUpdatingPicture(true)}
+                onprocessfiles={() => setIsUpdatingPicture(false)}
+                stylePanelAspectRatio="1:1"
+                onerror={handleFileError}
+                stylePanelLayout="circle"
+                server={{
+                  process: (
+                    fieldName,
+                    file,
+                    metadata,
+                    load,
+                    error,
+                    progress,
+                    abort,
+                    transfer,
+                    options
+                  ) => {
+                    // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
+                    FileChecksum.create(file, (checksum_error, checksum) => {
+                      if (checksum_error) {
+                        console.error(checksum_error);
+                        error();
+                      }
+                      axios
+                        .post(
+                          `${process.env.API_URL}/rails/active_storage/direct_uploads`,
+                          {
+                            blob: {
+                              filename: file.name,
+                              content_type: file.type,
+                              byte_size: file.size,
+                              checksum: checksum,
+                            },
+                          }
+                        )
+                        .then((response) => {
+                          if (!response.data) {
+                            return error;
+                          }
+                          const signed_id = response.data.signed_id;
+                          axios
+                            .put(response.data.direct_upload.url, file, {
+                              headers: response.data.direct_upload.headers,
+                              onUploadProgress: (progressEvent) => {
+                                progress(
+                                  progressEvent.lengthComputable,
+                                  progressEvent.loaded,
+                                  progressEvent.total
+                                );
+                              },
+                              // need to remove default Authorization header when sending to s3
+                              transformRequest: (data, headers) => {
+                                if (process.env !== "local") {
+                                  delete headers.common["Authorization"];
+                                }
+                                return data;
+                              },
+                            })
+                            .then((response) => {
+                              setProfileImage(signed_id);
+                              load(signed_id);
+                            })
+                            .catch((error) => {
+                              if (!axios.isCancel(error)) {
+                                console.error(error);
+                                // error();
+                              }
+                            });
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                        });
+                    });
+                    return {
+                      abort: () => {
+                        // This function is entered if the user has tapped the cancel button
+                        // request.abort(); TODO: is there an active storage abort?
+
+                        // Let FilePond know the request has been cancelled
+                        abort();
+                      },
+                    };
+                  },
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                  ondata: (formData) => {
+                    formData.append("blob", value);
+                    return formData;
+                  },
+                  onload: () => {
+                    props.onUploadComplete();
+                  },
+                }}
+                credits={false}
+                labelIdle='Drag & Drop your profile picture or <span class="filepond--label-action">Browse</span>'
+              />
+            </Grid>
+          </Grid>
         </Stack>
+        <Card
+          noBorder
+          noRadius
+          sx={{
+            position: "sticky",
+            bottom: -24,
+            zIndex: 2,
+            paddingLeft: 0,
+          }}
+        >
+          <Stack direction="row" spacing={3} alignItems="center">
+            <Button small disabled={isUpdatingPicture} type="submit">
+              <Typography variant="bodyRegular" bold>
+                Save
+              </Typography>
+            </Button>
+            {isUpdatingPicture && (
+              <Typography variant="bodyRegular" lightened>
+                Updating profile image...
+              </Typography>
+            )}
+          </Stack>
+        </Card>
       </form>
     </Modal>
   );

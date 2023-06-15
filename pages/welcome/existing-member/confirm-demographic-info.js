@@ -140,7 +140,7 @@ const ConfirmDemographicInfo = ({}) => {
         if (response.error) {
           console.error(error);
         } else {
-          // router.push("/welcome/existing-member/add-profile-info");
+          router.push("/welcome/existing-member/add-profile-info");
         }
       });
   };
