@@ -36,13 +36,6 @@ const Network = () => {
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
 
-  //FOR DEMO
-  useEffect(() => {
-    category === "people"
-      ? setQuery("foundation partner")
-      : setQuery("montessori");
-  }, [category]);
-
   // console.log({ results });
 
   return (
