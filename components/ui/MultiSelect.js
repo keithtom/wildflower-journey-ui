@@ -79,7 +79,7 @@ const MultiSelect = ({
         {options.map((option) => (
           <MenuItem key={option} value={option}>
             {withCheckbox ? (
-              <Checkbox checked={value.indexOf(option) > -1} />
+              <Checkbox checked={value?.indexOf(option) > -1} />
             ) : null}
             {option}
           </MenuItem>
