@@ -4,8 +4,13 @@ import stepsApi from "@api/workflow/steps";
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 
 // show me all milestones for a phase
-async function index(workflowId, phase, config={}) {
-  return workflowsApi.get(`/workflows/${workflowId}/processes?phase=${phase}`, config);
+async function index(workflowId, phase, config = {}, omitInclude = false) {
+  
+  let url = `/workflows/${workflowId}/processes?phase=${phase}`;
+  if (omitInclude) {
+    url += "&omit_include=true";
+  }
+  return workflowsApi.get(url, config);
 }
 
 // look at an individual process/milestone

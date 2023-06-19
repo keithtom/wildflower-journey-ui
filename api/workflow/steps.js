@@ -102,4 +102,14 @@ async function selectOption(taskId, optionId) {
   return response;
 }
 
-export default { assign, unassign, complete, uncomplete, selectOption, augmentStep};
+async function show({milestoneId, taskId, config = {}}) {
+  let response;
+  try {
+    response = await workflowsApi.get(`/processes/${milestoneId}/steps/${taskId}`, config);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  
+  return response;
+}
+export default { assign, unassign, complete, uncomplete, selectOption, augmentStep, show};

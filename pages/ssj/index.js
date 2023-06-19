@@ -4,11 +4,11 @@ import Router from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
 import getAuthHeader from "@lib/getAuthHeader";
-import axios from "axios";
 import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
 
 import ssjApi from "@api/ssj/ssj";
+import processesApi from "@api/workflow/processes";
 import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Milestone from "../../components/Milestone";
@@ -1282,10 +1282,9 @@ export async function getServerSideProps({ params, req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
 
   // turn this in to a catch all api for the ssj/dashboard
-  const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   let responseProgress;
   try {
-    responseProgress = await axios.get(apiRouteProgress, config);
+    responseProgress = await ssjApi.progress({ workflowId, config });
   } catch (error) {
     if (error?.response?.status === 401) {
       clearLoggedInState({ req, res });
@@ -1304,8 +1303,7 @@ export async function getServerSideProps({ params, req, res }) {
   if (numAssignedSteps == 0) {
     const phase = getCookie("phase", { req, res }); // this should be your teams current phase?
     // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-    const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&omit_include=true`;
-    const response = await axios.get(apiRoute, config);
+    const response = await processesApi.index(workflowId, phase, config, true)
     const data = response.data;
 
     data.data.forEach((milestone) => {

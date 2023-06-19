@@ -46,4 +46,14 @@ async function invitePartner(data) {
   });
 }
 
-export default { setStartDate, getTeam, invitePartner };
+async function progress({workflowId, config = {}}) {
+  let response;
+  try {
+    response = await workflowsApi.get(`/progress?workflow_id=${workflowId}`, config);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  return response;
+}
+
+export default { setStartDate, getTeam, invitePartner, progress };
