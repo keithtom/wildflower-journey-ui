@@ -46,14 +46,30 @@ async function invitePartner(data) {
   });
 }
 
-async function progress({workflowId, config = {}}) {
+async function progress({ workflowId, config = {} }) {
   let response;
   try {
-    response = await workflowsApi.get(`/progress?workflow_id=${workflowId}`, config);
+    response = await workflowsApi.get(
+      `/progress?workflow_id=${workflowId}`,
+      config
+    );
   } catch (error) {
     return Promise.reject(error);
   }
   return response;
 }
 
-export default { setStartDate, getTeam, invitePartner, progress };
+async function resources({ workflowId, config = {} }) {
+  let response;
+  try {
+    response = await workflowsApi.get(
+      `/resources?workflow_id=${workflowId}`,
+      config
+    );
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  return response;
+}
+
+export default { setStartDate, getTeam, invitePartner, progress, resources };

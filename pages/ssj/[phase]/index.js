@@ -430,7 +430,11 @@ export async function getServerSideProps({ params, req, res }) {
 
   let response;
   try {
-    response = await processesApi.index(workflowId, phase, config);
+    response = await processesApi.index({
+      workflowId,
+      config,
+      params: { phase },
+    });
   } catch (error) {
     if (error?.response?.status === 401) {
       clearLoggedInState({ req, res });

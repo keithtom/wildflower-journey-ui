@@ -1,22 +1,14 @@
 import { useState } from "react";
 import { getCookie } from "cookies-next";
+import ssjApi from "@api/ssj/ssj";
 
-import {
-  PageContainer,
-  Typography,
-  Card,
-  Stack,
-  Icon,
-  Grid,
-  Chip,
-} from "@ui";
+import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
 import Resource from "../../components/Resource";
 import Hero from "../../components/Hero";
 import getAuthHeader from "../../lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import axios from "axios";
 
 const Resources = ({ dataResources }) => {
   const [showResourcesByCategory, setShowResourcesByCategory] = useState(true);
@@ -130,18 +122,17 @@ export default Resources;
 export async function getServerSideProps({ req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
-    console.log("no token found, redirecting to login")
+    console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
   const workflowId = getCookie("workflowId", { req, res });
-  const apiRouteResources = `${process.env.API_URL}/v1/ssj/dashboard/resources?workflow_id=${workflowId}`;
   let responseResources;
   try {
-    responseResources = await axios.get(apiRouteResources, config);
+    responseResources = await ssjApi.resources({ workflowId, config });
   } catch (error) {
     if (error?.response?.status === 401) {
-      clearLoggedInState({req, res});
+      clearLoggedInState({ req, res });
       return redirectLoginProps();
     } else {
       console.error(error);

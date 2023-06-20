@@ -1303,7 +1303,7 @@ export async function getServerSideProps({ params, req, res }) {
   if (numAssignedSteps == 0) {
     const phase = getCookie("phase", { req, res }); // this should be your teams current phase?
     // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-    const response = await processesApi.index(workflowId, phase, config, true)
+    const response = await processesApi.index({workflowId, params: { phase, omit_include: true }, config })
     const data = response.data;
 
     data.data.forEach((milestone) => {
