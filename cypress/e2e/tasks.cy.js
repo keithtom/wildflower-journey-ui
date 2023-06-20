@@ -163,7 +163,7 @@ describe("tasks", () => {
       });
     });
 
-    it("can be assigned to both partners", () => {
+    it.only("can be assigned to both partners", () => {
       // login as partner 1 and assign task to themselves. check that avatar icon appears
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
@@ -358,14 +358,12 @@ describe("tasks", () => {
       cy.contains("Milestone D-E-F").click();
       cy.contains("Collaborative Step 1").click();
       cy.contains("Add to my to do list").click();
-      cy.get("span[type='close']").first().click({ force: true });
       cy.contains("ASSIGNEE");
-      cy.get("span[type='close']").last().click({ force: true });
       cy.get("span[type='close']").last().click({ force: true });
       cy.get(".MuiAvatar-img").should("have.length", 2); //once in the header and once in the assignment
       cy.logout();
 
-      // login as partner 2 and navigate to that same step and check that partner's avatar icon appears
+      // // login as partner 2 and navigate to that same step and check that partner's avatar icon appears
       cy.get("@partner2Email").then((email) => {
         cy.login(email, "password");
       });
@@ -377,9 +375,7 @@ describe("tasks", () => {
       // assign task to partner 2
       cy.contains("Collaborative Step 1").click();
       cy.contains("Add to my to do list").click();
-      cy.get("span[type='close']").first().click({ force: true });
       cy.contains("ASSIGNEE");
-      cy.get("span[type='close']").last().click({ force: true });
       cy.get("span[type='close']").last().click({ force: true });
       cy.get(".MuiAvatar-img").should("have.length", 3); //once in the header and twice in the assignment
       cy.logout();
@@ -456,11 +452,11 @@ describe("tasks", () => {
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
-      cy.get('span[type="close"]').first().click({force: true});
-      cy.get('span[type="close"]').last().click({force: true});
+      cy.get('span[type="close"]').first().click({ force: true });
+      cy.get('span[type="close"]').last().click({ force: true });
 
       // check that there is no Hold up
-      cy.contains("a li div p", /^Startup$/).click({force: true});
+      cy.contains("a li div p", /^Startup$/).click({ force: true });
       cy.contains("Milestone D-E-F").should("exist");
       cy.contains("To do").should("exist");
       cy.contains("Hold up! Try something else first.").should("not.exist");

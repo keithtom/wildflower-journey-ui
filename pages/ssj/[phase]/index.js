@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import getAuthHeader from "../../../lib/getAuthHeader";
-import workflowApi from "@api/workflow/processes";
+import processesApi from "@api/workflow/processes";
 import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
@@ -430,7 +430,11 @@ export async function getServerSideProps({ params, req, res }) {
 
   let response;
   try {
-    response = await workflowApi.index(workflowId, phase, config);
+    response = await processesApi.index({
+      workflowId,
+      config,
+      params: { phase },
+    });
   } catch (error) {
     if (error?.response?.status === 401) {
       clearLoggedInState({ req, res });

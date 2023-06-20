@@ -4,22 +4,40 @@ import stepsApi from "@api/workflow/steps";
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 
 // show me all milestones for a phase
-async function index(workflowId, phase, config={}) {
-  return workflowsApi.get(`/workflows/${workflowId}/processes?phase=${phase}`, config);
+async function index({ workflowId, params, config = {} }) {
+  let url = `/workflows/${workflowId}/processes`;
+  if (params !== undefined) {
+    url += `?`;
+    const paramNames = Object.keys(params);
+    paramNames.forEach((param, index) => {
+      if (index != 0) {
+        url += `&`;
+      }
+      url += `${param}=${params[param]}`;
+    });
+  }
+
+  let response;
+  try {
+    response = workflowsApi.get(url, config);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  return response;
 }
 
 // look at an individual process/milestone
 async function show(id, config = {}) {
   let response;
   try {
-    response = await workflowsApi.get(`/processes/${id}`, config);  
+    response = await workflowsApi.get(`/processes/${id}`, config);
   } catch (error) {
     return Promise.reject(error);
   }
   const included = response.data.included;
-  
+
   wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
-  
+
   var steps = response.data.data.relationships.steps.data;
   steps.forEach((step) => {
     step = stepsApi.augmentStep(step, included);

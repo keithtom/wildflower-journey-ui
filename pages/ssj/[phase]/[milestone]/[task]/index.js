@@ -5,7 +5,7 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import axios from "axios";
+import stepsApi from "@api/workflow/steps";
 
 import {
   PageContainer,
@@ -41,10 +41,7 @@ const StyledTaskResources = styled(Card)`
     `}
 `;
 
-const TaskPage = ({
-  MilestoneId,
-  MilestoneTitle,
-}) => {
+const TaskPage = ({ MilestoneId, MilestoneTitle }) => {
   const [userIsEditing, setUserIsEditing] = useState(false);
   const isSensibleDefault = false;
   const isDecision = false;
@@ -93,19 +90,11 @@ const TaskPage = ({
             </Grid>
           </Grid>
           <StyledTaskHeader downplayed={isUpNext}>
-            <Task
-              task={task}
-              notNavigable
-              isNext={true}
-            />
+            <Task task={task} notNavigable isNext={true} />
           </StyledTaskHeader>
         </Stack>
 
-        {isDecision ? (
-          <DecisionForm
-            disabled={userIsEditing}
-          />
-        ) : null}
+        {isDecision ? <DecisionForm disabled={userIsEditing} /> : null}
 
         <StyledTaskResources downplayed={isUpNext}>
           <Stack spacing={3}>
@@ -311,20 +300,19 @@ const DecisionForm = ({ options, disabled }) => {
 export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
-    console.log("no token found, redirecting to login")
+    console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
-  const MilestoneId = query.milestone;
-  const TaskId = query.task;
-  const apiRoute = `${process.env.API_URL}/v1/workflow/processes/${MilestoneId}/steps/${TaskId}`;
+  const milestoneId = query.milestone;
+  const taskId = query.task;
 
   let response;
   try {
-    response = await axios.get(apiRoute, config);
+    response = await stepsApi.get({ milestoneId, taskId, config });
   } catch (error) {
     if (error?.response?.status === 401) {
-      clearLoggedInState({req, res});
+      clearLoggedInState({ req, res });
       return redirectLoginProps();
     } else {
       console.error(error);
