@@ -295,20 +295,6 @@ const EditProfileModal = ({
   const handleFileError = (error) => {
     setShowError(error);
   };
-  // general
-  // - about
-  // - responsibilities
-  // - board member of ... QUESTION: what is the workflow for linking schools to people? ie: "claiming a school"
-  // - email
-  // - phone
-
-  // demographic
-  // - roles
-  // - location
-  // - language
-  // - race/ethnicity
-  // - pronouns
-  // - montessori certification level
 
   const {
     control,

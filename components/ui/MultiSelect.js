@@ -1,5 +1,6 @@
 import { default as MaterialSelect } from "@mui/material/Select";
 import { styled, css } from "@mui/material/styles";
+import FormHelperText from "@mui/material/FormHelperText";
 
 import { FormControl, MenuItem } from "@mui/material";
 import { Chip, Icon, Input, Stack, Typography, Checkbox } from "./index";
@@ -26,66 +27,72 @@ const MultiSelect = ({
   label,
   placeholder,
   withCheckbox,
+  helperText,
   ...props
 }) => {
   return (
-    <FormControl fullWidth={!props.autoWidth}>
-      {label ? (
-        <Typography variant="bodyRegular" sx={{ marginBottom: "8px" }}>
-          {label}
-        </Typography>
-      ) : null}
-      <CustomMultiSelect
-        multiple
-        labelId={`${id}-label`}
-        id={id}
-        value={value}
-        onChange={onChange}
-        input={<Input />}
-        displayEmpty
-        autoWidth
-        IconComponent={(props) => (
-          <Icon
-            type="expandMore"
-            variant="lightened"
-            hoverable
-            style={{ top: "auto" }}
-            {...props}
-          />
-        )}
-        renderValue={(selected) => {
-          if (selected.length === 0) {
-            return (
-              <Typography
-                variant="bodyRegular"
-                lightened
-                sx={{ marginLeft: "8px" }}
-              >
-                {placeholder}
-              </Typography>
-            );
-          }
+    <Stack>
+      <FormControl fullWidth={!props.autoWidth}>
+        {label ? (
+          <Typography variant="bodyRegular" sx={{ marginBottom: "8px" }}>
+            {label}
+          </Typography>
+        ) : null}
+        <CustomMultiSelect
+          multiple
+          labelId={`${id}-label`}
+          id={id}
+          value={value}
+          onChange={onChange}
+          input={<Input />}
+          displayEmpty
+          autoWidth
+          IconComponent={(props) => (
+            <Icon
+              type="expandMore"
+              variant="lightened"
+              hoverable
+              style={{ top: "auto" }}
+              {...props}
+            />
+          )}
+          renderValue={(selected) => {
+            if (selected.length === 0) {
+              return (
+                <Typography
+                  variant="bodyRegular"
+                  lightened
+                  sx={{ marginLeft: "8px" }}
+                >
+                  {placeholder}
+                </Typography>
+              );
+            }
 
-          return (
-            <Stack direction="row" spacing={1}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Stack>
-          );
-        }}
-        {...props}
-      >
-        {options.map((option) => (
-          <MenuItem key={option} value={option}>
-            {withCheckbox ? (
-              <Checkbox checked={value?.indexOf(option) > -1} />
-            ) : null}
-            {option}
-          </MenuItem>
-        ))}
-      </CustomMultiSelect>
-    </FormControl>
+            return (
+              <Stack direction="row" spacing={1}>
+                {selected.map((value) => (
+                  <Chip key={value} label={value} />
+                ))}
+              </Stack>
+            );
+          }}
+          {...props}
+        >
+          {options.map((option) => (
+            <MenuItem key={option} value={option}>
+              {withCheckbox ? (
+                <Checkbox checked={value?.indexOf(option) > -1} />
+              ) : null}
+              {option}
+            </MenuItem>
+          ))}
+        </CustomMultiSelect>
+      </FormControl>
+      {helperText && (
+        <FormHelperText error={props.error}>{helperText}</FormHelperText>
+      )}
+    </Stack>
   );
 };
 
