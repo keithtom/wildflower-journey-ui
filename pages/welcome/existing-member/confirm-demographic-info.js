@@ -300,7 +300,7 @@ const ConfirmDemographicInfo = ({}) => {
                   <Controller
                     name="lgbtqia"
                     control={control}
-                    rules={{ required: true }}
+                    rules={{ required: false }}
                     render={({ field: { onChange, value } }) => (
                       <RadioGroup value={value} handleOptionsChange>
                         {lgbtqiaOptions.map((o, i) => (
