@@ -17,55 +17,53 @@ const Select = ({
   ...props
 }) => {
   return (
-    <FormControl fullWidth>
-      {label ? (
-        <Typography variant="bodyRegular" sx={{ marginBottom: "8px" }}>
-          {label}
-        </Typography>
-      ) : null}
+    <Stack>
+      <FormControl fullWidth>
+        {label ? (
+          <Typography variant="bodyRegular" sx={{ marginBottom: "8px" }}>
+            {label}
+          </Typography>
+        ) : null}
 
-      <MaterialSelect
-        error={error}
-        labelId={`${id}-label`}
-        id={id}
-        value={value}
-        onChange={onChange}
-        input={<Input />}
-        displayEmpty={true}
-        renderValue={(value) =>
-          value?.length !== 0 ? (
-            Array.isArray(value) ? (
-              value.join(", ")
-            ) : (
+        <MaterialSelect
+          error={error}
+          labelId={`${id}-label`}
+          id={id}
+          value={value}
+          onChange={onChange}
+          input={<Input />}
+          displayEmpty={true}
+          renderValue={(value) =>
+            value ? (
               value
+            ) : (
+              <Typography variant="bodyRegular" lightened>
+                {placeholder}
+              </Typography>
             )
-          ) : (
-            <Typography variant="bodyRegular" lightened>
-              {placeholder}
-            </Typography>
-          )
-        }
-        IconComponent={(props) => (
-          <Icon
-            type="expandMore"
-            variant="lightened"
-            hoverable
-            style={{ top: "auto" }}
-            {...props}
-          />
-        )}
-        {...props}
-      >
-        {options.map((option, i) => (
-          <MenuItem key={i} value={option}>
-            {option}
-          </MenuItem>
-        ))}
-      </MaterialSelect>
+          }
+          IconComponent={(props) => (
+            <Icon
+              type="expandMore"
+              variant="lightened"
+              hoverable
+              style={{ top: "auto" }}
+              {...props}
+            />
+          )}
+          {...props}
+        >
+          {options.map((option, i) => (
+            <MenuItem key={i} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </MaterialSelect>
+      </FormControl>
       {helperText && (
         <FormHelperText error={error}>{helperText}</FormHelperText>
       )}
-    </FormControl>
+    </Stack>
   );
 };
 

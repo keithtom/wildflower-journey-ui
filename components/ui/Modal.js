@@ -29,7 +29,9 @@ export default function Modal({
           <Grid container alignItems="center" justifyContent="flex-end">
             {title && (
               <Grid item flex={1}>
-                <Typography variant="h4">{title}</Typography>
+                <Typography variant="h4" bold>
+                  {title}
+                </Typography>
               </Grid>
             )}
             <Grid item>
