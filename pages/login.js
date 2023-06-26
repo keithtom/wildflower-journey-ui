@@ -5,6 +5,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
 import authApi from "@api/auth";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import {
   Button,
@@ -59,6 +60,7 @@ const Login = ({}) => {
         console.log(error);
         console.log(error.response.data); // error message
         if (error.response.status === 401) {
+          clearLoggedInState({});
           setError("email", {
             type: "invalid",
             message: error.response.data,

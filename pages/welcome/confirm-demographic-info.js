@@ -5,6 +5,7 @@ import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import {
   Button,
@@ -104,6 +105,7 @@ const ConfirmDemographicInfo = ({}) => {
         })
         .catch((error) => {
           if (error?.response?.status === 401) {
+            clearLoggedInState({});
             router.push("/login");
           } else {
             console.error(error);
@@ -141,6 +143,7 @@ const ConfirmDemographicInfo = ({}) => {
       })
       .catch((error) => {
         if (error?.response?.status === 401) {
+          clearLoggedInState({});
           router.push("/login");
         } else {
           console.error(error);

@@ -22,6 +22,7 @@ registerPlugin(
 );
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import axios from "axios";
 
@@ -424,6 +425,7 @@ const EditProfileModal = ({
       })
       .catch((error) => {
         if (error?.response?.status === 401) {
+          clearLoggedInState({});
           router.push("/login");
         } else {
           console.error(error);
