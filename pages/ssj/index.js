@@ -84,6 +84,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
       })
       .catch(function (error) {
         if (error?.response?.status === 401) {
+          clearLoggedInState({});
           Router.push("/login");
         } else {
           console.error(error);
@@ -796,6 +797,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
       ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
     } catch (err) {
       if (err?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(err);
@@ -948,6 +950,7 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
       }
     } catch (err) {
       if (err?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(err);
@@ -1303,7 +1306,11 @@ export async function getServerSideProps({ params, req, res }) {
   if (numAssignedSteps == 0) {
     const phase = getCookie("phase", { req, res }); // this should be your teams current phase?
     // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-    const response = await processesApi.index({workflowId, params: { phase, omit_include: true }, config })
+    const response = await processesApi.index({
+      workflowId,
+      params: { phase, omit_include: true },
+      config,
+    });
     const data = response.data;
 
     data.data.forEach((milestone) => {

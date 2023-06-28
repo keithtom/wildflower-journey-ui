@@ -80,7 +80,7 @@ const ConfirmYourDetails = ({}) => {
       })
       .then((response) => {
         if (response.error) {
-          console.error(error);
+          console.error(response.error);
         } else {
           const person = response.data.attributes;
           currentUser.attributes.firstName = person.firstName;
