@@ -351,7 +351,7 @@ const SchoolResultItem = ({
 const FakeFilters = [
   {
     title: "State",
-    param: "people_filters[address_states]",
+    param: "people_filters[address_state]",
     options: [
       { label: "Alabama", value: "Alabama" },
       { label: "Alaska", value: "Alaska" },
@@ -452,7 +452,7 @@ const FakeFilters = [
   // },
   {
     title: "Language",
-    param: "people_filters[primary_languages]",
+    param: "people_filters[languages]",
     doNotDisplayFor: "schools",
     options: [
       { value: "English", label: "English" },
@@ -512,7 +512,7 @@ const FakeFilters = [
   },
   {
     title: "Governance",
-    param: "school_filters[governance]",
+    param: "school_filters[governance_type]",
     doNotDisplayFor: "people",
     options: [
       { label: "Independent", value: "Independent" },
@@ -543,7 +543,7 @@ const FakeFilters = [
 
   {
     title: "Ethnicity",
-    param: "people_filters[race_ethinicities]",
+    param: "people_filters[race_ethnicities]",
     doNotDisplayFor: "schools",
     options: [
       {
