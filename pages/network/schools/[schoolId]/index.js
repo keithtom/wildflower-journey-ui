@@ -41,8 +41,9 @@ const School = ({}) => {
   console.log("schoolId", schoolId);
 
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
-  const { data, error, isLoading } = useSWR(`/api/school/${schoolId}`, () =>
-    schoolApi.show(schoolId, { network: true }).then((res) => res.data)
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/school/${schoolId}`,
+    () => schoolApi.show(schoolId, { network: true }).then((res) => res.data)
   );
 
   if (error)
@@ -51,7 +52,7 @@ const School = ({}) => {
   // console.log("about to render", data.data);
   const school = data.data;
   const included = data.included;
-  const address = included.find((i) => i.type === "address"); // a school only has one address
+  const address = included?.find((i) => i.type === "address"); // a school only has one address
 
   const schoolFallback = "/assets/images/school-placeholder.png";
 
@@ -63,8 +64,7 @@ const School = ({}) => {
     school.attributes.agesServedList ||
     school.attributes.governanceType ||
     school.attributes.maxEnrollment;
-  const isMySchool = true; //TODO: If currentUser id matches any of relationships.people of type TL then true
-  const claimSchoolPending = true; // TODO: If currentUser has submitted a request to claim school this should be true, if school is either already theirs, then false, or if no claim has been submitted, then false
+  const isMySchool = false; //TODO: If currentUser id matches any of relationships.people of type TL then true
 
   // console.log({ school });
 
@@ -154,27 +154,6 @@ const School = ({}) => {
                       </Typography>
                     </Stack>
                   </Button>
-                ) : claimSchoolPending ? (
-                  <Card
-                    size="small"
-                    variant="lightened"
-                    onClick={() => setClaimSchoolModalOpen(true)}
-                    hoverable
-                  >
-                    <Grid container spacing={3} alignItems="center">
-                      <Grid item>
-                        <Icon type="time" variant="primary" />
-                      </Grid>
-                      <Grid item flex={1}>
-                        <Typography variant="bodyRegular" bold>
-                          School claim submitted
-                        </Typography>
-                        <Typography variant="bodySmall" lightened>
-                          Check back soon to update your school profile.
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Card>
                 ) : (
                   <Card
                     size="small"
@@ -196,7 +175,7 @@ const School = ({}) => {
                           Is this your school?
                         </Typography>
                         <Typography variant="bodySmall" lightened>
-                          Claim it to start updating this profile.
+                          You should be able to edit this page.
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -254,6 +233,8 @@ const School = ({}) => {
         open={editProfileModalOpen}
         school={school}
         address={address}
+        mutate={mutate}
+        setEditProfileModalOpen={setEditProfileModalOpen}
       />
       <ClaimSchoolModal
         toggle={() => setClaimSchoolModalOpen(!claimSchoolModalOpen)}
@@ -267,21 +248,41 @@ export default School;
 
 const ClaimSchoolModal = ({ toggle, open }) => {
   return (
-    <Modal toggle={toggle} open={open} title="Claim This School">
-      <Card variant="lightened">
-        <Stack spacing={6}>
-          <Stack spacing={2}>
-            <Typography variant="bodyLarge" bold>
-              Claim school
-            </Typography>
-          </Stack>
+    <Modal toggle={toggle} open={open} title="Is this your school?">
+      <Stack spacing={6}>
+        <Stack spacing={2}>
+          <Typography variant="bodyRegular">
+            If this is your school you should be able to edit this page. Let us
+            know whats wrong and we'll fix it as soon as we can!
+          </Typography>
         </Stack>
-      </Card>
+        <Card variant="lightened">
+          <Grid container spacing={6}>
+            <Grid item>
+              <Typography variant="bodyLarge" lightened>
+                Email
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography variant="bodyLarge" highlight>
+                support@wildflowerschools.org
+              </Typography>
+            </Grid>
+          </Grid>
+        </Card>
+      </Stack>
     </Modal>
   );
 };
 
-const EditProfileModal = ({ toggle, open, school, address }) => {
+const EditProfileModal = ({
+  toggle,
+  open,
+  school,
+  address,
+  mutate,
+  setEditProfileModalOpen,
+}) => {
   // city
   // state
   // openDate
@@ -297,12 +298,14 @@ const EditProfileModal = ({ toggle, open, school, address }) => {
   // leadership
   // board members
 
-  const [city, setCity] = useState(address.attributes.city);
+  const [city, setCity] = useState(address?.attributes?.city);
   const handleCityChange = (event) => {
     setCity(event.target.value);
   };
 
-  const [locationState, setLocationState] = useState(address.attributes.state);
+  const [locationState, setLocationState] = useState(
+    address?.attributes?.state
+  );
   const handleLocationStateChange = (event) => {
     setLocationState(event.target.value);
   };
@@ -382,6 +385,8 @@ const EditProfileModal = ({ toggle, open, school, address }) => {
           console.error(response.error);
         } else {
           console.log("successfully updated", response.data);
+          mutate();
+          setEditProfileModalOpen(false);
         }
       });
   };
