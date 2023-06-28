@@ -1,10 +1,30 @@
 import Head from "next/head";
 import { useState } from "react";
 import useSWR from "swr";
+import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { clearLoggedInState } from "@lib/handleLogout";
+import { FilePond, registerPlugin } from "react-filepond";
+import "filepond/dist/filepond.min.css";
+import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+registerPlugin(
+  FilePondPluginImageExifOrientation,
+  FilePondPluginImagePreview,
+  FilePondPluginFileValidateSize,
+  FilePondPluginFileValidateType
+);
+import { getCookie } from "cookies-next";
+import { FileChecksum } from "@lib/rails-filechecksum";
+
+import axios from "axios";
+
+const token = getCookie("auth");
 
 import schoolApi from "@api/schools";
 import {
@@ -64,7 +84,7 @@ const School = ({}) => {
     school.attributes.agesServedList ||
     school.attributes.governanceType ||
     school.attributes.maxEnrollment;
-  const isMySchool = false; //TODO: If currentUser id matches any of relationships.people of type TL then true
+  const isMySchool = true; //TODO: If currentUser id matches any of relationships.people of type TL then true
 
   // console.log({ school });
 
@@ -246,6 +266,16 @@ const School = ({}) => {
 
 export default School;
 
+const StyledFilePond = styled(FilePond)`
+  .filepond--root {
+    font-family: ${({ theme }) => theme.typography.family};
+  }
+  .filepond--panel-root {
+    width: 100%;
+    background-color: ${({ theme }) => theme.color.neutral.lightened};
+  }
+`;
+
 const ClaimSchoolModal = ({ toggle, open }) => {
   return (
     <Modal toggle={toggle} open={open} title="Is this your school?">
@@ -342,6 +372,12 @@ const EditProfileModal = ({
   };
   console.log("school", school);
 
+  const [bannerImage, setBannerImage] = useState();
+  const [isUpdatingBannerImage, setIsUpdatingBannerImage] = useState(false);
+  const handleFileError = (error) => {
+    setShowError(error);
+  };
+
   const {
     control,
     handleSubmit,
@@ -374,6 +410,7 @@ const EditProfileModal = ({
             city: data.city,
             state: data.state,
           },
+          //TODO: heroImageUrl : bannerImage
         },
       })
       .then((response) => {
@@ -385,6 +422,7 @@ const EditProfileModal = ({
           console.error(response.error);
         } else {
           console.log("successfully updated", response.data);
+          setBannerImage(null);
           mutate();
           setEditProfileModalOpen(false);
         }
@@ -554,6 +592,116 @@ const EditProfileModal = ({
               />
             )}
           />
+
+          <Typography variant="bodyRegular">Add a new banner image</Typography>
+          <Grid container justifyContent="center">
+            <Grid item xs={12}>
+              <StyledFilePond
+                files={bannerImage}
+                allowReorder={false}
+                allowMultiple={false}
+                maxFileSize="5MB"
+                acceptedFileTypes={["image/*"]}
+                onupdatefiles={setBannerImage}
+                onaddfilestart={() => setIsUpdatingBannerImage(true)}
+                onprocessfiles={() => setIsUpdatingBannerImage(false)}
+                onerror={handleFileError}
+                stylePanelAspectRatio="4:1"
+                stylePanelLayout="integrated"
+                server={{
+                  process: (
+                    fieldName,
+                    file,
+                    metadata,
+                    load,
+                    error,
+                    progress,
+                    abort,
+                    transfer,
+                    options
+                  ) => {
+                    // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
+                    FileChecksum.create(file, (checksum_error, checksum) => {
+                      if (checksum_error) {
+                        console.error(checksum_error);
+                        error();
+                      }
+                      axios
+                        .post(
+                          `${process.env.API_URL}/rails/active_storage/direct_uploads`,
+                          {
+                            blob: {
+                              filename: file.name,
+                              content_type: file.type,
+                              byte_size: file.size,
+                              checksum: checksum,
+                            },
+                          }
+                        )
+                        .then((response) => {
+                          if (!response.data) {
+                            return error;
+                          }
+                          const signed_id = response.data.signed_id;
+                          axios
+                            .put(response.data.direct_upload.url, file, {
+                              headers: response.data.direct_upload.headers,
+                              onUploadProgress: (progressEvent) => {
+                                progress(
+                                  progressEvent.lengthComputable,
+                                  progressEvent.loaded,
+                                  progressEvent.total
+                                );
+                              },
+                              // need to remove default Authorization header when sending to s3
+                              transformRequest: (data, headers) => {
+                                if (process.env !== "local") {
+                                  delete headers.common["Authorization"];
+                                }
+                                return data;
+                              },
+                            })
+                            .then((response) => {
+                              setProfileImage(signed_id);
+                              load(signed_id);
+                            })
+                            .catch((error) => {
+                              if (!axios.isCancel(error)) {
+                                console.error(error);
+                                // error();
+                              }
+                            });
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                        });
+                    });
+                    return {
+                      abort: () => {
+                        // This function is entered if the user has tapped the cancel button
+                        // request.abort(); TODO: is there an active storage abort?
+
+                        // Let FilePond know the request has been cancelled
+                        abort();
+                      },
+                    };
+                  },
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                  ondata: (formData) => {
+                    formData.append("blob", value);
+                    return formData;
+                  },
+                  onload: () => {
+                    props.onUploadComplete();
+                  },
+                }}
+                credits={false}
+                labelIdle='Drag & Drop your school banner image or <span class="filepond--label-action">Browse</span>'
+              />
+            </Grid>
+          </Grid>
         </Stack>
         <Card
           noBorder
@@ -566,11 +714,20 @@ const EditProfileModal = ({
           }}
         >
           <Stack direction="row" spacing={3} alignItems="center">
-            <Button small type="submit">
+            <Button
+              small
+              disabled={isUpdatingBannerImage || isSubmitting}
+              type="submit"
+            >
               <Typography variant="bodyRegular" bold>
                 Save
               </Typography>
             </Button>
+            {isUpdatingBannerImage && (
+              <Typography variant="bodyRegular" lightened>
+                Updating image...
+              </Typography>
+            )}
           </Stack>
         </Card>
       </form>
