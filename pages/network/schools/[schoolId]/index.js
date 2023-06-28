@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import schoolApi from "@api/schools";
 import {
@@ -49,6 +50,8 @@ const School = ({}) => {
   if (isLoading || !data) return <PageContainer isLoading={true} />;
   // console.log("about to render", data.data);
   const school = data.data;
+  const included = data.included;
+  const address = included.find((i) => i.type === "address"); // a school only has one address
 
   const schoolFallback = "/assets/images/school-placeholder.png";
 
@@ -249,6 +252,8 @@ const School = ({}) => {
       <EditProfileModal
         toggle={() => setEditProfileModalOpen(!editProfileModalOpen)}
         open={editProfileModalOpen}
+        school={school}
+        address={address}
       />
       <ClaimSchoolModal
         toggle={() => setClaimSchoolModalOpen(!claimSchoolModalOpen)}
@@ -276,7 +281,7 @@ const ClaimSchoolModal = ({ toggle, open }) => {
   );
 };
 
-const EditProfileModal = ({ toggle, open }) => {
+const EditProfileModal = ({ toggle, open, school, address }) => {
   // city
   // state
   // openDate
@@ -292,6 +297,48 @@ const EditProfileModal = ({ toggle, open }) => {
   // leadership
   // board members
 
+  const [city, setCity] = useState(address.attributes.city);
+  const handleCityChange = (event) => {
+    setCity(event.target.value);
+  };
+
+  const [locationState, setLocationState] = useState(address.attributes.state);
+  const handleLocationStateChange = (event) => {
+    setLocationState(event.target.value);
+  };
+
+  const [openDate, setOpenDate] = useState(school.attributes.openedOn);
+  const handleOpenDate = (event) => {
+    setOpenDate(event.target.value);
+  };
+
+  const [agesServedList, setAgesServedList] = useState(
+    school.attributes.agesServedList
+  );
+  const handleAgesServedList = (event) => {
+    setAgesServedList(event.target.value);
+  };
+
+  const [governanceType, setGovernanceType] = useState(
+    school.attributes.governanceType
+  );
+  const handleGovernanceType = (event) => {
+    setGovernanceType(event.target.value);
+  };
+
+  const [maxEnrollment, setMaxEnrollment] = useState(
+    school.attributes.maxEnrollment
+  );
+  const handleMaxEnrollment = (event) => {
+    setMaxEnrollment(event.target.value);
+  };
+
+  const [about, setAbout] = useState(school.attributes.about);
+  const handleAbout = (event) => {
+    setAbout(event.target.value);
+  };
+  console.log("school", school);
+
   const {
     control,
     handleSubmit,
@@ -300,13 +347,43 @@ const EditProfileModal = ({ toggle, open }) => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      city: "",
-      state: "",
+      city: city,
+      state: locationState,
+      openDate: openDate,
+      agesServedList: agesServedList,
+      governanceType: governanceType,
+      maxEnrollment: maxEnrollment,
+      about: about,
     },
   });
 
   const onSubmit = (data) => {
-    console.log("data", data);
+    console.log(data);
+    schoolApi
+      .update(school.id, {
+        school: {
+          about: data.about,
+          opened_on: data.openDate,
+          ages_served_list: data.agesServedList,
+          governance_type: data.governanceType,
+          max_enrollment: data.maxEnrollment,
+          address_attributes: {
+            city: data.city,
+            state: data.state,
+          },
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          if (response.status === 401) {
+            clearLoggedInState({});
+            Router.push("/login");
+          }
+          console.error(response.error);
+        } else {
+          console.log("successfully updated", response.data);
+        }
+      });
   };
 
   return (
@@ -321,7 +398,9 @@ const EditProfileModal = ({ toggle, open }) => {
               <TextField
                 label="City"
                 placeholder="e.g. Boston"
+                value={city}
                 error={errors.city}
+                onChange={handleCityChange}
                 helperText={
                   errors &&
                   errors.city &&
@@ -341,6 +420,8 @@ const EditProfileModal = ({ toggle, open }) => {
                 label="State"
                 placeholder="e.g. Massachusetts"
                 error={errors.state}
+                value={locationState}
+                onChange={handleLocationStateChange}
                 helperText={
                   errors &&
                   errors.state &&
@@ -363,6 +444,8 @@ const EditProfileModal = ({ toggle, open }) => {
                   id="open-date"
                   disablePast
                   error={errors.openDate}
+                  value={openDate}
+                  onChange={handleOpenDate}
                   helperText={
                     errors &&
                     errors.openDate &&
@@ -377,7 +460,7 @@ const EditProfileModal = ({ toggle, open }) => {
             />
           </Stack>
           <Controller
-            name="agesServed"
+            name="agesServedList"
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
@@ -388,6 +471,8 @@ const EditProfileModal = ({ toggle, open }) => {
                 options={agesServed.options.map((l) => l.label)}
                 error={errors.agesServed}
                 defaultValue={[]}
+                value={agesServedList}
+                onChange={handleAgesServedList}
                 helperText={
                   errors &&
                   errors.agesServed &&
@@ -399,14 +484,16 @@ const EditProfileModal = ({ toggle, open }) => {
             )}
           />
           <Controller
-            name="governance"
+            name="governanceType"
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
               <Select
-                label="Governance"
+                label="GovernanceType"
                 placeholder="Select your school's governance..."
                 options={governance.options.map((l) => l.label)}
+                value={governanceType}
+                onChange={handleGovernanceType}
                 error={errors.governance}
                 helperText={
                   errors &&
@@ -426,6 +513,8 @@ const EditProfileModal = ({ toggle, open }) => {
               <TextField
                 label="Maximum enrollment"
                 placeholder="e.g. 30"
+                value={maxEnrollment}
+                onChange={handleMaxEnrollment}
                 error={errors.maxEnrollment}
                 helperText={
                   errors &&
@@ -447,6 +536,8 @@ const EditProfileModal = ({ toggle, open }) => {
                 placeholder="e.g. Your school's profile"
                 multiline={true}
                 rows={4}
+                value={about}
+                onChange={handleAbout}
                 error={errors.about}
                 helperText={
                   errors &&
