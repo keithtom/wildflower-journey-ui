@@ -60,8 +60,9 @@ const School = ({}) => {
     school.attributes.agesServedList ||
     school.attributes.governanceType ||
     school.attributes.maxEnrollment;
-  const isMySchool = true; //TODO: If currentUser id matches any of relationships.people of type TL then true
-  const claimSchoolPending = true; // TODO: If currentUser has submitted a request to claim school this should be true, if school is either already theirs, then false, or if no claim has been submitted, then false
+  const isMySchool = false; //TODO: If currentUser id matches any of relationships.people of type TL then true
+  const claimSchoolPending = false; // TODO: If currentUser has submitted a request to claim school this should be true, if school is either already theirs, then false, or if no claim has been submitted, then false
+  const isUnclaimedSchool = true;
 
   // console.log({ school });
 
@@ -152,12 +153,7 @@ const School = ({}) => {
                     </Stack>
                   </Button>
                 ) : claimSchoolPending ? (
-                  <Card
-                    size="small"
-                    variant="lightened"
-                    onClick={() => setClaimSchoolModalOpen(true)}
-                    hoverable
-                  >
+                  <Card size="small" variant="lightened">
                     <Grid container spacing={3} alignItems="center">
                       <Grid item>
                         <Icon type="time" variant="primary" />
@@ -172,7 +168,7 @@ const School = ({}) => {
                       </Grid>
                     </Grid>
                   </Card>
-                ) : (
+                ) : isUnclaimedSchool ? (
                   <Card
                     size="small"
                     variant="lightened"
@@ -193,7 +189,7 @@ const School = ({}) => {
                           Is this your school?
                         </Typography>
                         <Typography variant="bodySmall" lightened>
-                          Claim it to start updating this profile.
+                          Make changes to who owns this school.
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -201,7 +197,7 @@ const School = ({}) => {
                       </Grid>
                     </Grid>
                   </Card>
-                )}
+                ) : null}
               </Stack>
             </Grid>
             {hasInfo ? (
@@ -263,15 +259,9 @@ export default School;
 const ClaimSchoolModal = ({ toggle, open }) => {
   return (
     <Modal toggle={toggle} open={open} title="Claim This School">
-      <Card variant="lightened">
-        <Stack spacing={6}>
-          <Stack spacing={2}>
-            <Typography variant="bodyLarge" bold>
-              Claim school
-            </Typography>
-          </Stack>
-        </Stack>
-      </Card>
+      <Stack spacing={6}>
+        <Typography variant="bodyRegular">If this is your school...</Typography>
+      </Stack>
     </Modal>
   );
 };
