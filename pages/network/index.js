@@ -550,10 +550,10 @@ const FakeFilters = [
         value: "American Indian or Alaska Native",
         label: "American Indian or Alaska Native",
       },
-      { value: "Asian", label: "Asian" },
+      { value: "Asian, or Asian American", label: "Asian, or Asian American" },
       {
-        value: "Black or African American",
-        label: "Black or African American",
+        value: "Black, African American, or Afro-Caribbean",
+        label: "Black, African American, or Afro-Caribbean",
       },
       {
         value: "Hispanic, Latinx, or Spanish Origin",
