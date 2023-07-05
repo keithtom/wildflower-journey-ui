@@ -4,6 +4,7 @@ import { styled, css } from "@mui/material/styles";
 import stepsApi from "@api/workflow/steps";
 import { useUserContext } from "@lib/useUserContext";
 import Router from "next/router";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import {
   Typography,
@@ -128,6 +129,7 @@ const Task = ({
       }
     } catch (error) {
       if (error?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(error);
@@ -157,6 +159,7 @@ const Task = ({
       setTaskCompleters(task.relationships.completers.data || []);
     } catch (err) {
       if (err?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(err);
@@ -175,6 +178,7 @@ const Task = ({
       setTaskAssignees(task.relationships.assignees.data || []);
     } catch (err) {
       if (err?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(err);
@@ -199,6 +203,7 @@ const Task = ({
       }
     } catch (err) {
       if (err?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(err);
@@ -225,8 +230,13 @@ const Task = ({
       setTaskCompleters(task.relationships.completers.data || []);
 
       setIsDecided(true);
+      setInfoDrawerOpen(false);
+      if (removeStep) {
+        removeStep(taskId);
+      }
     } catch (err) {
       if (err?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(err);
@@ -409,13 +419,14 @@ const DecisionDrawerActions = ({
   const completedBy = taskCompleters[0]; // just take the first since only used when its not me
 
   const StyledDecisionCard = styled(Card)`
+    width: 100%;
     /* Disabled */
     ${(props) =>
       props.disabled &&
       css`
         opacity: 0.7;
         pointer-events: none;
-      `}
+      `};
   `;
   return (
     <Stack spacing={4}>

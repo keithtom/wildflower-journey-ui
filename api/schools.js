@@ -10,4 +10,8 @@ async function show(id, params = {}) {
   return schoolsApi.get(`/${id}`, params)
 }
 
-export default { index, show };
+async function update(id, params = {}) {
+  return schoolsApi.put(`/${id}`, params)
+}
+
+export default { index, show, update };

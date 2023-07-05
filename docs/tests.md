@@ -13,7 +13,7 @@ When code is pushed to github, integration tests are automatically run using git
 
 
 ## Resetting Database Between Tests
-Before each test, a request is made to the API to create a new user and delete stale test users. This before hook is defined in `../cypress/support/e2e.js` file by calling `resetFixturesAndLogin` command. Note that the login flow skips this before hook because we want to explicityly test logging in.
+Before most tests, a request is made to the API to create a new user and delete stale test users. This before hook is defined in `../cypress/support/commands.js` file and called in each test file. Note that there are two functions that reset fixtures `resetFixtures` and `resetPartnerFixtures`. 
 
 ## Gotchas
 1. The cypress config file (`cypress.config.js`) has access to the `.env` file but not the `.env.local` file. 

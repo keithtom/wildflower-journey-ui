@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import {
   Button,
@@ -92,6 +93,7 @@ const ConfirmYourDetails = ({}) => {
       })
       .catch(function (error) {
         if (error?.response?.status === 401) {
+          clearLoggedInState({});
           router.push("/login");
         } else {
           console.error(error);

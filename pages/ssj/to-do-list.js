@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState } from "react";
 import {
   PageContainer,
@@ -16,6 +15,7 @@ import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import { getCookie } from "cookies-next";
 import assignmentsApi from "@api/workflow/assignments";
+import processesApi from "@api/workflow/processes";
 
 const ToDoList = ({ steps, milestonesToDo }) => {
   const [assignedSteps, setAssignedSteps] = useState(steps);
@@ -141,8 +141,11 @@ export async function getServerSideProps({ req, res }) {
   // console.log("steps", steps)
 
   let milestonesToDo = [];
-  const apiRouteMilestones = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&omit_include=true`;
-  const responseMilestones = await axios.get(apiRouteMilestones, config);
+  const responseMilestones = await processesApi.index({
+    workflowId,
+    params: { phase, omit_include: true },
+    config,
+  });
 
   milestonesToDo = responseMilestones.data.data.filter(
     (milestone) => milestone.attributes.status == "to do"

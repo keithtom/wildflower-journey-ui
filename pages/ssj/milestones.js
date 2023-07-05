@@ -1,23 +1,15 @@
 import { useState } from "react";
 import { getCookie } from "cookies-next";
-import ssj_categories from "@lib/ssj/categories"
+import ssj_categories from "@lib/ssj/categories";
+import processesApi from "@api/workflow/processes";
 
-import {
-  PageContainer,
-  Typography,
-  Card,
-  Stack,
-  Icon,
-  Grid,
-  Chip,
-} from "@ui";
+import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
 import Milestone from "../../components/Milestone";
 import Hero from "../../components/Hero";
 import getAuthHeader from "../../lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import axios from "axios";
 
 const Milestones = ({ processByCategory, processByPhase }) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
@@ -142,18 +134,17 @@ export default Milestones;
 export async function getServerSideProps({ req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
-    console.log("no token found, redirecting to login")
+    console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
-  
+
   const workflowId = getCookie("workflowId", { req, res });
-  const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes`;
   let response;
   try {
-    response = await axios.get(apiRoute, config);
+    response = await processesApi.index({ workflowId, config });
   } catch (error) {
     if (error?.response?.status === 401) {
-      clearLoggedInState({req, res});
+      clearLoggedInState({ req, res });
       return redirectLoginProps();
     } else {
       console.error(error);
@@ -182,23 +173,23 @@ export async function getServerSideProps({ req, res }) {
   const groupedAlbumsProcesses = data.data.filter((d) =>
     d.attributes.categories.includes(ssj_categories.ALBUMS_ADVICE)
   );
-  
+
   const processByCategory = [
-    { 
+    {
       category: ssj_categories.FINANCE,
-      processes:groupedFinanceProcesses
+      processes: groupedFinanceProcesses,
     },
-    { 
+    {
       category: ssj_categories.FACILITIES,
-      processes: groupedFacilitiesProcesses
+      processes: groupedFacilitiesProcesses,
     },
     {
       category: ssj_categories.GOVERNANCE_COMPLIANCE,
       processes: groupedGovernanceComplianceProcesses,
     },
-    { 
+    {
       category: ssj_categories.HUMAN_RESOURCES,
-      processes: groupedHumanResourcesProcesses
+      processes: groupedHumanResourcesProcesses,
     },
     {
       category: ssj_categories.COMMUNITY_FAMILY_ENGAGEMENT,
@@ -208,9 +199,9 @@ export async function getServerSideProps({ req, res }) {
       category: ssj_categories.CLASSROOM_PROGRAM_PRACTICES,
       processes: groupedClassroomProgramPracticesProcesses,
     },
-    { 
+    {
       category: ssj_categories.ALBUMS_ADVICE,
-      processes: groupedAlbumsProcesses
+      processes: groupedAlbumsProcesses,
     },
   ];
 

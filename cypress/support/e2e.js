@@ -19,14 +19,14 @@ import "./commands";
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-beforeEach(() => {
-  switch (Cypress.currentTest.title) {
-    case "should log in successfully":
-    case "should display a login form":
-    case "should authenticate and redirect to onboarding":
-      // noop
-      break;
-    default:
-      cy.resetFixturesAndLogin();
-  }
-});
+// beforeEach(() => {
+//   switch (Cypress.currentTest.title) {
+//     case "should log in successfully":
+//     case "should display a login form":
+//     case "should authenticate and redirect to onboarding":
+//       // noop
+//       break;
+//     default:
+//       cy.resetFixturesAndLogin();
+//   }
+// });

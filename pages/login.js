@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import axios from "axios";
 import Router from "next/router";
 import FormHelperText from "@mui/material/FormHelperText";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
-import usersApi from "../api/users";
+import authApi from "@api/auth";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import {
   Button,
@@ -18,7 +18,6 @@ import {
   Icon,
 } from "@ui";
 
-const loginRoute = `${process.env.API_URL}/login`;
 const Login = ({}) => {
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { setCurrentUser, isLoggedIn } = useUserContext();
@@ -35,13 +34,8 @@ const Login = ({}) => {
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm();
   const onSubmit = (data) => {
-    axios
-      .post(loginRoute, {
-        user: {
-          email: data.email,
-          password: data.password,
-        },
-      })
+    authApi
+      .login(data.email, data.password)
       .then(function (response) {
         setCookie("auth", response.headers["authorization"], {
           maxAge: 60 * 60 * 24 * 30,
@@ -66,6 +60,7 @@ const Login = ({}) => {
         console.log(error);
         console.log(error.response.data); // error message
         if (error.response.status === 401) {
+          clearLoggedInState({});
           setError("email", {
             type: "invalid",
             message: error.response.data,
@@ -83,7 +78,7 @@ const Login = ({}) => {
     if (emailValid) {
       try {
         const email = getValues("email");
-        await usersApi.loginEmailLink(email);
+        await authApi.loginEmailLink(email);
         setSentEmailLoginRequest(true);
       } catch (error) {
         console.error(error);
