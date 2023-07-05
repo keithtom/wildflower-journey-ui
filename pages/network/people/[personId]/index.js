@@ -85,6 +85,7 @@ const Person = ({}) => {
   // if (!data.data) return <div>loading...</div>;
 
   const person = data.data;
+  // const included = data.included;
 
   const { currentUser } = useUserContext();
   const isMyProfile = currentUser?.id === personId;
@@ -103,6 +104,7 @@ const Person = ({}) => {
 
   // console.log({ person });
   // console.log({ currentUser });
+  // console.log({ included });
 
   return (
     <>
