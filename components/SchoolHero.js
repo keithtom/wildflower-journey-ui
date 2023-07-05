@@ -26,7 +26,13 @@ const StyledLogo = styled(Box)`
   overflow: hidden;
 `;
 
-const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
+const SchoolHero = ({
+  heroImg,
+  logoImg,
+  schoolName,
+  schoolLocation,
+  schoolLeaders,
+}) => {
   return (
     <>
       <Grid container justifyContent="center" spacing={6}>
@@ -66,6 +72,35 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
             ) : null}
           </Stack>
         </Grid>
+        {schoolLeaders ? (
+          <Grid item>
+            <Stack direction="row" spacing={6}>
+              {schoolLeaders.map((leader, i) => (
+                <Link href={`/network/people/${leader.id}`}>
+                  <Stack
+                    direction="row"
+                    spacing={3}
+                    key={i}
+                    alignItems="center"
+                  >
+                    <Avatar src={leader.attributes.imageUrl} />
+                    <Stack>
+                      <Typography variant="bodyRegular" bold>
+                        {leader.attributes.firstName}{" "}
+                        {leader.attributes.lastName.charAt(0)}.
+                      </Typography>
+                      {leader.attributes.roleList.map((r, i) => (
+                        <Typography variant="bodySmall" lightened key={i}>
+                          {r}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </Stack>
+                </Link>
+              ))}
+            </Stack>
+          </Grid>
+        ) : null}
       </Grid>
     </>
   );
