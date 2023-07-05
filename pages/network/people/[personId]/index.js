@@ -441,7 +441,6 @@ const EditProfileModal = ({
           <Controller
             name="firstName"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 label="First name"
@@ -460,7 +459,6 @@ const EditProfileModal = ({
           <Controller
             name="lastName"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 label="Last name"
@@ -479,7 +477,6 @@ const EditProfileModal = ({
           <Controller
             name="city"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 label="City"
@@ -498,7 +495,6 @@ const EditProfileModal = ({
           <Controller
             name="state"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 label="State"
@@ -517,7 +513,6 @@ const EditProfileModal = ({
           <Controller
             name="email"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 label="Email"
@@ -577,7 +572,6 @@ const EditProfileModal = ({
           <Controller
             name="primaryLanguage"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <Select
                 label="What is your primary language?"
@@ -620,7 +614,6 @@ const EditProfileModal = ({
           <Controller
             name="raceEthnicity"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <MultiSelect
                 withCheckbox
@@ -694,7 +687,6 @@ const EditProfileModal = ({
           <Controller
             name="gender"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <Select
                 label="What is your gender identity?"
@@ -737,7 +729,6 @@ const EditProfileModal = ({
           <Controller
             name="pronouns"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <Select
                 label="What are your pronouns?"
@@ -790,7 +781,6 @@ const EditProfileModal = ({
             <Controller
               name="householdIncome"
               control={control}
-              rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value} handleOptionsChange>
                   {incomeOptions.map((o, i) => (
@@ -819,7 +809,6 @@ const EditProfileModal = ({
             <Controller
               name="montessoriCertified"
               control={control}
-              rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value} handleOptionsChange>
                   {montessoriCertificationOptions.map((o, i) => (

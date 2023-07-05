@@ -421,7 +421,6 @@ const EditProfileModal = ({
           <Controller
             name="city"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 label="City"
@@ -442,7 +441,6 @@ const EditProfileModal = ({
           <Controller
             name="state"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 label="State"
@@ -465,7 +463,6 @@ const EditProfileModal = ({
             <Controller
               name="openDate"
               control={control}
-              rules={{ required: true }}
               render={({ field }) => (
                 <DatePicker
                   label="Your open date"
@@ -490,7 +487,6 @@ const EditProfileModal = ({
           <Controller
             name="agesServedList"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <MultiSelect
                 withCheckbox
@@ -514,7 +510,6 @@ const EditProfileModal = ({
           <Controller
             name="governanceType"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <Select
                 label="GovernanceType"
@@ -536,7 +531,6 @@ const EditProfileModal = ({
           <Controller
             name="maxEnrollment"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 label="Maximum enrollment"
