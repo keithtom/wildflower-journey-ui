@@ -370,12 +370,13 @@ const EditProfileModal = ({
   const handleAbout = (event) => {
     setAbout(event.target.value);
   };
-  console.log("school", school);
 
-  const [bannerImage, setBannerImage] = useState();
+  const [bannerPicture, setBannerPicture] = useState(null);
+  const [bannerImage, setBannerImage] = useState(null);
   const [isUpdatingBannerImage, setIsUpdatingBannerImage] = useState(false);
   const handleFileError = (error) => {
-    setShowError(error);
+    console.log(error);
+    setShowError(error); // TODO: Taylor can you help with this?
   };
 
   const {
@@ -410,7 +411,7 @@ const EditProfileModal = ({
             city: data.city,
             state: data.state,
           },
-          //TODO: heroImageUrl : bannerImage
+          banner_image: bannerImage,
         },
       })
       .then((response) => {
@@ -422,7 +423,7 @@ const EditProfileModal = ({
           console.error(response.error);
         } else {
           console.log("successfully updated", response.data);
-          setBannerImage(null);
+          setBannerPicture(null);
           mutate();
           setEditProfileModalOpen(false);
         }
@@ -597,12 +598,12 @@ const EditProfileModal = ({
           <Grid container justifyContent="center">
             <Grid item xs={12}>
               <StyledFilePond
-                files={bannerImage}
+                files={bannerPicture}
                 allowReorder={false}
                 allowMultiple={false}
                 maxFileSize="5MB"
                 acceptedFileTypes={["image/*"]}
-                onupdatefiles={setBannerImage}
+                onupdatefiles={setBannerPicture}
                 onaddfilestart={() => setIsUpdatingBannerImage(true)}
                 onprocessfiles={() => setIsUpdatingBannerImage(false)}
                 onerror={handleFileError}
@@ -662,7 +663,7 @@ const EditProfileModal = ({
                               },
                             })
                             .then((response) => {
-                              setProfileImage(signed_id);
+                              setBannerImage(signed_id);
                               load(signed_id);
                             })
                             .catch((error) => {
