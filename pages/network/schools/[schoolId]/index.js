@@ -21,12 +21,14 @@ registerPlugin(
 );
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
+import { useUserContext } from "@lib/useUserContext";
 
 import axios from "axios";
 
 const token = getCookie("auth");
 
 import schoolApi from "@api/schools";
+import peopleApi from "@api/people";
 import {
   Box,
   PageContainer,
@@ -51,10 +53,12 @@ import {
 import SchoolHero from "@components/SchoolHero";
 import AttributesCard from "@components/AttributesCard";
 import UserCard from "@components/UserCard";
+import { Data } from "styled-icons/crypto";
 
 const School = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [claimSchoolModalOpen, setClaimSchoolModalOpen] = useState(false);
+  const { currentUser } = useUserContext();
 
   const router = useRouter();
   const { schoolId } = router.query;
@@ -68,7 +72,8 @@ const School = ({}) => {
 
   if (error)
     return <PageContainer>failed to load ${error.message}</PageContainer>;
-  if (isLoading || !data) return <PageContainer isLoading={true} />;
+  if (isLoading || !Data) return <PageContainer isLoading={true} />;
+
   // console.log("about to render", data.data);
   const school = data.data;
   const included = data.included;
@@ -77,16 +82,35 @@ const School = ({}) => {
   const schoolFallback = "/assets/images/school-placeholder.png";
 
   const hasInfo = school.attributes.about;
-  const hasLeadership = school.attributes.leaders;
   const hasAttributes =
     school.relationships.address.data ||
     school.attributes.openedOn ||
     school.attributes.agesServedList ||
     school.attributes.governanceType ||
     school.attributes.maxEnrollment;
-  const isMySchool = true; //TODO: If currentUser id matches any of relationships.people of type TL then true
+  const isMySchool = school.relationships.people.data.filter(
+    (person) => person.id === currentUser?.id
+  ).length
+    ? true
+    : false;
 
-  // console.log({ school });
+  const findMatchingItems = (array1, array2, property) => {
+    const matchingItems = array1.filter((item1) =>
+      array2.some((item2) => item1[property] === item2[property])
+    );
+    return matchingItems;
+  };
+
+  const schoolLeaders = findMatchingItems(
+    included,
+    school.relationships.people.data,
+    "id"
+  );
+
+  // console.log({ currentUser });
+  // console.log({ isMySchool });
+  // console.log({ included });
+  // console.log({ schoolLeaders });
 
   return (
     <>
@@ -105,52 +129,12 @@ const School = ({}) => {
                 ? school?.attributes?.logoUrl
                 : schoolFallback
             }
+            schoolLeaders={schoolLeaders}
           />
-
-          {school?.attributes?.leaders ? (
-            <Grid container spacing={8} justifyContent="space-between">
-              <Grid item>
-                <Stack direction="row" spacing={6}>
-                  {school?.attributes?.leaders.map((l, i) => (
-                    <UserCard
-                      key={i}
-                      link={`/network/people/${l?.attributes?.id}`}
-                      firstName={l?.attributes?.firstName}
-                      lastName={l?.attributes?.lastName}
-                      email={l?.attributes?.email}
-                      phone={l?.attributes?.phone}
-                      role={l?.attributes?.role}
-                      profileImage={l?.attributes?.imageSrc}
-                    />
-                  ))}
-                </Stack>
-              </Grid>
-            </Grid>
-          ) : null}
 
           <Grid container spacing={8}>
             <Grid item xs={12} md={hasInfo ? 4 : 12}>
               <Stack spacing={6}>
-                {hasLeadership ? (
-                  <Card>
-                    <Stack container spacing={3}>
-                      {school?.attributes?.leaders.map((l, i) => (
-                        <Grid item>
-                          <UserCard
-                            key={i}
-                            link={`/network/people/${l?.attributes?.id}`}
-                            firstName={l?.attributes?.firstName}
-                            lastName={l?.attributes?.lastName}
-                            email={l?.attributes?.email}
-                            phone={l?.attributes?.phone}
-                            role={l?.attributes?.role}
-                            profileImage={l?.attributes?.imageSrc}
-                          />
-                        </Grid>
-                      ))}
-                    </Stack>
-                  </Card>
-                ) : null}
                 {hasAttributes ? (
                   <AttributesCard
                     state={school?.relationships?.address?.data?.state}
