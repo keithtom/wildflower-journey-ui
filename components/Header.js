@@ -39,6 +39,8 @@ const Header = ({ toggleNavOpen }) => {
 
   const showNetwork = true;
 
+  // console.log({ currentUser });
+
   return (
     <CustomAppBar>
       <Grid
@@ -139,7 +141,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
         Router.push("/logged-out");
       }
     }
-  };
+  }
 
   return (
     <>
