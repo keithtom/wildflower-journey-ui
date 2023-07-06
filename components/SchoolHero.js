@@ -83,13 +83,21 @@ const SchoolHero = ({
                     key={i}
                     alignItems="center"
                   >
-                    <Avatar src={leader.attributes.imageUrl} />
+                    <Avatar src={leader?.attributes?.imageUrl} />
                     <Stack>
-                      <Typography variant="bodyRegular" bold>
-                        {leader.attributes.firstName}{" "}
-                        {leader.attributes.lastName.charAt(0)}.
-                      </Typography>
-                      {leader.attributes.roleList.map((r, i) => (
+                      <Stack direction="row" spacing={1}>
+                        {leader.attributes.firstName ? (
+                          <Typography variant="bodyRegular" bold>
+                            {leader?.attributes?.firstName}
+                          </Typography>
+                        ) : null}
+                        {leader.attributes.lastName ? (
+                          <Typography variant="bodyRegular" bold>
+                            {leader?.attributes?.lastName?.charAt(0)}.
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                      {leader?.attributes?.roleList.map((r, i) => (
                         <Typography variant="bodySmall" lightened key={i}>
                           {r}
                         </Typography>

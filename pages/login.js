@@ -20,9 +20,11 @@ import {
 
 const Login = ({}) => {
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
-  const { setCurrentUser, isLoggedIn } = useUserContext();
-  if (isLoggedIn) {
+  const { setCurrentUser, isLoggedIn, currentUser } = useUserContext();
+  if (isLoggedIn && currentUser?.attributes.ssj) {
     Router.push("/ssj");
+  } else if (isLoggedIn && !currentUser?.attributes.ssj) {
+    Router.push("/network");
   }
 
   const {
@@ -53,7 +55,11 @@ const Login = ({}) => {
           type: response.data.data.type,
           attributes: userAttributes,
         });
-        Router.push("/ssj");
+        if (currentUser?.attributes.ssj) {
+          Router.push("/ssj");
+        } else {
+          Router.push("/network");
+        }
       })
       .catch(function (error) {
         // handle error
