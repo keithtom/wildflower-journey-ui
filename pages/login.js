@@ -16,6 +16,7 @@ import {
   TextField,
   PageContainer,
   Icon,
+  Spinner,
 } from "@ui";
 
 const Login = ({}) => {
@@ -45,7 +46,7 @@ const Login = ({}) => {
         });
         const userAttributes = response.data.data.attributes;
         const personId = response.data.data.relationships.person.data.id;
-        if (hasSSJ) {
+        if (!currentUser?.attributes?.ssj) {
           setCookie("workflowId", userAttributes.ssj.workflowId, {
             maxAge: 60 * 60 * 24 * 30,
           });
@@ -53,15 +54,16 @@ const Login = ({}) => {
             maxAge: 60 * 60 * 24 * 30,
           });
         }
+
         setCurrentUser({
           id: personId,
           type: response.data.data.type,
           attributes: userAttributes,
         });
-        if (hasSSJ) {
-          Router.push("/ssj");
-        } else {
+        if (!currentUser?.attributes?.ssj) {
           Router.push("/network");
+        } else {
+          Router.push("/ssj");
         }
       })
       .catch(function (error) {
@@ -191,11 +193,20 @@ const Login = ({}) => {
                         </FormHelperText>
                       )}
                     </Stack>
+
                     <Stack alignItems="center" spacing={3}>
-                      <Button full disabled={isSubmitting} type="submit">
-                        <Typography variant="bodyRegular" light>
-                          Log in
-                        </Typography>
+                      <Button
+                        full
+                        disabled={isSubmitting || isSubmitSuccessful}
+                        type="submit"
+                      >
+                        {isSubmitSuccessful ? (
+                          <Spinner />
+                        ) : (
+                          <Typography variant="bodyRegular" light>
+                            Log in
+                          </Typography>
+                        )}
                       </Button>
                       <Typography variant="bodyMini" bold lightened>
                         OR
@@ -203,7 +214,7 @@ const Login = ({}) => {
 
                       <Button
                         full
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isSubmitSuccessful}
                         variant="text"
                         onClick={handleRequestEmailLink}
                       >

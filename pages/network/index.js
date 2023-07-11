@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
 
+import { useUserContext } from "@lib/useUserContext";
 import useSearch from "../../hooks/useSearch";
 import {
   PageContainer,
@@ -25,6 +26,8 @@ const Network = () => {
   const { query, setQuery, filters, setFilters, results, isSearching, error } =
     useSearch();
   const [category, setCategory] = useState("people");
+  const { currentUser } = useUserContext();
+
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
     setFilters({ ...filters, models: e.target.value });
@@ -40,7 +43,7 @@ const Network = () => {
 
   return (
     <>
-      <PageContainer>
+      <PageContainer isLoading={!currentUser} hideNav={!currentUser}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item xs={12} sm={8}>
             <Typography variant="h4" bold>

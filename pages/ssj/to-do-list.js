@@ -28,7 +28,7 @@ const ToDoList = ({ steps, milestonesToDo }) => {
 
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 
-  console.log({ assignedSteps });
+  // console.log({ assignedSteps });
 
   return (
     <PageContainer isLoading={false}>
