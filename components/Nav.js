@@ -39,8 +39,6 @@ const CustomDrawer = styled(Drawer)`
   }
 `;
 
-const showNetwork = true;
-
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
   return (
@@ -95,7 +93,7 @@ const Navigation = ({}) => {
   // console.log({ currentUser });
   return (
     <Box>
-      {showNetwork ? (
+      {!currentUser?.attributes?.ssj ? (
         <NavLink
           variant="primary"
           to="/network"
