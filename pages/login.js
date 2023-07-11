@@ -21,7 +21,7 @@ import {
 const Login = ({}) => {
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { setCurrentUser, isLoggedIn, currentUser } = useUserContext();
-  const hasSSJ = currentUser?.attributes?.ssj;
+  const hasSSJ = currentUser?.attributes?.ssj ? true : false;
   if (isLoggedIn && hasSSJ) {
     Router.push("/ssj");
   } else if (isLoggedIn && !hasSSJ) {
