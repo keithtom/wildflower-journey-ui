@@ -4,11 +4,11 @@ import Router from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
 import getAuthHeader from "@lib/getAuthHeader";
-import axios from "axios";
 import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
 
 import ssjApi from "@api/ssj/ssj";
+import processesApi from "@api/workflow/processes";
 import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Milestone from "../../components/Milestone";
@@ -76,18 +76,20 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
 
   useEffect(() => {
     const teamData = ssjApi.getTeam();
-    teamData.then(function (result) {
-      setTeam(result);
-      setSubmittedPartnerRequest(result.invitedPartner);
-      setOpenDate(result.expectedStartDate);
-    })
-    .catch(function (error) {
-      if (error?.response?.status === 401) {
-        Router.push("/login");
-      } else {
-        console.error(error);
-      }
-    });
+    teamData
+      .then(function (result) {
+        setTeam(result);
+        setSubmittedPartnerRequest(result.invitedPartner);
+        setOpenDate(result.expectedStartDate);
+      })
+      .catch(function (error) {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          Router.push("/login");
+        } else {
+          console.error(error);
+        }
+      });
   }, []);
 
   const partners =
@@ -159,23 +161,27 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Grid>
               <Grid item>
-                <Grid container spacing={6}>
+                <Grid container spacing={3} alignItems="center">
                   <Grid item>
-                    <Typography variant="bodyMini" bold lightened>
-                      PHASE
-                    </Typography>
-                    <Typography variant="bodySmall">Visioning</Typography>
+                    <Card size="small">
+                      <Typography variant="bodyMini" bold lightened>
+                        PHASE
+                      </Typography>
+                      <Typography variant="bodySmall">Visioning</Typography>
+                    </Card>
                   </Grid>
                   {currentUser?.personAddress?.city &&
                   currentUser?.personAddress?.state ? (
                     <Grid item>
-                      <Typography variant="bodyMini" bold lightened>
-                        LOCATION
-                      </Typography>
-                      <Typography variant="bodySmall">
-                        {currentUser?.personAddress?.city},{" "}
-                        {currentUser?.personAddress?.state}
-                      </Typography>
+                      <Card size="small">
+                        <Typography variant="bodyMini" bold lightened>
+                          LOCATION
+                        </Typography>
+                        <Typography variant="bodySmall">
+                          {currentUser?.personAddress?.city},{" "}
+                          {currentUser?.personAddress?.state}
+                        </Typography>
+                      </Card>
                     </Grid>
                   ) : null}
                   <Grid item>
@@ -185,7 +191,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                         hoverable
                         onClick={() => setAddOpenDateModalOpen(true)}
                       >
-                        <Stack direction="row" spacing={6}>
+                        <Stack direction="row" spacing={3} alignItems="center">
                           <Stack>
                             <Typography variant="bodyMini" bold lightened>
                               OPEN DATE
@@ -194,17 +200,18 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                               {moment(openDate).format("MMMM D, YYYY")}
                             </Typography>
                           </Stack>
-                          <Icon
-                            type="pencil"
-                            size="small"
-                            variant="lightened"
-                          />
+                          <IconButton>
+                            <Icon
+                              type="pencil"
+                              size="small"
+                              variant="lightened"
+                            />
+                          </IconButton>
                         </Stack>
                       </Card>
                     ) : (
                       <Button
-                        variant="light"
-                        small
+                        variant="lightened"
                         onClick={() => setAddOpenDateModalOpen(true)}
                       >
                         <Stack direction="row" spacing={2} alignItems="center">
@@ -790,6 +797,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
       ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
     } catch (err) {
       if (err?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(err);
@@ -942,6 +950,7 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
       }
     } catch (err) {
       if (err?.response?.status === 401) {
+        clearLoggedInState({});
         Router.push("/login");
       } else {
         console.error(err);
@@ -1269,20 +1278,19 @@ const waysToWorkTogether = [
 export async function getServerSideProps({ params, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
-    console.log("no token found, redirecting to login")
+    console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
   const workflowId = getCookie("workflowId", { req, res });
 
   // turn this in to a catch all api for the ssj/dashboard
-  const apiRouteProgress = `${process.env.API_URL}/v1/ssj/dashboard/progress?workflow_id=${workflowId}`;
   let responseProgress;
   try {
-    responseProgress = await axios.get(apiRouteProgress, config);
+    responseProgress = await ssjApi.progress({ workflowId, config });
   } catch (error) {
     if (error?.response?.status === 401) {
-      clearLoggedInState({req, res});
+      clearLoggedInState({ req, res });
       return redirectLoginProps();
     } else {
       console.error(error);
@@ -1298,8 +1306,11 @@ export async function getServerSideProps({ params, req, res }) {
   if (numAssignedSteps == 0) {
     const phase = getCookie("phase", { req, res }); // this should be your teams current phase?
     // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-    const apiRoute = `${process.env.API_URL}/v1/workflow/workflows/${workflowId}/processes?phase=${phase}&omit_include=true`;
-    const response = await axios.get(apiRoute, config);
+    const response = await processesApi.index({
+      workflowId,
+      params: { phase, omit_include: true },
+      config,
+    });
     const data = response.data;
 
     data.data.forEach((milestone) => {

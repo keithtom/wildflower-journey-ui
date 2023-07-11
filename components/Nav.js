@@ -4,6 +4,7 @@ import { useMediaQuery } from "react-responsive";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
 
+import { useUserContext } from "../lib/useUserContext";
 import { user } from "../lib/utils/fake-data";
 import { theme } from "../styles/theme";
 import {
@@ -38,11 +39,8 @@ const CustomDrawer = styled(Drawer)`
   }
 `;
 
-const showNetwork = process.env.APP_ENV !== 'production';
-
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
-
   return (
     <StyledNav sx={{ display: "flex" }}>
       <CustomDrawer
@@ -90,9 +88,12 @@ export default Nav;
 
 const Navigation = ({}) => {
   const router = useRouter();
+  const { currentUser, isLoggedIn } = useUserContext();
+
+  // console.log({ currentUser });
   return (
     <Box>
-      {showNetwork ? (
+      {!currentUser?.attributes?.ssj ? (
         <NavLink
           variant="primary"
           to="/network"
@@ -101,13 +102,15 @@ const Navigation = ({}) => {
           icon="bookReader"
         />
       ) : null}
-      <NavLink
-        variant="primary"
-        to="/ssj"
-        active={router.asPath === "/ssj"}
-        label="School Startup Journey"
-        icon="home"
-      />
+      {currentUser?.attributes?.ssj ? (
+        <NavLink
+          variant="primary"
+          to="/ssj"
+          active={router.asPath === "/ssj"}
+          label="School Startup Journey"
+          icon="home"
+        />
+      ) : null}
       {router.pathname.includes("/ssj") && <SSJNavigation />}
       {/* <NavLink
         to="/advice"

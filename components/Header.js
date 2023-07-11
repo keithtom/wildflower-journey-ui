@@ -37,7 +37,9 @@ const Header = ({ toggleNavOpen }) => {
 
   const logo = "/assets/images/wildflower-logo.png";
 
-  const showNetwork = true;
+  const showNetwork = !currentUser?.attributes?.ssj;
+
+  // console.log({ currentUser });
 
   return (
     <CustomAppBar>
@@ -139,7 +141,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
         Router.push("/logged-out");
       }
     }
-  };
+  }
 
   return (
     <>

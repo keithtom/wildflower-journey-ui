@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, FormGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
 import registrationsApi from "../../api/registrations";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import {
   Button,
@@ -45,6 +46,7 @@ const CreatePassword = ({}) => {
       })
       .catch((err) => {
         if (err?.response?.status === 401) {
+          clearLoggedInState({});
           router.push("/login");
         } else {
           console.error(err);

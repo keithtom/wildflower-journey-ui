@@ -26,7 +26,13 @@ const StyledLogo = styled(Box)`
   overflow: hidden;
 `;
 
-const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
+const SchoolHero = ({
+  heroImg,
+  logoImg,
+  schoolName,
+  schoolLocation,
+  schoolLeaders,
+}) => {
   return (
     <>
       <Grid container justifyContent="center" spacing={6}>
@@ -35,10 +41,10 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
             noBorder
             size="large"
             sx={{
-              height: "240px",
+              height: "320px",
               backgroundImage: `url(${heroImg})`,
               backgroundSize: "cover",
-              backgroundPosition: "bottom center",
+              backgroundPosition: "center center",
             }}
           />
         </Grid>
@@ -55,7 +61,7 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
           </StyledLogo>
         </Grid>
         <Grid item flex={1}>
-          <Stack spacing={2}>
+          <Stack>
             <Typography variant="h2" bold>
               {schoolName}
             </Typography>
@@ -66,6 +72,43 @@ const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
             ) : null}
           </Stack>
         </Grid>
+        {schoolLeaders ? (
+          <Grid item>
+            <Stack direction="row" spacing={6}>
+              {schoolLeaders.map((leader, i) => (
+                <Link href={`/network/people/${leader.id}`}>
+                  <Stack
+                    direction="row"
+                    spacing={3}
+                    key={i}
+                    alignItems="center"
+                  >
+                    <Avatar src={leader?.attributes?.imageUrl} />
+                    <Stack>
+                      <Stack direction="row" spacing={1}>
+                        {leader.attributes.firstName ? (
+                          <Typography variant="bodyRegular" bold>
+                            {leader?.attributes?.firstName}
+                          </Typography>
+                        ) : null}
+                        {leader.attributes.lastName ? (
+                          <Typography variant="bodyRegular" bold>
+                            {leader?.attributes?.lastName?.charAt(0)}.
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                      {leader?.attributes?.roleList.map((r, i) => (
+                        <Typography variant="bodySmall" lightened key={i}>
+                          {r}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </Stack>
+                </Link>
+              ))}
+            </Stack>
+          </Grid>
+        ) : null}
       </Grid>
     </>
   );

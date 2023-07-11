@@ -10,7 +10,8 @@ const ModalCard = styled(Card)`
   transform: translate(-50%, -50%);
   width: 600px;
   max-height: 640px;
-  overflow: auto;
+  overflow-y: scroll;
+  overflow-x: hidden;
   max-width: 90%;
 `;
 
@@ -28,7 +29,9 @@ export default function Modal({
           <Grid container alignItems="center" justifyContent="flex-end">
             {title && (
               <Grid item flex={1}>
-                <Typography variant="h4">{title}</Typography>
+                <Typography variant="h4" bold>
+                  {title}
+                </Typography>
               </Grid>
             )}
             <Grid item>

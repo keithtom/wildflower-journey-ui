@@ -107,7 +107,7 @@ const AddProfileInfo = ({}) => {
   };
 
   const isExistingTL = false;
-  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  const introducerProfilePic = "/assets/images/placeholder-flower.png";
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -135,19 +135,17 @@ const AddProfileInfo = ({}) => {
                       </Typography>
                     </Stack>
                   </StyledChatBubble>
-                  {opsGuide ? (
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <Avatar size="sm" src={opsGuide?.imageUrl} />
-                      <Stack>
-                        <Typography variant="bodySmall" bold>
-                          {opsGuide?.firstName} {opsGuide?.lastName}
-                        </Typography>
-                        <Typography variant="bodySmall" lightened>
-                          Operations Guide
-                        </Typography>
-                      </Stack>
+                  <Stack direction="row" spacing={3} alignItems="center">
+                    <Avatar size="sm" src={introducerProfilePic} />
+                    <Stack>
+                      <Typography variant="bodySmall" bold>
+                        Katelyn + Cam
+                      </Typography>
+                      <Typography variant="bodySmall" lightened>
+                        Foundation Partners
+                      </Typography>
                     </Stack>
-                  ) : null}
+                  </Stack>
                 </>
               )}
 

@@ -1,28 +1,43 @@
 import { DatePicker as MaterialDatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import FormHelperText from "@mui/material/FormHelperText";
 import { styled, css } from "@mui/material/styles";
-import { TextField } from "./index";
+import { TextField, Stack } from "./index";
 
 const CustomDatePicker = styled(MaterialDatePicker)``;
 
-export default function DatePicker({ id, value, onChange, label, ...props }) {
+export default function DatePicker({
+  id,
+  value,
+  onChange,
+  label,
+  helperText,
+  error,
+  ...props
+}) {
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <CustomDatePicker
-        id={id}
-        label={label}
-        value={value}
-        onChange={onChange}
-        renderInput={({ inputRef, inputProps, InputProps }) => (
-          <TextField
-            inputRef={inputRef}
-            {...inputProps}
-            endAdornment={InputProps?.endAdornment}
-          />
-        )}
-        {...props}
-      />
-    </LocalizationProvider>
+    <Stack>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <CustomDatePicker
+          id={id}
+          label={label}
+          value={value}
+          onChange={onChange}
+          renderInput={({ inputRef, inputProps, InputProps }) => (
+            <TextField
+              error={error}
+              inputRef={inputRef}
+              endAdornment={InputProps?.endAdornment}
+              {...inputProps}
+            />
+          )}
+          {...props}
+        />
+      </LocalizationProvider>
+      {helperText && (
+        <FormHelperText error={error}>{helperText}</FormHelperText>
+      )}
+    </Stack>
   );
 }
