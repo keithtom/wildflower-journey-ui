@@ -21,9 +21,10 @@ import {
 const Login = ({}) => {
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { setCurrentUser, isLoggedIn, currentUser } = useUserContext();
-  if (isLoggedIn && currentUser?.attributes.ssj) {
+  const hasSSJ = currentUser?.attributes?.ssj;
+  if (isLoggedIn && hasSSJ) {
     Router.push("/ssj");
-  } else if (isLoggedIn && !currentUser?.attributes.ssj) {
+  } else if (isLoggedIn && !hasSSJ) {
     Router.push("/network");
   }
 
@@ -44,18 +45,20 @@ const Login = ({}) => {
         });
         const userAttributes = response.data.data.attributes;
         const personId = response.data.data.relationships.person.data.id;
-        setCookie("workflowId", userAttributes.ssj.workflowId, {
-          maxAge: 60 * 60 * 24 * 30,
-        });
-        setCookie("phase", userAttributes.ssj.currentPhase, {
-          maxAge: 60 * 60 * 24 * 30,
-        });
+        if (hasSSJ) {
+          setCookie("workflowId", userAttributes.ssj.workflowId, {
+            maxAge: 60 * 60 * 24 * 30,
+          });
+          setCookie("phase", userAttributes.ssj.currentPhase, {
+            maxAge: 60 * 60 * 24 * 30,
+          });
+        }
         setCurrentUser({
           id: personId,
           type: response.data.data.type,
           attributes: userAttributes,
         });
-        if (currentUser?.attributes.ssj) {
+        if (hasSSJ) {
           Router.push("/ssj");
         } else {
           Router.push("/network");
@@ -64,7 +67,7 @@ const Login = ({}) => {
       .catch(function (error) {
         // handle error
         console.log(error);
-        console.log(error.response.data); // error message
+        // console.log(error.response.data); // error message
         if (error.response.status === 401) {
           clearLoggedInState({});
           setError("email", {
