@@ -418,6 +418,10 @@ const ConfirmDemographicInfo = ({}) => {
                     As a reference point, today a family of four with a family
                     income of $47,638/year is the limit to receive subsidies.
                   </Typography>
+                  <Typography variant="bodySmall" lightened>
+                    NOTE: This answer will not appear publicly or on your
+                    profile in the Wildflower network.
+                  </Typography>
                   <Controller
                     name="householdIncome"
                     control={control}
