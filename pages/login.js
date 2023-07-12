@@ -195,12 +195,8 @@ const Login = ({}) => {
                     </Stack>
 
                     <Stack alignItems="center" spacing={3}>
-                      <Button
-                        full
-                        disabled={isSubmitting || isSubmitSuccessful}
-                        type="submit"
-                      >
-                        {isSubmitSuccessful ? (
+                      <Button full disabled={isSubmitting} type="submit">
+                        {isSubmitting ? (
                           <Spinner />
                         ) : (
                           <Typography variant="bodyRegular" light>
@@ -214,7 +210,7 @@ const Login = ({}) => {
 
                       <Button
                         full
-                        disabled={isSubmitting || isSubmitSuccessful}
+                        disabled={isSubmitting}
                         variant="text"
                         onClick={handleRequestEmailLink}
                       >
