@@ -46,7 +46,7 @@ const Login = ({}) => {
         });
         const userAttributes = response.data.data.attributes;
         const personId = response.data.data.relationships.person.data.id;
-        if (!currentUser?.attributes?.ssj) {
+        if (response.data.data.attributes.ssj) {
           setCookie("workflowId", userAttributes.ssj.workflowId, {
             maxAge: 60 * 60 * 24 * 30,
           });
@@ -60,7 +60,7 @@ const Login = ({}) => {
           type: response.data.data.type,
           attributes: userAttributes,
         });
-        if (!currentUser?.attributes?.ssj) {
+        if (!response.data.data.attributes.ssj) {
           Router.push("/network");
         } else {
           Router.push("/ssj");
