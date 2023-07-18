@@ -76,11 +76,25 @@ const Person = ({}) => {
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
   const { data, error, isLoading, mutate } = useSWR(
     `/api/person/${personId}`,
-    () => peopleApi.show(personId, { network: true }).then((res) => res.data)
+    () => peopleApi.show(personId, { network: true }).then((res) => res.data),
+    {
+      onErrorRetry: (error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      },
+    }
   );
 
   if (error)
-    return <PageContainer>failed to load ${error.message}</PageContainer>;
+    return (
+      <PageContainer isLoading={true}>
+        failed to load ${error.message}
+      </PageContainer>
+    );
   if (isLoading || !data) return <PageContainer isLoading={true} />;
   // if (!data.data) return <div>loading...</div>;
 
