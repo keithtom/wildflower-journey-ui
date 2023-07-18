@@ -1,11 +1,11 @@
 import Head from "next/head";
 import { useState } from "react";
 import useSWR from "swr";
+
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
-import { clearLoggedInState } from "@lib/handleLogout";
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
@@ -22,6 +22,7 @@ registerPlugin(
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
 import { useUserContext } from "@lib/useUserContext";
+import { clearLoggedInState } from "@lib/handleLogout";
 
 import axios from "axios";
 
@@ -67,11 +68,25 @@ const School = ({}) => {
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
   const { data, error, isLoading, mutate } = useSWR(
     `/api/school/${schoolId}`,
-    () => schoolApi.show(schoolId, { network: true }).then((res) => res.data)
+    () => schoolApi.show(schoolId, { network: true }).then((res) => res.data),
+    {
+      onErrorRetry: (error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      },
+    }
   );
 
   if (error)
-    return <PageContainer>failed to load ${error.message}</PageContainer>;
+    return (
+      <PageContainer isLoading={true}>
+        failed to load ${error.message}
+      </PageContainer>
+    );
   if (isLoading || !Data) return <PageContainer isLoading={true} />;
 
   // console.log("about to render", data.data);
