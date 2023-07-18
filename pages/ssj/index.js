@@ -136,7 +136,6 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 </Stack>
               </Card>
             </Grid>
-            B
           </Grid>
         ) : (
           <Stack spacing={16}>
