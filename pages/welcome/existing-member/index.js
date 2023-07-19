@@ -31,7 +31,7 @@ const ExistingTL = ({}) => {
   const { currentUser } = useUserContext();
   // console.log(currentUser);
   return (
-    <PageContainer isLoading={!currentUser} hideNav>
+    <PageContainer hideNav>
       <Grid container alignItems="center" justifyContent="center">
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <Card noPadding>
