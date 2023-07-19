@@ -44,6 +44,16 @@ async function tokenAuth(token) {
     maxAge: 60 * 60 * 24 * 30,
   });
   const userAttributes = response.data.data.attributes;
+
+  if (!userAttributes.password && !userAttributes.ssj) {
+    return {
+      redirect: {
+        destination: "/welcome/existing-member",
+        permanent: false,
+      },
+    };
+  }
+
   if (userAttributes.ssj) {
     setCookie("workflowId", userAttributes.ssj.workflowId, {
       maxAge: 60 * 60 * 24 * 30,
