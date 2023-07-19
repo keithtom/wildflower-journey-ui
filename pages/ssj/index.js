@@ -86,8 +86,6 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
         if (error?.response?.status === 401) {
           clearLoggedInState({});
           Router.push("/login");
-        } else if (!currentUser.attributes.ssj) {
-          Router.push("/network");
         } else {
           console.error(error);
         }
@@ -1284,6 +1282,14 @@ export async function getServerSideProps({ params, req, res }) {
   }
 
   const workflowId = getCookie("workflowId", { req, res });
+  if (!workflowId) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/network",
+      },
+    };
+  }
 
   // turn this in to a catch all api for the ssj/dashboard
   let responseProgress;
