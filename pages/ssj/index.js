@@ -86,6 +86,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
         if (error?.response?.status === 401) {
           clearLoggedInState({});
           Router.push("/login");
+        } else if (!currentUser.attributes.ssj) {
+          Router.push("/network");
         } else {
           console.error(error);
         }
