@@ -2,8 +2,8 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
-import { useRouter } from "next/router";
 
+import getAuthHeader from "@lib/getAuthHeader";
 import { useUserContext } from "@lib/useUserContext";
 import useSearch from "../../hooks/useSearch";
 import {
@@ -22,14 +22,13 @@ import {
   MultiSelect,
   Spinner,
 } from "@ui";
-import { clearLoggedInState } from "@lib/handleLogout";
+import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
 const Network = () => {
   const { query, setQuery, filters, setFilters, results, isSearching, error } =
     useSearch();
   const [category, setCategory] = useState("people");
   const { currentUser } = useUserContext();
-  const router = useRouter();
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
@@ -44,13 +43,6 @@ const Network = () => {
 
   // console.log({ results });
   // console.log({ currentUser });
-
-  useEffect(() => {
-    if (!currentUser) {
-      clearLoggedInState({});
-      router.push("/login");
-    }
-  }, []);
 
   return (
     <>
@@ -614,3 +606,12 @@ const FakeFilters = [
     ],
   },
 ];
+
+export async function getServerSideProps({ params, req, res }) {
+  const config = getAuthHeader({ req, res });
+  if (!config) {
+    console.log("no token found, redirecting to login");
+    return redirectLoginProps();
+  }
+  return { props: { config } };
+}
