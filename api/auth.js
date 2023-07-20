@@ -45,31 +45,14 @@ async function tokenAuth(token) {
   });
   const userAttributes = response.data.data.attributes;
 
-  // console.log({ response });
-
-  // if (response) {
-  //   if (
-  //     userAttributes.firstName === null &&
-  //     userAttributes.lastName === null &&
-  //     userAttributes.ssj === null
-  //   ) {
-  //     return {
-  //       redirect: {
-  //         destination: "/welcome/existing-member",
-  //         permanent: false,
-  //       },
-  //     };
-  //   }
-  // }
-
-  // if (userAttributes.ssj) {
-  //   setCookie("workflowId", userAttributes.ssj.workflowId, {
-  //     maxAge: 60 * 60 * 24 * 30,
-  //   });
-  //   setCookie("phase", userAttributes.ssj.currentPhase, {
-  //     maxAge: 60 * 60 * 24 * 30,
-  //   });
-  // }
+  if (userAttributes.ssj) {
+    setCookie("workflowId", userAttributes.ssj.workflowId, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+    setCookie("phase", userAttributes.ssj.currentPhase, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  }
 
   return response;
 }
