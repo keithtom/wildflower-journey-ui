@@ -22,10 +22,17 @@ const Token = ({ query }) => {
             email: user.email,
             profileImage: user.imageUrl,
           });
-          if (!user.firstName) {
-            Router.push("/welcome/existing-member");
+          console.log({ user });
+          if (!user.ssj) {
+            if (!user.firstName && !user.lastName) {
+              Router.push("/welcome/existing-member");
+            }
           } else {
-            Router.push(redirect);
+            if (!user.firstName && !user.lastName) {
+              Router.push("/welcome/new-etl");
+            } else {
+              Router.push(redirect);
+            }
           }
         })
         .catch((error) => {
