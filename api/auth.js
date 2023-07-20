@@ -45,6 +45,8 @@ async function tokenAuth(token) {
   });
   const userAttributes = response.data.data.attributes;
 
+  console.log({ userAttributes });
+
   // if (!userAttributes.password && !userAttributes.ssj) {
   //   return {
   //     redirect: {
