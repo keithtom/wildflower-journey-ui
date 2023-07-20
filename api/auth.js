@@ -45,7 +45,7 @@ async function tokenAuth(token) {
   });
   const userAttributes = response.data.data.attributes;
 
-  if (userAttributes.ssj) {
+  if (response.data.data.attributes.ssj) {
     setCookie("workflowId", userAttributes.ssj.workflowId, {
       maxAge: 60 * 60 * 24 * 30,
     });
