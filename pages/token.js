@@ -22,9 +22,11 @@ const Token = ({ query }) => {
             email: user.email,
             profileImage: user.imageUrl,
           });
-          !currentUser.firstName && !currentUser.lastName && !currentUser.ssj
-            ? Router.push("/welcome/existing-member")
-            : Router.push(redirect);
+          if (!user.firstName) {
+            Router.push("/welcome/existing-member");
+          } else {
+            Router.push(redirect);
+          }
         })
         .catch((error) => {
           // if tokenAuth fails then
