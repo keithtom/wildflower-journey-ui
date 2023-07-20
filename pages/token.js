@@ -23,12 +23,15 @@ const Token = ({ query }) => {
             profileImage: user.imageUrl,
           });
           console.log({ user });
-          if (!user.ssj) {
-            if (!user.firstName && !user.lastName) {
+
+          if (!user.attributes.ssj) {
+            if (!user.attributes.firstName && !user.attributes.lastName) {
               Router.push("/welcome/existing-member");
+            } else {
+              Router.push(redirect);
             }
           } else {
-            if (!user.firstName && !user.lastName) {
+            if (!user.attributes.firstName && !user.attributes.lastName) {
               Router.push("/welcome/new-etl");
             } else {
               Router.push(redirect);
