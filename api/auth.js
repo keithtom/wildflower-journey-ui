@@ -49,9 +49,9 @@ async function tokenAuth(token) {
 
   if (response) {
     if (
-      !userAttributes.firstName &&
-      !userAttributes.lastName &&
-      !userAttributes.ssj
+      userAttributes.firstName === null &&
+      userAttributes.lastName === null &&
+      userAttributes.ssj === null
     ) {
       return {
         redirect: {
