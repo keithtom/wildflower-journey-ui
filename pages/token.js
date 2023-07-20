@@ -27,6 +27,8 @@ const Token = ({ query }) => {
           if (!user.attributes.ssj) {
             if (!user.attributes.firstName && !user.attributes.lastName) {
               Router.push("/welcome/existing-member");
+            } else {
+              Router.push(redirect);
             }
           } else {
             if (!user.attributes.firstName && !user.attributes.lastName) {
