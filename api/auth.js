@@ -47,14 +47,18 @@ async function tokenAuth(token) {
 
   console.log({ userAttributes });
 
-  // if (!userAttributes.password && !userAttributes.ssj) {
-  //   return {
-  //     redirect: {
-  //       destination: "/welcome/existing-member",
-  //       permanent: false,
-  //     },
-  //   };
-  // }
+  if (
+    !userAttributes.firstName &&
+    !userAttributes.lastName &&
+    !userAttributes.ssj
+  ) {
+    return {
+      redirect: {
+        destination: "/welcome/existing-member",
+        permanent: false,
+      },
+    };
+  }
 
   if (userAttributes.ssj) {
     setCookie("workflowId", userAttributes.ssj.workflowId, {
