@@ -655,6 +655,9 @@ const ProgressBar = ({ processes }) => {
       `}
   `;
 
+  let p = processes;
+  let reverseProcesses = [...p].reverse();
+
   return (
     <Stack spacing={3}>
       <Typography variant="bodyMini" bold lightened>
@@ -662,7 +665,7 @@ const ProgressBar = ({ processes }) => {
         MILESTONES COMPLETED
       </Typography>
       <Stack spacing={1} direction="row">
-        {processes.map((p, i) => (
+        {reverseProcesses.map((p, i) => (
           <StyledProcessIndicator key={i} variant={p} />
         ))}
       </Stack>
