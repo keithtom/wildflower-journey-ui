@@ -29,12 +29,12 @@ const CustomAppBar = styled(AppBar)`
   justify-content: center;
   display: flex;
   ${(props) =>
-    props.env === "development" &&
+    props.env === "dev" &&
     css`
       background: red;
     `}
   ${(props) =>
-    props.env === "staging" &&
+    props.env === "STAGING" &&
     css`
       background: blue;
     `}
@@ -50,7 +50,7 @@ const Header = ({ toggleNavOpen }) => {
   const showNetwork = !currentUser?.attributes?.ssj;
 
   // console.log({ currentUser });
-  console.log(process.env.APP_ENV);
+  // console.log(process.env.APP_ENV);
 
   return (
     <CustomAppBar env={process.env.APP_ENV}>
