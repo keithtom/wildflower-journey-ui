@@ -50,10 +50,10 @@ const Header = ({ toggleNavOpen }) => {
   const showNetwork = !currentUser?.attributes?.ssj;
 
   // console.log({ currentUser });
-  console.log(process.env.NODE_ENV);
+  console.log(process.env.APP_ENV);
 
   return (
-    <CustomAppBar env={process.env.NODE_ENV}>
+    <CustomAppBar env={process.env.APP_ENV}>
       <Grid
         container
         justifyContent={isLoggedIn ? "space-between" : "center"}
