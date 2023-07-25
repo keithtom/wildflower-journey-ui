@@ -37,7 +37,7 @@ const Token = ({ query }) => {
 
           if (
             !user.attributes.ssj &&
-            softLaunchDirectoryUsers.includes(user.email)
+            softLaunchDirectoryUsers.includes(user.attributes.email)
           ) {
             Router.push("/welcome/existing-member");
           } else {
