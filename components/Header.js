@@ -28,6 +28,16 @@ const CustomAppBar = styled(AppBar)`
   padding: 0 ${({ theme }) => theme.util.buffer * 4}px;
   justify-content: center;
   display: flex;
+  ${(props) =>
+    props.env === "development" &&
+    css`
+      background: red;
+    `}
+  ${(props) =>
+    props.env === "staging" &&
+    css`
+      background: blue;
+    `}
 `;
 
 const Header = ({ toggleNavOpen }) => {
@@ -40,9 +50,10 @@ const Header = ({ toggleNavOpen }) => {
   const showNetwork = !currentUser?.attributes?.ssj;
 
   // console.log({ currentUser });
+  // console.log(process.env.NODE_ENV);
 
   return (
-    <CustomAppBar>
+    <CustomAppBar env={process.env.NODE_ENV}>
       <Grid
         container
         justifyContent={isLoggedIn ? "space-between" : "center"}
