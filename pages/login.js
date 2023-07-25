@@ -121,7 +121,7 @@ const Login = ({}) => {
                           Check your email for a secure link to log in.
                         </Typography>
                         <Typography>
-                          You should recieve it within a few minutes.
+                          You should receive it within a few minutes.
                         </Typography>
                       </Stack>
                     </Grid>
