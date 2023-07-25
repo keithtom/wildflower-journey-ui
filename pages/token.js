@@ -15,6 +15,8 @@ const Token = ({ query }) => {
     "alejandra@thedahliaschoolsf.org",
     "maggie@wildflowerschools.org",
     "taylor@littleuniverse.com",
+    "katelyn.shore@wildflowerschools.org",
+    "li.ouyang@wildflowerschools.org",
   ];
 
   useEffect(() => {
