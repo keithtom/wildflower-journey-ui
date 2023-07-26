@@ -54,10 +54,10 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
     setUserIsEditing(false);
   };
 
-  var milestonePrerequisites = milestone.relationships.prerequisiteProcesses.data
-  
-  const sortedMilestoneTasks = milestone.relationships.steps.data
-  .sort((a, b) =>
+  var milestonePrerequisites =
+    milestone.relationships.prerequisiteProcesses.data;
+
+  const sortedMilestoneTasks = milestone.relationships.steps.data.sort((a, b) =>
     a.attributes.position > b.attributes.position ? 1 : -1
   );
 
@@ -385,17 +385,17 @@ const EditableTaskList = ({ tasks }) => {
 export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
-    console.log("no token found, redirecting to login")
+    console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
   const milestoneId = query.milestone;
   let response;
   try {
-    response = await processesApi.show(milestoneId, config)
+    response = await processesApi.show(milestoneId, config);
   } catch (error) {
     if (error?.response?.status === 401) {
-      clearLoggedInState({req, res});
+      clearLoggedInState({ req, res });
       return redirectLoginProps();
     } else {
       console.error(error);
@@ -403,7 +403,7 @@ export async function getServerSideProps({ query, req, res }) {
   }
   const data = response.data;
   const milestone = data.data;
-  
+
   const FakeMilestoneTasks = [
     {
       title: "Complete WF School Name Research Document",

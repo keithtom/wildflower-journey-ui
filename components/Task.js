@@ -440,7 +440,7 @@ const DecisionDrawerActions = ({
               <Typography variant="bodyRegular" bold>
                 {decisionQuestion}
               </Typography>
-              <RadioGroup value={selectedDecisionOption} handleOptionsChange>
+              <RadioGroup value={selectedDecisionOption}>
                 {decisionOptions.map((o, i) => (
                   <FormControlLabel
                     key={o.id}

@@ -115,7 +115,9 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
   const id = open ? "profile-nav" : null;
   const { setCurrentUser } = useUserContext();
 
-  const StyledOption = styled(ListItem)`
+  const StyledOption = styled(ListItem, {
+    shouldForwardProp: (prop) => prop !== "hoverable",
+  })`
     border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
     &:last-child {
       border-bottom: none;

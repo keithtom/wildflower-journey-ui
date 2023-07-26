@@ -9,8 +9,7 @@ const NavLink = ({ to, icon, active, variant, label }) => {
     &:hover {
       background: ${({ theme }) => theme.color.neutral.lightened};
     }
-    //Active
-    ${(props) => props.active && css``}
+
     //Primary
     ${(props) =>
       props.variant === "primary" &&
@@ -37,7 +36,7 @@ const NavLink = ({ to, icon, active, variant, label }) => {
 
   return (
     <Link href={to}>
-      <CustomListItem active={active} variant={variant}>
+      <CustomListItem variant={variant}>
         <Grid
           container
           spacing={3}

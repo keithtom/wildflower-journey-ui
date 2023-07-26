@@ -229,7 +229,7 @@ const PauseSSJModal = ({ toggle, open, setSSJPaused }) => {
             control={control}
             rules={{ required: true }}
             render={({ field: { onChange, value } }) => (
-              <RadioGroup value={value} handleOptionsChange>
+              <RadioGroup value={value}>
                 {pauseLengthOptions.map((o, i) => (
                   <FormControlLabel
                     key={i}

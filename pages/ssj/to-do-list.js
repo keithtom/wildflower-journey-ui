@@ -85,8 +85,8 @@ const ToDoList = ({ steps, milestonesToDo }) => {
                 >
                   <Stack spacing={2}>
                     {milestonesToDo.map((m, i) => (
-                      <Link href={`/ssj/${m.attributes.phase}/${m.id}`}>
-                        <Card variant="light" size="small" key={i} hoverable>
+                      <Link href={`/ssj/${m.attributes.phase}/${m.id}`} key={i}>
+                        <Card variant="light" size="small" hoverable>
                           <Stack
                             direction="row"
                             alignItems="center"

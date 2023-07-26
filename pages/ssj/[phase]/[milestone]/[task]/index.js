@@ -262,7 +262,7 @@ const DecisionForm = ({ options, disabled }) => {
       disabled={disabled}
     >
       <Stack spacing={3}>
-        <RadioGroup value={decisionOption} handleOptionsChange>
+        <RadioGroup value={decisionOption}>
           {options.map((o, i) => (
             <FormControlLabel
               key={i}
