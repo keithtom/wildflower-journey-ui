@@ -1,3 +1,4 @@
+import React from "react";
 import { InputBase } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 
@@ -17,8 +18,8 @@ const StyledInput = styled(InputBase)`
     `}
 `;
 
-const Input = ({ inputRef, error, ...props }) => {
-  return <StyledInput ref={inputRef} error={error} {...props} />;
-};
+const Input = React.forwardRef(({ error, ...props }, ref) => {
+  return <StyledInput ref={ref} error={error} {...props} />;
+});
 
 export default Input;

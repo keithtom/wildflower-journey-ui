@@ -1,7 +1,23 @@
 import { default as MaterialTypography } from "@mui/material/Typography";
 import { styled, css } from "@mui/material/styles";
 
-const CustomTypography = styled(MaterialTypography)`
+const CustomTypography = styled(MaterialTypography, {
+  shouldForwardProp: (prop) =>
+    prop !== "bold" &&
+    prop !== "light" &&
+    prop !== "lightened" &&
+    prop !== "highlight" &&
+    prop !== "transparent" &&
+    prop !== "error" &&
+    prop !== "warning" &&
+    prop !== "success" &&
+    prop !== "capitalize" &&
+    prop !== "uppercase" &&
+    prop !== "center" &&
+    prop !== "link" &&
+    prop !== "hoverable" &&
+    prop !== "struck",
+})`
   /* Default */
   text-decoration: none;
   color: ${({ theme }) => theme.color.text.main};

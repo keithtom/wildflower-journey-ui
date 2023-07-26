@@ -68,8 +68,10 @@ const CreatePassword = ({}) => {
                     name="password"
                     control={control}
                     rules={{ required: true }}
+                    defaultValue=""
                     render={({ field }) => (
                       <TextField
+                        autoComplete="new-password"
                         label="Password"
                         type="password"
                         placeholder="Your secure password"
@@ -91,8 +93,10 @@ const CreatePassword = ({}) => {
                       required: true,
                       validate: (value) => value === password.current,
                     }}
+                    defaultValue=""
                     render={({ field }) => (
                       <TextField
+                        autoComplete="new-password"
                         label="Confirm password"
                         type="password"
                         placeholder="Confirm your password"

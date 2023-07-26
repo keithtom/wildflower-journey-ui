@@ -1,7 +1,9 @@
 import { default as MaterialAvatar } from "@mui/material/Avatar";
 import { styled, css } from "@mui/material/styles";
 
-const CustomAvatar = styled(MaterialAvatar)`
+const CustomAvatar = styled(MaterialAvatar, {
+  shouldForwardProp: (prop) => prop !== "hoverable",
+})`
   width: ${({ theme }) => theme.util.buffer * 12}px;
   height: ${({ theme }) => theme.util.buffer * 12}px;
   background: ${({ theme }) => theme.color.primary.main};

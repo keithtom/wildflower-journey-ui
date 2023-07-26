@@ -6,7 +6,7 @@ const CustomRadio = styled(MaterialRadio)`
 `;
 
 const Radio = ({ ...props }) => {
-  return <CustomRadio defaultChecked disableRipple {...props} />;
+  return <CustomRadio disableRipple {...props} />;
 };
 
 export default Radio;
