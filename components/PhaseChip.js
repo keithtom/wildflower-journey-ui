@@ -1,7 +1,7 @@
 import { Icon, Chip, Stack, Typography } from "./ui";
 
 const PhaseChip = ({ phase, withIcon, size, ...props }) => {
-  console.log("Phase chip props", phase, withIcon, size, props)
+  // console.log("Phase chip props", phase, withIcon, size, props)
   return (
     <Chip
       size={size}

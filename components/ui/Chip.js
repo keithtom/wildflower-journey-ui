@@ -1,7 +1,9 @@
 import { default as MaterialChip } from "@mui/material/Chip";
 import { styled, css } from "@mui/material/styles";
 
-const CustomChip = styled(MaterialChip)`
+const CustomChip = styled(MaterialChip, {
+  shouldForwardProp: (prop) => prop !== "bgColor",
+})`
   border-radius: ${({ theme }) => theme.radius.md}px;
   background: ${({ theme }) => theme.color.neutral.main};
 

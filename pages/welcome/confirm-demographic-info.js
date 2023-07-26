@@ -321,7 +321,7 @@ const ConfirmDemographicInfo = ({}) => {
                     control={control}
                     rules={{ required: false }}
                     render={({ field: { onChange, value } }) => (
-                      <RadioGroup value={value} handleOptionsChange>
+                      <RadioGroup value={value}>
                         {lgbtqiaOptions.map((o, i) => (
                           <FormControlLabel
                             key={i}
@@ -446,7 +446,7 @@ const ConfirmDemographicInfo = ({}) => {
                     control={control}
                     rules={{ required: true }}
                     render={({ field: { onChange, value } }) => (
-                      <RadioGroup value={value} handleOptionsChange>
+                      <RadioGroup value={value}>
                         {incomeOptions.map((o, i) => (
                           <FormControlLabel
                             key={i}
@@ -475,7 +475,7 @@ const ConfirmDemographicInfo = ({}) => {
                     control={control}
                     rules={{ required: true }}
                     render={({ field: { onChange, value } }) => (
-                      <RadioGroup value={value} handleOptionsChange>
+                      <RadioGroup value={value}>
                         {montessoriCertificationOptions.map((o, i) => (
                           <FormControlLabel
                             key={i}

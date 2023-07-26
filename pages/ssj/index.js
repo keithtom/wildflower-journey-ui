@@ -104,7 +104,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
-  console.log({ currentUser });
+  // console.log({ currentUser });
 
   return (
     <>
@@ -290,13 +290,11 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                     >
                       <Stack spacing={2}>
                         {milestonesToDo.map((m, i) => (
-                          <Link href={`/ssj/${m.attributes.phase}/${m.id}`}>
-                            <Card
-                              variant="light"
-                              size="small"
-                              key={i}
-                              hoverable
-                            >
+                          <Link
+                            href={`/ssj/${m.attributes.phase}/${m.id}`}
+                            key={i}
+                          >
+                            <Card variant="light" size="small" hoverable>
                               <Stack
                                 direction="row"
                                 alignItems="center"
@@ -338,8 +336,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
               </Grid>
               <Grid container spacing={3} alignItems="stretch">
                 {partners && partners.length ? (
-                  partners.map((p) => (
-                    <Grid item xs={12} sm={4}>
+                  partners.map((p, i) => (
+                    <Grid item xs={12} sm={4} key={i}>
                       <UserCard
                         key={p.id}
                         firstName={p.attributes.firstName}

@@ -147,8 +147,10 @@ const Login = ({}) => {
                           pattern:
                             /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                         }}
+                        defaultValue=""
                         render={({ field }) => (
                           <TextField
+                            autoComplete="username"
                             label="Email"
                             placeholder="e.g. jane.smith@gmail.com"
                             error={errors.email}
@@ -170,8 +172,10 @@ const Login = ({}) => {
                         name="password"
                         control={control}
                         rules={{ required: true }}
+                        defaultValue=""
                         render={({ field }) => (
                           <TextField
+                            autoComplete="current-password"
                             type="password"
                             label="Password"
                             placeholder="e.g. your password"
