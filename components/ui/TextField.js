@@ -28,7 +28,7 @@ const TextField = React.forwardRef(
           ) : null}
           <Input
             multiline={multiline}
-            ref={ref} // Forward the ref to the Input component
+            ref={ref}
             placeholder={placeholder}
             endAdornment={endAdornment}
             error={error}
