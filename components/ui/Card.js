@@ -108,12 +108,7 @@ const CustomCard = styled(MaterialCard, {
 `;
 
 const Card = ({ children, ...props }) => {
-  return (
-    <CustomCard {...props}>
-      {children}
-      {/* <CustomCardContent>{children}</CustomCardContent> */}
-    </CustomCard>
-  );
+  return <CustomCard {...props}>{children}</CustomCard>;
 };
 
 export default Card;
