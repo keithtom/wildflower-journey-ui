@@ -10,6 +10,7 @@ import { parseISO } from "date-fns";
 import ssjApi from "@api/ssj/ssj";
 import processesApi from "@api/workflow/processes";
 import { useUserContext } from "@lib/useUserContext";
+import useAuth from "@lib/utils/useAuth";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
@@ -103,6 +104,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
+
+  useAuth("/login");
 
   // console.log({ currentUser });
 
