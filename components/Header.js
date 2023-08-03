@@ -87,6 +87,7 @@ const Header = ({ toggleNavOpen }) => {
         {isLoggedIn ? (
           <Grid item>
             <AvatarMenu
+              showNetwork={showNetwork}
               myProfileLink={
                 showNetwork ? `/network/people/${currentUser.id}` : null
               }
@@ -102,7 +103,7 @@ const Header = ({ toggleNavOpen }) => {
 
 export default Header;
 
-const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
+const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
   const [profileNavOpen, setProfileNavOpen] = useState(false);
   const handleOpen = (event) => {
     setProfileNavOpen(event.currentTarget);
@@ -189,7 +190,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink }) => {
         {myProfileLink ? (
           <NavLink to={myProfileLink} label="My Profile" />
         ) : null}
-        <NavLink to="/settings" label="Settings" />
+        {showNetwork ? null : <NavLink to="/settings" label="Settings" />}
         <StyledOption onClick={handleLogOut} hoverable>
           <Typography variant="bodyRegular">Sign out</Typography>
         </StyledOption>

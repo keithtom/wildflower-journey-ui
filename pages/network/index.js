@@ -45,13 +45,6 @@ const Network = () => {
   // console.log({ results });
   // console.log({ currentUser });
 
-  useEffect(() => {
-    if (!currentUser) {
-      clearLoggedInState({});
-      router.push("/login");
-    }
-  }, []);
-
   return (
     <>
       <PageContainer isLoading={!currentUser} hideNav={!currentUser}>
