@@ -53,8 +53,6 @@ const CustomChip = styled(MaterialChip, {
 `;
 
 const Chip = ({ variant, size, label, ...props }) => {
-  // console.log("Chip props", props);
-
   return (
     <CustomChip
       variant={variant ? variant : "lightened"}

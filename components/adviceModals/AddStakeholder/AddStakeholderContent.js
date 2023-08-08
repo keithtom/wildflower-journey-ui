@@ -13,18 +13,9 @@ import {
   Switch,
   Checkbox,
 } from "@ui";
-import NetworkContent from '../../page-content/NetworkContent'
 
 const AddStakeholderContent = ({ toggle }) => {
-  return (
-    <div>
-      <Grid container spacing={4}>
-        <Grid item xs={12}>
-          <NetworkContent asStakeholderSelection/>
-        </Grid>
-      </Grid>
-    </div>
-  );
+  return <div></div>;
 };
 
 export default AddStakeholderContent;
