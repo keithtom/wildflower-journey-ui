@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, FormGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
 import registrationsApi from "../../../api/registrations";
+import useAuth from "@lib/utils/useAuth";
 
 import {
   Button,
@@ -47,6 +48,8 @@ const CreatePassword = ({}) => {
         console.error(error.message);
       });
   };
+
+  useAuth("/login");
 
   return (
     <PageContainer hideNav>
