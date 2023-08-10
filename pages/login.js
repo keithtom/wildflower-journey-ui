@@ -37,10 +37,10 @@ const Login = ({}) => {
     setError,
     formState: { errors, isSubmitSuccessful, isSubmitting },
   } = useForm();
-  const onSubmit = (data) => {
-    authApi
-      .login(data.email, data.password)
-      .then(function (response) {
+
+  const onSubmit = async (data) => {
+    try {
+      await authApi.login(data.email, data.password).then(function (response) {
         setCookie("auth", response.headers["authorization"], {
           maxAge: 60 * 60 * 24 * 30,
         });
@@ -65,23 +65,24 @@ const Login = ({}) => {
         } else {
           Router.push("/ssj");
         }
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-        // console.log(error.response.data); // error message
-        if (error.response.status === 401) {
-          clearLoggedInState({});
-          setError("email", {
-            type: "invalid",
-            message: error.response.data,
-          });
-          setError("password", {
-            type: "invalid",
-            message: error.response.data,
-          });
-        }
       });
+      // Process successful login response
+    } catch (error) {
+      // handle error
+      console.log(error);
+      // console.log(error.response.data); // error message
+      if (error.response.status === 401) {
+        clearLoggedInState({});
+        setError("email", {
+          type: "invalid",
+          message: error.response.data,
+        });
+        setError("password", {
+          type: "invalid",
+          message: error.response.data,
+        });
+      }
+    }
   };
 
   async function handleRequestEmailLink() {
@@ -150,6 +151,7 @@ const Login = ({}) => {
                         defaultValue=""
                         render={({ field }) => (
                           <TextField
+                            disabled={isSubmitting || isSubmitSuccessful}
                             autoComplete="username"
                             label="Email"
                             placeholder="e.g. jane.smith@gmail.com"
@@ -175,6 +177,7 @@ const Login = ({}) => {
                         defaultValue=""
                         render={({ field }) => (
                           <TextField
+                            disabled={isSubmitting || isSubmitSuccessful}
                             autoComplete="current-password"
                             type="password"
                             label="Password"
@@ -199,14 +202,19 @@ const Login = ({}) => {
                     </Stack>
 
                     <Stack alignItems="center" spacing={3}>
-                      <Button full disabled={isSubmitting} type="submit">
-                        {isSubmitting ? (
-                          <Spinner />
-                        ) : (
+                      <Button
+                        full
+                        disabled={isSubmitting || isSubmitSuccessful}
+                        type="submit"
+                      >
+                        <Stack spacing={6} direction="row">
+                          {isSubmitting || isSubmitSuccessful ? (
+                            <Spinner size="20px" />
+                          ) : null}
                           <Typography variant="bodyRegular" light>
                             Log in
                           </Typography>
-                        )}
+                        </Stack>
                       </Button>
                       <Typography variant="bodyMini" bold lightened>
                         OR
@@ -214,7 +222,7 @@ const Login = ({}) => {
 
                       <Button
                         full
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isSubmitSuccessful}
                         variant="text"
                         onClick={handleRequestEmailLink}
                       >
