@@ -6,6 +6,7 @@ import Router from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 
+import useAuth from "@lib/utils/useAuth";
 import { useUserContext } from "@lib/useUserContext";
 import {
   Alert,
@@ -35,6 +36,8 @@ const SettingsPage = () => {
   const [abandonSSJModalOpen, setAbandonSSJModalOpen] = useState(false);
   const [SSJAbandonProcessStarted, setSSJAbandonProcessStarted] =
     useState(false);
+
+  useAuth("/login");
 
   return (
     <>

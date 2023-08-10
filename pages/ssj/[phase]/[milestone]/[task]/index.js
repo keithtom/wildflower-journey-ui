@@ -7,6 +7,7 @@ import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import stepsApi from "@api/workflow/steps";
 
+import useAuth from "@lib/utils/useAuth";
 import {
   PageContainer,
   Typography,
@@ -50,6 +51,8 @@ const TaskPage = ({ MilestoneId, MilestoneTitle }) => {
   const router = useRouter();
   const { phase, task } = router.query;
   const taskId = task;
+
+  useAuth("/login");
 
   return (
     <PageContainer>

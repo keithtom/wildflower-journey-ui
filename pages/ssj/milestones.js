@@ -3,6 +3,7 @@ import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import processesApi from "@api/workflow/processes";
 
+import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
@@ -29,6 +30,8 @@ const Milestones = ({ processByCategory, processByPhase }) => {
   // console.log({ processByPhase });
 
   const hero = "/assets/images/ssj/wildflowerCollection.jpg";
+
+  useAuth("/login");
 
   return (
     <PageContainer>

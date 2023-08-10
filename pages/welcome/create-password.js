@@ -3,9 +3,10 @@ import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, FormGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
+
 import registrationsApi from "../../api/registrations";
 import { clearLoggedInState } from "@lib/handleLogout";
-
+import useAuth from "@lib/utils/useAuth";
 import {
   Button,
   Grid,
@@ -54,6 +55,7 @@ const CreatePassword = ({}) => {
         console.error(err.message);
       });
   };
+  useAuth("/login");
 
   return (
     <PageContainer hideNav>

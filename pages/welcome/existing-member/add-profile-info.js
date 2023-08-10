@@ -19,6 +19,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../../api/people";
+import useAuth from "@lib/utils/useAuth";
 
 const token = getCookie("auth");
 
@@ -108,6 +109,8 @@ const AddProfileInfo = ({}) => {
 
   const isExistingTL = false;
   const introducerProfilePic = "/assets/images/placeholder-flower.png";
+
+  useAuth("/login");
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
