@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
@@ -42,7 +42,6 @@ const CustomAppBar = styled(AppBar)`
 
 const Header = ({ toggleNavOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
-
   const { currentUser, isLoggedIn } = useUserContext();
 
   const logo = "/assets/images/wildflower-logo.png";
@@ -89,10 +88,10 @@ const Header = ({ toggleNavOpen }) => {
             <AvatarMenu
               showNetwork={showNetwork}
               myProfileLink={
-                showNetwork ? `/network/people/${currentUser.id}` : null
+                showNetwork ? `/network/people/${currentUser?.id}` : null
               }
               avatarSrc={currentUser?.attributes?.imageUrl}
-              userName={`${currentUser.attributes.firstName} ${currentUser.attributes.lastName}`}
+              userName={`${currentUser?.attributes.firstName} ${currentUser?.attributes.lastName}`}
             />
           </Grid>
         ) : null}
