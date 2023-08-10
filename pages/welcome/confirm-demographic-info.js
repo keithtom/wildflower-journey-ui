@@ -17,6 +17,7 @@ import {
   ethnicityOptions,
   ageClassroomsInterestedInOffering,
 } from "../../lib/utils/demographic-options";
+import useAuth from "@lib/utils/useAuth";
 
 import {
   Button,
@@ -176,6 +177,8 @@ const ConfirmDemographicInfo = ({}) => {
     watchFields.gender === "A not-listed or more specific gender identity";
   const showCustomPronounsField =
     watchFields.pronouns === "Not-listed or more specific pronouns";
+
+  useAuth("/login");
 
   // console.log({ watchFields });
 

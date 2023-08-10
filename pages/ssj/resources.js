@@ -2,6 +2,7 @@ import { useState } from "react";
 import { getCookie } from "cookies-next";
 import ssjApi from "@api/ssj/ssj";
 
+import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
 import CategoryChip from "../../components/CategoryChip";
 import PhaseChip from "../../components/PhaseChip";
@@ -25,6 +26,7 @@ const Resources = ({ dataResources }) => {
 
   const hero = "/assets/images/ssj/wildflowerSystems.jpg";
 
+  useAuth("/login");
   // console.log({ dataResources });
 
   return (

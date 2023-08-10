@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
 
+import useAuth from "@lib/utils/useAuth";
 import { useUserContext } from "@lib/useUserContext";
 import {
   Button,
@@ -51,6 +52,7 @@ const StyledMessage = styled(Card)`
 const NewETL = ({}) => {
   const { currentUser } = useUserContext();
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  useAuth("/login");
   // console.log(currentUser);
   return (
     <PageContainer isLoading={!currentUser} hideNav>

@@ -16,6 +16,7 @@ import {
   ethnicityOptions,
   roleOptions,
 } from "../../../lib/utils/demographic-options";
+import useAuth from "@lib/utils/useAuth";
 
 import {
   Button,
@@ -160,6 +161,7 @@ const ConfirmDemographicInfo = ({}) => {
   const showCustomPronounsField =
     watchFields.pronouns === "Not-listed or more specific pronouns";
 
+  useAuth("/login");
   // console.log({ watchFields });
 
   return (

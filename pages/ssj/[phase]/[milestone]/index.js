@@ -8,6 +8,7 @@ import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
+import useAuth from "@lib/utils/useAuth";
 import {
   Avatar,
   Button,
@@ -63,6 +64,8 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
 
   const router = useRouter();
   const { phase } = router.query;
+
+  useAuth("/login");
 
   return (
     <PageContainer>
