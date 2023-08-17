@@ -1,0 +1,14 @@
+{
+  "log-in": "Log in",
+  "email": "Email",
+  "password": "Password",
+  "your-password": "Your password",
+  "this-field-is-required": "This field is required",
+  "please-enter-a-vaild-email": "Please enter a valid email",
+  "email-or-password-is-invalid": "Email or password is invalid",
+  "or": "Or",
+  "request-an-email-link-to-login": "Request an email link to login",
+  "check-your-email-for-a-secure-link-to-log-in": "Revise su correo electrónico para obtener un enlace seguro para iniciar sesión",
+  "you-should-receive-it-within-a-few-minutes": "Deberías recibirlo en unos minutos",
+  "login-with-my-email-and-password": "Login with my email and password"
+}
