@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { styled, css } from "@mui/material/styles";
 import { AppBar, IconButton, ListItem } from "@mui/material";
-import Router from "next/router";
+import { useRouter } from "next/router";
+
 import { useUserContext } from "../lib/useUserContext";
 import { clearLoggedInState } from "../lib/handleLogout";
 import registrationsAPI from "../api/registrations";
@@ -42,7 +43,7 @@ const CustomAppBar = styled(AppBar)`
 
 const Header = ({ toggleNavOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
-
+  const Router = useRouter();
   const { currentUser, isLoggedIn } = useUserContext();
 
   const logo = "/assets/images/wildflower-logo.png";
@@ -96,6 +97,9 @@ const Header = ({ toggleNavOpen }) => {
             />
           </Grid>
         ) : null}
+        <Grid item sx={{ position: "fixed", right: "24px" }}>
+          <LocaleMenu />
+        </Grid>
       </Grid>
     </CustomAppBar>
   );
@@ -196,5 +200,33 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
         </StyledOption>
       </StyledUserMenu>
     </>
+  );
+};
+
+// change just the locale and maintain all other route information including href's query
+const LocaleMenu = ({}) => {
+  const router = useRouter();
+  const { pathname, asPath, query } = router;
+  return (
+    <Stack direction="row" spacing={3}>
+      <Typography
+        hoverable
+        lightened={router.locale !== "en"}
+        onClick={() =>
+          router.push({ pathname, query }, asPath, { locale: "en" })
+        }
+      >
+        EN
+      </Typography>
+      <Typography
+        hoverable
+        lightened={router.locale !== "es"}
+        onClick={() =>
+          router.push({ pathname, query }, asPath, { locale: "es" })
+        }
+      >
+        ES
+      </Typography>
+    </Stack>
   );
 };

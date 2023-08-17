@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import Router from "next/router";
 import FormHelperText from "@mui/material/FormHelperText";
-import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
+
+import { useTranslation, Trans } from "next-i18next";
+
+import { useUserContext } from "../lib/useUserContext";
 import authApi from "@api/auth";
 import { clearLoggedInState } from "@lib/handleLogout";
 
@@ -23,6 +26,9 @@ const Login = ({}) => {
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { setCurrentUser, isLoggedIn, currentUser } = useUserContext();
   const hasSSJ = currentUser?.attributes?.ssj ? true : false;
+
+  const { t } = useTranslation("login");
+
   if (isLoggedIn && hasSSJ) {
     Router.push("/ssj");
   } else if (isLoggedIn && !hasSSJ) {
@@ -107,7 +113,7 @@ const Login = ({}) => {
               <Grid container justifyContent="center">
                 <Grid item>
                   <Typography variant="h4" bold>
-                    Log in
+                    {t("log-in")}
                   </Typography>
                 </Grid>
               </Grid>
@@ -119,10 +125,10 @@ const Login = ({}) => {
                       <Stack spacing={3} alignItems="center">
                         <Icon type="checkCircle" variant="primary" />
                         <Typography variant="h3" center bold>
-                          Check your email for a secure link to log in.
+                          {t("check-your-email-for-a-secure-link-to-log-in")}
                         </Typography>
                         <Typography>
-                          You should receive it within a few minutes.
+                          {t("you-should-receive-it-within-a-few-minutes")}
                         </Typography>
                       </Stack>
                     </Grid>
@@ -132,7 +138,7 @@ const Login = ({}) => {
                     variant="text"
                   >
                     <Typography lightened variant="bodyRegular" center>
-                      Login with my email and password.
+                      {t("login-with-my-email-and-password")}
                     </Typography>
                   </Button>
                 </Stack>
@@ -153,18 +159,18 @@ const Login = ({}) => {
                           <TextField
                             disabled={isSubmitting || isSubmitSuccessful}
                             autoComplete="username"
-                            label="Email"
+                            label={t("email")}
                             placeholder="e.g. jane.smith@gmail.com"
                             error={errors.email}
                             helperText={
                               errors &&
                               errors.email &&
                               errors.email.type === "required"
-                                ? "This field is required"
+                                ? t("this-field-is-required")
                                 : errors &&
                                   errors.email &&
                                   errors.email.type === "pattern" &&
-                                  "Please enter a valid email"
+                                  t("please-enter-a-valid-email")
                             }
                             {...field}
                           />
@@ -180,14 +186,14 @@ const Login = ({}) => {
                             disabled={isSubmitting || isSubmitSuccessful}
                             autoComplete="current-password"
                             type="password"
-                            label="Password"
-                            placeholder="e.g. your password"
+                            label={t("password")}
+                            placeholder={`e.g. ${t("your-password")}`}
                             error={errors.password}
                             helperText={
                               errors &&
                               errors.password &&
                               errors.password.type === "required" &&
-                              "This field is required"
+                              t("this-field-is-required")
                             }
                             {...field}
                           />
@@ -196,7 +202,7 @@ const Login = ({}) => {
                       {(errors?.email?.type === "invalid" ||
                         errors?.password?.type === "invalid") && (
                         <FormHelperText error={true}>
-                          Email or password is invalid
+                          {t("email-or-password-is-invalid")}
                         </FormHelperText>
                       )}
                     </Stack>
@@ -212,12 +218,12 @@ const Login = ({}) => {
                             <Spinner size="20px" />
                           ) : null}
                           <Typography variant="bodyRegular" light>
-                            Log in
+                            {t("log-in")}
                           </Typography>
                         </Stack>
                       </Button>
                       <Typography variant="bodyMini" bold lightened>
-                        OR
+                        {t("or")}
                       </Typography>
 
                       <Button
@@ -227,7 +233,7 @@ const Login = ({}) => {
                         onClick={handleRequestEmailLink}
                       >
                         <Typography variant="bodyRegular">
-                          Request an email link to login
+                          {t("request-an-email-link-to-login")}
                         </Typography>
                       </Button>
                     </Stack>
@@ -243,3 +249,14 @@ const Login = ({}) => {
 };
 
 export default Login;
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common", "login"])),
+      // Will be passed to the page component as props
+    },
+  };
+}
