@@ -18,19 +18,27 @@ describe("tasks", () => {
         cy.contains("Step 1").click();
         cy.contains("Add to my to do list").click();
         cy.contains("TASK ADDED").should("be.visible");
-        cy.get("span[type='close']").first().click({ force: true });
+        cy.get(".MuiSnackbar-root span svg").click({ force: true });
         cy.contains("ASSIGNEE");
-        cy.get("span[type='close']").last().click({ force: true });
+        cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+          .first()
+          .click({
+            force: true,
+          });
 
-        // Assign to Step 2
+        // // Assign to Step 2
         cy.contains("Step 2").click();
         cy.contains("Add to my to do list").click();
         cy.contains("TASK ADDED").should("be.visible");
-        cy.get("span[type='close']").first().click({ force: true });
+        cy.get(".MuiSnackbar-root span svg").click({ force: true });
         cy.contains("ASSIGNEE");
-        cy.get("span[type='close']").last().click({ force: true });
+        cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+          .first()
+          .click({
+            force: true,
+          });
 
-        // avatar should appear 3x. Once in the header, and twice for the assignments
+        // // avatar should appear 3x. Once in the header, and twice for the assignments
         cy.get(".MuiAvatar-img").should("have.length", 3);
 
         cy.contains("Your to do list").click();
@@ -46,7 +54,7 @@ describe("tasks", () => {
         cy.contains("Milestone A").click();
         cy.contains("Step 1").click();
         cy.contains("Mark task complete").click();
-        cy.get('span[type="checkCircle"]').should("be.visible");
+        cy.get("span.completedTask").should("be.visible");
 
         cy.contains("Visioning").click();
         cy.contains("Working on 1 of 2 remaining tasks").should("be.visible");
@@ -103,7 +111,7 @@ describe("tasks", () => {
         cy.contains("Step 1").click();
         cy.contains("Mark incomplete").click();
         cy.contains("Remove from to do list").click();
-        cy.get('span[type="checkCircle"]').should("not.exist");
+        cy.get("span.completedTask").should("not.exist");
       });
 
       it("should move a milestone from Up Next to To Do when prerequisites are complete", () => {
@@ -118,12 +126,11 @@ describe("tasks", () => {
         cy.contains("Add to my to do list").click();
         cy.contains("Option 1").click();
         cy.contains("Make final decision").click();
-        cy.get("span[type='close']").first().click();
         cy.contains("Visioning").click();
         // Milestone B-2 should now be in the To Do section
         cy.contains("Milestone B-2")
           .prev()
-          .get("span[type='rightArrowCircle']")
+          .get("span.rightArrowCircle")
           .should("be.visible");
       });
     });
@@ -134,12 +141,20 @@ describe("tasks", () => {
         cy.contains("Milestone B-1").click();
         cy.contains("Decision Step 1").click();
         cy.contains("Add to my to do list").click();
-        cy.get("span[type='close']").first().click();
+        cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+          .first()
+          .click({
+            force: true,
+          });
 
         // Check that you can access decision in the to do list
         cy.contains("Your to do list").click();
         cy.contains("Decision Step 1").click();
-        cy.get("span[type='close']").first().click();
+        cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+          .first()
+          .click({
+            force: true,
+          });
 
         // Check that you can select an option and submit
         cy.contains("Visioning").click();
@@ -174,8 +189,12 @@ describe("tasks", () => {
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("ASSIGNEE");
-      cy.get("span[type='close']").last().click({ force: true });
-      cy.get("span[type='close']").first().click({ force: true });
+      cy.get(".MuiSnackbar-root span svg").click({ force: true });
+      cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+        .first()
+        .click({
+          force: true,
+        });
       cy.get(".MuiAvatar-img").should("have.length", 2); //once in the header and once in the assignment
       cy.logout();
 
@@ -192,8 +211,12 @@ describe("tasks", () => {
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("ASSIGNEE");
-      cy.get("span[type='close']").last().click({ force: true });
-      cy.get("span[type='close']").first().click({ force: true });
+      cy.get(".MuiSnackbar-root span svg").click({ force: true });
+      cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+        .first()
+        .click({
+          force: true,
+        });
       cy.get(".MuiAvatar-img").should("have.length", 3); //once in the header and twice in the assignment
       cy.logout();
     });
@@ -209,7 +232,7 @@ describe("tasks", () => {
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
-      cy.get('span[type="checkCircle"]').should("be.visible");
+      cy.get("span.completedTask").should("be.visible");
       cy.logout();
 
       // login as partner 2 and navigate to that same step and check that partner's avatar icon appears
@@ -219,11 +242,11 @@ describe("tasks", () => {
       cy.visit("/ssj");
       cy.contains("Visioning").click();
       cy.contains("Milestone A").click();
-      cy.get('span[type="checkCircle"]').should("have.length", 1);
+      cy.get("span.checkCircleAssignee").should("have.length", 1);
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
-      cy.get('span[type="checkCircle"]').should("have.length", 2);
+      cy.get("span.checkCircleAssignee").should("have.length", 2);
       cy.logout();
     });
 
@@ -392,7 +415,7 @@ describe("tasks", () => {
       cy.contains("Collaborative Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
-      cy.get('span[type="checkCircle"]').should("be.visible");
+      cy.get("span.completedTask").should("be.visible");
       cy.logout();
 
       // login as partner 2 and navigate to that same step and check that partner's avatar icon appears
@@ -402,7 +425,7 @@ describe("tasks", () => {
       cy.visit("/ssj");
       cy.contains("a li div p", /^Startup$/).click();
       cy.contains("Milestone D-E-F").click();
-      cy.get('span[type="checkCircle"]').should("have.length", 2);
+      cy.get("span.completedTask").should("have.length", 2);
       cy.contains("Collaborative Step 1").should(
         "have.css",
         "text-decoration-line",
@@ -424,7 +447,7 @@ describe("tasks", () => {
       cy.contains("Collaborative Step 1").click();
       cy.contains("Mark incomplete").click();
       cy.contains("Remove from to do list").click();
-      cy.get('span[type="checkCircle"]').should("not.exist");
+      cy.get("span.completedTask").should("not.exist");
       cy.logout();
     });
 
@@ -443,8 +466,12 @@ describe("tasks", () => {
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
-      cy.get('span[type="close"]').first().click();
-      cy.get('span[type="close"]').last().click();
+      cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+        .first()
+        .click({
+          force: true,
+        });
+      cy.contains("Great work!").parent().next().click();
 
       // complete second prerequisite
       cy.contains("a li div p", /^Startup$/).click();
@@ -452,8 +479,11 @@ describe("tasks", () => {
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
-      cy.get('span[type="close"]').first().click({ force: true });
-      cy.get('span[type="close"]').last().click({ force: true });
+      cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+        .first()
+        .click({
+          force: true,
+        });
 
       // check that there is no Hold up
       cy.contains("a li div p", /^Startup$/).click({ force: true });
