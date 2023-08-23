@@ -15,7 +15,7 @@ describe('login spec', () => {
     cy.get('input[name="email"]').type("test@test.com");
     cy.get('input[name="password"]').type("password");
     cy.get('button[type="submit"]').click();
-    cy.url({timeout: 60000}).should("include", "/ssj");
+    cy.get('div#headerAvatarIcon').should("be.visible");
   });
 })
 

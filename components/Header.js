@@ -161,6 +161,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
     <>
       <Avatar
         alt={userName}
+        id="headerAvatarIcon"
         hoverable
         size="sm"
         onClick={handleOpen}
