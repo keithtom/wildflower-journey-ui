@@ -75,6 +75,7 @@ describe("onboarding spec", () => {
       )
         .next()
         .next()
+        .next()
         .children()
         .first()
         .click();
@@ -136,7 +137,7 @@ describe("onboarding spec", () => {
         cy.visit("/welcome/existing-member/confirm-demographic-info");
       });
 
-      it.only("should display form", () => {
+      it("should display form", () => {
         cy.contains("language");
         cy.contains("ethnicity");
         cy.contains("LGBTQIA");
@@ -175,6 +176,7 @@ describe("onboarding spec", () => {
         )
           .next()
           .next()
+          .next()
           .children()
           .first()
           .click();
@@ -194,19 +196,12 @@ describe("onboarding spec", () => {
         cy.contains("Primary/Early Childhood").click({ force: true });
         cy.get("body").click(0, 0); // close dropdwon
 
-        cy.contains("What Age Classrooms are you interested in offering?")
-          .next()
-          .click();
-        cy.contains("Infants").click({ force: true });
-        cy.contains("Toddler").click({ force: true });
-        cy.get("body").click(0, 0); // close dropdwon
-
         cy.contains("Emerging Teacher Leader").click();
 
         cy.get('button[type="submit"]').click();
         cy.url({ timeout: 60000 }).should(
           "include",
-          "/welcome/add-profile-info"
+          "/welcome/existing-member/add-profile-info"
         );
       });
     });
