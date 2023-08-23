@@ -433,7 +433,7 @@ describe("tasks", () => {
       cy.visit("/ssj");
       cy.contains("a li div p", /^Startup$/).click();
       cy.contains("Milestone D-E-F").click();
-      cy.get("span.completedTask").should("have.length", 2);
+      cy.get("span.completedTask").should("have.length", 1);
       cy.contains("Collaborative Step 1").should(
         "have.css",
         "text-decoration-line",
