@@ -48,7 +48,13 @@ import {
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
-const StyledIcon = styled("span")`
+const StyledIcon = styled("span", {
+  shouldForwardProp: (prop) =>
+    prop !== "type" &&
+    prop !== "filled" &&
+    prop !== "hoverable" &&
+    prop !== "variant",
+})`
   width: ${({ theme }) => theme.util.buffer * 6}px;
   height: ${({ theme }) => theme.util.buffer * 6}px;
   display: flex;

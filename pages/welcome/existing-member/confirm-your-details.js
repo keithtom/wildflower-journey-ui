@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../../api/people";
+import useAuth from "@lib/utils/useAuth";
 
 import {
   Button,
@@ -94,6 +95,8 @@ const ConfirmYourDetails = ({}) => {
 
   const isExistingTL = false;
   const introducerProfilePic = "/assets/images/placeholder-flower.png";
+
+  useAuth("/login");
 
   // console.log({ errors });
   // console.log({ currentUser });

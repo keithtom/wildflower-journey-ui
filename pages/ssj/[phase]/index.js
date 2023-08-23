@@ -7,6 +7,7 @@ import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
+import useAuth from "@lib/utils/useAuth";
 import {
   PageContainer,
   Typography,
@@ -37,6 +38,8 @@ const PhasePage = ({
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
   const startupHero = "/assets/images/ssj/startup.jpg";
+
+  useAuth("/login");
 
   return (
     <>

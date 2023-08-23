@@ -67,10 +67,17 @@ const Milestone = ({
                     <Icon type="circle" variant="lightened" />
                   )}
                   {status === "in progress" && (
-                    <Icon type="rightArrowCircleSolid" variant="lightened" />
+                    <Icon
+                      type="rightArrowCircleSolid"
+                      variant="lightened"
+                    />
                   )}
                   {status === "to do" && (
-                    <Icon type="rightArrowCircle" variant="primary" />
+                    <Icon
+                      className="rightArrowCircle"
+                      type="rightArrowCircle"
+                      variant="primary"
+                    />
                   )}
                 </Grid>
                 <Typography

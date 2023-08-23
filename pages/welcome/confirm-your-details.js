@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
 import { clearLoggedInState } from "@lib/handleLogout";
+import useAuth from "@lib/utils/useAuth";
 
 import {
   Button,
@@ -103,6 +104,8 @@ const ConfirmYourDetails = ({}) => {
 
   const isExistingTL = false;
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+
+  useAuth("/login");
 
   // console.log({ errors });
   // console.log({ currentUser });

@@ -1,7 +1,14 @@
 import { default as MaterialCard } from "@mui/material/Card";
 import { styled, css } from "@mui/material/styles";
 
-const CustomCard = styled(MaterialCard)`
+const CustomCard = styled(MaterialCard, {
+  shouldForwardProp: (prop) =>
+    prop !== "elevated" &&
+    prop !== "noPadding" &&
+    prop !== "hoverable" &&
+    prop !== "noBorder" &&
+    prop !== "noRadius",
+})`
   border-radius: ${({ theme }) => theme.radius.lg}px;
   border: 1px solid ${({ theme }) => theme.color.neutral.main};
   padding: ${({ theme }) => theme.util.buffer * 6}px;
@@ -101,12 +108,7 @@ const CustomCard = styled(MaterialCard)`
 `;
 
 const Card = ({ children, ...props }) => {
-  return (
-    <CustomCard {...props}>
-      {children}
-      {/* <CustomCardContent>{children}</CustomCardContent> */}
-    </CustomCard>
-  );
+  return <CustomCard {...props}>{children}</CustomCard>;
 };
 
 export default Card;

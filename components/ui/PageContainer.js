@@ -4,7 +4,6 @@ import { styled, css } from "@mui/material/styles";
 import { user } from "../../lib/utils/fake-data";
 import { theme } from "../../styles/theme";
 
-import { useUserContext } from "@lib/useUserContext";
 import { Box, Grid, Card, Stack, Icon, Typography, Spinner } from "./index";
 import Nav from "../Nav";
 import Header from "../Header";
@@ -24,7 +23,6 @@ const PageContent = styled(Box)`
 const PageContainer = ({ children, isLoading, hideNav }) => {
   //TODO: Get this data from the backend
   const SSJAbandonProcessStarted = false;
-  const { currentUser } = useUserContext();
 
   const [navOpen, setNavOpen] = useState(false);
   const toggleNavOpen = () => setNavOpen(!navOpen);
@@ -64,7 +62,7 @@ const PageContainer = ({ children, isLoading, hideNav }) => {
         ) : (
           <>
             <Header toggleNavOpen={toggleNavOpen} user={user} />
-            {hideNav || !currentUser ? null : (
+            {hideNav ? null : (
               <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
             )}
             <PageContent>

@@ -126,6 +126,7 @@ const School = ({}) => {
   // console.log({ isMySchool });
   // console.log({ included });
   // console.log({ schoolLeaders });
+  // console.log({ school });
 
   return (
     <>
@@ -312,21 +313,6 @@ const EditProfileModal = ({
   mutate,
   setEditProfileModalOpen,
 }) => {
-  // city
-  // state
-  // openDate
-  // agesServed
-  // governance
-  // maxEnrollment
-
-  // TODO: Images?
-  // logo
-  // banner / hero
-
-  // TODO: People? Via directory?
-  // leadership
-  // board members
-
   const [city, setCity] = useState(address?.attributes?.city);
   const handleCityChange = (event) => {
     setCity(event.target.value);

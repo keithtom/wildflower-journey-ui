@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
 
+import useAuth from "@lib/utils/useAuth";
 import { useUserContext } from "@lib/useUserContext";
 import {
   Button,
@@ -29,6 +30,7 @@ const StyledHeroText = styled(Box)`
 
 const ExistingTL = ({}) => {
   const { currentUser } = useUserContext();
+  useAuth("/login");
   // console.log(currentUser);
   return (
     <PageContainer hideNav>

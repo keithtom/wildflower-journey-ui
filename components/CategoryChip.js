@@ -3,8 +3,8 @@ import { theme } from "../styles/theme";
 import ssj_categories from "@lib/ssj/categories";
 
 const CategoryChip = ({ category, withIcon, ...props }) => {
-  console.log("Category chip props", category, withIcon, props)
-  
+  // console.log("Category chip props", category, withIcon, props)
+
   const categories = {
     [ssj_categories.ALBUMS_ADVICE]: theme.color.highlights.pink,
     [ssj_categories.FINANCE]: theme.color.highlights.brown,

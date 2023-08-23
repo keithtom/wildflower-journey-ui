@@ -10,6 +10,7 @@ import { parseISO } from "date-fns";
 import ssjApi from "@api/ssj/ssj";
 import processesApi from "@api/workflow/processes";
 import { useUserContext } from "@lib/useUserContext";
+import useAuth from "@lib/utils/useAuth";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Milestone from "../../components/Milestone";
 import Task from "../../components/Task";
@@ -104,7 +105,9 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
-  console.log({ currentUser });
+  useAuth("/login");
+
+  // console.log({ currentUser });
 
   return (
     <>
@@ -290,13 +293,11 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                     >
                       <Stack spacing={2}>
                         {milestonesToDo.map((m, i) => (
-                          <Link href={`/ssj/${m.attributes.phase}/${m.id}`}>
-                            <Card
-                              variant="light"
-                              size="small"
-                              key={i}
-                              hoverable
-                            >
+                          <Link
+                            href={`/ssj/${m.attributes.phase}/${m.id}`}
+                            key={i}
+                          >
+                            <Card variant="light" size="small" hoverable>
                               <Stack
                                 direction="row"
                                 alignItems="center"
@@ -338,8 +339,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
               </Grid>
               <Grid container spacing={3} alignItems="stretch">
                 {partners && partners.length ? (
-                  partners.map((p) => (
-                    <Grid item xs={12} sm={4}>
+                  partners.map((p, i) => (
+                    <Grid item xs={12} sm={4} key={i}>
                       <UserCard
                         key={p.id}
                         firstName={p.attributes.firstName}
@@ -488,7 +489,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 setUnlocked={toggleOnboardingWaysToWork}
               />
             )}
-            {/* {userOnboardedPeers ? (
+            {userOnboardedPeers ? (
               <Card variant="lightened" size="large">
                 <Grid
                   container
@@ -499,7 +500,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                   <Grid item>
                     <Stack>
                       <Typography variant="h3" bold>
-                        There are 22 other Emerging Teacher Leaders
+                        There are 7 other Emerging Teacher Leaders
                       </Typography>
                       <Typography variant="bodyRegular" lightened>
                         Get to know a growing number of Emerging Teacher Leaders
@@ -509,11 +510,11 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                   </Grid>
                   <Grid item>
                     <Stack direction="row" spacing={6}>
-                      <AvatarGroup>
+                      {/* <AvatarGroup>
                         {FakeETLs.slice(0, 4).map((f, i) => (
                           <Avatar src={f.attributes.profileImage} key={i} />
                         ))}
-                      </AvatarGroup>
+                      </AvatarGroup> */}
                       <Button onClick={() => setViewEtlsModalOpen(true)}>
                         <Typography variant="h4" bold light>
                           Meet your peers
@@ -533,7 +534,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                 img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
                 setUnlocked={toggleOnboardingPeers}
               />
-            )} */}
+            )}
           </Stack>
         )}
       </PageContainer>
@@ -769,13 +770,14 @@ const WaysToWorkCard = ({ waysToWork }) => {
 const ETLs = ({}) => {
   return (
     <Grid container spacing={3}>
-      {FakeETLs.slice(0, 4).map((f, i) => (
+      {FakeETLs.map((f, i) => (
         <Grid item xs={12} sm={6} key={i}>
           <UserCard
             firstName={f.attributes.firstName}
             lastName={f.attributes.lastName}
             role={f.roles[0]}
             profileImage={f.attributes.profileImage}
+            email={f.attributes.email}
           />
         </Grid>
       ))}
@@ -852,18 +854,6 @@ const ViewEtlsModal = ({ toggle, open }) => {
   return (
     <Modal title="Meet your peers" toggle={toggle} open={open}>
       <Stack spacing={3}>
-        <Card variant="primaryLightened">
-          <Stack alignItems="center" justifyContent="center" spacing={3}>
-            <Typography variant="h4" highlight bold>
-              Get to know {FakeETLs.length} other Emerging Teacher Leaders
-            </Typography>
-            <Typography variant="bodyRegular" highlight center>
-              Everyone shown here has opted in to being open to connecting with
-              other Emerging Teacher Leaders such as yourself! Reach out and
-              build your community.
-            </Typography>
-          </Stack>
-        </Card>
         <ETLs />
       </Stack>
     </Modal>
@@ -1140,51 +1130,66 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
 
 const FakeETLs = [
   {
-    id: "2601-8f69",
     type: "person",
     roles: ["Emerging Teacher Leader"],
     attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Brett",
-      lastName: "Vincent",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/men/2.jpg",
+      email: "anedd28@gmail.com ",
+      firstName: "Adassa",
+      lastName: "Brutus",
     },
   },
   {
-    id: "2601-8f69",
     type: "person",
     roles: ["Emerging Teacher Leader"],
     attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Mary",
-      lastName: "Truman",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/men/50.jpg",
+      email: "chip@pinyonmontessori.org",
+      firstName: "Chip",
+      lastName: "Reichanadter",
     },
   },
   {
-    id: "2601-8f69",
     type: "person",
     roles: ["Emerging Teacher Leader"],
     attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Bobby",
-      lastName: "Smith",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/men/15.jpg",
+      email: "yolson@gmail.com",
+      firstName: "Jarrett",
+      lastName: "Yoliswa",
     },
   },
   {
-    id: "2601-8f69",
     type: "person",
     roles: ["Emerging Teacher Leader"],
     attributes: {
-      email: "noel_trantow@homenick.net",
-      firstName: "Alice",
-      lastName: "Tufts",
-      phone: "(917) 123-4567",
-      profileImage: "https://randomuser.me/api/portraits/women/43.jpg",
+      email: "jennifer.irvingg@gmail.com",
+      firstName: "Jennifer",
+      lastName: "Irving",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "anneldesir@gmail.com",
+      firstName: "Anne",
+      lastName: "Desir",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "caitlin.reusche@gmail.com",
+      firstName: "Caitlin",
+      lastName: "Reusche",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "allison.bizon@gmail.com",
+      firstName: "Alli",
+      lastName: "Bizon",
     },
   },
 ];

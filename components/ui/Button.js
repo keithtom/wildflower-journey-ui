@@ -1,7 +1,10 @@
 import { default as MaterialButton } from "@mui/material/Button";
 import { styled, css } from "@mui/material/styles";
 
-const CustomButton = styled(MaterialButton)`
+const CustomButton = styled(MaterialButton, {
+  shouldForwardProp: (prop) =>
+    prop !== "full" && prop !== "small" && prop !== "disabled",
+})`
   padding: ${({ theme }) => theme.util.buffer * 3}px
     ${({ theme }) => theme.util.buffer * 6}px;
   border-radius: ${({ theme }) => theme.radius.full}px;

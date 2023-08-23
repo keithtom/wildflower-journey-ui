@@ -23,6 +23,7 @@ import {
   Spinner,
 } from "@ui";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
+import useAuth from "@lib/utils/useAuth";
 
 const Network = () => {
   const { query, setQuery, filters, setFilters, results, isSearching, error } =
@@ -40,6 +41,8 @@ const Network = () => {
 
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
+
+  useAuth("/login");
 
   // console.log({ results });
   // console.log({ currentUser });

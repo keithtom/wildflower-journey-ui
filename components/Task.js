@@ -283,6 +283,7 @@ const Task = ({
                   <Icon
                     type={taskIsComplete ? "checkCircle" : "circleSolid"}
                     variant={taskIsComplete ? "primary" : "lightest"}
+                    className={taskIsComplete ? "completedTask" : "uncompletedTask"}
                   />
                   <Typography
                     variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
@@ -315,6 +316,7 @@ const Task = ({
                     badgeContent={
                       assignee?.attributes?.completedAt && (
                         <Icon
+                          className="checkCircleAssignee"
                           type="checkCircle"
                           size="small"
                           variant="primary"
@@ -440,7 +442,7 @@ const DecisionDrawerActions = ({
               <Typography variant="bodyRegular" bold>
                 {decisionQuestion}
               </Typography>
-              <RadioGroup value={selectedDecisionOption} handleOptionsChange>
+              <RadioGroup value={selectedDecisionOption}>
                 {decisionOptions.map((o, i) => (
                   <FormControlLabel
                     key={o.id}

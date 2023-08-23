@@ -94,8 +94,9 @@ const InfoDrawer = ({
                       ASSIGNEE
                     </Typography>
                     <Stack spacing={2} direction="row">
-                      {assignees.map((assignee) => (
+                      {assignees.map((assignee, i) => (
                         <AvatarWrapper
+                          key={i}
                           badgeContent={
                             assignee.attributes.completedAt && (
                               <Icon

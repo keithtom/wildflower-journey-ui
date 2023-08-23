@@ -16,6 +16,7 @@ import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import { getCookie } from "cookies-next";
 import assignmentsApi from "@api/workflow/assignments";
 import processesApi from "@api/workflow/processes";
+import useAuth from "@lib/utils/useAuth";
 
 const ToDoList = ({ steps, milestonesToDo }) => {
   const [assignedSteps, setAssignedSteps] = useState(steps);
@@ -28,6 +29,7 @@ const ToDoList = ({ steps, milestonesToDo }) => {
 
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 
+  useAuth("/login");
   // console.log({ assignedSteps });
 
   return (
@@ -85,8 +87,8 @@ const ToDoList = ({ steps, milestonesToDo }) => {
                 >
                   <Stack spacing={2}>
                     {milestonesToDo.map((m, i) => (
-                      <Link href={`/ssj/${m.attributes.phase}/${m.id}`}>
-                        <Card variant="light" size="small" key={i} hoverable>
+                      <Link href={`/ssj/${m.attributes.phase}/${m.id}`} key={i}>
+                        <Card variant="light" size="small" hoverable>
                           <Stack
                             direction="row"
                             alignItems="center"

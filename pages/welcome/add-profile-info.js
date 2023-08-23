@@ -20,6 +20,7 @@ import axios from "axios";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
 import { clearLoggedInState } from "@lib/handleLogout";
+import useAuth from "@lib/utils/useAuth";
 
 const token = getCookie("auth");
 
@@ -117,6 +118,8 @@ const AddProfileInfo = ({}) => {
 
   const isExistingTL = false;
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+
+  useAuth("/login");
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
