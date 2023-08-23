@@ -382,7 +382,11 @@ describe("tasks", () => {
       cy.contains("Collaborative Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("ASSIGNEE");
-      cy.get("span[type='close']").last().click({ force: true });
+      cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+        .first()
+        .click({
+          force: true,
+        });
       cy.get(".MuiAvatar-img").should("have.length", 2); //once in the header and once in the assignment
       cy.logout();
 
@@ -399,7 +403,11 @@ describe("tasks", () => {
       cy.contains("Collaborative Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("ASSIGNEE");
-      cy.get("span[type='close']").last().click({ force: true });
+      cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+        .first()
+        .click({
+          force: true,
+        });
       cy.get(".MuiAvatar-img").should("have.length", 3); //once in the header and twice in the assignment
       cy.logout();
     });
