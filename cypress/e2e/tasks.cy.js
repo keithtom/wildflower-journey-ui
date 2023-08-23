@@ -178,7 +178,7 @@ describe("tasks", () => {
       });
     });
 
-    it.only("can be assigned to both partners", () => {
+    it("can be assigned to both partners", () => {
       // login as partner 1 and assign task to themselves. check that avatar icon appears
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");

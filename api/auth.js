@@ -44,12 +44,15 @@ async function tokenAuth(token) {
     maxAge: 60 * 60 * 24 * 30,
   });
   const userAttributes = response.data.data.attributes;
-  setCookie("workflowId", userAttributes.ssj.workflowId, {
-    maxAge: 60 * 60 * 24 * 30,
-  });
-  setCookie("phase", userAttributes.ssj.currentPhase, {
-    maxAge: 60 * 60 * 24 * 30,
-  });
+
+  if (response.data.data.attributes.ssj) {
+    setCookie("workflowId", userAttributes.ssj.workflowId, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+    setCookie("phase", userAttributes.ssj.currentPhase, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  }
 
   return response;
 }

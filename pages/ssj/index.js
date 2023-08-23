@@ -1290,6 +1290,14 @@ export async function getServerSideProps({ params, req, res }) {
   }
 
   const workflowId = getCookie("workflowId", { req, res });
+  if (!workflowId) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/network",
+      },
+    };
+  }
 
   // turn this in to a catch all api for the ssj/dashboard
   let responseProgress;
