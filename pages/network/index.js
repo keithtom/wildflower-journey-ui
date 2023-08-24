@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
+import { styled, css } from "@mui/material/styles";
 
 import getAuthHeader from "@lib/getAuthHeader";
 import { useUserContext } from "@lib/useUserContext";
@@ -29,6 +30,7 @@ const Network = () => {
   const { query, setQuery, filters, setFilters, results, isSearching, error } =
     useSearch();
   const [category, setCategory] = useState("people");
+  const [userQuery, setUserQuery] = useState("");
   const { currentUser } = useUserContext();
 
   const handleCategoryChange = (e) => {
@@ -37,13 +39,26 @@ const Network = () => {
   };
 
   if (error) return <PageContainer>failed to load</PageContainer>;
-  const noResults = query && results.length === 0;
+  const noResults = userQuery && results.length === 0;
 
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
 
   useAuth("/login");
 
+  useEffect(() => {
+    if (userQuery === "") {
+      setQuery("*");
+    } else {
+      setQuery(userQuery);
+    }
+  }, [userQuery]);
+  useEffect(() => {
+    setQuery("*");
+  }, []);
+
+  // console.log(isSearching);
+  // console.log({ query });
   // console.log({ results });
   // console.log({ currentUser });
 
@@ -62,9 +77,9 @@ const Network = () => {
               placeholder="Search for something..."
               endAdornment={<Icon type="search" variant="lightened" />}
               onChange={(e) => {
-                setQuery(e.target.value);
+                setUserQuery(e.target.value);
               }}
-              value={query}
+              value={userQuery}
             />
           </Grid>
         </Grid>
@@ -128,7 +143,7 @@ const Network = () => {
                       lastName={f.attributes.lastName}
                       roles={f.attributes.roleList}
                       location={f.attributes.location}
-                      trainingLevel={f.attributes.trainingLevel}
+                      trainingLevel={f.attributes.montessoriCertifiedLevelList}
                       schoolLogo={f.attributes.school?.logoUrl}
                       schoolLink={`/network/schools/${f.attributes.school?.id}`}
                       key={f.id}
@@ -160,7 +175,7 @@ const Network = () => {
                 mt={16}
               >
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                  {isSearching ? (
+                  {isSearching || (!results.length && !noResults) ? (
                     <Grid container justifyContent="center">
                       <Grid item>
                         <Spinner />
