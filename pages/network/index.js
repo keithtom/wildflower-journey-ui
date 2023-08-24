@@ -47,17 +47,19 @@ const Network = () => {
   useAuth("/login");
 
   useEffect(() => {
-    setQuery("*");
     if (userQuery === "") {
       setQuery("*");
     } else {
       setQuery(userQuery);
     }
   }, [userQuery]);
+  useEffect(() => {
+    setQuery("*");
+  }, []);
 
-  console.log(isSearching);
-  console.log({ query });
-  console.log({ results });
+  // console.log(isSearching);
+  // console.log({ query });
+  // console.log({ results });
   // console.log({ currentUser });
 
   return (
@@ -141,7 +143,7 @@ const Network = () => {
                       lastName={f.attributes.lastName}
                       roles={f.attributes.roleList}
                       location={f.attributes.location}
-                      trainingLevel={f.attributes.trainingLevel}
+                      trainingLevel={f.attributes.montessoriCertifiedLevelList}
                       schoolLogo={f.attributes.school?.logoUrl}
                       schoolLink={`/network/schools/${f.attributes.school?.id}`}
                       key={f.id}
