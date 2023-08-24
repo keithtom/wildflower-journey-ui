@@ -35,6 +35,16 @@ const CustomChip = styled(MaterialChip, {
         background: ${props.theme.color.primary.darkened};
       }
     `}
+  /* PrimaryLightened */
+  ${(props) =>
+    props.variant === "primaryLightened" &&
+    css`
+      background: ${props.theme.color.primary.lightest};
+      color: ${props.theme.color.text.main};
+      &:hover {
+        background: ${props.theme.color.primary.lightest};
+      }
+    `}
 
   /* Filled */
   ${(props) =>

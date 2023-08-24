@@ -112,7 +112,7 @@ const Network = () => {
           </Grid>
           <Grid item flex={1}>
             <Grid container spacing={2}>
-              {FakeFilters.map((f, i) =>
+              {Filters.map((f, i) =>
                 f.doNotDisplayFor === category ? null : (
                   <Grid item key={i}>
                     <FilterMultiSelect
@@ -162,6 +162,7 @@ const Network = () => {
                       location={f.attributes.location}
                       agesServed={f.attributes.agesServedList}
                       leaders={f.attributes.leaders || []}
+                      // charter={f.attributes.charter} TODO: Return from backend and use here
                       key={f.id}
                     />
                   ))}
@@ -318,6 +319,7 @@ const SchoolResultItem = ({
   location,
   agesServed,
   leaders,
+  charter,
 }) => {
   return (
     <Link href={schoolLink && schoolLink}>
@@ -363,6 +365,29 @@ const SchoolResultItem = ({
                       <Chip label={a} size="small" />
                     </Grid>
                   ))}
+                {charter && (
+                  <Grid item xs={12}>
+                    <Chip
+                      label={
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Icon
+                            type="shapePolygon"
+                            size="small"
+                            variant="primary"
+                          />
+                          <Typography variant="bodyMini" bold highlight>
+                            CHARTER
+                          </Typography>
+                          <Typography variant="bodyMini" bold>
+                            {charter}
+                          </Typography>
+                        </Stack>
+                      }
+                      size="small"
+                      variant="primaryLightened"
+                    />
+                  </Grid>
+                )}
               </Grid>
             </Stack>
           </Card>
@@ -372,7 +397,7 @@ const SchoolResultItem = ({
   );
 };
 
-const FakeFilters = [
+const Filters = [
   {
     title: "State",
     param: "people_filters[address_state]",
@@ -440,16 +465,6 @@ const FakeFilters = [
       { label: "More than 5 years", value: "More than 5 years" },
     ],
   },
-  // {
-  //   title: "Program",
-  //   doNotDisplayFor: "people",
-  //   options: [
-  //     { label: "1", value: "1" },
-  //     { label: "2", value: "2" },
-  //     { label: "3", value: "3" },
-  //     { label: "4", value: "4" },
-  //   ],
-  // },
   {
     title: "Age level",
     param: "school_filters[age_levels]",
@@ -464,16 +479,7 @@ const FakeFilters = [
       { value: "High School", label: "High School" },
     ],
   },
-  // {
-  //   title: "Capacity",
-  //   doNotDisplayFor: "people",
-  //   options: [
-  //     { label: "1", value: "1" },
-  //     { label: "2", value: "2" },
-  //     { label: "3", value: "3" },
-  //     { label: "4", value: "4" },
-  //   ],
-  // },
+
   {
     title: "Language",
     param: "people_filters[languages]",
@@ -544,26 +550,6 @@ const FakeFilters = [
       { label: "District", value: "District" },
     ],
   },
-  // {
-  //   title: "Affinity groups",
-  //   doNotDisplayFor: "schools",
-  //   options: [
-  //     { label: "1", value: "1" },
-  //     { label: "2", value: "2" },
-  //     { label: "3", value: "3" },
-  //     { label: "4", value: "4" },
-  //   ],
-  // },
-  // {
-  //   title: "Pronouns",
-  //   doNotDisplayFor: "schools",
-  //   options: [
-  //     { label: "1", value: "1" },
-  //     { label: "2", value: "2" },
-  //     { label: "3", value: "3" },
-  //     { label: "4", value: "4" },
-  //   ],
-  // },
 
   {
     title: "Ethnicity",
@@ -621,6 +607,26 @@ const FakeFilters = [
       { label: "Emerging Teacher Leader", value: "Emerging Teacher Leader" },
       { label: "Foundation Partner", value: "Foundation Partner" },
       { label: "Charter Staff", value: "Charter Staff" },
+    ],
+  },
+  {
+    title: "Charter",
+    param: "school_filters[charter]",
+    doNotDisplayFor: "people",
+    options: [
+      {
+        label: "Minnesota Wildflower Montessori School",
+        value: "Minnesota Wildflower Montessori School",
+      },
+      { label: "Colorado Charter", value: "Colorado Charter" },
+      {
+        label: "Wildflower New York Charter School",
+        value: "Wildflower New York Charter School",
+      },
+      {
+        label: "DC Wildflower Public Charter School",
+        value: "DC Wildflower Public Charter School",
+      },
     ],
   },
 ];
