@@ -121,6 +121,7 @@ const School = ({}) => {
     school.relationships.people.data,
     "id"
   );
+  const isCharter = false; //TODO: Check whether the school attributes include charter data
 
   // console.log({ currentUser });
   // console.log({ isMySchool });
@@ -159,6 +160,30 @@ const School = ({}) => {
                     governance={school?.attributes?.governanceType}
                     maxEnrollment={school?.attributes?.maxEnrollment}
                   />
+                ) : null}
+                {isCharter ? (
+                  <Card variant="primaryLightened" size="small">
+                    <Grid
+                      container
+                      justifyContent="space-between"
+                      alignItems="center"
+                      spacing={3}
+                    >
+                      <Grid item>
+                        <Icon type="shapePolygon" variant="primary" />
+                      </Grid>
+                      <Grid item flex={1}>
+                        <Stack>
+                          <Typography variant="bodySmall" bold highlight>
+                            CHARTER
+                          </Typography>
+                          <Typography variant="bodyRegular">
+                            DC Wildflower Public Charter School
+                          </Typography>
+                        </Stack>
+                      </Grid>
+                    </Grid>
+                  </Card>
                 ) : null}
 
                 {isMySchool ? (
@@ -217,6 +242,48 @@ const School = ({}) => {
                       <Typography variant="bodyLarge">
                         {school?.attributes?.about}
                       </Typography>
+                    </Stack>
+                  ) : null}
+                  {/*TODO: Related charters . length (they could be a charter, but the only charter) */}
+                  {isCharter ? (
+                    <Stack spacing={3}>
+                      <Typography variant="h4" bold>
+                        Our Charter Community
+                      </Typography>
+                      {/* TODO: Map through other charter schools in same group*/}
+                      <Link href="">
+                        {" "}
+                        {/* TODO: Link using id of charter */}
+                        <Card size="small">
+                          <Grid
+                            container
+                            alignItems="center"
+                            justifyContent="space-between"
+                          >
+                            <Grid item>
+                              <Stack
+                                direction="row"
+                                spacing={3}
+                                alignItems="center"
+                              >
+                                <Avatar src="" />
+                                <Stack>
+                                  <Typography variant="bodyLarge">
+                                    Washington DC Montessori{" "}
+                                    {/*TODO: Charter name */}
+                                  </Typography>
+                                  <Typography variant="bodyRegular" lightened>
+                                    Washington DC {/*TODO: Charter location */}
+                                  </Typography>
+                                </Stack>
+                              </Stack>
+                            </Grid>
+                            <Grid item>
+                              <Icon type="chevronRight" variant="lightened" />
+                            </Grid>
+                          </Grid>
+                        </Card>
+                      </Link>
                     </Stack>
                   ) : null}
 
