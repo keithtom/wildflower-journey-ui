@@ -42,3 +42,27 @@ describe("visiting website for the first time via email link", () => {
     })
   })
 })
+
+// https://trello.com/c/wQZS62F9/393-error-message-when-getting-invited-to-network
+describe("existing member visiting website, invite from network (no ssj)", () => {
+  it("should authenticate and redirect to onboarding", () => {
+    cy.request({
+      method: "GET",
+      url: `${Cypress.env("apiUrl")}/network_invite_email_link`,
+      body: {
+        email: `cypress_test_${Date.now()}@test.com`,
+      },
+    }).then((resp) => {
+      cy.visit(resp.body.invite_url);
+      cy.url({ timeout: 20000 }).should("include", "/welcome/existing-member");
+      cy.getCookies()
+        .should("have.length.of.at.most", 2)
+        .should((cookies) => {
+          const authCookie = cookies.find((cookie) => {
+            return cookie.name === "auth";
+          });
+          expect(authCookie).to.not.be.undefined;
+        });
+    });
+  });
+});
