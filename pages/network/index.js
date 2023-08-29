@@ -27,8 +27,19 @@ import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
 
 const Network = () => {
-  const { query, setQuery, filters, setFilters, results, isSearching, error } =
-    useSearch();
+  const {
+    query,
+    setQuery,
+    filters,
+    setFilters,
+    results,
+    isSearching,
+    error,
+    currentPage,
+    handlePageChange,
+    perPage,
+    setPerPage,
+  } = useSearch();
   const [category, setCategory] = useState("people");
   const [userQuery, setUserQuery] = useState("");
   const { currentUser } = useUserContext();
@@ -57,9 +68,11 @@ const Network = () => {
     setQuery("*");
   }, []);
 
+  // console.log("perPage", perPage);
+  // console.log(currentPage);
+  // console.log({ results });
   // console.log(isSearching);
   // console.log({ query });
-  // console.log({ results });
   // console.log({ currentUser });
 
   return (

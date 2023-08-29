@@ -8,6 +8,8 @@ const useSearch = () => {
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   // cache for query and params.  use SWR for duplicate queries later.
   // const { data, error, isLoading } = useSWR(`/api/search`, () => peopleApi.show(personId).then(res => res.data))
@@ -20,7 +22,7 @@ const useSearch = () => {
         // add url params or attach params for query and data...
         setIsSearching(true);
         searchApi
-          .search(query, filters)
+          .search(query, filters, { page: currentPage, perPage })
           .then((res) => {
             setIsSearching(false);
             setResults(res.data.data);
@@ -33,9 +35,25 @@ const useSearch = () => {
       fetch();
     }, 1000);
     return () => clearTimeout(timeoutId);
-  }, [query, filters]);
+  }, [query, filters, currentPage, perPage]);
 
-  return { query, setQuery, filters, setFilters, results, isSearching, error };
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  return {
+    query,
+    setQuery,
+    filters,
+    setFilters,
+    results,
+    isSearching,
+    error,
+    currentPage,
+    handlePageChange,
+    perPage,
+    setPerPage,
+  };
 };
 
 export default useSearch;
