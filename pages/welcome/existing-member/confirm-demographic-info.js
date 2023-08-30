@@ -111,6 +111,7 @@ const ConfirmDemographicInfo = ({}) => {
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
           role: person?.attributes?.roleList || [],
+          is_onboarded: true,
         });
       });
     }
