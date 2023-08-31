@@ -8,8 +8,6 @@ async function search(query, filters = {}, params = {}, config = {}) {
 
   const { page, perPage, ...otherParams } = params;
 
-  console.log("params in searchApi!!!!!", params);
-
   // add filters and params.
   const response = await searchApi.get("", {
     params: {
@@ -21,7 +19,6 @@ async function search(query, filters = {}, params = {}, config = {}) {
       per_page: perPage,
     },
   });
-  console.log("response in searchApi!!!", response);
   return response;
   // load resources from included
 }

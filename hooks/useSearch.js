@@ -9,8 +9,9 @@ const useSearch = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [allDataLoaded, setAllDataLoaded] = useState(false);
+  const [perPage, setPerPage] = useState(11);
+  const [hasMore, setHasMore] = useState(false);
+  const [noResults, setNoResults] = useState(true);
 
   // cache for query and params.  use SWR for duplicate queries later.
   // const { data, error, isLoading } = useSWR(`/api/search`, () => peopleApi.show(personId).then(res => res.data))
@@ -21,27 +22,49 @@ const useSearch = () => {
       // api call w/ query to update results
       const fetch = async () => {
         // add url params or attach params for query and data...
+
+        setIsSearching(true);
+
         if (query && query !== "" && query !== "*") {
           setResults([]);
           setCurrentPage(1);
+          setIsSearching(true);
+          setNoResults(false);
+          setHasMore(false);
         }
-        setIsSearching(true);
+
         searchApi
           .search(query, filters, { page: currentPage, perPage })
           .then((res) => {
+            const allResults = res.data.data;
+            const displayPerPage = perPage - 1;
+            const displayedResults = allResults.slice(0, displayPerPage);
+
+            if (allResults.length === 0) {
+              setNoResults(true);
+              setHasMore(false);
+            } else {
+              if (allResults.length > displayPerPage) {
+                setResults((prevResults) => {
+                  const newResults = displayedResults.filter(
+                    //don't show duplicate results
+                    (newResult) =>
+                      !prevResults.some(
+                        (prevResult) => prevResult.id === newResult.id
+                      )
+                  );
+                  return [...prevResults, ...newResults];
+                });
+                setTimeout(() => {
+                  setHasMore(true);
+                }, 250);
+              } else if (allResults.length <= displayPerPage) {
+                setResults(allResults);
+                setHasMore(false);
+              }
+            }
+
             setIsSearching(false);
-            setResults((prevResults) => {
-              const newResults = res.data.data.filter(
-                (newResult) =>
-                  !prevResults.some(
-                    (prevResult) => prevResult.id === newResult.id
-                  )
-              );
-              return [...prevResults, ...newResults];
-            });
-            setTimeout(() => {
-              setAllDataLoaded(true);
-            }, 150);
           })
           .catch((err) => {
             setIsSearching(false);
@@ -53,6 +76,11 @@ const useSearch = () => {
     return () => clearTimeout(timeoutId);
   }, [query, filters, currentPage, perPage]);
 
+  useEffect(() => {
+    setResults([]);
+    setNoResults(false);
+  }, [filters]);
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -63,13 +91,15 @@ const useSearch = () => {
     filters,
     setFilters,
     results,
+    setResults,
     isSearching,
+    setIsSearching,
     error,
     currentPage,
     handlePageChange,
+    hasMore,
+    noResults,
     perPage,
-    setPerPage,
-    allDataLoaded,
   };
 };
 
