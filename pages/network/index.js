@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
 import { styled, css } from "@mui/material/styles";
+import { useInView } from "react-intersection-observer";
 
 import getAuthHeader from "@lib/getAuthHeader";
 import { useUserContext } from "@lib/useUserContext";
@@ -22,6 +23,7 @@ import {
   Radio,
   MultiSelect,
   Spinner,
+  Button,
 } from "@ui";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
@@ -37,11 +39,11 @@ const Network = () => {
     error,
     currentPage,
     handlePageChange,
-    perPage,
-    setPerPage,
+    allDataLoaded,
   } = useSearch();
   const [category, setCategory] = useState("people");
-  const [userQuery, setUserQuery] = useState("");
+  const [userQuery, setUserQuery] = useState(null);
+  const [noResults, setNoResults] = useState(false);
   const { currentUser } = useUserContext();
 
   const handleCategoryChange = (e) => {
@@ -50,7 +52,6 @@ const Network = () => {
   };
 
   if (error) return <PageContainer>failed to load</PageContainer>;
-  const noResults = userQuery && results.length === 0;
 
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
@@ -60,13 +61,37 @@ const Network = () => {
   useEffect(() => {
     if (userQuery === "") {
       setQuery("*");
+      handlePageChange(1);
     } else {
       setQuery(userQuery);
     }
   }, [userQuery]);
+
   useEffect(() => {
     setQuery("*");
   }, []);
+
+  useEffect(() => {
+    if (allDataLoaded && !isSearching && results.length === 0) {
+      setNoResults(true);
+    } else {
+      setNoResults(false);
+    }
+  }, [results, allDataLoaded]);
+
+  const { ref, inView } = useInView({
+    threshold: 0,
+    triggerOnce: true,
+  });
+
+  const handleFetchNewResults = () => {
+    if (inView) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+  useEffect(() => {
+    handleFetchNewResults();
+  }, [inView]);
 
   // console.log("perPage", perPage);
   // console.log(currentPage);
@@ -74,6 +99,8 @@ const Network = () => {
   // console.log(isSearching);
   // console.log({ query });
   // console.log({ currentUser });
+  // console.log({ allDataLoaded });
+  // console.log({ inView });
 
   return (
     <>
@@ -144,40 +171,56 @@ const Network = () => {
           {results.length ? (
             <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={6}>
               {category === "people"
-                ? results.map((f) => (
-                    <PersonResultItem
-                      personLink={`/network/people/${f.id}`}
-                      profileImg={
-                        f.attributes.imageUrl
-                          ? f.attributes.imageUrl
-                          : profileFallback
-                      }
-                      firstName={f.attributes.firstName}
-                      lastName={f.attributes.lastName}
-                      roles={f.attributes.roleList}
-                      location={f.attributes.location}
-                      trainingLevel={f.attributes.montessoriCertifiedLevelList}
-                      schoolLogo={f.attributes.school?.logoUrl}
-                      schoolLink={`/network/schools/${f.attributes.school?.id}`}
-                      key={f.id}
-                    />
+                ? results.map((f, i) => (
+                    <>
+                      <PersonResultItem
+                        personLink={`/network/people/${f.id}`}
+                        profileImg={
+                          f.attributes.imageUrl
+                            ? f.attributes.imageUrl
+                            : profileFallback
+                        }
+                        firstName={f.attributes.firstName}
+                        lastName={f.attributes.lastName}
+                        roles={f.attributes.roleList}
+                        location={f.attributes.location}
+                        trainingLevel={
+                          f.attributes.montessoriCertifiedLevelList
+                        }
+                        schoolLogo={f.attributes.school?.logoUrl}
+                        schoolLink={`/network/schools/${f.attributes.school?.id}`}
+                        key={f.id}
+                      />
+                      {allDataLoaded && i + 1 === results.length ? (
+                        <div ref={ref} style={{ opacity: 0 }} key={i}>
+                          asdf
+                        </div>
+                      ) : null}
+                    </>
                   ))
-                : results.map((f) => (
-                    <SchoolResultItem
-                      schoolLink={`/network/schools/${f.id}`}
-                      heroImg={
-                        f.attributes.heroUrl
-                          ? f.attributes.heroUrl
-                          : schoolFallback
-                      }
-                      logoImg={f.attributes.logoUrl}
-                      name={f.attributes.name}
-                      location={f.attributes.location}
-                      agesServed={f.attributes.agesServedList}
-                      leaders={f.attributes.leaders || []}
-                      // charter={f.attributes.charter} TODO: Return from backend and use here
-                      key={f.id}
-                    />
+                : results.map((f, i) => (
+                    <>
+                      <SchoolResultItem
+                        schoolLink={`/network/schools/${f.id}`}
+                        heroImg={
+                          f.attributes.heroUrl
+                            ? f.attributes.heroUrl
+                            : schoolFallback
+                        }
+                        logoImg={f.attributes.logoUrl}
+                        name={f.attributes.name}
+                        location={f.attributes.location}
+                        agesServed={f.attributes.agesServedList}
+                        leaders={f.attributes.leaders || []}
+                        // charter={f.attributes.charter} TODO: Return from backend and use here
+                        key={f.id}
+                      />
+                      {allDataLoaded && i + 1 === results.length ? (
+                        <div ref={ref} style={{ opacity: 0 }} key={i}>
+                          asdf
+                        </div>
+                      ) : null}
+                    </>
                   ))}
             </Masonry>
           ) : (
@@ -189,13 +232,14 @@ const Network = () => {
                 mt={16}
               >
                 <Grid item xs={12} sm={6} md={4} lg={3}>
-                  {isSearching || (!results.length && !noResults) ? (
+                  {isSearching ? (
                     <Grid container justifyContent="center">
                       <Grid item>
                         <Spinner />
                       </Grid>
                     </Grid>
-                  ) : noResults ? (
+                  ) : null}
+                  {noResults ? (
                     <Card size="large">
                       <Stack spacing={3}>
                         <Icon type="flag" size="large" variant="primary" />
@@ -207,24 +251,16 @@ const Network = () => {
                         </Typography>
                       </Stack>
                     </Card>
-                  ) : (
-                    <Card size="large">
-                      <Stack spacing={3}>
-                        <Icon type="search" size="large" variant="primary" />
-                        <Typography variant="bodyLarge" bold>
-                          You haven't searched for anything yet!
-                        </Typography>
-                        <Typography variant="bodyRegular" lightened>
-                          Search for people or for schools above to see results
-                          from the My Wildflower directory!
-                        </Typography>
-                      </Stack>
-                    </Card>
-                  )}
+                  ) : null}
                 </Grid>
               </Grid>
             </Grid>
           )}
+          {/* {noResults ? null : <div ref={ref}>asdf</div>} */}
+
+          {/* <Button onClick={() => handlePageChange(currentPage + 1)}>
+            <Typography>Next</Typography>
+          </Button> */}
         </Grid>
       </PageContainer>
     </>
@@ -352,8 +388,8 @@ const SchoolResultItem = ({
           >
             {/* {logoImg && <Avatar src={logoImg} />} */}
             <AvatarGroup>
-              {leaders.map((l) => (
-                <Avatar src={l.imageSrc} size="sm" />
+              {leaders.map((l, i) => (
+                <Avatar src={l.imageSrc} size="sm" key={i} />
               ))}
             </AvatarGroup>
           </Stack>

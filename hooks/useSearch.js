@@ -10,6 +10,7 @@ const useSearch = () => {
   const [error, setError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const [allDataLoaded, setAllDataLoaded] = useState(false);
 
   // cache for query and params.  use SWR for duplicate queries later.
   // const { data, error, isLoading } = useSWR(`/api/search`, () => peopleApi.show(personId).then(res => res.data))
@@ -20,12 +21,27 @@ const useSearch = () => {
       // api call w/ query to update results
       const fetch = async () => {
         // add url params or attach params for query and data...
+        if (query && query !== "" && query !== "*") {
+          setResults([]);
+          setCurrentPage(1);
+        }
         setIsSearching(true);
         searchApi
           .search(query, filters, { page: currentPage, perPage })
           .then((res) => {
             setIsSearching(false);
-            setResults(res.data.data);
+            setResults((prevResults) => {
+              const newResults = res.data.data.filter(
+                (newResult) =>
+                  !prevResults.some(
+                    (prevResult) => prevResult.id === newResult.id
+                  )
+              );
+              return [...prevResults, ...newResults];
+            });
+            setTimeout(() => {
+              setAllDataLoaded(true);
+            }, 150);
           })
           .catch((err) => {
             setIsSearching(false);
@@ -53,6 +69,7 @@ const useSearch = () => {
     handlePageChange,
     perPage,
     setPerPage,
+    allDataLoaded,
   };
 };
 
