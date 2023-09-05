@@ -35,7 +35,6 @@ const MultiSelect = React.forwardRef(
     },
     ref
   ) => {
-    console.log(options);
     return (
       <Stack>
         <FormControl fullWidth={!props.autoWidth}>
@@ -75,11 +74,17 @@ const MultiSelect = React.forwardRef(
                   </Typography>
                 );
               }
-
+              const selectedLabels = selected.map((selectedValue) => {
+                // Find the corresponding label for the selected value
+                const selectedOption = options.find(
+                  (option) => option.value === selectedValue
+                );
+                return selectedOption ? selectedOption.label : selectedValue;
+              });
               return (
                 <Stack direction="row" spacing={1}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={value} />
+                  {selectedLabels.map((label) => (
+                    <Chip key={label} label={label} />
                   ))}
                 </Stack>
               );

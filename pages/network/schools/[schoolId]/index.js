@@ -560,7 +560,7 @@ const EditProfileModal = ({
                 withCheckbox
                 label="Ages served"
                 placeholder="Select the ages your school serves..."
-                options={agesServed.options.map((l) => l.label)}
+                options={agesServed.options.map((l) => l)}
                 error={errors.agesServed}
                 defaultValue={[]}
                 value={agesServedList}

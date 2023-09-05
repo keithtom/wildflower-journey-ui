@@ -633,7 +633,7 @@ const EditProfileModal = ({
                 withCheckbox
                 label="What is your ethnicity?"
                 placeholder="Select as many as you like..."
-                options={ethnicityOptions.map((l) => l.label)}
+                options={ethnicityOptions.map((l) => l)}
                 error={errors.raceEthnicity}
                 defaultValue={[]}
                 helperText={
@@ -858,7 +858,7 @@ const EditProfileModal = ({
                   withCheckbox
                   label="What Levels are you certified (or seeking certification) for?"
                   placeholder="Select as many as you like..."
-                  options={levelsOfMontessoriCertification.map((l) => l.label)}
+                  options={levelsOfMontessoriCertification.map((l) => l)}
                   error={errors.montessoriCertifiedLevels}
                   defaultValue={[]}
                   helperText={
@@ -881,7 +881,7 @@ const EditProfileModal = ({
                 withCheckbox
                 label="What is your role at Wildflower Schools?"
                 placeholder="Select all roles you hold..."
-                options={roleOptions.map((r) => r.label)}
+                options={roleOptions.map((r) => r)}
                 error={errors.role}
                 defaultValue={[]}
                 helperText={
