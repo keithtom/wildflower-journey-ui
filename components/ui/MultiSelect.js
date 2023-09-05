@@ -35,6 +35,7 @@ const MultiSelect = React.forwardRef(
     },
     ref
   ) => {
+    console.log(options);
     return (
       <Stack>
         <FormControl fullWidth={!props.autoWidth}>
@@ -85,12 +86,12 @@ const MultiSelect = React.forwardRef(
             }}
             {...props}
           >
-            {options.map((option) => (
-              <MenuItem key={option} value={option}>
+            {options.map((option, i) => (
+              <MenuItem key={i} value={option.value}>
                 {withCheckbox ? (
-                  <Checkbox checked={value?.indexOf(option) > -1} />
+                  <Checkbox checked={value?.indexOf(option.value) > -1} />
                 ) : null}
-                {option}
+                {option.label}
               </MenuItem>
             ))}
           </CustomMultiSelect>

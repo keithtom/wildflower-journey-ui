@@ -61,6 +61,7 @@ const Network = () => {
   // console.log({ query });
   // console.log({ results });
   // console.log({ currentUser });
+  console.log({ filters });
 
   return (
     <>
@@ -239,7 +240,7 @@ const FilterMultiSelect = ({ filter, setFilters }) => {
     <MultiSelect
       withCheckbox
       autoWidth
-      options={filter.options.map((o) => o.label)}
+      options={filter.options.map((o) => o)}
       value={filterValue}
       onChange={handleValueChange}
       placeholder={filter.title}
@@ -402,7 +403,7 @@ const Filters = [
     title: "State",
     param: "people_filters[address_state]",
     options: [
-      { label: "Alabama", value: "Alabama" },
+      { label: "Alabama", value: "AL" },
       { label: "Alaska", value: "Alaska" },
       { label: "Arizona", value: "Arizona" },
       { label: "Arkansas", value: "Arkansas" },
