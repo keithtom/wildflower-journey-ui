@@ -11,6 +11,10 @@ When code is pushed to github, integration tests are automatically run using git
 ## Running tests locally
 `yarn run cypress open`
 
+## Running tests locally against dev
+`CYPRESS_apiUrl=https://api-dev.wildflowerschools.org API_URL=https://api-dev.wildflowershcools.org yarn run cypress open`
+
+
 
 ## Resetting Database Between Tests
 Before most tests, a request is made to the API to create a new user and delete stale test users. This before hook is defined in `../cypress/support/commands.js` file and called in each test file. Note that there are two functions that reset fixtures `resetFixtures` and `resetPartnerFixtures`. 
