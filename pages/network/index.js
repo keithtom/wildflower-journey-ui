@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
 import { styled, css } from "@mui/material/styles";
+import { useInView } from "react-intersection-observer";
 
 import getAuthHeader from "@lib/getAuthHeader";
 import { useUserContext } from "@lib/useUserContext";
@@ -22,45 +23,81 @@ import {
   Radio,
   MultiSelect,
   Spinner,
+  Button,
 } from "@ui";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
 
 const Network = () => {
-  const { query, setQuery, filters, setFilters, results, isSearching, error } =
-    useSearch();
+  const {
+    query,
+    setQuery,
+    filters,
+    setFilters,
+    results,
+    setResults,
+    isSearching,
+    setIsSearching,
+    error,
+    currentPage,
+    handlePageChange,
+    hasMore,
+    noResults,
+  } = useSearch();
   const [category, setCategory] = useState("people");
-  const [userQuery, setUserQuery] = useState("");
+  const [userQuery, setUserQuery] = useState(null);
+
   const { currentUser } = useUserContext();
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-    setFilters({ ...filters, models: e.target.value });
-  };
-
   if (error) return <PageContainer>failed to load</PageContainer>;
-  const noResults = userQuery && results.length === 0;
 
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
 
   useAuth("/login");
 
+  const { ref, inView } = useInView({
+    threshold: 0,
+    triggerOnce: true,
+  });
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value);
+    setFilters({ models: e.target.value });
+    setResults([]);
+  };
+  const handleFetchNewResults = () => {
+    if (inView && results.length > 0) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+  useEffect(() => {
+    handleFetchNewResults();
+  }, [inView]);
+
   useEffect(() => {
     if (userQuery === "") {
       setQuery("*");
+      handlePageChange(1);
     } else {
       setQuery(userQuery);
     }
   }, [userQuery]);
+
   useEffect(() => {
+    setIsSearching(true);
     setQuery("*");
   }, []);
 
+  // console.log("perPage", perPage);
+  // console.log(currentPage);
   // console.log(isSearching);
   // console.log({ query });
-  // console.log({ results });
   // console.log({ currentUser });
+  // console.log({ currentUser });
+  // console.log({ results });
+  // console.log({ noResults });
+  // console.log({ inView });
+  // console.log("hasMore------------------------", hasMore);
   // console.log({ filters });
 
   return (
@@ -84,7 +121,6 @@ const Network = () => {
             />
           </Grid>
         </Grid>
-
         <Grid container alignItems="center" mb={2}>
           <Grid item xs={12} sm={1}>
             <Typography lightened>Show</Typography>
@@ -106,7 +142,6 @@ const Network = () => {
             </RadioGroup>
           </Grid>
         </Grid>
-
         <Grid container>
           <Grid item xs={12} sm={1}>
             <Typography lightened>Filter by</Typography>
@@ -127,9 +162,8 @@ const Network = () => {
             </Grid>
           </Grid>
         </Grid>
-
         <Grid container mt={12}>
-          {results.length ? (
+          {results.length > 0 && (
             <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={6}>
               {category === "people"
                 ? results.map((f) => (
@@ -168,47 +202,37 @@ const Network = () => {
                     />
                   ))}
             </Masonry>
-          ) : (
-            <Grid item xs={12}>
-              <Grid
-                container
-                alignItems="center"
-                justifyContent="center"
-                mt={16}
-              >
-                <Grid item xs={12} sm={6} md={4} lg={3}>
-                  {isSearching || (!results.length && !noResults) ? (
-                    <Grid container justifyContent="center">
-                      <Grid item>
-                        <Spinner />
-                      </Grid>
-                    </Grid>
-                  ) : noResults ? (
-                    <Card size="large">
-                      <Stack spacing={3}>
-                        <Icon type="flag" size="large" variant="primary" />
-                        <Typography variant="bodyLarge" bold>
-                          Oops! Looks like there's nothing here
-                        </Typography>
-                        <Typography variant="bodyRegular" lightened>
-                          Try a different search term or more general query!
-                        </Typography>
-                      </Stack>
-                    </Card>
-                  ) : (
-                    <Card size="large">
-                      <Stack spacing={3}>
-                        <Icon type="search" size="large" variant="primary" />
-                        <Typography variant="bodyLarge" bold>
-                          You haven't searched for anything yet!
-                        </Typography>
-                        <Typography variant="bodyRegular" lightened>
-                          Search for people or for schools above to see results
-                          from the My Wildflower directory!
-                        </Typography>
-                      </Stack>
-                    </Card>
-                  )}
+          )}
+          {hasMore && !isSearching && results.length > 0 && (
+            <div
+              ref={ref}
+              style={{ opacity: 0, width: "100%", height: "1px" }}
+            />
+          )}
+          {!hasMore && noResults && !isSearching && (
+            <Grid item xs={12} mt={24}>
+              <Grid container justifyContent="center" alignItems="center">
+                <Grid item>
+                  <Stack spacing={6} alignItems="center">
+                    <Icon type="flag" size="large" variant="primary" />
+                    <Stack spacing={3} alignItems="center">
+                      <Typography variant="h3" bold>
+                        Oops! Looks like there's nothing here
+                      </Typography>
+                      <Typography variant="bodyLarge" lightened>
+                        Try a different search term or more general query
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
+          {isSearching && (
+            <Grid item xs={12} mt={results.length ? 0 : 48}>
+              <Grid container alignItems="center" justifyContent="center">
+                <Grid item>
+                  <Spinner />
                 </Grid>
               </Grid>
             </Grid>
@@ -340,8 +364,8 @@ const SchoolResultItem = ({
           >
             {/* {logoImg && <Avatar src={logoImg} />} */}
             <AvatarGroup>
-              {leaders.map((l) => (
-                <Avatar src={l.imageSrc} size="sm" />
+              {leaders.map((l, i) => (
+                <Avatar src={l.imageSrc} size="sm" key={i} />
               ))}
             </AvatarGroup>
           </Stack>
