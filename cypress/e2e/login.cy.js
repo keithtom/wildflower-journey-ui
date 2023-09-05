@@ -33,15 +33,16 @@ describe("ssj user", () => {
         cy.url().should("include", "/token");
         cy.location().should((location) => {
           expect(location.pathname).to.eq("/welcome/new-etl");
-        });
-        cy.getCookies()
-          .should("have.length.greaterThan", 2)
-          .should((cookies) => {
-            const authCookie = cookies.find((cookie) => {
-              return cookie.name === "auth";
+        }).then(() => {
+          cy.getCookies()
+            .should("have.length.greaterThan", 2)
+            .should((cookies) => {
+              const authCookie = cookies.find((cookie) => {
+                return cookie.name === "auth";
+              });
+              expect(authCookie).to.not.be.undefined;
             });
-            expect(authCookie).to.not.be.undefined;
-          });
+        });
       });
     });
   });
@@ -59,14 +60,15 @@ describe("ssj user", () => {
         cy.visit(resp.body.invite_url);
         cy.location().should((location) => {
           expect(location.pathname).to.eq("/ssj");
-        });
-        cy.getCookies()
-          .should("have.length.greaterThan", 2)
-          .should((cookies) => {
-            const authCookie = cookies.find((cookie) => {
-              return cookie.name === "auth";
+        }).then(() => {
+          cy.getCookies()
+            .should("have.length.greaterThan", 2)
+            .should((cookies) => {
+              const authCookie = cookies.find((cookie) => {
+                return cookie.name === "auth";
+              });
+              expect(authCookie).to.not.be.undefined;
             });
-            expect(authCookie).to.not.be.undefined;
           });
       });
     });
@@ -89,15 +91,16 @@ describe("network user", () => {
         cy.visit(resp.body.invite_url);
         cy.location().should((location) => {
           expect(location.pathname).to.eq("/welcome/existing-member");
-        });
-        cy.getCookies()
-          .should("have.length.of.at.most", 2)
-          .should((cookies) => {
-            const authCookie = cookies.find((cookie) => {
-              return cookie.name === "auth";
+        }).then(() => {
+          cy.getCookies()
+            .should("have.length.of.at.most", 2)
+            .should((cookies) => {
+              const authCookie = cookies.find((cookie) => {
+                return cookie.name === "auth";
+              });
+              expect(authCookie).to.not.be.undefined;
             });
-            expect(authCookie).to.not.be.undefined;
-          });
+        });
       });
     });
   });
@@ -115,7 +118,7 @@ describe("network user", () => {
         cy.visit(resp.body.invite_url);
         cy.location().should((location) => {
           expect(location.pathname).to.eq("/network");
-        });
+        }).then(() => {
         cy.getCookies()
           .should("have.length.of.at.most", 2)
           .should((cookies) => {
@@ -124,6 +127,7 @@ describe("network user", () => {
             });
             expect(authCookie).to.not.be.undefined;
           });
+        });
       });
     });
   });
