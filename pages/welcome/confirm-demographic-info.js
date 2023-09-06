@@ -280,7 +280,7 @@ const ConfirmDemographicInfo = ({}) => {
                       withCheckbox
                       label="What is your ethnicity?"
                       placeholder="Select as many as you like..."
-                      options={ethnicityOptions.map((l) => l)}
+                      options={ethnicityOptions}
                       error={errors.raceEthnicity}
                       defaultValue={[]}
                       helperText={
@@ -509,7 +509,7 @@ const ConfirmDemographicInfo = ({}) => {
                         withCheckbox
                         label="What Levels are you certified (or seeking certification) for?"
                         placeholder="Select as many as you like..."
-                        options={levelsOfMontessoriCertification.map((l) => l)}
+                        options={levelsOfMontessoriCertification}
                         error={errors.montessoriCertifiedLevels}
                         defaultValue={[]}
                         helperText={
@@ -533,7 +533,7 @@ const ConfirmDemographicInfo = ({}) => {
                       withCheckbox
                       label="What Age Classrooms are you interested in offering?"
                       placeholder="Select as many as you like..."
-                      options={ageClassroomsInterestedInOffering.map((l) => l)}
+                      options={ageClassroomsInterestedInOffering}
                       error={errors.classroomAge}
                       defaultValue={[]}
                       helperText={

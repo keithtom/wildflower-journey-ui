@@ -264,7 +264,7 @@ const FilterMultiSelect = ({ filter, setFilters }) => {
     <MultiSelect
       withCheckbox
       autoWidth
-      options={filter.options.map((o) => o)}
+      options={filter.options}
       value={filterValue}
       onChange={handleValueChange}
       placeholder={filter.title}

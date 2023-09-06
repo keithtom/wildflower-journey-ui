@@ -260,7 +260,7 @@ const ConfirmDemographicInfo = ({}) => {
                       withCheckbox
                       label="What is your ethnicity?"
                       placeholder="Select as many as you like..."
-                      options={ethnicityOptions.map((l) => l)}
+                      options={ethnicityOptions}
                       error={errors.raceEthnicity}
                       defaultValue={[]}
                       helperText={
@@ -489,7 +489,7 @@ const ConfirmDemographicInfo = ({}) => {
                         withCheckbox
                         label="What Levels are you certified (or seeking certification) for?"
                         placeholder="Select as many as you like..."
-                        options={levelsOfMontessoriCertification.map((l) => l)}
+                        options={levelsOfMontessoriCertification}
                         error={errors.montessoriCertifiedLevels}
                         defaultValue={[]}
                         helperText={
@@ -514,7 +514,7 @@ const ConfirmDemographicInfo = ({}) => {
                       withCheckbox
                       label="What is your role at Wildflower Schools?"
                       placeholder="Select all roles you hold..."
-                      options={roleOptions.map((r) => r)}
+                      options={roleOptions}
                       error={errors.role}
                       defaultValue={[]}
                       helperText={
