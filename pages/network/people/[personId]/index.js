@@ -404,7 +404,7 @@ const EditProfileModal = ({
           montessori_certified: data.montessoriCertified,
           montessori_certified_level_list: data.montessoriCertifiedLevels,
           classroom_age_list: data.classroomAge,
-          role_list: [data.role],
+          role_list: data.role,
           about: data.about,
           phone: data.phone,
           profile_image: profileImage,
@@ -633,7 +633,7 @@ const EditProfileModal = ({
                 withCheckbox
                 label="What is your ethnicity?"
                 placeholder="Select as many as you like..."
-                options={ethnicityOptions.map((l) => l.label)}
+                options={ethnicityOptions}
                 error={errors.raceEthnicity}
                 defaultValue={[]}
                 helperText={
@@ -858,7 +858,7 @@ const EditProfileModal = ({
                   withCheckbox
                   label="What Levels are you certified (or seeking certification) for?"
                   placeholder="Select as many as you like..."
-                  options={levelsOfMontessoriCertification.map((l) => l.label)}
+                  options={levelsOfMontessoriCertification}
                   error={errors.montessoriCertifiedLevels}
                   defaultValue={[]}
                   helperText={
@@ -872,35 +872,29 @@ const EditProfileModal = ({
               )}
             />
           ) : null}
-          <Stack spacing={1}>
-            <Typography variant="bodyRegular">
-              What is your role at Wildflower Schools?
-            </Typography>
-            <Controller
-              name="role"
-              control={control}
-              rules={{ required: false }}
-              render={({ field: { onChange, value } }) => (
-                <RadioGroup value={value}>
-                  {roleOptions.map((o, i) => (
-                    <FormControlLabel
-                      key={i}
-                      value={o.value}
-                      control={<Radio />}
-                      label={o.label}
-                      onChange={onChange}
-                    />
-                  ))}
-                </RadioGroup>
-              )}
-            />
-            <FormHelperText error={errors.role}>
-              {errors &&
-                errors.role &&
-                errors.role.type === "required" &&
-                "This field is required"}
-            </FormHelperText>
-          </Stack>
+          <Controller
+            name="role"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <MultiSelect
+                withCheckbox
+                label="What is your role at Wildflower Schools?"
+                placeholder="Select all roles you hold..."
+                options={roleOptions}
+                error={errors.role}
+                defaultValue={[]}
+                helperText={
+                  errors &&
+                  errors.role &&
+                  errors.role.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+
           <Divider />
           <Typography variant="bodyRegular">Add a new profile image</Typography>
           <Grid container justifyContent="center">

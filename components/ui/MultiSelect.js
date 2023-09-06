@@ -74,23 +74,29 @@ const MultiSelect = React.forwardRef(
                   </Typography>
                 );
               }
-
+              const selectedLabels = selected.map((selectedValue) => {
+                // Find the corresponding label for the selected value
+                const selectedOption = options.find(
+                  (option) => option.value === selectedValue
+                );
+                return selectedOption ? selectedOption.label : selectedValue;
+              });
               return (
                 <Stack direction="row" spacing={1}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={value} />
+                  {selectedLabels.map((label) => (
+                    <Chip key={label} label={label} />
                   ))}
                 </Stack>
               );
             }}
             {...props}
           >
-            {options.map((option) => (
-              <MenuItem key={option} value={option}>
+            {options.map((option, i) => (
+              <MenuItem key={i} value={option.value}>
                 {withCheckbox ? (
-                  <Checkbox checked={value?.indexOf(option) > -1} />
+                  <Checkbox checked={value?.indexOf(option.value) > -1} />
                 ) : null}
-                {option}
+                {option.label}
               </MenuItem>
             ))}
           </CustomMultiSelect>

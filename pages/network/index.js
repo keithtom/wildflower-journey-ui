@@ -2,6 +2,8 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
+import { styled, css } from "@mui/material/styles";
+import { useInView } from "react-intersection-observer";
 
 import getAuthHeader from "@lib/getAuthHeader";
 import { useUserContext } from "@lib/useUserContext";
@@ -21,31 +23,82 @@ import {
   Radio,
   MultiSelect,
   Spinner,
+  Button,
 } from "@ui";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
 
 const Network = () => {
-  const { query, setQuery, filters, setFilters, results, isSearching, error } =
-    useSearch();
+  const {
+    query,
+    setQuery,
+    filters,
+    setFilters,
+    results,
+    setResults,
+    isSearching,
+    setIsSearching,
+    error,
+    currentPage,
+    handlePageChange,
+    hasMore,
+    noResults,
+  } = useSearch();
   const [category, setCategory] = useState("people");
+  const [userQuery, setUserQuery] = useState(null);
+
   const { currentUser } = useUserContext();
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-    setFilters({ ...filters, models: e.target.value });
-  };
-
   if (error) return <PageContainer>failed to load</PageContainer>;
-  const noResults = query && results.length === 0;
 
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
 
   useAuth("/login");
 
-  // console.log({ results });
+  const { ref, inView } = useInView({
+    threshold: 0,
+    triggerOnce: true,
+  });
+  const handleCategoryChange = (e) => {
+    setCategory(e.target.value);
+    setFilters({ models: e.target.value });
+    setResults([]);
+  };
+  const handleFetchNewResults = () => {
+    if (inView && results.length > 0) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+  useEffect(() => {
+    handleFetchNewResults();
+  }, [inView]);
+
+  useEffect(() => {
+    if (userQuery === "") {
+      setQuery("*");
+      handlePageChange(1);
+    } else {
+      setQuery(userQuery);
+    }
+  }, [userQuery]);
+
+  useEffect(() => {
+    setIsSearching(true);
+    setQuery("*");
+  }, []);
+
+  // console.log("perPage", perPage);
+  // console.log(currentPage);
+  // console.log(isSearching);
+  // console.log({ query });
   // console.log({ currentUser });
+  // console.log({ currentUser });
+  // console.log({ results });
+  // console.log({ noResults });
+  // console.log({ inView });
+  // console.log("hasMore------------------------", hasMore);
+  // console.log({ filters });
 
   return (
     <>
@@ -62,13 +115,12 @@ const Network = () => {
               placeholder="Search for something..."
               endAdornment={<Icon type="search" variant="lightened" />}
               onChange={(e) => {
-                setQuery(e.target.value);
+                setUserQuery(e.target.value);
               }}
-              value={query}
+              value={userQuery}
             />
           </Grid>
         </Grid>
-
         <Grid container alignItems="center" mb={2}>
           <Grid item xs={12} sm={1}>
             <Typography lightened>Show</Typography>
@@ -90,14 +142,13 @@ const Network = () => {
             </RadioGroup>
           </Grid>
         </Grid>
-
         <Grid container>
           <Grid item xs={12} sm={1}>
             <Typography lightened>Filter by</Typography>
           </Grid>
           <Grid item flex={1}>
             <Grid container spacing={2}>
-              {FakeFilters.map((f, i) =>
+              {Filters.map((f, i) =>
                 f.doNotDisplayFor === category ? null : (
                   <Grid item key={i}>
                     <FilterMultiSelect
@@ -111,9 +162,8 @@ const Network = () => {
             </Grid>
           </Grid>
         </Grid>
-
         <Grid container mt={12}>
-          {results.length ? (
+          {results.length > 0 && (
             <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={6}>
               {category === "people"
                 ? results.map((f) => (
@@ -128,7 +178,7 @@ const Network = () => {
                       lastName={f.attributes.lastName}
                       roles={f.attributes.roleList}
                       location={f.attributes.location}
-                      trainingLevel={f.attributes.trainingLevel}
+                      trainingLevel={f.attributes.montessoriCertifiedLevelList}
                       schoolLogo={f.attributes.school?.logoUrl}
                       schoolLink={`/network/schools/${f.attributes.school?.id}`}
                       key={f.id}
@@ -147,51 +197,42 @@ const Network = () => {
                       location={f.attributes.location}
                       agesServed={f.attributes.agesServedList}
                       leaders={f.attributes.leaders || []}
+                      // charter={f.attributes.charter} TODO: Return from backend and use here
                       key={f.id}
                     />
                   ))}
             </Masonry>
-          ) : (
-            <Grid item xs={12}>
-              <Grid
-                container
-                alignItems="center"
-                justifyContent="center"
-                mt={16}
-              >
-                <Grid item xs={12} sm={6} md={4} lg={3}>
-                  {isSearching ? (
-                    <Grid container justifyContent="center">
-                      <Grid item>
-                        <Spinner />
-                      </Grid>
-                    </Grid>
-                  ) : noResults ? (
-                    <Card size="large">
-                      <Stack spacing={3}>
-                        <Icon type="flag" size="large" variant="primary" />
-                        <Typography variant="bodyLarge" bold>
-                          Oops! Looks like there's nothing here
-                        </Typography>
-                        <Typography variant="bodyRegular" lightened>
-                          Try a different search term or more general query!
-                        </Typography>
-                      </Stack>
-                    </Card>
-                  ) : (
-                    <Card size="large">
-                      <Stack spacing={3}>
-                        <Icon type="search" size="large" variant="primary" />
-                        <Typography variant="bodyLarge" bold>
-                          You haven't searched for anything yet!
-                        </Typography>
-                        <Typography variant="bodyRegular" lightened>
-                          Search for people or for schools above to see results
-                          from the My Wildflower directory!
-                        </Typography>
-                      </Stack>
-                    </Card>
-                  )}
+          )}
+          {hasMore && !isSearching && results.length > 0 && (
+            <div
+              ref={ref}
+              style={{ opacity: 0, width: "100%", height: "1px" }}
+            />
+          )}
+          {!hasMore && noResults && !isSearching && (
+            <Grid item xs={12} mt={24}>
+              <Grid container justifyContent="center" alignItems="center">
+                <Grid item>
+                  <Stack spacing={6} alignItems="center">
+                    <Icon type="flag" size="large" variant="primary" />
+                    <Stack spacing={3} alignItems="center">
+                      <Typography variant="h3" bold>
+                        Oops! Looks like there's nothing here
+                      </Typography>
+                      <Typography variant="bodyLarge" lightened>
+                        Try a different search term or more general query
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
+          {isSearching && (
+            <Grid item xs={12} mt={results.length ? 0 : 48}>
+              <Grid container alignItems="center" justifyContent="center">
+                <Grid item>
+                  <Spinner />
                 </Grid>
               </Grid>
             </Grid>
@@ -223,7 +264,7 @@ const FilterMultiSelect = ({ filter, setFilters }) => {
     <MultiSelect
       withCheckbox
       autoWidth
-      options={filter.options.map((o) => o.label)}
+      options={filter.options}
       value={filterValue}
       onChange={handleValueChange}
       placeholder={filter.title}
@@ -303,6 +344,7 @@ const SchoolResultItem = ({
   location,
   agesServed,
   leaders,
+  charter,
 }) => {
   return (
     <Link href={schoolLink && schoolLink}>
@@ -322,8 +364,8 @@ const SchoolResultItem = ({
           >
             {/* {logoImg && <Avatar src={logoImg} />} */}
             <AvatarGroup>
-              {leaders.map((l) => (
-                <Avatar src={l.imageSrc} size="sm" />
+              {leaders.map((l, i) => (
+                <Avatar src={l.imageSrc} size="sm" key={i} />
               ))}
             </AvatarGroup>
           </Stack>
@@ -348,6 +390,29 @@ const SchoolResultItem = ({
                       <Chip label={a} size="small" />
                     </Grid>
                   ))}
+                {charter && (
+                  <Grid item xs={12}>
+                    <Chip
+                      label={
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Icon
+                            type="shapePolygon"
+                            size="small"
+                            variant="primary"
+                          />
+                          <Typography variant="bodyMini" bold highlight>
+                            CHARTER
+                          </Typography>
+                          <Typography variant="bodyMini" bold>
+                            {charter}
+                          </Typography>
+                        </Stack>
+                      }
+                      size="small"
+                      variant="primaryLightened"
+                    />
+                  </Grid>
+                )}
               </Grid>
             </Stack>
           </Card>
@@ -357,61 +422,63 @@ const SchoolResultItem = ({
   );
 };
 
-const FakeFilters = [
+const Filters = [
   {
     title: "State",
     param: "people_filters[address_state]",
     options: [
-      { label: "Alabama", value: "Alabama" },
-      { label: "Alaska", value: "Alaska" },
-      { label: "Arizona", value: "Arizona" },
-      { label: "Arkansas", value: "Arkansas" },
-      { label: "California", value: "California" },
-      { label: "Colorado", value: "Colorado" },
-      { label: "Connecticut", value: "Connecticut" },
-      { label: "Delaware", value: "Delaware" },
-      { label: "Florida", value: "Florida" },
-      { label: "Georgia", value: "Georgia" },
-      { label: "Hawaii", value: "Hawaii" },
-      { label: "Idaho", value: "Idaho" },
-      { label: "Illinois", value: "Illinois" },
-      { label: "Indiana", value: "Indiana" },
-      { label: "Iowa", value: "Iowa" },
-      { label: "Kansas", value: "Kansas" },
-      { label: "Kentucky", value: "Kentucky" },
-      { label: "Louisiana", value: "Louisiana" },
-      { label: "Maine", value: "Maine" },
-      { label: "Maryland", value: "Maryland" },
-      { label: "Massachusetts", value: "Massachusetts" },
-      { label: "Michigan", value: "Michigan" },
-      { label: "Minnesota", value: "Minnesota" },
-      { label: "Mississippi", value: "Mississippi" },
-      { label: "Missouri", value: "Missouri" },
-      { label: "Montana", value: "Montana" },
-      { label: "Nebraska", value: "Nebraska" },
-      { label: "Nevada", value: "Nevada" },
-      { label: "New Hampshire", value: "New Hampshire" },
-      { label: "New Jersey", value: "New Jersey" },
-      { label: "New Mexico", value: "New Mexico" },
-      { label: "New York", value: "New York" },
-      { label: "North Carolina", value: "North Carolina" },
-      { label: "North Dakota", value: "North Dakota" },
-      { label: "Ohio", value: "Ohio" },
-      { label: "Oklahoma", value: "Oklahoma" },
-      { label: "Oregon", value: "Oregon" },
-      { label: "Pennsylvania", value: "Pennsylvania" },
-      { label: "Rhode Island", value: "Rhode Island" },
-      { label: "South Carolina", value: "South Carolina" },
-      { label: "South Dakota", value: "South Dakota" },
-      { label: "Tennessee", value: "Tennessee" },
-      { label: "Texas", value: "Texas" },
-      { label: "Utah", value: "Utah" },
-      { label: "Vermont", value: "Vermont" },
-      { label: "Virginia", value: "Virginia" },
-      { label: "Washington", value: "Washington" },
-      { label: "West Virginia", value: "West Virginia" },
-      { label: "Wisconsin", value: "Wisconsin" },
-      { label: "Wyoming", value: "Wyoming" },
+      { label: "Alabama", value: "AL" },
+      { label: "Alaska", value: "AK" },
+      { label: "Arizona", value: "AZ" },
+      { label: "Arkansas", value: "AR" },
+      { label: "California", value: "CA" },
+      { label: "Colorado", value: "CO" },
+      { label: "Connecticut", value: "CT" },
+      { label: "Delaware", value: "DE" },
+      { label: "District of Columbia", value: "DC" },
+      { label: "Florida", value: "FL" },
+      { label: "Georgia", value: "GA" },
+      { label: "Hawaii", value: "HI" },
+      { label: "Idaho", value: "ID" },
+      { label: "Illinois", value: "IL" },
+      { label: "Indiana", value: "IN" },
+      { label: "Iowa", value: "IA" },
+      { label: "Kansas", value: "KS" },
+      { label: "Kentucky", value: "KY" },
+      { label: "Louisiana", value: "LA" },
+      { label: "Maine", value: "ME" },
+      { label: "Maryland", value: "MD" },
+      { label: "Massachusetts", value: "MA" },
+      { label: "Michigan", value: "MI" },
+      { label: "Minnesota", value: "MN" },
+      { label: "Mississippi", value: "MS" },
+      { label: "Missouri", value: "MO" },
+      { label: "Montana", value: "MT" },
+      { label: "Nebraska", value: "NE" },
+      { label: "Nevada", value: "NV" },
+      { label: "New Hampshire", value: "NH" },
+      { label: "New Jersey", value: "NJ" },
+      { label: "New Mexico", value: "NM" },
+      { label: "New York", value: "NY" },
+      { label: "North Carolina", value: "NC" },
+      { label: "North Dakota", value: "ND" },
+      { label: "Ohio", value: "OH" },
+      { label: "Oklahoma", value: "OK" },
+      { label: "Oregon", value: "OR" },
+      { label: "Pennsylvania", value: "PA" },
+      { label: "Rhode Island", value: "RI" },
+      { label: "South Carolina", value: "SC" },
+      { label: "South Dakota", value: "SD" },
+      { label: "Tennessee", value: "TN" },
+      { label: "Texas", value: "TX" },
+      { label: "Trust Territories", value: "TT" },
+      { label: "Utah", value: "UT" },
+      { label: "Vermont", value: "VT" },
+      { label: "Virginia", value: "VA" },
+      { label: "Washington", value: "WA" },
+      { label: "West Virginia", value: "WV" },
+      { label: "Wisconsin", value: "WI" },
+      { label: "Wyoming", value: "WY" },
     ],
   },
   {
@@ -425,16 +492,6 @@ const FakeFilters = [
       { label: "More than 5 years", value: "More than 5 years" },
     ],
   },
-  // {
-  //   title: "Program",
-  //   doNotDisplayFor: "people",
-  //   options: [
-  //     { label: "1", value: "1" },
-  //     { label: "2", value: "2" },
-  //     { label: "3", value: "3" },
-  //     { label: "4", value: "4" },
-  //   ],
-  // },
   {
     title: "Age level",
     param: "school_filters[age_levels]",
@@ -449,16 +506,7 @@ const FakeFilters = [
       { value: "High School", label: "High School" },
     ],
   },
-  // {
-  //   title: "Capacity",
-  //   doNotDisplayFor: "people",
-  //   options: [
-  //     { label: "1", value: "1" },
-  //     { label: "2", value: "2" },
-  //     { label: "3", value: "3" },
-  //     { label: "4", value: "4" },
-  //   ],
-  // },
+
   {
     title: "Language",
     param: "people_filters[languages]",
@@ -529,26 +577,6 @@ const FakeFilters = [
       { label: "District", value: "District" },
     ],
   },
-  // {
-  //   title: "Affinity groups",
-  //   doNotDisplayFor: "schools",
-  //   options: [
-  //     { label: "1", value: "1" },
-  //     { label: "2", value: "2" },
-  //     { label: "3", value: "3" },
-  //     { label: "4", value: "4" },
-  //   ],
-  // },
-  // {
-  //   title: "Pronouns",
-  //   doNotDisplayFor: "schools",
-  //   options: [
-  //     { label: "1", value: "1" },
-  //     { label: "2", value: "2" },
-  //     { label: "3", value: "3" },
-  //     { label: "4", value: "4" },
-  //   ],
-  // },
 
   {
     title: "Ethnicity",
@@ -606,6 +634,26 @@ const FakeFilters = [
       { label: "Emerging Teacher Leader", value: "Emerging Teacher Leader" },
       { label: "Foundation Partner", value: "Foundation Partner" },
       { label: "Charter Staff", value: "Charter Staff" },
+    ],
+  },
+  {
+    title: "Charter",
+    param: "school_filters[charter]",
+    doNotDisplayFor: "people",
+    options: [
+      {
+        label: "Minnesota Wildflower Montessori School",
+        value: "Minnesota Wildflower Montessori School",
+      },
+      { label: "Colorado Charter", value: "Colorado Charter" },
+      {
+        label: "Wildflower New York Charter School",
+        value: "Wildflower New York Charter School",
+      },
+      {
+        label: "DC Wildflower Public Charter School",
+        value: "DC Wildflower Public Charter School",
+      },
     ],
   },
 ];

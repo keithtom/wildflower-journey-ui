@@ -8,17 +8,6 @@ const Token = ({ query }) => {
   const { token, redirect } = query;
   let loggedIn = false;
 
-  const softLaunchDirectoryUsers = [
-    "rachel.kimboko@dcwildflowerpcs.org",
-    "brandon.royce-diop@wildflowerschools.org",
-    "latania@blazingstarsmontessori.org",
-    "alejandra@thedahliaschoolsf.org",
-    "maggie@wildflowerschools.org",
-    "taylor@littleuniverse.com",
-    "katelyn.shore@wildflowerschools.org",
-    "li.ouyang@wildflowerschools.org",
-  ];
-
   useEffect(() => {
     // Example link: https://platform.wildflowerschools.org/token?token=&redirect=https%3A%2F%2Fplatform.wildflowerschools.org%2Fwelcome%2Fexisting-tl
     if (!loggedIn) {
@@ -33,16 +22,7 @@ const Token = ({ query }) => {
             email: user.email,
             profileImage: user.imageUrl,
           });
-          console.log({ user });
-
-          if (
-            !user.attributes.ssj &&
-            softLaunchDirectoryUsers.includes(user.attributes.email)
-          ) {
-            Router.push("/welcome/existing-member");
-          } else {
-            Router.push(redirect);
-          }
+          Router.push(redirect);
         })
         .catch((error) => {
           // if tokenAuth fails then
