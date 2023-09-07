@@ -196,7 +196,10 @@ describe("onboarding spec", () => {
         cy.contains("Primary/Early Childhood").click({ force: true });
         cy.get("body").click(0, 0); // close dropdwon
 
-        cy.contains("Emerging Teacher Leader").click();
+        cy.contains("What is your role at Wildflower Schools?").next().click();
+        cy.contains("Emerging Teacher Leader").click({ force: true });
+        cy.contains("Foundation Partner").click({ force: true });
+        cy.get("body").click(0, 0); // close dropdwon
 
         cy.get('button[type="submit"]').click();
         cy.url({ timeout: 60000 }).should(

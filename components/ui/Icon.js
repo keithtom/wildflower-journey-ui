@@ -25,6 +25,7 @@ import {
   FileBlank,
   Copy,
   Search,
+  ShapePolygon,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -208,6 +209,7 @@ export default function Icon({ ...props }) {
     copy: <Copy />,
     search: <Search />,
     wrench: <Wrench />,
+    shapePolygon: <ShapePolygon />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

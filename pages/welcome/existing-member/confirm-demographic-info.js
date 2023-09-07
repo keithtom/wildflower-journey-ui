@@ -92,7 +92,7 @@ const ConfirmDemographicInfo = ({}) => {
     if (currentUser) {
       peopleApi.show(currentUser.id).then((response) => {
         const person = response.data.data;
-        console.log("person", person);
+        // console.log("person", person);
         // SAVEPOINT this request is working.  need to make sure data is persisted and returned
         // and then loaded into form.  then we are done here.
         reset({
@@ -111,6 +111,7 @@ const ConfirmDemographicInfo = ({}) => {
             person?.attributes?.montessoriCertifiedLevelList || [],
           classroomAge: person?.attributes?.classroomAgeList || [],
           role: person?.attributes?.roleList || [],
+          is_onboarded: true,
         });
       });
     }
@@ -134,7 +135,7 @@ const ConfirmDemographicInfo = ({}) => {
           montessori_certified: data.montessoriCertified,
           montessori_certified_level_list: data.montessoriCertifiedLevels,
           classroom_age_list: data.classroomAge,
-          role_list: [data.role],
+          role_list: data.role,
         },
       })
       .then((response) => {
@@ -259,7 +260,7 @@ const ConfirmDemographicInfo = ({}) => {
                       withCheckbox
                       label="What is your ethnicity?"
                       placeholder="Select as many as you like..."
-                      options={ethnicityOptions.map((l) => l.label)}
+                      options={ethnicityOptions}
                       error={errors.raceEthnicity}
                       defaultValue={[]}
                       helperText={
@@ -488,9 +489,7 @@ const ConfirmDemographicInfo = ({}) => {
                         withCheckbox
                         label="What Levels are you certified (or seeking certification) for?"
                         placeholder="Select as many as you like..."
-                        options={levelsOfMontessoriCertification.map(
-                          (l) => l.label
-                        )}
+                        options={levelsOfMontessoriCertification}
                         error={errors.montessoriCertifiedLevels}
                         defaultValue={[]}
                         helperText={
@@ -505,35 +504,29 @@ const ConfirmDemographicInfo = ({}) => {
                     )}
                   />
                 ) : null}
-                <Stack spacing={1}>
-                  <Typography variant="bodyRegular">
-                    What is your role at Wildflower Schools?
-                  </Typography>
-                  <Controller
-                    name="role"
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field: { onChange, value } }) => (
-                      <RadioGroup value={value}>
-                        {roleOptions.map((o, i) => (
-                          <FormControlLabel
-                            key={i}
-                            value={o.value}
-                            control={<Radio />}
-                            label={o.label}
-                            onChange={onChange}
-                          />
-                        ))}
-                      </RadioGroup>
-                    )}
-                  />
-                  <FormHelperText error={errors.role}>
-                    {errors &&
-                      errors.role &&
-                      errors.role.type === "required" &&
-                      "This field is required"}
-                  </FormHelperText>
-                </Stack>
+
+                <Controller
+                  name="role"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <MultiSelect
+                      withCheckbox
+                      label="What is your role at Wildflower Schools?"
+                      placeholder="Select all roles you hold..."
+                      options={roleOptions}
+                      error={errors.role}
+                      defaultValue={[]}
+                      helperText={
+                        errors &&
+                        errors.role &&
+                        errors.role.type === "required" &&
+                        "This field is required"
+                      }
+                      {...field}
+                    />
+                  )}
+                />
 
                 <Typography variant="bodySmall" lightened>
                   This information is only used for anonymous reporting reasons

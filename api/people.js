@@ -3,7 +3,7 @@ import wildflowerApi from "@api/base";
 const peopleApi = wildflowerApi.register(`/v1/people`);
 
 function show(personId, params={}) {
-  return peopleApi.get(`/${personId}`, params);
+  return peopleApi.get(`/${personId}`, {params: params});
 }
 
 async function update(personId, personParams) {
