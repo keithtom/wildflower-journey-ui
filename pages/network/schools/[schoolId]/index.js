@@ -252,8 +252,7 @@ const School = ({}) => {
                       </Typography>
                     </Stack>
                   ) : null}
-                  {/*TODO: Related charters . length (they could be a charter, but the only charter) */}
-                  {isCharter ? (
+                  {isCharter && sisterSchools.length ? (
                     <Grid container>
                       <Grid item xs={12} sm={6}>
                         <Typography variant="h4" bold>
