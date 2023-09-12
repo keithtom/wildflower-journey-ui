@@ -53,6 +53,7 @@ import {
 } from "@ui";
 import SchoolHero from "@components/SchoolHero";
 import AttributesCard from "@components/AttributesCard";
+import SchoolCard from "@components/SchoolCard";
 import UserCard from "@components/UserCard";
 import { Data } from "styled-icons/crypto";
 
@@ -121,13 +122,20 @@ const School = ({}) => {
     school.relationships.people.data,
     "id"
   );
-  const isCharter = false; //TODO: Check whether the school attributes include charter data
+  const isCharter = school.attributes.charterString;
+  const allSisterSchools = findMatchingItems(
+    included,
+    school.relationships.sisterSchools.data,
+    "id"
+  );
+  const sisterSchools = allSisterSchools.filter((s) => s.id !== school.id);
 
   // console.log({ currentUser });
   // console.log({ isMySchool });
   // console.log({ included });
   // console.log({ schoolLeaders });
   // console.log({ school });
+  // console.log({ sisterSchools });
 
   return (
     <>
@@ -178,7 +186,7 @@ const School = ({}) => {
                             CHARTER
                           </Typography>
                           <Typography variant="bodyRegular">
-                            DC Wildflower Public Charter School
+                            {school.attributes.charterString}
                           </Typography>
                         </Stack>
                       </Grid>
@@ -246,45 +254,26 @@ const School = ({}) => {
                   ) : null}
                   {/*TODO: Related charters . length (they could be a charter, but the only charter) */}
                   {isCharter ? (
-                    <Stack spacing={3}>
-                      <Typography variant="h4" bold>
-                        Our Charter Community
-                      </Typography>
-                      {/* TODO: Map through other charter schools in same group*/}
-                      <Link href="">
-                        {" "}
-                        {/* TODO: Link using id of charter */}
-                        <Card size="small">
-                          <Grid
-                            container
-                            alignItems="center"
-                            justifyContent="space-between"
-                          >
-                            <Grid item>
-                              <Stack
-                                direction="row"
-                                spacing={3}
-                                alignItems="center"
-                              >
-                                <Avatar src="" />
-                                <Stack>
-                                  <Typography variant="bodyLarge">
-                                    Washington DC Montessori{" "}
-                                    {/*TODO: Charter name */}
-                                  </Typography>
-                                  <Typography variant="bodyRegular" lightened>
-                                    Washington DC {/*TODO: Charter location */}
-                                  </Typography>
-                                </Stack>
-                              </Stack>
-                            </Grid>
-                            <Grid item>
-                              <Icon type="chevronRight" variant="lightened" />
-                            </Grid>
-                          </Grid>
-                        </Card>
-                      </Link>
-                    </Stack>
+                    <Grid container>
+                      <Grid item xs={12} sm={6}>
+                        <Typography variant="h4" bold>
+                          Our Charter Community
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Stack spacing={3}>
+                          {sisterSchools.map((s, i) => (
+                            <SchoolCard
+                              key={i}
+                              schoolName={s.attributes.name}
+                              logo={s.attributes.logoUrl}
+                              location={s.attributes.location}
+                              link={`/network/schools/${s.id}`}
+                            />
+                          ))}
+                        </Stack>
+                      </Grid>
+                    </Grid>
                   ) : null}
 
                   {/* <Grid container>

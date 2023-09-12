@@ -94,7 +94,7 @@ const Network = () => {
   // console.log({ query });
   // console.log({ currentUser });
   // console.log({ currentUser });
-  // console.log({ results });
+  console.log({ results });
   // console.log({ noResults });
   // console.log({ inView });
   // console.log("hasMore------------------------", hasMore);
@@ -197,7 +197,7 @@ const Network = () => {
                       location={f.attributes.location}
                       agesServed={f.attributes.agesServedList}
                       leaders={f.attributes.leaders || []}
-                      // charter={f.attributes.charter} TODO: Return from backend and use here
+                      charter={f.attributes.charterString}
                       key={f.id}
                     />
                   ))}
@@ -369,7 +369,12 @@ const SchoolResultItem = ({
               ))}
             </AvatarGroup>
           </Stack>
-          <Card size="small" noBorder>
+          <Card
+            size="small"
+            noBorder
+            noRadius
+            sx={{ borderTop: "1px solid", borderColor: "neutral.lightened" }}
+          >
             <Stack spacing={3}>
               <Grid container justifyContent="space-between">
                 <Grid item flex={1}>

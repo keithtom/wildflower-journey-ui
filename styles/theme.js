@@ -146,9 +146,11 @@ export const theme = createTheme({
       dark: "#D6A00F",
     },
     neutral: {
-      light: "#FAFAFA",
-      main: "#E1E1E2",
-      dark: "#CACACE",
+      lightest: "#FFFFFF",
+      lightened: "#F7F7F7",
+      main: "#EAEAEA",
+      darkened: "#B2B2B2",
+      dark: "#1A1A1A",
     },
     border: {
       main: borderColor,
