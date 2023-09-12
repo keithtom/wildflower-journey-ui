@@ -64,11 +64,11 @@ const School = ({}) => {
 
   const router = useRouter();
   const { schoolId } = router.query;
-  console.log("schoolId", schoolId);
+  // console.log("schoolId", schoolId);
 
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
   const { data, error, isLoading, mutate } = useSWR(
-    `/api/school/${schoolId}`,
+    schoolId ? `/api/school/${schoolId}` : null,
     () => schoolApi.show(schoolId, { network: true }).then((res) => res.data),
     {
       onErrorRetry: (error) => {
@@ -88,7 +88,7 @@ const School = ({}) => {
         failed to load ${error.message}
       </PageContainer>
     );
-  if (isLoading || !Data) return <PageContainer isLoading={true} />;
+  if (isLoading || !data) return <PageContainer isLoading={true} />;
 
   // console.log("about to render", data.data);
   const school = data.data;

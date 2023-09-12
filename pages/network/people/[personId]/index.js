@@ -70,12 +70,14 @@ import peopleApi from "@api/people";
 
 const Person = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
+  const { currentUser } = useUserContext();
+
   const router = useRouter();
   const { personId } = router.query;
 
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
   const { data, error, isLoading, mutate } = useSWR(
-    `/api/person/${personId}`,
+    personId ? `/api/person/${personId}` : null,
     () => peopleApi.show(personId, { network: true }).then((res) => res.data),
     {
       onErrorRetry: (error) => {
@@ -101,7 +103,6 @@ const Person = ({}) => {
   const person = data.data;
   const included = data.included;
 
-  const { currentUser } = useUserContext();
   const isMyProfile = currentUser?.id === personId;
   const hasSchool = person.relationships.schools.length;
   const hasContact = person.attributes.email || person.attributes.phone;
@@ -135,7 +136,7 @@ const Person = ({}) => {
 
   return (
     <>
-      <PageContainer isLoading={isLoading || !currentUser}>
+      <PageContainer>
         <Stack spacing={6}>
           <ProfileHero
             profileImage={person.attributes?.imageUrl}

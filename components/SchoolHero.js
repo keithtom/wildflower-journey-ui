@@ -76,13 +76,8 @@ const SchoolHero = ({
           <Grid item>
             <Stack direction="row" spacing={6}>
               {schoolLeaders.map((leader, i) => (
-                <Link href={`/network/people/${leader.id}`}>
-                  <Stack
-                    direction="row"
-                    spacing={3}
-                    key={i}
-                    alignItems="center"
-                  >
+                <Link href={`/network/people/${leader.id}`} key={i}>
+                  <Stack direction="row" spacing={3} alignItems="center">
                     <Avatar src={leader?.attributes?.imageUrl} />
                     <Stack>
                       <Stack direction="row" spacing={1}>
