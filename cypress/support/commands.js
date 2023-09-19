@@ -40,6 +40,10 @@ Cypress.Commands.add("login", (email, password) => {
       resp.body.data.attributes.ssj.workflowId
     );
     window.cookieStore.set("phase", resp.body.data.attributes.ssj.currentPhase);
+    window.cookieStore.set("firstName", resp.body.data.attributes.firstName);
+    window.cookieStore.set("lastName", resp.body.data.attributes.lastName);
+    window.cookieStore.set("id", resp.body.data.id);
+    console.log(resp);
   });
 });
 
@@ -53,7 +57,7 @@ function resetFixtures() {
     body: {
       email: email,
     },
-  })
+  });
   return email;
 }
 
@@ -68,18 +72,18 @@ function resetPartnerFixtures() {
     body: {
       emails: [email1, email2],
     },
-  })
+  });
   return [email1, email2];
 }
 
-Cypress.Commands.add('resetFixtures', () => {
+Cypress.Commands.add("resetFixtures", () => {
   cy.wrap(resetFixtures());
-})
+});
 
 // Used with tests that are testing partner workflows
-Cypress.Commands.add('resetPartnerFixtures', () => {
+Cypress.Commands.add("resetPartnerFixtures", () => {
   cy.wrap(resetPartnerFixtures());
-})
+});
 
 Cypress.Commands.add("resetFixturesAndLogin", () => {
   cy.resetFixtures().then((email) => {
@@ -88,7 +92,7 @@ Cypress.Commands.add("resetFixturesAndLogin", () => {
 });
 
 Cypress.Commands.add("logout", () => {
-  window.cookieStore.delete("auth")
-  window.cookieStore.delete("phase")
-  window.cookieStore.delete("workflowId")
-})
+  window.cookieStore.delete("auth");
+  window.cookieStore.delete("phase");
+  window.cookieStore.delete("workflowId");
+});
