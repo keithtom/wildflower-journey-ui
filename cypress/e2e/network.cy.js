@@ -5,72 +5,72 @@ describe("network", () => {
     cy.viewport(1280, 832);
   });
 
-  // describe("foundation member browsing", () => {
-  //   beforeEach(() => {
-  //     cy.resetFixturesAndLogin();
-  //     cy.visit("/network", { timeout: 60000 });
-  //   });
-  //   describe("viewing results, filtering, and viewing profile pages", () => {
-  //     it("should return people results", () => {
-  //       // Can view the /network page
-  //       cy.contains("Network");
-  //       // Can see initialized people results on the /network page
-  //       cy.request({
-  //         method: "GET",
-  //         url: `${Cypress.env(
-  //           "apiUrl"
-  //         )}/v1/search?q=*&models=people&page=1&per_page=11`,
-  //       }).then((res) => {
-  //         expect(res.status).to.equal(200);
-  //         expect(res.body.data.length).to.be.greaterThan(0);
-  //       });
-  //       // Can search for a person
-  //       cy.get('input[name="search"]').type("katelyn");
-  //       // Can see results for a searched person
-  //       cy.contains("Katelyn Shore");
-  //       // Can filter results
-  //       cy.contains("Language").click();
-  //       cy.contains("English").click({ force: true });
-  //       cy.get("body").click(0, 0);
-  //       // Can see filtered results for a searched person
-  //       cy.contains("Katelyn Shore");
-  //       // Can clear the search input
-  //       cy.get('input[name="search"]').clear();
-  //       // Can toggle to search for schools
-  //       cy.contains("Schools").click();
-  //       // Can see the initialized school results on the /network page
-  //       cy.request({
-  //         method: "GET",
+  describe("foundation member browsing", () => {
+    beforeEach(() => {
+      cy.resetFixturesAndLogin();
+      cy.visit("/network", { timeout: 60000 });
+    });
+    describe("viewing results, filtering, and viewing profile pages", () => {
+      it("should return people results", () => {
+        // Can view the /network page
+        cy.contains("Network");
+        // Can see initialized people results on the /network page
+        cy.request({
+          method: "GET",
+          url: `${Cypress.env(
+            "apiUrl"
+          )}/v1/search?q=*&models=people&page=1&per_page=11`,
+        }).then((res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body.data.length).to.be.greaterThan(0);
+        });
+        // Can search for a person
+        cy.get('input[name="search"]').type("katelyn");
+        // Can see results for a searched person
+        cy.contains("Katelyn Shore");
+        // Can filter results
+        cy.contains("Language").click();
+        cy.contains("English").click({ force: true });
+        cy.get("body").click(0, 0);
+        // Can see filtered results for a searched person
+        cy.contains("Katelyn Shore");
+        // Can clear the search input
+        cy.get('input[name="search"]').clear();
+        // Can toggle to search for schools
+        cy.contains("Schools").click();
+        // Can see the initialized school results on the /network page
+        cy.request({
+          method: "GET",
 
-  //         url: `${Cypress.env(
-  //           "apiUrl"
-  //         )}/v1/search?q=*&models=schools&page=1&per_page=11`,
-  //       }).then((res) => {
-  //         expect(res.status).to.equal(200);
-  //         expect(res.body.data.length).to.be.greaterThan(0);
-  //       });
-  //       // Can search for a school
-  //       cy.get('input[name="search"]').type("wild rose");
-  //       // Can see results for a searched school
-  //       cy.contains("Wild Rose Montessori");
-  //       // Can filter results
-  //       cy.contains("State").click();
-  //       cy.contains("Massachusetts").click({ force: true });
-  //       cy.get("body").click(0, 0);
-  //       // Can see filtered results for a searched school
-  //       cy.contains("Wild Rose Montessori");
-  //       // Can click on a school result
-  //       cy.contains("Wild Rose Montessori").click();
-  //       // Can view the /[schoolId] page
-  //       cy.contains("Wild Rose Montessori");
-  //       cy.contains("Cambridge, MA");
-  //       // Can click a school leader on the /[schoolId] page
-  //       cy.contains("Katelyn").click();
-  //       // Can view the /[personId] page
-  //       cy.contains("Katelyn Shore");
-  //     });
-  //   });
-  // });
+          url: `${Cypress.env(
+            "apiUrl"
+          )}/v1/search?q=*&models=schools&page=1&per_page=11`,
+        }).then((res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body.data.length).to.be.greaterThan(0);
+        });
+        // Can search for a school
+        cy.get('input[name="search"]').type("wild rose");
+        // Can see results for a searched school
+        cy.contains("Wild Rose Montessori");
+        // Can filter results
+        cy.contains("State").click();
+        cy.contains("Massachusetts").click({ force: true });
+        cy.get("body").click(0, 0);
+        // Can see filtered results for a searched school
+        cy.contains("Wild Rose Montessori");
+        // Can click on a school result
+        cy.contains("Wild Rose Montessori").click();
+        // Can view the /[schoolId] page
+        cy.contains("Wild Rose Montessori");
+        cy.contains("Cambridge, MA");
+        // Can click a school leader on the /[schoolId] page
+        cy.contains("Katelyn").click();
+        // Can view the /[personId] page
+        cy.contains("Katelyn Shore");
+      });
+    });
+  });
 
   describe("foundation member and TL browsing and editing", () => {
     beforeEach(() => {
@@ -106,6 +106,12 @@ describe("network", () => {
           .then((l) => {
             lastName = l.value;
           });
+        let id;
+        cy.getCookie("id")
+          .should("exist")
+          .then((i) => {
+            id = i.value;
+          });
         //Wait for cookies to be set, then type name into search
         cy.then(() => {
           cy.get('input[name="search"]').type(`${firstName} ${lastName}`);
@@ -121,7 +127,7 @@ describe("network", () => {
           cy.get('input[name="lastName"]').clear().type("newLastName");
           cy.get('input[name="city"]').clear().type("Brooklyn");
           cy.get('input[name="state"]').clear().type("New York");
-          cy.get('input[name="email"]').clear().type("newEmail@email.com");
+          cy.get('input[name="email"]').clear().type(`newEmail${id}@email.com`);
           cy.get('input[name="phone"]').clear().type("(123) 456 7890");
           cy.get('[name="about"]').clear().type("New about me bio");
 
@@ -193,7 +199,7 @@ describe("network", () => {
           // wait for upload to complete after 1 minute
           cy.wait("@upload", { requestTimeout: 60000 });
 
-          cy.get('button[type="submit"]').click();
+          cy.get('button[type="submit"]').should("not.be.disabled").click();
         });
       });
     });
