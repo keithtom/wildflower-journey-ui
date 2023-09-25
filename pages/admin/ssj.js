@@ -94,6 +94,7 @@ const SchoolsInSSJ = [
 
 const StyledPersonOption = styled(Card)`
   border-bottom: 1px solid ${({ theme }) => theme.color.neutral.main};
+  /* padding: 0 ${({ theme }) => theme.util.buffer * 3}px; */
   &:last-child {
     border-bottom: 0;
   }
@@ -374,51 +375,78 @@ const AddSchoolModal = ({ open, toggle }) => {
                   render={({ field: { onChange, value } }) => (
                     <RadioGroup value={value}>
                       {OperationsGuides.map((og, i) => (
-                        <FormControlLabel
-                          key={i}
-                          value={og.value}
-                          label={og.label}
-                          control={
-                            <Radio />
-                            // <StyledPersonOption size="small" noBorder noRadius>
-                            //   <Grid
-                            //     container
-                            //     justifyContent="space-between"
-                            //     alignItems="center"
-                            //   >
-                            //     <Grid item>
-                            //       <Stack
-                            //         direction="row"
-                            //         spacing={3}
-                            //         alignItems="center"
-                            //       >
-                            //         <Avatar src={og.imageUrl} size="sm" />
-                            //         <Typography variant="bodyRegular" bold>
-                            //           {og.firstName} {og.lastName}
-                            //         </Typography>
-                            //         {og.roleList.map((r, i) => (
-                            //           <Typography
-                            //             variant="bodyRegular"
-                            //             lightened
-                            //             key={i}
-                            //           >
-                            //             {r}
-                            //           </Typography>
-                            //         ))}
-                            //       </Stack>
-                            //     </Grid>
-                            //     <Grid item>
-                            //       <Button variant="text" small>
-                            //         <Typography variant="bodyRegular" bold>
-                            //           Add
-                            //         </Typography>
-                            //       </Button>
-                            //     </Grid>
-                            //   </Grid>
-                            // </StyledPersonOption>
-                          }
-                          onChange={onChange}
-                        />
+                        <StyledPersonOption size="small" noBorder noRadius>
+                          <FormControlLabel
+                            sx={{ width: "100%" }}
+                            key={i}
+                            value={og.value}
+                            label={
+                              <Grid container>
+                                <Grid item>
+                                  <Stack
+                                    direction="row"
+                                    spacing={3}
+                                    alignItems="center"
+                                  >
+                                    <Avatar src={og.imageUrl} size="sm" />
+                                    <Typography variant="bodyRegular" bold>
+                                      {og.firstName} {og.lastName}
+                                    </Typography>
+                                    {og.roleList.map((r, i) => (
+                                      <Typography
+                                        variant="bodyRegular"
+                                        lightened
+                                        key={i}
+                                      >
+                                        {r}
+                                      </Typography>
+                                    ))}
+                                  </Stack>
+                                </Grid>
+                              </Grid>
+                            }
+                            control={
+                              <Radio />
+
+                              //   <Grid
+                              //     container
+                              //     justifyContent="space-between"
+                              //     alignItems="center"
+                              //   >
+                              //     <Grid item>
+                              //       <Stack
+                              //         direction="row"
+                              //         spacing={3}
+                              //         alignItems="center"
+                              //       >
+                              //         <Avatar src={og.imageUrl} size="sm" />
+                              //         <Typography variant="bodyRegular" bold>
+                              //           {og.firstName} {og.lastName}
+                              //         </Typography>
+                              //         {og.roleList.map((r, i) => (
+                              //           <Typography
+                              //             variant="bodyRegular"
+                              //             lightened
+                              //             key={i}
+                              //           >
+                              //             {r}
+                              //           </Typography>
+                              //         ))}
+                              //       </Stack>
+                              //     </Grid>
+                              //     <Grid item>
+                              //       <Button variant="text" small>
+                              //         <Typography variant="bodyRegular" bold>
+                              //           Add
+                              //         </Typography>
+                              //       </Button>
+                              //     </Grid>
+                              //   </Grid>
+                              // </StyledPersonOption>
+                            }
+                            onChange={onChange}
+                          />
+                        </StyledPersonOption>
                       ))}
                     </RadioGroup>
                   )}
@@ -481,6 +509,8 @@ const OperationsGuides = [
     imageUrl: "/",
   },
   {
+    value: "B",
+    label: "B",
     firstName: "B",
     lastName: "B",
     roleList: ["Operations Guide"],
