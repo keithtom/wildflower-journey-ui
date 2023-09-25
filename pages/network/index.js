@@ -64,6 +64,7 @@ const Network = () => {
     setCategory(e.target.value);
     setFilters({ models: e.target.value });
     setResults([]);
+    handlePageChange(1);
   };
   const handleFetchNewResults = () => {
     if (inView && results.length > 0) {
@@ -88,8 +89,11 @@ const Network = () => {
     setQuery("*");
   }, []);
 
-  // console.log("perPage", perPage);
-  // console.log(currentPage);
+  useEffect(() => {
+    handlePageChange(1);
+  }, [filters]);
+
+  console.log(currentPage);
   // console.log(isSearching);
   // console.log({ query });
   // console.log({ currentUser });
