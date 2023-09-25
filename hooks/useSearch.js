@@ -59,7 +59,16 @@ const useSearch = () => {
                   setHasMore(true);
                 }, 250);
               } else if (allResults.length <= displayPerPage) {
-                setResults(allResults);
+                setResults((prevResults) => {
+                  const newResults = displayedResults.filter(
+                    //don't show duplicate results
+                    (newResult) =>
+                      !prevResults.some(
+                        (prevResult) => prevResult.id === newResult.id
+                      )
+                  );
+                  return [...prevResults, ...newResults];
+                });
                 setHasMore(false);
               }
             }
