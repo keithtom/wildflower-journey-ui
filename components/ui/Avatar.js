@@ -6,7 +6,7 @@ const CustomAvatar = styled(MaterialAvatar, {
 })`
   width: ${({ theme }) => theme.util.buffer * 12}px;
   height: ${({ theme }) => theme.util.buffer * 12}px;
-  background: ${({ theme }) => theme.color.primary.main};
+  background: ${({ theme }) => theme.color.neutral.lightest};
 
   /* mini */
   ${(props) =>
