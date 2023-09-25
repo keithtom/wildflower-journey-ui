@@ -29,6 +29,11 @@ const CustomAppBar = styled(AppBar)`
   justify-content: center;
   display: flex;
   ${(props) =>
+    props.isAdmin &&
+    css`
+      background: ${props.theme.color.neutral.dark};
+    `}
+  ${(props) =>
     props.env === "dev" &&
     css`
       background: red;
@@ -43,17 +48,18 @@ const CustomAppBar = styled(AppBar)`
 const Header = ({ toggleNavOpen }) => {
   const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
 
-  const { currentUser, isLoggedIn } = useUserContext();
+  const { currentUser, isLoggedIn, isAdmin } = useUserContext();
 
   const logo = "/assets/images/wildflower-logo.png";
 
   const showNetwork = !currentUser?.attributes?.ssj;
 
   // console.log({ currentUser });
+  // console.log({ isAdmin });
   // console.log(process.env.APP_ENV);
 
   return (
-    <CustomAppBar env={process.env.APP_ENV}>
+    <CustomAppBar env={process.env.APP_ENV} isAdmin={isAdmin}>
       <Grid
         container
         justifyContent={isLoggedIn ? "space-between" : "center"}
@@ -71,16 +77,21 @@ const Header = ({ toggleNavOpen }) => {
                 <Icon type="menu" />
               </IconButton>
               <img src={logo} style={{ height: "24px" }} />
-              <Typography variant="bodyRegular" bold noWrap>
+              <Typography variant="bodyRegular" bold noWrap light={isAdmin}>
                 My Wildflower
               </Typography>
             </Stack>
           ) : (
             <Stack direction="row" alignItems="center" spacing={3}>
               <img src={logo} style={{ height: "32px" }} />
-              <Typography variant="bodyLarge" bold noWrap>
+              <Typography variant="bodyLarge" bold noWrap lightened={isAdmin}>
                 My Wildflower
               </Typography>
+              {isAdmin ? (
+                <Typography variant="bodyLarge" light>
+                  Admin
+                </Typography>
+              ) : null}
             </Stack>
           )}
         </Grid>
