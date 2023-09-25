@@ -70,12 +70,14 @@ import peopleApi from "@api/people";
 
 const Person = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
+  const { currentUser } = useUserContext();
+
   const router = useRouter();
   const { personId } = router.query;
 
   // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
   const { data, error, isLoading, mutate } = useSWR(
-    `/api/person/${personId}`,
+    personId ? `/api/person/${personId}` : null,
     () => peopleApi.show(personId, { network: true }).then((res) => res.data),
     {
       onErrorRetry: (error) => {
@@ -99,9 +101,8 @@ const Person = ({}) => {
   // if (!data.data) return <div>loading...</div>;
 
   const person = data.data;
-  // const included = data.included;
+  const included = data.included;
 
-  const { currentUser } = useUserContext();
   const isMyProfile = currentUser?.id === personId;
   const hasSchool = person.relationships.schools.length;
   const hasContact = person.attributes.email || person.attributes.phone;
@@ -116,13 +117,26 @@ const Person = ({}) => {
     person.attributes.rolesResonsibilities ||
     person.attributes.boardMemberOf;
 
+  const findMatchingItems = (array1, array2, property) => {
+    const matchingItems = array1.filter((item1) =>
+      array2.some((item2) => item1[property] === item2[property])
+    );
+    return matchingItems;
+  };
+  const userSchool = findMatchingItems(
+    included,
+    person.relationships.schools.data,
+    "id"
+  );
+
   // console.log({ person });
   // console.log({ currentUser });
   // console.log({ included });
+  // console.log({ userSchool });
 
   return (
     <>
-      <PageContainer isLoading={isLoading || !currentUser}>
+      <PageContainer>
         <Stack spacing={6}>
           <ProfileHero
             profileImage={person.attributes?.imageUrl}
@@ -132,7 +146,6 @@ const Person = ({}) => {
             school={person.attributes?.school?.name}
             schoolLogo={person.attributes?.school?.logoUrl}
             location={person.attributes?.location}
-            // schoolLink={`/network/schools/${FakePerson.attributes.school.id}`}
           />
 
           <Grid container spacing={8}>
@@ -250,6 +263,28 @@ const Person = ({}) => {
                       </Grid>
                     </Grid>
                   ) : null}
+                  {userSchool ? (
+                    <Grid container>
+                      <Grid item xs={12} sm={6}>
+                        <Typography variant="h4" bold>
+                          School
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Stack spacing={3}>
+                          {userSchool.map((s, i) => (
+                            <SchoolCard
+                              key={i}
+                              schoolName={s.attributes.name}
+                              logo={s.attributes.logoUrl}
+                              location={s.attributes.location}
+                              link={`/network/schools/${s.id}`}
+                            />
+                          ))}
+                        </Stack>
+                      </Grid>
+                    </Grid>
+                  ) : null}
                   {person?.attributes?.boardMemberOf ? (
                     <Grid container>
                       <Grid item xs={12} sm={6}>
@@ -261,6 +296,7 @@ const Person = ({}) => {
                         <Stack spacing={3}>
                           {person.attributes.boardMemberOf.map((b, i) => (
                             <SchoolCard
+                              key={i}
                               schoolName={b.name}
                               logo={b.logoUrl}
                               location={b.location}
