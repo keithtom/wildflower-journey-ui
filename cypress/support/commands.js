@@ -35,11 +35,16 @@ Cypress.Commands.add("login", (email, password) => {
     },
   }).then((resp) => {
     window.cookieStore.set("auth", resp.headers.authorization);
-    window.cookieStore.set(
-      "workflowId",
-      resp.body.data.attributes.ssj.workflowId
-    );
-    window.cookieStore.set("phase", resp.body.data.attributes.ssj.currentPhase);
+    if (resp.body.data.attributes.ssj) {
+      window.cookieStore.set(
+        "workflowId",
+        resp.body.data.attributes.ssj.workflowId
+      );
+      window.cookieStore.set(
+        "phase",
+        resp.body.data.attributes.ssj.currentPhase
+      );
+    }
     window.cookieStore.set("firstName", resp.body.data.attributes.firstName);
     window.cookieStore.set("lastName", resp.body.data.attributes.lastName);
     window.cookieStore.set("id", resp.body.data.id);
@@ -54,6 +59,20 @@ function resetFixtures() {
   cy.request({
     method: "PUT",
     url: `${Cypress.env("apiUrl")}/reset_fixtures`,
+    body: {
+      email: email,
+    },
+  });
+  return email;
+}
+
+function resetNetworkFixtures() {
+  const timestamp = Date.now();
+  const email = `cypress_test_${timestamp}@test.com`;
+
+  cy.request({
+    method: "PUT",
+    url: `${Cypress.env("apiUrl")}/reset_network_fixtures`,
     body: {
       email: email,
     },
@@ -79,7 +98,10 @@ function resetPartnerFixtures() {
 Cypress.Commands.add("resetFixtures", () => {
   cy.wrap(resetFixtures());
 });
-
+// Used with tests that are testing network workflows
+Cypress.Commands.add("resetNetworkFixtures", () => {
+  cy.wrap(resetNetworkFixtures());
+});
 // Used with tests that are testing partner workflows
 Cypress.Commands.add("resetPartnerFixtures", () => {
   cy.wrap(resetPartnerFixtures());
@@ -87,6 +109,12 @@ Cypress.Commands.add("resetPartnerFixtures", () => {
 
 Cypress.Commands.add("resetFixturesAndLogin", () => {
   cy.resetFixtures().then((email) => {
+    cy.login(email, "password");
+  });
+});
+
+Cypress.Commands.add("resetNetworkFixturesAndLogin", () => {
+  cy.resetNetworkFixtures().then((email) => {
     cy.login(email, "password");
   });
 });

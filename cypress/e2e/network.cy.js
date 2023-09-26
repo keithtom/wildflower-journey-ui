@@ -7,7 +7,7 @@ describe("network", () => {
 
   describe("foundation member browsing", () => {
     beforeEach(() => {
-      cy.resetFixturesAndLogin();
+      cy.resetNetworkFixturesAndLogin();
       cy.visit("/network", { timeout: 60000 });
     });
     describe("viewing results, filtering, and viewing profile pages", () => {
@@ -74,7 +74,7 @@ describe("network", () => {
 
   describe("foundation member and TL browsing and editing", () => {
     beforeEach(() => {
-      cy.resetFixturesAndLogin();
+      cy.resetNetworkFixturesAndLogin();
       cy.visit("/network", { timeout: 60000 });
     });
     describe("viewing results, searching for self, editing profile", () => {
