@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -124,6 +124,7 @@ const AddSchoolModal = ({ open, toggle }) => {
     trigger,
     getValues,
     reset,
+    watch,
     formState: { errors },
   } = useForm();
 
@@ -145,76 +146,89 @@ const AddSchoolModal = ({ open, toggle }) => {
     setEmergingTeacherLeaders(postRemovedETLs);
   };
 
+  useEffect(() => {
+    const opsValue = getValues("operationsGuide");
+    setOperationsGuide(opsValue);
+  }, [watch("operationsGuide")]);
+  useEffect(() => {
+    const rglValue = getValues("regionalGrowthLead");
+    setRegionalGrowthLead(rglValue);
+  }, [watch("regionalGrowthLead")]);
+
   const onSubmit = (data) => {
     //Submit data
+    console.log({ data });
   };
+
   // console.log({ emergingTeacherLeaders });
+  // console.log({ opsValue });
+  // console.log({ operationsGuide });
   // console.log({ errors });
   // console.log({ isValid });
 
   return (
-    <Modal
-      open={open}
-      toggle={toggle}
-      title="Add a school"
-      fixedActions={
-        <Grid container justifyContent="space-between">
-          <Grid item>
-            {activeStep !== 0 ? (
-              <Button
-                onClick={handlePrev}
-                disabled={activeStep === 0}
-                variant="text"
-              >
-                <Typography variant="bodyRegular" bold light>
-                  Prev
-                </Typography>
-              </Button>
-            ) : null}
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Modal
+        open={open}
+        toggle={toggle}
+        title="Add a school"
+        fixedActions={
+          <Grid container justifyContent="space-between">
+            <Grid item>
+              {activeStep !== 0 ? (
+                <Button
+                  onClick={handlePrev}
+                  disabled={activeStep === 0}
+                  variant="text"
+                >
+                  <Typography variant="bodyRegular" bold light>
+                    Prev
+                  </Typography>
+                </Button>
+              ) : null}
+            </Grid>
+            <Grid item>
+              {activeStep === 3 ? (
+                <Button type="submit">
+                  <Typography variant="bodyRegular" bold light>
+                    Invite
+                  </Typography>
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  disabled={
+                    activeStep === 0
+                      ? !emergingTeacherLeaders.length
+                      : activeStep === 1
+                      ? !operationsGuide
+                      : activeStep === 2 && !regionalGrowthLead
+                  }
+                >
+                  <Typography variant="bodyRegular" bold light>
+                    Next
+                  </Typography>
+                </Button>
+              )}
+            </Grid>
           </Grid>
-          <Grid item>
-            {activeStep === 3 ? (
-              <Button>
-                <Typography variant="bodyRegular" bold light>
-                  Invite
-                </Typography>
-              </Button>
-            ) : (
-              <Button
-                onClick={handleNext}
-                disabled={
-                  activeStep === 0
-                    ? !emergingTeacherLeaders.length
-                    : activeStep === 1
-                    ? !operationsGuide
-                    : activeStep === 2 && !regionalGrowthLead
-                }
-              >
-                <Typography variant="bodyRegular" bold light>
-                  Next
-                </Typography>
-              </Button>
-            )}
-          </Grid>
-        </Grid>
-      }
-    >
-      <Stepper activeStep={activeStep}>
-        <Step>
-          <StepLabel>Add ETLs</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Add OG</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Add RGL</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Invite</StepLabel>
-        </Step>
-      </Stepper>
+        }
+      >
+        <Stepper activeStep={activeStep}>
+          <Step>
+            <StepLabel>Add ETLs</StepLabel>
+          </Step>
+          <Step>
+            <StepLabel>Add OG</StepLabel>
+          </Step>
+          <Step>
+            <StepLabel>Add RGL</StepLabel>
+          </Step>
+          <Step>
+            <StepLabel>Invite</StepLabel>
+          </Step>
+        </Stepper>
 
-      <form>
         {activeStep === 0 ? (
           <Grid container spacing={3}>
             <Grid item xs={12}>
@@ -405,45 +419,7 @@ const AddSchoolModal = ({ open, toggle }) => {
                                 </Grid>
                               </Grid>
                             }
-                            control={
-                              <Radio />
-
-                              //   <Grid
-                              //     container
-                              //     justifyContent="space-between"
-                              //     alignItems="center"
-                              //   >
-                              //     <Grid item>
-                              //       <Stack
-                              //         direction="row"
-                              //         spacing={3}
-                              //         alignItems="center"
-                              //       >
-                              //         <Avatar src={og.imageUrl} size="sm" />
-                              //         <Typography variant="bodyRegular" bold>
-                              //           {og.firstName} {og.lastName}
-                              //         </Typography>
-                              //         {og.roleList.map((r, i) => (
-                              //           <Typography
-                              //             variant="bodyRegular"
-                              //             lightened
-                              //             key={i}
-                              //           >
-                              //             {r}
-                              //           </Typography>
-                              //         ))}
-                              //       </Stack>
-                              //     </Grid>
-                              //     <Grid item>
-                              //       <Button variant="text" small>
-                              //         <Typography variant="bodyRegular" bold>
-                              //           Add
-                              //         </Typography>
-                              //       </Button>
-                              //     </Grid>
-                              //   </Grid>
-                              // </StyledPersonOption>
-                            }
+                            control={<Radio />}
                             onChange={onChange}
                           />
                         </StyledPersonOption>
@@ -455,47 +431,62 @@ const AddSchoolModal = ({ open, toggle }) => {
             </Grid>
           </Grid>
         ) : activeStep === 2 ? (
-          <Grid container>
+          <Grid container spacing={3}>
             <Grid item xs={12}>
               <Card noPadding>
-                {RegionalGrowthLeads.map((rgl, i) => (
-                  <StyledPersonOption size="small" noBorder noRadius key={i}>
-                    <Grid
-                      container
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Grid item>
-                        <Stack direction="row" spacing={3} alignItems="center">
-                          <Avatar src={rgl.imageUrl} size="sm" />
-                          <Typography variant="bodyRegular" bold>
-                            {rgl.firstName} {rgl.lastName}
-                          </Typography>
-                          {rgl.roleList.map((r, i) => (
-                            <Typography variant="bodyRegular" lightened key={i}>
-                              {r}
-                            </Typography>
-                          ))}
-                        </Stack>
-                      </Grid>
-                      <Grid item>
-                        <Button variant="text" small>
-                          <Typography variant="bodyRegular" bold>
-                            Add
-                          </Typography>
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </StyledPersonOption>
-                ))}
+                <Controller
+                  name="regionalGrowthLead"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { onChange, value } }) => (
+                    <RadioGroup value={value}>
+                      {RegionalGrowthLeads.map((rgl, i) => (
+                        <StyledPersonOption size="small" noBorder noRadius>
+                          <FormControlLabel
+                            sx={{ width: "100%" }}
+                            key={i}
+                            value={rgl.value}
+                            label={
+                              <Grid container>
+                                <Grid item>
+                                  <Stack
+                                    direction="row"
+                                    spacing={3}
+                                    alignItems="center"
+                                  >
+                                    <Avatar src={rgl.imageUrl} size="sm" />
+                                    <Typography variant="bodyRegular" bold>
+                                      {rgl.firstName} {rgl.lastName}
+                                    </Typography>
+                                    {rgl.roleList.map((r, i) => (
+                                      <Typography
+                                        variant="bodyRegular"
+                                        lightened
+                                        key={i}
+                                      >
+                                        {r}
+                                      </Typography>
+                                    ))}
+                                  </Stack>
+                                </Grid>
+                              </Grid>
+                            }
+                            control={<Radio />}
+                            onChange={onChange}
+                          />
+                        </StyledPersonOption>
+                      ))}
+                    </RadioGroup>
+                  )}
+                ></Controller>
               </Card>
             </Grid>
           </Grid>
         ) : (
           activeStep === 3 && <Grid container>Summary</Grid>
         )}
-      </form>
-    </Modal>
+      </Modal>
+    </form>
   );
 };
 
@@ -519,12 +510,16 @@ const OperationsGuides = [
 ];
 const RegionalGrowthLeads = [
   {
+    value: "A - RGL",
+    label: "A - RGL",
     firstName: "A",
     lastName: "A",
     roleList: ["Regional Growth Lead"],
     imageUrl: "/",
   },
   {
+    value: "B - RGL",
+    label: "B - RGL",
     firstName: "B",
     lastName: "B",
     roleList: ["Regional Growth Lead"],
