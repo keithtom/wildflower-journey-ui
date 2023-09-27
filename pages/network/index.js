@@ -61,6 +61,7 @@ const Network = () => {
     triggerOnce: true,
   });
   const handleCategoryChange = (e) => {
+    setIsSearching(true);
     setCategory(e.target.value);
     setFilters({ models: e.target.value });
     setResults([]);
@@ -159,7 +160,7 @@ const Network = () => {
                       filter={f}
                       setFilters={setFilters}
                       isSearching={isSearching}
-                      // disabled={f.doNotDisplayFor === category}
+                      category={category}
                     />
                   </Grid>
                 )
@@ -250,7 +251,7 @@ const Network = () => {
 
 export default Network;
 
-const FilterMultiSelect = ({ filter, setFilters, isSearching }) => {
+const FilterMultiSelect = ({ filter, category, setFilters, isSearching }) => {
   const [filterValue, setFilterValue] = useState([]);
   const handleValueChange = (event) => {
     const {
@@ -264,6 +265,9 @@ const FilterMultiSelect = ({ filter, setFilters, isSearching }) => {
       return { ...filters, [filter.param]: value };
     });
   };
+  useEffect(() => {
+    setFilterValue([]);
+  }, [category]);
   // console.log(filterValue);
   return (
     <MultiSelect
