@@ -5,7 +5,7 @@ describe("network", () => {
     cy.viewport(1280, 832);
   });
 
-  describe("foundation member browsing", () => {
+  describe("network user browsing", () => {
     beforeEach(() => {
       cy.resetNetworkFixturesAndLogin();
       cy.visit("/network", { timeout: 60000 });
@@ -72,7 +72,7 @@ describe("network", () => {
     });
   });
 
-  describe("foundation member and TL browsing and editing", () => {
+  describe("network user with TL role browsing and editing", () => {
     beforeEach(() => {
       cy.resetNetworkFixturesAndLogin();
       cy.visit("/network", { timeout: 60000 });

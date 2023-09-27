@@ -45,7 +45,7 @@ const Network = () => {
     noResults,
   } = useSearch();
   const [category, setCategory] = useState("people");
-  const [userQuery, setUserQuery] = useState(null);
+  const [userQuery, setUserQuery] = useState("");
 
   const { currentUser } = useUserContext();
 
