@@ -264,7 +264,7 @@ const Person = ({}) => {
                       </Grid>
                     </Grid>
                   ) : null}
-                  {userSchool ? (
+                  {userSchool.length ? (
                     <Grid container>
                       <Grid item xs={12} sm={6}>
                         <Typography variant="h4" bold>
