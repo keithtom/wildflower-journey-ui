@@ -570,7 +570,7 @@ const EditProfileModal = ({
               <Select
                 label="GovernanceType"
                 placeholder="Select your school's governance..."
-                options={governance.options.map((l) => l.label)}
+                options={governance.options}
                 value={governanceType}
                 onChange={handleGovernanceType}
                 error={errors.governance}

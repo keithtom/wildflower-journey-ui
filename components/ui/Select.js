@@ -41,7 +41,8 @@ const Select = React.forwardRef(
             displayEmpty={true}
             renderValue={(value) =>
               value ? (
-                value
+                // value
+                options.find((option) => option.value === value)?.label || value
               ) : (
                 <Typography variant="bodyRegular" lightened>
                   {placeholder}
@@ -60,8 +61,8 @@ const Select = React.forwardRef(
             {...props}
           >
             {options.map((option, i) => (
-              <MenuItem key={i} value={option}>
-                {option}
+              <MenuItem key={i} value={option.value}>
+                {option.label}
               </MenuItem>
             ))}
           </MaterialSelect>

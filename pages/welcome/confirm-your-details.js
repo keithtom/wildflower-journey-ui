@@ -6,6 +6,7 @@ import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
 import { clearLoggedInState } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
+import { unitedStatesOptions } from "../../lib/utils/demographic-options";
 
 import {
   Button,
@@ -20,6 +21,7 @@ import {
   IconButton,
   TextField,
   PageContainer,
+  Select,
 } from "@ui";
 
 const StyledChatBubble = styled(Box)`
@@ -216,14 +218,15 @@ const ConfirmYourDetails = ({}) => {
                     control={control}
                     rules={{ required: true }}
                     render={({ field }) => (
-                      <TextField
+                      <Select
                         label="State"
-                        placeholder="e.g. Massachusetts"
+                        placeholder="e.g.Massachusetts"
+                        options={unitedStatesOptions}
                         error={errors.state}
                         helperText={
                           errors &&
                           errors.state &&
-                          errors.state &&
+                          errors.state.type === "required" &&
                           "This field is required"
                         }
                         {...field}
