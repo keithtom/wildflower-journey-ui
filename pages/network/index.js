@@ -102,7 +102,7 @@ const Network = () => {
   // console.log({ noResults });
   // console.log({ inView });
   // console.log("hasMore------------------------", hasMore);
-  // console.log({ filters });
+  console.log({ filters });
 
   return (
     <>
@@ -158,6 +158,7 @@ const Network = () => {
                     <FilterMultiSelect
                       filter={f}
                       setFilters={setFilters}
+                      isSearching={isSearching}
                       // disabled={f.doNotDisplayFor === category}
                     />
                   </Grid>
@@ -249,7 +250,7 @@ const Network = () => {
 
 export default Network;
 
-const FilterMultiSelect = ({ filter, setFilters }) => {
+const FilterMultiSelect = ({ filter, setFilters, isSearching }) => {
   const [filterValue, setFilterValue] = useState([]);
   const handleValueChange = (event) => {
     const {
@@ -266,6 +267,7 @@ const FilterMultiSelect = ({ filter, setFilters }) => {
   // console.log(filterValue);
   return (
     <MultiSelect
+      disabled={isSearching}
       withCheckbox
       autoWidth
       options={filter.options}
