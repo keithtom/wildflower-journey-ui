@@ -14,7 +14,7 @@ describe("onboarding spec", () => {
       cy.get('input[name="firstName"]').should("be.visible");
       cy.get('input[name="lastName"]').should("be.visible");
       cy.get('input[name="city"]').should("be.visible");
-      cy.get('input[name="state"]').should("be.visible");
+      cy.contains("state").should("be.visible");
       cy.get('input[name="email"]').should("be.visible");
       cy.get('button[type="submit"]').should("be.visible");
     });
@@ -23,7 +23,9 @@ describe("onboarding spec", () => {
       cy.get('input[name="firstName"]').clear().type("newFirstName");
       cy.get('input[name="lastName"]').clear().type("newLastName");
       cy.get('input[name="city"]').clear().type("Brooklyn");
-      cy.get('input[name="state"]').clear().type("New York");
+      cy.contains("State").next().click();
+      cy.contains("New York").click();
+      cy.get("body").click(0, 0); // close dropdwon
       cy.get('button[type="submit"]').click();
       cy.url({ timeout: 10000 }).should(
         "include",
@@ -131,6 +133,34 @@ describe("onboarding spec", () => {
     });
   });
 
+  describe("inputting personal details", () => {
+    beforeEach(() => {
+      cy.visit("/welcome/existing-member/confirm-your-details");
+    });
+
+    it("should display form", () => {
+      cy.get('input[name="firstName"]').should("be.visible");
+      cy.get('input[name="lastName"]').should("be.visible");
+      cy.get('input[name="city"]').should("be.visible");
+      cy.contains("state").should("be.visible");
+      cy.get('input[name="email"]').should("be.visible");
+      cy.get('button[type="submit"]').should("be.visible");
+    });
+
+    it("should be able to update fields", () => {
+      cy.get('input[name="firstName"]').clear().type("newFirstName");
+      cy.get('input[name="lastName"]').clear().type("newLastName");
+      cy.get('input[name="city"]').clear().type("Brooklyn");
+      cy.contains("State").next().click();
+      cy.contains("New York").click();
+      cy.get("body").click(0, 0); // close dropdwon
+      cy.get('button[type="submit"]').click();
+      cy.url({ timeout: 10000 }).should(
+        "include",
+        "/welcome/confirm-demographic-info"
+      );
+    });
+  });
   describe("existing member", () => {
     describe("confirming demographic info", () => {
       beforeEach(() => {
