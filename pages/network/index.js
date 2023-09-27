@@ -64,6 +64,7 @@ const Network = () => {
     setCategory(e.target.value);
     setFilters({ models: e.target.value });
     setResults([]);
+    handlePageChange(1);
   };
   const handleFetchNewResults = () => {
     if (inView && results.length > 0) {
@@ -88,13 +89,16 @@ const Network = () => {
     setQuery("*");
   }, []);
 
-  // console.log("perPage", perPage);
+  useEffect(() => {
+    handlePageChange(1);
+  }, [filters]);
+
   // console.log(currentPage);
   // console.log(isSearching);
   // console.log({ query });
   // console.log({ currentUser });
   // console.log({ currentUser });
-  console.log({ results });
+  // console.log({ results });
   // console.log({ noResults });
   // console.log({ inView });
   // console.log("hasMore------------------------", hasMore);
@@ -621,8 +625,8 @@ const Filters = [
     param: "people_filters[genders]",
     doNotDisplayFor: "schools",
     options: [
-      { value: "Male", label: "Male/Man" },
-      { value: "Female", label: "Female/Woman" },
+      { value: "Male/Man", label: "Male/Man" },
+      { value: "Female/Woman", label: "Female/Woman" },
       { value: "Gender Non-Conforming", label: "Gender Non-Conforming" },
       {
         value: "A not-listed or more specific gender identity",
