@@ -45,7 +45,7 @@ const Network = () => {
     noResults,
   } = useSearch();
   const [category, setCategory] = useState("people");
-  const [userQuery, setUserQuery] = useState(null);
+  const [userQuery, setUserQuery] = useState("");
 
   const { currentUser } = useUserContext();
 
@@ -97,12 +97,12 @@ const Network = () => {
   // console.log(isSearching);
   // console.log({ query });
   // console.log({ currentUser });
-  // console.log({ currentUser });
+  // console.log({ currentPage });
   // console.log({ results });
   // console.log({ noResults });
   // console.log({ inView });
   // console.log("hasMore------------------------", hasMore);
-  console.log({ filters });
+  // console.log({ filters });
 
   return (
     <>
