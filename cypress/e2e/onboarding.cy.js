@@ -14,7 +14,7 @@ describe("onboarding spec", () => {
       cy.get('input[name="firstName"]').should("be.visible");
       cy.get('input[name="lastName"]').should("be.visible");
       cy.get('input[name="city"]').should("be.visible");
-      cy.contains("state").should("be.visible");
+      cy.contains("State").should("be.visible");
       cy.get('input[name="email"]').should("be.visible");
       cy.get('button[type="submit"]').should("be.visible");
     });
@@ -142,7 +142,7 @@ describe("onboarding spec", () => {
       cy.get('input[name="firstName"]').should("be.visible");
       cy.get('input[name="lastName"]').should("be.visible");
       cy.get('input[name="city"]').should("be.visible");
-      cy.contains("state").should("be.visible");
+      cy.contains("State").should("be.visible");
       cy.get('input[name="email"]').should("be.visible");
       cy.get('button[type="submit"]').should("be.visible");
     });
@@ -157,7 +157,7 @@ describe("onboarding spec", () => {
       cy.get('button[type="submit"]').click();
       cy.url({ timeout: 10000 }).should(
         "include",
-        "/welcome/confirm-demographic-info"
+        "/welcome/existing-member/confirm-demographic-info"
       );
     });
   });
