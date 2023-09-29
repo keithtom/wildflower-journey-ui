@@ -523,7 +523,6 @@ const EditProfileModal = ({
                 <DatePicker
                   label="Your open date"
                   id="open-date"
-                  disablePast
                   error={errors.openDate}
                   value={openDate}
                   onChange={handleOpenDate}
