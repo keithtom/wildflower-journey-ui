@@ -43,6 +43,7 @@ const Network = () => {
     handlePageChange,
     hasMore,
     noResults,
+    perPage,
   } = useSearch();
   const [category, setCategory] = useState("people");
   const [userQuery, setUserQuery] = useState("");
@@ -69,6 +70,7 @@ const Network = () => {
   };
   const handleFetchNewResults = () => {
     if (inView && results.length > 0) {
+      setIsSearching(true);
       handlePageChange(currentPage + 1);
     }
   };
@@ -160,6 +162,7 @@ const Network = () => {
                       filter={f}
                       setFilters={setFilters}
                       isSearching={isSearching}
+                      setIsSearching={setIsSearching}
                       category={category}
                     />
                   </Grid>
@@ -209,11 +212,13 @@ const Network = () => {
                   ))}
             </Masonry>
           )}
-          {hasMore && !isSearching && results.length > 0 && (
-            <div
-              ref={ref}
-              style={{ opacity: 0, width: "100%", height: "1px" }}
-            />
+          {hasMore && !isSearching && results.length >= perPage - 1 && (
+            <Grid item xs={12} mt={results.length ? 0 : 48}>
+              <div
+                ref={ref}
+                style={{ opacity: 0, width: "100%", height: "48px" }}
+              />
+            </Grid>
           )}
           {!hasMore && noResults && !isSearching && (
             <Grid item xs={12} mt={24}>
@@ -251,7 +256,13 @@ const Network = () => {
 
 export default Network;
 
-const FilterMultiSelect = ({ filter, category, setFilters, isSearching }) => {
+const FilterMultiSelect = ({
+  filter,
+  category,
+  setFilters,
+  setIsSearching,
+  isSearching,
+}) => {
   const [filterValue, setFilterValue] = useState([]);
   const handleValueChange = (event) => {
     const {
@@ -262,6 +273,7 @@ const FilterMultiSelect = ({ filter, category, setFilters, isSearching }) => {
       typeof value === "string" ? value.split(",") : value
     );
     setFilters((filters) => {
+      setIsSearching(true);
       return { ...filters, [filter.param]: value };
     });
   };
