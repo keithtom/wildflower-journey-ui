@@ -236,7 +236,7 @@ const ConfirmDemographicInfo = ({}) => {
                     <Select
                       label="What is your primary language?"
                       placeholder="Select a language..."
-                      options={languageOptions.map((l) => l.label)}
+                      options={languageOptions}
                       error={errors.primaryLanguage}
                       helperText={
                         errors &&
@@ -353,7 +353,7 @@ const ConfirmDemographicInfo = ({}) => {
                     <Select
                       label="What is your gender identity?"
                       placeholder="Select one..."
-                      options={genderOptions.map((l) => l.label)}
+                      options={genderOptions}
                       error={errors.gender}
                       helperText={
                         errors &&
@@ -396,7 +396,7 @@ const ConfirmDemographicInfo = ({}) => {
                     <Select
                       label="What are your pronouns?"
                       placeholder="Select one..."
-                      options={pronounsOptions.map((l) => l.label)}
+                      options={pronounsOptions}
                       error={errors.pronouns}
                       helperText={
                         errors &&
