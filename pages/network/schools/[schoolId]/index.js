@@ -523,7 +523,6 @@ const EditProfileModal = ({
                 <DatePicker
                   label="Your open date"
                   id="open-date"
-                  disablePast
                   error={errors.openDate}
                   value={openDate}
                   onChange={handleOpenDate}
@@ -570,7 +569,7 @@ const EditProfileModal = ({
               <Select
                 label="GovernanceType"
                 placeholder="Select your school's governance..."
-                options={governance.options.map((l) => l.label)}
+                options={governance.options}
                 value={governanceType}
                 onChange={handleGovernanceType}
                 error={errors.governance}

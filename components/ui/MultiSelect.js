@@ -15,7 +15,7 @@ const CustomMultiSelect = styled(MaterialSelect)`
     props.disabled &&
     css`
       background: ${props.theme.color.neutral.lightened};
-      border: none;
+      border: 1px solid ${props.theme.color.neutral.lightened};
       opacity: 0.6;
     `}
 `;

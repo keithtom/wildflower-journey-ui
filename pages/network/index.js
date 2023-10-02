@@ -43,9 +43,10 @@ const Network = () => {
     handlePageChange,
     hasMore,
     noResults,
+    perPage,
   } = useSearch();
   const [category, setCategory] = useState("people");
-  const [userQuery, setUserQuery] = useState(null);
+  const [userQuery, setUserQuery] = useState("");
 
   const { currentUser } = useUserContext();
 
@@ -61,6 +62,7 @@ const Network = () => {
     triggerOnce: true,
   });
   const handleCategoryChange = (e) => {
+    setIsSearching(true);
     setCategory(e.target.value);
     setFilters({ models: e.target.value });
     setResults([]);
@@ -68,6 +70,7 @@ const Network = () => {
   };
   const handleFetchNewResults = () => {
     if (inView && results.length > 0) {
+      setIsSearching(true);
       handlePageChange(currentPage + 1);
     }
   };
@@ -97,7 +100,7 @@ const Network = () => {
   // console.log(isSearching);
   // console.log({ query });
   // console.log({ currentUser });
-  // console.log({ currentUser });
+  // console.log({ currentPage });
   // console.log({ results });
   // console.log({ noResults });
   // console.log({ inView });
@@ -158,7 +161,9 @@ const Network = () => {
                     <FilterMultiSelect
                       filter={f}
                       setFilters={setFilters}
-                      // disabled={f.doNotDisplayFor === category}
+                      isSearching={isSearching}
+                      setIsSearching={setIsSearching}
+                      category={category}
                     />
                   </Grid>
                 )
@@ -207,11 +212,13 @@ const Network = () => {
                   ))}
             </Masonry>
           )}
-          {hasMore && !isSearching && results.length > 0 && (
-            <div
-              ref={ref}
-              style={{ opacity: 0, width: "100%", height: "1px" }}
-            />
+          {hasMore && !isSearching && results.length >= perPage - 1 && (
+            <Grid item xs={12} mt={results.length ? 0 : 48}>
+              <div
+                ref={ref}
+                style={{ opacity: 0, width: "100%", height: "48px" }}
+              />
+            </Grid>
           )}
           {!hasMore && noResults && !isSearching && (
             <Grid item xs={12} mt={24}>
@@ -249,7 +256,13 @@ const Network = () => {
 
 export default Network;
 
-const FilterMultiSelect = ({ filter, setFilters }) => {
+const FilterMultiSelect = ({
+  filter,
+  category,
+  setFilters,
+  setIsSearching,
+  isSearching,
+}) => {
   const [filterValue, setFilterValue] = useState([]);
   const handleValueChange = (event) => {
     const {
@@ -260,12 +273,17 @@ const FilterMultiSelect = ({ filter, setFilters }) => {
       typeof value === "string" ? value.split(",") : value
     );
     setFilters((filters) => {
+      setIsSearching(true);
       return { ...filters, [filter.param]: value };
     });
   };
+  useEffect(() => {
+    setFilterValue([]);
+  }, [category]);
   // console.log(filterValue);
   return (
     <MultiSelect
+      disabled={isSearching}
       withCheckbox
       autoWidth
       options={filter.options}
