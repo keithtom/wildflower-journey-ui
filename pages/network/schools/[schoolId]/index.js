@@ -455,8 +455,7 @@ const EditProfileModal = ({
             city: data.city,
             state: data.state,
           },
-          // TODO: Add correct school logo key
-          // school_logo_image: schoolLogoImage,
+          logo_image: schoolLogoImage,
           banner_image: bannerImage,
         },
       })
@@ -470,6 +469,7 @@ const EditProfileModal = ({
         } else {
           console.log("successfully updated", response.data);
           setBannerPicture(null);
+          setSchoolLogoPicture(null);
           mutate();
           setEditProfileModalOpen(false);
         }
