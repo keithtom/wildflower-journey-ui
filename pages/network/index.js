@@ -197,8 +197,8 @@ const Network = () => {
                     <SchoolResultItem
                       schoolLink={`/network/schools/${f.id}`}
                       heroImg={
-                        f.attributes.heroUrl
-                          ? f.attributes.heroUrl
+                        f.attributes.heroImageUrl
+                          ? f.attributes.heroImageUrl
                           : schoolFallback
                       }
                       logoImg={f.attributes.logoUrl}
@@ -374,22 +374,21 @@ const SchoolResultItem = ({
         <Stack>
           <Stack
             p={6}
-            justifyContent="space-between"
-            alignItems="flex-start"
+            justifyContent="center"
+            alignItems="center"
             sx={{
-              backgroundImage: `url(${logoImg ? logoImg : heroImg})`,
-              backgroundSize: `${logoImg ? "contain" : "cover"}`,
-              backgroundRepeat: `${logoImg ? "no-repeat" : null}`,
-              backgroundPosition: `${logoImg ? "center" : null}`,
-              minHeight: "240px",
+              padding: 0,
             }}
           >
-            {/* {logoImg && <Avatar src={logoImg} />} */}
-            <AvatarGroup>
-              {leaders.map((l, i) => (
-                <Avatar src={l.imageSrc} size="sm" key={i} />
-              ))}
-            </AvatarGroup>
+            <img
+              src={logoImg ? logoImg : heroImg}
+              style={{
+                width: "100%",
+                objectFit: logoImg ? "contain" : "cover",
+                height: "320px",
+                aspectRatio: "1:1",
+              }}
+            />
           </Stack>
           <Card
             size="small"
