@@ -412,15 +412,15 @@ const EditProfileModal = ({
     setAbout(event.target.value);
   };
 
-  const [bannerPicture, setBannerPicture] = useState(null);
-  const [bannerImage, setBannerImage] = useState(null);
+  const [bannerPicture, setBannerPicture] = useState();
+  const [bannerImage, setBannerImage] = useState();
   const [isUpdatingBannerImage, setIsUpdatingBannerImage] = useState(false);
   const handleFileError = (error) => {
     console.log(error);
     setShowError(error); // TODO: Taylor can you help with this?
   };
-  const [schoolLogoPicture, setSchoolLogoPicture] = useState(null);
-  const [schoolLogoImage, setSchoolLogoImage] = useState(null);
+  const [schoolLogoPicture, setSchoolLogoPicture] = useState();
+  const [schoolLogoImage, setSchoolLogoImage] = useState();
   const [isUpdatingSchoolLogoImage, setIsUpdatingSchoolLogoImage] =
     useState(false);
 
