@@ -17,6 +17,7 @@ import {
   PageContainer,
   Icon,
   Spinner,
+  IconButton,
 } from "@ui";
 
 const Login = ({}) => {
@@ -118,11 +119,12 @@ const Login = ({}) => {
                     <Grid container justifyContent="center">
                       <Stack spacing={3} alignItems="center">
                         <Icon type="checkCircle" variant="primary" />
-                        <Typography variant="h3" center bold>
-                          Check your email for a secure link to log in.
+                        <Typography variant="h4" center bold>
+                          We emailed you a link
                         </Typography>
-                        <Typography>
-                          You should receive it within a few minutes.
+                        <Typography variant="bodyRegular">
+                          Check your email for a secure link to log in. You
+                          should receive it within a few minutes.
                         </Typography>
                       </Stack>
                     </Grid>
@@ -131,7 +133,7 @@ const Login = ({}) => {
                     onClick={() => setSentEmailLoginRequest(false)}
                     variant="text"
                   >
-                    <Typography lightened variant="bodyRegular" center>
+                    <Typography variant="bodyRegular" center>
                       Login with my email and password.
                     </Typography>
                   </Button>
@@ -216,21 +218,48 @@ const Login = ({}) => {
                           </Typography>
                         </Stack>
                       </Button>
-                      <Typography variant="bodyMini" bold lightened>
-                        OR
-                      </Typography>
-
-                      <Button
-                        full
-                        disabled={isSubmitting || isSubmitSuccessful}
-                        variant="text"
-                        onClick={handleRequestEmailLink}
-                      >
-                        <Typography variant="bodyRegular">
-                          Request an email link to login
-                        </Typography>
-                      </Button>
                     </Stack>
+
+                    <Card variant="lightened" size="small">
+                      <Grid container alignItems="center">
+                        <Grid item flex={1}>
+                          <Grid container spacing={3}>
+                            <Grid item>
+                              <Icon type="lock" variant="lightened" />
+                            </Grid>
+                            <Grid item flex={1}>
+                              <Stack>
+                                <Typography variant="bodyRegular" bold>
+                                  Forgot your password?
+                                </Typography>
+                                <Typography variant="bodyRegular">
+                                  Request an email link to login.
+                                </Typography>
+                              </Stack>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                        <Grid item>
+                          <Button
+                            onClick={handleRequestEmailLink}
+                            disabled={isSubmitting || isSubmitSuccessful}
+                            small
+                            variant="lightened"
+                          >
+                            <Stack
+                              direction="row"
+                              spacing={3}
+                              alignItems="center"
+                            >
+                              <Typography variant="bodyRegular">
+                                Request link
+                              </Typography>
+                              <Icon type="rightArrow" variant="primary" />
+                            </Stack>
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    </Card>
                   </Stack>
                 </form>
               )}

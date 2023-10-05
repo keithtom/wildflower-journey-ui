@@ -38,6 +38,7 @@ import {
   genderOptions,
   ethnicityOptions,
   roleOptions,
+  unitedStatesOptions,
 } from "../../../../lib/utils/demographic-options";
 import { useUserContext } from "@lib/useUserContext";
 import {
@@ -263,7 +264,7 @@ const Person = ({}) => {
                       </Grid>
                     </Grid>
                   ) : null}
-                  {userSchool ? (
+                  {userSchool.length ? (
                     <Grid container>
                       <Grid item xs={12} sm={6}>
                         <Typography variant="h4" bold>
@@ -545,10 +546,12 @@ const EditProfileModal = ({
           <Controller
             name="state"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
-              <TextField
+              <Select
                 label="State"
-                placeholder="e.g. Massachusetts"
+                placeholder="e.g.Massachusetts"
+                options={unitedStatesOptions}
                 error={errors.state}
                 helperText={
                   errors &&
@@ -626,7 +629,7 @@ const EditProfileModal = ({
               <Select
                 label="What is your primary language?"
                 placeholder="Select a language..."
-                options={languageOptions.map((l) => l.label)}
+                options={languageOptions}
                 error={errors.primaryLanguage}
                 helperText={
                   errors &&
@@ -741,7 +744,7 @@ const EditProfileModal = ({
               <Select
                 label="What is your gender identity?"
                 placeholder="Select one..."
-                options={genderOptions.map((l) => l.label)}
+                options={genderOptions}
                 error={errors.gender}
                 helperText={
                   errors &&
@@ -783,7 +786,7 @@ const EditProfileModal = ({
               <Select
                 label="What are your pronouns?"
                 placeholder="Select one..."
-                options={pronounsOptions.map((l) => l.label)}
+                options={pronounsOptions}
                 error={errors.pronouns}
                 helperText={
                   errors &&

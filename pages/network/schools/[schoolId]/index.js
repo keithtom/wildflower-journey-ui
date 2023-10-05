@@ -411,13 +411,17 @@ const EditProfileModal = ({
     setAbout(event.target.value);
   };
 
-  const [bannerPicture, setBannerPicture] = useState(null);
-  const [bannerImage, setBannerImage] = useState(null);
+  const [bannerPicture, setBannerPicture] = useState();
+  const [bannerImage, setBannerImage] = useState();
   const [isUpdatingBannerImage, setIsUpdatingBannerImage] = useState(false);
   const handleFileError = (error) => {
     console.log(error);
     setShowError(error); // TODO: Taylor can you help with this?
   };
+  const [schoolLogoPicture, setSchoolLogoPicture] = useState();
+  const [schoolLogoImage, setSchoolLogoImage] = useState();
+  const [isUpdatingSchoolLogoImage, setIsUpdatingSchoolLogoImage] =
+    useState(false);
 
   const {
     control,
@@ -451,6 +455,7 @@ const EditProfileModal = ({
             city: data.city,
             state: data.state,
           },
+          logo_image: schoolLogoImage,
           banner_image: bannerImage,
         },
       })
@@ -464,6 +469,7 @@ const EditProfileModal = ({
         } else {
           console.log("successfully updated", response.data);
           setBannerPicture(null);
+          setSchoolLogoPicture(null);
           mutate();
           setEditProfileModalOpen(false);
         }
@@ -523,7 +529,6 @@ const EditProfileModal = ({
                 <DatePicker
                   label="Your open date"
                   id="open-date"
-                  disablePast
                   error={errors.openDate}
                   value={openDate}
                   onChange={handleOpenDate}
@@ -570,7 +575,7 @@ const EditProfileModal = ({
               <Select
                 label="GovernanceType"
                 placeholder="Select your school's governance..."
-                options={governance.options.map((l) => l.label)}
+                options={governance.options}
                 value={governanceType}
                 onChange={handleGovernanceType}
                 error={errors.governance}
@@ -628,115 +633,233 @@ const EditProfileModal = ({
             )}
           />
 
-          <Typography variant="bodyRegular">Add a new banner image</Typography>
-          <Grid container justifyContent="center">
-            <Grid item xs={12}>
-              <StyledFilePond
-                files={bannerPicture}
-                allowReorder={false}
-                allowMultiple={false}
-                maxFileSize="5MB"
-                acceptedFileTypes={["image/*"]}
-                onupdatefiles={setBannerPicture}
-                onaddfilestart={() => setIsUpdatingBannerImage(true)}
-                onprocessfiles={() => setIsUpdatingBannerImage(false)}
-                onerror={handleFileError}
-                stylePanelAspectRatio="4:1"
-                stylePanelLayout="integrated"
-                server={{
-                  process: (
-                    fieldName,
-                    file,
-                    metadata,
-                    load,
-                    error,
-                    progress,
-                    abort,
-                    transfer,
-                    options
-                  ) => {
-                    // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
-                    FileChecksum.create(file, (checksum_error, checksum) => {
-                      if (checksum_error) {
-                        console.error(checksum_error);
-                        error();
-                      }
-                      axios
-                        .post(
-                          `${process.env.API_URL}/rails/active_storage/direct_uploads`,
-                          {
-                            blob: {
-                              filename: file.name,
-                              content_type: file.type,
-                              byte_size: file.size,
-                              checksum: checksum,
-                            },
-                          }
-                        )
-                        .then((response) => {
-                          if (!response.data) {
-                            return error;
-                          }
-                          const signed_id = response.data.signed_id;
-                          axios
-                            .put(response.data.direct_upload.url, file, {
-                              headers: response.data.direct_upload.headers,
-                              onUploadProgress: (progressEvent) => {
-                                progress(
-                                  progressEvent.lengthComputable,
-                                  progressEvent.loaded,
-                                  progressEvent.total
-                                );
+          <Stack spacing={3}>
+            <Typography variant="bodyRegular">
+              Add a new school logo image
+            </Typography>
+            <Grid container justifyContent="center">
+              <Grid item xs={4}>
+                <StyledFilePond
+                  files={schoolLogoPicture}
+                  allowReorder={false}
+                  allowMultiple={false}
+                  maxFileSize="5MB"
+                  acceptedFileTypes={["image/*"]}
+                  onupdatefiles={setSchoolLogoPicture}
+                  onaddfilestart={() => setIsUpdatingSchoolLogoImage(true)}
+                  onprocessfiles={() => setIsUpdatingSchoolLogoImage(false)}
+                  onerror={handleFileError}
+                  stylePanelAspectRatio="1:1"
+                  stylePanelLayout="circle"
+                  server={{
+                    process: (
+                      fieldName,
+                      file,
+                      metadata,
+                      load,
+                      error,
+                      progress,
+                      abort,
+                      transfer,
+                      options
+                    ) => {
+                      // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
+                      FileChecksum.create(file, (checksum_error, checksum) => {
+                        if (checksum_error) {
+                          console.error(checksum_error);
+                          error();
+                        }
+                        axios
+                          .post(
+                            `${process.env.API_URL}/rails/active_storage/direct_uploads`,
+                            {
+                              blob: {
+                                filename: file.name,
+                                content_type: file.type,
+                                byte_size: file.size,
+                                checksum: checksum,
                               },
-                              // need to remove default Authorization header when sending to s3
-                              transformRequest: (data, headers) => {
-                                if (process.env !== "local") {
-                                  delete headers.common["Authorization"];
+                            }
+                          )
+                          .then((response) => {
+                            if (!response.data) {
+                              return error;
+                            }
+                            const signed_id = response.data.signed_id;
+                            axios
+                              .put(response.data.direct_upload.url, file, {
+                                headers: response.data.direct_upload.headers,
+                                onUploadProgress: (progressEvent) => {
+                                  progress(
+                                    progressEvent.lengthComputable,
+                                    progressEvent.loaded,
+                                    progressEvent.total
+                                  );
+                                },
+                                // need to remove default Authorization header when sending to s3
+                                transformRequest: (data, headers) => {
+                                  if (process.env !== "local") {
+                                    delete headers.common["Authorization"];
+                                  }
+                                  return data;
+                                },
+                              })
+                              .then((response) => {
+                                setSchoolLogoImage(signed_id);
+                                load(signed_id);
+                              })
+                              .catch((error) => {
+                                if (!axios.isCancel(error)) {
+                                  console.error(error);
+                                  // error();
                                 }
-                                return data;
-                              },
-                            })
-                            .then((response) => {
-                              setBannerImage(signed_id);
-                              load(signed_id);
-                            })
-                            .catch((error) => {
-                              if (!axios.isCancel(error)) {
-                                console.error(error);
-                                // error();
-                              }
-                            });
-                        })
-                        .catch((error) => {
-                          console.log(error);
-                        });
-                    });
-                    return {
-                      abort: () => {
-                        // This function is entered if the user has tapped the cancel button
-                        // request.abort(); TODO: is there an active storage abort?
+                              });
+                          })
+                          .catch((error) => {
+                            console.log(error);
+                          });
+                      });
+                      return {
+                        abort: () => {
+                          // This function is entered if the user has tapped the cancel button
+                          // request.abort(); TODO: is there an active storage abort?
 
-                        // Let FilePond know the request has been cancelled
-                        abort();
-                      },
-                    };
-                  },
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                  ondata: (formData) => {
-                    formData.append("blob", value);
-                    return formData;
-                  },
-                  onload: () => {
-                    props.onUploadComplete();
-                  },
-                }}
-                credits={false}
-                labelIdle='Drag & Drop your school banner image or <span class="filepond--label-action">Browse</span>'
-              />
+                          // Let FilePond know the request has been cancelled
+                          abort();
+                        },
+                      };
+                    },
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                    ondata: (formData) => {
+                      formData.append("blob", value);
+                      return formData;
+                    },
+                    onload: () => {
+                      props.onUploadComplete();
+                    },
+                  }}
+                  credits={false}
+                  labelIdle='Drag & Drop your school logo image or <span class="filepond--label-action">Browse</span>'
+                />
+              </Grid>
             </Grid>
-          </Grid>
+          </Stack>
+
+          <Stack spacing={3}>
+            <Typography variant="bodyRegular">
+              Add a new banner image
+            </Typography>
+            <Grid container justifyContent="center">
+              <Grid item xs={12}>
+                <StyledFilePond
+                  files={bannerPicture}
+                  allowReorder={false}
+                  allowMultiple={false}
+                  maxFileSize="5MB"
+                  acceptedFileTypes={["image/*"]}
+                  onupdatefiles={setBannerPicture}
+                  onaddfilestart={() => setIsUpdatingBannerImage(true)}
+                  onprocessfiles={() => setIsUpdatingBannerImage(false)}
+                  onerror={handleFileError}
+                  stylePanelAspectRatio="4:1"
+                  stylePanelLayout="integrated"
+                  server={{
+                    process: (
+                      fieldName,
+                      file,
+                      metadata,
+                      load,
+                      error,
+                      progress,
+                      abort,
+                      transfer,
+                      options
+                    ) => {
+                      // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
+                      FileChecksum.create(file, (checksum_error, checksum) => {
+                        if (checksum_error) {
+                          console.error(checksum_error);
+                          error();
+                        }
+                        axios
+                          .post(
+                            `${process.env.API_URL}/rails/active_storage/direct_uploads`,
+                            {
+                              blob: {
+                                filename: file.name,
+                                content_type: file.type,
+                                byte_size: file.size,
+                                checksum: checksum,
+                              },
+                            }
+                          )
+                          .then((response) => {
+                            if (!response.data) {
+                              return error;
+                            }
+                            const signed_id = response.data.signed_id;
+                            axios
+                              .put(response.data.direct_upload.url, file, {
+                                headers: response.data.direct_upload.headers,
+                                onUploadProgress: (progressEvent) => {
+                                  progress(
+                                    progressEvent.lengthComputable,
+                                    progressEvent.loaded,
+                                    progressEvent.total
+                                  );
+                                },
+                                // need to remove default Authorization header when sending to s3
+                                transformRequest: (data, headers) => {
+                                  if (process.env !== "local") {
+                                    delete headers.common["Authorization"];
+                                  }
+                                  return data;
+                                },
+                              })
+                              .then((response) => {
+                                setBannerImage(signed_id);
+                                load(signed_id);
+                              })
+                              .catch((error) => {
+                                if (!axios.isCancel(error)) {
+                                  console.error(error);
+                                  // error();
+                                }
+                              });
+                          })
+                          .catch((error) => {
+                            console.log(error);
+                          });
+                      });
+                      return {
+                        abort: () => {
+                          // This function is entered if the user has tapped the cancel button
+                          // request.abort(); TODO: is there an active storage abort?
+
+                          // Let FilePond know the request has been cancelled
+                          abort();
+                        },
+                      };
+                    },
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                    ondata: (formData) => {
+                      formData.append("blob", value);
+                      return formData;
+                    },
+                    onload: () => {
+                      props.onUploadComplete();
+                    },
+                  }}
+                  credits={false}
+                  labelIdle='Drag & Drop your school banner image or <span class="filepond--label-action">Browse</span>'
+                />
+              </Grid>
+            </Grid>
+          </Stack>
         </Stack>
         <Card
           noBorder
@@ -751,14 +874,18 @@ const EditProfileModal = ({
           <Stack direction="row" spacing={3} alignItems="center">
             <Button
               small
-              disabled={isUpdatingBannerImage || isSubmitting}
+              disabled={
+                isUpdatingBannerImage ||
+                isUpdatingSchoolLogoImage ||
+                isSubmitting
+              }
               type="submit"
             >
               <Typography variant="bodyRegular" bold>
                 Save
               </Typography>
             </Button>
-            {isUpdatingBannerImage && (
+            {(isUpdatingBannerImage || isUpdatingSchoolLogoImage) && (
               <Typography variant="bodyRegular" lightened>
                 Updating image...
               </Typography>

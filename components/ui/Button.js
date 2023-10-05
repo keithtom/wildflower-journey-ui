@@ -115,6 +115,7 @@ const CustomButton = styled(MaterialButton, {
     css`
       pointer-events: none;
       background: ${props.theme.color.neutral.lightened};
+      pointer-events: none;
       * {
         color: ${props.theme.color.neutral.darkened} !important;
       }

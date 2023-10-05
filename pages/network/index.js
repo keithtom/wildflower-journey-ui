@@ -43,9 +43,10 @@ const Network = () => {
     handlePageChange,
     hasMore,
     noResults,
+    perPage,
   } = useSearch();
   const [category, setCategory] = useState("people");
-  const [userQuery, setUserQuery] = useState(null);
+  const [userQuery, setUserQuery] = useState("");
 
   const { currentUser } = useUserContext();
 
@@ -61,12 +62,15 @@ const Network = () => {
     triggerOnce: true,
   });
   const handleCategoryChange = (e) => {
+    setIsSearching(true);
     setCategory(e.target.value);
     setFilters({ models: e.target.value });
     setResults([]);
+    handlePageChange(1);
   };
   const handleFetchNewResults = () => {
     if (inView && results.length > 0) {
+      setIsSearching(true);
       handlePageChange(currentPage + 1);
     }
   };
@@ -88,13 +92,16 @@ const Network = () => {
     setQuery("*");
   }, []);
 
-  // console.log("perPage", perPage);
+  useEffect(() => {
+    handlePageChange(1);
+  }, [filters]);
+
   // console.log(currentPage);
   // console.log(isSearching);
   // console.log({ query });
   // console.log({ currentUser });
-  // console.log({ currentUser });
-  console.log({ results });
+  // console.log({ currentPage });
+  // console.log({ results });
   // console.log({ noResults });
   // console.log({ inView });
   // console.log("hasMore------------------------", hasMore);
@@ -154,7 +161,9 @@ const Network = () => {
                     <FilterMultiSelect
                       filter={f}
                       setFilters={setFilters}
-                      // disabled={f.doNotDisplayFor === category}
+                      isSearching={isSearching}
+                      setIsSearching={setIsSearching}
+                      category={category}
                     />
                   </Grid>
                 )
@@ -188,8 +197,8 @@ const Network = () => {
                     <SchoolResultItem
                       schoolLink={`/network/schools/${f.id}`}
                       heroImg={
-                        f.attributes.heroUrl
-                          ? f.attributes.heroUrl
+                        f.attributes.heroImageUrl
+                          ? f.attributes.heroImageUrl
                           : schoolFallback
                       }
                       logoImg={f.attributes.logoUrl}
@@ -203,11 +212,13 @@ const Network = () => {
                   ))}
             </Masonry>
           )}
-          {hasMore && !isSearching && results.length > 0 && (
-            <div
-              ref={ref}
-              style={{ opacity: 0, width: "100%", height: "1px" }}
-            />
+          {hasMore && !isSearching && results.length >= perPage - 1 && (
+            <Grid item xs={12} mt={results.length ? 0 : 48}>
+              <div
+                ref={ref}
+                style={{ opacity: 0, width: "100%", height: "48px" }}
+              />
+            </Grid>
           )}
           {!hasMore && noResults && !isSearching && (
             <Grid item xs={12} mt={24}>
@@ -245,7 +256,13 @@ const Network = () => {
 
 export default Network;
 
-const FilterMultiSelect = ({ filter, setFilters }) => {
+const FilterMultiSelect = ({
+  filter,
+  category,
+  setFilters,
+  setIsSearching,
+  isSearching,
+}) => {
   const [filterValue, setFilterValue] = useState([]);
   const handleValueChange = (event) => {
     const {
@@ -256,12 +273,17 @@ const FilterMultiSelect = ({ filter, setFilters }) => {
       typeof value === "string" ? value.split(",") : value
     );
     setFilters((filters) => {
+      setIsSearching(true);
       return { ...filters, [filter.param]: value };
     });
   };
+  useEffect(() => {
+    setFilterValue([]);
+  }, [category]);
   // console.log(filterValue);
   return (
     <MultiSelect
+      disabled={isSearching}
       withCheckbox
       autoWidth
       options={filter.options}
@@ -352,22 +374,21 @@ const SchoolResultItem = ({
         <Stack>
           <Stack
             p={6}
-            justifyContent="space-between"
-            alignItems="flex-start"
+            justifyContent="center"
+            alignItems="center"
             sx={{
-              backgroundImage: `url(${logoImg ? logoImg : heroImg})`,
-              backgroundSize: `${logoImg ? "contain" : "cover"}`,
-              backgroundRepeat: `${logoImg ? "no-repeat" : null}`,
-              backgroundPosition: `${logoImg ? "center" : null}`,
-              minHeight: "240px",
+              padding: 0,
             }}
           >
-            {/* {logoImg && <Avatar src={logoImg} />} */}
-            <AvatarGroup>
-              {leaders.map((l, i) => (
-                <Avatar src={l.imageSrc} size="sm" key={i} />
-              ))}
-            </AvatarGroup>
+            <img
+              src={logoImg ? logoImg : heroImg}
+              style={{
+                width: "100%",
+                objectFit: logoImg ? "contain" : "cover",
+                height: "320px",
+                aspectRatio: "1:1",
+              }}
+            />
           </Stack>
           <Card
             size="small"
@@ -621,8 +642,8 @@ const Filters = [
     param: "people_filters[genders]",
     doNotDisplayFor: "schools",
     options: [
-      { value: "Male", label: "Male/Man" },
-      { value: "Female", label: "Female/Woman" },
+      { value: "Male/Man", label: "Male/Man" },
+      { value: "Female/Woman", label: "Female/Woman" },
       { value: "Gender Non-Conforming", label: "Gender Non-Conforming" },
       {
         value: "A not-listed or more specific gender identity",

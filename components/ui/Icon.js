@@ -46,6 +46,7 @@ import {
   Time,
   Home,
   Wrench,
+  Lock,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -210,6 +211,7 @@ export default function Icon({ ...props }) {
     search: <Search />,
     wrench: <Wrench />,
     shapePolygon: <ShapePolygon />,
+    lock: <Lock />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

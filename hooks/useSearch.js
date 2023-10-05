@@ -38,8 +38,7 @@ const useSearch = () => {
           .then((res) => {
             const allResults = res.data.data;
             const displayPerPage = perPage - 1;
-            const displayedResults = allResults.slice(0, displayPerPage);
-
+            const displayedResults = allResults.slice(0, perPage);
             if (allResults.length === 0) {
               setNoResults(true);
               setHasMore(false);
@@ -59,7 +58,16 @@ const useSearch = () => {
                   setHasMore(true);
                 }, 250);
               } else if (allResults.length <= displayPerPage) {
-                setResults(allResults);
+                setResults((prevResults) => {
+                  const newResults = displayedResults.filter(
+                    //don't show duplicate results
+                    (newResult) =>
+                      !prevResults.some(
+                        (prevResult) => prevResult.id === newResult.id
+                      )
+                  );
+                  return [...prevResults, ...newResults];
+                });
                 setHasMore(false);
               }
             }
