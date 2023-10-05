@@ -120,54 +120,65 @@ const AddSchoolModal = ({ open, toggle }) => {
   };
 
   return (
-    <Modal open={open} toggle={toggle} title="Add a school">
-      <Stepper activeStep={activeStep}>
-        <Step>
-          <StepLabel>Add ETLs</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Add OG</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Add RGL</StepLabel>
-        </Step>
-        <Step>
-          <StepLabel>Invite</StepLabel>
-        </Step>
-      </Stepper>
+    <>
       {activeStep === 0 ? (
         <AddEmergingTeacherLeaders
           handleNext={handleNext}
           setNewSchoolData={setNewSchoolData}
           newSchoolData={newSchoolData}
+          activeStep={activeStep}
+          open={open}
+          toggle={toggle}
         />
       ) : activeStep === 1 ? (
-        <div>
-          <AddOperationsGuide
-            handleNext={handleNext}
-            setNewSchoolData={setNewSchoolData}
-            newSchoolData={newSchoolData}
-          />
-        </div>
+        <AddOperationsGuide
+          handleNext={handleNext}
+          setNewSchoolData={setNewSchoolData}
+          newSchoolData={newSchoolData}
+          activeStep={activeStep}
+          open={open}
+          toggle={toggle}
+        />
       ) : activeStep === 2 ? (
-        <div>
-          <AddRegionalGrowthLead
-            handleNext={handleNext}
-            setNewSchoolData={setNewSchoolData}
-            newSchoolData={newSchoolData}
-          />
-        </div>
+        <AddRegionalGrowthLead
+          handleNext={handleNext}
+          setNewSchoolData={setNewSchoolData}
+          newSchoolData={newSchoolData}
+          activeStep={activeStep}
+          open={open}
+          toggle={toggle}
+        />
       ) : (
         activeStep === 3 && (
-          <div>
-            <InviteSchool
-              newSchoolData={newSchoolData}
-              handleInviteComplete={handleInviteComplete}
-            />
-          </div>
+          <InviteSchool
+            newSchoolData={newSchoolData}
+            handleInviteComplete={handleInviteComplete}
+            activeStep={activeStep}
+            open={open}
+            toggle={toggle}
+          />
         )
       )}
-    </Modal>
+    </>
+  );
+};
+
+const FormStepper = ({ activeStep }) => {
+  return (
+    <Stepper activeStep={activeStep}>
+      <Step>
+        <StepLabel>Add ETLs</StepLabel>
+      </Step>
+      <Step>
+        <StepLabel>Add OG</StepLabel>
+      </Step>
+      <Step>
+        <StepLabel>Add RGL</StepLabel>
+      </Step>
+      <Step>
+        <StepLabel>Invite</StepLabel>
+      </Step>
+    </Stepper>
   );
 };
 
@@ -346,9 +357,12 @@ const AddEmergingTeacherLeaders = ({
   handleNext,
   newSchoolData,
   setNewSchoolData,
+  activeStep,
+  open,
+  toggle,
 }) => {
   const [multiplePeople, setMultiplePeople] = useState([]);
-  const { control, handleSubmit } = useForm();
+  const { handleSubmit } = useForm();
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
@@ -356,32 +370,49 @@ const AddEmergingTeacherLeaders = ({
     });
     handleNext();
   };
+
   // console.log(multiplePeople);
   return (
-    <div>
+    <Modal
+      open={open}
+      toggle={toggle}
+      title="Add a school"
+      fixedActions={
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container>
+            <Grid item></Grid>
+            <Grid item>
+              <Button type="submit" disabled={!multiplePeople.length}>
+                <Typography variant="bodyRegular" bold light>
+                  Next
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      }
+    >
+      <FormStepper activeStep={activeStep} />
       <AddMultiplePeopleForm
         setMultiplePeople={setMultiplePeople}
         multiplePeople={multiplePeople}
       />
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>ETLs</div>
-        <div>
-          <button type="submit">Next</button>
-        </div>
-      </form>
-    </div>
+    </Modal>
   );
 };
 const AddOperationsGuide = ({
   handleNext,
   newSchoolData,
   setNewSchoolData,
+  activeStep,
+  open,
+  toggle,
 }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
-  } = useForm();
+    formState: { isValid, isDirty, errors },
+  } = useForm({ mode: "onChange" });
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
@@ -391,81 +422,98 @@ const AddOperationsGuide = ({
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Card noPadding>
-              <Controller
-                name="operationsGuide"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { onChange, value } }) => (
-                  <RadioGroup value={value}>
-                    {OperationsGuides.map((og, i) => (
-                      <StyledPersonOption
-                        size="small"
-                        noBorder
-                        noRadius
-                        noPadding
-                      >
-                        <FormControlLabel
-                          sx={{ width: "100%", height: "100%", padding: 2 }}
-                          key={i}
-                          value={og.email}
-                          label={
-                            <Grid container>
-                              <Grid item>
-                                <Stack
-                                  direction="row"
-                                  spacing={3}
-                                  alignItems="center"
-                                >
-                                  <Avatar src={og.imageUrl} size="sm" />
-                                  <Typography variant="bodyRegular" bold>
-                                    {og.firstName} {og.lastName}
-                                  </Typography>
-                                  {og.roleList.map((r, i) => (
-                                    <Typography
-                                      variant="bodyRegular"
-                                      lightened
-                                      key={i}
-                                    >
-                                      {r}
-                                    </Typography>
-                                  ))}
-                                </Stack>
-                              </Grid>
-                            </Grid>
-                          }
-                          control={<Radio />}
-                          onChange={onChange}
-                        />
-                      </StyledPersonOption>
-                    ))}
-                  </RadioGroup>
-                )}
-              />
-            </Card>
+    <Modal
+      open={open}
+      toggle={toggle}
+      title="Add a school"
+      fixedActions={
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container>
+            <Grid item></Grid>
+            <Grid item>
+              <Button type="submit" disabled={!isDirty || !isValid}>
+                <Typography variant="bodyRegular" bold light>
+                  Next
+                </Typography>
+              </Button>
+            </Grid>
           </Grid>
+        </form>
+      }
+    >
+      <FormStepper activeStep={activeStep} />
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Card noPadding>
+            <Controller
+              name="operationsGuide"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <RadioGroup value={value}>
+                  {OperationsGuides.map((og, i) => (
+                    <StyledPersonOption
+                      size="small"
+                      noBorder
+                      noRadius
+                      noPadding
+                    >
+                      <FormControlLabel
+                        sx={{ width: "100%", height: "100%", padding: 2 }}
+                        key={i}
+                        value={og.email}
+                        label={
+                          <Grid container>
+                            <Grid item>
+                              <Stack
+                                direction="row"
+                                spacing={3}
+                                alignItems="center"
+                              >
+                                <Avatar src={og.imageUrl} size="sm" />
+                                <Typography variant="bodyRegular" bold>
+                                  {og.firstName} {og.lastName}
+                                </Typography>
+                                {og.roleList.map((r, i) => (
+                                  <Typography
+                                    variant="bodyRegular"
+                                    lightened
+                                    key={i}
+                                  >
+                                    {r}
+                                  </Typography>
+                                ))}
+                              </Stack>
+                            </Grid>
+                          </Grid>
+                        }
+                        control={<Radio />}
+                        onChange={onChange}
+                      />
+                    </StyledPersonOption>
+                  ))}
+                </RadioGroup>
+              )}
+            />
+          </Card>
         </Grid>
-        <div>
-          <button type="submit">Next</button>
-        </div>
-      </form>
-    </div>
+      </Grid>
+    </Modal>
   );
 };
 const AddRegionalGrowthLead = ({
   handleNext,
   newSchoolData,
   setNewSchoolData,
+  activeStep,
+  open,
+  toggle,
 }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
-  } = useForm();
+    formState: { isValid, isDirty, errors },
+  } = useForm({ mode: "onChange" });
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
@@ -474,72 +522,92 @@ const AddRegionalGrowthLead = ({
     handleNext();
   };
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Card noPadding>
-              <Controller
-                name="regionalGrowthLead"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { onChange, value } }) => (
-                  <RadioGroup value={value}>
-                    {RegionalGrowthLeads.map((rgl, i) => (
-                      <StyledPersonOption
-                        size="small"
-                        noBorder
-                        noRadius
-                        noPadding
-                      >
-                        <FormControlLabel
-                          sx={{ width: "100%", height: "100%", padding: 2 }}
-                          key={i}
-                          value={rgl.email}
-                          label={
-                            <Grid container>
-                              <Grid item>
-                                <Stack
-                                  direction="row"
-                                  spacing={3}
-                                  alignItems="center"
-                                >
-                                  <Avatar src={rgl.imageUrl} size="sm" />
-                                  <Typography variant="bodyRegular" bold>
-                                    {rgl.firstName} {rgl.lastName}
-                                  </Typography>
-                                  {rgl.roleList.map((r, i) => (
-                                    <Typography
-                                      variant="bodyRegular"
-                                      lightened
-                                      key={i}
-                                    >
-                                      {r}
-                                    </Typography>
-                                  ))}
-                                </Stack>
-                              </Grid>
-                            </Grid>
-                          }
-                          control={<Radio />}
-                          onChange={onChange}
-                        />
-                      </StyledPersonOption>
-                    ))}
-                  </RadioGroup>
-                )}
-              />
-            </Card>
+    <Modal
+      open={open}
+      toggle={toggle}
+      title="Add a school"
+      fixedActions={
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container>
+            <Grid item></Grid>
+            <Grid item>
+              <Button type="submit" disabled={!isDirty || !isValid}>
+                <Typography variant="bodyRegular" bold light>
+                  Next
+                </Typography>
+              </Button>
+            </Grid>
           </Grid>
+        </form>
+      }
+    >
+      <FormStepper activeStep={activeStep} />
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Card noPadding>
+            <Controller
+              name="regionalGrowthLead"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <RadioGroup value={value}>
+                  {RegionalGrowthLeads.map((rgl, i) => (
+                    <StyledPersonOption
+                      size="small"
+                      noBorder
+                      noRadius
+                      noPadding
+                    >
+                      <FormControlLabel
+                        sx={{ width: "100%", height: "100%", padding: 2 }}
+                        key={i}
+                        value={rgl.email}
+                        label={
+                          <Grid container>
+                            <Grid item>
+                              <Stack
+                                direction="row"
+                                spacing={3}
+                                alignItems="center"
+                              >
+                                <Avatar src={rgl.imageUrl} size="sm" />
+                                <Typography variant="bodyRegular" bold>
+                                  {rgl.firstName} {rgl.lastName}
+                                </Typography>
+                                {rgl.roleList.map((r, i) => (
+                                  <Typography
+                                    variant="bodyRegular"
+                                    lightened
+                                    key={i}
+                                  >
+                                    {r}
+                                  </Typography>
+                                ))}
+                              </Stack>
+                            </Grid>
+                          </Grid>
+                        }
+                        control={<Radio />}
+                        onChange={onChange}
+                      />
+                    </StyledPersonOption>
+                  ))}
+                </RadioGroup>
+              )}
+            />
+          </Card>
         </Grid>
-        <div>
-          <button type="submit">Next</button>
-        </div>
-      </form>
-    </div>
+      </Grid>
+    </Modal>
   );
 };
-const InviteSchool = ({ newSchoolData, handleInviteComplete }) => {
+const InviteSchool = ({
+  newSchoolData,
+  handleInviteComplete,
+  activeStep,
+  open,
+  toggle,
+}) => {
   const { control, handleSubmit } = useForm();
   const onSubmit = () => {
     // newSchoolData
@@ -548,14 +616,28 @@ const InviteSchool = ({ newSchoolData, handleInviteComplete }) => {
     handleInviteComplete();
   };
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>Summary</div>
-        <div>
-          <button type="submit">Invite</button>
-        </div>
-      </form>
-    </div>
+    <Modal
+      open={open}
+      toggle={toggle}
+      title="Add a school"
+      fixedActions={
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container>
+            <Grid item></Grid>
+            <Grid item>
+              <Button type="submit">
+                <Typography variant="bodyRegular" bold light>
+                  Invite
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      }
+    >
+      <FormStepper activeStep={activeStep} />
+      <div>Summary</div>
+    </Modal>
   );
 };
 
