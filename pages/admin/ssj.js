@@ -132,6 +132,7 @@ const AddSchoolModal = ({ open, toggle }) => {
         />
       ) : activeStep === 1 ? (
         <AddOperationsGuide
+          handlePrev={handlePrev}
           handleNext={handleNext}
           setNewSchoolData={setNewSchoolData}
           newSchoolData={newSchoolData}
@@ -141,6 +142,7 @@ const AddSchoolModal = ({ open, toggle }) => {
         />
       ) : activeStep === 2 ? (
         <AddRegionalGrowthLead
+          handlePrev={handlePrev}
           handleNext={handleNext}
           setNewSchoolData={setNewSchoolData}
           newSchoolData={newSchoolData}
@@ -151,8 +153,9 @@ const AddSchoolModal = ({ open, toggle }) => {
       ) : (
         activeStep === 3 && (
           <InviteSchool
-            newSchoolData={newSchoolData}
+            handlePrev={handlePrev}
             handleInviteComplete={handleInviteComplete}
+            newSchoolData={newSchoolData}
             activeStep={activeStep}
             open={open}
             toggle={toggle}
@@ -361,7 +364,9 @@ const AddEmergingTeacherLeaders = ({
   open,
   toggle,
 }) => {
-  const [multiplePeople, setMultiplePeople] = useState([]);
+  const [multiplePeople, setMultiplePeople] = useState(
+    newSchoolData.etl_people_params ? newSchoolData.etl_people_params : []
+  );
   const { handleSubmit } = useForm();
   const onSubmit = (data) => {
     setNewSchoolData({
@@ -371,7 +376,6 @@ const AddEmergingTeacherLeaders = ({
     handleNext();
   };
 
-  // console.log(multiplePeople);
   return (
     <Modal
       open={open}
@@ -379,8 +383,19 @@ const AddEmergingTeacherLeaders = ({
       title="Add a school"
       fixedActions={
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container>
-            <Grid item></Grid>
+          <Grid
+            container
+            justifyContent={activeStep === 0 ? "flex-end" : "space-between"}
+          >
+            {activeStep === 0 ? null : (
+              <Grid item>
+                <Button type="submit" variant="text">
+                  <Typography variant="bodyRegular" bold light>
+                    Prev
+                  </Typography>
+                </Button>
+              </Grid>
+            )}
             <Grid item>
               <Button type="submit" disabled={!multiplePeople.length}>
                 <Typography variant="bodyRegular" bold light>
@@ -394,6 +409,7 @@ const AddEmergingTeacherLeaders = ({
     >
       <FormStepper activeStep={activeStep} />
       <AddMultiplePeopleForm
+        newSchoolData={newSchoolData}
         setMultiplePeople={setMultiplePeople}
         multiplePeople={multiplePeople}
       />
@@ -401,6 +417,7 @@ const AddEmergingTeacherLeaders = ({
   );
 };
 const AddOperationsGuide = ({
+  handlePrev,
   handleNext,
   newSchoolData,
   setNewSchoolData,
@@ -411,8 +428,15 @@ const AddOperationsGuide = ({
   const {
     control,
     handleSubmit,
-    formState: { isValid, isDirty, errors },
-  } = useForm({ mode: "onChange" });
+    formState: { isValid, errors },
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      operationsGuide: newSchoolData.ops_guide_email
+        ? newSchoolData.ops_guide_email
+        : null,
+    },
+  });
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
@@ -428,10 +452,16 @@ const AddOperationsGuide = ({
       title="Add a school"
       fixedActions={
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container>
-            <Grid item></Grid>
+          <Grid container justifyContent="space-between">
             <Grid item>
-              <Button type="submit" disabled={!isDirty || !isValid}>
+              <Button variant="text" onClick={handlePrev}>
+                <Typography variant="bodyRegular" bold light>
+                  Prev
+                </Typography>
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button type="submit" disabled={!isValid}>
                 <Typography variant="bodyRegular" bold light>
                   Next
                 </Typography>
@@ -502,6 +532,7 @@ const AddOperationsGuide = ({
   );
 };
 const AddRegionalGrowthLead = ({
+  handlePrev,
   handleNext,
   newSchoolData,
   setNewSchoolData,
@@ -512,8 +543,15 @@ const AddRegionalGrowthLead = ({
   const {
     control,
     handleSubmit,
-    formState: { isValid, isDirty, errors },
-  } = useForm({ mode: "onChange" });
+    formState: { isValid, errors },
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      regionalGrowthLead: newSchoolData.rgl_email
+        ? newSchoolData.rgl_email
+        : null,
+    },
+  });
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
@@ -528,10 +566,16 @@ const AddRegionalGrowthLead = ({
       title="Add a school"
       fixedActions={
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container>
-            <Grid item></Grid>
+          <Grid container justifyContent="space-between">
             <Grid item>
-              <Button type="submit" disabled={!isDirty || !isValid}>
+              <Button variant="text" onClick={handlePrev}>
+                <Typography variant="bodyRegular" bold light>
+                  Prev
+                </Typography>
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button type="submit" disabled={!isValid}>
                 <Typography variant="bodyRegular" bold light>
                   Next
                 </Typography>
@@ -602,6 +646,7 @@ const AddRegionalGrowthLead = ({
   );
 };
 const InviteSchool = ({
+  handlePrev,
   newSchoolData,
   handleInviteComplete,
   activeStep,
@@ -615,6 +660,7 @@ const InviteSchool = ({
     console.log({ newSchoolData });
     handleInviteComplete();
   };
+  // console.log({ newSchoolData });
   return (
     <Modal
       open={open}
@@ -622,8 +668,14 @@ const InviteSchool = ({
       title="Add a school"
       fixedActions={
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container>
-            <Grid item></Grid>
+          <Grid container justifyContent="space-between">
+            <Grid item>
+              <Button variant="text" onClick={handlePrev}>
+                <Typography variant="bodyRegular" bold light>
+                  Prev
+                </Typography>
+              </Button>
+            </Grid>
             <Grid item>
               <Button type="submit">
                 <Typography variant="bodyRegular" bold light>
@@ -636,7 +688,48 @@ const InviteSchool = ({
       }
     >
       <FormStepper activeStep={activeStep} />
-      <div>Summary</div>
+      <Card>
+        <Stack spacing={6}>
+          <Stack spacing={3}>
+            <Typography variant="bodyRegular" bold>
+              Emerging Teacher Leader
+            </Typography>
+            {newSchoolData.etl_people_params.map((etl, i) => (
+              <Card variant="lightened" size="small" key={i}>
+                <Stack direction="row" spacing={3} alignItems="center">
+                  <Avatar size="sm" />
+                  <Typography variant="bodyRegular" bold>
+                    {etl.firstName} {etl.lastName}
+                  </Typography>
+                  <Typography variant="bodyRegular" lightened>
+                    Emerging Teacher Leader
+                  </Typography>
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+          <Stack spacing={3}>
+            <Typography variant="bodyRegular" bold>
+              Operations Guide
+            </Typography>
+            <Card size="small" variant="lightened">
+              <Typography variant="bodyRegular">
+                {newSchoolData.ops_guide_email}
+              </Typography>
+            </Card>
+          </Stack>
+          <Stack spacing={3}>
+            <Typography variant="bodyRegular" bold>
+              Regional Growth Lead
+            </Typography>
+            <Card size="small" variant="lightened">
+              <Typography variant="bodyRegular">
+                {newSchoolData.rgl_email}
+              </Typography>
+            </Card>
+          </Stack>
+        </Stack>
+      </Card>
     </Modal>
   );
 };
