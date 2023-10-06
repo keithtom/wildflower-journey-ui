@@ -26,10 +26,11 @@ import {
 } from "@ui";
 
 const AdminSSJ = ({}) => {
-  const katelyn = "asdf-1324";
-  const maggie = "asdf-1324";
+  // Check if maggie or katelyn?
+  // const katelyn = "asdf-1324";
+  // const maggie = "asdf-1324";
 
-  const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(true);
+  const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
 
   return (
     <>
