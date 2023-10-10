@@ -89,7 +89,7 @@ describe("network", () => {
     });
   });
   // --------------------- Teacher Leader
-  describe("Teacher leader", () => {
+  describe.only("Teacher leader", () => {
     beforeEach(() => {
       cy.resetNetworkFixturesAndLogin();
       cy.visit("/network", { timeout: 60000 });
@@ -146,7 +146,11 @@ describe("network", () => {
           cy.get('input[name="firstName"]').clear().type("newFirstName");
           cy.get('input[name="lastName"]').clear().type("newLastName");
           cy.get('input[name="city"]').clear().type("Brooklyn");
-          cy.get('input[name="state"]').clear().type("New York");
+
+          cy.contains("State").next().click();
+          cy.contains("New York").click();
+          cy.get("body").click(0, 0);
+
           cy.get('input[name="email"]').clear().type(`newEmail${id}@email.com`);
           cy.get('input[name="phone"]').clear().type("(123) 456 7890");
           cy.get('[name="about"]').clear().type("New about me bio");
@@ -222,7 +226,10 @@ describe("network", () => {
           cy.contains("Cypress Test School").click();
           cy.contains("Edit school profile").click();
           cy.get('input[name="city"]').clear().type("Brooklyn");
-          cy.get('input[name="state"]').clear().type("New York");
+
+          cy.contains("State").next().click();
+          cy.contains("New York").click();
+          cy.get("body").click(0, 0);
 
           cy.contains("open date", {
             matchCase: false,
@@ -253,16 +260,29 @@ describe("network", () => {
 
           cy.get('[name="about"]').clear().type("New school about");
 
-          cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as("upload");
-
+          cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as(
+            "uploadLogo"
+          );
           cy.fixture("test_profile_picture.jpg").then((filecontent) => {
-            cy.get('input[type="file"]').attachFile({
+            cy.get('[name="schoolLogo"]').attachFile({
               fileContent: filecontent.toString(),
               fileName: "test_profile_picture.jpg",
               mimeType: "image/jpg",
             });
           });
-          cy.wait("@upload", { requestTimeout: 60000 });
+          cy.wait("@uploadLogo", { requestTimeout: 60000 });
+
+          cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as(
+            "uploadBanner"
+          );
+          cy.fixture("test_profile_picture.jpg").then((filecontent) => {
+            cy.get('[name="bannerImage"]').attachFile({
+              fileContent: filecontent.toString(),
+              fileName: "test_profile_picture.jpg",
+              mimeType: "image/jpg",
+            });
+          });
+          cy.wait("@uploadBanner", { requestTimeout: 60000 });
           cy.get('button[type="submit"]').should("not.be.disabled").click();
         });
       });

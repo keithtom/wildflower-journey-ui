@@ -24,6 +24,8 @@ import { FileChecksum } from "@lib/rails-filechecksum";
 import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 
+import { unitedStatesOptions } from "../../../../lib/utils/demographic-options";
+
 import axios from "axios";
 
 const token = getCookie("auth");
@@ -503,13 +505,13 @@ const EditProfileModal = ({
           <Controller
             name="state"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
-              <TextField
+              <Select
                 label="State"
                 placeholder="e.g. Massachusetts"
+                options={unitedStatesOptions}
                 error={errors.state}
-                value={locationState}
-                onChange={handleLocationStateChange}
                 helperText={
                   errors &&
                   errors.state &&
@@ -640,6 +642,7 @@ const EditProfileModal = ({
             <Grid container justifyContent="center">
               <Grid item xs={4}>
                 <StyledFilePond
+                  name="schoolLogo"
                   files={schoolLogoPicture}
                   allowReorder={false}
                   allowMultiple={false}
@@ -754,6 +757,7 @@ const EditProfileModal = ({
             <Grid container justifyContent="center">
               <Grid item xs={12}>
                 <StyledFilePond
+                  name="bannerImage"
                   files={bannerPicture}
                   allowReorder={false}
                   allowMultiple={false}
