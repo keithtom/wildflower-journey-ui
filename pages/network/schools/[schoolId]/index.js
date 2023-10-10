@@ -24,6 +24,8 @@ import { FileChecksum } from "@lib/rails-filechecksum";
 import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 
+import { unitedStatesOptions } from "../../../../lib/utils/demographic-options";
+
 import axios from "axios";
 
 const token = getCookie("auth");
@@ -443,7 +445,7 @@ const EditProfileModal = ({
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
     schoolApi
       .update(school.id, {
         school: {
@@ -468,7 +470,7 @@ const EditProfileModal = ({
           }
           console.error(response.error);
         } else {
-          console.log("successfully updated", response.data);
+          // console.log("successfully updated", response.data);
           setBannerPicture(null);
           setSchoolLogoPicture(null);
           mutate();
@@ -504,13 +506,13 @@ const EditProfileModal = ({
           <Controller
             name="state"
             control={control}
+            rules={{ required: true }}
             render={({ field }) => (
-              <TextField
+              <Select
                 label="State"
                 placeholder="e.g. Massachusetts"
+                options={unitedStatesOptions}
                 error={errors.state}
-                value={locationState}
-                onChange={handleLocationStateChange}
                 helperText={
                   errors &&
                   errors.state &&
@@ -574,7 +576,7 @@ const EditProfileModal = ({
             control={control}
             render={({ field }) => (
               <Select
-                label="GovernanceType"
+                label="Governance type"
                 placeholder="Select your school's governance..."
                 options={governance.options}
                 value={governanceType}
@@ -641,6 +643,7 @@ const EditProfileModal = ({
             <Grid container justifyContent="center">
               <Grid item xs={4}>
                 <StyledFilePond
+                  name="schoolLogo"
                   files={schoolLogoPicture}
                   allowReorder={false}
                   allowMultiple={false}
@@ -755,6 +758,7 @@ const EditProfileModal = ({
             <Grid container justifyContent="center">
               <Grid item xs={12}>
                 <StyledFilePond
+                  name="bannerImage"
                   files={bannerPicture}
                   allowReorder={false}
                   allowMultiple={false}

@@ -118,6 +118,7 @@ const Network = () => {
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextField
+              name="search"
               fullWidth
               placeholder="Search for something..."
               endAdornment={<Icon type="search" variant="lightened" />}

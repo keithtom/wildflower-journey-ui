@@ -8,6 +8,7 @@ module.exports = defineConfig({
     apiUrl: process.env.API_URL,
   },
   "retries": 1,
+  "experimentalMemoryManagement": true,
   e2e: {
     baseUrl: "http://localhost:3000",
     defaultCommandTimeout: 50000,
