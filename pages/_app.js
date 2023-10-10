@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { theme } from "../styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-console.log();
 import { UserProvider } from "../lib/useUserContext";
 import { useRouter } from "next/router";
 import NProgress from "nprogress";

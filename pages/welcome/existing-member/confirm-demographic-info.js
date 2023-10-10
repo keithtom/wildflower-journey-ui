@@ -118,7 +118,7 @@ const ConfirmDemographicInfo = ({}) => {
   }, [currentUser]);
 
   const onSubmit = (data) => {
-    console.log("classroomAge: ", data.classroomAge);
+    // console.log("classroomAge: ", data.classroomAge);
     peopleApi
       .update(currentUser.id, {
         person: {

@@ -444,7 +444,7 @@ const EditProfileModal = ({
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
     schoolApi
       .update(school.id, {
         school: {
@@ -469,7 +469,7 @@ const EditProfileModal = ({
           }
           console.error(response.error);
         } else {
-          console.log("successfully updated", response.data);
+          // console.log("successfully updated", response.data);
           setBannerPicture(null);
           setSchoolLogoPicture(null);
           mutate();

@@ -221,7 +221,7 @@ const PauseSSJModal = ({ toggle, open, setSSJPaused }) => {
     },
   });
   const onSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
     setSSJPaused(true);
     toggle();
   };
@@ -306,7 +306,7 @@ const AbandonSSJModal = ({ toggle, open, setSSJAbandonProcessStarted }) => {
     },
   });
   const onSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
     setSSJAbandonProcessStarted(true);
     toggle();
   };
