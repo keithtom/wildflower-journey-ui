@@ -5,6 +5,7 @@ import Masonry from "@mui/lab/Masonry";
 import { styled, css } from "@mui/material/styles";
 import { useInView } from "react-intersection-observer";
 
+import { getScreenSize } from "../../hooks/react-responsive";
 import getAuthHeader from "@lib/getAuthHeader";
 import { useUserContext } from "@lib/useUserContext";
 import useSearch from "../../hooks/useSearch";
@@ -49,6 +50,7 @@ const Network = () => {
   const [userQuery, setUserQuery] = useState("");
 
   const { currentUser } = useUserContext();
+  const { screenSize } = getScreenSize();
 
   if (error) return <PageContainer>failed to load</PageContainer>;
 
@@ -108,73 +110,81 @@ const Network = () => {
   // console.log({ filters });
 
   return (
-    <>
-      <PageContainer isLoading={!currentUser} hideNav={!currentUser}>
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item xs={12} sm={8}>
-            <Typography variant="h4" bold>
-              Explore the Wildflower Network
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              name="search"
-              fullWidth
-              placeholder="Search for something..."
-              endAdornment={<Icon type="search" variant="lightened" />}
-              onChange={(e) => {
-                setUserQuery(e.target.value);
-              }}
-              value={userQuery}
-            />
+    <PageContainer isLoading={!currentUser} hideNav={!currentUser}>
+      <Grid
+        container
+        justifyContent="space-between"
+        alignItems="center"
+        spacing={6}
+      >
+        <Grid item xs={12} sm={8}>
+          <Typography variant="h4" bold>
+            Explore the Wildflower Network
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <TextField
+            name="search"
+            fullWidth
+            placeholder="Search for something..."
+            endAdornment={<Icon type="search" variant="lightened" />}
+            onChange={(e) => {
+              setUserQuery(e.target.value);
+            }}
+            value={userQuery}
+          />
+        </Grid>
+      </Grid>
+      <Grid container alignItems="center" mb={2}>
+        <Grid item xs={12} sm={1}>
+          <Typography lightened>Show</Typography>
+        </Grid>
+        <Grid item flex={1}>
+          <RadioGroup value={category} onChange={handleCategoryChange}>
+            <Stack direction="row">
+              <FormControlLabel
+                value="people"
+                control={<Radio />}
+                label="People"
+              />
+              <FormControlLabel
+                value="schools"
+                control={<Radio />}
+                label="Schools"
+              />
+            </Stack>
+          </RadioGroup>
+        </Grid>
+      </Grid>
+      <Grid container>
+        <Grid item xs={12} sm={1}>
+          <Typography lightened>Filter by</Typography>
+        </Grid>
+        <Grid item flex={1}>
+          <Grid container spacing={2}>
+            {Filters.map((f, i) =>
+              f.doNotDisplayFor === category ? null : (
+                <Grid item key={i}>
+                  <FilterMultiSelect
+                    filter={f}
+                    setFilters={setFilters}
+                    isSearching={isSearching}
+                    setIsSearching={setIsSearching}
+                    category={category}
+                  />
+                </Grid>
+              )
+            )}
           </Grid>
         </Grid>
-        <Grid container alignItems="center" mb={2}>
-          <Grid item xs={12} sm={1}>
-            <Typography lightened>Show</Typography>
-          </Grid>
-          <Grid item flex={1}>
-            <RadioGroup value={category} onChange={handleCategoryChange}>
-              <Stack direction="row">
-                <FormControlLabel
-                  value="people"
-                  control={<Radio />}
-                  label="People"
-                />
-                <FormControlLabel
-                  value="schools"
-                  control={<Radio />}
-                  label="Schools"
-                />
-              </Stack>
-            </RadioGroup>
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item xs={12} sm={1}>
-            <Typography lightened>Filter by</Typography>
-          </Grid>
-          <Grid item flex={1}>
-            <Grid container spacing={2}>
-              {Filters.map((f, i) =>
-                f.doNotDisplayFor === category ? null : (
-                  <Grid item key={i}>
-                    <FilterMultiSelect
-                      filter={f}
-                      setFilters={setFilters}
-                      isSearching={isSearching}
-                      setIsSearching={setIsSearching}
-                      category={category}
-                    />
-                  </Grid>
-                )
-              )}
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid container mt={12}>
+      </Grid>
+      <Grid container mt={12}>
+        <Grid item xs={12}>
           {results.length > 0 && (
-            <Masonry columns={{ xs: 1, sm: 2, md: 3 }} spacing={6}>
+            <Masonry
+              columns={screenSize.isSm ? 2 : 3}
+              spacing={screenSize.isSm ? 3 : 6}
+            >
               {category === "people"
                 ? results.map((f) => (
                     <PersonResultItem
@@ -213,45 +223,45 @@ const Network = () => {
                   ))}
             </Masonry>
           )}
-          {hasMore && !isSearching && results.length >= perPage - 1 && (
-            <Grid item xs={12} mt={results.length ? 0 : 48}>
-              <div
-                ref={ref}
-                style={{ opacity: 0, width: "100%", height: "48px" }}
-              />
-            </Grid>
-          )}
-          {!hasMore && noResults && !isSearching && (
-            <Grid item xs={12} mt={24}>
-              <Grid container justifyContent="center" alignItems="center">
-                <Grid item>
-                  <Stack spacing={6} alignItems="center">
-                    <Icon type="flag" size="large" variant="primary" />
-                    <Stack spacing={3} alignItems="center">
-                      <Typography variant="h3" bold>
-                        Oops! Looks like there's nothing here
-                      </Typography>
-                      <Typography variant="bodyLarge" lightened>
-                        Try a different search term or more general query
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </Grid>
-              </Grid>
-            </Grid>
-          )}
-          {isSearching && (
-            <Grid item xs={12} mt={results.length ? 0 : 48}>
-              <Grid container alignItems="center" justifyContent="center">
-                <Grid item>
-                  <Spinner />
-                </Grid>
-              </Grid>
-            </Grid>
-          )}
         </Grid>
-      </PageContainer>
-    </>
+        {hasMore && !isSearching && results.length >= perPage - 1 && (
+          <Grid item xs={12} mt={results.length ? 0 : 48}>
+            <div
+              ref={ref}
+              style={{ opacity: 0, width: "100%", height: "48px" }}
+            />
+          </Grid>
+        )}
+        {!hasMore && noResults && !isSearching && (
+          <Grid item xs={12} mt={24}>
+            <Grid container justifyContent="center" alignItems="center">
+              <Grid item>
+                <Stack spacing={6} alignItems="center">
+                  <Icon type="flag" size="large" variant="primary" />
+                  <Stack spacing={3} alignItems="center">
+                    <Typography variant="h3" bold>
+                      Oops! Looks like there's nothing here
+                    </Typography>
+                    <Typography variant="bodyLarge" lightened>
+                      Try a different search term or more general query
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
+        {isSearching && (
+          <Grid item xs={12} mt={results.length ? 0 : 48}>
+            <Grid container alignItems="center" justifyContent="center">
+              <Grid item>
+                <Spinner />
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
+      </Grid>
+    </PageContainer>
   );
 };
 
@@ -307,7 +317,7 @@ const PersonResultItem = ({
 }) => {
   return (
     <Link href={personLink && personLink}>
-      <Card noPadding hoverable>
+      <Card noPadding hoverable sx={{ width: "100%" }}>
         <Stack>
           <img src={profileImg} style={{ width: "100%" }} />
           <Card size="small" noBorder>
