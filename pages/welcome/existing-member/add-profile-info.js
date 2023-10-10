@@ -80,9 +80,15 @@ const StyledFilePond = styled(FilePond)`
 const AddProfileInfo = ({}) => {
   const [profilePicture, setProfilePicture] = useState();
   const [profileImage, setProfileImage] = useState();
+  const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
   const [showError, setShowError] = useState();
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
+
+  const handleFileStart = () => {
+    setIsUpdatingPicture(true);
+    setShowError(false);
+  };
 
   const handleSubmit = () => {
     peopleApi
@@ -176,7 +182,8 @@ const AddProfileInfo = ({}) => {
                     maxFileSize="5MB"
                     acceptedFileTypes={["image/*"]}
                     onupdatefiles={setProfilePicture}
-                    onaddfilestart={() => setShowError(false)}
+                    onaddfilestart={handleFileStart}
+                    onprocessfiles={() => setIsUpdatingPicture(false)}
                     stylePanelAspectRatio="1:1"
                     onerror={handleFileError}
                     stylePanelLayout="circle"
@@ -291,7 +298,7 @@ const AddProfileInfo = ({}) => {
                   {/* TODO: Change the destination depending on existing vs new TL */}
                   <Button
                     full
-                    disabled={!profilePicture}
+                    disabled={!profilePicture || isUpdatingPicture}
                     onClick={handleSubmit}
                   >
                     <Typography variant="bodyRegular" light>
