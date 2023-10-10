@@ -550,7 +550,7 @@ const EditProfileModal = ({
             render={({ field }) => (
               <Select
                 label="State"
-                placeholder="e.g.Massachusetts"
+                placeholder="e.g. Massachusetts"
                 options={unitedStatesOptions}
                 error={errors.state}
                 helperText={
@@ -1016,6 +1016,7 @@ const EditProfileModal = ({
                         })
                         .catch((error) => {
                           console.log(error);
+                          console.error(error);
                         });
                     });
                     return {
