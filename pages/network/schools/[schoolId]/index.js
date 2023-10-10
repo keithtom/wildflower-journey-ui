@@ -568,7 +568,7 @@ const EditProfileModal = ({
             control={control}
             render={({ field }) => (
               <Select
-                label="GovernanceType"
+                label="Governance type"
                 placeholder="Select your school's governance..."
                 options={governance.options.map((l) => l.label)}
                 value={governanceType}
