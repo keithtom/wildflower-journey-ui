@@ -26,6 +26,7 @@ describe("onboarding spec", () => {
       cy.contains("State").next().click();
       cy.contains("New York").click();
       cy.get("body").click(0, 0); // close dropdwon
+      cy.get('input[name="email"]').clear().type("newEmail@email.com");
       cy.get('button[type="submit"]').click();
       cy.url({ timeout: 10000 }).should(
         "include",
@@ -154,6 +155,7 @@ describe("onboarding spec", () => {
       cy.contains("State").next().click();
       cy.contains("New York").click();
       cy.get("body").click(0, 0); // close dropdwon
+      cy.get('input[name="email"]').clear().type("newEmail@email.com");
       cy.get('button[type="submit"]').click();
       cy.url({ timeout: 10000 }).should(
         "include",
