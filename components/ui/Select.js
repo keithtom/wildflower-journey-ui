@@ -21,6 +21,13 @@ const Select = React.forwardRef(
     },
     ref
   ) => {
+    let selectedOption;
+    let displayLabel;
+    if (value) {
+      selectedOption = options.filter((o) => o.value === value);
+      displayLabel = selectedOption[0]?.label;
+    }
+
     return (
       <Stack>
         <FormControl fullWidth>
@@ -41,8 +48,7 @@ const Select = React.forwardRef(
             displayEmpty={true}
             renderValue={(value) =>
               value ? (
-                // value
-                options.find((option) => option.value === value)?.label || value
+                displayLabel
               ) : (
                 <Typography variant="bodyRegular" lightened>
                   {placeholder}

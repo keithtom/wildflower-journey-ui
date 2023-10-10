@@ -57,16 +57,30 @@ const ConfirmYourDetails = ({}) => {
     watch,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      city: "",
+      state: "",
+      email: "",
+    },
+  });
 
   useEffect(() => {
-    reset({
-      firstName: currentUser?.attributes.firstName,
-      lastName: currentUser?.attributes.lastName,
-      city: currentUser?.attributes.city,
-      state: currentUser?.attributes.state,
-      email: currentUser?.attributes.email,
-    });
+    if (currentUser) {
+      peopleApi.show(currentUser.id).then((response) => {
+        const person = response.data.data;
+        // console.log({ person });
+        reset({
+          firstName: person?.attributes.firstName,
+          lastName: person?.attributes.lastName,
+          city: currentUser?.personAddress.city,
+          state: currentUser?.personAddress.state,
+          email: person?.attributes.email,
+        });
+      });
+    }
   }, [currentUser]);
 
   const onSubmit = (data) => {
