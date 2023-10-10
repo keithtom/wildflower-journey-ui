@@ -291,7 +291,7 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
   });
   const onSubmit = (data) => {
     //TODO: Submit the custom milestone data to the backend
-    console.log(data);
+    // console.log(data);
     setTimeout(() => {
       toggle();
     }, resetFormTime);

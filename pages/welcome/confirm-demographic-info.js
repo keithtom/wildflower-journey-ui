@@ -94,7 +94,7 @@ const ConfirmDemographicInfo = ({}) => {
         .show(currentUser.id)
         .then((response) => {
           const person = response.data.data;
-          console.log("person", person);
+          // console.log("person", person);
           // SAVEPOINT this request is working.  need to make sure data is persisted and returned
           // and then loaded into form.  then we are done here.
           reset({
@@ -127,7 +127,7 @@ const ConfirmDemographicInfo = ({}) => {
   }, [currentUser]);
 
   const onSubmit = (data) => {
-    console.log("classroomAge: ", data.classroomAge);
+    // console.log("classroomAge: ", data.classroomAge);
     peopleApi
       .update(currentUser.id, {
         person: {
