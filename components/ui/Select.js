@@ -64,6 +64,7 @@ const Select = React.forwardRef(
                 {...props}
               />
             )}
+            MenuProps={{ sx: { maxWidth: "300px", maxHeight: "400px" } }}
             {...props}
           >
             {options.map((option, i) => (
