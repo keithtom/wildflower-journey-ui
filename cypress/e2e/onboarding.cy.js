@@ -8,6 +8,7 @@ describe("onboarding spec", () => {
   describe("inputting personal details", () => {
     beforeEach(() => {
       cy.visit("/welcome/confirm-your-details");
+      cy.wait(1500);
     });
 
     it("should display form", () => {
@@ -26,6 +27,9 @@ describe("onboarding spec", () => {
       cy.contains("State").next().click();
       cy.contains("New York").click();
       cy.get("body").click(0, 0); // close dropdwon
+      cy.get('input[name="email"]')
+        .clear()
+        .type(`newEmail${new Date().valueOf()}@email.com`);
       cy.get('button[type="submit"]').click();
       cy.url({ timeout: 10000 }).should(
         "include",
@@ -37,6 +41,7 @@ describe("onboarding spec", () => {
   describe("confirming demographic info", () => {
     beforeEach(() => {
       cy.visit("/welcome/confirm-demographic-info");
+      cy.wait(1500);
     });
 
     it("should display form", () => {
@@ -51,7 +56,7 @@ describe("onboarding spec", () => {
 
     it("should be able to update fields", () => {
       cy.contains("What is your primary language?").next().click();
-      cy.contains("English").click();
+      cy.contains("English").click({ force: true });
       cy.get("body").click(0, 0); // close dropdwon
 
       cy.contains("What is your ethnicity?").next().click();
@@ -112,6 +117,7 @@ describe("onboarding spec", () => {
   describe("add-profile-info", () => {
     beforeEach(() => {
       cy.visit("/welcome/add-profile-info", { responseTimeout: 60000 });
+      cy.wait(1500);
     });
 
     it("uploads a file", () => {
@@ -136,6 +142,7 @@ describe("onboarding spec", () => {
   describe("inputting personal details", () => {
     beforeEach(() => {
       cy.visit("/welcome/existing-member/confirm-your-details");
+      cy.wait(1500);
     });
 
     it("should display form", () => {
@@ -154,6 +161,9 @@ describe("onboarding spec", () => {
       cy.contains("State").next().click();
       cy.contains("New York").click();
       cy.get("body").click(0, 0); // close dropdwon
+      cy.get('input[name="email"]')
+        .clear()
+        .type(`newEmail${new Date().valueOf()}@email.com`);
       cy.get('button[type="submit"]').click();
       cy.url({ timeout: 10000 }).should(
         "include",
@@ -165,6 +175,7 @@ describe("onboarding spec", () => {
     describe("confirming demographic info", () => {
       beforeEach(() => {
         cy.visit("/welcome/existing-member/confirm-demographic-info");
+        cy.wait(1500);
       });
 
       it("should display form", () => {
@@ -180,7 +191,7 @@ describe("onboarding spec", () => {
 
       it("should be able to update fields", () => {
         cy.contains("What is your primary language?").next().click();
-        cy.contains("English").click();
+        cy.contains("English").click({ force: true });
         cy.get("body").click(0, 0); // close dropdwon
 
         cy.contains("What is your ethnicity?").next().click();
