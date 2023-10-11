@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { useMediaQuery } from "react-responsive";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
 
+import { getScreenSize } from "../hooks/react-responsive";
 import { useUserContext } from "../lib/useUserContext";
 import { user } from "../lib/utils/fake-data";
 import { theme } from "../styles/theme";
@@ -40,11 +40,14 @@ const CustomDrawer = styled(Drawer)`
 `;
 
 const Nav = ({ toggleNavOpen, navOpen }) => {
-  const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
+  const { screenSize } = getScreenSize();
+
+  // console.log(screenSize.isSm);
+
   return (
     <StyledNav sx={{ display: "flex" }}>
       <CustomDrawer
-        variant={isSm ? `temporary` : `permanent`}
+        variant={screenSize.isSm ? "temporary" : "permanent"}
         anchor="left"
         open={navOpen}
         onClose={toggleNavOpen}

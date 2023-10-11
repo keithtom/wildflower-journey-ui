@@ -25,6 +25,8 @@ import {
   MultiSelect,
   Spinner,
   Button,
+  IconButton,
+  Box,
 } from "@ui";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
@@ -48,6 +50,7 @@ const Network = () => {
   } = useSearch();
   const [category, setCategory] = useState("people");
   const [userQuery, setUserQuery] = useState("");
+  const [expandFilters, setExpandFilters] = useState(false);
 
   const { currentUser } = useUserContext();
   const { screenSize } = getScreenSize();
@@ -115,7 +118,7 @@ const Network = () => {
         container
         justifyContent="space-between"
         alignItems="center"
-        spacing={6}
+        spacing={screenSize.isSm ? 3 : 0}
       >
         <Grid item xs={12} sm={8}>
           <Typography variant="h4" bold>
@@ -134,51 +137,77 @@ const Network = () => {
             value={userQuery}
           />
         </Grid>
-      </Grid>
-      <Grid container alignItems="center" mb={2}>
-        <Grid item xs={12} sm={1}>
-          <Typography lightened>Show</Typography>
-        </Grid>
-        <Grid item flex={1}>
-          <RadioGroup value={category} onChange={handleCategoryChange}>
-            <Stack direction="row">
-              <FormControlLabel
-                value="people"
-                control={<Radio />}
-                label="People"
-              />
-              <FormControlLabel
-                value="schools"
-                control={<Radio />}
-                label="Schools"
-              />
-            </Stack>
-          </RadioGroup>
-        </Grid>
-      </Grid>
-      <Grid container>
-        <Grid item xs={12} sm={1}>
-          <Typography lightened>Filter by</Typography>
-        </Grid>
-        <Grid item flex={1}>
-          <Grid container spacing={2}>
-            {Filters.map((f, i) =>
-              f.doNotDisplayFor === category ? null : (
-                <Grid item key={i}>
-                  <FilterMultiSelect
-                    filter={f}
-                    setFilters={setFilters}
-                    isSearching={isSearching}
-                    setIsSearching={setIsSearching}
-                    category={category}
+        <Grid item xs={12}>
+          <Grid container alignItems="center" mb={2}>
+            <Grid item flex={1}>
+              <RadioGroup value={category} onChange={handleCategoryChange}>
+                <Stack direction="row">
+                  <FormControlLabel
+                    value="people"
+                    control={<Radio />}
+                    label="People"
                   />
+                  <FormControlLabel
+                    value="schools"
+                    control={<Radio />}
+                    label="Schools"
+                  />
+                </Stack>
+              </RadioGroup>
+            </Grid>
+            <Grid item xs={12} mt={screenSize.isSm ? 0 : 3}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={1}>
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Grid item>
+                      <Typography lightened>Filter by</Typography>
+                    </Grid>
+                    {screenSize.isSm && (
+                      <Grid item>
+                        <IconButton
+                          onClick={() => setExpandFilters(!expandFilters)}
+                        >
+                          <Icon type={expandFilters ? "minus" : "filter"} />
+                        </IconButton>
+                      </Grid>
+                    )}
+                  </Grid>
                 </Grid>
-              )
-            )}
+
+                <Grid
+                  item
+                  flex={1}
+                  sx={{
+                    display:
+                      expandFilters || !screenSize.isSm ? "flex" : "none",
+                  }}
+                >
+                  <Grid container spacing={2}>
+                    {Filters.map((f, i) =>
+                      f.doNotDisplayFor === category ? null : (
+                        <Grid item xs={screenSize.isSm ? 12 : null} key={i}>
+                          <FilterMultiSelect
+                            filter={f}
+                            setFilters={setFilters}
+                            isSearching={isSearching}
+                            setIsSearching={setIsSearching}
+                            category={category}
+                          />
+                        </Grid>
+                      )
+                    )}
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
-      <Grid container mt={12}>
+      <Grid container mt={screenSize.isSm ? 6 : 12}>
         <Grid item xs={12}>
           {results.length > 0 && (
             <Masonry
