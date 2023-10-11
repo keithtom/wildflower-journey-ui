@@ -100,7 +100,7 @@ const ConfirmDemographicInfo = ({}) => {
           primaryLanguageOther: person?.attributes?.primaryLanguageOther || "",
           raceEthnicity: person?.attributes?.raceEthnicityList || [],
           raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
-          lgbtqia: person?.attributes?.lgbtqia || "",
+          lgbtqia: person?.attributes?.lgbtqia,
           gender: person?.attributes?.gender || "",
           genderOther: person?.attributes?.genderOther || "",
           pronouns: person?.attributes?.pronouns || "",
