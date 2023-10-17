@@ -26,6 +26,8 @@ import {
   Copy,
   Search,
   ShapePolygon,
+  Filter,
+  Minus,
 } from "@styled-icons/boxicons-regular";
 import {
   Bus,
@@ -212,6 +214,8 @@ export default function Icon({ ...props }) {
     wrench: <Wrench />,
     shapePolygon: <ShapePolygon />,
     lock: <Lock />,
+    filter: <Filter />,
+    minus: <Minus />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
