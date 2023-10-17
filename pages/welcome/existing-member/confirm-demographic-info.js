@@ -136,6 +136,7 @@ const ConfirmDemographicInfo = ({}) => {
           montessori_certified_level_list: data.montessoriCertifiedLevels,
           classroom_age_list: data.classroomAge,
           role_list: data.role,
+          is_onboarded: true,
         },
       })
       .then((response) => {
