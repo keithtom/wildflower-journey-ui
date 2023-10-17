@@ -33,6 +33,8 @@ const token = getCookie("auth");
 import schoolApi from "@api/schools";
 import peopleApi from "@api/people";
 import {
+  Divider,
+  Alert,
   Box,
   PageContainer,
   Button,
@@ -108,7 +110,7 @@ const School = ({}) => {
     school.attributes.maxEnrollment;
   const adminId = "10c9-a091";
   const isMySchool = school.relationships.people.data.filter(
-    (person) => (person.id === currentUser?.id) || (adminId === currentUser?.id)
+    (person) => person.id === currentUser?.id || adminId === currentUser?.id
   ).length
     ? true
     : false;
@@ -157,12 +159,56 @@ const School = ({}) => {
                 ? school?.attributes?.logoUrl
                 : schoolFallback
             }
-            schoolLeaders={schoolLeaders}
           />
 
           <Grid container spacing={8}>
             <Grid item xs={12} md={hasInfo ? 4 : 12}>
               <Stack spacing={6}>
+                {schoolLeaders ? (
+                  <Grid item xs={12}>
+                    <Card>
+                      <Stack spacing={6}>
+                        {schoolLeaders.map((leader, i) => (
+                          <Link href={`/network/people/${leader.id}`} key={i}>
+                            <Stack
+                              direction="row"
+                              spacing={3}
+                              alignItems="center"
+                            >
+                              <Avatar
+                                src={leader?.attributes?.imageUrl}
+                                size="sm"
+                              />
+                              <Stack>
+                                <Stack direction="row" spacing={1}>
+                                  {leader.attributes.firstName ? (
+                                    <Typography variant="bodyRegular" bold>
+                                      {leader?.attributes?.firstName}
+                                    </Typography>
+                                  ) : null}
+                                  {leader.attributes.lastName ? (
+                                    <Typography variant="bodyRegular" bold>
+                                      {leader?.attributes?.lastName}
+                                    </Typography>
+                                  ) : null}
+                                </Stack>
+                                {leader?.attributes?.roleList.map((r, i) => (
+                                  <Typography
+                                    variant="bodySmall"
+                                    lightened
+                                    key={i}
+                                  >
+                                    {r}
+                                  </Typography>
+                                ))}
+                              </Stack>
+                            </Stack>
+                          </Link>
+                        ))}
+                      </Stack>
+                    </Card>
+                  </Grid>
+                ) : null}
                 {hasAttributes ? (
                   <AttributesCard
                     state={school?.relationships?.address?.data?.state}
@@ -371,6 +417,8 @@ const EditProfileModal = ({
   mutate,
   setEditProfileModalOpen,
 }) => {
+  const [showError, setShowError] = useState();
+
   const [city, setCity] = useState(address?.attributes?.city);
   const handleCityChange = (event) => {
     setCity(event.target.value);
@@ -417,21 +465,29 @@ const EditProfileModal = ({
   const [bannerPicture, setBannerPicture] = useState();
   const [bannerImage, setBannerImage] = useState();
   const [isUpdatingBannerImage, setIsUpdatingBannerImage] = useState(false);
-  const handleFileError = (error) => {
-    console.log(error);
-    setShowError(error); // TODO: Taylor can you help with this?
-  };
   const [schoolLogoPicture, setSchoolLogoPicture] = useState();
   const [schoolLogoImage, setSchoolLogoImage] = useState();
   const [isUpdatingSchoolLogoImage, setIsUpdatingSchoolLogoImage] =
     useState(false);
+
+  const [showLogoError, setShowLogoError] = useState(false);
+  const [showBannerError, setShowBannerError] = useState(false);
+
+  const handleLogoError = (error) => {
+    setShowLogoError(error);
+    setIsUpdatingSchoolLogoImage(false);
+  };
+  const handleBannerError = (error) => {
+    setShowBannerError(error);
+    setIsUpdatingBannerImage(false);
+  };
 
   const {
     control,
     handleSubmit,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm({
     defaultValues: {
       city: city,
@@ -637,11 +693,26 @@ const EditProfileModal = ({
           />
 
           <Stack spacing={3}>
+            <Divider />
+            {showLogoError ? (
+              <Grid container>
+                <Grid item xs={12}>
+                  <Alert severity="error">
+                    <Stack>
+                      {showLogoError.main}
+                      <Typography variant="bodySmall" error>
+                        {showLogoError.sub}
+                      </Typography>
+                    </Stack>
+                  </Alert>
+                </Grid>
+              </Grid>
+            ) : null}
             <Typography variant="bodyRegular">
               Add a new school logo image
             </Typography>
             <Grid container justifyContent="center">
-              <Grid item xs={4}>
+              <Grid item xs={12} sm={8} md={6}>
                 <StyledFilePond
                   name="schoolLogo"
                   files={schoolLogoPicture}
@@ -652,7 +723,7 @@ const EditProfileModal = ({
                   onupdatefiles={setSchoolLogoPicture}
                   onaddfilestart={() => setIsUpdatingSchoolLogoImage(true)}
                   onprocessfiles={() => setIsUpdatingSchoolLogoImage(false)}
-                  onerror={handleFileError}
+                  onerror={handleLogoError}
                   stylePanelAspectRatio="1:1"
                   stylePanelLayout="circle"
                   server={{
@@ -749,14 +820,30 @@ const EditProfileModal = ({
                 />
               </Grid>
             </Grid>
+            <Divider />
           </Stack>
 
           <Stack spacing={3}>
+            <Divider />
+            {showBannerError ? (
+              <Grid container>
+                <Grid item xs={12}>
+                  <Alert severity="error">
+                    <Stack>
+                      {showBannerError.main}
+                      <Typography variant="bodySmall" error>
+                        {showBannerError.sub}
+                      </Typography>
+                    </Stack>
+                  </Alert>
+                </Grid>
+              </Grid>
+            ) : null}
             <Typography variant="bodyRegular">
               Add a new banner image
             </Typography>
             <Grid container justifyContent="center">
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={8} md={6}>
                 <StyledFilePond
                   name="bannerImage"
                   files={bannerPicture}
@@ -767,7 +854,7 @@ const EditProfileModal = ({
                   onupdatefiles={setBannerPicture}
                   onaddfilestart={() => setIsUpdatingBannerImage(true)}
                   onprocessfiles={() => setIsUpdatingBannerImage(false)}
-                  onerror={handleFileError}
+                  onerror={handleBannerError}
                   stylePanelAspectRatio="4:1"
                   stylePanelLayout="integrated"
                   server={{
@@ -864,6 +951,7 @@ const EditProfileModal = ({
                 />
               </Grid>
             </Grid>
+            <Divider />
           </Stack>
         </Stack>
         <Card
@@ -880,6 +968,7 @@ const EditProfileModal = ({
             <Button
               small
               disabled={
+                !isDirty ||
                 isUpdatingBannerImage ||
                 isUpdatingSchoolLogoImage ||
                 isSubmitting
