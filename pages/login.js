@@ -7,6 +7,7 @@ import { setCookie } from "cookies-next";
 import authApi from "@api/auth";
 import { clearLoggedInState } from "@lib/handleLogout";
 
+import { getScreenSize } from "../hooks/react-responsive";
 import {
   Button,
   Grid,
@@ -21,6 +22,7 @@ import {
 } from "@ui";
 
 const Login = ({}) => {
+  const { screenSize } = getScreenSize();
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { setCurrentUser, isLoggedIn, currentUser } = useUserContext();
   const hasSSJ = currentUser?.attributes?.ssj ? true : false;
@@ -251,9 +253,11 @@ const Login = ({}) => {
                               spacing={3}
                               alignItems="center"
                             >
-                              <Typography variant="bodyRegular">
-                                Request link
-                              </Typography>
+                              {!screenSize.isSm && (
+                                <Typography variant="bodyRegular">
+                                  Request link
+                                </Typography>
+                              )}
                               <Icon type="rightArrow" variant="primary" />
                             </Stack>
                           </Button>
