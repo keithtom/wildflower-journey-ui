@@ -100,7 +100,7 @@ const ConfirmDemographicInfo = ({}) => {
           primaryLanguageOther: person?.attributes?.primaryLanguageOther || "",
           raceEthnicity: person?.attributes?.raceEthnicityList || [],
           raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
-          lgbtqia: person?.attributes?.lgbtqia || "",
+          lgbtqia: person?.attributes?.lgbtqia,
           gender: person?.attributes?.gender || "",
           genderOther: person?.attributes?.genderOther || "",
           pronouns: person?.attributes?.pronouns || "",
@@ -118,7 +118,7 @@ const ConfirmDemographicInfo = ({}) => {
   }, [currentUser]);
 
   const onSubmit = (data) => {
-    console.log("classroomAge: ", data.classroomAge);
+    // console.log("classroomAge: ", data.classroomAge);
     peopleApi
       .update(currentUser.id, {
         person: {
@@ -136,6 +136,7 @@ const ConfirmDemographicInfo = ({}) => {
           montessori_certified_level_list: data.montessoriCertifiedLevels,
           classroom_age_list: data.classroomAge,
           role_list: data.role,
+          is_onboarded: true,
         },
       })
       .then((response) => {

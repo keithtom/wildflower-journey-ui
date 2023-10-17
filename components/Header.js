@@ -8,6 +8,8 @@ import { clearLoggedInState } from "../lib/handleLogout";
 import registrationsAPI from "../api/registrations";
 import { theme } from "../styles/theme";
 import { useRouter } from "next/router";
+import { getScreenSize } from "../hooks/react-responsive";
+
 import {
   Avatar,
   Typography,
@@ -47,8 +49,8 @@ const CustomAppBar = styled(AppBar)`
 `;
 
 const Header = ({ toggleNavOpen }) => {
-  const isSm = useMediaQuery({ maxDeviceWidth: theme.breakpoints.values.sm });
   const router = useRouter();
+  const { screenSize } = getScreenSize();
 
   const { currentUser, isLoggedIn, isAdmin } = useUserContext();
 
@@ -70,7 +72,7 @@ const Header = ({ toggleNavOpen }) => {
         alignItems="center"
       >
         <Grid item>
-          {isSm && isLoggedIn ? (
+          {screenSize.isSm && isLoggedIn ? (
             <Stack direction="row" alignItems="center" spacing={2}>
               <IconButton
                 color="inherit"
