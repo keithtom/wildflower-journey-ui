@@ -96,15 +96,13 @@ const Navigation = ({}) => {
   // console.log({ currentUser });
   return (
     <Box>
-      {!currentUser?.attributes?.ssj ? (
-        <NavLink
-          variant="primary"
-          to="/network"
-          active={router.pathname.includes("/network")}
-          label="Network"
-          icon="bookReader"
-        />
-      ) : null}
+      <NavLink
+        variant="primary"
+        to="/network"
+        active={router.pathname.includes("/network")}
+        label="Network"
+        icon="bookReader"
+      />
       {currentUser?.attributes?.ssj ? (
         <NavLink
           variant="primary"
