@@ -26,13 +26,7 @@ const StyledLogo = styled(Box)`
   overflow: hidden;
 `;
 
-const SchoolHero = ({
-  heroImg,
-  logoImg,
-  schoolName,
-  schoolLocation,
-  schoolLeaders,
-}) => {
+const SchoolHero = ({ heroImg, logoImg, schoolName, schoolLocation }) => {
   return (
     <>
       <Grid container justifyContent="center" spacing={6}>
@@ -48,7 +42,7 @@ const SchoolHero = ({
             }}
           />
         </Grid>
-        <Grid item ml={[6]}>
+        <Grid item ml={{ xs: 0, sm: 6 }}>
           <StyledLogo>
             <img
               src={logoImg}
@@ -72,38 +66,6 @@ const SchoolHero = ({
             ) : null}
           </Stack>
         </Grid>
-        {schoolLeaders ? (
-          <Grid item>
-            <Stack direction="row" spacing={6}>
-              {schoolLeaders.map((leader, i) => (
-                <Link href={`/network/people/${leader.id}`} key={i}>
-                  <Stack direction="row" spacing={3} alignItems="center">
-                    <Avatar src={leader?.attributes?.imageUrl} />
-                    <Stack>
-                      <Stack direction="row" spacing={1}>
-                        {leader.attributes.firstName ? (
-                          <Typography variant="bodyRegular" bold>
-                            {leader?.attributes?.firstName}
-                          </Typography>
-                        ) : null}
-                        {leader.attributes.lastName ? (
-                          <Typography variant="bodyRegular" bold>
-                            {leader?.attributes?.lastName?.charAt(0)}.
-                          </Typography>
-                        ) : null}
-                      </Stack>
-                      {leader?.attributes?.roleList.map((r, i) => (
-                        <Typography variant="bodySmall" lightened key={i}>
-                          {r}
-                        </Typography>
-                      ))}
-                    </Stack>
-                  </Stack>
-                </Link>
-              ))}
-            </Stack>
-          </Grid>
-        ) : null}
       </Grid>
     </>
   );
