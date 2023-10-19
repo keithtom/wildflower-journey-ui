@@ -542,6 +542,7 @@ const Filters = [
       { label: "West Virginia", value: "WV" },
       { label: "Wisconsin", value: "WI" },
       { label: "Wyoming", value: "WY" },
+      { label: "Puerto Rico", value: "PR" },
     ],
   },
   {
