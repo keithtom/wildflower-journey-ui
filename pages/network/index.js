@@ -418,6 +418,7 @@ const SchoolResultItem = ({
             }}
           >
             <img
+              alt="logo"
               src={logoImg ? logoImg : heroImg}
               style={{
                 width: "100%",
