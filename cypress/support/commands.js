@@ -124,3 +124,11 @@ Cypress.Commands.add("logout", () => {
   window.cookieStore.delete("phase");
   window.cookieStore.delete("workflowId");
 });
+
+Cypress.on("uncaught:exception", (err) => {
+  if (resizeObserverLoopErrRe.test(err.message)) {
+    // returning false here prevents Cypress from
+    // failing the test
+    return false;
+  }
+});

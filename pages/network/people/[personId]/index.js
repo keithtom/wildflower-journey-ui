@@ -43,6 +43,7 @@ import {
 import { useUserContext } from "@lib/useUserContext";
 import {
   Divider,
+  Alert,
   Box,
   PageContainer,
   Button,
@@ -265,7 +266,7 @@ const Person = ({}) => {
                     </Grid>
                   ) : null}
                   {userSchool.length ? (
-                    <Grid container>
+                    <Grid container spacing={3}>
                       <Grid item xs={12} sm={6}>
                         <Typography variant="h4" bold>
                           School
@@ -355,7 +356,7 @@ const EditProfileModal = ({
     handleSubmit,
     watch,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm({
     defaultValues: {
       firstName: "",
@@ -935,9 +936,23 @@ const EditProfileModal = ({
           />
 
           <Divider />
+          {showError ? (
+            <Grid container>
+              <Grid item xs={12}>
+                <Alert severity="error">
+                  <Stack>
+                    {showError.main}
+                    <Typography variant="bodySmall" error>
+                      {showError.sub}
+                    </Typography>
+                  </Stack>
+                </Alert>
+              </Grid>
+            </Grid>
+          ) : null}
           <Typography variant="bodyRegular">Add a new profile image</Typography>
           <Grid container justifyContent="center">
-            <Grid item xs={4}>
+            <Grid item xs={12} sm={8} md={6}>
               <StyledFilePond
                 files={profilePicture}
                 allowReorder={false}
@@ -1045,6 +1060,7 @@ const EditProfileModal = ({
               />
             </Grid>
           </Grid>
+          <Divider />
         </Stack>
         <Card
           noBorder
@@ -1057,7 +1073,11 @@ const EditProfileModal = ({
           }}
         >
           <Stack direction="row" spacing={3} alignItems="center">
-            <Button small disabled={isUpdatingPicture} type="submit">
+            <Button
+              small
+              disabled={!isDirty || isUpdatingPicture || isSubmitting}
+              type="submit"
+            >
               <Typography variant="bodyRegular" bold>
                 Save
               </Typography>
