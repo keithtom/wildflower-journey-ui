@@ -17,8 +17,8 @@ const workflowsApi = wildflowerApi.register("/v1/admin", {});
 //       last_name: "test2",
 //     },
 //   ],
-//   ops_guide_email: "234s-32x2",
-//   rgl_email: "kdo23-lkx3",
+//   ops_guide_id: "234s-32x2",
+//   rgl_id: "kdo23-lkx3",
 // };
 async function inviteTeam(data) {
   let response;
