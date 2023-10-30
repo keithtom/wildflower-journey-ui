@@ -72,4 +72,10 @@ async function resources({ workflowId, config = {} }) {
   return response;
 }
 
-export default { setStartDate, getTeam, invitePartner, progress, resources };
+export default {
+  setStartDate,
+  getTeam,
+  invitePartner,
+  progress,
+  resources,
+};

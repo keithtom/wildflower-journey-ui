@@ -5,6 +5,9 @@ import StepLabel from "@mui/material/StepLabel";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
+import adminApi from "@api/admin";
+import peopleApi from "@api/people";
+import useSWR from "swr";
 
 import {
   Box,
@@ -31,7 +34,6 @@ const AdminSSJ = ({}) => {
   // const maggie = "asdf-1324";
 
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
-
   return (
     <>
       <PageContainer isAdmin>
@@ -446,6 +448,23 @@ const AddOperationsGuide = ({
     handleNext();
   };
 
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    "api/school?ops_guides",
+    () => peopleApi.index({ ops_guide: true }).then((res) => res.data),
+    {
+      onErrorRetry: (error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      },
+    }
+  );
+  let opsGuides = data || [];
+    // TODO: do we need to add a spinner with isLoading?
+
   return (
     <Modal
       open={open}
@@ -482,7 +501,7 @@ const AddOperationsGuide = ({
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {OperationsGuides.map((og, i) => (
+                  {opsGuides.map((og, i) => (
                     <StyledPersonOption
                       size="small"
                       noBorder
@@ -492,7 +511,7 @@ const AddOperationsGuide = ({
                       <FormControlLabel
                         sx={{ width: "100%", height: "100%", padding: 2 }}
                         key={i}
-                        value={og.email}
+                        value={og?.attributes?.email}
                         label={
                           <Grid container>
                             <Grid item>
@@ -501,11 +520,11 @@ const AddOperationsGuide = ({
                                 spacing={3}
                                 alignItems="center"
                               >
-                                <Avatar src={og.imageUrl} size="sm" />
+                                <Avatar src={og?.attributes?.imageUrl} size="sm" />
                                 <Typography variant="bodyRegular" bold>
-                                  {og.firstName} {og.lastName}
+                                  {og?.attributes?.firstName} {og?.attributes?.lastName}
                                 </Typography>
-                                {og.roleList.map((r, i) => (
+                                {og?.attributes?.roleList.map((r, i) => (
                                   <Typography
                                     variant="bodyRegular"
                                     lightened
@@ -553,6 +572,23 @@ const AddRegionalGrowthLead = ({
         : null,
     },
   });
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    "api/school?ops_guides",
+    () => peopleApi.index({ rgl: true }).then((res) => res.data),
+    {
+      onErrorRetry: (error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      },
+    }
+  );
+  let rgl = data || [];
+  // TODO: do we need to add a spinner with isLoading?
+
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
@@ -596,7 +632,7 @@ const AddRegionalGrowthLead = ({
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {RegionalGrowthLeads.map((rgl, i) => (
+                  {rgl.map((rgl, i) => (
                     <StyledPersonOption
                       size="small"
                       noBorder
@@ -606,7 +642,7 @@ const AddRegionalGrowthLead = ({
                       <FormControlLabel
                         sx={{ width: "100%", height: "100%", padding: 2 }}
                         key={i}
-                        value={rgl.email}
+                        value={rgl?.attributes?.email}
                         label={
                           <Grid container>
                             <Grid item>
@@ -615,11 +651,11 @@ const AddRegionalGrowthLead = ({
                                 spacing={3}
                                 alignItems="center"
                               >
-                                <Avatar src={rgl.imageUrl} size="sm" />
+                                <Avatar src={rgl?.attributes?.imageUrl} size="sm" />
                                 <Typography variant="bodyRegular" bold>
-                                  {rgl.firstName} {rgl.lastName}
+                                  {rgl?.attributes?.firstName} {rgl?.attributes?.lastName}
                                 </Typography>
-                                {rgl.roleList.map((r, i) => (
+                                {rgl?.attributes?.roleList.map((r, i) => (
                                   <Typography
                                     variant="bodyRegular"
                                     lightened
@@ -645,7 +681,7 @@ const AddRegionalGrowthLead = ({
       </Grid>
     </Modal>
   );
-};
+};;
 const InviteSchool = ({
   handlePrev,
   newSchoolData,
@@ -659,6 +695,7 @@ const InviteSchool = ({
     // newSchoolData
     //submit to api
     console.log({ newSchoolData });
+    adminApi.inviteTeam(newSchoolData);
     handleInviteComplete();
   };
   // console.log({ newSchoolData });
@@ -734,38 +771,3 @@ const InviteSchool = ({
     </Modal>
   );
 };
-
-const OperationsGuides = [
-  {
-    email: "a@a.com",
-    firstName: "A",
-    lastName: "A",
-    roleList: ["Operations Guide"],
-    imageUrl: "/",
-  },
-  {
-    email: "b@b.com",
-    value: "B",
-    label: "B",
-    firstName: "B",
-    lastName: "B",
-    roleList: ["Operations Guide"],
-    imageUrl: "/",
-  },
-];
-const RegionalGrowthLeads = [
-  {
-    email: "a-rgl@a.com",
-    firstName: "A",
-    lastName: "A",
-    roleList: ["Regional Growth Lead"],
-    imageUrl: "/",
-  },
-  {
-    email: "b-rgl@b.com",
-    firstName: "B",
-    lastName: "B",
-    roleList: ["Regional Growth Lead"],
-    imageUrl: "/",
-  },
-];
