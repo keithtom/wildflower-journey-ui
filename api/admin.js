@@ -23,7 +23,7 @@ const workflowsApi = wildflowerApi.register("/v1/admin", {});
 async function inviteTeam(data) {
   let response;
   try {
-    response = await workflowsApi.post(`/ssj_invite_team`, data);
+    response = await workflowsApi.post(`/ssj_teams`, data);
   } catch (error) {
     return Promise.reject(error);
   }
