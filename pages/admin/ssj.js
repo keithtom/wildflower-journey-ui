@@ -435,15 +435,15 @@ const AddOperationsGuide = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      operationsGuide: newSchoolData.ops_guide_email
-        ? newSchoolData.ops_guide_email
+      operationsGuide: newSchoolData.ops_guide_id
+        ? newSchoolData.ops_guide_id
         : null,
     },
   });
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
-      ops_guide_email: data.operationsGuide,
+      ops_guide_id: data.operationsGuide,
     });
     handleNext();
   };
@@ -463,7 +463,7 @@ const AddOperationsGuide = ({
     }
   );
   let opsGuides = data || [];
-    // TODO: do we need to add a spinner with isLoading?
+  // TODO: do we need to add a spinner with isLoading?
 
   return (
     <Modal
@@ -511,7 +511,7 @@ const AddOperationsGuide = ({
                       <FormControlLabel
                         sx={{ width: "100%", height: "100%", padding: 2 }}
                         key={i}
-                        value={og?.attributes?.email}
+                        value={og.id}
                         label={
                           <Grid container>
                             <Grid item>
@@ -520,9 +520,13 @@ const AddOperationsGuide = ({
                                 spacing={3}
                                 alignItems="center"
                               >
-                                <Avatar src={og?.attributes?.imageUrl} size="sm" />
+                                <Avatar
+                                  src={og?.attributes?.imageUrl}
+                                  size="sm"
+                                />
                                 <Typography variant="bodyRegular" bold>
-                                  {og?.attributes?.firstName} {og?.attributes?.lastName}
+                                  {og?.attributes?.firstName}{" "}
+                                  {og?.attributes?.lastName}
                                 </Typography>
                                 {og?.attributes?.roleList.map((r, i) => (
                                   <Typography
@@ -567,8 +571,8 @@ const AddRegionalGrowthLead = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      regionalGrowthLead: newSchoolData.rgl_email
-        ? newSchoolData.rgl_email
+      regionalGrowthLead: newSchoolData.rgl_id
+        ? newSchoolData.rgl_id
         : null,
     },
   });
@@ -592,7 +596,7 @@ const AddRegionalGrowthLead = ({
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
-      rgl_email: data.regionalGrowthLead,
+      rgl_id: data.regionalGrowthLead,
     });
     handleNext();
   };
@@ -642,7 +646,7 @@ const AddRegionalGrowthLead = ({
                       <FormControlLabel
                         sx={{ width: "100%", height: "100%", padding: 2 }}
                         key={i}
-                        value={rgl?.attributes?.email}
+                        value={rgl.id}
                         label={
                           <Grid container>
                             <Grid item>
@@ -651,9 +655,13 @@ const AddRegionalGrowthLead = ({
                                 spacing={3}
                                 alignItems="center"
                               >
-                                <Avatar src={rgl?.attributes?.imageUrl} size="sm" />
+                                <Avatar
+                                  src={rgl?.attributes?.imageUrl}
+                                  size="sm"
+                                />
                                 <Typography variant="bodyRegular" bold>
-                                  {rgl?.attributes?.firstName} {rgl?.attributes?.lastName}
+                                  {rgl?.attributes?.firstName}{" "}
+                                  {rgl?.attributes?.lastName}
                                 </Typography>
                                 {rgl?.attributes?.roleList.map((r, i) => (
                                   <Typography
@@ -681,7 +689,7 @@ const AddRegionalGrowthLead = ({
       </Grid>
     </Modal>
   );
-};;
+};
 const InviteSchool = ({
   handlePrev,
   newSchoolData,
@@ -695,7 +703,7 @@ const InviteSchool = ({
     // newSchoolData
     //submit to api
     console.log({ newSchoolData });
-    adminApi.inviteTeam(newSchoolData);
+    adminApi.inviteTeam({ team: newSchoolData });
     handleInviteComplete();
   };
   // console.log({ newSchoolData });
