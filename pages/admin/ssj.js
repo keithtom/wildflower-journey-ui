@@ -5,6 +5,9 @@ import StepLabel from "@mui/material/StepLabel";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
+import teamsApi from "@api/ssj/teams";
+import peopleApi from "@api/people";
+import useSWR from "swr";
 
 import {
   Box,
@@ -30,8 +33,24 @@ const AdminSSJ = ({}) => {
   // const katelyn = "asdf-1324";
   // const maggie = "asdf-1324";
 
-  const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    "api/teams",
+    () => teamsApi.index().then((res) => res.data),
+    {
+      onErrorRetry: (error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      },
+    }
+  );
+  let ssjTeams = data || [];
+  // TODO: do we need to add a spinner with isLoading?
 
+  const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
   return (
     <>
       <PageContainer isAdmin>
@@ -54,11 +73,11 @@ const AdminSSJ = ({}) => {
             <Grid item xs={12}>
               <Card noPadding noRadius noBorder>
                 <Stack spacing={1}>
-                  {SchoolsInSSJ.map((s, i) => (
+                  {ssjTeams.map((s, i) => (
                     <Card size="small" key={i}>
                       <Stack direction="row" alignItems="center" spacing={3}>
                         <Avatar size="sm" />
-                        <Typography>{s.name}</Typography>
+                        <Typography>{s?.attributes?.tempName}</Typography>
                       </Stack>
                     </Card>
                   ))}
@@ -433,18 +452,35 @@ const AddOperationsGuide = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      operationsGuide: newSchoolData.ops_guide_email
-        ? newSchoolData.ops_guide_email
+      operationsGuide: newSchoolData.ops_guide_id
+        ? newSchoolData.ops_guide_id
         : null,
     },
   });
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
-      ops_guide_email: data.operationsGuide,
+      ops_guide_id: data.operationsGuide,
     });
     handleNext();
   };
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    "api/school?ops_guides",
+    () => peopleApi.index({ ops_guide: true }).then((res) => res.data),
+    {
+      onErrorRetry: (error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      },
+    }
+  );
+  let opsGuides = data || [];
+  // TODO: do we need to add a spinner with isLoading?
 
   return (
     <Modal
@@ -482,7 +518,7 @@ const AddOperationsGuide = ({
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {OperationsGuides.map((og, i) => (
+                  {opsGuides.map((og, i) => (
                     <StyledPersonOption
                       size="small"
                       noBorder
@@ -492,7 +528,7 @@ const AddOperationsGuide = ({
                       <FormControlLabel
                         sx={{ width: "100%", height: "100%", padding: 2 }}
                         key={i}
-                        value={og.email}
+                        value={og.id}
                         label={
                           <Grid container>
                             <Grid item>
@@ -501,11 +537,15 @@ const AddOperationsGuide = ({
                                 spacing={3}
                                 alignItems="center"
                               >
-                                <Avatar src={og.imageUrl} size="sm" />
+                                <Avatar
+                                  src={og?.attributes?.imageUrl}
+                                  size="sm"
+                                />
                                 <Typography variant="bodyRegular" bold>
-                                  {og.firstName} {og.lastName}
+                                  {og?.attributes?.firstName}{" "}
+                                  {og?.attributes?.lastName}
                                 </Typography>
-                                {og.roleList.map((r, i) => (
+                                {og?.attributes?.roleList.map((r, i) => (
                                   <Typography
                                     variant="bodyRegular"
                                     lightened
@@ -548,15 +588,30 @@ const AddRegionalGrowthLead = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      regionalGrowthLead: newSchoolData.rgl_email
-        ? newSchoolData.rgl_email
-        : null,
+      regionalGrowthLead: newSchoolData.rgl_id ? newSchoolData.rgl_id : null,
     },
   });
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    "api/school?ops_guides",
+    () => peopleApi.index({ rgl: true }).then((res) => res.data),
+    {
+      onErrorRetry: (error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      },
+    }
+  );
+  let rgl = data || [];
+  // TODO: do we need to add a spinner with isLoading?
+
   const onSubmit = (data) => {
     setNewSchoolData({
       ...newSchoolData,
-      rgl_email: data.regionalGrowthLead,
+      rgl_id: data.regionalGrowthLead,
     });
     handleNext();
   };
@@ -596,7 +651,7 @@ const AddRegionalGrowthLead = ({
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {RegionalGrowthLeads.map((rgl, i) => (
+                  {rgl.map((rgl, i) => (
                     <StyledPersonOption
                       size="small"
                       noBorder
@@ -606,7 +661,7 @@ const AddRegionalGrowthLead = ({
                       <FormControlLabel
                         sx={{ width: "100%", height: "100%", padding: 2 }}
                         key={i}
-                        value={rgl.email}
+                        value={rgl.id}
                         label={
                           <Grid container>
                             <Grid item>
@@ -615,11 +670,15 @@ const AddRegionalGrowthLead = ({
                                 spacing={3}
                                 alignItems="center"
                               >
-                                <Avatar src={rgl.imageUrl} size="sm" />
+                                <Avatar
+                                  src={rgl?.attributes?.imageUrl}
+                                  size="sm"
+                                />
                                 <Typography variant="bodyRegular" bold>
-                                  {rgl.firstName} {rgl.lastName}
+                                  {rgl?.attributes?.firstName}{" "}
+                                  {rgl?.attributes?.lastName}
                                 </Typography>
-                                {rgl.roleList.map((r, i) => (
+                                {rgl?.attributes?.roleList.map((r, i) => (
                                   <Typography
                                     variant="bodyRegular"
                                     lightened
@@ -659,6 +718,7 @@ const InviteSchool = ({
     // newSchoolData
     //submit to api
     console.log({ newSchoolData });
+    teamsApi.inviteTeam({ team: newSchoolData });
     handleInviteComplete();
   };
   // console.log({ newSchoolData });
@@ -734,38 +794,3 @@ const InviteSchool = ({
     </Modal>
   );
 };
-
-const OperationsGuides = [
-  {
-    email: "a@a.com",
-    firstName: "A",
-    lastName: "A",
-    roleList: ["Operations Guide"],
-    imageUrl: "/",
-  },
-  {
-    email: "b@b.com",
-    value: "B",
-    label: "B",
-    firstName: "B",
-    lastName: "B",
-    roleList: ["Operations Guide"],
-    imageUrl: "/",
-  },
-];
-const RegionalGrowthLeads = [
-  {
-    email: "a-rgl@a.com",
-    firstName: "A",
-    lastName: "A",
-    roleList: ["Regional Growth Lead"],
-    imageUrl: "/",
-  },
-  {
-    email: "b-rgl@b.com",
-    firstName: "B",
-    lastName: "B",
-    roleList: ["Regional Growth Lead"],
-    imageUrl: "/",
-  },
-];
