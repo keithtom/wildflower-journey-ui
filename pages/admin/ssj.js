@@ -33,8 +33,12 @@ import {
 } from "@ui";
 
 const AdminSSJ = ({}) => {
+  const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
+
   const { currentUser } = useUserContext();
+
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
+
   const { data, error, isLoading, isValidating, mutate } = useSWR(
     "api/teams",
     () => teamsApi.index().then((res) => res.data),
@@ -51,7 +55,6 @@ const AdminSSJ = ({}) => {
   );
   let ssjTeams = data || [];
 
-  const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
   return (
     <>
       <PageContainer isAdmin>
@@ -121,6 +124,7 @@ const AddSchoolModal = ({ open, toggle }) => {
   const [team, setTeam] = useState({});
   const [tempDisplayData, setTempDisplayData] = useState({});
   const [activeStep, setActiveStep] = useState(0);
+  const { mutate } = useSWRConfig();
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -134,6 +138,7 @@ const AddSchoolModal = ({ open, toggle }) => {
     setTempDisplayData({});
     setActiveStep(0);
     toggle();
+    mutate("api/teams");
   };
 
   return (

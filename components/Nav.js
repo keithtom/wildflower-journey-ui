@@ -91,12 +91,11 @@ export default Nav;
 
 const Navigation = () => {
   const router = useRouter();
-  const { currentUser, isLoggedIn, isAdmin } = useUserContext();
+  const { currentUser, isLoggedIn } = useUserContext();
 
-  // console.log({ currentUser });
   return (
     <Box>
-      {isAdmin ? (
+      {router.pathname.includes("/admin") ? (
         <NavLink
           variant="primary"
           to="admin/ssj"
@@ -123,7 +122,7 @@ const Navigation = () => {
               icon="home"
             />
           ) : null}
-          {router.pathname.includes("/ssj") && <SSJNavigation />}
+          {router.asPath === "/ssj" && <SSJNavigation />}
         </>
       )}
     </Box>

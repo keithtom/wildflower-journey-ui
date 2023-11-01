@@ -208,7 +208,13 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
         {myProfileLink ? (
           <NavLink to={myProfileLink} label="My Profile" />
         ) : null}
-        {isAdmin ? <NavLink to="/admin/ssj" label="Admin" /> : null}
+
+        {isAdmin ? (
+          <>
+            <NavLink to="/ssj" label="Home" />
+            <NavLink to="/admin/ssj" label="Admin" />
+          </>
+        ) : null}
         {showNetwork ? null : <NavLink to="/settings" label="Settings" />}
         <StyledOption onClick={handleLogOut} hoverable>
           <Typography variant="bodyRegular">Sign out</Typography>
