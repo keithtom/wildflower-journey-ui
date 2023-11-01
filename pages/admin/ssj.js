@@ -33,6 +33,23 @@ const AdminSSJ = ({}) => {
   // const katelyn = "asdf-1324";
   // const maggie = "asdf-1324";
 
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    "api/teams",
+    () => teamsApi.index().then((res) => res.data),
+    {
+      onErrorRetry: (error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      },
+    }
+  );
+  let ssjTeams = data || [];
+  // TODO: do we need to add a spinner with isLoading?
+
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
   return (
     <>
@@ -56,11 +73,11 @@ const AdminSSJ = ({}) => {
             <Grid item xs={12}>
               <Card noPadding noRadius noBorder>
                 <Stack spacing={1}>
-                  {SchoolsInSSJ.map((s, i) => (
+                  {ssjTeams.map((s, i) => (
                     <Card size="small" key={i}>
                       <Stack direction="row" alignItems="center" spacing={3}>
                         <Avatar size="sm" />
-                        <Typography>{s.name}</Typography>
+                        <Typography>{s?.attributes?.tempName}</Typography>
                       </Stack>
                     </Card>
                   ))}
@@ -571,9 +588,7 @@ const AddRegionalGrowthLead = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      regionalGrowthLead: newSchoolData.rgl_id
-        ? newSchoolData.rgl_id
-        : null,
+      regionalGrowthLead: newSchoolData.rgl_id ? newSchoolData.rgl_id : null,
     },
   });
   const { data, error, isLoading, isValidating, mutate } = useSWR(

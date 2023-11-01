@@ -2,6 +2,17 @@ import wildflowerApi from "@api/base";
 
 const teamsApi = wildflowerApi.register("/v1/ssj/teams", {});
 
+async function index() {
+  let response;
+  try {
+    response = await teamsApi.get(`/`);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  const responseData = await response.data;
+  return responseData;
+}
+
 async function setStartDate(data) {
   let response;
   try {
@@ -69,5 +80,6 @@ export default {
   setStartDate,
   getTeam,
   inviteTeam,
+  index,
   // invitePartner,
 };
