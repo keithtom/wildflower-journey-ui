@@ -7,8 +7,11 @@ import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 
+import { clearLoggedInState } from "@lib/handleLogout";
+import { useUserContext } from "@lib/useUserContext";
+import useAuth from "@lib/utils/useAuth";
 import {
   Box,
   PageContainer,
@@ -26,13 +29,12 @@ import {
   TextField,
   Link,
   Radio,
+  Spinner,
 } from "@ui";
 
 const AdminSSJ = ({}) => {
-  // Check if maggie or katelyn?
-  // const katelyn = "asdf-1324";
-  // const maggie = "asdf-1324";
-
+  const { currentUser } = useUserContext();
+  useAuth(!currentUser?.attributes?.isAdmin && "/network");
   const { data, error, isLoading, isValidating, mutate } = useSWR(
     "api/teams",
     () => teamsApi.index().then((res) => res.data),
@@ -48,7 +50,6 @@ const AdminSSJ = ({}) => {
     }
   );
   let ssjTeams = data || [];
-  // TODO: do we need to add a spinner with isLoading?
 
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
   return (
@@ -73,14 +74,22 @@ const AdminSSJ = ({}) => {
             <Grid item xs={12}>
               <Card noPadding noRadius noBorder>
                 <Stack spacing={1}>
-                  {ssjTeams.map((s, i) => (
-                    <Card size="small" key={i}>
-                      <Stack direction="row" alignItems="center" spacing={3}>
-                        <Avatar size="sm" />
-                        <Typography>{s?.attributes?.tempName}</Typography>
-                      </Stack>
-                    </Card>
-                  ))}
+                  {isLoading ? (
+                    <Grid container justifyContent="center">
+                      <Grid item>
+                        <Spinner />
+                      </Grid>
+                    </Grid>
+                  ) : (
+                    ssjTeams.map((s, i) => (
+                      <Card size="small" key={i}>
+                        <Stack direction="row" alignItems="center" spacing={3}>
+                          <Avatar size="sm" />
+                          <Typography>{s?.attributes?.tempName}</Typography>
+                        </Stack>
+                      </Card>
+                    ))
+                  )}
                 </Stack>
               </Card>
             </Grid>
@@ -97,21 +106,6 @@ const AdminSSJ = ({}) => {
 
 export default AdminSSJ;
 
-const SchoolsInSSJ = [
-  {
-    logoUrl: "",
-    name: "1",
-  },
-  {
-    logoUrl: "",
-    name: "2",
-  },
-  {
-    logoUrl: "",
-    name: "3",
-  },
-];
-
 const StyledPersonOption = styled(Card)`
   border-bottom: 1px solid ${({ theme }) => theme.color.neutral.main};
   &:last-child {
@@ -124,8 +118,10 @@ const StyledPersonOption = styled(Card)`
 `;
 
 const AddSchoolModal = ({ open, toggle }) => {
-  const [newSchoolData, setNewSchoolData] = useState({});
+  const [team, setTeam] = useState({});
+  const [tempDisplayData, setTempDisplayData] = useState({});
   const [activeStep, setActiveStep] = useState(0);
+
   const handleNext = () => {
     setActiveStep(activeStep + 1);
   };
@@ -134,7 +130,8 @@ const AddSchoolModal = ({ open, toggle }) => {
   };
 
   const handleInviteComplete = () => {
-    setNewSchoolData({});
+    setTeam({});
+    setTempDisplayData({});
     setActiveStep(0);
     toggle();
   };
@@ -144,8 +141,8 @@ const AddSchoolModal = ({ open, toggle }) => {
       {activeStep === 0 ? (
         <AddEmergingTeacherLeaders
           handleNext={handleNext}
-          setNewSchoolData={setNewSchoolData}
-          newSchoolData={newSchoolData}
+          setTeam={setTeam}
+          team={team}
           activeStep={activeStep}
           open={open}
           toggle={toggle}
@@ -154,8 +151,10 @@ const AddSchoolModal = ({ open, toggle }) => {
         <AddOperationsGuide
           handlePrev={handlePrev}
           handleNext={handleNext}
-          setNewSchoolData={setNewSchoolData}
-          newSchoolData={newSchoolData}
+          setTeam={setTeam}
+          team={team}
+          setTempDisplayData={setTempDisplayData}
+          tempDisplayData={tempDisplayData}
           activeStep={activeStep}
           open={open}
           toggle={toggle}
@@ -164,8 +163,10 @@ const AddSchoolModal = ({ open, toggle }) => {
         <AddRegionalGrowthLead
           handlePrev={handlePrev}
           handleNext={handleNext}
-          setNewSchoolData={setNewSchoolData}
-          newSchoolData={newSchoolData}
+          setTeam={setTeam}
+          team={team}
+          setTempDisplayData={setTempDisplayData}
+          tempDisplayData={tempDisplayData}
           activeStep={activeStep}
           open={open}
           toggle={toggle}
@@ -175,7 +176,9 @@ const AddSchoolModal = ({ open, toggle }) => {
           <InviteSchool
             handlePrev={handlePrev}
             handleInviteComplete={handleInviteComplete}
-            newSchoolData={newSchoolData}
+            team={team}
+            setTempDisplayData={setTempDisplayData}
+            tempDisplayData={tempDisplayData}
             activeStep={activeStep}
             open={open}
             toggle={toggle}
@@ -216,7 +219,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
     setMultiplePeople((multiplePeople) => {
       return [...multiplePeople, data];
     });
-    reset({ firstName: "", lastName: "", email: "" });
+    reset({ first_name: "", last_name: "", email: "" });
   };
   const handleRemovePerson = (email) => {
     const removedPeople = multiplePeople.filter((p) => p.email !== email);
@@ -253,12 +256,14 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                               alignItems="center"
                             >
                               <Avatar size="sm" />
-                              <Typography variant="bodyRegular" bold>
-                                {etl.firstName} {etl.lastName}
-                              </Typography>
-                              <Typography variant="bodyRegular" lightened>
-                                Emerging Teacher Leader
-                              </Typography>
+                              <Stack>
+                                <Typography variant="bodyRegular" bold>
+                                  {etl.first_name} {etl.last_name}
+                                </Typography>
+                                <Typography variant="bodyRegular" lightened>
+                                  Emerging Teacher Leader
+                                </Typography>
+                              </Stack>
                             </Stack>
                           </Grid>
                           <Grid item>
@@ -290,7 +295,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <Controller
-                      name="firstName"
+                      name="first_name"
                       control={control}
                       rules={{
                         required: {
@@ -315,7 +320,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Controller
-                      name="lastName"
+                      name="last_name"
                       control={control}
                       rules={{
                         required: {
@@ -378,19 +383,19 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
 
 const AddEmergingTeacherLeaders = ({
   handleNext,
-  newSchoolData,
-  setNewSchoolData,
+  team,
+  setTeam,
   activeStep,
   open,
   toggle,
 }) => {
   const [multiplePeople, setMultiplePeople] = useState(
-    newSchoolData.etl_people_params ? newSchoolData.etl_people_params : []
+    team.etl_people_params ? team.etl_people_params : []
   );
   const { handleSubmit } = useForm();
   const onSubmit = (data) => {
-    setNewSchoolData({
-      ...newSchoolData,
+    setTeam({
+      ...team,
       etl_people_params: multiplePeople,
     });
     handleNext();
@@ -429,7 +434,7 @@ const AddEmergingTeacherLeaders = ({
     >
       <FormStepper activeStep={activeStep} />
       <AddMultiplePeopleForm
-        newSchoolData={newSchoolData}
+        team={team}
         setMultiplePeople={setMultiplePeople}
         multiplePeople={multiplePeople}
       />
@@ -439,8 +444,10 @@ const AddEmergingTeacherLeaders = ({
 const AddOperationsGuide = ({
   handlePrev,
   handleNext,
-  newSchoolData,
-  setNewSchoolData,
+  team,
+  setTeam,
+  setTempDisplayData,
+  tempDisplayData,
   activeStep,
   open,
   toggle,
@@ -452,20 +459,39 @@ const AddOperationsGuide = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      operationsGuide: newSchoolData.ops_guide_id
-        ? newSchoolData.ops_guide_id
-        : null,
+      operationsGuide: team.ops_guide_id ? team.ops_guide_id : null,
     },
   });
   const onSubmit = (data) => {
-    setNewSchoolData({
-      ...newSchoolData,
+    setTeam({
+      ...team,
       ops_guide_id: data.operationsGuide,
+    });
+    const selectedOpsGuide = opsGuides.filter(
+      (o) => o.id === data.operationsGuide
+    );
+    setTempDisplayData({
+      ...tempDisplayData,
+      opsGuide: {
+        firstName: selectedOpsGuide[0].attributes.firstName,
+        lastName: selectedOpsGuide[0].attributes.lastName,
+        roleList: selectedOpsGuide[0].attributes.roleList,
+        imageUrl: selectedOpsGuide[0].attributes.imageUrl,
+      },
     });
     handleNext();
   };
+  useEffect(() => {
+    mutate("api/school");
+  }, [activeStep]);
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR(
+  const {
+    data: opsGuideData,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  } = useSWR(
     "api/school?ops_guides",
     () => peopleApi.index({ ops_guide: true }).then((res) => res.data),
     {
@@ -479,8 +505,7 @@ const AddOperationsGuide = ({
       },
     }
   );
-  let opsGuides = data || [];
-  // TODO: do we need to add a spinner with isLoading?
+  let opsGuides = opsGuideData || [];
 
   return (
     <Modal
@@ -518,51 +543,61 @@ const AddOperationsGuide = ({
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {opsGuides.map((og, i) => (
-                    <StyledPersonOption
-                      size="small"
-                      noBorder
-                      noRadius
-                      noPadding
-                    >
-                      <FormControlLabel
-                        sx={{ width: "100%", height: "100%", padding: 2 }}
-                        key={i}
-                        value={og.id}
-                        label={
-                          <Grid container>
-                            <Grid item>
-                              <Stack
-                                direction="row"
-                                spacing={3}
-                                alignItems="center"
-                              >
-                                <Avatar
-                                  src={og?.attributes?.imageUrl}
-                                  size="sm"
-                                />
-                                <Typography variant="bodyRegular" bold>
-                                  {og?.attributes?.firstName}{" "}
-                                  {og?.attributes?.lastName}
-                                </Typography>
-                                {og?.attributes?.roleList.map((r, i) => (
-                                  <Typography
-                                    variant="bodyRegular"
-                                    lightened
-                                    key={i}
-                                  >
-                                    {r}
-                                  </Typography>
-                                ))}
-                              </Stack>
+                  {isLoading || isValidating ? (
+                    <Card noBorder size="large">
+                      <Grid container justifyContent="center">
+                        <Grid item>
+                          <Spinner />
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  ) : (
+                    opsGuides.map((og, i) => (
+                      <StyledPersonOption
+                        size="small"
+                        noBorder
+                        noRadius
+                        noPadding
+                      >
+                        <FormControlLabel
+                          sx={{ width: "100%", height: "100%", padding: 2 }}
+                          key={i}
+                          value={og.id}
+                          label={
+                            <Grid container>
+                              <Grid item>
+                                <Stack
+                                  direction="row"
+                                  spacing={3}
+                                  alignItems="center"
+                                >
+                                  <Avatar
+                                    src={og?.attributes?.imageUrl}
+                                    size="sm"
+                                  />
+                                  <Stack>
+                                    <Typography variant="bodyRegular" bold>
+                                      {og?.attributes?.firstName}{" "}
+                                      {og?.attributes?.lastName}
+                                    </Typography>
+                                    <Typography variant="bodyRegular" lightened>
+                                      {og?.attributes?.roleList.map((r, i) => (
+                                        <StyledRoleListItem key={i}>
+                                          {r}
+                                        </StyledRoleListItem>
+                                      ))}
+                                    </Typography>
+                                  </Stack>
+                                </Stack>
+                              </Grid>
                             </Grid>
-                          </Grid>
-                        }
-                        control={<Radio />}
-                        onChange={onChange}
-                      />
-                    </StyledPersonOption>
-                  ))}
+                          }
+                          control={<Radio />}
+                          onChange={onChange}
+                        />
+                      </StyledPersonOption>
+                    ))
+                  )}
                 </RadioGroup>
               )}
             />
@@ -575,8 +610,10 @@ const AddOperationsGuide = ({
 const AddRegionalGrowthLead = ({
   handlePrev,
   handleNext,
-  newSchoolData,
-  setNewSchoolData,
+  team,
+  setTeam,
+  setTempDisplayData,
+  tempDisplayData,
   activeStep,
   open,
   toggle,
@@ -588,10 +625,19 @@ const AddRegionalGrowthLead = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      regionalGrowthLead: newSchoolData.rgl_id ? newSchoolData.rgl_id : null,
+      regionalGrowthLead: team.rgl_id ? team.rgl_id : null,
     },
   });
-  const { data, error, isLoading, isValidating, mutate } = useSWR(
+  useEffect(() => {
+    mutate("api/school");
+  }, [activeStep]);
+  const {
+    data: rglData,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  } = useSWR(
     "api/school?ops_guides",
     () => peopleApi.index({ rgl: true }).then((res) => res.data),
     {
@@ -605,13 +651,21 @@ const AddRegionalGrowthLead = ({
       },
     }
   );
-  let rgl = data || [];
-  // TODO: do we need to add a spinner with isLoading?
-
+  let rgl = rglData || [];
   const onSubmit = (data) => {
-    setNewSchoolData({
-      ...newSchoolData,
+    setTeam({
+      ...team,
       rgl_id: data.regionalGrowthLead,
+    });
+    const selectedRgl = rgl.filter((o) => o.id === data.regionalGrowthLead);
+    setTempDisplayData({
+      ...tempDisplayData,
+      rgl: {
+        firstName: selectedRgl[0].attributes.firstName,
+        lastName: selectedRgl[0].attributes.lastName,
+        roleList: selectedRgl[0].attributes.roleList,
+        imageUrl: selectedRgl[0].attributes.imageUrl,
+      },
     });
     handleNext();
   };
@@ -651,51 +705,61 @@ const AddRegionalGrowthLead = ({
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {rgl.map((rgl, i) => (
-                    <StyledPersonOption
-                      size="small"
-                      noBorder
-                      noRadius
-                      noPadding
-                    >
-                      <FormControlLabel
-                        sx={{ width: "100%", height: "100%", padding: 2 }}
-                        key={i}
-                        value={rgl.id}
-                        label={
-                          <Grid container>
-                            <Grid item>
-                              <Stack
-                                direction="row"
-                                spacing={3}
-                                alignItems="center"
-                              >
-                                <Avatar
-                                  src={rgl?.attributes?.imageUrl}
-                                  size="sm"
-                                />
-                                <Typography variant="bodyRegular" bold>
-                                  {rgl?.attributes?.firstName}{" "}
-                                  {rgl?.attributes?.lastName}
-                                </Typography>
-                                {rgl?.attributes?.roleList.map((r, i) => (
-                                  <Typography
-                                    variant="bodyRegular"
-                                    lightened
-                                    key={i}
-                                  >
-                                    {r}
-                                  </Typography>
-                                ))}
-                              </Stack>
+                  {isLoading || isValidating ? (
+                    <Card noBorder size="large">
+                      <Grid container justifyContent="center">
+                        <Grid item>
+                          <Spinner />
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  ) : (
+                    rgl.map((rgl, i) => (
+                      <StyledPersonOption
+                        size="small"
+                        noBorder
+                        noRadius
+                        noPadding
+                      >
+                        <FormControlLabel
+                          sx={{ width: "100%", height: "100%", padding: 2 }}
+                          key={i}
+                          value={rgl.id}
+                          label={
+                            <Grid container>
+                              <Grid item>
+                                <Stack
+                                  direction="row"
+                                  spacing={3}
+                                  alignItems="center"
+                                >
+                                  <Avatar
+                                    src={rgl?.attributes?.imageUrl}
+                                    size="sm"
+                                  />
+                                  <Stack>
+                                    <Typography variant="bodyRegular" bold>
+                                      {rgl?.attributes?.firstName}{" "}
+                                      {rgl?.attributes?.lastName}
+                                    </Typography>
+                                    <Typography variant="bodyRegular" lightened>
+                                      {rgl?.attributes?.roleList.map((r, i) => (
+                                        <StyledRoleListItem key={i}>
+                                          {r}
+                                        </StyledRoleListItem>
+                                      ))}
+                                    </Typography>
+                                  </Stack>
+                                </Stack>
+                              </Grid>
                             </Grid>
-                          </Grid>
-                        }
-                        control={<Radio />}
-                        onChange={onChange}
-                      />
-                    </StyledPersonOption>
-                  ))}
+                          }
+                          control={<Radio />}
+                          onChange={onChange}
+                        />
+                      </StyledPersonOption>
+                    ))
+                  )}
                 </RadioGroup>
               )}
             />
@@ -707,21 +771,22 @@ const AddRegionalGrowthLead = ({
 };
 const InviteSchool = ({
   handlePrev,
-  newSchoolData,
+  team,
+  tempDisplayData,
   handleInviteComplete,
   activeStep,
   open,
   toggle,
 }) => {
   const { control, handleSubmit } = useForm();
+
   const onSubmit = () => {
-    // newSchoolData
-    //submit to api
-    console.log({ newSchoolData });
-    teamsApi.inviteTeam({ team: newSchoolData });
+    // console.log({ team });
+    teamsApi.inviteTeam({ team: team });
     handleInviteComplete();
   };
-  // console.log({ newSchoolData });
+  console.log({ team });
+  // console.log({ tempDisplayData });
   return (
     <Modal
       open={open}
@@ -755,16 +820,18 @@ const InviteSchool = ({
             <Typography variant="bodyRegular" bold>
               Emerging Teacher Leader
             </Typography>
-            {newSchoolData.etl_people_params.map((etl, i) => (
+            {team.etl_people_params.map((etl, i) => (
               <Card variant="lightened" size="small" key={i}>
                 <Stack direction="row" spacing={3} alignItems="center">
                   <Avatar size="sm" />
-                  <Typography variant="bodyRegular" bold>
-                    {etl.firstName} {etl.lastName}
-                  </Typography>
-                  <Typography variant="bodyRegular" lightened>
-                    Emerging Teacher Leader
-                  </Typography>
+                  <Stack>
+                    <Typography variant="bodyRegular" bold>
+                      {etl.firstName} {etl.lastName}
+                    </Typography>
+                    <Typography variant="bodyRegular" lightened>
+                      Emerging Teacher Leader
+                    </Typography>
+                  </Stack>
                 </Stack>
               </Card>
             ))}
@@ -774,9 +841,25 @@ const InviteSchool = ({
               Operations Guide
             </Typography>
             <Card size="small" variant="lightened">
-              <Typography variant="bodyRegular">
-                {newSchoolData.ops_guide_email}
-              </Typography>
+              <Grid container>
+                <Grid item>
+                  <Stack direction="row" spacing={3} alignItems="center">
+                    <Avatar src={tempDisplayData.opsGuide.imageUrl} size="sm" />
+                    <Stack>
+                      <Typography variant="bodyRegular" bold>
+                        {tempDisplayData.opsGuide.firstName}{" "}
+                        {tempDisplayData.opsGuide.lastName}
+                      </Typography>
+
+                      <Typography variant="bodyRegular" lightened>
+                        {tempDisplayData.opsGuide.roleList.map((r, i) => (
+                          <StyledRoleListItem key={i}>{r}</StyledRoleListItem>
+                        ))}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Grid>
+              </Grid>
             </Card>
           </Stack>
           <Stack spacing={3}>
@@ -784,9 +867,24 @@ const InviteSchool = ({
               Regional Growth Lead
             </Typography>
             <Card size="small" variant="lightened">
-              <Typography variant="bodyRegular">
-                {newSchoolData.rgl_email}
-              </Typography>
+              <Grid container>
+                <Grid item>
+                  <Stack direction="row" spacing={3} alignItems="center">
+                    <Avatar src={tempDisplayData.rgl.imageUrl} size="sm" />
+                    <Stack>
+                      <Typography variant="bodyRegular" bold>
+                        {tempDisplayData.rgl.firstName}{" "}
+                        {tempDisplayData.rgl.lastName}
+                      </Typography>
+                      <Typography variant="bodyRegular" lightened>
+                        {tempDisplayData.rgl.roleList.map((r, i) => (
+                          <StyledRoleListItem key={i}>{r}</StyledRoleListItem>
+                        ))}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </Grid>
+              </Grid>
             </Card>
           </Stack>
         </Stack>
@@ -794,3 +892,15 @@ const InviteSchool = ({
     </Modal>
   );
 };
+
+const StyledRoleListItem = styled(Box)`
+  display: inline;
+  &:after {
+    content: ", ";
+  }
+  &:last-child {
+    &:after {
+      content: none;
+    }
+  }
+`;
