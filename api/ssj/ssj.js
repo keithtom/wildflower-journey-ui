@@ -11,31 +11,6 @@ async function dashboard() {
   // we can massage the response here into a data structure the frontend wants
 }
 
-async function setStartDate(date) {
-  let response;
-  try {
-    response = await workflowsApi.put(`/team`, {
-      team: { expected_start_date: date },
-    });
-  } catch (error) {
-    return Promise.reject(error);
-  }
-  const data = await response.data;
-  return data;
-}
-
-async function getTeam() {
-  let response;
-  try {
-    response = await workflowsApi.get(`/team`);
-  } catch (error) {
-    return Promise.reject(error);
-  }
-  const data = await response.data;
-  return data;
-  // if response good, great.  else.  error out?
-}
-
 async function invitePartner(data) {
   return await workflowsApi.put(`/invite_partner`, {
     person: {
@@ -73,8 +48,6 @@ async function resources({ workflowId, config = {} }) {
 }
 
 export default {
-  setStartDate,
-  getTeam,
   invitePartner,
   progress,
   resources,

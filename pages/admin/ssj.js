@@ -5,7 +5,7 @@ import StepLabel from "@mui/material/StepLabel";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
-import adminApi from "@api/admin";
+import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
 import useSWR from "swr";
 
@@ -703,7 +703,7 @@ const InviteSchool = ({
     // newSchoolData
     //submit to api
     console.log({ newSchoolData });
-    adminApi.inviteTeam({ team: newSchoolData });
+    teamsApi.inviteTeam({ team: newSchoolData });
     handleInviteComplete();
   };
   // console.log({ newSchoolData });
