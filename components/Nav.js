@@ -120,7 +120,8 @@ const Navigation = () => {
               icon="home"
             />
           ) : null}
-          {router.pathname.includes("/ssj/") && <SSJNavigation />}
+          {router.pathname.includes("/ssj") &&
+            !router.pathname.includes("/admin") && <SSJNavigation />}
         </>
       )}
     </Box>
