@@ -89,37 +89,41 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
 
 export default Nav;
 
-const Navigation = ({}) => {
+const Navigation = () => {
   const router = useRouter();
   const { currentUser, isLoggedIn } = useUserContext();
 
-  // console.log({ currentUser });
   return (
     <Box>
-      <NavLink
-        variant="primary"
-        to="/network"
-        active={router.pathname.includes("/network")}
-        label="Network"
-        icon="bookReader"
-      />
-      {currentUser?.attributes?.ssj ? (
+      {router.pathname.includes("/admin") ? (
         <NavLink
           variant="primary"
-          to="/ssj"
-          active={router.asPath === "/ssj"}
+          to="admin/ssj"
+          active={router.pathname.includes("/admin/ssj")}
           label="School Startup Journey"
-          icon="home"
         />
-      ) : null}
-      {router.pathname.includes("/ssj") && <SSJNavigation />}
-      {/* <NavLink
-        to="/advice"
-        active={router.pathname.includes("/advice")}
-        label="Advice"
-        icon="conversation"
-        />
-      {router.pathname.includes("/advice") && <AdviceProcessNavigation />} */}
+      ) : (
+        <>
+          <NavLink
+            variant="primary"
+            to="/network"
+            active={router.pathname.includes("/network")}
+            label="Network"
+            icon="bookReader"
+          />
+          {currentUser?.attributes?.ssj ? (
+            <NavLink
+              variant="primary"
+              to="/ssj"
+              active={router.asPath === "/ssj"}
+              label="School Startup Journey"
+              icon="home"
+            />
+          ) : null}
+          {router.pathname.includes("/ssj") &&
+            !router.pathname.includes("/admin") && <SSJNavigation />}
+        </>
+      )}
     </Box>
   );
 };

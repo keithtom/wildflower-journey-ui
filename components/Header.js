@@ -7,6 +7,7 @@ import { useUserContext } from "../lib/useUserContext";
 import { clearLoggedInState } from "../lib/handleLogout";
 import registrationsAPI from "../api/registrations";
 import { theme } from "../styles/theme";
+import { useRouter } from "next/router";
 import { getScreenSize } from "../hooks/react-responsive";
 
 import {
@@ -31,6 +32,11 @@ const CustomAppBar = styled(AppBar)`
   justify-content: center;
   display: flex;
   ${(props) =>
+    props.isAdmin &&
+    css`
+      background: ${props.theme.color.neutral.dark};
+    `}
+  ${(props) =>
     props.env === "dev" &&
     css`
       background: red;
@@ -43,19 +49,23 @@ const CustomAppBar = styled(AppBar)`
 `;
 
 const Header = ({ toggleNavOpen }) => {
+  const router = useRouter();
   const { screenSize } = getScreenSize();
 
-  const { currentUser, isLoggedIn } = useUserContext();
+  const { currentUser, isLoggedIn, isAdmin } = useUserContext();
 
   const logo = "/assets/images/wildflower-logo.png";
 
   const showNetwork = !currentUser?.attributes?.ssj;
 
   // console.log({ currentUser });
+  // console.log({ isAdmin });
   // console.log(process.env.APP_ENV);
 
+  const adminView = isAdmin && router.asPath === "/admin/ssj" ? true : false;
+
   return (
-    <CustomAppBar env={process.env.APP_ENV}>
+    <CustomAppBar env={process.env.APP_ENV} isAdmin={adminView}>
       <Grid
         container
         justifyContent={isLoggedIn ? "space-between" : "center"}
@@ -73,16 +83,21 @@ const Header = ({ toggleNavOpen }) => {
                 <Icon type="menu" />
               </IconButton>
               <img src={logo} style={{ height: "24px" }} />
-              <Typography variant="bodyRegular" bold noWrap>
+              <Typography variant="bodyRegular" bold noWrap light={adminView}>
                 My Wildflower
               </Typography>
             </Stack>
           ) : (
             <Stack direction="row" alignItems="center" spacing={3}>
               <img src={logo} style={{ height: "32px" }} />
-              <Typography variant="bodyLarge" bold noWrap>
+              <Typography variant="bodyLarge" bold noWrap lightened={adminView}>
                 My Wildflower
               </Typography>
+              {adminView ? (
+                <Typography variant="bodyLarge" light>
+                  Admin
+                </Typography>
+              ) : null}
             </Stack>
           )}
         </Grid>
@@ -116,7 +131,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
 
   const open = Boolean(profileNavOpen);
   const id = open ? "profile-nav" : null;
-  const { setCurrentUser } = useUserContext();
+  const { setCurrentUser, isAdmin } = useUserContext();
 
   const StyledOption = styled(ListItem, {
     shouldForwardProp: (prop) => prop !== "hoverable",
@@ -192,6 +207,13 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
         </StyledOption>
         {myProfileLink ? (
           <NavLink to={myProfileLink} label="My Profile" />
+        ) : null}
+
+        {isAdmin ? (
+          <>
+            <NavLink to="/ssj" label="Home" />
+            <NavLink to="/admin/ssj" label="Admin" />
+          </>
         ) : null}
         {showNetwork ? null : <NavLink to="/settings" label="Settings" />}
         <StyledOption onClick={handleLogOut} hoverable>
