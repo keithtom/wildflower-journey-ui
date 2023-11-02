@@ -207,13 +207,10 @@ const Network = () => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid container mt={screenSize.isSm ? 6 : 12}>
+      <Grid container mt={{ xs: 6, sm: 12 }}>
         <Grid item xs={12}>
           {results.length > 0 && (
-            <Masonry
-              columns={screenSize.isSm ? 2 : 3}
-              spacing={screenSize.isSm ? 3 : 6}
-            >
+            <Masonry columns={{ xs: 2, sm: 3 }} spacing={{ xs: 3, sm: 6 }}>
               {category === "people"
                 ? results.map((f) => (
                     <PersonResultItem
@@ -421,12 +418,12 @@ const SchoolResultItem = ({
             }}
           >
             <img
+              alt="logo"
               src={logoImg ? logoImg : heroImg}
               style={{
                 width: "100%",
                 objectFit: logoImg ? "contain" : "cover",
-                height: "320px",
-                aspectRatio: "1:1",
+                aspectRatio: "1/1",
               }}
             />
           </Stack>
@@ -545,6 +542,7 @@ const Filters = [
       { label: "West Virginia", value: "WV" },
       { label: "Wisconsin", value: "WI" },
       { label: "Wyoming", value: "WY" },
+      { label: "Puerto Rico", value: "PR" },
     ],
   },
   {
