@@ -95,7 +95,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
 
   const partners =
     team?.data?.relationships?.partners?.data?.length > 1
-      ? team.team.data.filter((t) => {
+      ? team.data.relationships.partners.data.filter((t) => {
           return t.id !== currentUser?.id;
         })
       : null;
