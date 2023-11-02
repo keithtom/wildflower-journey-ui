@@ -104,15 +104,13 @@ const Navigation = () => {
         />
       ) : (
         <>
-          {!currentUser?.attributes?.ssj ? (
-            <NavLink
-              variant="primary"
-              to="/network"
-              active={router.pathname.includes("/network")}
-              label="Network"
-              icon="bookReader"
-            />
-          ) : null}
+          <NavLink
+            variant="primary"
+            to="/network"
+            active={router.pathname.includes("/network")}
+            label="Network"
+            icon="bookReader"
+          />
           {currentUser?.attributes?.ssj ? (
             <NavLink
               variant="primary"
@@ -122,7 +120,7 @@ const Navigation = () => {
               icon="home"
             />
           ) : null}
-          {router.asPath === "/ssj" && <SSJNavigation />}
+          {router.pathname.includes("/ssj/") && <SSJNavigation />}
         </>
       )}
     </Box>

@@ -97,7 +97,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   }, [currentUser]);
 
   const partners =
-    team?.relationships?.partners?.data?.length > 1
+    team?.relationships?.partners?.data?.length >= 1
       ? team.relationships.partners.data.filter((t) => {
           return t.id !== currentUser?.id;
         })
@@ -111,6 +111,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   useAuth("/login");
 
   // console.log({ currentUser });
+  // console.log({ team });
+  // console.log({ partners });
 
   return (
     <>
