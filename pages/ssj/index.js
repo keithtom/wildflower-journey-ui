@@ -8,6 +8,7 @@ import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
 
 import ssjApi from "@api/ssj/ssj";
+import teamsApi from "@api/ssj/teams";
 import processesApi from "@api/workflow/processes";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
@@ -76,25 +77,27 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const [team, setTeam] = useState();
 
   useEffect(() => {
-    const teamData = ssjApi.getTeam();
-    teamData
-      .then(function (result) {
-        setTeam(result);
-        setSubmittedPartnerRequest(result.invitedPartner);
-        setOpenDate(result.expectedStartDate);
-      })
-      .catch(function (error) {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          Router.push("/login");
-        } else {
-          console.error(error);
-        }
-      });
-  }, []);
+    if (currentUser !== null) {
+      const teamData = teamsApi.getTeam(currentUser?.attributes?.ssj?.teamId);
+      teamData
+        .then(function (result) {
+          setTeam(result.data);
+          setSubmittedPartnerRequest(result.data?.attributes?.invitedPartner);
+          setOpenDate(result.data?.attributes?.expectedStartDate);
+        })
+        .catch(function (error) {
+          if (error?.response?.status === 401) {
+            clearLoggedInState({});
+            Router.push("/login");
+          } else {
+            console.error(error);
+          }
+        });
+    }
+  }, [currentUser]);
 
   const partners =
-    team?.relationships?.partners?.data?.length > 1
+    team?.relationships?.partners?.data?.length >= 1
       ? team.relationships.partners.data.filter((t) => {
           return t.id !== currentUser?.id;
         })
@@ -108,6 +111,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   useAuth("/login");
 
   // console.log({ currentUser });
+  // console.log({ team });
+  // console.log({ partners });
 
   return (
     <>
@@ -798,7 +803,10 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
   };
   const handleSetOpenDate = () => {
     try {
-      ssjApi.setStartDate(moment(dateValue).format("YYYY-MM-DD")); //send to api
+      teamsApi.setStartDate({
+        id: team?.id,
+        date: moment(dateValue).format("YYYY-MM-DD"),
+      }); //send to api
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});

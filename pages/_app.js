@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === "production") {
   H.init(process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID, {
     environment: process.env.APP_ENV,
     enableStrictPrivacy: false,
-    tracingOrigins: true,
+    tracingOrigins: ["api2.wildflowerschools.org"],
     networkRecording: {
       enabled: true,
       recordHeadersAndBody: true,
