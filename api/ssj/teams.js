@@ -1,11 +1,12 @@
 import wildflowerApi from "@api/base";
+import { getCookie } from "cookies-next";
 
 const teamsApi = wildflowerApi.register("/v1/ssj/teams", {});
 
 async function index() {
   let response;
   try {
-    response = await teamsApi.get(`/`);
+    response = await teamsApi.get(`/`, getAuthHeader());
   } catch (error) {
     return Promise.reject(error);
   }
@@ -16,9 +17,13 @@ async function index() {
 async function setStartDate(data) {
   let response;
   try {
-    response = await teamsApi.put(`/${data.id}`, {
-      team: { expected_start_date: data.date },
-    });
+    response = await teamsApi.put(
+      `/${data.id}`,
+      {
+        team: { expected_start_date: data.date },
+      },
+      getAuthHeader()
+    );
   } catch (error) {
     return Promise.reject(error);
   }
@@ -29,7 +34,7 @@ async function setStartDate(data) {
 async function getTeam(id) {
   let response;
   try {
-    response = await teamsApi.get(`/${id}`);
+    response = await teamsApi.get(`/${id}`, getAuthHeader());
   } catch (error) {
     return Promise.reject(error);
   }
@@ -58,7 +63,7 @@ async function getTeam(id) {
 async function inviteTeam(data) {
   let response;
   try {
-    response = await teamsApi.post(`/`, data);
+    response = await teamsApi.post(`/`, data, getAuthHeader());
   } catch (error) {
     return Promise.reject(error);
   }
@@ -75,6 +80,11 @@ async function inviteTeam(data) {
 //     },
 //   });
 // }
+
+function getAuthHeader() {
+  const token = getCookie("auth");
+  return { headers: { Authorization: token } };
+}
 
 export default {
   setStartDate,

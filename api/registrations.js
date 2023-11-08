@@ -1,8 +1,6 @@
 import axios from "axios";
 import { getCookie } from "cookies-next";
 
-const token = getCookie("auth");
-
 const api = axios.create({
   baseURL: `${process.env.API_URL}`,
   timeout: 30000,
@@ -13,7 +11,6 @@ const api = axios.create({
     "Access-Control-Allow-Headers":
       "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
     "Content-Type": "application/json",
-    Authorization: token,
   },
 });
 
@@ -24,18 +21,28 @@ const api = axios.create({
 // update
 
 async function setPassword(password, passwordConfirmation) {
-  const response = await api.put("/signup", {
-    user: {
-      password: password,
-      password_confirmation: passwordConfirmation,
+  const response = await api.put(
+    "/signup",
+    {
+      user: {
+        password: password,
+        password_confirmation: passwordConfirmation,
+      },
     },
-  });
+    getAuthHeader()
+  );
 
   return response;
 }
 
 async function logout() {
-  return await api.delete("/logout");
+  return await api.delete("/logout", getAuthHeader());
+}
+
+// api is instantiated by the Header before a user is logged in. Therefore, cannot set the auth header on instantiation.
+function getAuthHeader() {
+  const token = getCookie("auth");
+  return { headers: { Authorization: token } };
 }
 
 export default { setPassword, logout };
