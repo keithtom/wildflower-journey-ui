@@ -563,6 +563,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
         open={addOpenDateModalOpen}
         openDate={openDate}
         setOpenDate={setOpenDate}
+        team={team}
       />
     </>
   );
@@ -789,7 +790,7 @@ const ETLs = ({}) => {
     </Grid>
   );
 };
-const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate }) => {
+const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
   const [dateValue, setDateValue] = useState();
   const [changedDateValue, setChangedDateValue] = useState(false);
   useEffect(() => {
