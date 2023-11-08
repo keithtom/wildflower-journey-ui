@@ -7,11 +7,11 @@ module.exports = defineConfig({
   env: {
     apiUrl: process.env.API_URL,
   },
-  "retries": 1,
-  "experimentalMemoryManagement": true,
+  retries: 1,
+  experimentalMemoryManagement: true,
   e2e: {
     baseUrl: "http://localhost:3000",
-    defaultCommandTimeout: 50000,
+    defaultCommandTimeout: 5000,
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
