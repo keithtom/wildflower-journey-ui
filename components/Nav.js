@@ -8,6 +8,7 @@ import { useUserContext } from "../lib/useUserContext";
 import { user } from "../lib/utils/fake-data";
 import { theme } from "../styles/theme";
 import {
+  Select,
   Card,
   Typography,
   Stack,
@@ -91,7 +92,7 @@ export default Nav;
 
 const Navigation = () => {
   const router = useRouter();
-  const { currentUser, isLoggedIn } = useUserContext();
+  const { currentUser, isLoggedIn, isOperationsGuide } = useUserContext();
 
   return (
     <Box>
@@ -122,6 +123,20 @@ const Navigation = () => {
           ) : null}
           {router.pathname.includes("/ssj") &&
             !router.pathname.includes("/admin") && <SSJNavigation />}
+          {isOperationsGuide ? (
+            <Stack spacing={3}>
+              <NavLink
+                variant="primary"
+                to="/your-schools"
+                active={router.asPath === "/your-schools"}
+                label="Your Schools"
+                icon="buildingHouse"
+              />
+              <Box pl={3} pr={3}>
+                <OpsSchoolSelect />
+              </Box>
+            </Stack>
+          ) : null}
         </>
       )}
     </Box>
@@ -177,3 +192,30 @@ const SSJNavigation = ({}) => {
     </Box>
   );
 };
+
+const OpsSchoolSelect = () => {
+  const [selectedSchool, setSelectedSchool] = useState();
+  const handleSelectSchool = (e) => {
+    setSelectedSchool(e.target.value);
+  };
+
+  return (
+    <Select
+      placeholder="Select a school to view"
+      options={OpsSchools}
+      value={selectedSchool}
+      onChange={handleSelectSchool}
+    />
+  );
+};
+
+const OpsSchools = [
+  {
+    value: "asdf-1234",
+    label: "June Bug Montessori",
+  },
+  {
+    value: "fdsa-1234",
+    label: "Flower Montessori",
+  },
+];
