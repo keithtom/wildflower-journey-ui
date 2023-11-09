@@ -98,7 +98,7 @@ const Navigation = () => {
       {router.pathname.includes("/admin") ? (
         <NavLink
           variant="primary"
-          to="admin/ssj"
+          to="/admin/ssj"
           active={router.pathname.includes("/admin/ssj")}
           label="School Startup Journey"
         />
