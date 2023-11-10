@@ -8,6 +8,7 @@ import { styled, css } from "@mui/material/styles";
 import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
 import useSWR, { useSWRConfig } from "swr";
+import { useRouter } from "next/router";
 
 import { clearLoggedInState } from "@lib/handleLogout";
 import { useUserContext } from "@lib/useUserContext";
@@ -34,8 +35,8 @@ import {
 
 const AdminSSJ = ({}) => {
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
-
   const { currentUser } = useUserContext();
+  const router = useRouter();
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
@@ -831,7 +832,7 @@ const InviteSchool = ({
                   <Avatar size="sm" />
                   <Stack>
                     <Typography variant="bodyRegular" bold>
-                      {etl.firstName} {etl.lastName}
+                      {etl.first_name} {etl.last_name}
                     </Typography>
                     <Typography variant="bodyRegular" lightened>
                       Emerging Teacher Leader
