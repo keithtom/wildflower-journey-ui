@@ -6,6 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import getAuthHeader from "@lib/getAuthHeader";
 import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
+import Badge from "@mui/material/Badge";
 
 import ssjApi from "@api/ssj/ssj";
 import teamsApi from "@api/ssj/teams";
@@ -19,6 +20,7 @@ import Hero from "../../components/Hero";
 import UserCard from "../../components/UserCard";
 
 import {
+  Chip,
   Box,
   PageContainer,
   Button,
@@ -156,7 +158,13 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
             >
               <Grid item>
                 <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar src={currentUser?.attributes.imageUrl} />
+                  <Badge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    badgeContent={<EditBadge url="/welcome/add-profile-info" />}
+                  >
+                    <Avatar src={currentUser?.attributes.imageUrl} />
+                  </Badge>
                   <Stack>
                     <Typography variant="h4" bold>
                       Welcome, {currentUser?.attributes?.firstName}!
@@ -570,6 +578,27 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
 };
 
 export default SSJ;
+
+const EditBadge = ({ url }) => {
+  return (
+    <Link href={url}>
+      <Box
+        sx={{
+          background: "white",
+          border: "1px solid #eaeaea",
+          borderRadius: "24px",
+          width: "24px",
+          height: "24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Icon type="pencil" size="small" variant="lightened" />
+      </Box>
+    </Link>
+  );
+};
 
 const OnboardingCard = ({
   icon,
