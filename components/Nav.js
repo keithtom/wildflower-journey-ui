@@ -121,8 +121,6 @@ const Navigation = () => {
               icon="home"
             />
           ) : null}
-          {router.pathname.includes("/ssj") &&
-            !router.pathname.includes("/admin") && <SSJNavigation />}
           {isOperationsGuide ? (
             <Stack spacing={3}>
               <NavLink
@@ -132,18 +130,25 @@ const Navigation = () => {
                 label="Your Schools"
                 icon="buildingHouse"
               />
-              <Box pl={3} pr={3}>
-                <OpsSchoolSelect />
-              </Box>
+              {router.asPath === "/your-schools" ? (
+                <Box pl={3} pr={3} pb={3}>
+                  <OpsSchoolSelect />
+                </Box>
+              ) : null}
             </Stack>
           ) : null}
+          {router.pathname.includes("/ssj") ||
+            (router.asPath === "/your-schools" &&
+              !router.pathname.includes("/admin") && (
+                <SSJNavigation opsView={router.asPath === "/your-schools"} />
+              ))}
         </>
       )}
     </Box>
   );
 };
 
-const SSJNavigation = ({}) => {
+const SSJNavigation = ({ opsView }) => {
   const router = useRouter();
   return (
     <Box>
@@ -151,7 +156,7 @@ const SSJNavigation = ({}) => {
         variant="secondary"
         to="/ssj/to-do-list"
         active={router.asPath === "/ssj/to-do-list"}
-        label="Your to do list"
+        label="To do list"
         icon="calendarCheck"
       />
       <NavLink
@@ -182,19 +187,21 @@ const SSJNavigation = ({}) => {
         label="Startup"
         icon={true}
       />
-      <NavLink
-        variant="secondary"
-        to="/ssj/resources"
-        active={router.asPath === "/ssj/resources"}
-        label="Resources"
-        icon="fileBlank"
-      />
+      {opsView ? null : (
+        <NavLink
+          variant="secondary"
+          to="/ssj/resources"
+          active={router.asPath === "/ssj/resources"}
+          label="Resources"
+          icon="fileBlank"
+        />
+      )}
     </Box>
   );
 };
 
 const OpsSchoolSelect = () => {
-  const [selectedSchool, setSelectedSchool] = useState();
+  const [selectedSchool, setSelectedSchool] = useState(OpsSchools[0].value);
   const handleSelectSchool = (e) => {
     setSelectedSchool(e.target.value);
   };
