@@ -186,6 +186,7 @@ const AddSchoolModal = ({ open, toggle }) => {
             setTempDisplayData={setTempDisplayData}
             tempDisplayData={tempDisplayData}
             activeStep={activeStep}
+            setActiveStep={setActiveStep}
             open={open}
             toggle={toggle}
           />
@@ -781,17 +782,32 @@ const InviteSchool = ({
   tempDisplayData,
   handleInviteComplete,
   activeStep,
+  setActiveStep,
   open,
   toggle,
 }) => {
-  const { control, handleSubmit } = useForm();
+  const [duplicateEmailError, setDuplicateEmailError] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm();
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     // console.log({ team });
-    teamsApi.inviteTeam({ team: team });
+    try {
+      await teamsApi.inviteTeam({ team: team });
+    } catch (error) {
+      if (error?.response?.status === 422) {
+        setDuplicateEmailError(error.response.data.message);
+      }
+      // console.log({ error });
+      console.error(error);
+    }
     handleInviteComplete();
   };
-  console.log({ team });
+  // console.log({ team });
+  // console.log({ duplicateEmailError });
   // console.log({ tempDisplayData });
   return (
     <Modal
@@ -809,10 +825,14 @@ const InviteSchool = ({
               </Button>
             </Grid>
             <Grid item>
-              <Button type="submit">
-                <Typography variant="bodyRegular" bold light>
-                  Invite
-                </Typography>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <Spinner size={20} />
+                ) : (
+                  <Typography variant="bodyRegular" bold light>
+                    Invite
+                  </Typography>
+                )}
               </Button>
             </Grid>
           </Grid>
@@ -827,7 +847,12 @@ const InviteSchool = ({
               Emerging Teacher Leader
             </Typography>
             {team.etl_people_params.map((etl, i) => (
-              <Card variant="lightened" size="small" key={i}>
+              <Card
+                variant={duplicateEmailError ? "error" : "lightened"}
+                size="small"
+                key={i}
+                error
+              >
                 <Stack direction="row" spacing={3} alignItems="center">
                   <Avatar size="sm" />
                   <Stack>
@@ -841,6 +866,18 @@ const InviteSchool = ({
                 </Stack>
               </Card>
             ))}
+            {duplicateEmailError ? (
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="bodyRegular" error>
+                  {duplicateEmailError}
+                </Typography>
+                <Button variant="text" small onClick={() => setActiveStep(0)}>
+                  <Typography variant="bodySmall" bold highlight>
+                    Edit ETLs
+                  </Typography>
+                </Button>
+              </Stack>
+            ) : null}
           </Stack>
           <Stack spacing={3}>
             <Typography variant="bodyRegular" bold>

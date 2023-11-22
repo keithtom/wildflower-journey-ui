@@ -53,6 +53,14 @@ const CustomCard = styled(MaterialCard, {
       border: 1px solid ${props.theme.color.success.lightest};
     `}
 
+      /* Error */
+      ${(props) =>
+    props.variant === "error" &&
+    css`
+      background: ${props.theme.color.error.lightest};
+      border: 1px solid ${props.theme.color.error.medium};
+    `}
+
   /* Small */
   ${(props) =>
     props.size === "small" &&
