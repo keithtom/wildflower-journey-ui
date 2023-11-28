@@ -114,10 +114,6 @@ const Person = ({}) => {
     person.attributes.raceEthnicityList.length ||
     person.attributes.pronouns ||
     person.attributes.montessoriCertifiedLevelList.length;
-  const hasInfo =
-    person.attributes.about ||
-    person.attributes.rolesResonsibilities ||
-    person.attributes.boardMemberOf;
 
   const findMatchingItems = (array1, array2, property) => {
     const matchingItems = array1.filter((item1) =>
@@ -130,6 +126,11 @@ const Person = ({}) => {
     person.relationships.schools.data,
     "id"
   );
+  const hasInfo =
+    person.attributes.about ||
+    person.attributes.rolesResonsibilities ||
+    person.attributes.boardMemberOf ||
+    userSchool;
 
   // console.log({ person });
   // console.log({ currentUser });
@@ -265,6 +266,7 @@ const Person = ({}) => {
                       </Grid>
                     </Grid>
                   ) : null}
+
                   {userSchool.length ? (
                     <Grid container spacing={3}>
                       <Grid item xs={12} sm={6}>
