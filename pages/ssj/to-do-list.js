@@ -140,7 +140,6 @@ export async function getServerSideProps({ req, res }) {
     }
   }
 
-  console.log(response.data);
   let steps = response.data.data;
   // console.log("steps", steps)
 
