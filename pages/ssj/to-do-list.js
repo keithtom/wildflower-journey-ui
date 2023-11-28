@@ -14,7 +14,7 @@ import Hero from "@components/Hero";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import { getCookie } from "cookies-next";
-import assignmentsApi from "@api/workflow/assignments";
+import stepsApi from "@api/workflow/steps";
 import processesApi from "@api/workflow/processes";
 import useAuth from "@lib/utils/useAuth";
 
@@ -128,8 +128,9 @@ export async function getServerSideProps({ req, res }) {
   const workflowId = getCookie("workflowId", { req, res });
 
   let response;
+  config.params = { current_user: true };
   try {
-    response = await assignmentsApi.index(workflowId, config);
+    response = await stepsApi.assigned(workflowId, config);
   } catch (error) {
     if (error?.response?.status === 401) {
       clearLoggedInState({ req, res });
@@ -139,6 +140,7 @@ export async function getServerSideProps({ req, res }) {
     }
   }
 
+  console.log(response.data);
   let steps = response.data.data;
   // console.log("steps", steps)
 

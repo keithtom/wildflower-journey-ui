@@ -89,7 +89,7 @@ describe("network", () => {
     });
   });
   // --------------------- Teacher Leader
-  describe.only("Teacher leader", () => {
+  describe("Teacher leader", () => {
     beforeEach(() => {
       cy.resetNetworkFixturesAndLogin();
       cy.visit("/network", { timeout: 60000 });
