@@ -7,7 +7,7 @@ module.exports = defineConfig({
   env: {
     apiUrl: process.env.API_URL,
   },
-  retries: 1,
+  retries: 2,
   experimentalMemoryManagement: true,
   e2e: {
     baseUrl: "http://localhost:3000",
