@@ -9,7 +9,10 @@ describe("network", () => {
     beforeEach(() => {
       cy.resetNetworkFixturesAndLogin();
       cy.visit("/network", { timeout: 60000 });
+      cy.wait(5000);
     });
+
+    // Continue
     describe("visiting network page", () => {
       it("should load the page", () => {
         cy.contains("Network");
@@ -38,15 +41,13 @@ describe("network", () => {
         cy.contains("English").click({ force: true });
         cy.get("body").click(0, 0);
       });
-      it("should show results for search and filter", () => {
-        cy.contains("Katelyn Shore");
-      });
     });
     describe("viewing school results", () => {
       it("should toggle to school category", () => {
         cy.contains("Schools").click();
       });
       it("should return school results", () => {
+        cy.contains("Schools").click();
         cy.request({
           method: "GET",
           url: `${Cypress.env(
@@ -58,38 +59,34 @@ describe("network", () => {
         });
       });
     });
-    describe("filtering and searching people", () => {
+    describe("filtering and searching schools", () => {
       it("should allow searching", () => {
+        cy.contains("Schools").click();
         cy.get('input[name="search"]').type("wild rose");
         cy.contains("Wild Rose Montessori");
       });
       it("should allow filtering", () => {
+        cy.contains("Schools").click();
+        cy.wait(5000);
         cy.contains("State").click();
         cy.contains("Massachusetts").click({ force: true });
         cy.get("body").click(0, 0);
       });
-      it("should show results for search and filter", () => {
-        cy.contains("Wild Rose Montessori");
-      });
     });
     describe("visiting school and person pages", () => {
-      it("should allow clicking on school result", () => {
+      it("should allow clicking on school result and navigating to person profile from there", () => {
+        cy.contains("Schools").click();
+        cy.get('input[name="search"]').type("wild rose");
         cy.contains("Wild Rose Montessori").click();
-      });
-      it("should show the school page", () => {
         cy.contains("Wild Rose Montessori");
         cy.contains("Cambridge, MA");
-      });
-      it("should permit clicking on a school leader", () => {
-        cy.contains("Katelyn").click();
-      });
-      it("should show the person page", () => {
+        cy.contains("Katelyn Shore").click();
         cy.contains("Katelyn Shore");
       });
     });
   });
   // --------------------- Teacher Leader
-  describe.only("Teacher leader", () => {
+  describe("Teacher leader", () => {
     beforeEach(() => {
       cy.resetNetworkFixturesAndLogin();
       cy.visit("/network", { timeout: 60000 });

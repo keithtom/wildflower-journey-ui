@@ -181,13 +181,10 @@ const School = ({}) => {
                               />
                               <Stack>
                                 <Stack direction="row" spacing={1}>
-                                  {leader.attributes.firstName ? (
+                                  {leader.attributes.firstName &&
+                                  leader.attributes.firstName ? (
                                     <Typography variant="bodyRegular" bold>
-                                      {leader?.attributes?.firstName}
-                                    </Typography>
-                                  ) : null}
-                                  {leader.attributes.lastName ? (
-                                    <Typography variant="bodyRegular" bold>
+                                      {leader?.attributes?.firstName}{" "}
                                       {leader?.attributes?.lastName}
                                     </Typography>
                                   ) : null}
