@@ -23,6 +23,7 @@ import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
 import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
+import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 
 import { unitedStatesOptions } from "../../../../lib/utils/demographic-options";
 
@@ -115,20 +116,13 @@ const School = ({}) => {
     ? true
     : false;
 
-  const findMatchingItems = (array1, array2, property) => {
-    const matchingItems = array1.filter((item1) =>
-      array2.some((item2) => item1[property] === item2[property])
-    );
-    return matchingItems;
-  };
-
-  const schoolLeaders = findMatchingItems(
+  const schoolLeaders = handleFindMatchingItems(
     included,
     school.relationships.people.data,
     "id"
   );
   const isCharter = school.attributes.charterString;
-  const allSisterSchools = findMatchingItems(
+  const allSisterSchools = handleFindMatchingItems(
     included,
     school.relationships.sisterSchools.data,
     "id"
