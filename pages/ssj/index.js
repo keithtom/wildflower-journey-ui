@@ -513,7 +513,8 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                   <Grid item>
                     <Stack>
                       <Typography variant="h3" bold>
-                        There are 7 other Emerging Teacher Leaders
+                        There are {FakeETLs.length} other Emerging Teacher
+                        Leaders
                       </Typography>
                       <Typography variant="bodyRegular" lightened>
                         Get to know a growing number of Emerging Teacher Leaders
@@ -1228,6 +1229,78 @@ const FakeETLs = [
       email: "allison.bizon@gmail.com",
       firstName: "Alli",
       lastName: "Bizon",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "emmccarroll@gmail.com",
+      firstName: "Erin",
+      lastName: "McCarroll",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "brayariana00@gmail.com@gmail.com",
+      firstName: "Ariana",
+      lastName: "Bray",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "sandie.littletree@gmail.com ",
+      firstName: "Sandie",
+      lastName: "Schwehr",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "makenzie.LittleTree@gmail.com",
+      firstName: "Makenzie",
+      lastName: "Schwehr",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "sarahmtupper@gmail.com",
+      firstName: "Sarah",
+      lastName: "Tupper",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "margaretbeagle@gmail.com",
+      firstName: "Margaret",
+      lastName: "Beagle",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "stephaniemerholz@yahoo.com",
+      firstName: "Stephanie",
+      lastName: "Hull",
+    },
+  },
+  {
+    type: "person",
+    roles: ["Emerging Teacher Leader"],
+    attributes: {
+      email: "wildfloweratthelanding@gmail.com ",
+      firstName: "Sachi",
+      lastName: "Sakuray",
     },
   },
 ];
