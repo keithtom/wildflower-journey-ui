@@ -6,6 +6,7 @@ import moment from "moment";
 import peopleApi from "@api/people";
 import teamsApi from "@api/ssj/teams";
 import { useUserContext } from "@lib/useUserContext";
+import { useAssignWorkflowId } from "@lib/useContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 
@@ -199,8 +200,9 @@ const YourSchools = () => {
 export default YourSchools;
 
 const SchoolCard = ({ name, location, team, openDate, workflowId }) => {
+  const assignWorkflowId = useAssignWorkflowId();
   const handleSetActiveTeam = (workflowId) => {
-    console.log(workflowId);
+    assignWorkflowId(workflowId);
     // set the workflow id for the team to view
     // store the workflow id in state someplace that can be accessed by other pages (a new useWorkflow context hook?) -> maybe a generalized state manager context hook...
     //redirect to that team's ssj to do list
