@@ -112,7 +112,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
 
   useAuth("/login");
 
-  // console.log({ currentUser });
+  console.log({ currentUser });
   // console.log({ team });
   // console.log({ partners });
 

@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
 
+import { useWorkflowId } from "@lib/useContext";
 import { getScreenSize } from "../hooks/react-responsive";
 import { useUserContext } from "../lib/useUserContext";
 import { user } from "../lib/utils/fake-data";
@@ -42,7 +43,9 @@ const CustomDrawer = styled(Drawer)`
 
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const { screenSize } = getScreenSize();
+  const workflowId = useWorkflowId();
 
+  console.log("workflowId NAV----", workflowId);
   // console.log(screenSize.isSm);
 
   return (
