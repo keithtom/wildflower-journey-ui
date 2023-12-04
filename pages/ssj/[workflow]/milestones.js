@@ -5,11 +5,11 @@ import processesApi from "@api/workflow/processes";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
-import CategoryChip from "../../components/CategoryChip";
-import PhaseChip from "../../components/PhaseChip";
-import Milestone from "../../components/Milestone";
-import Hero from "../../components/Hero";
-import getAuthHeader from "../../lib/getAuthHeader";
+import CategoryChip from "@components/CategoryChip";
+import PhaseChip from "@components/PhaseChip";
+import Milestone from "@components/Milestone";
+import Hero from "@components/Hero";
+import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
 const Milestones = ({ processByCategory, processByPhase }) => {

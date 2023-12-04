@@ -4,11 +4,11 @@ import ssjApi from "@api/ssj/ssj";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
-import CategoryChip from "../../components/CategoryChip";
-import PhaseChip from "../../components/PhaseChip";
-import Resource from "../../components/Resource";
-import Hero from "../../components/Hero";
-import getAuthHeader from "../../lib/getAuthHeader";
+import CategoryChip from "@components/CategoryChip";
+import PhaseChip from "@components/PhaseChip";
+import Resource from "@components/Resource";
+import Hero from "@components/Hero";
+import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
 const Resources = ({ dataResources }) => {

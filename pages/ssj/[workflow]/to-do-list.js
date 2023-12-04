@@ -32,6 +32,8 @@ const ToDoList = ({ steps, milestonesToDo }) => {
   useAuth("/login");
   // console.log({ assignedSteps });
 
+  console.log({ steps });
+
   return (
     <PageContainer isLoading={false}>
       <Stack spacing={12}>
@@ -117,7 +119,7 @@ const ToDoList = ({ steps, milestonesToDo }) => {
 
 export default ToDoList;
 
-export async function getServerSideProps({ req, res }) {
+export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
     console.log("no token found, redirecting to login");
@@ -125,7 +127,8 @@ export async function getServerSideProps({ req, res }) {
   }
 
   const phase = getCookie("phase", { req, res });
-  const workflowId = getCookie("workflowId", { req, res });
+  // const workflowId = getCookie("workflowId", { req, res });
+  const workflowId = query.workflow;
 
   let response;
   config.params = { current_user: true };
