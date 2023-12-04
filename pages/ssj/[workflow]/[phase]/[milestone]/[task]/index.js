@@ -22,8 +22,8 @@ import {
   Radio,
   Box,
 } from "@ui";
-import Task from "../../../../../components/Task";
-import Resource from "../../../../../components/Resource";
+import Task from "@components/Task";
+import Resource from "@components/Resource";
 
 const StyledTaskHeader = styled(Box)`
   /* downplayed */
@@ -49,7 +49,7 @@ const TaskPage = ({ MilestoneId, MilestoneTitle }) => {
   const isUpNext = false;
 
   const router = useRouter();
-  const { phase, task } = router.query;
+  const { workflow, phase, task } = router.query;
   const taskId = task;
 
   useAuth("/login");
@@ -61,7 +61,7 @@ const TaskPage = ({ MilestoneId, MilestoneTitle }) => {
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href={`/ssj/${phase}/${MilestoneId}`}>
+                <Link href={`/ssj/${workflow}/${phase}/${MilestoneId}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>

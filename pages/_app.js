@@ -3,7 +3,6 @@ import { theme } from "../styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { UserProvider } from "../lib/useUserContext";
-import { SiteContextProvider } from "../lib/useContext";
 import { useRouter } from "next/router";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
@@ -56,9 +55,7 @@ function MyApp({ Component, pageProps }) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <UserProvider>
-          <SiteContextProvider>
-            <Component {...pageProps} />
-          </SiteContextProvider>
+          <Component {...pageProps} />
         </UserProvider>
       </ThemeProvider>
     </ErrorBoundary>
