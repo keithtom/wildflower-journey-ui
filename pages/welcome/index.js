@@ -6,16 +6,21 @@ import { useUserContext } from "@lib/useUserContext";
 
 const Welcome = () => {
   const router = useRouter();
-  const currentUser = useUserContext();
+  const { currentUser } = useUserContext();
 
-  // console.log({ currentUser });
-
-  const isEmergingTeacherLeader = true; //TODO: Update with check in roleList
-  const isTeacherLeader = true; //TODO: Update with check in roleList
-  const isOperationsGuide = true; //TODO: Update with check in roleList
-  const isRegionalGrowthLead = true; //TODO: Update with check in roleList
-  const isFoundationPartner = true; //TODO: Update with check in roleList
-  const isOnboarded = true; //TODO: Update with check in attributes
+  const isEmergingTeacherLeader = currentUser?.personRoleList.includes(
+    "Emerging Teacher Leader"
+  );
+  const isTeacherLeader =
+    currentUser?.personRoleList.includes("Teacher Leader");
+  const isOperationsGuide =
+    currentUser?.personRoleList.includes("Operations Guide");
+  const isRegionalGrowthLead = currentUser?.personRoleList.includes(
+    "Regional Growth Lead"
+  );
+  const isFoundationPartner =
+    currentUser?.personRoleList.includes("Foundation Parnter");
+  const isOnboarded = currentUser?.personIsOnboarded;
 
   useEffect(() => {
     if (isOnboarded) {
@@ -44,7 +49,7 @@ const Welcome = () => {
         router.push("/welcome/existing-member");
       }
     }
-  }, []);
+  }, [currentUser]);
 
   return (
     <Grid container justifyContent="center" mt={32}>
