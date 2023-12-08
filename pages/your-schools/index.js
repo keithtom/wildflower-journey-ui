@@ -206,7 +206,6 @@ const SchoolCard = ({ name, location, team, openDate, workflowId }) => {
   const router = useRouter();
   const handleSetActiveTeam = (workflowId) => {
     router.push(`/ssj/${workflowId}/to-do-list`);
-    console.log(workflowId);
     sessionStorage.setItem("schoolName", name);
     // set the workflow id for the team to view
     // store the workflow id in state someplace that can be accessed by other pages (a new useWorkflow context hook?) -> maybe a generalized state manager context hook...
