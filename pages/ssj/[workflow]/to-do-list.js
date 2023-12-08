@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   PageContainer,
   Typography,
@@ -8,6 +8,7 @@ import {
   Link,
   Grid,
   Button,
+  Avatar,
 } from "@ui";
 import Task from "@components/Task";
 import Hero from "@components/Hero";
@@ -17,9 +18,13 @@ import { getCookie } from "cookies-next";
 import stepsApi from "@api/workflow/steps";
 import processesApi from "@api/workflow/processes";
 import useAuth from "@lib/utils/useAuth";
+import { useUserContext } from "@lib/useUserContext";
 
 const ToDoList = ({ steps, milestonesToDo }) => {
-  const [assignedSteps, setAssignedSteps] = useState(steps);
+  const { currentUser, isOperationsGuide } = useUserContext();
+  const [assignedSteps, setAssignedSteps] = useState([]);
+  const [teamAssignments, setTeamAssignments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const removeStep = (taskId) => {
     setTimeout(() => {
@@ -29,38 +34,103 @@ const ToDoList = ({ steps, milestonesToDo }) => {
 
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 
-  useAuth("/login");
-  // console.log({ assignedSteps });
+  useEffect(() => {
+    if (isOperationsGuide) {
+      const assignmentsByAssigneeId = {};
+      steps.forEach((item) => {
+        const assignees = item.relationships.assignees.data;
+        assignees.forEach((assignee) => {
+          const assigneeId = assignee.id;
 
-  console.log({ steps });
+          // Create an array for the assignee ID if it doesn't exist
+          if (!assignmentsByAssigneeId[assigneeId]) {
+            assignmentsByAssigneeId[assigneeId] = {
+              assigneeId,
+              firstName: assignee.attributes.firstName,
+              lastName: assignee.attributes.lastName,
+              imgUrl: assignee.attributes.imageUrl,
+              assignments: [],
+            };
+          }
+
+          // Push the item to the array for the assignee ID
+          assignmentsByAssigneeId[assigneeId].assignments.push(item);
+        });
+      });
+      const newArray = Object.values(assignmentsByAssigneeId);
+      setTeamAssignments(newArray);
+      setIsLoading(false);
+    } else {
+      setAssignedSteps(steps);
+      setIsLoading(false);
+    }
+  }, [currentUser]);
+
+  // useAuth("/login");
+
+  console.log({ assignedSteps });
+  console.log({ teamAssignments });
 
   return (
-    <PageContainer isLoading={false}>
+    <PageContainer isLoading={isLoading}>
       <Stack spacing={12}>
         <Hero imageUrl={hero} />
-        <Stack spacing={6} direction="row" alignItems="center">
-          <Icon type="calendarCheck" variant="primary" size="large" />
-          <Typography variant="h3" bold>
-            Your to do list
-          </Typography>
-          <Typography variant="h3" lightened>
-            {assignedSteps.length ? assignedSteps.length : null}
-          </Typography>
-        </Stack>
 
-        {assignedSteps.length ? (
-          <Stack>
-            {assignedSteps.map((step, i) => {
-              return (
-                <Task
-                  key={step.id}
-                  task={step}
-                  processName={step.relationships.process.data.attributes.title}
-                  isNext={i === 0}
-                  removeStep={removeStep}
-                />
-              );
-            })}
+        {teamAssignments.length ? (
+          teamAssignments.map((t, i) => (
+            <Stack spacing={12} key={i}>
+              <Stack spacing={6} direction="row" alignItems="center">
+                <Avatar src={t.imgUrl} />
+                <Typography variant="h3" bold>
+                  {t.firstName} {t.lastName}'s to do List
+                </Typography>
+                <Typography variant="h3" lightened>
+                  {t.assignments.length ? t.assignments.length : null}
+                </Typography>
+              </Stack>
+              <Stack>
+                {t.assignments.map((step, i) => {
+                  return (
+                    <Task
+                      key={step.id}
+                      task={step}
+                      processName={
+                        step.relationships.process.data.attributes.title
+                      }
+                      isNext={i === 0}
+                      removeStep={removeStep}
+                    />
+                  );
+                })}
+              </Stack>
+            </Stack>
+          ))
+        ) : assignedSteps.length ? (
+          <Stack spacing={12}>
+            <Stack spacing={6} direction="row" alignItems="center">
+              <Icon type="calendarCheck" variant="primary" size="large" />
+              <Typography variant="h3" bold>
+                Your to do list
+              </Typography>
+              <Typography variant="h3" lightened>
+                {assignedSteps.length ? assignedSteps.length : null}
+              </Typography>
+            </Stack>
+            <Stack>
+              {assignedSteps.map((step, i) => {
+                return (
+                  <Task
+                    key={step.id}
+                    task={step}
+                    processName={
+                      step.relationships.process.data.attributes.title
+                    }
+                    isNext={i === 0}
+                    removeStep={removeStep}
+                  />
+                );
+              })}
+            </Stack>
           </Stack>
         ) : (
           <Card noPadding>
@@ -70,12 +140,14 @@ const ToDoList = ({ steps, milestonesToDo }) => {
                   <Stack spacing={6}>
                     <Icon type="calendarCheck" variant="primary" />
                     <Typography variant="h3" bold>
-                      Looks like you don't have any tasks on your to do list!
+                      {isOperationsGuide
+                        ? "Looks like this team doesn't have anything on their do to list!"
+                        : "Looks like you don't have any tasks on your to do list!"}
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
-                      To start, add a task from one of these milestones. You can
-                      take them on at your own pace, according to your
-                      interests, needs, and timeline.
+                      {isOperationsGuide
+                        ? "Next time you meet with them help them add a task to their to do list. Here are a few suggested tasks for this team."
+                        : "To start, add a task from one of these milestones. You can take them on at your own pace, according to your interests, needs, and timeline."}
                     </Typography>
                   </Stack>
                 </Card>
@@ -130,8 +202,10 @@ export async function getServerSideProps({ query, req, res }) {
   // const workflowId = getCookie("workflowId", { req, res });
   const workflowId = query.workflow;
 
+  console.log(workflowId);
+
   let response;
-  config.params = { current_user: true };
+  config.params = { current_user: null };
   try {
     response = await stepsApi.assigned(workflowId, config);
   } catch (error) {

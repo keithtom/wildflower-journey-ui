@@ -283,7 +283,9 @@ const Task = ({
                   <Icon
                     type={taskIsComplete ? "checkCircle" : "circleSolid"}
                     variant={taskIsComplete ? "primary" : "lightest"}
-                    className={taskIsComplete ? "completedTask" : "uncompletedTask"}
+                    className={
+                      taskIsComplete ? "completedTask" : "uncompletedTask"
+                    }
                   />
                   <Typography
                     variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
