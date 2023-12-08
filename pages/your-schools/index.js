@@ -5,9 +5,10 @@ import moment from "moment";
 
 import peopleApi from "@api/people";
 import teamsApi from "@api/ssj/teams";
-import { useUserContext } from "@lib/useUserContext";
+import { useUserContext, useAssignViewingSchool } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
+import useAuth from "@lib/utils/useAuth";
 
 import PhaseChip from "../../components/PhaseChip";
 import {
@@ -25,6 +26,8 @@ import {
 const YourSchools = () => {
   const { currentUser } = useUserContext();
   const router = useRouter();
+
+  useAuth("/login");
 
   //swr call to teams for currentUser ops guide
   const { data, error, isLoading, isValidating, mutate } = useSWR(
@@ -63,6 +66,7 @@ const YourSchools = () => {
     }
   );
   //TODO: Find a way to only request this data from the peopleApi so the entire people list is not provided, slowing performance
+  //TODO: or, find a way to include the ssj etl display data in the teamapi req
   //Filter the people data to only show ETLs part of the relevant teams
   const ETLs =
     peopleData && ssjETLs && handleFindMatchingItems(peopleData, ssjETLs, "id");
@@ -82,14 +86,14 @@ const YourSchools = () => {
 
   // console.log({ ssjETLs });
   // console.log({ ETLs });
-  console.log({ ssjTeams });
+  // console.log({ ssjTeams });
   // console.log({ peopleData });
   // console.log({ visioningTeams });
   // console.log({ currentUser });
   // console.log({ data });
 
   return (
-    <PageContainer isLoading={peopleDataLoading || isLoading}>
+    <PageContainer isLoading={isLoading}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Stack spacing={3} direction="row" alignItems="center">
@@ -202,8 +206,8 @@ const SchoolCard = ({ name, location, team, openDate, workflowId }) => {
   const router = useRouter();
   const handleSetActiveTeam = (workflowId) => {
     router.push(`/ssj/${workflowId}/to-do-list`);
-    sessionStorage.setItem("viewingSchoolName", name);
     console.log(workflowId);
+    sessionStorage.setItem("schoolName", name);
     // set the workflow id for the team to view
     // store the workflow id in state someplace that can be accessed by other pages (a new useWorkflow context hook?) -> maybe a generalized state manager context hook...
     //redirect to that team's ssj to do list

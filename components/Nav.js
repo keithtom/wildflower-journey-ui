@@ -17,6 +17,7 @@ import {
   Box,
   NavLink,
   Icon,
+  Snackbar,
 } from "./ui/index";
 import Header from "./Header";
 
@@ -93,15 +94,43 @@ export default Nav;
 const Navigation = () => {
   const router = useRouter();
   const { currentUser, isLoggedIn, isOperationsGuide } = useUserContext();
-  const [ogViewingSchool, setOgViewingSchool] = useState("");
+  const [ogViewingSchool, setOgViewingSchool] = useState();
+
   const { workflow } = router.query;
 
   useEffect(() => {
-    setOgViewingSchool(sessionStorage.getItem("viewingSchoolName"));
+    if (router.asPath === "/your-schools") {
+      sessionStorage.removeItem("schoolName");
+    }
+    if (
+      router.pathname.includes("/ssj/") &&
+      sessionStorage.getItem("schoolName")
+    ) {
+      setOgViewingSchool(sessionStorage.getItem("schoolName"));
+    }
   }, []);
+
+  // console.log({ ogViewingSchool });
 
   return (
     <Box>
+      <Snackbar
+        open={ogViewingSchool}
+        autoHideDuration={null}
+        anchorOrigin={{ vertical: "middle", horizontal: "center" }}
+      >
+        <div>
+          <Card size="small" variant="primaryLightened">
+            <Stack direction="row" spacing={3} alignItems="center">
+              <Typography variant="bodySmall" bold highlight>
+                VIEWING
+              </Typography>
+              <Typography variant="bodyRegular">{ogViewingSchool}</Typography>
+            </Stack>
+          </Card>
+        </div>
+      </Snackbar>
+
       {router.pathname.includes("/admin") ? (
         <NavLink
           variant="primary"
@@ -118,7 +147,7 @@ const Navigation = () => {
             label="Network"
             icon="bookReader"
           />
-          {currentUser?.attributes?.ssj ? (
+          {!isOperationsGuide && currentUser?.attributes?.ssj ? (
             <NavLink
               variant="primary"
               to="/ssj"
@@ -136,11 +165,11 @@ const Navigation = () => {
                 label="Your Schools"
                 icon="buildingHouse"
               />
-              {router.pathname.includes("/ssj") ? (
+              {ogViewingSchool && router.pathname.includes("/ssj/") ? (
                 <Box pl={3} pr={3} pb={3}>
-                  <Card size="small" variant="lightened">
-                    <Stack>
-                      <Typography variant="bodyMini" bold highlight>
+                  <Card size="small" variant="primaryLightened">
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Typography variant="bodySmall" bold highlight>
                         VIEWING
                       </Typography>
                       <Typography variant="bodyRegular">
@@ -152,16 +181,11 @@ const Navigation = () => {
               ) : null}
             </Stack>
           ) : null}
-          {/* {router.pathname.includes("/ssj") ||
-            (router.asPath === "/your-schools" &&
-              !router.pathname.includes("/admin") && (
-                <SSJNavigation opsView={router.asPath === "/your-schools"} />
-              ))} */}
 
           {router.pathname.includes("/ssj") ? (
             <SSJNavigation
               SSJworkflowId={workflow}
-              opsView={router.asPath === "/your-schools"}
+              opsView={isOperationsGuide}
             />
           ) : null}
         </>

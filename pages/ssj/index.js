@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { getCookie } from "cookies-next";
 
 import { useUserContext } from "@lib/useUserContext";
+import { PageContainer } from "@components/ui";
 
 // The purpose of this page is to:
 // Insert the workflow ID into the query params
@@ -12,20 +13,22 @@ import { useUserContext } from "@lib/useUserContext";
 const SSJWorkflow = ({}) => {
   const router = useRouter();
 
-  const { currentUser } = useUserContext();
+  const { currentUser, isOperationsGuide } = useUserContext();
   const SSJWorkflowId = currentUser?.attributes?.ssj?.workflowId;
 
   useEffect(() => {
-    if (SSJWorkflowId) {
+    if (SSJWorkflowId && !isOperationsGuide) {
       router.push(`/ssj/${SSJWorkflowId}`);
     }
-    // TODO: if is ops guide...
+    if (isOperationsGuide) {
+      router.push(`/your-schools`);
+    }
   }, [currentUser]);
 
   // console.log(currentUser);
   // console.log(SSJWorkflowId);
 
-  return <div>Loading</div>;
+  return <PageContainer hideNav isLoading={true}></PageContainer>;
 };
 
 export default SSJWorkflow;

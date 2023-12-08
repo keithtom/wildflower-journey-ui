@@ -18,6 +18,7 @@ import WorktimeChip from "./WorktimeChip";
 import CategoryChip from "./CategoryChip";
 import StatusChip from "./StatusChip";
 import Resource from "./Resource";
+import { useUserContext } from "@lib/useUserContext";
 
 const CustomDrawer = styled(Drawer)`
   .MuiDrawer-paper {
@@ -62,6 +63,8 @@ const InfoDrawer = ({
   isComplete,
   worktime,
 }) => {
+  const { isOperationsGuide } = useUserContext();
+
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
       <StyledInfoCard noBorder noRadius>
@@ -174,9 +177,11 @@ const InfoDrawer = ({
         </Stack>
       </StyledInfoCard>
 
-      <ActionsContainer noBorder noPadding noRadius>
-        {actions}
-      </ActionsContainer>
+      {isOperationsGuide ? null : (
+        <ActionsContainer noBorder noPadding noRadius>
+          {actions}
+        </ActionsContainer>
+      )}
     </CustomDrawer>
   );
 };

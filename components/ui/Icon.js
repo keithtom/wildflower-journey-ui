@@ -12,7 +12,6 @@ import {
   RightArrowCircle,
   Plus,
   Check,
-  BuildingHouse,
   Extension,
   Palette,
   Pause,
@@ -30,6 +29,7 @@ import {
   Minus,
 } from "@styled-icons/boxicons-regular";
 import {
+  BuildingHouse,
   Bus,
   BookReader,
   Conversation,
