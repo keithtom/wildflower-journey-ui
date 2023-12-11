@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import moment from "moment";
+import Skeleton from "@mui/material/Skeleton";
 
 import peopleApi from "@api/people";
 import teamsApi from "@api/ssj/teams";
@@ -61,7 +62,7 @@ const YourSchools = () => {
   // console.log({ ssjTeams });
 
   return (
-    <PageContainer isLoading={isLoading}>
+    <PageContainer>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Stack spacing={3} direction="row" alignItems="center">

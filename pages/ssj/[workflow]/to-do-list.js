@@ -68,8 +68,8 @@ const ToDoList = ({ steps, milestonesToDo }) => {
 
   // useAuth("/login");
 
-  console.log({ assignedSteps });
-  console.log({ teamAssignments });
+  // console.log({ assignedSteps });
+  // console.log({ teamAssignments });
 
   return (
     <PageContainer isLoading={isLoading}>

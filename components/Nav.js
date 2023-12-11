@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
 
 import { getScreenSize } from "../hooks/react-responsive";
 import { useUserContext } from "../lib/useUserContext";
@@ -111,8 +112,9 @@ const Navigation = () => {
   }, []);
 
   // console.log({ ogViewingSchool });
+  // console.log({ currentUser });
 
-  return (
+  return currentUser ? (
     <Box>
       {isOperationsGuide && router.pathname.includes("/ssj/") ? (
         <Snackbar
@@ -152,8 +154,8 @@ const Navigation = () => {
           {!isOperationsGuide && currentUser?.attributes?.ssj ? (
             <NavLink
               variant="primary"
-              to="/ssj"
-              active={router.asPath === "/ssj"}
+              to={`/ssj/${currentUser?.attributes?.ssj?.workflowId}`}
+              active={router.asPath === `/ssj/${workflow}`}
               label="School Startup Journey"
               icon="home"
             />
@@ -167,6 +169,7 @@ const Navigation = () => {
                 label="Your Schools"
                 icon="buildingHouse"
               />
+
               {ogViewingSchool && router.pathname.includes("/ssj/") ? (
                 <Box pl={3} pr={3} pb={3}>
                   <Card size="small" variant="primaryLightened">
@@ -193,6 +196,8 @@ const Navigation = () => {
         </>
       )}
     </Box>
+  ) : (
+    <Box />
   );
 };
 
@@ -204,35 +209,35 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
       <NavLink
         variant="secondary"
         to={`/ssj/${SSJworkflowId}/to-do-list`}
-        active={router.asPath === "/ssj/to-do-list"}
+        active={router.pathname.includes("/to-do-list")}
         label="To do list"
         icon="calendarCheck"
       />
       <NavLink
         variant="secondary"
         to={`/ssj/${SSJworkflowId}/milestones`}
-        active={router.asPath === "/ssj/milestones"}
+        active={router.pathname.includes("/milestones")}
         label="Milestones"
         icon="layer"
       />
       <NavLink
         variant="tertiary"
         to={`/ssj/${SSJworkflowId}/visioning`}
-        active={router.asPath === "/ssj/visioning"}
+        active={router.pathname.includes("/visioning")}
         label="Visioning"
         icon={true}
       />
       <NavLink
         variant="tertiary"
         to={`/ssj/${SSJworkflowId}/planning`}
-        active={router.asPath === "/ssj/planning"}
+        active={router.pathname.includes("/planning")}
         label="Planning"
         icon={true}
       />
       <NavLink
         variant="tertiary"
         to={`/ssj/${SSJworkflowId}/startup`}
-        active={router.asPath === "/ssj/startup"}
+        active={router.pathname.includes("/startup")}
         label="Startup"
         icon={true}
       />
@@ -240,7 +245,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
         <NavLink
           variant="secondary"
           to={`/ssj/${SSJworkflowId}/resources`}
-          active={router.asPath === "/ssj/resources"}
+          active={router.pathname.includes("/resources")}
           label="Resources"
           icon="fileBlank"
         />
@@ -248,30 +253,3 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
     </Box>
   );
 };
-
-const OpsSchoolSelect = () => {
-  const [selectedSchool, setSelectedSchool] = useState(OpsSchools[0].value);
-  const handleSelectSchool = (e) => {
-    setSelectedSchool(e.target.value);
-  };
-
-  return (
-    <Select
-      placeholder="Select a school to view"
-      options={OpsSchools}
-      value={selectedSchool}
-      onChange={handleSelectSchool}
-    />
-  );
-};
-
-const OpsSchools = [
-  {
-    value: "asdf-1234",
-    label: "June Bug Montessori",
-  },
-  {
-    value: "fdsa-1234",
-    label: "Flower Montessori",
-  },
-];
