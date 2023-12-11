@@ -134,14 +134,14 @@ const Milestones = ({ processByCategory, processByPhase }) => {
 
 export default Milestones;
 
-export async function getServerSideProps({ req, res }) {
+export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
     console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
-  const workflowId = getCookie("workflowId", { req, res });
+  const workflowId = query.workflow;
   let response;
   try {
     response = await processesApi.index({ workflowId, config });

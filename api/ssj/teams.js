@@ -11,6 +11,7 @@ async function index() {
     return Promise.reject(error);
   }
   const responseData = await response.data;
+  wildflowerApi.loadAllRelationshipsFromIncluded(responseData);
   return responseData;
 }
 

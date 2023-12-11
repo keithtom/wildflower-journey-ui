@@ -114,22 +114,24 @@ const Navigation = () => {
 
   return (
     <Box>
-      <Snackbar
-        open={ogViewingSchool}
-        autoHideDuration={null}
-        anchorOrigin={{ vertical: "middle", horizontal: "center" }}
-      >
-        <div>
-          <Card size="small" variant="primaryLightened">
-            <Stack direction="row" spacing={3} alignItems="center">
-              <Typography variant="bodySmall" bold highlight>
-                VIEWING
-              </Typography>
-              <Typography variant="bodyRegular">{ogViewingSchool}</Typography>
-            </Stack>
-          </Card>
-        </div>
-      </Snackbar>
+      {isOperationsGuide && router.pathname.includes("/ssj/") ? (
+        <Snackbar
+          open={ogViewingSchool}
+          autoHideDuration={null}
+          anchorOrigin={{ vertical: "middle", horizontal: "center" }}
+        >
+          <div>
+            <Card size="small" variant="primaryLightened">
+              <Stack direction="row" spacing={3} alignItems="center">
+                <Typography variant="bodySmall" bold highlight>
+                  VIEWING
+                </Typography>
+                <Typography variant="bodyRegular">{ogViewingSchool}</Typography>
+              </Stack>
+            </Card>
+          </div>
+        </Snackbar>
+      ) : null}
 
       {router.pathname.includes("/admin") ? (
         <NavLink

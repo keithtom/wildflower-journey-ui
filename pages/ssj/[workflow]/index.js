@@ -1396,14 +1396,13 @@ const waysToWorkTogether = [
   },
 ];
 
-export async function getServerSideProps({ params, req, res }) {
+export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
     console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
-
-  const workflowId = getCookie("workflowId", { req, res });
+  const workflowId = query.workflow;
   if (!workflowId) {
     return {
       redirect: {

@@ -199,10 +199,7 @@ export async function getServerSideProps({ query, req, res }) {
   }
 
   const phase = getCookie("phase", { req, res });
-  // const workflowId = getCookie("workflowId", { req, res });
   const workflowId = query.workflow;
-
-  console.log(workflowId);
 
   let response;
   config.params = { current_user: null };

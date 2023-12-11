@@ -121,14 +121,14 @@ const Resources = ({ dataResources }) => {
 
 export default Resources;
 
-export async function getServerSideProps({ req, res }) {
+export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
     console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
-  const workflowId = getCookie("workflowId", { req, res });
+  const workflowId = query.workflow;
   let responseResources;
   try {
     responseResources = await ssjApi.resources({ workflowId, config });

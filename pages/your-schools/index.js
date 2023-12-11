@@ -46,30 +46,6 @@ const YourSchools = () => {
   );
   //set teams array
   let ssjTeams = data || [];
-  //set a new array of the ETLs
-  const ssjETLs = [].concat(
-    ...ssjTeams.map((t) => t.relationships.partners.data)
-  );
-  //request the people data from the api
-  const { data: peopleData, isLoading: peopleDataLoading } = useSWR(
-    "/api/person",
-    () => peopleApi.index().then((res) => res?.data),
-    {
-      onErrorRetry: (error) => {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
-      },
-    }
-  );
-  //TODO: Find a way to only request this data from the peopleApi so the entire people list is not provided, slowing performance
-  //TODO: or, find a way to include the ssj etl display data in the teamapi req
-  //Filter the people data to only show ETLs part of the relevant teams
-  const ETLs =
-    peopleData && ssjETLs && handleFindMatchingItems(peopleData, ssjETLs, "id");
 
   //set grouped teams by phase
   const visioningTeams = ssjTeams.filter(
@@ -82,15 +58,7 @@ const YourSchools = () => {
     (team) => team.attributes.currentPhase === "startup"
   );
 
-  //identify the workflowID for each of the teams
-
-  // console.log({ ssjETLs });
-  // console.log({ ETLs });
   // console.log({ ssjTeams });
-  // console.log({ peopleData });
-  // console.log({ visioningTeams });
-  // console.log({ currentUser });
-  // console.log({ data });
 
   return (
     <PageContainer isLoading={isLoading}>
@@ -127,15 +95,7 @@ const YourSchools = () => {
                         name={v.attributes.tempName}
                         location={v.attributes.tempLocation}
                         openDate={v.attributes.expectedStartDate}
-                        team={
-                          ETLs &&
-                          visioningTeams &&
-                          handleFindMatchingItems(
-                            ETLs,
-                            v.relationships.partners.data,
-                            "id"
-                          )
-                        }
+                        team={v.relationships.partners.data}
                         workflowId={v.attributes.workflowId}
                       />
                     ))}
@@ -152,15 +112,7 @@ const YourSchools = () => {
                         name={p.attributes.tempName}
                         location={p.attributes.tempLocation}
                         openDate={p.attributes.expectedStartDate}
-                        team={
-                          ETLs &&
-                          planningTeams &&
-                          handleFindMatchingItems(
-                            ETLs,
-                            p.relationships.partners.data,
-                            "id"
-                          )
-                        }
+                        team={v.relationships.partners.data}
                         workflowId={p.attributes.workflowId}
                       />
                     ))}
@@ -177,15 +129,7 @@ const YourSchools = () => {
                         name={s.attributes.tempName}
                         location={s.attributes.tempLocation}
                         openDate={s.attributes.expectedStartDate}
-                        team={
-                          ETLs &&
-                          startupTeams &&
-                          handleFindMatchingItems(
-                            ETLs,
-                            s.relationships.partners.data,
-                            "id"
-                          )
-                        }
+                        team={v.relationships.partners.data}
                         workflowId={s.attributes.workflowId}
                       />
                     ))}
@@ -205,11 +149,8 @@ export default YourSchools;
 const SchoolCard = ({ name, location, team, openDate, workflowId }) => {
   const router = useRouter();
   const handleSetActiveTeam = (workflowId) => {
-    router.push(`/ssj/${workflowId}/to-do-list`);
     sessionStorage.setItem("schoolName", name);
-    // set the workflow id for the team to view
-    // store the workflow id in state someplace that can be accessed by other pages (a new useWorkflow context hook?) -> maybe a generalized state manager context hook...
-    //redirect to that team's ssj to do list
+    router.push(`/ssj/${workflowId}/to-do-list`);
   };
   return (
     <Card size="small">
