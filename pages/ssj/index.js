@@ -13,8 +13,12 @@ import { PageContainer } from "@components/ui";
 const SSJWorkflow = ({}) => {
   const router = useRouter();
 
-  const { currentUser, isOperationsGuide } = useUserContext();
+  const { currentUser } = useUserContext();
   const SSJWorkflowId = currentUser?.attributes?.ssj?.workflowId;
+
+  //TODO: Retrieve this from useUserContext() when user test is complete
+  const isOperationsGuide =
+    currentUser?.attributes?.email === "maya.soriano@wildflowerschools.org";
 
   useEffect(() => {
     if (SSJWorkflowId && !isOperationsGuide) {

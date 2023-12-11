@@ -94,10 +94,13 @@ export default Nav;
 
 const Navigation = () => {
   const router = useRouter();
-  const { currentUser, isLoggedIn, isOperationsGuide } = useUserContext();
+  const { currentUser } = useUserContext();
   const [ogViewingSchool, setOgViewingSchool] = useState();
-
   const { workflow } = router.query;
+
+  //TODO: Retrieve this from useUserContext() when user test is complete
+  const isOperationsGuide =
+    currentUser?.attributes?.email === "maya.soriano@wildflowerschools.org";
 
   useEffect(() => {
     if (router.asPath === "/your-schools") {
@@ -112,7 +115,7 @@ const Navigation = () => {
   }, []);
 
   // console.log({ ogViewingSchool });
-  // console.log({ currentUser });
+  console.log({ currentUser });
 
   return currentUser ? (
     <Box>
