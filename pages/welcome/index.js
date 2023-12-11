@@ -14,7 +14,9 @@ const Welcome = () => {
   const isTeacherLeader =
     currentUser?.personRoleList.includes("Teacher Leader");
   const isOperationsGuide =
-    currentUser?.personRoleList.includes("Operations Guide");
+    currentUser?.personRoleList.includes("Operations Guide") ||
+    currentUser?.personRoleList.includes("Ops Guide");
+
   const isRegionalGrowthLead = currentUser?.personRoleList.includes(
     "Regional Growth Lead"
   );
