@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+
 import {
   PageContainer,
   Typography,
@@ -25,6 +27,9 @@ const ToDoList = ({ steps, milestonesToDo }) => {
   const [assignedSteps, setAssignedSteps] = useState([]);
   const [teamAssignments, setTeamAssignments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  const { workflow } = router.query;
 
   const removeStep = (taskId) => {
     setTimeout(() => {
@@ -70,6 +75,8 @@ const ToDoList = ({ steps, milestonesToDo }) => {
 
   // console.log({ assignedSteps });
   // console.log({ teamAssignments });
+
+  // console.log({ steps });
 
   return (
     <PageContainer isLoading={isLoading}>
@@ -146,41 +153,46 @@ const ToDoList = ({ steps, milestonesToDo }) => {
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
                       {isOperationsGuide
-                        ? "Next time you meet with them help them add a task to their to do list. Here are a few suggested tasks for this team."
+                        ? "Next time you meet with them help them add a task to their to do list."
                         : "To start, add a task from one of these milestones. You can take them on at your own pace, according to your interests, needs, and timeline."}
                     </Typography>
                   </Stack>
                 </Card>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <Card
-                  noBorder
-                  variant="lightened"
-                  noRadius
-                  sx={{ height: "100%" }}
-                >
-                  <Stack spacing={2}>
-                    {milestonesToDo.map((m, i) => (
-                      <Link href={`/ssj/${m.attributes.phase}/${m.id}`} key={i}>
-                        <Card variant="light" size="small" hoverable>
-                          <Stack
-                            direction="row"
-                            alignItems="center"
-                            justifyContent="space-between"
-                          >
-                            <Typography variant="bodyRegular" bold>
-                              {m.attributes.title}
-                            </Typography>
-                            <Button small variant="text">
-                              Start here
-                            </Button>
-                          </Stack>
-                        </Card>
-                      </Link>
-                    ))}
-                  </Stack>
-                </Card>
-              </Grid>
+              {!isOperationsGuide ? (
+                <Grid item xs={12} sm={6}>
+                  <Card
+                    noBorder
+                    variant="lightened"
+                    noRadius
+                    sx={{ height: "100%" }}
+                  >
+                    <Stack spacing={2}>
+                      {milestonesToDo.map((m, i) => (
+                        <Link
+                          href={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                          key={i}
+                        >
+                          <Card variant="light" size="small" hoverable>
+                            <Stack
+                              direction="row"
+                              alignItems="center"
+                              justifyContent="space-between"
+                            >
+                              <Typography variant="bodyRegular" bold>
+                                {m.attributes.title}
+                              </Typography>
+                              <Button small variant="text">
+                                Start here
+                              </Button>
+                            </Stack>
+                          </Card>
+                        </Link>
+                      ))}
+                    </Stack>
+                  </Card>
+                </Grid>
+              ) : null}
             </Grid>
           </Card>
         )}
@@ -202,7 +214,10 @@ export async function getServerSideProps({ query, req, res }) {
   const workflowId = query.workflow;
 
   let response;
-  config.params = { current_user: null };
+
+  //TODO: Why does this config with current_user: true allow the to do list to be shown for 2 users?
+  config.params = { current_user: true };
+
   try {
     response = await stepsApi.assigned(workflowId, config);
   } catch (error) {

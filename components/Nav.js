@@ -115,7 +115,7 @@ const Navigation = () => {
   }, []);
 
   // console.log({ ogViewingSchool });
-  console.log({ currentUser });
+  // console.log({ currentUser });
 
   return currentUser ? (
     <Box>
