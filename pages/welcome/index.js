@@ -22,6 +22,7 @@ const Welcome = () => {
   );
   const isFoundationPartner =
     currentUser?.personRoleList.includes("Foundation Parnter");
+  const isCharterStaff = currentUser?.personRoleList.includes("Charter Staff");
   const isOnboarded = currentUser?.personIsOnboarded;
 
   useEffect(() => {
@@ -33,7 +34,8 @@ const Welcome = () => {
         isTeacherLeader ||
         isOperationsGuide ||
         isRegionalGrowthLead ||
-        isFoundationPartner
+        isFoundationPartner ||
+        isCharterStaff
       ) {
         router.push("/network");
       }
@@ -46,7 +48,8 @@ const Welcome = () => {
         isTeacherLeader ||
         isOperationsGuide ||
         isRegionalGrowthLead ||
-        isFoundationPartner
+        isFoundationPartner ||
+        isCharterStaff
       ) {
         router.push("/welcome/existing-member");
       }
