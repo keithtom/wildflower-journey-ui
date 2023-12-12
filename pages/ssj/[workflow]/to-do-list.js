@@ -211,13 +211,11 @@ export async function getServerSideProps({ query, req, res }) {
   }
 
   const phase = getCookie("phase", { req, res });
+  const isOg = getCookie("isOg", { req, res });
   const workflowId = query.workflow;
 
   let response;
-
-  //TODO: Why does this config with current_user: true allow the to do list to be shown for 2 users?
-  config.params = { current_user: true };
-
+  config.params = { current_user: !isOg };
   try {
     response = await stepsApi.assigned(workflowId, config);
   } catch (error) {
