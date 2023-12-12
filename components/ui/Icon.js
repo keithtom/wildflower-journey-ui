@@ -12,7 +12,6 @@ import {
   RightArrowCircle,
   Plus,
   Check,
-  BuildingHouse,
   Extension,
   Palette,
   Pause,
@@ -30,6 +29,7 @@ import {
   Minus,
 } from "@styled-icons/boxicons-regular";
 import {
+  BuildingHouse,
   Bus,
   BookReader,
   Conversation,
@@ -49,6 +49,8 @@ import {
   Home,
   Wrench,
   Lock,
+  Map,
+  CalendarAlt,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -216,6 +218,8 @@ export default function Icon({ ...props }) {
     lock: <Lock />,
     filter: <Filter />,
     minus: <Minus />,
+    map: <Map />,
+    calendar: <CalendarAlt />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

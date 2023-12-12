@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
 
 import { getScreenSize } from "../hooks/react-responsive";
 import { useUserContext } from "../lib/useUserContext";
 import { user } from "../lib/utils/fake-data";
 import { theme } from "../styles/theme";
 import {
+  Select,
   Card,
   Typography,
   Stack,
@@ -16,6 +18,7 @@ import {
   Box,
   NavLink,
   Icon,
+  Snackbar,
 } from "./ui/index";
 import Header from "./Header";
 
@@ -91,10 +94,46 @@ export default Nav;
 
 const Navigation = () => {
   const router = useRouter();
-  const { currentUser, isLoggedIn } = useUserContext();
+  const { currentUser, isOperationsGuide } = useUserContext();
+  const [ogViewingSchool, setOgViewingSchool] = useState();
+  const { workflow } = router.query;
 
-  return (
+  useEffect(() => {
+    if (router.asPath === "/your-schools") {
+      sessionStorage.removeItem("schoolName");
+    }
+    if (
+      router.pathname.includes("/ssj/") &&
+      sessionStorage.getItem("schoolName")
+    ) {
+      setOgViewingSchool(sessionStorage.getItem("schoolName"));
+    }
+  }, []);
+
+  // console.log({ ogViewingSchool });
+  // console.log({ currentUser });
+
+  return currentUser ? (
     <Box>
+      {isOperationsGuide && router.pathname.includes("/ssj/") ? (
+        <Snackbar
+          open={ogViewingSchool}
+          autoHideDuration={null}
+          anchorOrigin={{ vertical: "middle", horizontal: "center" }}
+        >
+          <div>
+            <Card size="small" variant="primaryLightened">
+              <Stack direction="row" spacing={3} alignItems="center">
+                <Typography variant="bodySmall" bold highlight>
+                  VIEWING
+                </Typography>
+                <Typography variant="bodyRegular">{ogViewingSchool}</Typography>
+              </Stack>
+            </Card>
+          </div>
+        </Snackbar>
+      ) : null}
+
       {router.pathname.includes("/admin") ? (
         <NavLink
           variant="primary"
@@ -111,69 +150,105 @@ const Navigation = () => {
             label="Network"
             icon="bookReader"
           />
-          {currentUser?.attributes?.ssj ? (
+          {!isOperationsGuide && currentUser?.attributes?.ssj ? (
             <NavLink
               variant="primary"
-              to="/ssj"
-              active={router.asPath === "/ssj"}
+              to={`/ssj/${currentUser?.attributes?.ssj?.workflowId}`}
+              active={router.asPath === `/ssj/${workflow}`}
               label="School Startup Journey"
               icon="home"
             />
           ) : null}
-          {router.pathname.includes("/ssj") &&
-            !router.pathname.includes("/admin") && <SSJNavigation />}
+          {isOperationsGuide ? (
+            <Stack spacing={3}>
+              <NavLink
+                variant="primary"
+                to="/your-schools"
+                active={router.asPath === "/your-schools"}
+                label="Your Schools"
+                icon="buildingHouse"
+              />
+
+              {ogViewingSchool && router.pathname.includes("/ssj/") ? (
+                <Box pl={3} pr={3} pb={3}>
+                  <Card size="small" variant="primaryLightened">
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Typography variant="bodySmall" bold highlight>
+                        VIEWING
+                      </Typography>
+                      <Typography variant="bodyRegular">
+                        {ogViewingSchool}
+                      </Typography>
+                    </Stack>
+                  </Card>
+                </Box>
+              ) : null}
+            </Stack>
+          ) : null}
+
+          {router.pathname.includes("/ssj") ? (
+            <SSJNavigation
+              SSJworkflowId={workflow}
+              opsView={isOperationsGuide}
+            />
+          ) : null}
         </>
       )}
     </Box>
+  ) : (
+    <Box />
   );
 };
 
-const SSJNavigation = ({}) => {
+const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   const router = useRouter();
+
   return (
     <Box>
       <NavLink
         variant="secondary"
-        to="/ssj/to-do-list"
-        active={router.asPath === "/ssj/to-do-list"}
-        label="Your to do list"
+        to={`/ssj/${SSJworkflowId}/to-do-list`}
+        active={router.pathname.includes("/to-do-list")}
+        label="To do list"
         icon="calendarCheck"
       />
       <NavLink
         variant="secondary"
-        to="/ssj/milestones"
-        active={router.asPath === "/ssj/milestones"}
+        to={`/ssj/${SSJworkflowId}/milestones`}
+        active={router.pathname.includes("/milestones")}
         label="Milestones"
         icon="layer"
       />
       <NavLink
         variant="tertiary"
-        to="/ssj/visioning"
-        active={router.asPath === "/ssj/visioning"}
+        to={`/ssj/${SSJworkflowId}/visioning`}
+        active={router.pathname.includes("/visioning")}
         label="Visioning"
         icon={true}
       />
       <NavLink
         variant="tertiary"
-        to="/ssj/planning"
-        active={router.asPath === "/ssj/planning"}
+        to={`/ssj/${SSJworkflowId}/planning`}
+        active={router.pathname.includes("/planning")}
         label="Planning"
         icon={true}
       />
       <NavLink
         variant="tertiary"
-        to="/ssj/startup"
-        active={router.asPath === "/ssj/startup"}
+        to={`/ssj/${SSJworkflowId}/startup`}
+        active={router.pathname.includes("/startup")}
         label="Startup"
         icon={true}
       />
-      <NavLink
-        variant="secondary"
-        to="/ssj/resources"
-        active={router.asPath === "/ssj/resources"}
-        label="Resources"
-        icon="fileBlank"
-      />
+      {opsView ? null : (
+        <NavLink
+          variant="secondary"
+          to={`/ssj/${SSJworkflowId}/resources`}
+          active={router.pathname.includes("/resources")}
+          label="Resources"
+          icon="fileBlank"
+        />
+      )}
     </Box>
   );
 };

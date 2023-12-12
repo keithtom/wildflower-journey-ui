@@ -2,14 +2,15 @@ import { useState } from "react";
 import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import processesApi from "@api/workflow/processes";
+import { useRouter } from "next/router";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
-import CategoryChip from "../../components/CategoryChip";
-import PhaseChip from "../../components/PhaseChip";
-import Milestone from "../../components/Milestone";
-import Hero from "../../components/Hero";
-import getAuthHeader from "../../lib/getAuthHeader";
+import CategoryChip from "@components/CategoryChip";
+import PhaseChip from "@components/PhaseChip";
+import Milestone from "@components/Milestone";
+import Hero from "@components/Hero";
+import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
 const Milestones = ({ processByCategory, processByPhase }) => {
@@ -30,6 +31,10 @@ const Milestones = ({ processByCategory, processByPhase }) => {
   // console.log({ processByPhase });
 
   const hero = "/assets/images/ssj/wildflowerCollection.jpg";
+
+  const router = useRouter();
+
+  const { workflow, phase } = router.query;
 
   useAuth("/login");
 
@@ -80,7 +85,7 @@ const Milestones = ({ processByCategory, processByPhase }) => {
                     <Stack spacing={3}>
                       {a.processes.map((m, i) => (
                         <Milestone
-                          link={`/ssj/${m.attributes.phase}/${m.id}`}
+                          link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                           key={i}
                           status={m.attributes.status}
                           description={m.attributes.description}
@@ -109,7 +114,7 @@ const Milestones = ({ processByCategory, processByPhase }) => {
                   <Stack spacing={3}>
                     {p.processes.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${m.attributes.phase}/${m.id}`}
+                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         status={m.attributes.status}
                         description={m.attributes.description}
@@ -134,14 +139,14 @@ const Milestones = ({ processByCategory, processByPhase }) => {
 
 export default Milestones;
 
-export async function getServerSideProps({ req, res }) {
+export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
     console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
-  const workflowId = getCookie("workflowId", { req, res });
+  const workflowId = query.workflow;
   let response;
   try {
     response = await processesApi.index({ workflowId, config });
