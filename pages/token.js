@@ -23,12 +23,14 @@ const Token = ({ query }) => {
             email: user.email,
             profileImage: user.imageUrl,
           });
-
+          console.log({ user });
+          console.log({ response });
           //construct the relevant data to redirect based on
-          const personRoleList = result.data?.included?.find((a) => {
+          const personId = user?.relationships?.person?.data?.id;
+          const personRoleList = response.data?.included?.find((a) => {
             return a.id === personId;
           })?.attributes?.roleList;
-          const personIsOnboarded = result.data?.included?.find((a) => {
+          const personIsOnboarded = response.data?.included?.find((a) => {
             return a.id === personId;
           })?.attributes?.isOnboarded;
           //extract individual roles to check with
