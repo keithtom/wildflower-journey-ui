@@ -44,26 +44,8 @@ const Login = ({}) => {
   const onSubmit = async (data) => {
     try {
       await authApi.login(data.email, data.password).then(function (response) {
-        setCookie("auth", response.headers["authorization"], {
-          maxAge: 60 * 60 * 24 * 30,
-        });
         const userAttributes = response.data.data.attributes;
         const personId = response.data.data.relationships.person.data.id;
-
-        const personAttributes = response.data.included.find(
-          (item) => personId == item.id
-        )?.attributes;
-        if (response.data.data.attributes.ssj) {
-          setCookie("workflowId", userAttributes.ssj.workflowId, {
-            maxAge: 60 * 60 * 24 * 30,
-          });
-          setCookie("phase", userAttributes.ssj.currentPhase, {
-            maxAge: 60 * 60 * 24 * 30,
-          });
-          setCookie("isOg", personAttributes["isOg?"], {
-            maxAge: 60 * 60 * 24 * 30,
-          });
-        }
 
         setCurrentUser({
           id: personId,
