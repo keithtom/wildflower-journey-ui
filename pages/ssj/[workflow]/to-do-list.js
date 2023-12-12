@@ -215,7 +215,7 @@ export async function getServerSideProps({ query, req, res }) {
   const workflowId = query.workflow;
 
   let response;
-  config.params = { current_user: !isOg };
+  config.params = { current_user: isOg ? null : true };
   try {
     response = await stepsApi.assigned(workflowId, config);
   } catch (error) {
