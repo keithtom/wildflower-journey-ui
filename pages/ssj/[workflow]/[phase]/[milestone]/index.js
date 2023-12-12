@@ -63,7 +63,7 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
   );
 
   const router = useRouter();
-  const { phase } = router.query;
+  const { workflow, phase } = router.query;
 
   useAuth("/login");
 
@@ -90,7 +90,7 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
                     {milestonePrerequisites &&
                       milestonePrerequisites.map((m, i) => (
                         <Milestone
-                          link={`/ssj/${phase}/${m.id}`}
+                          link={`/ssj/${workflow}/${phase}/${m.id}`}
                           key={i}
                           title={m.attributes.title}
                           description={m.attributes.description}
@@ -107,7 +107,7 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href={`/ssj/${phase}`}>
+                <Link href={`/ssj/${workflow}/${phase}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>
