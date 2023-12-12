@@ -4,11 +4,11 @@ import ssjApi from "@api/ssj/ssj";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
-import CategoryChip from "../../components/CategoryChip";
-import PhaseChip from "../../components/PhaseChip";
-import Resource from "../../components/Resource";
-import Hero from "../../components/Hero";
-import getAuthHeader from "../../lib/getAuthHeader";
+import CategoryChip from "@components/CategoryChip";
+import PhaseChip from "@components/PhaseChip";
+import Resource from "@components/Resource";
+import Hero from "@components/Hero";
+import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
 const Resources = ({ dataResources }) => {
@@ -121,14 +121,14 @@ const Resources = ({ dataResources }) => {
 
 export default Resources;
 
-export async function getServerSideProps({ req, res }) {
+export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
     console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
 
-  const workflowId = getCookie("workflowId", { req, res });
+  const workflowId = query.workflow;
   let responseResources;
   try {
     responseResources = await ssjApi.resources({ workflowId, config });

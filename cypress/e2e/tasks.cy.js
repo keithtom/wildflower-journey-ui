@@ -41,7 +41,7 @@ describe("tasks", () => {
         // // avatar should appear 3x. Once in the header, and twice for the assignments
         cy.get(".MuiAvatar-img").should("have.length", 3);
 
-        cy.contains("Your to do list").click();
+        cy.contains("To do list").click();
         cy.contains("Step 1").should("be.visible");
         cy.contains("Step 2").should("be.visible");
 
@@ -59,7 +59,7 @@ describe("tasks", () => {
         cy.contains("Visioning").click();
         cy.contains("Working on 1 of 2 remaining tasks").should("be.visible");
 
-        cy.contains("Your to do list").click();
+        cy.contains("To do list").click();
         cy.contains("Step 1").should("not.exist");
         cy.contains("Step 2").should("be.visible");
 
@@ -148,7 +148,7 @@ describe("tasks", () => {
           });
 
         // Check that you can access decision in the to do list
-        cy.contains("Your to do list").click();
+        cy.contains("To do list").click();
         cy.contains("Decision Step 1").click();
         cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
           .first()

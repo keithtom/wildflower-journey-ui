@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import getAuthHeader from "../../../lib/getAuthHeader";
+import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
 import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
@@ -20,8 +20,8 @@ import {
   Select,
   Button,
 } from "@ui";
-import Milestone from "../../../components/Milestone";
-import Hero from "../../../components/Hero";
+import Milestone from "@components/Milestone";
+import Hero from "@components/Hero";
 
 const PhasePage = ({
   milestonesInProgress,
@@ -33,7 +33,7 @@ const PhasePage = ({
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
 
   const router = useRouter();
-  const { phase } = router.query;
+  const { workflow, phase } = router.query;
 
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
@@ -83,7 +83,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {milestonesInProgress.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${m.attributes.phase}/${m.id}`}
+                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         description={m.attributes.description}
@@ -122,7 +122,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {milestonesToDo.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${m.attributes.phase}/${m.id}`}
+                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         description={m.attributes.description}
@@ -160,7 +160,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {milestonesUpNext.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${m.attributes.phase}/${m.id}`}
+                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         description={m.attributes.description}
@@ -196,7 +196,7 @@ const PhasePage = ({
                   <Stack spacing={3}>
                     {milestonesDone.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${m.attributes.phase}/${m.id}`}
+                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={m.attributes.title}
                         description={m.attributes.description}
@@ -422,14 +422,14 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
   );
 };
 
-export async function getServerSideProps({ params, req, res }) {
+export async function getServerSideProps({ query, req, res }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
     console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
-  const { phase } = params;
-  const workflowId = getCookie("workflowId", { req, res });
+  const { phase, workflow } = query;
+  const workflowId = workflow;
 
   let response;
   try {
