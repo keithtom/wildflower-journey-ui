@@ -115,7 +115,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
 
   useAuth("/login");
 
-  console.log({ currentUser });
+  // console.log({ currentUser });
   // console.log({ team });
   // console.log({ partners });
 
@@ -310,7 +310,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
                       <Stack spacing={2}>
                         {milestonesToDo.map((m, i) => (
                           <Link
-                            href={`/ssj/${m.attributes.phase}/${m.id}`}
+                            href={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                             key={i}
                           >
                             <Card variant="light" size="small" hoverable>
