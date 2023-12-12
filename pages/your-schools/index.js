@@ -86,54 +86,60 @@ const YourSchools = () => {
                 </Typography>
 
                 {visioningTeams.length ? (
-                  <Stack spacing={3}>
+                  <Stack spacing={6}>
                     <Grid item>
                       <PhaseChip phase="Visioning" size="large" />
                     </Grid>
-                    {visioningTeams.map((v, i) => (
-                      <SchoolCard
-                        key={i}
-                        name={v.attributes.tempName}
-                        location={v.attributes.tempLocation}
-                        openDate={v.attributes.expectedStartDate}
-                        team={v.relationships.partners.data}
-                        workflowId={v.attributes.workflowId}
-                      />
-                    ))}
+                    <Stack spacing={3} id="visioning-stack">
+                      {visioningTeams.map((v, i) => (
+                        <SchoolCard
+                          key={i}
+                          name={v.attributes.tempName}
+                          location={v.attributes.tempLocation}
+                          openDate={v.attributes.expectedStartDate}
+                          team={v.relationships.partners.data}
+                          workflowId={v.attributes.workflowId}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
                 ) : null}
                 {planningTeams.length ? (
-                  <Stack spacing={3}>
+                  <Stack spacing={6}>
                     <Grid item>
                       <PhaseChip phase="Planning" size="large" />
                     </Grid>
-                    {planningTeams.map((p, i) => (
-                      <SchoolCard
-                        key={i}
-                        name={p.attributes.tempName}
-                        location={p.attributes.tempLocation}
-                        openDate={p.attributes.expectedStartDate}
-                        team={v.relationships.partners.data}
-                        workflowId={p.attributes.workflowId}
-                      />
-                    ))}
+                    <Stack spacing={3}>
+                      {planningTeams.map((p, i) => (
+                        <SchoolCard
+                          key={i}
+                          name={p.attributes.tempName}
+                          location={p.attributes.tempLocation}
+                          openDate={p.attributes.expectedStartDate}
+                          team={v.relationships.partners.data}
+                          workflowId={p.attributes.workflowId}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
                 ) : null}
                 {startupTeams.length ? (
-                  <Stack spacing={3}>
+                  <Stack spacing={6}>
                     <Grid item>
                       <PhaseChip phase="Startup" size="large" />
                     </Grid>
-                    {startupTeams.map((s, i) => (
-                      <SchoolCard
-                        key={i}
-                        name={s.attributes.tempName}
-                        location={s.attributes.tempLocation}
-                        openDate={s.attributes.expectedStartDate}
-                        team={v.relationships.partners.data}
-                        workflowId={s.attributes.workflowId}
-                      />
-                    ))}
+                    <Stack spacing={3}>
+                      {startupTeams.map((s, i) => (
+                        <SchoolCard
+                          key={i}
+                          name={s.attributes.tempName}
+                          location={s.attributes.tempLocation}
+                          openDate={s.attributes.expectedStartDate}
+                          team={v.relationships.partners.data}
+                          workflowId={s.attributes.workflowId}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
                 ) : null}
               </Stack>

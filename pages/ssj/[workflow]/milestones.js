@@ -2,6 +2,7 @@ import { useState } from "react";
 import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import processesApi from "@api/workflow/processes";
+import { useRouter } from "next/router";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
@@ -30,6 +31,10 @@ const Milestones = ({ processByCategory, processByPhase }) => {
   // console.log({ processByPhase });
 
   const hero = "/assets/images/ssj/wildflowerCollection.jpg";
+
+  const router = useRouter();
+
+  const { workflow, phase } = router.query;
 
   useAuth("/login");
 
@@ -80,7 +85,7 @@ const Milestones = ({ processByCategory, processByPhase }) => {
                     <Stack spacing={3}>
                       {a.processes.map((m, i) => (
                         <Milestone
-                          link={`/ssj/${m.attributes.phase}/${m.id}`}
+                          link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                           key={i}
                           status={m.attributes.status}
                           description={m.attributes.description}
@@ -109,7 +114,7 @@ const Milestones = ({ processByCategory, processByPhase }) => {
                   <Stack spacing={3}>
                     {p.processes.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${m.attributes.phase}/${m.id}`}
+                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         status={m.attributes.status}
                         description={m.attributes.description}

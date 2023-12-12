@@ -98,6 +98,7 @@ function resetPartnerFixtures() {
 Cypress.Commands.add("resetFixtures", () => {
   cy.wrap(resetFixtures());
 });
+
 // Used with tests that are testing network workflows
 Cypress.Commands.add("resetNetworkFixtures", () => {
   cy.wrap(resetNetworkFixtures());
