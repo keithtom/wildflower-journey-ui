@@ -24,6 +24,7 @@ const Token = ({ query }) => {
             type: response.data.data.type,
             attributes: userAttributes,
           });
+          console.log({ response });
 
           //construct the relevant data to redirect based on
           const personRoleList = response.data?.included?.find((a) => {
@@ -47,6 +48,7 @@ const Token = ({ query }) => {
           const isFoundationPartner =
             personRoleList.includes("Foundation Parnter");
           const isCharterStaff = personRoleList.includes("Charter Staff");
+          const isNoRoleInList = personRoleList.length === 0;
 
           //redirect to given routes based on role
           switch (true) {
@@ -59,7 +61,8 @@ const Token = ({ query }) => {
                 isOperationsGuide ||
                 isRegionalGrowthLead ||
                 isFoundationPartner ||
-                isCharterStaff):
+                isCharterStaff ||
+                isNoRoleInList):
               router.push("/network");
               break;
 
@@ -72,7 +75,8 @@ const Token = ({ query }) => {
                 isOperationsGuide ||
                 isRegionalGrowthLead ||
                 isFoundationPartner ||
-                isCharterStaff):
+                isCharterStaff ||
+                isNoRoleInList):
               router.push("/welcome/existing-member");
               break;
 
