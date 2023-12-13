@@ -15,13 +15,15 @@ const Token = ({ query }) => {
       authApi
         .tokenAuth(token, redirect)
         .then((response) => {
-          const user = response.data.data;
+          const userAttributes = response.data.data.attributes;
+          const personId = response.data.data.relationships.person.data.id;
+
           setCurrentUser({
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            profileImage: user.imageUrl,
+            id: personId,
+            type: response.data.data.type,
+            attributes: userAttributes,
           });
+
           Router.push(redirect);
         })
         .catch((error) => {
