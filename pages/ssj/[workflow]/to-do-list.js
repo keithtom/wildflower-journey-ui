@@ -80,7 +80,7 @@ const ToDoList = ({ steps, milestonesToDo }) => {
 
   return (
     <PageContainer isLoading={isLoading}>
-      <Stack spacing={12}>
+      <Stack spacing={12} mb={12}>
         <Hero imageUrl={hero} />
 
         {teamAssignments.length ? (
