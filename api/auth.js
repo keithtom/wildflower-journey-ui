@@ -33,6 +33,7 @@ async function login(email, password) {
     return Promise.reject(error);
   }
 
+  setCookies(response);
   return response;
 }
 
@@ -40,19 +41,7 @@ async function tokenAuth(token) {
   const response = await api.post(`/login?auth_token=${token}`, {
     token: token,
   });
-  setCookie("auth", response.headers["authorization"], {
-    maxAge: 60 * 60 * 24 * 30,
-  });
-  const userAttributes = response.data.data.attributes;
-
-  if (response.data.data.attributes.ssj) {
-    setCookie("workflowId", userAttributes.ssj.workflowId, {
-      maxAge: 60 * 60 * 24 * 30,
-    });
-    setCookie("phase", userAttributes.ssj.currentPhase, {
-      maxAge: 60 * 60 * 24 * 30,
-    });
-  }
+  setCookies(response);
 
   return response;
 }
@@ -63,6 +52,30 @@ async function loginEmailLink(email) {
   });
   const result = await response.json;
   return result;
+}
+
+function setCookies(response) {
+  setCookie("auth", response.headers["authorization"], {
+    maxAge: 60 * 60 * 24 * 30,
+  });
+  const userAttributes = response.data.data.attributes;
+
+  const personId = response.data.data.relationships.person.data.id;
+  const personAttributes = response.data.included.find(
+    (item) => personId == item.id
+  )?.attributes;
+
+  if (response.data.data.attributes.ssj) {
+    setCookie("workflowId", userAttributes.ssj.workflowId, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+    setCookie("phase", userAttributes.ssj.currentPhase, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+    setCookie("isOg", personAttributes["isOg?"], {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  }
 }
 
 export default { tokenAuth, loginEmailLink, login };
