@@ -116,7 +116,7 @@ const YourSchools = () => {
                           name={p.attributes.tempName}
                           location={p.attributes.tempLocation}
                           openDate={p.attributes.expectedStartDate}
-                          team={v.relationships.partners.data}
+                          team={p.relationships.partners.data}
                           workflowId={p.attributes.workflowId}
                         />
                       ))}
@@ -135,7 +135,7 @@ const YourSchools = () => {
                           name={s.attributes.tempName}
                           location={s.attributes.tempLocation}
                           openDate={s.attributes.expectedStartDate}
-                          team={v.relationships.partners.data}
+                          team={s.relationships.partners.data}
                           workflowId={s.attributes.workflowId}
                         />
                       ))}
