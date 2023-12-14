@@ -984,7 +984,6 @@ const AddPartnerModal = ({
   });
   async function onSubmit(data) {
     try {
-      console.log("team id", team.id);
       const response = await teamsApi.invitePartner(team.id, data);
       if (response.status === 200) {
         setSubmittedPartnerRequest(true);
