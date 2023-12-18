@@ -11,6 +11,7 @@ async function dashboard() {
   // we can massage the response here into a data structure the frontend wants
 }
 
+// DEPRECATED
 async function invitePartner(data) {
   return await workflowsApi.put(`/invite_partner`, {
     person: {
@@ -48,7 +49,7 @@ async function resources({ workflowId, config = {} }) {
 }
 
 export default {
-  invitePartner,
+  invitePartner, // DEPRECATED
   progress,
   resources,
 };
