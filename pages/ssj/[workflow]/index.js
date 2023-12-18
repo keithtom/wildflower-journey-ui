@@ -565,6 +565,7 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
         setSubmittedPartnerRequest={setSubmittedPartnerRequest}
         toggle={() => setAddPartnerModalOpen(!addPartnerModalOpen)}
         open={addPartnerModalOpen}
+        team={team}
       />
       <ViewEtlsModal
         toggle={() => setViewEtlsModalOpen(!viewEtlsModalOpen)}
@@ -964,7 +965,12 @@ const FirstTimeUserModal = ({ toggle, open, firstName }) => {
     </Modal>
   );
 };
-const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
+const AddPartnerModal = ({
+  toggle,
+  open,
+  setSubmittedPartnerRequest,
+  team,
+}) => {
   const {
     control,
     handleSubmit,
@@ -978,7 +984,7 @@ const AddPartnerModal = ({ toggle, open, setSubmittedPartnerRequest }) => {
   });
   async function onSubmit(data) {
     try {
-      const response = await ssjApi.invitePartner(data);
+      const response = await teamsApi.invitePartner(team.id, data);
       if (response.status === 200) {
         setSubmittedPartnerRequest(true);
       }
