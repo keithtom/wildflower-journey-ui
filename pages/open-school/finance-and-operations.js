@@ -50,6 +50,7 @@ const FinanceOps = () => {
                     <Typography variant="bodyLarge">
                       Finance & Operations
                     </Typography>
+                    <Chip label="Future Feature" size="small" />
                   </Stack>
                   <Stack spacing={3}>
                     <Typography variant="h2" bold>

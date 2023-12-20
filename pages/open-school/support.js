@@ -48,6 +48,7 @@ const Support = () => {
                   <Stack direction="row" spacing={3} alignItems="center">
                     <Icon type="homeHeart" variant="primary" />
                     <Typography variant="bodyLarge">Support@</Typography>
+                    <Chip label="Future Feature" size="small" />
                   </Stack>
                   <Stack spacing={3}>
                     <Typography variant="h2" bold>

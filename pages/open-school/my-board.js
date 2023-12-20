@@ -48,6 +48,7 @@ const MyBoard = () => {
                   <Stack direction="row" spacing={3} alignItems="center">
                     <Icon type="group" variant="primary" />
                     <Typography variant="bodyLarge">My Board</Typography>
+                    <Chip label="Future Feature" size="small" />
                   </Stack>
                   <Stack spacing={3}>
                     <Typography variant="h2" bold>

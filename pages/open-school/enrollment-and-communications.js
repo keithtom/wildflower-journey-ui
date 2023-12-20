@@ -50,6 +50,7 @@ const EnrollmentComms = () => {
                     <Typography variant="bodyLarge">
                       Enrollment & Family Communications
                     </Typography>
+                    <Chip label="Future Feature" size="small" />
                   </Stack>
                   <Stack spacing={3}>
                     <Typography variant="h2" bold>
