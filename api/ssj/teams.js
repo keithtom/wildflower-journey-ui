@@ -72,15 +72,15 @@ async function inviteTeam(data) {
   return response;
 }
 
-// async function invitePartner(data) {
-//   return await teamsApi.put(`/invite_partner`, {
-//     person: {
-//       first_name: data.partnerFirstName,
-//       last_name: data.partnerLastName,
-//       email: data.partnerEmail,
-//     },
-//   });
-// }
+async function invitePartner(id, data) {
+  return await teamsApi.put(`/${id}/invite_partner`, {
+    person: {
+      first_name: data.partnerFirstName,
+      last_name: data.partnerLastName,
+      email: data.partnerEmail,
+    },
+  });
+}
 
 function getAuthHeader() {
   const token = getCookie("auth");
@@ -92,5 +92,5 @@ export default {
   getTeam,
   inviteTeam,
   index,
-  // invitePartner,
+  invitePartner,
 };
