@@ -27,6 +27,10 @@ import {
   ShapePolygon,
   Filter,
   Minus,
+  Loader,
+  Highlight,
+  ListUl,
+  HomeHeart,
 } from "@styled-icons/boxicons-regular";
 import {
   BuildingHouse,
@@ -51,6 +55,7 @@ import {
   Lock,
   Map,
   CalendarAlt,
+  Group,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -220,6 +225,11 @@ export default function Icon({ ...props }) {
     minus: <Minus />,
     map: <Map />,
     calendar: <CalendarAlt />,
+    loader: <Loader />,
+    highlight: <Highlight />,
+    group: <Group />,
+    listUl: <ListUl />,
+    homeHeart: <HomeHeart />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
