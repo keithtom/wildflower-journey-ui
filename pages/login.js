@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import FormHelperText from "@mui/material/FormHelperText";
 import { useUserContext } from "../lib/useUserContext";
 import { setCookie } from "cookies-next";
@@ -26,11 +26,15 @@ const Login = ({}) => {
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { setCurrentUser, isLoggedIn, currentUser } = useUserContext();
   const hasSSJ = currentUser?.attributes?.ssj ? true : false;
-  if (isLoggedIn && hasSSJ) {
-    Router.push("/ssj");
-  } else if (isLoggedIn && !hasSSJ) {
-    Router.push("/network");
-  }
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoggedIn && hasSSJ) {
+      router.push("/ssj");
+    } else if (isLoggedIn && !hasSSJ) {
+      router.push("/network");
+    }
+  }, [isLoggedIn, hasSSJ]);
 
   const {
     control,
@@ -52,10 +56,66 @@ const Login = ({}) => {
           type: response.data.data.type,
           attributes: userAttributes,
         });
-        if (!response.data.data.attributes.ssj) {
-          Router.push("/network");
-        } else {
-          Router.push("/ssj");
+
+        //construct the relevant data to redirect based on
+        const personRoleList = response.data?.included?.find((a) => {
+          return a.id === personId;
+        })?.attributes?.roleList;
+        const personIsOnboarded = response.data?.included?.find((a) => {
+          return a.id === personId;
+        })?.attributes?.isOnboarded;
+        //extract individual roles to check with
+        const isEmergingTeacherLeader = personRoleList.includes(
+          "Emerging Teacher Leader"
+        );
+        const isTeacherLeader = personRoleList.includes("Teacher Leader");
+        const isOperationsGuide =
+          personRoleList.includes("Operations Guide") ||
+          personRoleList.includes("Ops Guide");
+
+        const isRegionalGrowthLead = personRoleList.includes(
+          "Regional Growth Lead"
+        );
+        const isFoundationPartner =
+          personRoleList.includes("Foundation Parnter");
+        const isCharterStaff = personRoleList.includes("Charter Staff");
+        const isNoRoleInList = personRoleList.length === 0;
+
+        //redirect to given routes based on role
+        switch (true) {
+          case personIsOnboarded && isEmergingTeacherLeader:
+            router.push("/ssj");
+            break;
+
+          case isTeacherLeader:
+            router.push("/open-school");
+            break;
+
+          case personIsOnboarded &&
+            (isOperationsGuide ||
+              isRegionalGrowthLead ||
+              isFoundationPartner ||
+              isCharterStaff ||
+              isNoRoleInList):
+            router.push("/network");
+            break;
+
+          case !personIsOnboarded && isEmergingTeacherLeader:
+            router.push("/welcome/new-etl");
+            break;
+
+          case !personIsOnboarded &&
+            (isOperationsGuide ||
+              isRegionalGrowthLead ||
+              isFoundationPartner ||
+              isCharterStaff ||
+              isNoRoleInList):
+            router.push("/welcome/existing-member");
+            break;
+
+          default:
+            router.push("/network");
+            break;
         }
       });
       // Process successful login response
@@ -212,8 +272,8 @@ const Login = ({}) => {
                     </Stack>
 
                     <Card variant="lightened" size="small">
-                      <Grid container alignItems="center">
-                        <Grid item flex={1}>
+                      <Grid container alignItems="center" spacing={2}>
+                        <Grid item xs={12}>
                           <Grid container spacing={3}>
                             <Grid item>
                               <Icon type="lock" variant="lightened" />
@@ -230,7 +290,7 @@ const Login = ({}) => {
                             </Grid>
                           </Grid>
                         </Grid>
-                        <Grid item>
+                        <Grid item xs={12} ml={6}>
                           <Button
                             onClick={handleRequestEmailLink}
                             disabled={isSubmitting || isSubmitSuccessful}

@@ -19,6 +19,7 @@ import {
   NavLink,
   Icon,
   Snackbar,
+  Chip,
 } from "./ui/index";
 import Header from "./Header";
 
@@ -110,7 +111,11 @@ const Navigation = () => {
     }
   }, []);
 
+  const isTeacherLeader =
+    currentUser?.personRoleList?.includes("Teacher Leader");
+
   // console.log({ ogViewingSchool });
+  // console.log({ isTeacherLeader });
   // console.log({ currentUser });
 
   return currentUser ? (
@@ -134,7 +139,7 @@ const Navigation = () => {
         </Snackbar>
       ) : null}
 
-      {router.pathname.includes("/admin") ? (
+      {router.pathname.includes("/admin/") ? (
         <NavLink
           variant="primary"
           to="/admin/ssj"
@@ -150,6 +155,21 @@ const Navigation = () => {
             label="Network"
             icon="bookReader"
           />
+
+          {isTeacherLeader ? (
+            <NavLink
+              variant="primary"
+              to="/open-school"
+              active={router.asPath === `/open-school`}
+              label="Your School Dashboard" //TODO: Make actual school name
+              icon="home"
+            />
+          ) : null}
+
+          {router.pathname.includes("/open-school") ? (
+            <OpenSchoolNavigation />
+          ) : null}
+
           {!isOperationsGuide && currentUser?.attributes?.ssj ? (
             <NavLink
               variant="primary"
@@ -249,6 +269,71 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
           icon="fileBlank"
         />
       )}
+    </Box>
+  );
+};
+
+const OpenSchoolNavigation = () => {
+  const router = useRouter();
+  return (
+    <Box>
+      <NavLink
+        variant="secondary"
+        to={`/open-school/admin-checklist`}
+        active={router.pathname.includes("/open-school/admin-checklist")}
+        label={
+          <Stack direction="row" spacing={3} alignItems="center">
+            <Typography
+              variant="bodyRegular"
+              bold
+              highlight={router.pathname.includes(
+                "/open-school/admin-checklist"
+              )}
+            >
+              Admin Checklist
+            </Typography>
+            <Chip size="small" label="Q1 2024" />
+          </Stack>
+        }
+        icon="loader"
+      />
+      <NavLink
+        variant="secondary"
+        to={`/open-school/enrollment-and-communications`}
+        active={router.pathname.includes(
+          "/open-school/enrollment-and-communications"
+        )}
+        label="Enrollment & Family Comms"
+        icon="loader"
+      />
+      <NavLink
+        variant="secondary"
+        to={`/open-school/finance-and-operations`}
+        active={router.pathname.includes("/open-school/finance-and-operations")}
+        label="Finance & Operations"
+        icon="loader"
+      />
+      <NavLink
+        variant="secondary"
+        to={`/open-school/my-board`}
+        active={router.pathname.includes("/open-school/my-board")}
+        label="My Board"
+        icon="loader"
+      />
+      <NavLink
+        variant="secondary"
+        to={`/open-school/resources`}
+        active={router.pathname.includes("/open-school/resources")}
+        label="Resources"
+        icon="loader"
+      />
+      <NavLink
+        variant="secondary"
+        to={`/open-school/support`}
+        active={router.pathname.includes("/open-school/support")}
+        label="Support@"
+        icon="loader"
+      />
     </Box>
   );
 };

@@ -46,6 +46,7 @@ const NavLink = ({ to, icon, active, variant, label }) => {
           {icon && (
             <Grid item>
               <Icon
+                size={variant === "secondary" && "small"}
                 type={icon}
                 variant={
                   active ? "primary" : variant === "tertiary" && "transparent"
