@@ -56,9 +56,12 @@ const Token = ({ query }) => {
               router.push("/ssj");
               break;
 
+            case personIsOnboarded && isTeacherLeader:
+              router.push("/open-school");
+              break;
+
             case personIsOnboarded &&
-              (isTeacherLeader ||
-                isOperationsGuide ||
+              (isOperationsGuide ||
                 isRegionalGrowthLead ||
                 isFoundationPartner ||
                 isCharterStaff ||
@@ -71,8 +74,7 @@ const Token = ({ query }) => {
               break;
 
             case !personIsOnboarded &&
-              (isTeacherLeader ||
-                isOperationsGuide ||
+              (isOperationsGuide ||
                 isRegionalGrowthLead ||
                 isFoundationPartner ||
                 isCharterStaff ||

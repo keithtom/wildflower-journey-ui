@@ -60,7 +60,6 @@ import SchoolHero from "@components/SchoolHero";
 import AttributesCard from "@components/AttributesCard";
 import SchoolCard from "@components/SchoolCard";
 import UserCard from "@components/UserCard";
-import { Data } from "styled-icons/crypto";
 
 const School = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
