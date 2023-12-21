@@ -73,7 +73,7 @@ const Support = () => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <img
-                  src="/assets/images/open-school/finance-ops.png"
+                  src="/assets/images/open-school/support.png"
                   style={{ width: "100%" }}
                 />
               </Grid>
