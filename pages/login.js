@@ -21,20 +21,83 @@ import {
   IconButton,
 } from "@ui";
 
+const RedirectFunction = ({ router, personRoleList, personIsOnboarded }) => {
+  //extract individual roles to check with
+  const isEmergingTeacherLeader = personRoleList.includes(
+    "Emerging Teacher Leader"
+  );
+  const isTeacherLeader = personRoleList.includes("Teacher Leader");
+  const isOperationsGuide =
+    personRoleList.includes("Operations Guide") ||
+    personRoleList.includes("Ops Guide");
+
+  const isRegionalGrowthLead = personRoleList.includes("Regional Growth Lead");
+  const isFoundationPartner = personRoleList.includes("Foundation Parnter");
+  const isCharterStaff = personRoleList.includes("Charter Staff");
+  const isNoRoleInList = personRoleList.length === 0;
+
+  //redirect to given routes based on role
+  switch (true) {
+    case personIsOnboarded && isEmergingTeacherLeader:
+      router.push("/ssj");
+      break;
+
+    case personIsOnboarded && isTeacherLeader:
+      router.push("/open-school");
+      break;
+
+    case personIsOnboarded && isOperationsGuide:
+      router.push("/your-schools");
+      break;
+
+    case personIsOnboarded &&
+      (isRegionalGrowthLead ||
+        isFoundationPartner ||
+        isCharterStaff ||
+        isNoRoleInList):
+      router.push("/network");
+      break;
+
+    case !personIsOnboarded && isEmergingTeacherLeader:
+      router.push("/welcome/new-etl");
+      break;
+
+    case !personIsOnboarded &&
+      (isTeacherLeader ||
+        isOperationsGuide ||
+        isRegionalGrowthLead ||
+        isFoundationPartner ||
+        isCharterStaff ||
+        isNoRoleInList):
+      router.push("/welcome/existing-member");
+      break;
+
+    default:
+      router.push("/network");
+      break;
+  }
+};
+
 const Login = ({}) => {
   const { screenSize } = getScreenSize();
   const [sentEmailLoginRequest, setSentEmailLoginRequest] = useState(false);
   const { setCurrentUser, isLoggedIn, currentUser } = useUserContext();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const hasSSJ = currentUser?.attributes?.ssj ? true : false;
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoggedIn && hasSSJ) {
-      router.push("/ssj");
-    } else if (isLoggedIn && !hasSSJ) {
-      router.push("/network");
+    if (isLoggedIn) {
+      setIsLoggingIn(true);
+      RedirectFunction({
+        router: router,
+        personRoleList: currentUser?.personRoleList,
+        personIsOnboarded: currentUser?.personIsOnboarded,
+      });
     }
-  }, [isLoggedIn, hasSSJ]);
+  }, [isLoggedIn, currentUser]);
+
+  // console.log({ currentUser });
 
   const {
     control,
@@ -50,73 +113,26 @@ const Login = ({}) => {
       await authApi.login(data.email, data.password).then(function (response) {
         const userAttributes = response.data.data.attributes;
         const personId = response.data.data.relationships.person.data.id;
+        const personRoleList = response?.data?.included?.find((a) => {
+          return a.id === personId;
+        })?.attributes?.roleList;
+        const personIsOnboarded = response?.data?.included?.find((a) => {
+          return a.id === personId;
+        })?.attributes?.isOnboarded;
 
         setCurrentUser({
           id: personId,
           type: response.data.data.type,
           attributes: userAttributes,
+          personRoleList: personRoleList,
+          personIsOnboarded: personIsOnboarded,
         });
 
-        //construct the relevant data to redirect based on
-        const personRoleList = response.data?.included?.find((a) => {
-          return a.id === personId;
-        })?.attributes?.roleList;
-        const personIsOnboarded = response.data?.included?.find((a) => {
-          return a.id === personId;
-        })?.attributes?.isOnboarded;
-        //extract individual roles to check with
-        const isEmergingTeacherLeader = personRoleList.includes(
-          "Emerging Teacher Leader"
-        );
-        const isTeacherLeader = personRoleList.includes("Teacher Leader");
-        const isOperationsGuide =
-          personRoleList.includes("Operations Guide") ||
-          personRoleList.includes("Ops Guide");
-
-        const isRegionalGrowthLead = personRoleList.includes(
-          "Regional Growth Lead"
-        );
-        const isFoundationPartner =
-          personRoleList.includes("Foundation Parnter");
-        const isCharterStaff = personRoleList.includes("Charter Staff");
-        const isNoRoleInList = personRoleList.length === 0;
-
-        //redirect to given routes based on role
-        switch (true) {
-          case personIsOnboarded && isEmergingTeacherLeader:
-            router.push("/ssj");
-            break;
-
-          case isTeacherLeader:
-            router.push("/open-school");
-            break;
-
-          case personIsOnboarded &&
-            (isOperationsGuide ||
-              isRegionalGrowthLead ||
-              isFoundationPartner ||
-              isCharterStaff ||
-              isNoRoleInList):
-            router.push("/network");
-            break;
-
-          case !personIsOnboarded && isEmergingTeacherLeader:
-            router.push("/welcome/new-etl");
-            break;
-
-          case !personIsOnboarded &&
-            (isOperationsGuide ||
-              isRegionalGrowthLead ||
-              isFoundationPartner ||
-              isCharterStaff ||
-              isNoRoleInList):
-            router.push("/welcome/existing-member");
-            break;
-
-          default:
-            router.push("/network");
-            break;
-        }
+        RedirectFunction({
+          router: router,
+          personRoleList: personRoleList,
+          personIsOnboarded: personIsOnboarded,
+        });
       });
       // Process successful login response
     } catch (error) {
@@ -204,7 +220,9 @@ const Login = ({}) => {
                         defaultValue=""
                         render={({ field }) => (
                           <TextField
-                            disabled={isSubmitting || isSubmitSuccessful}
+                            disabled={
+                              isSubmitting || isSubmitSuccessful || isLoggingIn
+                            }
                             autoComplete="username"
                             label="Email"
                             placeholder="e.g. jane.smith@gmail.com"
@@ -230,7 +248,9 @@ const Login = ({}) => {
                         defaultValue=""
                         render={({ field }) => (
                           <TextField
-                            disabled={isSubmitting || isSubmitSuccessful}
+                            disabled={
+                              isSubmitting || isSubmitSuccessful || isLoggingIn
+                            }
                             autoComplete="current-password"
                             type="password"
                             label="Password"
@@ -257,7 +277,9 @@ const Login = ({}) => {
                     <Stack alignItems="center" spacing={3}>
                       <Button
                         full
-                        disabled={isSubmitting || isSubmitSuccessful}
+                        disabled={
+                          isSubmitting || isSubmitSuccessful || isLoggingIn
+                        }
                         type="submit"
                       >
                         <Stack spacing={6} direction="row">
@@ -293,7 +315,9 @@ const Login = ({}) => {
                         <Grid item xs={12} ml={6}>
                           <Button
                             onClick={handleRequestEmailLink}
-                            disabled={isSubmitting || isSubmitSuccessful}
+                            disabled={
+                              isSubmitting || isSubmitSuccessful || isLoggingIn
+                            }
                             small
                             variant="lightened"
                           >
