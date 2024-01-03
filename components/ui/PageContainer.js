@@ -61,7 +61,7 @@ const PageContainer = ({ children, isLoading, hideNav }) => {
           </>
         ) : (
           <>
-            <Header toggleNavOpen={toggleNavOpen} user={user} />
+            <Header toggleNavOpen={toggleNavOpen} />
             {hideNav ? null : (
               <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
             )}

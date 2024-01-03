@@ -1,7 +1,7 @@
 import { styled, css } from "@mui/material/styles";
 import { ListItem } from "@mui/material";
 
-import { Typography, Grid, Link, Icon } from "./index";
+import { Typography, Grid, Icon, Link } from "./index";
 
 const NavLink = ({ to, icon, active, variant, label }) => {
   const CustomListItem = styled(ListItem)`

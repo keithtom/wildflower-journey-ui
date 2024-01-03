@@ -1,8 +1,10 @@
-import { default as MaterialLink } from "@mui/material/Link";
+// import { default as MaterialLink } from "@mui/material/Link";
 import { styled, css } from "@mui/material/styles";
 
+import { default as NextLink } from "next/link";
+
 // NOTE: This is not included in storybook
-const CustomLink = styled(MaterialLink)`
+const CustomLink = styled(NextLink)`
   text-decoration: none;
 `;
 
