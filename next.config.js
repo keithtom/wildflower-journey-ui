@@ -1,4 +1,4 @@
-import { withHighlightConfig } from "@highlight-run/next";
+const { withHighlightConfig } = require("@highlight-run/next/config");
 
 module.exports = withHighlightConfig({
   reactStrictMode: true,
