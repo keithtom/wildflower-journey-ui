@@ -12,6 +12,12 @@ describe("tasks", () => {
     describe("assigning tasks", () => {
       it("should allow multiple assignments and can complete", () => {
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Milestone A").click();
 
         // Assign to Step 1
@@ -42,6 +48,12 @@ describe("tasks", () => {
         cy.get(".MuiAvatar-img").should("have.length", 3);
 
         cy.contains("To do list").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/to-do-list"
+        );
+        // check for something that will be present on the to do list page
+        cy.contains("Your to do list", { timeout: 60000 }).should("be.visible");
         cy.contains("Step 1").should("be.visible");
         cy.contains("Step 2").should("be.visible");
 
@@ -49,6 +61,12 @@ describe("tasks", () => {
         cy.contains("You have 2 tasks").should("be.visible");
 
         cy.contains("Visioning").click({ timeout: 10000 });
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Working on 2 of 3 remaining tasks").should("be.visible");
 
         cy.contains("Milestone A").click();
@@ -57,9 +75,21 @@ describe("tasks", () => {
         cy.get("span.completedTask").should("be.visible");
 
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Working on 1 of 2 remaining tasks").should("be.visible");
 
         cy.contains("To do list").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/to-do-list"
+        );
+        // check for something that will be present on the to do list page
+        cy.contains("Your to do list", { timeout: 60000 }).should("be.visible");
         cy.contains("Step 1").should("not.exist");
         cy.contains("Step 2").should("be.visible");
 
@@ -69,6 +99,12 @@ describe("tasks", () => {
         cy.contains("Start here").should("be.visible");
 
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("2 of 3 tasks completed").should("be.visible");
         cy.visit("/ssj", { timeout: 60000 });
         cy.contains(
@@ -77,13 +113,16 @@ describe("tasks", () => {
 
         // Selecting a milestone that has prerequisites
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Up Next").should("be.visible");
         cy.contains("Milestone B-2").click();
         cy.contains("Hold up!").should("be.visible");
-        cy.contains("Milestone B-1").click();
 
-        // Able to complete a task before prequisites are complete
-        cy.go("back");
         cy.contains("Step 1").click();
         cy.contains("Add to my to do list").click();
         cy.contains("Mark task complete").click();
@@ -96,6 +135,12 @@ describe("tasks", () => {
         cy.contains("Mark task complete").click();
 
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Milestone A").click();
         cy.contains("Step 2").click();
         cy.contains("Mark incomplete").click();
@@ -104,6 +149,12 @@ describe("tasks", () => {
 
       it("should allow uncompleting and unassigning a step", () => {
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Milestone A").click();
         cy.contains("Step 1").click();
         cy.contains("Add to my to do list").click();
@@ -116,6 +167,12 @@ describe("tasks", () => {
 
       it("should move a milestone from Up Next to To Do when prerequisites are complete", () => {
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Up Next").should("be.visible");
         cy.contains("Milestone B-2").click();
         cy.contains("Hold up!").should("be.visible");
@@ -127,6 +184,12 @@ describe("tasks", () => {
         cy.contains("Option 1").click();
         cy.contains("Make final decision").click();
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         // Milestone B-2 should now be in the To Do section
         cy.contains("Milestone B-2")
           .prev()
@@ -138,26 +201,40 @@ describe("tasks", () => {
     describe("decision tasks", () => {
       it("should allow a decision to be selected and submitted", () => {
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Milestone B-1").click();
         cy.contains("Decision Step 1").click();
         cy.contains("Add to my to do list").click();
-        cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
-          .first()
-          .click({
-            force: true,
-          });
+        cy.get("#info-drawer-close").first().click({
+          force: true,
+        });
 
         // Check that you can access decision in the to do list
         cy.contains("To do list").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/to-do-list"
+        );
+        // check for something that will be present on the to do list page
+        cy.contains("Your to do list", { timeout: 60000 }).should("be.visible");
         cy.contains("Decision Step 1").click();
-        cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
-          .first()
-          .click({
-            force: true,
-          });
+        cy.get("#info-drawer-close").first().click({
+          force: true,
+        });
 
         // Check that you can select an option and submit
         cy.contains("Visioning").click();
+        cy.location("pathname", { timeout: 60000 }).should(
+          "include",
+          "/visioning"
+        );
+        // check for something that will be present on the visioning page
+        cy.get("#visioning-header");
         cy.contains("Milestone B-1").click();
         cy.contains("Decision Step 1").click();
         cy.contains("Option 1").click();
@@ -185,6 +262,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -204,6 +285,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.get(".MuiAvatar-img").should("have.length", 2); //once in the header and once in the assignment
 
@@ -228,6 +313,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -241,6 +330,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.get("span.checkCircleAssignee").should("have.length", 1);
       cy.contains("Step 1").click();
@@ -258,6 +351,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -269,6 +366,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -282,6 +383,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.contains("Step 1").should(
         "have.css",
@@ -299,6 +404,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.contains("Step 1").should(
         "have.css",
@@ -319,6 +428,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -329,6 +442,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -341,6 +458,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.get(".MuiAvatar-img").should("have.length", 3);
       cy.contains("Step 1").click();
@@ -353,6 +474,10 @@ describe("tasks", () => {
       });
       cy.visit("/ssj");
       cy.contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
       cy.contains("Milestone A").click();
       cy.get(".MuiAvatar-img").should("have.length", 2);
       cy.contains("Step 1").click();
