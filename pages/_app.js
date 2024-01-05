@@ -10,8 +10,7 @@ import "nprogress/nprogress.css";
 import { H } from "highlight.run";
 import { ErrorBoundary } from "@highlight-run/react";
 
-import Header from "../components/Header";
-import Nav from "../components/Nav";
+import AppBar from "../components/AppBar";
 
 if (process.env.NODE_ENV === "production") {
   console.log("enabling highlight.io", process.env);
@@ -58,7 +57,7 @@ function MyApp({ Component, pageProps }) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <UserProvider>
-          <Header />
+          <AppBar />
           <Component {...pageProps} />
         </UserProvider>
       </ThemeProvider>
