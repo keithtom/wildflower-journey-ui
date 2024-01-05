@@ -1,9 +1,9 @@
 import { styled, css } from "@mui/material/styles";
-import { ListItem } from "@mui/material";
+import { ListItem, ListItemIcon, ListItemText } from "@mui/material";
 
 import { Typography, Grid, Icon, Link } from "./index";
 
-const NavLink = ({ to, icon, active, variant, label }) => {
+const NavLink = ({ to, icon, active, variant, label, ...props }) => {
   const CustomListItem = styled(ListItem)`
     padding-left: ${({ theme }) => theme.util.buffer}px;
     &:hover {
@@ -36,15 +36,53 @@ const NavLink = ({ to, icon, active, variant, label }) => {
 
   return (
     <Link href={to}>
-      <CustomListItem variant={variant}>
+      <CustomListItem variant={variant} {...props}>
         <Grid
+          container
+          // spacing={3}
+          alignItems="center"
+          ml={variant === "secondary" ? 12 : variant === "tertiary" ? 8 : 3}
+        >
+          <Grid item>
+            {icon && (
+              <ListItemIcon
+                sx={{
+                  minWidth: variant === "secondary" ? 24 : 40,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Icon
+                  size={variant === "secondary" && "small"}
+                  type={icon}
+                  variant={
+                    active ? "primary" : variant === "tertiary" && "transparent"
+                  }
+                />
+              </ListItemIcon>
+            )}
+          </Grid>
+          <Grid item>
+            <ListItemText sx={{ px: 0 }}>
+              <Typography
+                highlight={active}
+                bold={variant === "primary" || variant === "secondary"}
+                variant="bodyRegular"
+              >
+                {label}
+              </Typography>
+            </ListItemText>
+          </Grid>
+        </Grid>
+        {/* <Grid
           container
           spacing={3}
           alignItems="center"
           ml={variant === "secondary" ? 10 : variant === "tertiary" ? 10 : 0}
         >
           {icon && (
-            <Grid item>
+            // <Grid item>
+            <ListItemIcon>
               <Icon
                 size={variant === "secondary" && "small"}
                 type={icon}
@@ -52,7 +90,8 @@ const NavLink = ({ to, icon, active, variant, label }) => {
                   active ? "primary" : variant === "tertiary" && "transparent"
                 }
               />
-            </Grid>
+            </ListItemIcon>
+            // </Grid>
           )}
           <Grid item>
             <Typography
@@ -63,7 +102,7 @@ const NavLink = ({ to, icon, active, variant, label }) => {
               {label}
             </Typography>
           </Grid>
-        </Grid>
+        </Grid> */}
       </CustomListItem>
     </Link>
   );

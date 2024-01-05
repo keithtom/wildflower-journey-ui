@@ -6,6 +6,7 @@ import { default as NextLink } from "next/link";
 // NOTE: This is not included in storybook
 const CustomLink = styled(NextLink)`
   text-decoration: none;
+  color: ${({ theme }) => theme.color.primary.main};
 `;
 
 const Link = ({ children, ...props }) => {

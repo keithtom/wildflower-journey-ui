@@ -2,7 +2,7 @@ import { default as MaterialAppBar } from "@mui/material/AppBar";
 import { styled, css } from "@mui/material/styles";
 
 const CustomAppBar = styled(MaterialAppBar, {
-  shouldForwardProp: (prop) => prop !== "isAdmin",
+  shouldForwardProp: (prop) => prop !== "isAdmin" && prop !== "env",
 })`
   outline: 1px solid ${({ theme }) => theme.color.neutral.main};
   border: none;

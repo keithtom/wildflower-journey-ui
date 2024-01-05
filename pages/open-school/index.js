@@ -171,12 +171,8 @@ const OpenSchool = () => {
           <Stack spacing={3}>
             <Grid>
               <Chip
-                label={
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Icon type="loader" size="small" />
-                    <Typography>Future features</Typography>
-                  </Stack>
-                }
+                icon={<Icon type="loader" size="small" />}
+                label="Future features"
               />
             </Grid>
             <Typography variant="h3" bold>
