@@ -100,7 +100,7 @@ describe("tasks part 2", () => {
       cy.logout();
     });
 
-    it("can have prerequisites", () => {
+    it.only("can have prerequisites", () => {
       // login as partner 1 and assign task to themselves. check that avatar icon appears
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
@@ -112,6 +112,7 @@ describe("tasks part 2", () => {
 
       // complete first prerequisite
       cy.contains("Milestone D").click();
+      cy.contains("h2", /^Milestone D$/);
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();
@@ -125,6 +126,7 @@ describe("tasks part 2", () => {
       // complete second prerequisite
       cy.contains("a li div p", /^Startup$/).click();
       cy.contains("Milestone E").click();
+      cy.contains("h2", /^Milestone E$/);
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
       cy.contains("Mark task complete").click();

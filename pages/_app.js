@@ -10,6 +10,8 @@ import "nprogress/nprogress.css";
 import { H } from "highlight.run";
 import { ErrorBoundary } from "@highlight-run/react";
 
+import AppBar from "../components/AppBar";
+
 if (process.env.NODE_ENV === "production") {
   console.log("enabling highlight.io", process.env);
   H.init(process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID, {
@@ -55,6 +57,7 @@ function MyApp({ Component, pageProps }) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <UserProvider>
+          <AppBar />
           <Component {...pageProps} />
         </UserProvider>
       </ThemeProvider>

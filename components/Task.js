@@ -532,7 +532,7 @@ const DecisionDrawerActions = ({
               </Button>
             ) : (
               <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
-                <Typography light bold>
+                <Typography light bold variant="bodyRegular">
                   Add to my to do list
                 </Typography>
               </Button>
@@ -622,7 +622,7 @@ const TaskDrawerActions = ({
             </Button>
           ) : (
             <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
-              <Typography light bold>
+              <Typography light bold variant="bodyRegular">
                 Add to my to do list
               </Typography>
             </Button>
