@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import { styled, css } from "@mui/material/styles";
-import { AppBar, IconButton, ListItem } from "@mui/material";
+import { IconButton, ListItem } from "@mui/material";
 import Router from "next/router";
 import { useUserContext } from "../lib/useUserContext";
 import { clearLoggedInState } from "../lib/handleLogout";
@@ -19,34 +19,7 @@ import {
   Icon,
   NavLink,
 } from "./ui/index";
-
-const CustomAppBar = styled(AppBar)`
-  outline: 1px solid ${({ theme }) => theme.color.neutral.main};
-  border: none;
-  background: white;
-  margin: 0;
-  position: fixed;
-  height: ${({ theme }) => theme.util.appBarHeight}px;
-  z-index: 2;
-  padding: 0 ${({ theme }) => theme.util.buffer * 4}px;
-  justify-content: center;
-  display: flex;
-  ${(props) =>
-    props.isAdmin &&
-    css`
-      background: ${props.theme.color.neutral.dark};
-    `}
-  ${(props) =>
-    props.env === "dev" &&
-    css`
-      background: red;
-    `}
-  ${(props) =>
-    props.env === "STAGING" &&
-    css`
-      background: blue;
-    `}
-`;
+import AppBar from "./AppBar";
 
 const Header = ({ toggleNavOpen }) => {
   const router = useRouter();
@@ -65,7 +38,7 @@ const Header = ({ toggleNavOpen }) => {
   const adminView = isAdmin && router.asPath === "/admin/ssj" ? true : false;
 
   return (
-    <CustomAppBar env={process.env.APP_ENV} isAdmin={adminView}>
+    <AppBar env={process.env.APP_ENV} isAdmin={adminView}>
       <Grid
         container
         justifyContent={isLoggedIn ? "space-between" : "center"}
@@ -114,7 +87,7 @@ const Header = ({ toggleNavOpen }) => {
           </Grid>
         ) : null}
       </Grid>
-    </CustomAppBar>
+    </AppBar>
   );
 };
 

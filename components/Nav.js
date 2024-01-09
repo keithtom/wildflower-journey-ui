@@ -281,19 +281,9 @@ const OpenSchoolNavigation = () => {
         variant="secondary"
         to={`/open-school/admin-checklist`}
         active={router.pathname.includes("/open-school/admin-checklist")}
-        label={
-          <Stack direction="row" spacing={3} alignItems="center">
-            <Typography
-              variant="bodyRegular"
-              bold
-              highlight={router.pathname.includes(
-                "/open-school/admin-checklist"
-              )}
-            >
-              Admin Checklist
-            </Typography>
-            <Chip size="small" label="Q1 2024" />
-          </Stack>
+        label="Admin Checklist"
+        secondaryAction={
+          <Chip size="small" label="Q1 2024" variant="lightened" />
         }
         icon="loader"
       />

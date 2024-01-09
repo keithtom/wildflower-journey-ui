@@ -17,6 +17,7 @@
     "@emotion/react": "^11.7.1",
     "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.6.0",
+    "@highlight-run/next": "^7.3.1",
     "@highlight-run/react": "^3.0.0",
     "@mui/icons-material": "^5.4.1",
     "@mui/lab": "^5.0.0-alpha.127",
@@ -66,7 +67,7 @@
     "@storybook/react": "^6.4.9",
     "babel-loader": "^8.2.3",
     "babel-plugin-styled-components": "^2.0.2",
-    "cypress": "^12.12.0",
+    "cypress": "^13.6.2",
     "eslint": "7",
     "eslint-config-next": "12.0.3"
   }

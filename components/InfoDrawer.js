@@ -80,7 +80,7 @@ const InfoDrawer = ({
                 />
               </Grid>
               <Grid item>
-                <IconButton onClick={toggle}>
+                <IconButton onClick={toggle} id="info-drawer-close">
                   <Icon type="close" />
                 </IconButton>
               </Grid>

@@ -3,9 +3,9 @@ import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/router";
 import FormHelperText from "@mui/material/FormHelperText";
 import { useUserContext } from "../lib/useUserContext";
-import { setCookie } from "cookies-next";
 import authApi from "@api/auth";
 import { clearLoggedInState } from "@lib/handleLogout";
+import RedirectUser from "@lib/redirectUser";
 
 import { getScreenSize } from "../hooks/react-responsive";
 import {
@@ -18,65 +18,7 @@ import {
   PageContainer,
   Icon,
   Spinner,
-  IconButton,
 } from "@ui";
-
-const RedirectFunction = ({ router, personRoleList, personIsOnboarded }) => {
-  //extract individual roles to check with
-  const isEmergingTeacherLeader = personRoleList.includes(
-    "Emerging Teacher Leader"
-  );
-  const isTeacherLeader = personRoleList.includes("Teacher Leader");
-  const isOperationsGuide =
-    personRoleList.includes("Operations Guide") ||
-    personRoleList.includes("Ops Guide");
-
-  const isRegionalGrowthLead = personRoleList.includes("Regional Growth Lead");
-  const isFoundationPartner = personRoleList.includes("Foundation Parnter");
-  const isCharterStaff = personRoleList.includes("Charter Staff");
-  const isNoRoleInList = personRoleList.length === 0;
-
-  //redirect to given routes based on role
-  switch (true) {
-    case personIsOnboarded && isEmergingTeacherLeader:
-      router.push("/ssj");
-      break;
-
-    case personIsOnboarded && isTeacherLeader:
-      router.push("/open-school");
-      break;
-
-    case personIsOnboarded && isOperationsGuide:
-      router.push("/your-schools");
-      break;
-
-    case personIsOnboarded &&
-      (isRegionalGrowthLead ||
-        isFoundationPartner ||
-        isCharterStaff ||
-        isNoRoleInList):
-      router.push("/network");
-      break;
-
-    case !personIsOnboarded && isEmergingTeacherLeader:
-      router.push("/welcome/new-etl");
-      break;
-
-    case !personIsOnboarded &&
-      (isTeacherLeader ||
-        isOperationsGuide ||
-        isRegionalGrowthLead ||
-        isFoundationPartner ||
-        isCharterStaff ||
-        isNoRoleInList):
-      router.push("/welcome/existing-member");
-      break;
-
-    default:
-      router.push("/network");
-      break;
-  }
-};
 
 const Login = ({}) => {
   const { screenSize } = getScreenSize();
@@ -89,10 +31,10 @@ const Login = ({}) => {
   useEffect(() => {
     if (isLoggedIn) {
       setIsLoggingIn(true);
-      RedirectFunction({
+      RedirectUser({
         router: router,
-        personRoleList: currentUser?.personRoleList,
-        personIsOnboarded: currentUser?.personIsOnboarded,
+        roleList: currentUser?.personRoleList,
+        isOnboarded: currentUser?.personIsOnboarded,
       });
     }
   }, [isLoggedIn, currentUser]);
@@ -128,10 +70,10 @@ const Login = ({}) => {
           personIsOnboarded: personIsOnboarded,
         });
 
-        RedirectFunction({
+        RedirectUser({
           router: router,
-          personRoleList: personRoleList,
-          personIsOnboarded: personIsOnboarded,
+          roleList: personRoleList,
+          isOnboarded: personIsOnboarded,
         });
       });
       // Process successful login response
