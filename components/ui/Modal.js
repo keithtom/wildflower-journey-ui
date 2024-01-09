@@ -3,7 +3,9 @@ import { Card, Grid, Icon, Stack, IconButton, Typography, Box } from "./index";
 import { styled, css } from "@mui/material/styles";
 
 const CustomModal = styled(MaterialModal)``;
-const ModalCard = styled(Card)`
+const ModalCard = styled(Card, {
+  shouldForwardProp: (prop) => prop !== "fixedActions",
+})`
   position: absolute;
   top: 50%;
   left: 50%;

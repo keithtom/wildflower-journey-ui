@@ -17,18 +17,8 @@ const CategoryChip = ({ category, withIcon, ...props }) => {
 
   return (
     <Chip
-      label={
-        withIcon ? (
-          <Stack spacing={2} direction="row" alignItems="center">
-            <Icon type="category" size="small" />
-            <Typography noWrap variant="bodyMini" bold>
-              {category}
-            </Typography>
-          </Stack>
-        ) : (
-          category
-        )
-      }
+      icon={withIcon ? <Icon type="category" size="small" /> : null}
+      label={category}
       {...props}
       bgColor={categories[category]}
     />

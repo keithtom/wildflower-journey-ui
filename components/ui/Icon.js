@@ -64,7 +64,8 @@ const StyledIcon = styled("span", {
     prop !== "type" &&
     prop !== "filled" &&
     prop !== "hoverable" &&
-    prop !== "variant",
+    prop !== "variant" &&
+    prop !== "size",
 })`
   width: ${({ theme }) => theme.util.buffer * 6}px;
   height: ${({ theme }) => theme.util.buffer * 6}px;

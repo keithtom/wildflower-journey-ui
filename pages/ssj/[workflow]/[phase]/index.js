@@ -54,7 +54,7 @@ const PhasePage = ({
                 : phase === "startup" && startupHero
             }
           />
-          <Typography variant="h2" bold capitalize>
+          <Typography variant="h2" bold capitalize id={`${phase}-header`}>
             {phase}
           </Typography>
 

@@ -214,7 +214,7 @@ const SchoolCard = ({ name, location, team, openDate, workflowId }) => {
                     <Typography variant="bodyRegular">
                       {team &&
                         team.map((t, i) => (
-                          <span>
+                          <span key={i}>
                             {t.attributes.firstName} {t.attributes.lastName}{" "}
                             {i !== team.length - 1 ? "and " : null}
                           </span>
