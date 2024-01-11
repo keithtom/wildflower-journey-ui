@@ -84,12 +84,13 @@ const ConfirmYourDetails = ({}) => {
   }, [currentUser]);
 
   const onSubmit = (data) => {
+    const downcasedEmail = data.email.toLowerCase();
     peopleApi
       .update(currentUser.id, {
         person: {
           first_name: data.firstName,
           last_name: data.lastName,
-          email: data.email,
+          email: downcasedEmail,
           address_attributes: {
             city: data.city,
             state: data.state,
