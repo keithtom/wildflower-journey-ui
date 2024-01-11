@@ -52,30 +52,33 @@ const Login = ({}) => {
 
   const onSubmit = async (data) => {
     try {
-      await authApi.login(data.email, data.password).then(function (response) {
-        const userAttributes = response.data.data.attributes;
-        const personId = response.data.data.relationships.person.data.id;
-        const personRoleList = response?.data?.included?.find((a) => {
-          return a.id === personId;
-        })?.attributes?.roleList;
-        const personIsOnboarded = response?.data?.included?.find((a) => {
-          return a.id === personId;
-        })?.attributes?.isOnboarded;
+      const downcasedEmail = data.email.toLowerCase();
+      await authApi
+        .login(downcasedEmail, data.password)
+        .then(function (response) {
+          const userAttributes = response.data.data.attributes;
+          const personId = response.data.data.relationships.person.data.id;
+          const personRoleList = response?.data?.included?.find((a) => {
+            return a.id === personId;
+          })?.attributes?.roleList;
+          const personIsOnboarded = response?.data?.included?.find((a) => {
+            return a.id === personId;
+          })?.attributes?.isOnboarded;
 
-        setCurrentUser({
-          id: personId,
-          type: response.data.data.type,
-          attributes: userAttributes,
-          personRoleList: personRoleList,
-          personIsOnboarded: personIsOnboarded,
-        });
+          setCurrentUser({
+            id: personId,
+            type: response.data.data.type,
+            attributes: userAttributes,
+            personRoleList: personRoleList,
+            personIsOnboarded: personIsOnboarded,
+          });
 
-        RedirectUser({
-          router: router,
-          roleList: personRoleList,
-          isOnboarded: personIsOnboarded,
+          RedirectUser({
+            router: router,
+            roleList: personRoleList,
+            isOnboarded: personIsOnboarded,
+          });
         });
-      });
       // Process successful login response
     } catch (error) {
       // handle error
