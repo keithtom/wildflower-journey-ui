@@ -40,6 +40,9 @@ import {
 import CategoryChip from "../../../components/CategoryChip";
 import Resource from "../../../components/Resource";
 
+import useTeam from "../../../hooks/useTeam";
+import useUser from "../../../hooks/useUser";
+
 const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
@@ -81,6 +84,12 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
   const [openDate, setOpenDate] = useState();
   const [team, setTeam] = useState();
 
+  const token = getCookie("auth");
+
+  const { user } = useUser(token);
+  console.log({ user });
+  const teamId = user?.data.attributes.ssj.teamId;
+
   useEffect(() => {
     if (currentUser !== null) {
       const teamData = teamsApi.getTeam(currentUser?.attributes?.ssj?.teamId);
@@ -100,6 +109,9 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
         });
     }
   }, [currentUser]);
+  const { data: theTeamData } = useTeam(teamId);
+  console.log({ theTeamData });
+  console.log({ team });
 
   const partners =
     team?.relationships?.partners?.data?.length >= 1

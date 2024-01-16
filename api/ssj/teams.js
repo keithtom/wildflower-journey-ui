@@ -45,6 +45,16 @@ async function getTeam(id) {
   // if response good, great.  else.  error out?
 }
 
+export const showTeam = {
+  key: (teamId) => `/v1/ssj/teams/${teamId}`,
+  fetcher: (teamId) =>
+    teamsApi.get(`/${teamId}`, getAuthHeader()).then((res) => {
+      const data = res.data;
+      wildflowerApi.loadAllRelationshipsFromIncluded(data);
+      return data;
+    }),
+};
+
 // let data = {
 //   etl_people_params: [
 //     {

@@ -22,6 +22,8 @@ import processesApi from "@api/workflow/processes";
 import useAuth from "@lib/utils/useAuth";
 import { useUserContext } from "@lib/useUserContext";
 
+import useAssignedSteps from "../../../hooks/useAssignedSteps";
+
 const ToDoList = ({ steps, milestonesToDo }) => {
   const { currentUser, isOperationsGuide } = useUserContext();
   const [assignedSteps, setAssignedSteps] = useState([]);
@@ -36,6 +38,19 @@ const ToDoList = ({ steps, milestonesToDo }) => {
       setAssignedSteps(assignedSteps.filter((step) => step.id !== taskId));
     }, 1500);
   };
+
+  console.log("calling use assigned steps hook ---------------");
+  const {
+    data: assignedStepsData,
+    isLoading: assignedIsLoading,
+    isError: assignedIsError,
+  } = useAssignedSteps(workflow);
+
+  console.log({ assignedIsError });
+  console.log({ assignedIsLoading });
+  console.log({ assignedStepsData });
+
+  console.log({ steps });
 
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 

@@ -24,4 +24,10 @@ async function show(id, config) {
 
   return response;
 }
+export const showUser = {
+  key: (userId) => `/v1/users/${userId}`,
+  fetcher: (userId, config) =>
+    api.get(`/${userId}`, config).then((res) => res.data),
+};
+
 export default { show };
