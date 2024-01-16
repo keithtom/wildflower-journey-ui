@@ -1,5 +1,12 @@
+import wildflowerApi from "@api/base";
 import axios from "axios";
-import { setCookie } from "cookies-next";
+import jwt_decode from "jwt-decode";
+import { getCookie } from "cookies-next";
+
+function getAuthHeader() {
+  const token = getCookie("auth");
+  return { headers: { Authorization: token } };
+}
 
 const api = axios.create({
   baseURL: `${process.env.API_URL}/v1/users`,
@@ -26,8 +33,13 @@ async function show(id, config) {
 }
 export const showUser = {
   key: (userId) => `/v1/users/${userId}`,
-  fetcher: (userId, config) =>
-    api.get(`/${userId}`, config).then((res) => res.data),
+  fetcher: (userId) => {
+    return wildflowerApi
+      .handleErrors(api.get(`/${userId}`, getAuthHeader()))
+      .then((data) => {
+        return data;
+      });
+  },
 };
 
 export default { show };

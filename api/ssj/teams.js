@@ -48,11 +48,12 @@ async function getTeam(id) {
 export const showTeam = {
   key: (teamId) => `/v1/ssj/teams/${teamId}`,
   fetcher: (teamId) =>
-    teamsApi.get(`/${teamId}`, getAuthHeader()).then((res) => {
-      const data = res.data;
-      wildflowerApi.loadAllRelationshipsFromIncluded(data);
-      return data;
-    }),
+    wildflowerApi
+      .handleErrors(teamsApi.get(`/${teamId}`, getAuthHeader()))
+      .then((data) => {
+        wildflowerApi.loadAllRelationshipsFromIncluded(data);
+        return data;
+      }),
 };
 
 // let data = {

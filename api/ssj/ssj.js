@@ -1,6 +1,12 @@
 import wildflowerApi from "@api/base";
+import { getCookie } from "cookies-next";
 
 const workflowsApi = wildflowerApi.register("/v1/ssj/dashboard", {});
+
+function getAuthHeader() {
+  const token = getCookie("auth");
+  return { headers: { Authorization: token } };
+}
 
 // have one function that gets a data structure used for entire dashboard
 
@@ -34,6 +40,19 @@ async function progress({ workflowId, config = {} }) {
   }
   return response;
 }
+
+export const showProgress = {
+  key: (workflowId) => `/v1/ssj/dashboard/progress?workflow_id=${workflowId}`,
+  fetcher: (workflowId) => {
+    return wildflowerApi
+      .handleErrors(
+        workflowsApi.get(`/progress?workflow_id=${workflowId}`, getAuthHeader())
+      )
+      .then((data) => {
+        return data;
+      });
+  },
+};
 
 async function resources({ workflowId, config = {} }) {
   let response;

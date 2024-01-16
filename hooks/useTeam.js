@@ -1,11 +1,11 @@
 import useSWR from "swr";
 import { showTeam } from "@api/ssj/teams";
 
-const useTeam = (teamId, config) => {
+const useTeam = (teamId) => {
   const { data, error } = useSWR(teamId ? showTeam.key(teamId) : null, () =>
-    showTeam.fetcher(teamId, config)
+    showTeam.fetcher(teamId)
   );
-  return { data, isLoading: !error && !data, isError: error };
+  return { team: data, isLoading: !error && !data, isError: error };
 };
 
 export default useTeam;

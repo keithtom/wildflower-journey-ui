@@ -42,76 +42,74 @@ import Resource from "../../../components/Resource";
 
 import useTeam from "../../../hooks/useTeam";
 import useUser from "../../../hooks/useUser";
+import useSSJProgress from "../../../hooks/useSSJProgress";
 
 const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
+  const { currentUser } = useUserContext();
+  const router = useRouter();
+  const { workflow } = router.query;
+  //TODO: Get this data from the backend
+  const isFirstTimeUser = false;
+  const ssjIsPaused = false;
+
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
   const [addOpenDateModalOpen, setAddOpenDateModalOpen] = useState(false);
   const [submittedPartnerRequest, setSubmittedPartnerRequest] = useState();
-  const { currentUser } = useUserContext();
-
-  const router = useRouter();
-  const { workflow } = router.query;
-
-  //TODO: Get this data from the backend
-  const isFirstTimeUser = false;
-  const ssjIsPaused = false;
-
   const [firstTimeUserModalOpen, setFirstTimeUserModalOpen] =
     useState(isFirstTimeUser);
   const [userOnboardedPeers, setUserOnboardedPeers] = useState(
     !isFirstTimeUser
   );
+  const [userOnboardedWaysToWork, setUserOnboardedWaysToWork] = useState(
+    !isFirstTimeUser
+  );
+  const [userOnboardedprogress, setUserOnboardedProgress] = useState(
+    !isFirstTimeUser
+  );
+  const [openDate, setOpenDate] = useState();
+  // const [team, setTeam] = useState();
+
   const toggleOnboardingPeers = () => {
     setViewEtlsModalOpen(true);
     setUserOnboardedPeers(true);
   };
-  const [userOnboardedWaysToWork, setUserOnboardedWaysToWork] = useState(
-    !isFirstTimeUser
-  );
   const toggleOnboardingWaysToWork = () => {
     setUserOnboardedWaysToWork(true);
   };
-  const [userOnboardedprogress, setUserOnboardedProgress] = useState(
-    !isFirstTimeUser
-  );
   const toggleOnboardingProgress = () => {
-    // setUserOnboardedProgress(true);
     router.push(`/ssj/${workflow}/visioning`);
   };
 
-  const [openDate, setOpenDate] = useState();
-  const [team, setTeam] = useState();
-
-  const token = getCookie("auth");
-
-  const { user } = useUser(token);
-  console.log({ user });
+  const { user } = useUser();
   const teamId = user?.data.attributes.ssj.teamId;
+  const { team } = useTeam(teamId);
+  const { progress } = useSSJProgress(workflow);
 
-  useEffect(() => {
-    if (currentUser !== null) {
-      const teamData = teamsApi.getTeam(currentUser?.attributes?.ssj?.teamId);
-      teamData
-        .then(function (result) {
-          setTeam(result.data);
-          setSubmittedPartnerRequest(result.data?.attributes?.invitedPartner);
-          setOpenDate(result.data?.attributes?.expectedStartDate);
-        })
-        .catch(function (error) {
-          if (error?.response?.status === 401) {
-            clearLoggedInState({});
-            router.push("/login");
-          } else {
-            console.error(error);
-          }
-        });
-    }
-  }, [currentUser]);
-  const { data: theTeamData } = useTeam(teamId);
-  console.log({ theTeamData });
+  console.log({ user });
   console.log({ team });
+  console.log({ progress });
+
+  // useEffect(() => {
+  //   if (currentUser !== null) {
+  //     const teamData = teamsApi.getTeam(currentUser?.attributes?.ssj?.teamId);
+  //     teamData
+  //       .then(function (result) {
+  //         setTeam(result.data);
+  //         setSubmittedPartnerRequest(result.data?.attributes?.invitedPartner);
+  //         setOpenDate(result.data?.attributes?.expectedStartDate);
+  //       })
+  //       .catch(function (error) {
+  //         if (error?.response?.status === 401) {
+  //           clearLoggedInState({});
+  //           router.push("/login");
+  //         } else {
+  //           console.error(error);
+  //         }
+  //       });
+  //   }
+  // }, [currentUser]);
 
   const partners =
     team?.relationships?.partners?.data?.length >= 1
