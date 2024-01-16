@@ -43,11 +43,13 @@ import Resource from "../../../components/Resource";
 import useTeam from "../../../hooks/useTeam";
 import useUser from "../../../hooks/useUser";
 import useSSJProgress from "../../../hooks/useSSJProgress";
+import useMilestonesForPhase from "../../../hooks/useMilestonesForPhase";
 
-const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
+const SSJ = () => {
   const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow } = router.query;
+  const phase = getCookie("phase");
   //TODO: Get this data from the backend
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
@@ -82,41 +84,32 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
     router.push(`/ssj/${workflow}/visioning`);
   };
 
-  const { user } = useUser();
+  // Data
+  const { user, isLoading: userIsLoading } = useUser();
   const teamId = user?.data.attributes.ssj.teamId;
-  const { team } = useTeam(teamId);
-  const { progress } = useSSJProgress(workflow);
-
-  console.log({ user });
-  console.log({ team });
-  console.log({ progress });
-
-  // useEffect(() => {
-  //   if (currentUser !== null) {
-  //     const teamData = teamsApi.getTeam(currentUser?.attributes?.ssj?.teamId);
-  //     teamData
-  //       .then(function (result) {
-  //         setTeam(result.data);
-  //         setSubmittedPartnerRequest(result.data?.attributes?.invitedPartner);
-  //         setOpenDate(result.data?.attributes?.expectedStartDate);
-  //       })
-  //       .catch(function (error) {
-  //         if (error?.response?.status === 401) {
-  //           clearLoggedInState({});
-  //           router.push("/login");
-  //         } else {
-  //           console.error(error);
-  //         }
-  //       });
-  //   }
-  // }, [currentUser]);
+  const { team, isLoading: teamIsLoading } = useTeam(teamId);
+  // const { team, partners } = useTeam(teamId); <-- would be really cool to do something like this
+  const {
+    progress,
+    assignedSteps,
+    isLoading: ssjProgressIsLoading,
+  } = useSSJProgress(workflow);
+  const {
+    milestones,
+    milestonesToDo,
+    isLoading: milestonesForPhaseIsLoading,
+  } = useMilestonesForPhase(workflow, {
+    phase,
+    omit_include: true,
+  });
 
   const partners =
-    team?.relationships?.partners?.data?.length >= 1
-      ? team.relationships.partners.data.filter((t) => {
+    team?.data.relationships?.partners?.data?.length >= 1
+      ? team.data.relationships.partners.data.filter((t) => {
           return t.id !== currentUser?.id;
         })
       : null;
+
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
@@ -125,446 +118,475 @@ const SSJ = ({ dataProgress, milestonesToDo, numAssignedSteps }) => {
 
   useAuth("/login");
 
+  const isLoading =
+    userIsLoading ||
+    teamIsLoading ||
+    ssjProgressIsLoading ||
+    milestonesForPhaseIsLoading;
+
+  console.log({ user });
+  console.log({ team });
+  console.log({ progress });
+  console.log({ milestones });
+  console.log({ milestonesToDo });
   // console.log({ currentUser });
   // console.log({ team });
   // console.log({ partners });
 
   return (
     <>
-      <PageContainer isLoading={!currentUser}>
-        {ssjIsPaused ? (
-          <Grid container alignItems="center" justifyContent="center">
-            <Grid item xs={12} sm={6} md={5} lg={4}>
-              <Card>
-                <Stack spacing={6}>
-                  <Icon type="pause" variant="primary" size="large" />
-                  <Typography variant="h4" bold>
-                    Your School Startup Journey is paused
-                  </Typography>
-                  <Typography variant="bodyLarge" lightened>
-                    You won't receive any notifications, but you'll retain
-                    membership in the Wildflower directory. If we don't hear
-                    from you, we'll email you to check in.
-                  </Typography>
-                  <Card variant="lightened" size="small">
-                    <Typography>
-                      We'll reach out like you asked in 2 weeks
-                    </Typography>
-                  </Card>
-                  <Link href="/settings">
-                    <Button full variant="primary">
-                      <Typography>Resume your SSJ in Settings</Typography>
-                    </Button>
-                  </Link>
-                </Stack>
-              </Card>
-            </Grid>
-          </Grid>
-        ) : (
-          <Stack spacing={16}>
-            <Hero imageUrl={hero} />
-            <Grid
-              container
-              spacing={3}
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Grid item>
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <Badge
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    badgeContent={<EditBadge url="/welcome/add-profile-info" />}
-                  >
-                    <Avatar src={currentUser?.attributes.imageUrl} />
-                  </Badge>
-                  <Stack>
+      {isLoading ? (
+        <PageContainer isLoading />
+      ) : (
+        <PageContainer>
+          {ssjIsPaused ? (
+            <Grid container alignItems="center" justifyContent="center">
+              <Grid item xs={12} sm={6} md={5} lg={4}>
+                <Card>
+                  <Stack spacing={6}>
+                    <Icon type="pause" variant="primary" size="large" />
                     <Typography variant="h4" bold>
-                      Welcome, {currentUser?.attributes?.firstName}!
+                      Your School Startup Journey is paused
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
-                      School Startup Journey
+                      You won't receive any notifications, but you'll retain
+                      membership in the Wildflower directory. If we don't hear
+                      from you, we'll email you to check in.
                     </Typography>
-                  </Stack>
-                </Stack>
-              </Grid>
-              <Grid item>
-                <Grid container spacing={3} alignItems="center">
-                  <Grid item>
-                    <Card size="small">
-                      <Typography variant="bodyMini" bold lightened>
-                        PHASE
+                    <Card variant="lightened" size="small">
+                      <Typography>
+                        We'll reach out like you asked in 2 weeks
                       </Typography>
-                      <Typography variant="bodySmall">Visioning</Typography>
                     </Card>
-                  </Grid>
-                  {currentUser?.personAddress?.city &&
-                  currentUser?.personAddress?.state ? (
-                    <Grid item>
-                      <Card size="small">
-                        <Typography variant="bodyMini" bold lightened>
-                          LOCATION
-                        </Typography>
-                        <Typography variant="bodySmall">
-                          {currentUser?.personAddress?.city},{" "}
-                          {currentUser?.personAddress?.state}
-                        </Typography>
-                      </Card>
-                    </Grid>
-                  ) : null}
-                  <Grid item>
-                    {openDate ? (
-                      <Card
-                        size="small"
-                        hoverable
-                        onClick={() => setAddOpenDateModalOpen(true)}
-                      >
-                        <Stack direction="row" spacing={3} alignItems="center">
-                          <Stack>
-                            <Typography variant="bodyMini" bold lightened>
-                              OPEN DATE
-                            </Typography>
-                            <Typography variant="bodySmall">
-                              {moment(openDate).format("MMMM D, YYYY")}
-                            </Typography>
-                          </Stack>
-                          <IconButton>
-                            <Icon
-                              type="pencil"
-                              size="small"
-                              variant="lightened"
-                            />
-                          </IconButton>
-                        </Stack>
-                      </Card>
-                    ) : (
-                      <Button
-                        variant="lightened"
-                        onClick={() => setAddOpenDateModalOpen(true)}
-                      >
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Icon type="plus" />
-                          <Typography variant="bodyRegular">
-                            Add your anticipated open date
-                          </Typography>
-                        </Stack>
-                      </Button>
-                    )}
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            {numAssignedSteps > 0 ? (
-              <Card variant="primaryLightened">
-                <Grid container alignItems="center">
-                  <Grid item flex={1}>
-                    <Stack direction="row" spacing={2}>
-                      <Typography variant="h3" bold>
-                        You have{" "}
-                      </Typography>
-                      <Typography variant="h3" highlight bold>
-                        {numAssignedSteps} task
-                        {numAssignedSteps > 1 ? `s` : null}
-                      </Typography>{" "}
-                      <Typography variant="h3" bold>
-                        on your to do list
-                      </Typography>
-                    </Stack>
-                  </Grid>
-                  <Grid item>
-                    <Link href={`/ssj/${workflow}/to-do-list`}>
-                      <Button>
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Typography variant="bodyLarge" bold light>
-                            Start working
-                          </Typography>
-                          <Icon type="rightArrow" variant="light" />
-                        </Stack>
+                    <Link href="/settings">
+                      <Button full variant="primary">
+                        <Typography>Resume your SSJ in Settings</Typography>
                       </Button>
                     </Link>
-                  </Grid>
-                </Grid>
-              </Card>
-            ) : (
-              <Card noPadding>
-                <Grid container spacing={24}>
-                  <Grid item xs={12} sm={6}>
-                    <Card
-                      size="large"
-                      noBorder
-                      noRadius
-                      sx={{ height: "100%" }}
-                    >
-                      <Stack spacing={6}>
-                        <Icon type="calendarCheck" variant="primary" />
-                        <Typography variant="h3" bold>
-                          Looks like you don't have any tasks on your to do
-                          list!
-                        </Typography>
-                        <Typography variant="bodyLarge" lightened>
-                          To start, add a task from one of these milestones. You
-                          can take them on at your own pace, according to your
-                          interests, needs, and timeline.
-                        </Typography>
-                      </Stack>
-                    </Card>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Card
-                      noBorder
-                      variant="lightened"
-                      noRadius
-                      sx={{ height: "100%" }}
-                    >
-                      <Stack spacing={2}>
-                        {milestonesToDo.map((m, i) => (
-                          <Link
-                            href={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                            key={i}
-                          >
-                            <Card variant="light" size="small" hoverable>
-                              <Stack
-                                direction="row"
-                                alignItems="center"
-                                justifyContent="space-between"
-                              >
-                                <Typography variant="bodyRegular" bold>
-                                  {m.attributes.title}
-                                </Typography>
-                                <Button small variant="text">
-                                  Start here
-                                </Button>
-                              </Stack>
-                            </Card>
-                          </Link>
-                        ))}
-                      </Stack>
-                    </Card>
-                  </Grid>
-                </Grid>
-              </Card>
-            )}
-
-            <Stack spacing={3} sx={{ width: "100%" }}>
+                  </Stack>
+                </Card>
+              </Grid>
+            </Grid>
+          ) : (
+            <Stack spacing={16}>
+              <Hero imageUrl={hero} />
               <Grid
                 container
+                spacing={3}
                 justifyContent="space-between"
                 alignItems="center"
               >
                 <Grid item>
-                  <Typography variant="h3" bold>
-                    Your Startup Family
-                  </Typography>
+                  <Stack direction="row" spacing={3} alignItems="center">
+                    <Badge
+                      overlap="circular"
+                      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                      badgeContent={
+                        <EditBadge url="/welcome/add-profile-info" />
+                      }
+                    >
+                      <Avatar src={currentUser?.attributes.imageUrl} />
+                    </Badge>
+                    <Stack>
+                      <Typography variant="h4" bold>
+                        Welcome, {currentUser?.attributes?.firstName}!
+                      </Typography>
+                      <Typography variant="bodyLarge" lightened>
+                        School Startup Journey
+                      </Typography>
+                    </Stack>
+                  </Stack>
                 </Grid>
                 <Grid item>
-                  <IconButton onClick={() => setAddPartnerModalOpen(true)}>
-                    <Icon type="plus" variant="lightened" />
-                  </IconButton>
-                </Grid>
-              </Grid>
-              <Grid container spacing={3} alignItems="stretch">
-                {partners && partners.length ? (
-                  partners.map((p, i) => (
-                    <Grid item xs={12} sm={4} key={i}>
-                      <UserCard
-                        key={p.id}
-                        firstName={p.attributes.firstName}
-                        lastName={p.attributes.lastName}
-                        email={p.attributes.email}
-                        phone={p.attributes.phone}
-                        role="Partner"
-                      />
+                  <Grid container spacing={3} alignItems="center">
+                    <Grid item>
+                      <Card size="small">
+                        <Typography variant="bodyMini" bold lightened>
+                          PHASE
+                        </Typography>
+                        <Typography variant="bodySmall">Visioning</Typography>
+                      </Card>
                     </Grid>
-                  ))
-                ) : (
-                  <Grid item xs={12} sm={4}>
-                    <AddPartnerCard
-                      submittedPartnerRequest={submittedPartnerRequest}
-                      onClick={() => setAddPartnerModalOpen(true)}
-                    />
-                  </Grid>
-                )}
-                {opsGuide ? (
-                  <Grid item xs={12} sm={4}>
-                    <UserCard
-                      firstName={opsGuide?.firstName}
-                      lastName={opsGuide?.lastName}
-                      email={opsGuide?.email}
-                      phone={opsGuide?.phone}
-                      profileImage={opsGuide?.imageUrl}
-                      role="Operations Guide"
-                    />
-                  </Grid>
-                ) : null}
-                {regionalGrowthLead ? (
-                  <Grid item xs={12} sm={4}>
-                    <UserCard
-                      firstName={regionalGrowthLead?.firstName}
-                      lastName={regionalGrowthLead?.lastName}
-                      email={regionalGrowthLead?.email}
-                      phone={regionalGrowthLead?.phone}
-                      profileImage={regionalGrowthLead?.imageUrl}
-                      role="Regional Growth Lead"
-                    />
-                  </Grid>
-                ) : null}
-              </Grid>
-            </Stack>
-
-            {userOnboardedprogress ? (
-              <Stack spacing={6}>
-                <Typography variant="h3" bold>
-                  Your Progress
-                </Typography>
-                <Stack direction="row" spacing={6}>
-                  <Typography
-                    variant="bodyLarge"
-                    bold
-                    hoverable
-                    lightened={!viewPhaseProgress}
-                    onClick={() => setViewPhaseProgress(true)}
-                  >
-                    Phases
-                  </Typography>
-                  <Typography
-                    variant="bodyLarge"
-                    bold
-                    hoverable
-                    lightened={viewPhaseProgress}
-                    onClick={() => setViewPhaseProgress(false)}
-                  >
-                    Categories
-                  </Typography>
-                </Stack>
-
-                {viewPhaseProgress ? (
-                  <Grid container spacing={3}>
-                    {dataProgress.by_phase.map((p, i) => (
-                      <Grid item xs={12} sm={4} key={i}>
-                        <PhaseProgressCard
-                          phase={p.name}
-                          link={`/ssj/${workflow}/${p.name}`}
-                          processes={p.statuses}
-                        />
+                    {currentUser?.personAddress?.city &&
+                    currentUser?.personAddress?.state ? (
+                      <Grid item>
+                        <Card size="small">
+                          <Typography variant="bodyMini" bold lightened>
+                            LOCATION
+                          </Typography>
+                          <Typography variant="bodySmall">
+                            {currentUser?.personAddress?.city},{" "}
+                            {currentUser?.personAddress?.state}
+                          </Typography>
+                        </Card>
                       </Grid>
-                    ))}
-                  </Grid>
-                ) : (
-                  <Grid container spacing={3} alignItems="stretch">
-                    {dataProgress.by_category.map((c, i) => (
-                      <Grid item xs={12} sm={4}>
-                        <Link href={`/ssj/${workflow}/milestones`}>
-                          <Card
-                            key={i}
-                            style={{ height: "100%" }}
-                            hoverable
-                            variant="lightened"
+                    ) : null}
+                    <Grid item>
+                      {openDate ? (
+                        <Card
+                          size="small"
+                          hoverable
+                          onClick={() => setAddOpenDateModalOpen(true)}
+                        >
+                          <Stack
+                            direction="row"
+                            spacing={3}
+                            alignItems="center"
                           >
-                            <Stack spacing={6}>
-                              <Grid container>
-                                <Grid item>
-                                  <CategoryChip
-                                    category={c.name}
-                                    size="large"
-                                  />
-                                </Grid>
-                              </Grid>
-                              <ProgressBar processes={c.statuses} />
+                            <Stack>
+                              <Typography variant="bodyMini" bold lightened>
+                                OPEN DATE
+                              </Typography>
+                              <Typography variant="bodySmall">
+                                {moment(openDate).format("MMMM D, YYYY")}
+                              </Typography>
                             </Stack>
-                          </Card>
-                        </Link>
-                      </Grid>
-                    ))}
-                  </Grid>
-                )}
-              </Stack>
-            ) : (
-              <OnboardingCard
-                icon="category"
-                title="Your progress"
-                description="The Wildflower School Startup Journey is organized into 3 phases: Visioning, Planning, and Startup."
-                action='Start viewing whats next in the "Visioning" phase'
-                ctaText="View visioning"
-                img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
-                setUnlocked={toggleOnboardingProgress}
-              />
-            )}
-
-            {userOnboardedWaysToWork ? (
-              <Stack spacing={6}>
-                <Typography variant="h3" bold>
-                  Ways to work together
-                </Typography>
-                <Grid container spacing={3}>
-                  {waysToWorkTogether.map((w, i) => (
-                    <Grid item xs={12} sm={4} alignItems="stretch" key={i}>
-                      <WaysToWorkCard waysToWork={w} />
+                            <IconButton>
+                              <Icon
+                                type="pencil"
+                                size="small"
+                                variant="lightened"
+                              />
+                            </IconButton>
+                          </Stack>
+                        </Card>
+                      ) : (
+                        <Button
+                          variant="lightened"
+                          onClick={() => setAddOpenDateModalOpen(true)}
+                        >
+                          <Stack
+                            direction="row"
+                            spacing={2}
+                            alignItems="center"
+                          >
+                            <Icon type="plus" />
+                            <Typography variant="bodyRegular">
+                              Add your anticipated open date
+                            </Typography>
+                          </Stack>
+                        </Button>
+                      )}
                     </Grid>
-                  ))}
+                  </Grid>
                 </Grid>
-              </Stack>
-            ) : (
-              <OnboardingCard
-                icon="conversation"
-                title="Ways to work together"
-                description="Access resources and trainings to start improving yourself, working with your team, and engaging your community."
-                action="Start by exploring resources"
-                ctaText="Explore resources"
-                img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
-                setUnlocked={toggleOnboardingWaysToWork}
-              />
-            )}
-            {userOnboardedPeers ? (
-              <Card variant="lightened" size="large">
+              </Grid>
+
+              {assignedSteps > 0 ? (
+                <Card variant="primaryLightened">
+                  <Grid container alignItems="center">
+                    <Grid item flex={1}>
+                      <Stack direction="row" spacing={2}>
+                        <Typography variant="h3" bold>
+                          You have{" "}
+                        </Typography>
+                        <Typography variant="h3" highlight bold>
+                          {assignedSteps} task
+                          {assignedSteps > 1 ? `s` : null}
+                        </Typography>{" "}
+                        <Typography variant="h3" bold>
+                          on your to do list
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid item>
+                      <Link href={`/ssj/${workflow}/to-do-list`}>
+                        <Button>
+                          <Stack
+                            direction="row"
+                            spacing={2}
+                            alignItems="center"
+                          >
+                            <Typography variant="bodyLarge" bold light>
+                              Start working
+                            </Typography>
+                            <Icon type="rightArrow" variant="light" />
+                          </Stack>
+                        </Button>
+                      </Link>
+                    </Grid>
+                  </Grid>
+                </Card>
+              ) : (
+                <Card noPadding>
+                  <Grid container spacing={24}>
+                    <Grid item xs={12} sm={6}>
+                      <Card
+                        size="large"
+                        noBorder
+                        noRadius
+                        sx={{ height: "100%" }}
+                      >
+                        <Stack spacing={6}>
+                          <Icon type="calendarCheck" variant="primary" />
+                          <Typography variant="h3" bold>
+                            Looks like you don't have any tasks on your to do
+                            list!
+                          </Typography>
+                          <Typography variant="bodyLarge" lightened>
+                            To start, add a task from one of these milestones.
+                            You can take them on at your own pace, according to
+                            your interests, needs, and timeline.
+                          </Typography>
+                        </Stack>
+                      </Card>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Card
+                        noBorder
+                        variant="lightened"
+                        noRadius
+                        sx={{ height: "100%" }}
+                      >
+                        <Stack spacing={2}>
+                          {milestonesToDo.map((m, i) => (
+                            <Link
+                              href={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                              key={i}
+                            >
+                              <Card variant="light" size="small" hoverable>
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  justifyContent="space-between"
+                                >
+                                  <Typography variant="bodyRegular" bold>
+                                    {m.attributes.title}
+                                  </Typography>
+                                  <Button small variant="text">
+                                    Start here
+                                  </Button>
+                                </Stack>
+                              </Card>
+                            </Link>
+                          ))}
+                        </Stack>
+                      </Card>
+                    </Grid>
+                  </Grid>
+                </Card>
+              )}
+
+              <Stack spacing={3} sx={{ width: "100%" }}>
                 <Grid
                   container
                   justifyContent="space-between"
                   alignItems="center"
-                  spacing={6}
                 >
                   <Grid item>
-                    <Stack>
-                      <Typography variant="h3" bold>
-                        There are {FakeETLs.length} other Emerging Teacher
-                        Leaders
-                      </Typography>
-                      <Typography variant="bodyRegular" lightened>
-                        Get to know a growing number of Emerging Teacher Leaders
-                        in the journey
-                      </Typography>
-                    </Stack>
+                    <Typography variant="h3" bold>
+                      Your Startup Family
+                    </Typography>
                   </Grid>
                   <Grid item>
-                    <Stack direction="row" spacing={6}>
-                      {/* <AvatarGroup>
+                    <IconButton onClick={() => setAddPartnerModalOpen(true)}>
+                      <Icon type="plus" variant="lightened" />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={3} alignItems="stretch">
+                  {partners && partners.length ? (
+                    partners.map((p, i) => (
+                      <Grid item xs={12} sm={4} key={i}>
+                        <UserCard
+                          key={p.id}
+                          firstName={p.attributes.firstName}
+                          lastName={p.attributes.lastName}
+                          email={p.attributes.email}
+                          phone={p.attributes.phone}
+                          role="Partner"
+                        />
+                      </Grid>
+                    ))
+                  ) : (
+                    <Grid item xs={12} sm={4}>
+                      <AddPartnerCard
+                        submittedPartnerRequest={submittedPartnerRequest}
+                        onClick={() => setAddPartnerModalOpen(true)}
+                      />
+                    </Grid>
+                  )}
+                  {opsGuide ? (
+                    <Grid item xs={12} sm={4}>
+                      <UserCard
+                        firstName={opsGuide?.firstName}
+                        lastName={opsGuide?.lastName}
+                        email={opsGuide?.email}
+                        phone={opsGuide?.phone}
+                        profileImage={opsGuide?.imageUrl}
+                        role="Operations Guide"
+                      />
+                    </Grid>
+                  ) : null}
+                  {regionalGrowthLead ? (
+                    <Grid item xs={12} sm={4}>
+                      <UserCard
+                        firstName={regionalGrowthLead?.firstName}
+                        lastName={regionalGrowthLead?.lastName}
+                        email={regionalGrowthLead?.email}
+                        phone={regionalGrowthLead?.phone}
+                        profileImage={regionalGrowthLead?.imageUrl}
+                        role="Regional Growth Lead"
+                      />
+                    </Grid>
+                  ) : null}
+                </Grid>
+              </Stack>
+
+              {userOnboardedprogress ? (
+                <Stack spacing={6}>
+                  <Typography variant="h3" bold>
+                    Your Progress
+                  </Typography>
+                  <Stack direction="row" spacing={6}>
+                    <Typography
+                      variant="bodyLarge"
+                      bold
+                      hoverable
+                      lightened={!viewPhaseProgress}
+                      onClick={() => setViewPhaseProgress(true)}
+                    >
+                      Phases
+                    </Typography>
+                    <Typography
+                      variant="bodyLarge"
+                      bold
+                      hoverable
+                      lightened={viewPhaseProgress}
+                      onClick={() => setViewPhaseProgress(false)}
+                    >
+                      Categories
+                    </Typography>
+                  </Stack>
+
+                  {viewPhaseProgress ? (
+                    <Grid container spacing={3}>
+                      {progress.by_phase.map((p, i) => (
+                        <Grid item xs={12} sm={4} key={i}>
+                          <PhaseProgressCard
+                            phase={p.name}
+                            link={`/ssj/${workflow}/${p.name}`}
+                            processes={p.statuses}
+                          />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  ) : (
+                    <Grid container spacing={3} alignItems="stretch">
+                      {progress.by_category.map((c, i) => (
+                        <Grid item xs={12} sm={4}>
+                          <Link href={`/ssj/${workflow}/milestones`}>
+                            <Card
+                              key={i}
+                              style={{ height: "100%" }}
+                              hoverable
+                              variant="lightened"
+                            >
+                              <Stack spacing={6}>
+                                <Grid container>
+                                  <Grid item>
+                                    <CategoryChip
+                                      category={c.name}
+                                      size="small"
+                                    />
+                                  </Grid>
+                                </Grid>
+                                <ProgressBar processes={c.statuses} />
+                              </Stack>
+                            </Card>
+                          </Link>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  )}
+                </Stack>
+              ) : (
+                <OnboardingCard
+                  icon="category"
+                  title="Your progress"
+                  description="The Wildflower School Startup Journey is organized into 3 phases: Visioning, Planning, and Startup."
+                  action='Start viewing whats next in the "Visioning" phase'
+                  ctaText="View visioning"
+                  img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
+                  setUnlocked={toggleOnboardingProgress}
+                />
+              )}
+
+              {userOnboardedWaysToWork ? (
+                <Stack spacing={6}>
+                  <Typography variant="h3" bold>
+                    Ways to work together
+                  </Typography>
+                  <Grid container spacing={3}>
+                    {waysToWorkTogether.map((w, i) => (
+                      <Grid item xs={12} sm={4} alignItems="stretch" key={i}>
+                        <WaysToWorkCard waysToWork={w} />
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Stack>
+              ) : (
+                <OnboardingCard
+                  icon="conversation"
+                  title="Ways to work together"
+                  description="Access resources and trainings to start improving yourself, working with your team, and engaging your community."
+                  action="Start by exploring resources"
+                  ctaText="Explore resources"
+                  img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
+                  setUnlocked={toggleOnboardingWaysToWork}
+                />
+              )}
+              {userOnboardedPeers ? (
+                <Card variant="lightened" size="large">
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                    spacing={6}
+                  >
+                    <Grid item>
+                      <Stack>
+                        <Typography variant="h3" bold>
+                          There are {FakeETLs.length} other Emerging Teacher
+                          Leaders
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          Get to know a growing number of Emerging Teacher
+                          Leaders in the journey
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid item>
+                      <Stack direction="row" spacing={6}>
+                        {/* <AvatarGroup>
                         {FakeETLs.slice(0, 4).map((f, i) => (
                           <Avatar src={f.attributes.profileImage} key={i} />
                         ))}
                       </AvatarGroup> */}
-                      <Button onClick={() => setViewEtlsModalOpen(true)}>
-                        <Typography variant="h4" bold light>
-                          Meet your peers
-                        </Typography>
-                      </Button>
-                    </Stack>
+                        <Button onClick={() => setViewEtlsModalOpen(true)}>
+                          <Typography variant="h4" bold light>
+                            Meet your peers
+                          </Typography>
+                        </Button>
+                      </Stack>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </Card>
-            ) : (
-              <OnboardingCard
-                icon="message"
-                title="Meet your peers"
-                description="You're not alone! There are more than 20 other Emerging Teacher Leaders currently working on their own journeys."
-                action="Start by taking a peek at who else is here"
-                ctaText="Meet others"
-                img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
-                setUnlocked={toggleOnboardingPeers}
-              />
-            )}
-          </Stack>
-        )}
-      </PageContainer>
+                </Card>
+              ) : (
+                <OnboardingCard
+                  icon="message"
+                  title="Meet your peers"
+                  description="You're not alone! There are more than 20 other Emerging Teacher Leaders currently working on their own journeys."
+                  action="Start by taking a peek at who else is here"
+                  ctaText="Meet others"
+                  img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
+                  setUnlocked={toggleOnboardingPeers}
+                />
+              )}
+            </Stack>
+          )}
+        </PageContainer>
+      )}
 
       <FirstTimeUserModal
         toggle={() => setFirstTimeUserModalOpen(!firstTimeUserModalOpen)}
@@ -1411,64 +1433,3 @@ const waysToWorkTogether = [
     ],
   },
 ];
-
-export async function getServerSideProps({ query, req, res }) {
-  const config = getAuthHeader({ req, res });
-  if (!config) {
-    console.log("no token found, redirecting to login");
-    return redirectLoginProps();
-  }
-  const workflowId = query.workflow;
-  if (!workflowId) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/network",
-      },
-    };
-  }
-
-  // turn this in to a catch all api for the ssj/dashboard
-  let responseProgress;
-  try {
-    responseProgress = await ssjApi.progress({ workflowId, config });
-  } catch (error) {
-    if (error?.response?.status === 401) {
-      clearLoggedInState({ req, res });
-      return redirectLoginProps();
-    } else {
-      console.error(error);
-    }
-  }
-  const dataProgress = await responseProgress.data;
-
-  // want to know how many assigned tasks there are.
-  var numAssignedSteps = dataProgress.assigned_steps;
-
-  // suggests potential milestones to start if no tasks assigned.
-  const milestonesToDo = [];
-  if (numAssignedSteps == 0) {
-    const phase = getCookie("phase", { req, res }); // this should be your teams current phase?
-    // processes/index (phase) I'm viewing this as a scoping?  but really its a phase show is another way of thinking about it.
-    const response = await processesApi.index({
-      workflowId,
-      params: { phase, omit_include: true },
-      config,
-    });
-    const data = response.data;
-
-    data.data.forEach((milestone) => {
-      if (milestone.attributes.status == "to do") {
-        milestonesToDo.push(milestone);
-      }
-    });
-  }
-
-  return {
-    props: {
-      milestonesToDo,
-      dataProgress,
-      numAssignedSteps,
-    },
-  };
-}

@@ -1,5 +1,11 @@
 import wildflowerApi from "@api/base";
 import stepsApi from "@api/workflow/steps";
+import { getCookie } from "cookies-next";
+
+function getAuthHeader() {
+  const token = getCookie("auth");
+  return { headers: { Authorization: token } };
+}
 
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 
@@ -25,6 +31,35 @@ async function index({ workflowId, params, config = {} }) {
   }
   return response;
 }
+
+export const showMilestonesForPhase = {
+  key: (workflowId, params) => {
+    let url = `/workflows/${workflowId}/processes`;
+    if (params !== undefined) {
+      url += `?`;
+      const paramNames = Object.keys(params);
+      paramNames.forEach((param, index) => {
+        if (index != 0) {
+          url += `&`;
+        }
+        url += `${param}=${params[param]}`;
+      });
+    }
+    return url;
+  },
+  fetcher: (workflowId, params, config = {}) => {
+    return wildflowerApi
+      .handleErrors(
+        workflowsApi.get(
+          showMilestonesForPhase.key(workflowId, params),
+          getAuthHeader()
+        )
+      )
+      .then((data) => {
+        return data;
+      });
+  },
+};
 
 // look at an individual process/milestone
 async function show(id, config = {}) {
