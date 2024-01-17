@@ -37,13 +37,13 @@ import {
   TextField,
   Link,
 } from "@ui";
-import CategoryChip from "../../../components/CategoryChip";
-import Resource from "../../../components/Resource";
+import CategoryChip from "@components/CategoryChip";
+import Resource from "@components/Resource";
 
-import useTeam from "../../../hooks/useTeam";
-import useUser from "../../../hooks/useUser";
-import useSSJProgress from "../../../hooks/useSSJProgress";
-import useMilestonesForPhase from "../../../hooks/useMilestonesForPhase";
+import useTeam from "@hooks/useTeam";
+import useUser from "@hooks/useUser";
+import useSSJProgress from "@hooks/useSSJProgress";
+import useMilestonesForPhase from "@hooks/useMilestonesForPhase";
 
 const SSJ = () => {
   const { currentUser } = useUserContext();

@@ -47,7 +47,7 @@ export const showMilestonesForPhase = {
     }
     return url;
   },
-  fetcher: (workflowId, params, config = {}) => {
+  fetcher: (workflowId, params) => {
     return wildflowerApi
       .handleErrors(
         workflowsApi.get(

@@ -6,7 +6,13 @@ const useSSJProgress = (workflowId) => {
     workflowId ? showProgress.key(workflowId) : null,
     () => showProgress.fetcher(workflowId)
   );
-  return { progress: data, isLoading: !error && !data, isError: error };
+
+  return {
+    assignedSteps: data?.assigned_steps,
+    progress: data,
+    isLoading: !error && !data,
+    isError: error,
+  };
 };
 
 export default useSSJProgress;
