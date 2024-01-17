@@ -14,7 +14,7 @@ import Hero from "@components/Hero";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
-import useMilestonesForPhase from "@hooks/useMilestonesForPhase";
+import useMilestones from "@hooks/useMilestones";
 
 const Milestones = ({}) => {
   const hero = "/assets/images/ssj/wildflowerCollection.jpg";
@@ -24,10 +24,6 @@ const Milestones = ({}) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
   const [showMilestonesByPhase, setShowMilestonesByPhase] = useState(false);
-
-  //Data
-  const { isLoading, milestonesByCategory, milestonesByPhase } =
-    useMilestonesForPhase(workflow, phase);
 
   const handleShowMilestonesByCategory = () => {
     setShowMilestonesByCategory(true);
@@ -39,11 +35,6 @@ const Milestones = ({}) => {
   };
 
   useAuth("/login");
-
-  // console.log({ milestones });
-  // console.log({ milestonesByCategory });
-  // console.log({ milestonesByPhase });
-  // console.log({ isLoading });
 
   return (
     <PageContainer>
@@ -79,78 +70,10 @@ const Milestones = ({}) => {
           </Grid>
         </Stack>
 
-        {isLoading ? (
-          <Stack spacing={6}>
-            {Array.from({ length: 12 }, (_, i) => (
-              <Card key={i}>
-                <Stack spacing={6}>
-                  <Skeleton width={240} height={48} />
-                  <Stack spacing={3}>
-                    {Array.from({ length: 16 }, (_, j) => (
-                      <Skeleton key={j} height={64} m={0} variant="rounded" />
-                    ))}
-                  </Stack>
-                </Stack>
-              </Card>
-            ))}
-          </Stack>
-        ) : showMilestonesByCategory ? (
-          milestonesByCategory.map((a, i) =>
-            a.milestones.length ? (
-              <Card key={i}>
-                <Stack spacing={6}>
-                  <Stack direction="row" spacing={6} alignItems="center">
-                    <CategoryChip category={a.category} size="large" />
-                    <Typography variant="h4" lightened>
-                      {a.milestones.length}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={3}>
-                    {a.milestones.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                        key={i}
-                        status={m.attributes.status}
-                        description={m.attributes.description}
-                        categories={m.attributes.categories}
-                        hideCategoryChip
-                        phase={m.attributes.phase}
-                        title={m.attributes.title}
-                        stepCount={m.attributes.stepsCount}
-                      />
-                    ))}
-                  </Stack>
-                </Stack>
-              </Card>
-            ) : null
-          )
+        {showMilestonesByCategory ? (
+          <MilestonesByCategory workflow={workflow} />
         ) : (
-          showMilestonesByPhase &&
-          milestonesByPhase.map((m, i) => (
-            <Card key={i}>
-              <Stack spacing={6}>
-                <Stack direction="row" spacing={6} alignItems="center">
-                  <PhaseChip phase={m.phase} size="large" />
-                  <Typography variant="h4" lightened>
-                    {m.milestones.length}
-                  </Typography>
-                </Stack>
-                <Stack spacing={3}>
-                  {m.milestones.map((m, i) => (
-                    <Milestone
-                      link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                      key={i}
-                      status={m.attributes.status}
-                      description={m.attributes.description}
-                      categories={m.attributes.categories}
-                      title={m.attributes.title}
-                      stepCount={m.attributes.stepsCount}
-                    />
-                  ))}
-                </Stack>
-              </Stack>
-            </Card>
-          ))
+          showMilestonesByPhase && <MilestonesByPhase workflow={workflow} />
         )}
       </Stack>
     </PageContainer>
@@ -158,3 +81,98 @@ const Milestones = ({}) => {
 };
 
 export default Milestones;
+
+const MilestonesByCategory = ({ workflow }) => {
+  const { isLoading, milestonesByCategory } = useMilestones(workflow);
+  return isLoading ? (
+    <Stack spacing={6}>
+      {Array.from({ length: 12 }, (_, i) => (
+        <Card key={i}>
+          <Stack spacing={6}>
+            <Skeleton width={240} height={48} />
+            <Stack spacing={3}>
+              {Array.from({ length: 16 }, (_, j) => (
+                <Skeleton key={j} height={64} m={0} variant="rounded" />
+              ))}
+            </Stack>
+          </Stack>
+        </Card>
+      ))}
+    </Stack>
+  ) : (
+    milestonesByCategory.map((a, i) =>
+      a.milestones.length ? (
+        <Card key={i}>
+          <Stack spacing={6}>
+            <Stack direction="row" spacing={6} alignItems="center">
+              <CategoryChip category={a.category} size="large" />
+              <Typography variant="h4" lightened>
+                {a.milestones.length}
+              </Typography>
+            </Stack>
+            <Stack spacing={3}>
+              {a.milestones.map((m, i) => (
+                <Milestone
+                  link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                  key={i}
+                  status={m.attributes.status}
+                  description={m.attributes.description}
+                  categories={m.attributes.categories}
+                  hideCategoryChip
+                  phase={m.attributes.phase}
+                  title={m.attributes.title}
+                  stepCount={m.attributes.stepsCount}
+                />
+              ))}
+            </Stack>
+          </Stack>
+        </Card>
+      ) : null
+    )
+  );
+};
+const MilestonesByPhase = ({ workflow }) => {
+  const { isLoading, milestonesByPhase } = useMilestones(workflow);
+  return isLoading ? (
+    <Stack spacing={6}>
+      {Array.from({ length: 12 }, (_, i) => (
+        <Card key={i}>
+          <Stack spacing={6}>
+            <Skeleton width={240} height={48} />
+            <Stack spacing={3}>
+              {Array.from({ length: 16 }, (_, j) => (
+                <Skeleton key={j} height={64} m={0} variant="rounded" />
+              ))}
+            </Stack>
+          </Stack>
+        </Card>
+      ))}
+    </Stack>
+  ) : (
+    milestonesByPhase.map((m, i) => (
+      <Card key={i}>
+        <Stack spacing={6}>
+          <Stack direction="row" spacing={6} alignItems="center">
+            <PhaseChip phase={m.phase} size="large" />
+            <Typography variant="h4" lightened>
+              {m.milestones.length}
+            </Typography>
+          </Stack>
+          <Stack spacing={3}>
+            {m.milestones.map((m, i) => (
+              <Milestone
+                link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                key={i}
+                status={m.attributes.status}
+                description={m.attributes.description}
+                categories={m.attributes.categories}
+                title={m.attributes.title}
+                stepCount={m.attributes.stepsCount}
+              />
+            ))}
+          </Stack>
+        </Stack>
+      </Card>
+    ))
+  );
+};

@@ -1,15 +1,22 @@
 import useSWR from "swr";
-import { showMilestonesForPhase } from "@api/workflow/processes";
+import { showMilestones } from "@api/workflow/processes";
 
-const useMilestonesForPhase = (workflowId, params) => {
+const useMilestones = (workflowId, params) => {
+  //Fetch the data using SWR
   const { data, error } = useSWR(
-    workflowId ? showMilestonesForPhase.key(workflowId, params) : null,
-    () => showMilestonesForPhase.fetcher(workflowId, params)
+    workflowId ? showMilestones.key(workflowId, params) : null,
+    () => showMilestones.fetcher(workflowId, params)
   );
 
-  const milestonesToDo = [];
+  // Initialize data forms
+  let milestonesToDo = null;
+  let milestonesByCategory = null;
+  let milestonesByPhase = null;
+  let milestonesByCurrentPhase = null;
 
+  // Transform the data into what is needed
   if (data && data.data) {
+    milestonesToDo = [];
     data.data.forEach((milestone) => {
       if (milestone.attributes.status === "to do") {
         milestonesToDo.push(milestone);
@@ -17,9 +24,8 @@ const useMilestonesForPhase = (workflowId, params) => {
     });
   }
 
-  const milestonesByCategory = [];
-
   if (data && data.data) {
+    milestonesByCategory = [];
     data.data.forEach((milestone) => {
       const categories = milestone.attributes.categories;
       if (categories && categories.length > 0) {
@@ -37,9 +43,8 @@ const useMilestonesForPhase = (workflowId, params) => {
     });
   }
 
-  const milestonesByPhase = [];
-
   if (data && data.data) {
+    milestonesByPhase = [];
     data.data.forEach((milestone) => {
       const phase = milestone.attributes.phase;
       if (phase) {
@@ -59,15 +64,36 @@ const useMilestonesForPhase = (workflowId, params) => {
     });
   }
 
+  if (data && data.data) {
+    milestonesByCurrentPhase = {};
+    data.data.forEach((milestone) => {
+      const status = milestone.attributes.status;
+      const phase = milestone.attributes.phase;
+      if (status && phase && phase === params?.phase) {
+        const key = status.replace(/\s+/g, "_"); // Replace spaces with underscores
+        if (!milestonesByCurrentPhase[key]) {
+          milestonesByCurrentPhase[key] = [];
+        }
+        milestonesByCurrentPhase[key].push(milestone);
+      }
+    });
+  }
+
   return {
     milestones: data,
     milestonesToDo,
     milestonesByCategory,
-    categoryMilestonesLoading: !milestonesByCategory,
     milestonesByPhase,
+    milestonesByCurrentPhase,
+
     isLoading: !error && !data,
+    isLoadingMilestonesToDo: milestonesToDo === null,
+    isLoadingMilestonesByCategory: milestonesByCategory === null,
+    isLoadingMilestonesByPhase: milestonesByPhase === null,
+    isLoadingMilestonesByCurrentPhase: milestonesByCurrentPhase === null,
+
     isError: error,
   };
 };
 
-export default useMilestonesForPhase;
+export default useMilestones;

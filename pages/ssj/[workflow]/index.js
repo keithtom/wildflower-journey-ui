@@ -43,7 +43,7 @@ import Resource from "@components/Resource";
 import useTeam from "@hooks/useTeam";
 import useUser from "@hooks/useUser";
 import useSSJProgress from "@hooks/useSSJProgress";
-import useMilestonesForPhase from "@hooks/useMilestonesForPhase";
+import useMilestones from "@hooks/useMilestones";
 
 const SSJ = () => {
   const { currentUser } = useUserContext();
@@ -98,7 +98,7 @@ const SSJ = () => {
     milestones,
     milestonesToDo,
     isLoading: milestonesForPhaseIsLoading,
-  } = useMilestonesForPhase(workflow, {
+  } = useMilestones(workflow, {
     phase,
     omit_include: true,
   });

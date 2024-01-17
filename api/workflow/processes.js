@@ -32,7 +32,7 @@ async function index({ workflowId, params, config = {} }) {
   return response;
 }
 
-export const showMilestonesForPhase = {
+export const showMilestones = {
   key: (workflowId, params) => {
     let url = `/workflows/${workflowId}/processes`;
     if (params !== undefined) {
@@ -51,7 +51,7 @@ export const showMilestonesForPhase = {
     return wildflowerApi
       .handleErrors(
         workflowsApi.get(
-          showMilestonesForPhase.key(workflowId, params),
+          showMilestones.key(workflowId, params),
           getAuthHeader()
         )
       )
