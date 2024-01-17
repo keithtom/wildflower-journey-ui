@@ -67,6 +67,22 @@ async function resources({ workflowId, config = {} }) {
   return response;
 }
 
+export const showResources = {
+  key: (workflowId) => `/v1/ssj/dashboard/resources?workflow_id=${workflowId}`,
+  fetcher: (workflowId) => {
+    return wildflowerApi
+      .handleErrors(
+        workflowsApi.get(
+          `/resources?workflow_id=${workflowId}`,
+          getAuthHeader()
+        )
+      )
+      .then((data) => {
+        return data;
+      });
+  },
+};
+
 export default {
   invitePartner, // DEPRECATED
   progress,
