@@ -82,7 +82,7 @@ async function assigned(workflowId, config = {}) {
 export const showAssigned = {
   key: (workflowId) => `/workflows/${workflowId}/assigned_steps`,
   fetcher: (workflowId) => {
-    workflowsApi
+    return workflowsApi
       .get(`/workflows/${workflowId}/assigned_steps`, getAuthHeader())
       .then((res) => {
         const data = res.data;
