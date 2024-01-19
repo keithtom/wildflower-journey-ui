@@ -14,6 +14,21 @@ async function index() {
   wildflowerApi.loadAllRelationshipsFromIncluded(responseData);
   return responseData;
 }
+export const showAllTeams = {
+  key: () => `/`,
+  fetcher: () => {
+    return teamsApi
+      .get(showAllTeams.key(), getAuthHeader())
+      .then((res) => {
+        const data = res.data;
+        wildflowerApi.loadAllRelationshipsFromIncluded(data);
+        return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
 
 async function setStartDate(data) {
   let response;
@@ -49,7 +64,7 @@ export const showTeam = {
   key: (teamId) => `/v1/ssj/teams/${teamId}`,
   fetcher: (teamId) => {
     return teamsApi
-      .get(`/${teamId}`, getAuthHeader())
+      .get(showTeam.key(teamId), getAuthHeader())
       .then((data) => {
         wildflowerApi.loadAllRelationshipsFromIncluded(data);
         return data;
