@@ -128,6 +128,7 @@ const Task = ({
       setTaskCompleters(task.relationships.completers.data || []);
 
       setInfoDrawerOpen(false);
+      mutate(`/workflows/${workflow}/assigned_steps`);
       if (removeStep) {
         removeStep(taskId);
         mutate(`/workflows/${workflow}/assigned_steps`);
@@ -162,6 +163,7 @@ const Task = ({
       setCanCompleteTask(task.attributes.canComplete);
       setCanUncompleteTask(task.attributes.canUncomplete);
       setTaskCompleters(task.relationships.completers.data || []);
+      mutate(`/workflows/${workflow}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
@@ -181,6 +183,7 @@ const Task = ({
       setCanUnassignTask(task.attributes.canUnassign);
 
       setTaskAssignees(task.relationships.assignees.data || []);
+      mutate(`/workflows/${workflow}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
@@ -202,7 +205,7 @@ const Task = ({
       setTaskAssignees(task.relationships.assignees.data || []);
 
       setInfoDrawerOpen(false);
-
+      mutate(`/workflows/${workflow}/assigned_steps`);
       if (removeStep) {
         removeStep(taskId);
         mutate(`/workflows/${workflow}/assigned_steps`);

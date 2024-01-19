@@ -22,6 +22,7 @@ import {
   Chip,
 } from "./ui/index";
 import Header from "./Header";
+import useAssignedSteps from "@hooks/useAssignedSteps";
 
 // import AdviceProcessNavigation from "./page-content/advice/AdviceProcessNavigation";
 
@@ -222,7 +223,9 @@ const Navigation = () => {
 
 const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   const router = useRouter();
-
+  const { workflow } = router.query;
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
+  console.log(assignedSteps);
   return (
     <Box>
       <NavLink
@@ -231,6 +234,11 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
         active={router.pathname.includes("/to-do-list")}
         label="To do list"
         icon="calendarCheck"
+        secondaryAction={
+          isLoading ? null : !assignedSteps.length ? null : (
+            <Chip size="small" label={assignedSteps.length} variant="primary" />
+          )
+        }
       />
       <NavLink
         variant="secondary"
