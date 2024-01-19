@@ -5,6 +5,8 @@ import stepsApi from "@api/workflow/steps";
 import { useUserContext } from "@lib/useUserContext";
 import Router from "next/router";
 import { clearLoggedInState } from "@lib/handleLogout";
+import { mutate } from "swr";
+import { useRouter } from "next/router";
 
 import {
   Typography,
@@ -57,6 +59,8 @@ const Task = ({
   processName,
 }) => {
   const { currentUser } = useUserContext(); // why doesn't this work?
+  const router = useRouter();
+  const { workflow } = router.query;
 
   // Common interface that all invokations of Task should use.
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
@@ -126,6 +130,7 @@ const Task = ({
       setInfoDrawerOpen(false);
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (error) {
       if (error?.response?.status === 401) {
@@ -200,6 +205,7 @@ const Task = ({
 
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -233,6 +239,7 @@ const Task = ({
       setInfoDrawerOpen(false);
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (err) {
       if (err?.response?.status === 401) {

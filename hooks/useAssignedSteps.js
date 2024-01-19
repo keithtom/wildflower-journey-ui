@@ -6,11 +6,9 @@ const useAssignedSteps = (workflowId) => {
     workflowId ? showAssigned.key(workflowId) : null,
     () => showAssigned.fetcher(workflowId)
   );
-  console.log("workflowId in swr hook -------------------", workflowId);
-  console.log("data in swr hook -------------------", data);
 
   return {
-    data,
+    assignedSteps: data?.data,
     isLoading: !error && !data,
     isError: error,
   };

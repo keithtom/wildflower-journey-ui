@@ -82,41 +82,21 @@ async function assigned(workflowId, config = {}) {
 export const showAssigned = {
   key: (workflowId) => `/workflows/${workflowId}/assigned_steps`,
   fetcher: (workflowId) => {
+    const config = getAuthHeader();
+    const isOg = getCookie("isOg");
+    config.params = { current_user: isOg ? null : true };
     return workflowsApi
-      .get(`/workflows/${workflowId}/assigned_steps`, getAuthHeader())
+      .get(`/workflows/${workflowId}/assigned_steps`, config)
       .then((res) => {
         const data = res.data;
         wildflowerApi.loadAllRelationshipsFromIncluded(data);
+        const included = data.included;
+        data.data.forEach((step) => {
+          step = augmentStep(step, included);
+        });
         return data;
       });
   },
-  // fetcher: (workflowId) => {
-  //   try {
-  //     const config = getAuthHeader();
-  //     const isOg = getCookie("isOg");
-  //     config.params = { current_user: isOg ? null : true };
-  //     workflowsApi
-  //       .get(`/workflows/${workflowId}/assigned_steps`, config)
-  //       .then((res) => {
-  //         const data = res.data;
-  //         const included = res.data.included;
-  //         wildflowerApi.loadAllRelationshipsFromIncluded(data);
-  //         var steps = res.data.data;
-  //         steps.forEach((step) => {
-  //           step = augmentStep(step, included);
-  //         });
-  //         console.log("data inside showAssigned--------------", data);
-  //         return data;
-  //       });
-  //   } catch (error) {
-  //     if (error.response && error.response.status === 401) {
-  //       // Redirect to login if the response is a 401
-  //       useHistory().push("/login");
-  //     } else {
-  //       throw error;
-  //     }
-  //   }
-  // },
 };
 
 // creates a custom task (TODO: not finished)

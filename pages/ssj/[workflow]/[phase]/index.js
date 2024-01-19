@@ -26,12 +26,7 @@ import Hero from "@components/Hero";
 
 import useMilestones from "@hooks/useMilestones";
 
-const PhasePage = ({
-  milestonesInProgress,
-  milestonesToDo,
-  milestonesUpNext,
-  milestonesDone,
-}) => {
+const PhasePage = () => {
   const [phaseCompleteModalOpen, setPhaseCompleteModalOpen] = useState(false);
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
 
