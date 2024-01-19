@@ -86,7 +86,7 @@ export const showAssigned = {
     const isOg = getCookie("isOg");
     config.params = { current_user: isOg ? null : true };
     return workflowsApi
-      .get(`/workflows/${workflowId}/assigned_steps`, config)
+      .get(showAssigned.key(workflowId), config)
       .then((res) => {
         const data = res.data;
         wildflowerApi.loadAllRelationshipsFromIncluded(data);
@@ -95,6 +95,9 @@ export const showAssigned = {
           step = augmentStep(step, included);
         });
         return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
       });
   },
 };

@@ -83,8 +83,9 @@ const Milestones = ({}) => {
 export default Milestones;
 
 const MilestonesByCategory = ({ workflow }) => {
-  const { isLoading, milestonesByCategory } = useMilestones(workflow);
-  return isLoading ? (
+  const { isLoadingMilestonesByCategory, milestonesByCategory } =
+    useMilestones(workflow);
+  return isLoadingMilestonesByCategory ? (
     <Stack spacing={6}>
       {Array.from({ length: 12 }, (_, i) => (
         <Card key={i}>
@@ -132,8 +133,9 @@ const MilestonesByCategory = ({ workflow }) => {
   );
 };
 const MilestonesByPhase = ({ workflow }) => {
-  const { isLoading, milestonesByPhase } = useMilestones(workflow);
-  return isLoading ? (
+  const { isLoadingMilestonesByPhase, milestonesByPhase } =
+    useMilestones(workflow);
+  return isLoadingMilestonesByPhase ? (
     <Stack spacing={6}>
       {Array.from({ length: 12 }, (_, i) => (
         <Card key={i}>

@@ -83,4 +83,25 @@ async function show(id, config = {}) {
   return response;
 }
 
+export const showMilestone = {
+  key: (id) => `/processes/${id}`,
+  fetcher: (id) => {
+    return workflowsApi
+      .get(showMilestone.key(id), getAuthHeader())
+      .then((response) => {
+        const included = response.data.included;
+        wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
+        const steps = response.data.data.relationships.steps.data;
+        steps.forEach((step) => {
+          step = stepsApi.augmentStep(step, included);
+        });
+        response.data.data.relationships.steps.data = steps;
+        return response;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
+
 export default { index, show };
