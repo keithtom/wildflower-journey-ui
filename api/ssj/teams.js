@@ -2,6 +2,23 @@ import wildflowerApi from "@api/base";
 import { getCookie } from "cookies-next";
 
 const teamsApi = wildflowerApi.register("/v1/ssj/teams", {});
+const allTeamsApi = wildflowerApi.register("/api/teams", {});
+
+export const showAllTeams = {
+  key: () => `/`,
+  fetcher: () => {
+    return allTeamsApi
+      .get(showAllTeams.key(), getAuthHeader())
+      .then((res) => {
+        const data = res.data;
+        wildflowerApi.loadAllRelationshipsFromIncluded(data);
+        return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
 
 async function index() {
   let response;
@@ -14,11 +31,12 @@ async function index() {
   wildflowerApi.loadAllRelationshipsFromIncluded(responseData);
   return responseData;
 }
-export const showAllTeams = {
+
+export const showAllSSJTeams = {
   key: () => `/`,
   fetcher: () => {
     return teamsApi
-      .get(showAllTeams.key(), getAuthHeader())
+      .get(showAllSSJTeams.key(), getAuthHeader())
       .then((res) => {
         const data = res.data;
         wildflowerApi.loadAllRelationshipsFromIncluded(data);
@@ -61,7 +79,7 @@ async function getTeam(id) {
 }
 
 export const showTeam = {
-  key: (teamId) => `/v1/ssj/teams/${teamId}`,
+  key: (teamId) => `/${teamId}`,
   fetcher: (teamId) => {
     return teamsApi
       .get(showTeam.key(teamId), getAuthHeader())

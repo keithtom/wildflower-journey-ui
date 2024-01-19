@@ -4,7 +4,7 @@ import Skeleton from "@mui/material/Skeleton";
 
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
-import useTeams from "@hooks/useTeams";
+import useSSJTeams from "@hooks/useSSJTeams";
 
 import PhaseChip from "../../components/PhaseChip";
 import {
@@ -24,7 +24,7 @@ const YourSchools = () => {
   const router = useRouter();
 
   //fetch data
-  const { teams, isLoading } = useTeams();
+  const { teams, isLoading } = useSSJTeams();
 
   //set teams array
   let ssjTeams = teams || [];

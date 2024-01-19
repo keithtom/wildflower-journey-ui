@@ -9,10 +9,12 @@ import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
 import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/router";
+import Skeleton from "@mui/material/Skeleton";
 
 import { clearLoggedInState } from "@lib/handleLogout";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
+import useAllTeams from "@hooks/useAllTeams";
 import {
   Box,
   PageContainer,
@@ -38,23 +40,26 @@ const AdminSSJ = ({}) => {
   const { currentUser } = useUserContext();
   const router = useRouter();
 
+  const { teams, isLoading } = useAllTeams();
+  console.log({ teams });
+
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR(
-    "api/teams",
-    () => teamsApi.index().then((res) => res.data),
-    {
-      onErrorRetry: (error) => {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
-      },
-    }
-  );
-  let ssjTeams = data || [];
+  // const { data, error, isLoading, isValidating, mutate } = useSWR(
+  //   "api/teams",
+  //   () => teamsApi.index().then((res) => res.data),
+  //   {
+  //     onErrorRetry: (error) => {
+  //       if (error?.response?.status === 401) {
+  //         clearLoggedInState({});
+  //         router.push("/login");
+  //       } else {
+  //         console.error(error);
+  //       }
+  //     },
+  //   }
+  // );
+  let ssjTeams = teams || [];
 
   return (
     <>
@@ -79,11 +84,11 @@ const AdminSSJ = ({}) => {
               <Card noPadding noRadius noBorder>
                 <Stack spacing={1}>
                   {isLoading ? (
-                    <Grid container justifyContent="center">
-                      <Grid item>
-                        <Spinner />
-                      </Grid>
-                    </Grid>
+                    <Stack spacing={2}>
+                      {Array.from({ length: 24 }, (_, j) => (
+                        <Skeleton key={j} height={48} m={0} variant="rounded" />
+                      ))}
+                    </Stack>
                   ) : (
                     ssjTeams.map((s, i) => (
                       <Card size="small" key={i}>
