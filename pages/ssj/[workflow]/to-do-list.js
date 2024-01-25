@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Skeleton from "@mui/material/Skeleton";
 import { mutate } from "swr";
+import { getCookie } from "cookies-next";
 
 import {
   PageContainer,
@@ -27,12 +28,16 @@ const ToDoList = ({}) => {
 
   const router = useRouter();
   const { workflow } = router.query;
+  const phase = getCookie("phase");
 
   const [teamAssignments, setTeamAssignments] = useState([]);
 
   const { currentUser, isOperationsGuide } = useUserContext();
   const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
-  const { milestonesToDo, isLoadingMilestonesToDo } = useMilestones(workflow);
+  const { milestonesToDo, isLoadingMilestonesToDo } = useMilestones(workflow, {
+    phase,
+    omit_include: true,
+  });
 
   const removeStep = (taskId) => {
     const updatedSteps = assignedSteps.filter((step) => step.id !== taskId);

@@ -88,7 +88,7 @@ const SSJ = () => {
   const { user, isLoading: userIsLoading } = useUser();
   const teamId = user?.data.attributes.ssj.teamId;
   const { team, isLoading: teamIsLoading } = useTeam(teamId);
-  // const { team, partners } = useTeam(teamId); <-- would be really cool to do something like this
+
   const {
     progress,
     assignedSteps,
