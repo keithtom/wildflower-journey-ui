@@ -6,8 +6,8 @@ const useMilestone = (id) => {
     showMilestone.fetcher(id)
   );
 
-  console.log({ data });
-  console.log({ error });
+  // console.log({ data });
+  // console.log({ error });
   return {
     milestone: data?.data?.data,
     isLoading: !error && !data,

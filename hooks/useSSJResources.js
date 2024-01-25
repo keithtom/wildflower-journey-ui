@@ -7,7 +7,7 @@ const useSSJResources = (workflowId) => {
     () => showResources.fetcher(workflowId)
   );
   return {
-    resources: data,
+    resources: data?.data,
     isLoading: !error && !data,
     isError: error,
   };

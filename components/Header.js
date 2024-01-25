@@ -31,7 +31,7 @@ const Header = ({ toggleNavOpen }) => {
 
   const showNetwork = !currentUser?.attributes?.ssj;
 
-  console.log({ currentUser });
+  // console.log({ currentUser });
   // console.log({ isAdmin });
   // console.log(process.env.APP_ENV);
 

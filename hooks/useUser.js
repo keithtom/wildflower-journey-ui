@@ -29,7 +29,7 @@ const useUser = () => {
 
   // Return the user's data, loading state, and error state
   return {
-    user: data,
+    user: data?.data,
     isLoading: !error && !data,
     isError: error,
   };

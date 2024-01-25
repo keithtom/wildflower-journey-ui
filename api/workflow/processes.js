@@ -48,15 +48,13 @@ export const showMilestones = {
     return url;
   },
   fetcher: (workflowId, params) => {
-    return wildflowerApi
-      .handleErrors(
-        workflowsApi.get(
-          showMilestones.key(workflowId, params),
-          getAuthHeader()
-        )
-      )
-      .then((data) => {
-        return data;
+    return workflowsApi
+      .get(showMilestones.key(workflowId, params), getAuthHeader())
+      .then((res) => {
+        return res;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
       });
   },
 };

@@ -34,10 +34,13 @@ async function show(id, config) {
 export const showUser = {
   key: (userId) => `/v1/users/${userId}`,
   fetcher: (userId) => {
-    return wildflowerApi
-      .handleErrors(api.get(`/${userId}`, getAuthHeader()))
+    return api
+      .get(`/${userId}`, getAuthHeader())
       .then((data) => {
         return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
       });
   },
 };

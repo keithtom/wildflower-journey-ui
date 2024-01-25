@@ -124,11 +124,11 @@ const SSJ = () => {
     ssjProgressIsLoading ||
     milestonesForPhaseIsLoading;
 
-  console.log({ user });
-  console.log({ team });
-  console.log({ progress });
-  console.log({ milestones });
-  console.log({ milestonesToDo });
+  // console.log({ user });
+  // console.log({ team });
+  // console.log({ progress });
+  // console.log({ milestones });
+  // console.log({ milestonesToDo });
   // console.log({ currentUser });
   // console.log({ team });
   // console.log({ partners });

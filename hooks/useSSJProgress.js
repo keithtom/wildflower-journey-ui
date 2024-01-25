@@ -8,8 +8,8 @@ const useSSJProgress = (workflowId) => {
   );
 
   return {
-    assignedSteps: data?.assigned_steps,
-    progress: data,
+    assignedSteps: data?.data?.assigned_steps,
+    progress: data?.data,
     isLoading: !error && !data,
     isError: error,
   };

@@ -44,12 +44,13 @@ async function progress({ workflowId, config = {} }) {
 export const showProgress = {
   key: (workflowId) => `/v1/ssj/dashboard/progress?workflow_id=${workflowId}`,
   fetcher: (workflowId) => {
-    return wildflowerApi
-      .handleErrors(
-        workflowsApi.get(`/progress?workflow_id=${workflowId}`, getAuthHeader())
-      )
+    return workflowsApi
+      .get(`/progress?workflow_id=${workflowId}`, getAuthHeader())
       .then((data) => {
         return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
       });
   },
 };
@@ -70,15 +71,13 @@ async function resources({ workflowId, config = {} }) {
 export const showResources = {
   key: (workflowId) => `/v1/ssj/dashboard/resources?workflow_id=${workflowId}`,
   fetcher: (workflowId) => {
-    return wildflowerApi
-      .handleErrors(
-        workflowsApi.get(
-          `/resources?workflow_id=${workflowId}`,
-          getAuthHeader()
-        )
-      )
+    return workflowsApi
+      .get(`/resources?workflow_id=${workflowId}`, getAuthHeader())
       .then((data) => {
         return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
       });
   },
 };

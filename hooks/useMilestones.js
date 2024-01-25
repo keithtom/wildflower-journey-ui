@@ -15,18 +15,18 @@ const useMilestones = (workflowId, params) => {
   let milestonesByCurrentPhase = null;
 
   // Transform the data into what is needed
-  if (data && data.data) {
+  if (data && data.data.data) {
     milestonesToDo = [];
-    data.data.forEach((milestone) => {
+    data.data.data.forEach((milestone) => {
       if (milestone.attributes.status === "to do") {
         milestonesToDo.push(milestone);
       }
     });
   }
 
-  if (data && data.data) {
+  if (data && data.data.data) {
     milestonesByCategory = [];
-    data.data.forEach((milestone) => {
+    data.data.data.forEach((milestone) => {
       const categories = milestone.attributes.categories;
       if (categories && categories.length > 0) {
         categories.forEach((category) => {
@@ -43,9 +43,9 @@ const useMilestones = (workflowId, params) => {
     });
   }
 
-  if (data && data.data) {
+  if (data && data.data.data) {
     milestonesByPhase = [];
-    data.data.forEach((milestone) => {
+    data.data.data.forEach((milestone) => {
       const phase = milestone.attributes.phase;
       if (phase) {
         const capitalizedPhase = phase.charAt(0).toUpperCase() + phase.slice(1);
@@ -64,9 +64,9 @@ const useMilestones = (workflowId, params) => {
     });
   }
 
-  if (data && data.data) {
+  if (data && data.data.data) {
     milestonesByCurrentPhase = {};
-    data.data.forEach((milestone) => {
+    data.data.data.forEach((milestone) => {
       const status = milestone.attributes.status;
       const phase = milestone.attributes.phase;
       if (status && phase && phase === params?.phase) {
