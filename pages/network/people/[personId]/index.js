@@ -1,5 +1,3 @@
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import Head from "next/head";
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
 import { useRouter } from "next/router";

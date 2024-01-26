@@ -7,7 +7,7 @@ const usePerson = (personId, params) => {
     () => showPerson.fetcher(personId, params)
   );
 
-  console.log({ data });
+  // console.log({ data });
 
   return {
     data: data?.data,
