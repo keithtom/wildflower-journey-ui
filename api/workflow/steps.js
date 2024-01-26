@@ -1,6 +1,13 @@
 import wildflowerApi from "@api/base";
+import { getCookie } from "cookies-next";
+import { useHistory } from "react-router-dom";
 
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
+
+function getAuthHeader() {
+  const token = getCookie("auth");
+  return { headers: { Authorization: token } };
+}
 
 // augment steps with assignees and completers which is a convenient short-hand for looking at assignments since the UI cares about the information this way.
 function augmentStep(step, included) {
@@ -71,6 +78,29 @@ async function assigned(workflowId, config = {}) {
 
   return response;
 }
+
+export const showAssigned = {
+  key: (workflowId) => `/workflows/${workflowId}/assigned_steps`,
+  fetcher: (workflowId) => {
+    const config = getAuthHeader();
+    const isOg = getCookie("isOg");
+    config.params = { current_user: isOg ? null : true };
+    return workflowsApi
+      .get(showAssigned.key(workflowId), config)
+      .then((res) => {
+        const data = res.data;
+        wildflowerApi.loadAllRelationshipsFromIncluded(data);
+        const included = data.included;
+        data.data.forEach((step) => {
+          step = augmentStep(step, included);
+        });
+        return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
 
 // creates a custom task (TODO: not finished)
 async function create(processId, title) {

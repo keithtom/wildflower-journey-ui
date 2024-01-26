@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { useState } from "react";
-import useSWR from "swr";
+import { mutate } from "swr";
+import Skeleton from "@mui/material/Skeleton";
 
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
@@ -32,7 +33,7 @@ import axios from "axios";
 const token = getCookie("auth");
 
 import schoolApi from "@api/schools";
-import peopleApi from "@api/people";
+
 import {
   Divider,
   Alert,
@@ -60,6 +61,7 @@ import SchoolHero from "@components/SchoolHero";
 import AttributesCard from "@components/AttributesCard";
 import SchoolCard from "@components/SchoolCard";
 import UserCard from "@components/UserCard";
+import useSchool from "@hooks/useSchool";
 
 const School = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
@@ -68,65 +70,50 @@ const School = ({}) => {
 
   const router = useRouter();
   const { schoolId } = router.query;
-  // console.log("schoolId", schoolId);
 
-  // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
-  const { data, error, isLoading, mutate } = useSWR(
-    schoolId ? `/api/school/${schoolId}` : null,
-    () => schoolApi.show(schoolId, { network: true }).then((res) => res.data),
-    {
-      onErrorRetry: (error) => {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
-      },
-    }
-  );
+  const { data: schoolData, isLoading } = useSchool(schoolId, {
+    network: true,
+  });
 
-  if (error)
-    return (
-      <PageContainer isLoading={true}>
-        failed to load ${error.message}
-      </PageContainer>
-    );
-  if (isLoading || !data) return <PageContainer isLoading={true} />;
-
-  // console.log("about to render", data.data);
-  const school = data.data;
-  const included = data.included;
+  const school = schoolData?.data;
+  const included = schoolData?.included;
   const address = included?.find((i) => i.type === "address"); // a school only has one address
 
   const schoolFallback = "/assets/images/school-placeholder.png";
 
-  const hasInfo = school.attributes.about;
+  const hasInfo = school?.attributes.about;
   const hasAttributes =
-    school.relationships.address.data ||
-    school.attributes.openedOn ||
-    school.attributes.agesServedList ||
-    school.attributes.governanceType ||
-    school.attributes.maxEnrollment;
+    school?.relationships.address.data ||
+    school?.attributes.openedOn ||
+    school?.attributes.agesServedList ||
+    school?.attributes.governanceType ||
+    school?.attributes.maxEnrollment;
   const adminId = "10c9-a091";
-  const isMySchool = school.relationships.people.data.filter(
+  const isMySchool = school?.relationships.people.data.filter(
     (person) => person.id === currentUser?.id || adminId === currentUser?.id
   ).length
     ? true
     : false;
 
-  const schoolLeaders = handleFindMatchingItems(
-    included,
-    school.relationships.people.data,
-    "id"
-  );
-  const isCharter = school.attributes.charterString;
-  const allSisterSchools = handleFindMatchingItems(
-    included,
-    school.relationships.sisterSchools.data,
-    "id"
-  );
-  const sisterSchools = allSisterSchools.filter((s) => s.id !== school.id);
+  let schoolLeaders;
+  let allSisterSchools;
+  let sisterSchools;
+  let isCharter;
+
+  if (!isLoading) {
+    schoolLeaders = handleFindMatchingItems(
+      included,
+      school?.relationships.people.data,
+      "id"
+    );
+    isCharter = school?.attributes.charterString;
+    allSisterSchools = handleFindMatchingItems(
+      included,
+      school?.relationships.sisterSchools.data,
+      "id"
+    );
+    sisterSchools = allSisterSchools.filter((s) => s.id !== school.id);
+  }
 
   // console.log({ currentUser });
   // console.log({ isMySchool });
@@ -139,182 +126,203 @@ const School = ({}) => {
     <>
       <PageContainer>
         <Stack spacing={6}>
-          <SchoolHero
-            schoolName={school?.attributes?.name}
-            schoolLocation={school?.attributes?.location}
-            heroImg={
-              school?.attributes?.heroImageUrl
-                ? school?.attributes?.heroImageUrl
-                : "https://images.unsplash.com/photo-1629654858857-615c2c8be8a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1494&q=80"
-            }
-            logoImg={
-              school?.attributes?.logoUrl
-                ? school?.attributes?.logoUrl
-                : schoolFallback
-            }
-          />
+          {isLoading ? (
+            <Skeleton height={400} width="100%" variant="rounded" />
+          ) : (
+            <SchoolHero
+              schoolName={school?.attributes?.name}
+              schoolLocation={school?.attributes?.location}
+              heroImg={
+                school?.attributes?.heroImageUrl
+                  ? school?.attributes?.heroImageUrl
+                  : "https://images.unsplash.com/photo-1629654858857-615c2c8be8a8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1494&q=80"
+              }
+              logoImg={
+                school?.attributes?.logoUrl
+                  ? school?.attributes?.logoUrl
+                  : schoolFallback
+              }
+            />
+          )}
 
-          <Grid container spacing={8}>
-            <Grid item xs={12} md={hasInfo ? 4 : 12}>
-              <Stack spacing={6}>
-                {schoolLeaders ? (
-                  <Grid item xs={12}>
-                    <Card>
-                      <Stack spacing={6}>
-                        {schoolLeaders.map((leader, i) => (
-                          <Link href={`/network/people/${leader.id}`} key={i}>
-                            <Stack
-                              direction="row"
-                              spacing={3}
-                              alignItems="center"
-                            >
-                              <Avatar
-                                src={leader?.attributes?.imageUrl}
-                                size="sm"
-                              />
-                              <Stack>
-                                <Stack direction="row" spacing={1}>
-                                  {leader.attributes.firstName &&
-                                  leader.attributes.firstName ? (
-                                    <Typography variant="bodyRegular" bold>
-                                      {leader?.attributes?.firstName}{" "}
-                                      {leader?.attributes?.lastName}
-                                    </Typography>
-                                  ) : null}
-                                </Stack>
-                                {leader?.attributes?.roleList.map((r, i) => (
-                                  <Typography
-                                    variant="bodySmall"
-                                    lightened
-                                    key={i}
-                                  >
-                                    {r}
-                                  </Typography>
-                                ))}
-                              </Stack>
-                            </Stack>
-                          </Link>
-                        ))}
-                      </Stack>
-                    </Card>
-                  </Grid>
-                ) : null}
-                {hasAttributes ? (
-                  <AttributesCard
-                    state={school?.relationships?.address?.data?.state}
-                    openDate={school?.attributes?.openedOn}
-                    agesServed={school?.attributes?.agesServedList}
-                    governance={school?.attributes?.governanceType}
-                    maxEnrollment={school?.attributes?.maxEnrollment}
-                  />
-                ) : null}
-                {isCharter ? (
-                  <Card variant="primaryLightened" size="small">
-                    <Grid
-                      container
-                      justifyContent="space-between"
-                      alignItems="center"
-                      spacing={3}
-                    >
-                      <Grid item>
-                        <Icon type="shapePolygon" variant="primary" />
-                      </Grid>
-                      <Grid item flex={1}>
-                        <Stack>
-                          <Typography variant="bodySmall" bold highlight>
-                            CHARTER
-                          </Typography>
-                          <Typography variant="bodyRegular">
-                            {school.attributes.charterString}
-                          </Typography>
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  </Card>
-                ) : null}
-
-                {isMySchool ? (
-                  <Button
-                    variant="lightened"
-                    full
-                    onClick={() => setEditProfileModalOpen(true)}
-                  >
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <Icon type="pencil" size="small" />
-                      <Typography variant="bodyRegular" bold>
-                        Edit school profile
-                      </Typography>
-                    </Stack>
-                  </Button>
-                ) : (
-                  <Card
-                    size="small"
-                    variant="lightened"
-                    onClick={() => setClaimSchoolModalOpen(true)}
-                    hoverable
-                  >
-                    <Grid
-                      container
-                      justifyContent="space-between"
-                      alignItems="center"
-                      spacing={3}
-                    >
-                      <Grid item>
-                        <Icon type="flag" variant="primary" />
-                      </Grid>
-                      <Grid item flex={1}>
-                        <Typography variant="bodyRegular" bold>
-                          Is this your school?
-                        </Typography>
-                        <Typography variant="bodySmall" lightened>
-                          You should be able to edit this page.
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Icon type="chevronRight" variant="lightened" />
-                      </Grid>
-                    </Grid>
-                  </Card>
-                )}
-              </Stack>
+          {isLoading ? (
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={4}>
+                <Stack spacing={6}>
+                  <Skeleton height={96} m={0} variant="rounded" />
+                  <Skeleton height={240} m={0} variant="rounded" />
+                </Stack>
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <Stack>
+                  {Array.from({ length: 8 }, (_, j) => (
+                    <Skeleton key={j} height={24} m={0} variant="text" />
+                  ))}
+                </Stack>
+              </Grid>
             </Grid>
-            {hasInfo ? (
-              <Grid item xs={12} sm={8}>
-                <Stack spacing={12}>
-                  {school?.attributes?.about ? (
-                    <Stack spacing={3}>
-                      <Typography variant="h4" bold>
-                        Our School
-                      </Typography>
-                      <Typography variant="bodyLarge">
-                        {school?.attributes?.about}
-                      </Typography>
-                    </Stack>
-                  ) : null}
-                  {isCharter && sisterSchools.length ? (
-                    <Grid container>
-                      <Grid item xs={12} sm={6}>
-                        <Typography variant="h4" bold>
-                          Our Charter Community
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={3}>
-                          {sisterSchools.map((s, i) => (
-                            <SchoolCard
-                              key={i}
-                              schoolName={s.attributes.name}
-                              logo={s.attributes.logoUrl}
-                              location={s.attributes.location}
-                              link={`/network/schools/${s.id}`}
-                            />
+          ) : (
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={hasInfo ? 4 : 12}>
+                <Stack spacing={6}>
+                  {schoolLeaders ? (
+                    <Grid item xs={12}>
+                      <Card>
+                        <Stack spacing={6}>
+                          {schoolLeaders.map((leader, i) => (
+                            <Link href={`/network/people/${leader.id}`} key={i}>
+                              <Stack
+                                direction="row"
+                                spacing={3}
+                                alignItems="center"
+                              >
+                                <Avatar
+                                  src={leader?.attributes?.imageUrl}
+                                  size="sm"
+                                />
+                                <Stack>
+                                  <Stack direction="row" spacing={1}>
+                                    {leader.attributes.firstName &&
+                                    leader.attributes.firstName ? (
+                                      <Typography variant="bodyRegular" bold>
+                                        {leader?.attributes?.firstName}{" "}
+                                        {leader?.attributes?.lastName}
+                                      </Typography>
+                                    ) : null}
+                                  </Stack>
+                                  {leader?.attributes?.roleList.map((r, i) => (
+                                    <Typography
+                                      variant="bodySmall"
+                                      lightened
+                                      key={i}
+                                    >
+                                      {r}
+                                    </Typography>
+                                  ))}
+                                </Stack>
+                              </Stack>
+                            </Link>
                           ))}
                         </Stack>
-                      </Grid>
+                      </Card>
                     </Grid>
                   ) : null}
+                  {hasAttributes ? (
+                    <AttributesCard
+                      state={school?.relationships?.address?.data?.state}
+                      openDate={school?.attributes?.openedOn}
+                      agesServed={school?.attributes?.agesServedList}
+                      governance={school?.attributes?.governanceType}
+                      maxEnrollment={school?.attributes?.maxEnrollment}
+                    />
+                  ) : null}
+                  {isCharter ? (
+                    <Card variant="primaryLightened" size="small">
+                      <Grid
+                        container
+                        justifyContent="space-between"
+                        alignItems="center"
+                        spacing={3}
+                      >
+                        <Grid item>
+                          <Icon type="shapePolygon" variant="primary" />
+                        </Grid>
+                        <Grid item flex={1}>
+                          <Stack>
+                            <Typography variant="bodySmall" bold highlight>
+                              CHARTER
+                            </Typography>
+                            <Typography variant="bodyRegular">
+                              {school.attributes.charterString}
+                            </Typography>
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  ) : null}
 
-                  {/* <Grid container>
+                  {isMySchool ? (
+                    <Button
+                      variant="lightened"
+                      full
+                      onClick={() => setEditProfileModalOpen(true)}
+                    >
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Icon type="pencil" size="small" />
+                        <Typography variant="bodyRegular" bold>
+                          Edit school profile
+                        </Typography>
+                      </Stack>
+                    </Button>
+                  ) : (
+                    <Card
+                      size="small"
+                      variant="lightened"
+                      onClick={() => setClaimSchoolModalOpen(true)}
+                      hoverable
+                    >
+                      <Grid
+                        container
+                        justifyContent="space-between"
+                        alignItems="center"
+                        spacing={3}
+                      >
+                        <Grid item>
+                          <Icon type="flag" variant="primary" />
+                        </Grid>
+                        <Grid item flex={1}>
+                          <Typography variant="bodyRegular" bold>
+                            Is this your school?
+                          </Typography>
+                          <Typography variant="bodySmall" lightened>
+                            You should be able to edit this page.
+                          </Typography>
+                        </Grid>
+                        <Grid item>
+                          <Icon type="chevronRight" variant="lightened" />
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  )}
+                </Stack>
+              </Grid>
+              {hasInfo ? (
+                <Grid item xs={12} sm={8}>
+                  <Stack spacing={12}>
+                    {school?.attributes?.about ? (
+                      <Stack spacing={3}>
+                        <Typography variant="h4" bold>
+                          Our School
+                        </Typography>
+                        <Typography variant="bodyLarge">
+                          {school?.attributes?.about}
+                        </Typography>
+                      </Stack>
+                    ) : null}
+                    {isCharter && sisterSchools.length ? (
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="h4" bold>
+                            Our Charter Community
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Stack spacing={3}>
+                            {sisterSchools.map((s, i) => (
+                              <SchoolCard
+                                key={i}
+                                schoolName={s.attributes.name}
+                                logo={s.attributes.logoUrl}
+                                location={s.attributes.location}
+                                link={`/network/schools/${s.id}`}
+                              />
+                            ))}
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    ) : null}
+
+                    {/* <Grid container>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="h4" bold>
                       School Board
@@ -336,24 +344,29 @@ const School = ({}) => {
                     </Stack>
                   </Grid>
                 </Grid> */}
-                </Stack>
-              </Grid>
-            ) : null}
-          </Grid>
+                  </Stack>
+                </Grid>
+              ) : null}
+            </Grid>
+          )}
         </Stack>
       </PageContainer>
-      <EditProfileModal
-        toggle={() => setEditProfileModalOpen(!editProfileModalOpen)}
-        open={editProfileModalOpen}
-        school={school}
-        address={address}
-        mutate={mutate}
-        setEditProfileModalOpen={setEditProfileModalOpen}
-      />
-      <ClaimSchoolModal
-        toggle={() => setClaimSchoolModalOpen(!claimSchoolModalOpen)}
-        open={claimSchoolModalOpen}
-      />
+      {isLoading ? null : (
+        <>
+          <EditProfileModal
+            toggle={() => setEditProfileModalOpen(!editProfileModalOpen)}
+            open={editProfileModalOpen}
+            school={school}
+            address={address}
+            mutate={mutate}
+            setEditProfileModalOpen={setEditProfileModalOpen}
+          />
+          <ClaimSchoolModal
+            toggle={() => setClaimSchoolModalOpen(!claimSchoolModalOpen)}
+            open={claimSchoolModalOpen}
+          />
+        </>
+      )}
     </>
   );
 };

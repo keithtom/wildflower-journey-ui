@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Skeleton from "@mui/material/Skeleton";
+import { mutate } from "swr";
+import { getCookie } from "cookies-next";
 
 import {
   PageContainer,
@@ -14,76 +17,56 @@ import {
 } from "@ui";
 import Task from "@components/Task";
 import Hero from "@components/Hero";
-import getAuthHeader from "@lib/getAuthHeader";
-import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import { getCookie } from "cookies-next";
-import stepsApi from "@api/workflow/steps";
-import processesApi from "@api/workflow/processes";
 import useAuth from "@lib/utils/useAuth";
 import { useUserContext } from "@lib/useUserContext";
 
-const ToDoList = ({ steps, milestonesToDo }) => {
-  const { currentUser, isOperationsGuide } = useUserContext();
-  const [assignedSteps, setAssignedSteps] = useState([]);
-  const [teamAssignments, setTeamAssignments] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+import useAssignedSteps from "@hooks/useAssignedSteps";
+import useMilestones from "@hooks/useMilestones";
 
-  const { workflow } = router.query;
-
-  const removeStep = (taskId) => {
-    setTimeout(() => {
-      setAssignedSteps(assignedSteps.filter((step) => step.id !== taskId));
-    }, 1500);
-  };
-
+const ToDoList = ({}) => {
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
 
-  useEffect(() => {
-    if (isOperationsGuide) {
-      const assignmentsByAssigneeId = {};
-      steps.forEach((item) => {
-        const assignees = item.relationships.assignees.data;
-        assignees.forEach((assignee) => {
-          const assigneeId = assignee.id;
+  const router = useRouter();
+  const { workflow } = router.query;
+  const phase = getCookie("phase");
 
-          // Create an array for the assignee ID if it doesn't exist
-          if (!assignmentsByAssigneeId[assigneeId]) {
-            assignmentsByAssigneeId[assigneeId] = {
-              assigneeId,
-              firstName: assignee.attributes.firstName,
-              lastName: assignee.attributes.lastName,
-              imgUrl: assignee.attributes.imageUrl,
-              assignments: [],
-            };
-          }
+  const [teamAssignments, setTeamAssignments] = useState([]);
 
-          // Push the item to the array for the assignee ID
-          assignmentsByAssigneeId[assigneeId].assignments.push(item);
-        });
-      });
-      const newArray = Object.values(assignmentsByAssigneeId);
-      setTeamAssignments(newArray);
-      setIsLoading(false);
-    } else {
-      setAssignedSteps(steps);
-      setIsLoading(false);
-    }
-  }, [currentUser]);
+  const { currentUser, isOperationsGuide } = useUserContext();
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
+  const { milestonesToDo, isLoadingMilestonesToDo } = useMilestones(workflow, {
+    phase,
+    omit_include: true,
+  });
 
-  // useAuth("/login");
+  const removeStep = (taskId) => {
+    const updatedSteps = assignedSteps.filter((step) => step.id !== taskId);
+    mutate(`/api/${workflow}/assigned_steps`, updatedSteps, false);
+  };
 
+  useAuth("/login");
+
+  // console.log({ assignedIsError });
+  // console.log({ assignedIsLoading });
   // console.log({ assignedSteps });
+  // console.log({ steps });
   // console.log({ teamAssignments });
 
-  // console.log({ steps });
-
   return (
-    <PageContainer isLoading={isLoading}>
+    <PageContainer>
       <Stack spacing={12} mb={12}>
         <Hero imageUrl={hero} />
 
-        {teamAssignments.length ? (
+        {isLoading ? (
+          <Stack spacing={6}>
+            <Skeleton width={240} height={48} />
+            <Stack spacing={3}>
+              {Array.from({ length: 5 }, (_, j) => (
+                <Skeleton key={j} height={64} m={0} variant="rounded" />
+              ))}
+            </Stack>
+          </Stack>
+        ) : teamAssignments.length ? (
           teamAssignments.map((t, i) => (
             <Stack spacing={12} key={i}>
               <Stack spacing={6} direction="row" alignItems="center">
@@ -167,29 +150,42 @@ const ToDoList = ({ steps, milestonesToDo }) => {
                     noRadius
                     sx={{ height: "100%" }}
                   >
-                    <Stack spacing={2}>
-                      {milestonesToDo.map((m, i) => (
-                        <Link
-                          href={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                          key={i}
-                        >
-                          <Card variant="light" size="small" hoverable>
-                            <Stack
-                              direction="row"
-                              alignItems="center"
-                              justifyContent="space-between"
-                            >
-                              <Typography variant="bodyRegular" bold>
-                                {m.attributes.title}
-                              </Typography>
-                              <Button small variant="text">
-                                Start here
-                              </Button>
-                            </Stack>
-                          </Card>
-                        </Link>
-                      ))}
-                    </Stack>
+                    {isLoadingMilestonesToDo ? (
+                      <Stack spacing={2}>
+                        {Array.from({ length: 3 }, (_, j) => (
+                          <Skeleton
+                            key={j}
+                            height={48}
+                            m={0}
+                            variant="rounded"
+                          />
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Stack spacing={2}>
+                        {milestonesToDo.map((m, i) => (
+                          <Link
+                            href={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                            key={i}
+                          >
+                            <Card variant="light" size="small" hoverable>
+                              <Stack
+                                direction="row"
+                                alignItems="center"
+                                justifyContent="space-between"
+                              >
+                                <Typography variant="bodyRegular" bold>
+                                  {m.attributes.title}
+                                </Typography>
+                                <Button small variant="text">
+                                  Start here
+                                </Button>
+                              </Stack>
+                            </Card>
+                          </Link>
+                        ))}
+                      </Stack>
+                    )}
                   </Card>
                 </Grid>
               ) : null}
@@ -202,49 +198,3 @@ const ToDoList = ({ steps, milestonesToDo }) => {
 };
 
 export default ToDoList;
-
-export async function getServerSideProps({ query, req, res }) {
-  const config = getAuthHeader({ req, res });
-  if (!config) {
-    console.log("no token found, redirecting to login");
-    return redirectLoginProps();
-  }
-
-  const phase = getCookie("phase", { req, res });
-  const isOg = getCookie("isOg", { req, res });
-  const workflowId = query.workflow;
-
-  let response;
-  config.params = { current_user: isOg ? null : true };
-  try {
-    response = await stepsApi.assigned(workflowId, config);
-  } catch (error) {
-    if (error?.response?.status === 401) {
-      clearLoggedInState({ req, res });
-      return redirectLoginProps();
-    } else {
-      console.error(error);
-    }
-  }
-
-  let steps = response.data.data;
-  // console.log("steps", steps)
-
-  let milestonesToDo = [];
-  const responseMilestones = await processesApi.index({
-    workflowId,
-    params: { phase, omit_include: true },
-    config,
-  });
-
-  milestonesToDo = responseMilestones.data.data.filter(
-    (milestone) => milestone.attributes.status == "to do"
-  );
-
-  return {
-    props: {
-      steps,
-      milestonesToDo,
-    },
-  };
-}

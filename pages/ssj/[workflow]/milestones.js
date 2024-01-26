@@ -3,6 +3,7 @@ import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import processesApi from "@api/workflow/processes";
 import { useRouter } from "next/router";
+import Skeleton from "@mui/material/Skeleton";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
@@ -13,7 +14,13 @@ import Hero from "@components/Hero";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
-const Milestones = ({ processByCategory, processByPhase }) => {
+import useMilestones from "@hooks/useMilestones";
+
+const Milestones = ({}) => {
+  const hero = "/assets/images/ssj/wildflowerCollection.jpg";
+  const router = useRouter();
+  const { workflow, phase } = router.query;
+
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
   const [showMilestonesByPhase, setShowMilestonesByPhase] = useState(false);
@@ -26,15 +33,6 @@ const Milestones = ({ processByCategory, processByPhase }) => {
     setShowMilestonesByPhase(true);
     setShowMilestonesByCategory(false);
   };
-
-  // console.log({ processByCategory });
-  // console.log({ processByPhase });
-
-  const hero = "/assets/images/ssj/wildflowerCollection.jpg";
-
-  const router = useRouter();
-
-  const { workflow, phase } = router.query;
 
   useAuth("/login");
 
@@ -71,67 +69,12 @@ const Milestones = ({ processByCategory, processByPhase }) => {
             </Grid>
           </Grid>
         </Stack>
-        {showMilestonesByCategory
-          ? processByCategory.map((a, i) =>
-              a.processes.length ? (
-                <Card key={i}>
-                  <Stack spacing={6}>
-                    <Stack direction="row" spacing={6} alignItems="center">
-                      <CategoryChip category={a.category} size="large" />
-                      <Typography variant="h4" lightened>
-                        {a.processes.length}
-                      </Typography>
-                    </Stack>
-                    <Stack spacing={3}>
-                      {a.processes.map((m, i) => (
-                        <Milestone
-                          link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                          key={i}
-                          status={m.attributes.status}
-                          description={m.attributes.description}
-                          categories={m.attributes.categories}
-                          hideCategoryChip
-                          phase={m.attributes.phase}
-                          title={m.attributes.title}
-                          stepCount={m.attributes.stepsCount}
-                        />
-                      ))}
-                    </Stack>
-                  </Stack>
-                </Card>
-              ) : null
-            )
-          : showMilestonesByPhase &&
-            processByPhase.map((p, i) => (
-              <Card key={i}>
-                <Stack spacing={6}>
-                  <Stack direction="row" spacing={6} alignItems="center">
-                    <PhaseChip phase={p.phase} size="large" />
-                    <Typography variant="h4" lightened>
-                      {p.processes.length}
-                    </Typography>
-                  </Stack>
-                  <Stack spacing={3}>
-                    {p.processes.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                        key={i}
-                        status={m.attributes.status}
-                        description={m.attributes.description}
-                        categories={m.attributes.categories}
-                        title={m.attributes.title}
-                        stepCount={m.attributes.stepsCount}
-                      />
-                    ))}
-                  </Stack>
-                </Stack>
-              </Card>
-            ))}
 
-        {/* {showMilestonesByPhase &&
-          processByPhase.map((p, i) => {
-            <div>hi</div>;
-          })} */}
+        {showMilestonesByCategory ? (
+          <MilestonesByCategory workflow={workflow} />
+        ) : (
+          showMilestonesByPhase && <MilestonesByPhase workflow={workflow} />
+        )}
       </Stack>
     </PageContainer>
   );
@@ -139,102 +82,99 @@ const Milestones = ({ processByCategory, processByPhase }) => {
 
 export default Milestones;
 
-export async function getServerSideProps({ query, req, res }) {
-  const config = getAuthHeader({ req, res });
-  if (!config) {
-    console.log("no token found, redirecting to login");
-    return redirectLoginProps();
-  }
-
-  const workflowId = query.workflow;
-  let response;
-  try {
-    response = await processesApi.index({ workflowId, config });
-  } catch (error) {
-    if (error?.response?.status === 401) {
-      clearLoggedInState({ req, res });
-      return redirectLoginProps();
-    } else {
-      console.error(error);
-    }
-  }
-  const data = await response.data;
-
-  const groupedFinanceProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes(ssj_categories.FINANCE)
+const MilestonesByCategory = ({ workflow }) => {
+  const { isLoadingMilestonesByCategory, milestonesByCategory } =
+    useMilestones(workflow);
+  return isLoadingMilestonesByCategory ? (
+    <Stack spacing={6}>
+      {Array.from({ length: 12 }, (_, i) => (
+        <Card key={i}>
+          <Stack spacing={6}>
+            <Skeleton width={240} height={48} />
+            <Stack spacing={3}>
+              {Array.from({ length: 16 }, (_, j) => (
+                <Skeleton key={j} height={64} m={0} variant="rounded" />
+              ))}
+            </Stack>
+          </Stack>
+        </Card>
+      ))}
+    </Stack>
+  ) : (
+    milestonesByCategory.map((a, i) =>
+      a.milestones.length ? (
+        <Card key={i}>
+          <Stack spacing={6}>
+            <Stack direction="row" spacing={6} alignItems="center">
+              <CategoryChip category={a.category} size="large" />
+              <Typography variant="h4" lightened>
+                {a.milestones.length}
+              </Typography>
+            </Stack>
+            <Stack spacing={3}>
+              {a.milestones.map((m, i) => (
+                <Milestone
+                  link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                  key={i}
+                  status={m.attributes.status}
+                  description={m.attributes.description}
+                  categories={m.attributes.categories}
+                  hideCategoryChip
+                  phase={m.attributes.phase}
+                  title={m.attributes.title}
+                  stepCount={m.attributes.stepsCount}
+                />
+              ))}
+            </Stack>
+          </Stack>
+        </Card>
+      ) : null
+    )
   );
-  const groupedFacilitiesProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes(ssj_categories.FACILITIES)
+};
+const MilestonesByPhase = ({ workflow }) => {
+  const { isLoadingMilestonesByPhase, milestonesByPhase } =
+    useMilestones(workflow);
+  return isLoadingMilestonesByPhase ? (
+    <Stack spacing={6}>
+      {Array.from({ length: 12 }, (_, i) => (
+        <Card key={i}>
+          <Stack spacing={6}>
+            <Skeleton width={240} height={48} />
+            <Stack spacing={3}>
+              {Array.from({ length: 16 }, (_, j) => (
+                <Skeleton key={j} height={64} m={0} variant="rounded" />
+              ))}
+            </Stack>
+          </Stack>
+        </Card>
+      ))}
+    </Stack>
+  ) : (
+    milestonesByPhase.map((m, i) => (
+      <Card key={i}>
+        <Stack spacing={6}>
+          <Stack direction="row" spacing={6} alignItems="center">
+            <PhaseChip phase={m.phase} size="large" />
+            <Typography variant="h4" lightened>
+              {m.milestones.length}
+            </Typography>
+          </Stack>
+          <Stack spacing={3}>
+            {m.milestones.map((m, i) => (
+              <Milestone
+                link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                key={i}
+                status={m.attributes.status}
+                description={m.attributes.description}
+                categories={m.attributes.categories}
+                title={m.attributes.title}
+                stepCount={m.attributes.stepsCount}
+              />
+            ))}
+          </Stack>
+        </Stack>
+      </Card>
+    ))
   );
-  const groupedGovernanceComplianceProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes(ssj_categories.GOVERNANCE_COMPLIANCE)
-  );
-  const groupedHumanResourcesProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes(ssj_categories.HUMAN_RESOURCES)
-  );
-  const groupedCommunityFamilyEngagementProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes(ssj_categories.COMMUNITY_FAMILY_ENGAGEMENT)
-  );
-  const groupedClassroomProgramPracticesProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes(ssj_categories.CLASSROOM_PROGRAM_PRACTICES)
-  );
-  const groupedAlbumsProcesses = data.data.filter((d) =>
-    d.attributes.categories.includes(ssj_categories.ALBUMS_ADVICE)
-  );
-
-  const processByCategory = [
-    {
-      category: ssj_categories.FINANCE,
-      processes: groupedFinanceProcesses,
-    },
-    {
-      category: ssj_categories.FACILITIES,
-      processes: groupedFacilitiesProcesses,
-    },
-    {
-      category: ssj_categories.GOVERNANCE_COMPLIANCE,
-      processes: groupedGovernanceComplianceProcesses,
-    },
-    {
-      category: ssj_categories.HUMAN_RESOURCES,
-      processes: groupedHumanResourcesProcesses,
-    },
-    {
-      category: ssj_categories.COMMUNITY_FAMILY_ENGAGEMENT,
-      processes: groupedCommunityFamilyEngagementProcesses,
-    },
-    {
-      category: ssj_categories.CLASSROOM_PROGRAM_PRACTICES,
-      processes: groupedClassroomProgramPracticesProcesses,
-    },
-    {
-      category: ssj_categories.ALBUMS_ADVICE,
-      processes: groupedAlbumsProcesses,
-    },
-  ];
-
-  const processByPhaseHash = {
-    visioning: [],
-    planning: [],
-    startup: [],
-  };
-
-  data.data.forEach((process) => {
-    if (process.attributes.phase !== null) {
-      processByPhaseHash[process.attributes.phase].push(process);
-    }
-  });
-
-  const processByPhase = [
-    { phase: "Visioning", processes: processByPhaseHash["visioning"] },
-    { phase: "Planning", processes: processByPhaseHash["planning"] },
-    { phase: "Startup", processes: processByPhaseHash["startup"] },
-  ];
-
-  return {
-    props: {
-      processByCategory,
-      processByPhase,
-    },
-  };
-}
+};
