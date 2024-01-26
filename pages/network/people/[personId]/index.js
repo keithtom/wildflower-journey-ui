@@ -1,10 +1,9 @@
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import Head from "next/head";
 import { useEffect, useState } from "react";
-import useSWR from "swr";
+import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
+import { Skeleton } from "@mui/material";
 
 import { styled } from "@mui/material/styles";
 import { FilePond, registerPlugin } from "react-filepond";
@@ -69,6 +68,7 @@ import ProfileHero from "@components/ProfileHero";
 import AttributesCard from "@components/AttributesCard";
 import SchoolCard from "@components/SchoolCard";
 import peopleApi from "@api/people";
+import usePerson from "@hooks/usePerson";
 
 const Person = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
@@ -77,43 +77,23 @@ const Person = ({}) => {
   const router = useRouter();
   const { personId } = router.query;
 
-  // api js files should return key and fetcher for each api call.  peopleApi.show.key and show.fetcher, or peopleApi.key('show', personId)
-  const { data, error, isLoading, mutate } = useSWR(
-    personId ? `/api/person/${personId}` : null,
-    () => peopleApi.show(personId, { network: true }).then((res) => res.data),
-    {
-      onErrorRetry: (error) => {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
-      },
-    }
-  );
+  // Fetch data
+  const { data: personData, isLoading } = usePerson(personId, {
+    network: true,
+  });
 
-  if (error)
-    return (
-      <PageContainer isLoading={true}>
-        failed to load ${error.message}
-      </PageContainer>
-    );
-  if (isLoading || !data) return <PageContainer isLoading={true} />;
-  // if (!data.data) return <div>loading...</div>;
-
-  const person = data.data;
-  const included = data.included;
+  const person = personData?.data;
+  const included = personData?.included;
 
   const isMyProfile = currentUser?.id === personId;
-  const hasSchool = person.relationships.schools.length;
-  const hasContact = person.attributes.email || person.attributes.phone;
+  const hasSchool = person?.relationships.schools.length;
+  const hasContact = person?.attributes.email || person?.attributes.phone;
   const hasAttributes =
-    person.attributes.location ||
-    person.attributes.primaryLanguage ||
-    person.attributes.raceEthnicityList.length ||
-    person.attributes.pronouns ||
-    person.attributes.montessoriCertifiedLevelList.length;
+    person?.attributes.location ||
+    person?.attributes.primaryLanguage ||
+    person?.attributes.raceEthnicityList.length ||
+    person?.attributes.pronouns ||
+    person?.attributes.montessoriCertifiedLevelList.length;
 
   const findMatchingItems = (array1, array2, property) => {
     const matchingItems = array1.filter((item1) =>
@@ -121,16 +101,22 @@ const Person = ({}) => {
     );
     return matchingItems;
   };
-  const userSchool = findMatchingItems(
-    included,
-    person.relationships.schools.data,
-    "id"
-  );
-  const hasInfo =
-    person.attributes.about ||
-    person.attributes.rolesResonsibilities ||
-    person.attributes.boardMemberOf ||
-    userSchool;
+
+  let hasInfo;
+  let userSchool;
+
+  if (!isLoading) {
+    userSchool = findMatchingItems(
+      included,
+      person?.relationships.schools.data,
+      "id"
+    );
+    hasInfo =
+      person?.attributes.about ||
+      person?.attributes.rolesResonsibilities ||
+      person?.attributes.boardMemberOf ||
+      userSchool;
+  }
 
   // console.log({ person });
   // console.log({ currentUser });
@@ -141,180 +127,219 @@ const Person = ({}) => {
     <>
       <PageContainer>
         <Stack spacing={6}>
-          <ProfileHero
-            profileImage={person.attributes?.imageUrl}
-            firstName={person.attributes?.firstName}
-            lastName={person.attributes?.lastName}
-            roles={person.attributes?.roleList}
-            school={person.attributes?.school?.name}
-            schoolLogo={person.attributes?.school?.logoUrl}
-            location={person.attributes?.location}
-          />
+          {isLoading ? (
+            <Card size="large">
+              <Grid container spacing={12} alignItems="center">
+                <Grid item>
+                  <Skeleton variant="circular" height={120} width={120} />
+                </Grid>
+                <Grid item>
+                  <Skeleton variant="text" height={64} width={240} />
+                  <Skeleton variant="text" height={24} width={120} />
+                </Grid>
+              </Grid>
+            </Card>
+          ) : (
+            <ProfileHero
+              profileImage={person.attributes?.imageUrl}
+              firstName={person.attributes?.firstName}
+              lastName={person.attributes?.lastName}
+              roles={person.attributes?.roleList}
+              school={person.attributes?.school?.name}
+              schoolLogo={person.attributes?.school?.logoUrl}
+              location={person.attributes?.location}
+            />
+          )}
 
-          <Grid container spacing={8}>
-            <Grid item xs={12} md={hasInfo ? 4 : 12}>
-              <Stack spacing={6}>
-                {hasSchool ? (
-                  schoolLink ? (
-                    <Card>
-                      <Stack spacing={3}>
-                        <Link href={schoolLink}>
-                          <img
-                            src={logoImg}
-                            style={{
-                              objectFit: "contain",
-                              height: "100%",
-                              width: "100%",
-                            }}
-                          />
-                        </Link>
-                        <Stack>
-                          <Typography variant="bodyLarge" lightened>
-                            {school}
-                          </Typography>
-                          <Typography variant="bodyRegular" lightened>
-                            {location}
-                          </Typography>
+          {isLoading ? (
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={4}>
+                <Stack spacing={6}>
+                  <Skeleton height={96} m={0} variant="rounded" />
+                  <Skeleton height={240} m={0} variant="rounded" />
+                </Stack>
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <Stack spacing={12}>
+                  <Stack>
+                    {Array.from({ length: 8 }, (_, j) => (
+                      <Skeleton key={j} height={24} m={0} variant="text" />
+                    ))}
+                  </Stack>
+                  <Stack spacing={3}>
+                    {Array.from({ length: 2 }, (_, j) => (
+                      <Skeleton key={j} height={64} m={0} variant="rounded" />
+                    ))}
+                  </Stack>
+                </Stack>
+              </Grid>
+            </Grid>
+          ) : (
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={hasInfo ? 4 : 12}>
+                <Stack spacing={6}>
+                  {hasSchool ? (
+                    schoolLink ? (
+                      <Card>
+                        <Stack spacing={3}>
+                          <Link href={schoolLink}>
+                            <img
+                              src={logoImg}
+                              style={{
+                                objectFit: "contain",
+                                height: "100%",
+                                width: "100%",
+                              }}
+                            />
+                          </Link>
+                          <Stack>
+                            <Typography variant="bodyLarge" lightened>
+                              {school}
+                            </Typography>
+                            <Typography variant="bodyRegular" lightened>
+                              {location}
+                            </Typography>
+                          </Stack>
                         </Stack>
+                      </Card>
+                    ) : null
+                  ) : null}
+                  {hasContact ? (
+                    <Card>
+                      <Stack spacing={2}>
+                        {person?.attributes?.email ? (
+                          <Stack spacing={1}>
+                            <Typography variant="bodySmall" bold lightened>
+                              EMAIL
+                            </Typography>
+                            <Typography variant="bodyRegular">
+                              {person?.attributes?.email}
+                            </Typography>
+                          </Stack>
+                        ) : null}
+                        {person?.attributes?.phone ? (
+                          <Stack spacing={1}>
+                            <Typography variant="bodySmall" bold lightened>
+                              PHONE
+                            </Typography>
+                            <Typography variant="bodyRegular">
+                              {person?.attributes?.phone}
+                            </Typography>
+                          </Stack>
+                        ) : null}
                       </Stack>
                     </Card>
-                  ) : null
-                ) : null}
-                {hasContact ? (
-                  <Card>
-                    <Stack spacing={2}>
-                      {person?.attributes?.email ? (
-                        <Stack spacing={1}>
-                          <Typography variant="bodySmall" bold lightened>
-                            EMAIL
-                          </Typography>
-                          <Typography variant="bodyRegular">
-                            {person?.attributes?.email}
-                          </Typography>
-                        </Stack>
-                      ) : null}
-                      {person?.attributes?.phone ? (
-                        <Stack spacing={1}>
-                          <Typography variant="bodySmall" bold lightened>
-                            PHONE
-                          </Typography>
-                          <Typography variant="bodyRegular">
-                            {person?.attributes?.phone}
-                          </Typography>
-                        </Stack>
-                      ) : null}
-                    </Stack>
-                  </Card>
-                ) : null}
-                {hasAttributes ? (
-                  <AttributesCard
-                    state={person?.attributes?.location}
-                    language={person?.attributes?.primaryLanguage}
-                    ethnicity={person?.attributes?.raceEthnicityList}
-                    pronouns={person?.attributes?.pronouns}
-                    montessoriCertification={
-                      person?.attributes?.montessoriCertifiedLevelList
-                    }
-                  />
-                ) : null}
-                {isMyProfile ? (
-                  <Button
-                    variant="lightened"
-                    full
-                    onClick={() => setEditProfileModalOpen(true)}
-                  >
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <Icon type="pencil" size="small" />
-                      <Typography variant="bodyRegular" bold>
-                        Edit profile
-                      </Typography>
-                    </Stack>
-                  </Button>
-                ) : null}
-              </Stack>
-            </Grid>
-            {hasInfo ? (
-              <Grid item sm={12} md={8}>
-                <Stack spacing={12}>
-                  {person?.attributes?.about ? (
-                    <Stack spacing={3}>
-                      <Typography variant="h4" bold>
-                        About me
-                      </Typography>
-                      <Typography variant="bodyLarge">
-                        {person.attributes.about}
-                      </Typography>
-                    </Stack>
                   ) : null}
-                  {person?.attributes?.rolesResonsibilities ? (
-                    <Grid container>
-                      <Grid item xs={12} sm={6}>
-                        <Typography variant="h4" bold>
-                          Roles and responsibilities
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={3}>
-                          {person.attributes.rolesResonsibilities.map(
-                            (r, i) => (
-                              <Typography variant="bodyLarge" key={i}>
-                                {r}
-                              </Typography>
-                            )
-                          )}
-                        </Stack>
-                      </Grid>
-                    </Grid>
+                  {hasAttributes ? (
+                    <AttributesCard
+                      state={person?.attributes?.location}
+                      language={person?.attributes?.primaryLanguage}
+                      ethnicity={person?.attributes?.raceEthnicityList}
+                      pronouns={person?.attributes?.pronouns}
+                      montessoriCertification={
+                        person?.attributes?.montessoriCertifiedLevelList
+                      }
+                    />
                   ) : null}
-
-                  {userSchool.length ? (
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} sm={6}>
-                        <Typography variant="h4" bold>
-                          School
+                  {isMyProfile ? (
+                    <Button
+                      variant="lightened"
+                      full
+                      onClick={() => setEditProfileModalOpen(true)}
+                    >
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Icon type="pencil" size="small" />
+                        <Typography variant="bodyRegular" bold>
+                          Edit profile
                         </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={3}>
-                          {userSchool.map((s, i) => (
-                            <SchoolCard
-                              key={i}
-                              schoolName={s.attributes.name}
-                              logo={s.attributes.logoUrl}
-                              location={s.attributes.location}
-                              link={`/network/schools/${s.id}`}
-                            />
-                          ))}
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  ) : null}
-                  {person?.attributes?.boardMemberOf ? (
-                    <Grid container>
-                      <Grid item xs={12} sm={6}>
-                        <Typography variant="h4" bold>
-                          Board member
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={3}>
-                          {person.attributes.boardMemberOf.map((b, i) => (
-                            <SchoolCard
-                              key={i}
-                              schoolName={b.name}
-                              logo={b.logoUrl}
-                              location={b.location}
-                              link={`/network/schools/${b.id}`}
-                            />
-                          ))}
-                        </Stack>
-                      </Grid>
-                    </Grid>
+                      </Stack>
+                    </Button>
                   ) : null}
                 </Stack>
               </Grid>
-            ) : null}
-          </Grid>
+              {hasInfo ? (
+                <Grid item sm={12} md={8}>
+                  <Stack spacing={12}>
+                    {person?.attributes?.about ? (
+                      <Stack spacing={3}>
+                        <Typography variant="h4" bold>
+                          About me
+                        </Typography>
+                        <Typography variant="bodyLarge">
+                          {person.attributes.about}
+                        </Typography>
+                      </Stack>
+                    ) : null}
+                    {person?.attributes?.rolesResonsibilities ? (
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="h4" bold>
+                            Roles and responsibilities
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Stack spacing={3}>
+                            {person.attributes.rolesResonsibilities.map(
+                              (r, i) => (
+                                <Typography variant="bodyLarge" key={i}>
+                                  {r}
+                                </Typography>
+                              )
+                            )}
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    ) : null}
+
+                    {userSchool.length ? (
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="h4" bold>
+                            School
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Stack spacing={3}>
+                            {userSchool.map((s, i) => (
+                              <SchoolCard
+                                key={i}
+                                schoolName={s.attributes.name}
+                                logo={s.attributes.logoUrl}
+                                location={s.attributes.location}
+                                link={`/network/schools/${s.id}`}
+                              />
+                            ))}
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    ) : null}
+                    {person?.attributes?.boardMemberOf ? (
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="h4" bold>
+                            Board member
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Stack spacing={3}>
+                            {person.attributes.boardMemberOf.map((b, i) => (
+                              <SchoolCard
+                                key={i}
+                                schoolName={b.name}
+                                logo={b.logoUrl}
+                                location={b.location}
+                                link={`/network/schools/${b.id}`}
+                              />
+                            ))}
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    ) : null}
+                  </Stack>
+                </Grid>
+              ) : null}
+            </Grid>
+          )}
         </Stack>
       </PageContainer>
       <EditProfileModal

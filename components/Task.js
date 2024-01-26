@@ -5,6 +5,8 @@ import stepsApi from "@api/workflow/steps";
 import { useUserContext } from "@lib/useUserContext";
 import Router from "next/router";
 import { clearLoggedInState } from "@lib/handleLogout";
+import { mutate } from "swr";
+import { useRouter } from "next/router";
 
 import {
   Typography,
@@ -57,6 +59,8 @@ const Task = ({
   processName,
 }) => {
   const { currentUser } = useUserContext(); // why doesn't this work?
+  const router = useRouter();
+  const { workflow, milestone } = router.query;
 
   // Common interface that all invokations of Task should use.
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
@@ -124,8 +128,12 @@ const Task = ({
       setTaskCompleters(task.relationships.completers.data || []);
 
       setInfoDrawerOpen(false);
+      mutate(`/processes/${milestone}`);
+      mutate(`/workflows/${workflow}/assigned_steps`);
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/processes/${milestone}`);
+        mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (error) {
       if (error?.response?.status === 401) {
@@ -157,6 +165,8 @@ const Task = ({
       setCanCompleteTask(task.attributes.canComplete);
       setCanUncompleteTask(task.attributes.canUncomplete);
       setTaskCompleters(task.relationships.completers.data || []);
+      mutate(`/processes/${milestone}`);
+      mutate(`/workflows/${workflow}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
@@ -176,6 +186,8 @@ const Task = ({
       setCanUnassignTask(task.attributes.canUnassign);
 
       setTaskAssignees(task.relationships.assignees.data || []);
+      mutate(`/processes/${milestone}`);
+      mutate(`/workflows/${workflow}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
@@ -197,9 +209,12 @@ const Task = ({
       setTaskAssignees(task.relationships.assignees.data || []);
 
       setInfoDrawerOpen(false);
-
+      mutate(`/processes/${milestone}`);
+      mutate(`/workflows/${workflow}/assigned_steps`);
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/processes/${milestone}`);
+        mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -233,6 +248,8 @@ const Task = ({
       setInfoDrawerOpen(false);
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/processes/${milestone}`);
+        mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (err) {
       if (err?.response?.status === 401) {

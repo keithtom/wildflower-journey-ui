@@ -6,6 +6,20 @@ function show(personId, params = {}) {
   return peopleApi.get(`/${personId}`, { params: params });
 }
 
+export const showPerson = {
+  key: (personId, params) => `/v1/people/${personId}`,
+  fetcher: (personId, params) => {
+    return peopleApi
+      .get(`/${personId}`, { params: params })
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
+
 async function update(personId, personParams) {
   let response;
   try {

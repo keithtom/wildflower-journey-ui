@@ -7,6 +7,7 @@ import { arrayMoveImmutable } from "array-move";
 import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
+import Skeleton from "@mui/material/Skeleton";
 
 import useAuth from "@lib/utils/useAuth";
 import {
@@ -27,23 +28,20 @@ import Task from "@components/Task";
 import CategoryChip from "@components/CategoryChip";
 import StatusChip from "@components/StatusChip";
 import Milestone from "@components/Milestone";
+import useMilestone from "@hooks/useMilestone";
 
-const StyledMilestoneHeader = styled(Stack)`
-  /* downplayed */
-  ${(props) =>
-    props.downplayed &&
-    css`
-      opacity: 0.5;
-    `}
-`;
+const MilestonePage = ({ FakeMilestoneTasks }) => {
+  const router = useRouter();
+  const { workflow, phase, milestone: milestoneQuery } = router.query;
 
-const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
-  const milestoneAttributes = milestone.attributes;
+  const { milestone, isLoading } = useMilestone(milestoneQuery);
+
+  const milestoneAttributes = milestone?.attributes;
+  const isSensibleDefault = false;
+  const isUpNext = milestoneAttributes?.status === "up next";
 
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
-  const isSensibleDefault = false;
-  const isUpNext = milestoneAttributes.status === "up next";
 
   const handleCompleteMilestone = () => {
     setCompleteModalOpen(true);
@@ -56,14 +54,11 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
   };
 
   var milestonePrerequisites =
-    milestone.relationships.prerequisiteProcesses.data;
+    milestone?.relationships?.prerequisiteProcesses?.data;
 
-  const sortedMilestoneTasks = milestone.relationships.steps.data.sort((a, b) =>
-    a.attributes.position > b.attributes.position ? 1 : -1
+  const sortedMilestoneTasks = milestone?.relationships?.steps?.data.sort(
+    (a, b) => (a.attributes.position > b.attributes.position ? 1 : -1)
   );
-
-  const router = useRouter();
-  const { workflow, phase } = router.query;
 
   useAuth("/login");
 
@@ -139,103 +134,125 @@ const MilestonePage = ({ FakeMilestoneTasks, milestone }) => {
             </Grid> */}
           </Grid>
 
-          <StyledMilestoneHeader spacing={8}>
-            <Typography variant="h2" bold capitalize>
-              {milestone.attributes.title}
-            </Typography>
-            <Typography variant="bodyLarge" lightened>
-              {milestone.attributes.description}
-            </Typography>
-            <Stack direction="row" spacing={6} alignItems="center">
-              {milestoneAttributes.status ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    STATUS
-                  </Typography>
-                  <StatusChip
-                    status={milestoneAttributes.status}
-                    size="small"
-                    withIcon
-                  />
-                </Stack>
-              ) : null}
-              {milestoneAttributes.categories.length && false ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    CATEGORY
-                  </Typography>
-                  <Stack direction="row" spacing={2}>
-                    {milestoneAttributes.categories.map((m, i) => (
-                      <CategoryChip
-                        category={m}
+          {isLoading ? (
+            <Stack spacing={8}>
+              <Skeleton height={64} width={320} m={0} />
+              <Stack spacing={2}>
+                <Skeleton height={24} m={0} />
+                <Skeleton height={24} m={0} />
+                <Skeleton height={24} m={0} />
+              </Stack>
+            </Stack>
+          ) : (
+            <>
+              <Stack spacing={8}>
+                <Typography variant="h2" bold capitalize>
+                  {milestone.attributes.title}
+                </Typography>
+                <Typography variant="bodyLarge" lightened>
+                  {milestone.attributes.description}
+                </Typography>
+                <Stack direction="row" spacing={6} alignItems="center">
+                  {milestoneAttributes.status ? (
+                    <Stack spacing={2}>
+                      <Typography variant="bodyMini" lightened bold>
+                        STATUS
+                      </Typography>
+                      <StatusChip
+                        status={milestoneAttributes.status}
                         size="small"
                         withIcon
-                        key={i}
                       />
-                    ))}
-                  </Stack>
-                </Stack>
-              ) : null}
+                    </Stack>
+                  ) : null}
+                  {milestoneAttributes.categories.length && false ? (
+                    <Stack spacing={2}>
+                      <Typography variant="bodyMini" lightened bold>
+                        CATEGORY
+                      </Typography>
+                      <Stack direction="row" spacing={2}>
+                        {milestoneAttributes.categories.map((m, i) => (
+                          <CategoryChip
+                            category={m}
+                            size="small"
+                            withIcon
+                            key={i}
+                          />
+                        ))}
+                      </Stack>
+                    </Stack>
+                  ) : null}
 
-              {milestoneAttributes.author ? (
-                <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    AUTHOR
-                  </Typography>
-                  <Avatar size="mini" />
+                  {milestoneAttributes.author ? (
+                    <Stack spacing={2}>
+                      <Typography variant="bodyMini" lightened bold>
+                        AUTHOR
+                      </Typography>
+                      <Avatar size="mini" />
+                    </Stack>
+                  ) : null}
                 </Stack>
-              ) : null}
-            </Stack>
-          </StyledMilestoneHeader>
-        </Stack>
-
-        <Stack>
-          <Stack direction="row" spacing={3} alignItems="center">
-            <Icon type="checkDouble" variant="primary" size="large" />
-            <Typography variant="h4" bold>
-              Tasks
-            </Typography>
-          </Stack>
-          {userIsEditing ? (
-            <>
-              <NewTaskInput />
-              <EditableTaskList tasks={FakeMilestoneTasks} />
+              </Stack>
             </>
-          ) : sortedMilestoneTasks ? (
-            sortedMilestoneTasks.map((t, i) => (
-              <Task
-                key={t.id}
-                task={t}
-                isLast={i + 1 === sortedMilestoneTasks.length}
-                isNext={isUpNext}
-                handleCompleteMilestone={handleCompleteMilestone}
-                categories={milestoneAttributes.categories}
-              />
-            ))
-          ) : (
-            <Card hoverable elevated size="small">
-              <Grid
-                container
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Grid item>
-                  <Stack>
-                    <Typography variant="bodyRegular" bold>
-                      Looks like there are no tasks for this milestone.
-                    </Typography>
-                    <Typography variant="bodySmall" lightened>
-                      Add a task to do in order to complete this milestone.
-                    </Typography>
-                  </Stack>
-                </Grid>
-                <Grid item>
-                  <Icon type="plus" variant="primary" />
-                </Grid>
-              </Grid>
-            </Card>
           )}
         </Stack>
+
+        {isLoading ? (
+          <Stack spacing={3}>
+            <Skeleton height={24} width={320} />
+            {Array.from({ length: 5 }, (_, j) => (
+              <Skeleton key={j} height={64} m={0} variant="rounded" />
+            ))}
+          </Stack>
+        ) : (
+          <Stack>
+            <Stack direction="row" spacing={3} alignItems="center">
+              <Icon type="checkDouble" variant="primary" size="large" />
+              <Typography variant="h4" bold>
+                Tasks
+              </Typography>
+            </Stack>
+            {userIsEditing ? (
+              <>
+                <NewTaskInput />
+                <EditableTaskList tasks={FakeMilestoneTasks} />
+              </>
+            ) : sortedMilestoneTasks ? (
+              sortedMilestoneTasks.map((t, i) => (
+                <Task
+                  key={t.id}
+                  task={t}
+                  isLast={i + 1 === sortedMilestoneTasks.length}
+                  isNext={isUpNext}
+                  handleCompleteMilestone={handleCompleteMilestone}
+                  categories={milestoneAttributes.categories}
+                />
+              ))
+            ) : (
+              <Card hoverable elevated size="small">
+                <Grid
+                  container
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <Stack>
+                      <Typography variant="bodyRegular" bold>
+                        Looks like there are no tasks for this milestone.
+                      </Typography>
+                      <Typography variant="bodySmall" lightened>
+                        Add a task to do in order to complete this milestone.
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  <Grid item>
+                    <Icon type="plus" variant="primary" />
+                  </Grid>
+                </Grid>
+              </Card>
+            )}
+          </Stack>
+        )}
 
         {userIsEditing ? (
           <Grid container alignItems="center" justifyContent="space-between">
@@ -385,28 +402,7 @@ const EditableTaskList = ({ tasks }) => {
   );
 };
 
-export async function getServerSideProps({ query, req, res }) {
-  const config = getAuthHeader({ req, res });
-  if (!config) {
-    console.log("no token found, redirecting to login");
-    return redirectLoginProps();
-  }
-
-  const milestoneId = query.milestone;
-  let response;
-  try {
-    response = await processesApi.show(milestoneId, config);
-  } catch (error) {
-    if (error?.response?.status === 401) {
-      clearLoggedInState({ req, res });
-      return redirectLoginProps();
-    } else {
-      console.error(error);
-    }
-  }
-  const data = response.data;
-  const milestone = data.data;
-
+export async function getServerSideProps() {
   const FakeMilestoneTasks = [
     {
       title: "Complete WF School Name Research Document",
@@ -435,7 +431,6 @@ export async function getServerSideProps({ query, req, res }) {
 
   return {
     props: {
-      milestone,
       FakeMilestoneTasks,
     },
   };

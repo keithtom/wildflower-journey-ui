@@ -1,15 +1,10 @@
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import useSWR from "swr";
 import moment from "moment";
 import Skeleton from "@mui/material/Skeleton";
 
-import peopleApi from "@api/people";
-import teamsApi from "@api/ssj/teams";
-import { useUserContext, useAssignViewingSchool } from "@lib/useUserContext";
-import { clearLoggedInState } from "@lib/handleLogout";
-import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
+import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
+import useAllTeams from "@hooks/useAllTeams";
 
 import PhaseChip from "../../components/PhaseChip";
 import {
@@ -28,25 +23,11 @@ const YourSchools = () => {
   const { currentUser } = useUserContext();
   const router = useRouter();
 
-  useAuth("/login");
+  //fetch data
+  const { teams, isLoading } = useAllTeams();
 
-  //swr call to teams for currentUser ops guide
-  const { data, error, isLoading, isValidating, mutate } = useSWR(
-    "api/ssj/teams",
-    () => teamsApi.index().then((res) => res.data),
-    {
-      onErrorRetry: (error) => {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
-      },
-    }
-  );
   //set teams array
-  let ssjTeams = data || [];
+  let ssjTeams = teams || [];
 
   //set grouped teams by phase
   const visioningTeams = ssjTeams.filter(
@@ -59,6 +40,7 @@ const YourSchools = () => {
     (team) => team.attributes.currentPhase === "startup"
   );
 
+  useAuth("/login");
   // console.log({ ssjTeams });
 
   return (
@@ -85,7 +67,16 @@ const YourSchools = () => {
                   Your Schools
                 </Typography>
 
-                {visioningTeams.length ? (
+                {isLoading ? (
+                  <Stack spacing={6}>
+                    <Skeleton width={120} height={48} />
+                    <Stack spacing={3}>
+                      {Array.from({ length: 5 }, (_, j) => (
+                        <Skeleton key={j} height={64} m={0} variant="rounded" />
+                      ))}
+                    </Stack>
+                  </Stack>
+                ) : visioningTeams.length ? (
                   <Stack spacing={6}>
                     <Grid item>
                       <PhaseChip phase="Visioning" size="large" />
@@ -104,7 +95,17 @@ const YourSchools = () => {
                     </Stack>
                   </Stack>
                 ) : null}
-                {planningTeams.length ? (
+
+                {isLoading ? (
+                  <Stack spacing={6}>
+                    <Skeleton width={120} height={48} />
+                    <Stack spacing={3}>
+                      {Array.from({ length: 5 }, (_, j) => (
+                        <Skeleton key={j} height={64} m={0} variant="rounded" />
+                      ))}
+                    </Stack>
+                  </Stack>
+                ) : planningTeams.length ? (
                   <Stack spacing={6}>
                     <Grid item>
                       <PhaseChip phase="Planning" size="large" />
@@ -123,7 +124,16 @@ const YourSchools = () => {
                     </Stack>
                   </Stack>
                 ) : null}
-                {startupTeams.length ? (
+                {isLoading ? (
+                  <Stack spacing={6}>
+                    <Skeleton width={120} height={48} />
+                    <Stack spacing={3}>
+                      {Array.from({ length: 5 }, (_, j) => (
+                        <Skeleton key={j} height={64} m={0} variant="rounded" />
+                      ))}
+                    </Stack>
+                  </Stack>
+                ) : startupTeams.length ? (
                   <Stack spacing={6}>
                     <Grid item>
                       <PhaseChip phase="Startup" size="large" />

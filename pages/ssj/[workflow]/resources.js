@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { getCookie } from "cookies-next";
 import ssjApi from "@api/ssj/ssj";
+import { useRouter } from "next/router";
+import Skeleton from "@mui/material/Skeleton";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
@@ -11,7 +13,12 @@ import Hero from "@components/Hero";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
-const Resources = ({ dataResources }) => {
+import useSSJResources from "@hooks/useSSJResources";
+
+const Resources = () => {
+  const router = useRouter();
+  const { workflow } = router.query;
+
   const [showResourcesByCategory, setShowResourcesByCategory] = useState(true);
   const [showResourcesByPhase, setShowResourcesByPhase] = useState(false);
 
@@ -19,15 +26,17 @@ const Resources = ({ dataResources }) => {
     setShowResourcesByPhase(false);
     setShowResourcesByCategory(true);
   };
-  const handleShowResourcesByPhase = () => {
+  const handleShowResourcesByPhase = (z) => {
     setShowResourcesByPhase(true);
     setShowResourcesByCategory(false);
   };
 
+  const { resources, isLoading } = useSSJResources(workflow);
+  // console.log({ resources });
+
   const hero = "/assets/images/ssj/wildflowerSystems.jpg";
 
   useAuth("/login");
-  // console.log({ dataResources });
 
   return (
     <PageContainer>
@@ -63,88 +72,77 @@ const Resources = ({ dataResources }) => {
           </Grid>
         </Stack>
 
-        {showResourcesByCategory
-          ? dataResources.by_category.map((a, i) => {
-              const name = Object.keys(a)[0];
-              const array = Object.values(a);
-              return array[0]?.length ? (
-                <Card key={i}>
-                  <Stack spacing={6}>
-                    <Stack direction="row" spacing={6} alignItems="center">
-                      <CategoryChip category={name} size="large" />
-                      <Typography variant="h4" lightened>
-                        {array[0].length}
-                      </Typography>
-                    </Stack>
-                    <Stack spacing={3}>
-                      {array[0].map((r, i) => (
-                        <Resource
-                          title={r.data.attributes.title}
-                          link={r.data.attributes.link}
-                          key={i}
-                        />
-                      ))}
-                    </Stack>
+        {isLoading ? (
+          <Stack spacing={6}>
+            {Array.from({ length: 12 }, (_, i) => (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Skeleton width={240} height={48} />
+                  <Stack spacing={3}>
+                    {Array.from({ length: 16 }, (_, j) => (
+                      <Skeleton key={j} height={64} m={0} variant="rounded" />
+                    ))}
                   </Stack>
-                </Card>
-              ) : null;
-            })
-          : dataResources.by_phase.map((a, i) => {
-              const name = Object.keys(a)[0];
-              const array = Object.values(a);
-              return (
-                <Card key={i}>
-                  <Stack spacing={6}>
-                    <Stack direction="row" spacing={6} alignItems="center">
-                      <PhaseChip phase={name} size="large" />
-                      <Typography variant="h4" lightened>
-                        {array[0].length}
-                      </Typography>
-                    </Stack>
-                    <Stack spacing={3}>
-                      {array[0].map((r, i) => (
-                        <Resource
-                          title={r.data.attributes.title}
-                          link={r.data.attributes.link}
-                          key={i}
-                        />
-                      ))}
-                    </Stack>
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+        ) : showResourcesByCategory ? (
+          resources.by_category.map((a, i) => {
+            const name = Object.keys(a)[0];
+            const array = Object.values(a);
+            return array[0]?.length ? (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={6} alignItems="center">
+                    <CategoryChip category={name} size="large" />
+                    <Typography variant="h4" lightened>
+                      {array[0].length}
+                    </Typography>
                   </Stack>
-                </Card>
-              );
-            })}
+                  <Stack spacing={3}>
+                    {array[0].map((r, i) => (
+                      <Resource
+                        title={r.data.attributes.title}
+                        link={r.data.attributes.link}
+                        key={i}
+                      />
+                    ))}
+                  </Stack>
+                </Stack>
+              </Card>
+            ) : null;
+          })
+        ) : (
+          resources.by_phase.map((a, i) => {
+            const name = Object.keys(a)[0];
+            const array = Object.values(a);
+            return (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={6} alignItems="center">
+                    <PhaseChip phase={name} size="large" />
+                    <Typography variant="h4" lightened>
+                      {array[0].length}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={3}>
+                    {array[0].map((r, i) => (
+                      <Resource
+                        title={r.data.attributes.title}
+                        link={r.data.attributes.link}
+                        key={i}
+                      />
+                    ))}
+                  </Stack>
+                </Stack>
+              </Card>
+            );
+          })
+        )}
       </Stack>
     </PageContainer>
   );
 };
 
 export default Resources;
-
-export async function getServerSideProps({ query, req, res }) {
-  const config = getAuthHeader({ req, res });
-  if (!config) {
-    console.log("no token found, redirecting to login");
-    return redirectLoginProps();
-  }
-
-  const workflowId = query.workflow;
-  let responseResources;
-  try {
-    responseResources = await ssjApi.resources({ workflowId, config });
-  } catch (error) {
-    if (error?.response?.status === 401) {
-      clearLoggedInState({ req, res });
-      return redirectLoginProps();
-    } else {
-      console.error(error);
-    }
-  }
-  const dataResources = await responseResources.data;
-
-  return {
-    props: {
-      dataResources,
-    },
-  };
-}
