@@ -60,7 +60,7 @@ const Task = ({
 }) => {
   const { currentUser } = useUserContext(); // why doesn't this work?
   const router = useRouter();
-  const { workflow } = router.query;
+  const { workflow, milestone } = router.query;
 
   // Common interface that all invokations of Task should use.
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
@@ -128,9 +128,11 @@ const Task = ({
       setTaskCompleters(task.relationships.completers.data || []);
 
       setInfoDrawerOpen(false);
+      mutate(`/processes/${milestone}`);
       mutate(`/workflows/${workflow}/assigned_steps`);
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/processes/${milestone}`);
         mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (error) {
@@ -163,6 +165,7 @@ const Task = ({
       setCanCompleteTask(task.attributes.canComplete);
       setCanUncompleteTask(task.attributes.canUncomplete);
       setTaskCompleters(task.relationships.completers.data || []);
+      mutate(`/processes/${milestone}`);
       mutate(`/workflows/${workflow}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -183,6 +186,7 @@ const Task = ({
       setCanUnassignTask(task.attributes.canUnassign);
 
       setTaskAssignees(task.relationships.assignees.data || []);
+      mutate(`/processes/${milestone}`);
       mutate(`/workflows/${workflow}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -205,9 +209,11 @@ const Task = ({
       setTaskAssignees(task.relationships.assignees.data || []);
 
       setInfoDrawerOpen(false);
+      mutate(`/processes/${milestone}`);
       mutate(`/workflows/${workflow}/assigned_steps`);
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/processes/${milestone}`);
         mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (err) {
@@ -242,6 +248,7 @@ const Task = ({
       setInfoDrawerOpen(false);
       if (removeStep) {
         removeStep(taskId);
+        mutate(`/processes/${milestone}`);
         mutate(`/workflows/${workflow}/assigned_steps`);
       }
     } catch (err) {

@@ -3,7 +3,7 @@ import { showMilestones } from "@api/workflow/processes";
 
 const useMilestones = (workflowId, params) => {
   //Fetch the data using SWR
-  const { data, error } = useSWR(
+  const { data, error, isValidating } = useSWR(
     workflowId ? showMilestones.key(workflowId, params) : null,
     () => showMilestones.fetcher(workflowId, params)
   );
@@ -93,6 +93,7 @@ const useMilestones = (workflowId, params) => {
     isLoadingMilestonesByCurrentPhase: milestonesByCurrentPhase === null,
 
     isError: error,
+    isValidating,
   };
 };
 

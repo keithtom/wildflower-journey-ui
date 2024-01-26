@@ -7,6 +7,7 @@ import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Skeleton from "@mui/material/Skeleton";
+import { mutate } from "swr";
 
 import useAuth from "@lib/utils/useAuth";
 import {
@@ -37,10 +38,13 @@ const PhasePage = () => {
   const visioningHero = "/assets/images/ssj/visioning.jpg";
   const startupHero = "/assets/images/ssj/startup.jpg";
 
-  const { milestonesByCurrentPhase, isLoadingMilestonesByCurrentPhase } =
-    useMilestones(workflow, {
-      phase: phase,
-    });
+  const {
+    milestonesByCurrentPhase,
+    isLoadingMilestonesByCurrentPhase,
+    isValidating,
+  } = useMilestones(workflow, {
+    phase: phase,
+  });
   // console.log({ milestonesByCurrentPhase });
   // console.log({ isLoadingMilestonesByCurrentPhase });
 
@@ -63,7 +67,7 @@ const PhasePage = () => {
             {phase}
           </Typography>
 
-          {isLoadingMilestonesByCurrentPhase ? (
+          {isLoadingMilestonesByCurrentPhase || isValidating ? (
             <Stack spacing={6}>
               {Array.from({ length: 4 }, (_, i) => (
                 <Card key={i}>
