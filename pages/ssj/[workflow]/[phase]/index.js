@@ -6,6 +6,8 @@ import processesApi from "@api/workflow/processes";
 import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
+import Skeleton from "@mui/material/Skeleton";
+import { mutate } from "swr";
 
 import useAuth from "@lib/utils/useAuth";
 import {
@@ -23,12 +25,9 @@ import {
 import Milestone from "@components/Milestone";
 import Hero from "@components/Hero";
 
-const PhasePage = ({
-  milestonesInProgress,
-  milestonesToDo,
-  milestonesUpNext,
-  milestonesDone,
-}) => {
+import useMilestones from "@hooks/useMilestones";
+
+const PhasePage = () => {
   const [phaseCompleteModalOpen, setPhaseCompleteModalOpen] = useState(false);
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
 
@@ -38,6 +37,16 @@ const PhasePage = ({
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
   const startupHero = "/assets/images/ssj/startup.jpg";
+
+  const {
+    milestonesByCurrentPhase,
+    isLoadingMilestonesByCurrentPhase,
+    isValidating,
+  } = useMilestones(workflow, {
+    phase: phase,
+  });
+  // console.log({ milestonesByCurrentPhase });
+  // console.log({ isLoadingMilestonesByCurrentPhase });
 
   useAuth("/login");
 
@@ -58,158 +67,178 @@ const PhasePage = ({
             {phase}
           </Typography>
 
-          <Stack spacing={6}>
-            {milestonesInProgress.length ? (
-              <Card>
-                <Stack spacing={3}>
-                  <Grid
-                    container
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Grid item ml={3}>
-                      <Stack direction="row" spacing={6}>
-                        <Icon type="rightArrowCircleSolid" variant="primary" />
-                        <Typography variant="bodyLarge" bold>
-                          In Progress
-                        </Typography>
-                        <Typography variant="bodyLarge" lightened>
-                          {milestonesInProgress.length}
-                        </Typography>
-                      </Stack>
+          {isLoadingMilestonesByCurrentPhase || isValidating ? (
+            <Stack spacing={6}>
+              {Array.from({ length: 4 }, (_, i) => (
+                <Card key={i}>
+                  <Stack spacing={6}>
+                    <Skeleton width={240} height={48} />
+                    <Stack spacing={3}>
+                      {Array.from({ length: 4 }, (_, j) => (
+                        <Skeleton key={j} height={64} m={0} variant="rounded" />
+                      ))}
+                    </Stack>
+                  </Stack>
+                </Card>
+              ))}
+            </Stack>
+          ) : (
+            <Stack spacing={6}>
+              {milestonesByCurrentPhase?.in_progress?.length ? (
+                <Card>
+                  <Stack spacing={3}>
+                    <Grid
+                      container
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Grid item ml={3}>
+                        <Stack direction="row" spacing={6}>
+                          <Icon
+                            type="rightArrowCircleSolid"
+                            variant="primary"
+                          />
+                          <Typography variant="bodyLarge" bold>
+                            In Progress
+                          </Typography>
+                          <Typography variant="bodyLarge" lightened>
+                            {milestonesByCurrentPhase?.in_progress?.length}
+                          </Typography>
+                        </Stack>
+                      </Grid>
                     </Grid>
-                  </Grid>
 
-                  <Stack spacing={3}>
-                    {milestonesInProgress.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                        key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
-                        categories={m.attributes.categories}
-                        status={m.attributes.status}
-                        stepCount={m.relationships.steps.data.length}
-                        completedStepsCount={m.attributes.completedStepsCount}
-                        stepsAssignedCount={m.attributes.stepsAssignedCount}
-                      />
-                    ))}
+                    <Stack spacing={3}>
+                      {milestonesByCurrentPhase?.in_progress?.map((m, i) => (
+                        <Milestone
+                          link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                          key={i}
+                          title={m.attributes.title}
+                          description={m.attributes.description}
+                          categories={m.attributes.categories}
+                          status={m.attributes.status}
+                          stepCount={m.relationships.steps.data.length}
+                          completedStepsCount={m.attributes.completedStepsCount}
+                          stepsAssignedCount={m.attributes.stepsAssignedCount}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
-                </Stack>
-              </Card>
-            ) : null}
-            {milestonesToDo.length ? (
-              <Card>
-                <Stack spacing={3}>
-                  <Grid
-                    container
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Grid item ml={3}>
-                      <Stack direction="row" spacing={6}>
-                        <Icon type="rightArrowCircle" variant="primary" />
-                        <Typography variant="bodyLarge" bold>
-                          To do
-                        </Typography>
-                        <Typography variant="bodyLarge" lightened>
-                          {milestonesToDo.length}
-                        </Typography>
-                      </Stack>
+                </Card>
+              ) : null}
+              {milestonesByCurrentPhase?.to_do?.length ? (
+                <Card>
+                  <Stack spacing={3}>
+                    <Grid
+                      container
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Grid item ml={3}>
+                        <Stack direction="row" spacing={6}>
+                          <Icon type="rightArrowCircle" variant="primary" />
+                          <Typography variant="bodyLarge" bold>
+                            To do
+                          </Typography>
+                          <Typography variant="bodyLarge" lightened>
+                            {milestonesByCurrentPhase?.to_do?.length}
+                          </Typography>
+                        </Stack>
+                      </Grid>
                     </Grid>
-                  </Grid>
 
-                  <Stack spacing={3}>
-                    {milestonesToDo.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                        key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
-                        categories={m.attributes.categories}
-                        status={m.attributes.status}
-                        stepCount={m.relationships.steps.data.length}
-                        completedStepsCount={m.attributes.completedStepsCount}
-                        stepsAssignedCount={m.attributes.stepsAssignedCount}
-                      />
-                    ))}
+                    <Stack spacing={3}>
+                      {milestonesByCurrentPhase?.to_do?.map((m, i) => (
+                        <Milestone
+                          link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                          key={i}
+                          title={m.attributes.title}
+                          description={m.attributes.description}
+                          categories={m.attributes.categories}
+                          status={m.attributes.status}
+                          stepCount={m.relationships.steps.data.length}
+                          completedStepsCount={m.attributes.completedStepsCount}
+                          stepsAssignedCount={m.attributes.stepsAssignedCount}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
-                </Stack>
-              </Card>
-            ) : null}
-            {milestonesUpNext.length ? (
-              <Card>
-                <Stack spacing={3}>
-                  <Grid
-                    container
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Grid item ml={3}>
-                      <Stack direction="row" spacing={6}>
-                        <Icon type="circle" variant="lightened" />
-                        <Typography variant="bodyLarge" bold>
-                          Up Next
-                        </Typography>
-                        <Typography variant="bodyLarge" lightened>
-                          {milestonesUpNext.length}
-                        </Typography>
-                      </Stack>
+                </Card>
+              ) : null}
+              {milestonesByCurrentPhase?.up_next?.length ? (
+                <Card>
+                  <Stack spacing={3}>
+                    <Grid
+                      container
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Grid item ml={3}>
+                        <Stack direction="row" spacing={6}>
+                          <Icon type="circle" variant="lightened" />
+                          <Typography variant="bodyLarge" bold>
+                            Up Next
+                          </Typography>
+                          <Typography variant="bodyLarge" lightened>
+                            {milestonesByCurrentPhase?.up_next?.length}
+                          </Typography>
+                        </Stack>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                  <Stack spacing={3}>
-                    {milestonesUpNext.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                        key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
-                        categories={m.attributes.categories}
-                        status={m.attributes.status}
-                        stepCount={m.relationships.steps.data.length}
-                      />
-                    ))}
+                    <Stack spacing={3}>
+                      {milestonesByCurrentPhase?.up_next?.map((m, i) => (
+                        <Milestone
+                          link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                          key={i}
+                          title={m.attributes.title}
+                          description={m.attributes.description}
+                          categories={m.attributes.categories}
+                          status={m.attributes.status}
+                          stepCount={m.relationships.steps.data.length}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
-                </Stack>
-              </Card>
-            ) : null}
-            {milestonesDone.length ? (
-              <Card>
-                <Stack spacing={3}>
-                  <Grid
-                    container
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Grid item ml={3}>
-                      <Stack direction="row" spacing={6}>
-                        <Icon type="checkCircle" variant="success" />
-                        <Typography variant="bodyLarge" bold>
-                          Done
-                        </Typography>
-                        <Typography variant="bodyLarge" lightened>
-                          {milestonesDone.length}
-                        </Typography>
-                      </Stack>
+                </Card>
+              ) : null}
+              {milestonesByCurrentPhase?.done?.length ? (
+                <Card>
+                  <Stack spacing={3}>
+                    <Grid
+                      container
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Grid item ml={3}>
+                        <Stack direction="row" spacing={6}>
+                          <Icon type="checkCircle" variant="success" />
+                          <Typography variant="bodyLarge" bold>
+                            Done
+                          </Typography>
+                          <Typography variant="bodyLarge" lightened>
+                            {milestonesByCurrentPhase?.done?.length}
+                          </Typography>
+                        </Stack>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                  <Stack spacing={3}>
-                    {milestonesDone.map((m, i) => (
-                      <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                        key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
-                        categories={m.attributes.categories}
-                        status={m.attributes.status}
-                        stepCount={m.relationships.steps.data.length}
-                      />
-                    ))}
+                    <Stack spacing={3}>
+                      {milestonesByCurrentPhase?.done?.map((m, i) => (
+                        <Milestone
+                          link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                          key={i}
+                          title={m.attributes.title}
+                          description={m.attributes.description}
+                          categories={m.attributes.categories}
+                          status={m.attributes.status}
+                          stepCount={m.relationships.steps.data.length}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
-                </Stack>
-              </Card>
-            ) : null}
-          </Stack>
+                </Card>
+              ) : null}
+            </Stack>
+          )}
 
           {/* <Card variant="lightened">
             <Grid container justifyContent="space-between" alignItems="center">
@@ -421,62 +450,3 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
     </Modal>
   );
 };
-
-export async function getServerSideProps({ query, req, res }) {
-  const config = getAuthHeader({ req, res });
-  if (!config) {
-    console.log("no token found, redirecting to login");
-    return redirectLoginProps();
-  }
-  const { phase, workflow } = query;
-  const workflowId = workflow;
-
-  let response;
-  try {
-    response = await processesApi.index({
-      workflowId,
-      config,
-      params: { phase },
-    });
-  } catch (error) {
-    if (error?.response?.status === 401) {
-      clearLoggedInState({ req, res });
-      return redirectLoginProps();
-    } else {
-      console.error(error);
-    }
-  }
-  const data = await response?.data;
-
-  const milestonesInProgress = [];
-  const milestonesToDo = [];
-  const milestonesUpNext = [];
-  const milestonesDone = [];
-
-  const currentPhaseMilestones = data.data.filter(
-    (m) => m.attributes.phase === phase
-  );
-
-  // pull me into API
-  currentPhaseMilestones.forEach((milestone) => {
-    if (milestone.attributes.status == "to do") {
-      milestonesToDo.push(milestone);
-    } else if (milestone.attributes.status == "up next") {
-      milestonesUpNext.push(milestone);
-    } else if (milestone.attributes.status == "done") {
-      milestonesDone.push(milestone);
-    } else if (milestone.attributes.status == "in progress") {
-      milestonesInProgress.push(milestone);
-    }
-  });
-
-  return {
-    props: {
-      currentPhaseMilestones,
-      milestonesInProgress,
-      milestonesToDo,
-      milestonesUpNext,
-      milestonesDone,
-    },
-  };
-}

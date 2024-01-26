@@ -15,6 +15,22 @@ async function index() {
   return responseData;
 }
 
+export const showAllTeams = {
+  key: () => `/`,
+  fetcher: () => {
+    return teamsApi
+      .get(showAllTeams.key(), getAuthHeader())
+      .then((res) => {
+        const data = res.data;
+        wildflowerApi.loadAllRelationshipsFromIncluded(data);
+        return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
+
 async function setStartDate(data) {
   let response;
   try {
@@ -44,6 +60,21 @@ async function getTeam(id) {
   return data;
   // if response good, great.  else.  error out?
 }
+
+export const showTeam = {
+  key: (teamId) => `/${teamId}`,
+  fetcher: (teamId) => {
+    return teamsApi
+      .get(showTeam.key(teamId), getAuthHeader())
+      .then((data) => {
+        wildflowerApi.loadAllRelationshipsFromIncluded(data);
+        return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
 
 // let data = {
 //   etl_people_params: [

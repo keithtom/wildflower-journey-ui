@@ -1,5 +1,11 @@
 import wildflowerApi from "@api/base";
 import stepsApi from "@api/workflow/steps";
+import { getCookie } from "cookies-next";
+
+function getAuthHeader() {
+  const token = getCookie("auth");
+  return { headers: { Authorization: token } };
+}
 
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 
@@ -26,6 +32,33 @@ async function index({ workflowId, params, config = {} }) {
   return response;
 }
 
+export const showMilestones = {
+  key: (workflowId, params) => {
+    let url = `/workflows/${workflowId}/processes`;
+    if (params !== undefined) {
+      url += `?`;
+      const paramNames = Object.keys(params);
+      paramNames.forEach((param, index) => {
+        if (index != 0) {
+          url += `&`;
+        }
+        url += `${param}=${params[param]}`;
+      });
+    }
+    return url;
+  },
+  fetcher: (workflowId, params) => {
+    return workflowsApi
+      .get(showMilestones.key(workflowId, params), getAuthHeader())
+      .then((res) => {
+        return res;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
+
 // look at an individual process/milestone
 async function show(id, config = {}) {
   let response;
@@ -47,5 +80,26 @@ async function show(id, config = {}) {
   response.data.data.relationships.steps.data = steps;
   return response;
 }
+
+export const showMilestone = {
+  key: (id) => `/processes/${id}`,
+  fetcher: (id) => {
+    return workflowsApi
+      .get(showMilestone.key(id), getAuthHeader())
+      .then((response) => {
+        const included = response.data.included;
+        wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
+        const steps = response.data.data.relationships.steps.data;
+        steps.forEach((step) => {
+          step = stepsApi.augmentStep(step, included);
+        });
+        response.data.data.relationships.steps.data = steps;
+        return response;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
 
 export default { index, show };
