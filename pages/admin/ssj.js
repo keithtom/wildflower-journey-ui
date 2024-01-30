@@ -144,7 +144,7 @@ const AddSchoolModal = ({ open, toggle }) => {
     setTempDisplayData({});
     setActiveStep(0);
     toggle();
-    mutate("api/teams");
+    mutate("api/ssj/teams");
   };
 
   return (
@@ -564,7 +564,7 @@ const AddOperationsGuide = ({
                       </Grid>
                     </Card>
                   ) : (
-                    opsGuides.map((og, i) => (
+                    opsGuides?.map((og, i) => (
                       <StyledPersonOption
                         size="small"
                         noBorder
@@ -726,7 +726,7 @@ const AddRegionalGrowthLead = ({
                       </Grid>
                     </Card>
                   ) : (
-                    rgl.map((rgl, i) => (
+                    rgl?.map((rgl, i) => (
                       <StyledPersonOption
                         size="small"
                         noBorder
