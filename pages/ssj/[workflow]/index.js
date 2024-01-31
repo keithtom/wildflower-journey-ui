@@ -339,7 +339,7 @@ const SSJ = () => {
                         sx={{ height: "100%" }}
                       >
                         <Stack spacing={2}>
-                          {milestonesToDo.map((m, i) => (
+                          {milestonesToDo?.map((m, i) => (
                             <Link
                               href={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                               key={i}
@@ -386,7 +386,7 @@ const SSJ = () => {
                 </Grid>
                 <Grid container spacing={3} alignItems="stretch">
                   {partners && partners.length ? (
-                    partners.map((p, i) => (
+                    partners?.map((p, i) => (
                       <Grid item xs={12} sm={4} key={i}>
                         <UserCard
                           key={p.id}
@@ -461,7 +461,7 @@ const SSJ = () => {
 
                   {viewPhaseProgress ? (
                     <Grid container spacing={3}>
-                      {progress.by_phase.map((p, i) => (
+                      {progress?.by_phase?.map((p, i) => (
                         <Grid item xs={12} sm={4} key={i}>
                           <PhaseProgressCard
                             phase={p.name}
@@ -473,7 +473,7 @@ const SSJ = () => {
                     </Grid>
                   ) : (
                     <Grid container spacing={3} alignItems="stretch">
-                      {progress.by_category.map((c, i) => (
+                      {progress?.by_category?.map((c, i) => (
                         <Grid item xs={12} sm={4}>
                           <Link href={`/ssj/${workflow}/milestones`}>
                             <Card
@@ -518,7 +518,7 @@ const SSJ = () => {
                     Ways to work together
                   </Typography>
                   <Grid container spacing={3}>
-                    {waysToWorkTogether.map((w, i) => (
+                    {waysToWorkTogether?.map((w, i) => (
                       <Grid item xs={12} sm={4} alignItems="stretch" key={i}>
                         <WaysToWorkCard waysToWork={w} />
                       </Grid>
@@ -738,7 +738,7 @@ const ProgressBar = ({ processes }) => {
         MILESTONES COMPLETED
       </Typography>
       <Stack spacing={1} direction="row">
-        {reverseProcesses.map((p, i) => (
+        {reverseProcesses?.map((p, i) => (
           <StyledProcessIndicator key={i} variant={p} />
         ))}
       </Stack>
@@ -938,7 +938,7 @@ const WaysToWorkModal = ({ toggle, open, title, resources }) => {
   return (
     <Modal title={title} toggle={toggle} open={open}>
       <Stack spacing={2}>
-        {resources.map((r, i) => (
+        {resources?.map((r, i) => (
           <Resource
             title={r.title}
             link={r.url}
