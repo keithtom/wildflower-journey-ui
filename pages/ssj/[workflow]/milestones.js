@@ -101,7 +101,7 @@ const MilestonesByCategory = ({ workflow }) => {
       ))}
     </Stack>
   ) : (
-    milestonesByCategory.map((a, i) =>
+    milestonesByCategory?.map((a, i) =>
       a.milestones.length ? (
         <Card key={i}>
           <Stack spacing={6}>
@@ -112,7 +112,7 @@ const MilestonesByCategory = ({ workflow }) => {
               </Typography>
             </Stack>
             <Stack spacing={3}>
-              {a.milestones.map((m, i) => (
+              {a.milestones?.map((m, i) => (
                 <Milestone
                   link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                   key={i}
@@ -151,7 +151,7 @@ const MilestonesByPhase = ({ workflow }) => {
       ))}
     </Stack>
   ) : (
-    milestonesByPhase.map((m, i) => (
+    milestonesByPhase?.map((m, i) => (
       <Card key={i}>
         <Stack spacing={6}>
           <Stack direction="row" spacing={6} alignItems="center">
@@ -161,7 +161,7 @@ const MilestonesByPhase = ({ workflow }) => {
             </Typography>
           </Stack>
           <Stack spacing={3}>
-            {m.milestones.map((m, i) => (
+            {m.milestones?.map((m, i) => (
               <Milestone
                 link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                 key={i}

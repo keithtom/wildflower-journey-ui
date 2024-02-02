@@ -108,12 +108,12 @@ const TaskPage = ({ MilestoneId, MilestoneTitle }) => {
               <>
                 <NewResourceInput />
                 {FakeResources &&
-                  FakeResources.map((r, i) => (
+                  FakeResources?.map((r, i) => (
                     <EditableResourceItem title={r.title} key={i} />
                   ))}
               </>
             ) : FakeResources ? (
-              FakeResources.map((r, i) => (
+              FakeResources?.map((r, i) => (
                 <Resource title={r.title} link={r.link} />
               ))
             ) : (
@@ -266,7 +266,7 @@ const DecisionForm = ({ options, disabled }) => {
     >
       <Stack spacing={3}>
         <RadioGroup value={decisionOption}>
-          {options.map((o, i) => (
+          {options?.map((o, i) => (
             <FormControlLabel
               key={i}
               value={o.value}
