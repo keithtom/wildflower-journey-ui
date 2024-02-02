@@ -82,7 +82,7 @@ const YourSchools = () => {
                       <PhaseChip phase="Visioning" size="large" />
                     </Grid>
                     <Stack spacing={3} id="visioning-stack">
-                      {visioningTeams?.map((v, i) => (
+                      {visioningTeams.map((v, i) => (
                         <SchoolCard
                           key={i}
                           name={v.attributes.tempName}
@@ -111,7 +111,7 @@ const YourSchools = () => {
                       <PhaseChip phase="Planning" size="large" />
                     </Grid>
                     <Stack spacing={3}>
-                      {planningTeams?.map((p, i) => (
+                      {planningTeams.map((p, i) => (
                         <SchoolCard
                           key={i}
                           name={p.attributes.tempName}
@@ -139,7 +139,7 @@ const YourSchools = () => {
                       <PhaseChip phase="Startup" size="large" />
                     </Grid>
                     <Stack spacing={3}>
-                      {startupTeams?.map((s, i) => (
+                      {startupTeams.map((s, i) => (
                         <SchoolCard
                           key={i}
                           name={s.attributes.tempName}
@@ -215,7 +215,7 @@ const SchoolCard = ({ name, location, team, openDate, workflowId }) => {
               <Stack spacing={3} direction="row">
                 <AvatarGroup>
                   {team &&
-                    team?.map((t, i) => (
+                    team.map((t, i) => (
                       <Avatar size="sm" src={t.attributes?.imageUrl} key={i} />
                     ))}
                 </AvatarGroup>
@@ -223,7 +223,7 @@ const SchoolCard = ({ name, location, team, openDate, workflowId }) => {
                   <span>
                     <Typography variant="bodyRegular">
                       {team &&
-                        team?.map((t, i) => (
+                        team.map((t, i) => (
                           <span key={i}>
                             {t.attributes.firstName} {t.attributes.lastName}{" "}
                             {i !== team.length - 1 ? "and " : null}

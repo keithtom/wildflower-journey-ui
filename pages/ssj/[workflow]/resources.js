@@ -88,7 +88,7 @@ const Resources = () => {
             ))}
           </Stack>
         ) : showResourcesByCategory ? (
-          resources.by_category?.map((a, i) => {
+          resources.by_category.map((a, i) => {
             const name = Object.keys(a)[0];
             const array = Object.values(a);
             return array[0]?.length ? (
@@ -101,7 +101,7 @@ const Resources = () => {
                     </Typography>
                   </Stack>
                   <Stack spacing={3}>
-                    {array[0]?.map((r, i) => (
+                    {array[0].map((r, i) => (
                       <Resource
                         title={r.data.attributes.title}
                         link={r.data.attributes.link}
@@ -114,7 +114,7 @@ const Resources = () => {
             ) : null;
           })
         ) : (
-          resources.by_phase?.map((a, i) => {
+          resources.by_phase.map((a, i) => {
             const name = Object.keys(a)[0];
             const array = Object.values(a);
             return (
@@ -127,7 +127,7 @@ const Resources = () => {
                     </Typography>
                   </Stack>
                   <Stack spacing={3}>
-                    {array[0]?.map((r, i) => (
+                    {array[0].map((r, i) => (
                       <Resource
                         title={r.data.attributes.title}
                         link={r.data.attributes.link}

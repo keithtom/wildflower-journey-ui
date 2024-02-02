@@ -279,7 +279,7 @@ const Person = ({}) => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Stack spacing={3}>
-                            {person.attributes.rolesResonsibilities?.map(
+                            {person.attributes.rolesResonsibilities.map(
                               (r, i) => (
                                 <Typography variant="bodyLarge" key={i}>
                                   {r}
@@ -300,7 +300,7 @@ const Person = ({}) => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Stack spacing={3}>
-                            {userSchool?.map((s, i) => (
+                            {userSchool.map((s, i) => (
                               <SchoolCard
                                 key={i}
                                 schoolName={s.attributes.name}
@@ -322,7 +322,7 @@ const Person = ({}) => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Stack spacing={3}>
-                            {person.attributes.boardMemberOf?.map((b, i) => (
+                            {person.attributes.boardMemberOf.map((b, i) => (
                               <SchoolCard
                                 key={i}
                                 schoolName={b.name}
@@ -746,7 +746,7 @@ const EditProfileModal = ({
               rules={{ required: false }}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {lgbtqiaOptions?.map((o, i) => (
+                  {lgbtqiaOptions.map((o, i) => (
                     <FormControlLabel
                       key={i}
                       value={o.value}
@@ -868,7 +868,7 @@ const EditProfileModal = ({
               control={control}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {incomeOptions?.map((o, i) => (
+                  {incomeOptions.map((o, i) => (
                     <FormControlLabel
                       key={i}
                       value={o.value}
@@ -896,7 +896,7 @@ const EditProfileModal = ({
               control={control}
               render={({ field: { onChange, value } }) => (
                 <RadioGroup value={value}>
-                  {montessoriCertificationOptions?.map((o, i) => (
+                  {montessoriCertificationOptions.map((o, i) => (
                     <FormControlLabel
                       key={i}
                       value={o.value}
