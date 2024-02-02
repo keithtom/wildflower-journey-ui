@@ -67,7 +67,7 @@ const ToDoList = ({}) => {
             </Stack>
           </Stack>
         ) : teamAssignments.length ? (
-          teamAssignments.map((t, i) => (
+          teamAssignments?.map((t, i) => (
             <Stack spacing={12} key={i}>
               <Stack spacing={6} direction="row" alignItems="center">
                 <Avatar src={t.imgUrl} />
@@ -79,7 +79,7 @@ const ToDoList = ({}) => {
                 </Typography>
               </Stack>
               <Stack>
-                {t.assignments.map((step, i) => {
+                {t.assignments?.map((step, i) => {
                   return (
                     <Task
                       key={step.id}
@@ -107,7 +107,7 @@ const ToDoList = ({}) => {
               </Typography>
             </Stack>
             <Stack>
-              {assignedSteps.map((step, i) => {
+              {assignedSteps?.map((step, i) => {
                 return (
                   <Task
                     key={step.id}
@@ -163,7 +163,7 @@ const ToDoList = ({}) => {
                       </Stack>
                     ) : (
                       <Stack spacing={2}>
-                        {milestonesToDo.map((m, i) => (
+                        {milestonesToDo?.map((m, i) => (
                           <Link
                             href={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                             key={i}

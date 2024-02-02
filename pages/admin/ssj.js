@@ -90,7 +90,7 @@ const AdminSSJ = ({}) => {
                       ))}
                     </Stack>
                   ) : (
-                    ssjTeams.map((s, i) => (
+                    ssjTeams?.map((s, i) => (
                       <Card size="small" key={i}>
                         <Stack direction="row" alignItems="center" spacing={3}>
                           <Avatar size="sm" />
@@ -253,7 +253,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                 spacing={2}
               >
                 {multiplePeople.length ? (
-                  multiplePeople.map((etl, i) => (
+                  multiplePeople?.map((etl, i) => (
                     <Grid item xs={12} key={i}>
                       <Card full noBorder size="small">
                         <Grid
@@ -593,7 +593,7 @@ const AddOperationsGuide = ({
                                       {og?.attributes?.lastName}
                                     </Typography>
                                     <Typography variant="bodyRegular" lightened>
-                                      {og?.attributes?.roleList.map((r, i) => (
+                                      {og?.attributes?.roleList?.map((r, i) => (
                                         <StyledRoleListItem key={i}>
                                           {r}
                                         </StyledRoleListItem>
@@ -755,11 +755,13 @@ const AddRegionalGrowthLead = ({
                                       {rgl?.attributes?.lastName}
                                     </Typography>
                                     <Typography variant="bodyRegular" lightened>
-                                      {rgl?.attributes?.roleList.map((r, i) => (
-                                        <StyledRoleListItem key={i}>
-                                          {r}
-                                        </StyledRoleListItem>
-                                      ))}
+                                      {rgl?.attributes?.roleList?.map(
+                                        (r, i) => (
+                                          <StyledRoleListItem key={i}>
+                                            {r}
+                                          </StyledRoleListItem>
+                                        )
+                                      )}
                                     </Typography>
                                   </Stack>
                                 </Stack>
@@ -851,7 +853,7 @@ const InviteSchool = ({
             <Typography variant="bodyRegular" bold>
               Emerging Teacher Leader
             </Typography>
-            {team.etl_people_params.map((etl, i) => (
+            {team.etl_people_params?.map((etl, i) => (
               <Card
                 variant={duplicateEmailError ? "error" : "lightened"}
                 size="small"
@@ -900,7 +902,7 @@ const InviteSchool = ({
                       </Typography>
 
                       <Typography variant="bodyRegular" lightened>
-                        {tempDisplayData.opsGuide.roleList.map((r, i) => (
+                        {tempDisplayData.opsGuide.roleList?.map((r, i) => (
                           <StyledRoleListItem key={i}>{r}</StyledRoleListItem>
                         ))}
                       </Typography>
@@ -925,7 +927,7 @@ const InviteSchool = ({
                         {tempDisplayData.rgl.lastName}
                       </Typography>
                       <Typography variant="bodyRegular" lightened>
-                        {tempDisplayData.rgl.roleList.map((r, i) => (
+                        {tempDisplayData.rgl.roleList?.map((r, i) => (
                           <StyledRoleListItem key={i}>{r}</StyledRoleListItem>
                         ))}
                       </Typography>
