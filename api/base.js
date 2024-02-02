@@ -1,5 +1,7 @@
 // boiler plate for API calls to api.wildflowerschools.org
 import { clearLoggedInState } from "@lib/handleLogout";
+import { setCurrentUser } from "@lib/useUserContext";
+import Router from "next/router";
 import axios from "axios";
 import { getCookie } from "cookies-next";
 import jwt_decode from "jwt-decode";
@@ -159,6 +161,11 @@ async function handleErrors(promise) {
       console.log(error.response.data);
       console.log(error.response.status);
       console.log(error.response.headers);
+      if (error.response.status === 401) {
+        clearLoggedInState({});
+        setCurrentUser(null);
+        Router.push("/login");
+      }
     } else if (error.request) {
       console.log(error.request);
     } else {
