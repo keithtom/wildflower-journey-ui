@@ -1,6 +1,6 @@
 // boiler plate for API calls to api.wildflowerschools.org
 import { clearLoggedInState } from "@lib/handleLogout";
-import { setCurrentUser } from "@lib/user";
+import { setCurrentUser } from "@lib/useUserContext";
 import Router from "next/router";
 import axios from "axios";
 import { getCookie } from "cookies-next";
