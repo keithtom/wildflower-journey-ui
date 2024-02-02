@@ -169,7 +169,7 @@ const School = ({}) => {
                     <Grid item xs={12}>
                       <Card>
                         <Stack spacing={6}>
-                          {schoolLeaders.map((leader, i) => (
+                          {schoolLeaders?.map((leader, i) => (
                             <Link href={`/network/people/${leader.id}`} key={i}>
                               <Stack
                                 direction="row"
@@ -190,7 +190,7 @@ const School = ({}) => {
                                       </Typography>
                                     ) : null}
                                   </Stack>
-                                  {leader?.attributes?.roleList.map((r, i) => (
+                                  {leader?.attributes?.roleList?.map((r, i) => (
                                     <Typography
                                       variant="bodySmall"
                                       lightened
@@ -308,7 +308,7 @@ const School = ({}) => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Stack spacing={3}>
-                            {sisterSchools.map((s, i) => (
+                            {sisterSchools?.map((s, i) => (
                               <SchoolCard
                                 key={i}
                                 schoolName={s.attributes.name}
@@ -330,7 +330,7 @@ const School = ({}) => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Stack spacing={3}>
-                      {FakeBoardMembers.map((f, i) => (
+                      {FakeBoardMembers?.map((f, i) => (
                         <UserCard
                           link={`/network/people/${f.attributes.id}`}
                           firstName={f.attributes.firstName}
