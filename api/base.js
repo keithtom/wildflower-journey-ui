@@ -161,11 +161,11 @@ async function handleErrors(promise) {
       console.log(error.response.data);
       console.log(error.response.status);
       console.log(error.response.headers);
-      if (error.response.status === 401) {
-        clearLoggedInState({});
-        setCurrentUser(null);
-        Router.push("/login");
-      }
+      // if (error.response.status === 401) {
+      //   clearLoggedInState({});
+      //   setCurrentUser(null);
+      //   Router.push("/login");
+      // }
     } else if (error.request) {
       console.log(error.request);
     } else {
