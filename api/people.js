@@ -42,9 +42,11 @@ async function update(personId, personParams) {
 // filter example: {{ops_guide: true, rgl: true}}
 // TODO update with SWR hook
 async function index(filter) {
+  const config = getAuthHeader();
+  config.params = filter;
   let response;
   try {
-    response = await peopleApi.get(`/`, { params: filter });
+    response = await peopleApi.get(`/`, config);
   } catch (error) {
     return Promise.reject(error);
   }

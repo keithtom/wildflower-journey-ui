@@ -1,5 +1,10 @@
 import axios from "axios";
-import { setCookie } from "cookies-next";
+import { setCookie, getCookie } from "cookies-next";
+
+function getAuthHeader() {
+  const token = getCookie("auth");
+  return { headers: { Authorization: token } };
+}
 
 const api = axios.create({
   baseURL: `${process.env.API_URL}`,
@@ -47,9 +52,14 @@ async function tokenAuth(token) {
 }
 
 async function loginEmailLink(email) {
-  const response = await api.post(`/users/email_login`, {
-    email: email,
-  });
+  const config = getAuthHeader();
+  const response = await api.post(
+    `/users/email_login`,
+    {
+      email: email,
+    },
+    config
+  );
   const result = await response.json;
   return result;
 }

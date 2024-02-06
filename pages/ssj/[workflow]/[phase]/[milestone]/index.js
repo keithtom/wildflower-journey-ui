@@ -9,7 +9,7 @@ import processesApi from "@api/workflow/processes";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Skeleton from "@mui/material/Skeleton";
 
-// import useAuth from "@lib/utils/useAuth";
+import useAuth from "@lib/utils/useAuth";
 import {
   Avatar,
   Button,
@@ -62,7 +62,7 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
     a.attributes.position > b.attributes.position ? 1 : -1
   );
 
-  // useAuth("/login");
+  useAuth("/login");
 
   return (
     <PageContainer>

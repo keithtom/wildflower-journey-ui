@@ -33,12 +33,7 @@ function register(path, options) {
       "Content-Type": "application/json",
     },
   };
-  if (token) {
-    // console.log("token from cookies", jwt_decode(token).sub)
-    config.headers["Authorization"] = token;
-  } else if (axios.defaults.headers.common["Authorization"]) {
-    // console.log("token set from axios global", jwt_decode(axios.defaults.headers.common['Authorization']).sub);
-  }
+
   const client = axios.create(config);
 
   client.interceptors.response.use(
