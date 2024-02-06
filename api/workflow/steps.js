@@ -118,7 +118,6 @@ async function create(processId, title) {
 
 async function assign(taskId) {
   const config = getAuthHeader();
-  console.log("config------------------------", config);
   let response;
   try {
     response = await workflowsApi.put(`/steps/${taskId}/assign`, {}, config);
@@ -192,6 +191,7 @@ async function selectOption(taskId, optionId) {
   return response;
 }
 
+//TODO turn this into an SWR hook
 async function show({ milestoneId, taskId, config = {} }) {
   let response;
   try {
