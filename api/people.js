@@ -16,8 +16,10 @@ function show(personId, params = {}) {
 export const showPerson = {
   key: (personId, params) => `/v1/people/${personId}`,
   fetcher: (personId, params) => {
+    const config = getAuthHeader();
+    config.params = params;
     return peopleApi
-      .get(`/${personId}`, { params: params })
+      .get(`/${personId}`, config)
       .then((data) => {
         return data;
       })

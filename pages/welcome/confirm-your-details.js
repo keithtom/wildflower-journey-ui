@@ -23,6 +23,7 @@ import {
   PageContainer,
   Select,
 } from "@ui";
+import usePerson from "@hooks/usePerson";
 
 const StyledChatBubble = styled(Box)`
   padding: ${({ theme }) => theme.util.buffer * 4}px;
@@ -51,6 +52,8 @@ const ConfirmYourDetails = ({}) => {
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
 
+  const { data: personData, isLoading } = usePerson(currentUser?.id);
+
   const {
     control,
     handleSubmit,
@@ -69,19 +72,15 @@ const ConfirmYourDetails = ({}) => {
 
   useEffect(() => {
     if (currentUser) {
-      peopleApi.show(currentUser.id).then((response) => {
-        const person = response.data.data;
-        // console.log({ person });
-        reset({
-          firstName: person?.attributes.firstName,
-          lastName: person?.attributes.lastName,
-          city: currentUser?.personAddress.city,
-          state: currentUser?.personAddress.state,
-          email: person?.attributes.email,
-        });
+      reset({
+        firstName: personData?.data?.attributes?.firstName,
+        lastName: personData?.data?.attributes?.firstName,
+        city: currentUser?.personAddress?.city,
+        state: currentUser?.personAddress?.state,
+        email: personData?.data?.attributes?.email,
       });
     }
-  }, [currentUser]);
+  }, [currentUser, isLoading]);
 
   const onSubmit = (data) => {
     const downcasedEmail = data.email.toLowerCase();

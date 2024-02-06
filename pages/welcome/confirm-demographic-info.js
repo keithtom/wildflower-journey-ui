@@ -36,6 +36,7 @@ import {
   Radio,
   PageContainer,
 } from "@ui";
+import usePerson from "@hooks/usePerson";
 
 const StyledChatBubble = styled(Box)`
   padding: ${({ theme }) => theme.util.buffer * 4}px;
@@ -64,6 +65,8 @@ const ConfirmDemographicInfo = ({}) => {
   const router = useRouter();
   const { currentUser } = useUserContext();
 
+  const { data: personData, isLoading } = usePerson(currentUser?.id);
+
   const {
     control,
     handleSubmit,
@@ -90,41 +93,27 @@ const ConfirmDemographicInfo = ({}) => {
 
   useEffect(() => {
     if (currentUser) {
-      peopleApi
-        .show(currentUser.id)
-        .then((response) => {
-          const person = response.data.data;
-          // console.log("person", person);
-          // SAVEPOINT this request is working.  need to make sure data is persisted and returned
-          // and then loaded into form.  then we are done here.
-          reset({
-            primaryLanguage: person?.attributes?.primaryLanguage || "",
-            primaryLanguageOther:
-              person?.attributes?.primaryLanguageOther || "",
-            raceEthnicity: person?.attributes?.raceEthnicityList || [],
-            raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
-            lgbtqia: person?.attributes?.lgbtqia,
-            gender: person?.attributes?.gender || "",
-            genderOther: person?.attributes?.genderOther || "",
-            pronouns: person?.attributes?.pronouns || "",
-            pronounsOther: person?.attributes?.pronounsOther || "",
-            householdIncome: person?.attributes?.householdIncome || "",
-            montessoriCertified: person?.attributes?.montessoriCertified || "",
-            montessoriCertifiedLevels:
-              person?.attributes?.montessoriCertifiedLevelList || [],
-            classroomAge: person?.attributes?.classroomAgeList || [],
-          });
-        })
-        .catch((error) => {
-          if (error?.response?.status === 401) {
-            clearLoggedInState({});
-            router.push("/login");
-          } else {
-            console.error(error);
-          }
-        });
+      reset({
+        primaryLanguage: personData?.data?.attributes?.primaryLanguage || "",
+        primaryLanguageOther:
+          personData?.data?.attributes?.primaryLanguageOther || "",
+        raceEthnicity: personData?.data?.attributes?.raceEthnicityList || [],
+        raceEthnicityOther:
+          personData?.data?.attributes?.raceEthnicityOther || "",
+        lgbtqia: personData?.data?.attributes?.lgbtqia,
+        gender: personData?.data?.attributes?.gender || "",
+        genderOther: personData?.data?.attributes?.genderOther || "",
+        pronouns: personData?.data?.attributes?.pronouns || "",
+        pronounsOther: personData?.data?.attributes?.pronounsOther || "",
+        householdIncome: personData?.data?.attributes?.householdIncome || "",
+        montessoriCertified:
+          personData?.data?.attributes?.montessoriCertified || "",
+        montessoriCertifiedLevels:
+          personData?.data?.attributes?.montessoriCertifiedLevelList || [],
+        classroomAge: personData?.data?.attributes?.classroomAgeList || [],
+      });
     }
-  }, [currentUser]);
+  }, [currentUser, isLoading]);
 
   const onSubmit = (data) => {
     // console.log("classroomAge: ", data.classroomAge);
