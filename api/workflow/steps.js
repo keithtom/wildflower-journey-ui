@@ -121,7 +121,7 @@ async function assign(taskId) {
   console.log("config------------------------", config);
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/assign`, config);
+    response = await workflowsApi.put(`/steps/${taskId}/assign`, {}, config);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -134,7 +134,7 @@ async function unassign(taskId) {
   const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/unassign`, config);
+    response = await workflowsApi.put(`/steps/${taskId}/unassign`, {}, config);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -148,7 +148,7 @@ async function complete(taskId) {
   const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/complete`, config);
+    response = await workflowsApi.put(`/steps/${taskId}/complete`, {}, config);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -161,7 +161,11 @@ async function uncomplete(taskId) {
   const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/uncomplete`, config);
+    response = await workflowsApi.put(
+      `/steps/${taskId}/uncomplete`,
+      {},
+      config
+    );
   } catch (error) {
     return Promise.reject(error);
   }
