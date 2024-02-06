@@ -83,8 +83,10 @@ const Milestones = ({}) => {
 export default Milestones;
 
 const MilestonesByCategory = ({ workflow }) => {
-  const { isLoadingMilestonesByCategory, milestonesByCategory } =
-    useMilestones(workflow);
+  const { isLoadingMilestonesByCategory, milestonesByCategory } = useMilestones(
+    workflow,
+    { omit_include: true }
+  );
   return isLoadingMilestonesByCategory ? (
     <Stack spacing={6}>
       {Array.from({ length: 12 }, (_, i) => (
