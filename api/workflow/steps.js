@@ -57,6 +57,7 @@ function augmentStep(step, included) {
 }
 
 // Grab assigned steps, given a workflow id
+//DEPRECATED for showAssigned
 async function assigned(workflowId, config = {}) {
   let response;
   try {
@@ -104,16 +105,22 @@ export const showAssigned = {
 
 // creates a custom task (TODO: not finished)
 async function create(processId, title) {
-  return await workflowsApi.post(`/processes/${processId}/steps`, {
-    title: title,
-  });
+  const config = getAuthHeader();
+  return await workflowsApi.post(
+    `/processes/${processId}/steps`,
+    {
+      title: title,
+    },
+    config
+  );
   // if response good, great.  else.  error out?
 }
 
 async function assign(taskId) {
+  const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/assign`);
+    response = await workflowsApi.put(`/steps/${taskId}/assign`, {}, config);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -123,9 +130,10 @@ async function assign(taskId) {
 }
 
 async function unassign(taskId) {
+  const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/unassign`);
+    response = await workflowsApi.put(`/steps/${taskId}/unassign`, {}, config);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -136,9 +144,10 @@ async function unassign(taskId) {
 
 // if response good, great.  else.  error out?
 async function complete(taskId) {
+  const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/complete`);
+    response = await workflowsApi.put(`/steps/${taskId}/complete`, {}, config);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -148,9 +157,14 @@ async function complete(taskId) {
 
 // TODO: do something w/ the response if it's not 200
 async function uncomplete(taskId) {
+  const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/uncomplete`);
+    response = await workflowsApi.put(
+      `/steps/${taskId}/uncomplete`,
+      {},
+      config
+    );
   } catch (error) {
     return Promise.reject(error);
   }
@@ -159,11 +173,16 @@ async function uncomplete(taskId) {
 }
 
 async function selectOption(taskId, optionId) {
+  const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/select_option`, {
-      selected_option_id: optionId,
-    });
+    response = await workflowsApi.put(
+      `/steps/${taskId}/select_option`,
+      {
+        selected_option_id: optionId,
+      },
+      config
+    );
   } catch (error) {
     return Promise.reject(error);
   }
@@ -172,6 +191,7 @@ async function selectOption(taskId, optionId) {
   return response;
 }
 
+//TODO turn this into an SWR hook
 async function show({ milestoneId, taskId, config = {} }) {
   let response;
   try {
