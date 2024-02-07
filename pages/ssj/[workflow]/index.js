@@ -12,7 +12,7 @@ import ssjApi from "@api/ssj/ssj";
 import teamsApi from "@api/ssj/teams";
 import processesApi from "@api/workflow/processes";
 import { useUserContext } from "@lib/useUserContext";
-// import useAuth from "@lib/utils/useAuth";
+import useAuth from "@lib/utils/useAuth";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Milestone from "../../../components/Milestone";
 import Task from "../../../components/Task";
@@ -116,7 +116,7 @@ const SSJ = () => {
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
-  // useAuth("/login");
+  useAuth("/login");
 
   const isLoading =
     userIsLoading ||
