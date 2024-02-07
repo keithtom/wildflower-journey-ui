@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import { Container, Draggable } from "react-smooth-dnd";
+// import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
 import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
@@ -56,8 +56,10 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
   var milestonePrerequisites =
     milestone?.relationships?.prerequisiteProcesses?.data;
 
-  const sortedMilestoneTasks = milestone?.relationships?.steps?.data.sort(
-    (a, b) => (a.attributes.position > b.attributes.position ? 1 : -1)
+  const milestoneRelationships = milestone?.relationships?.steps?.data;
+
+  const sortedMilestoneTasks = milestoneRelationships?.sort((a, b) =>
+    a.attributes.position > b.attributes.position ? 1 : -1
   );
 
   useAuth("/login");
@@ -214,8 +216,9 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
             </Stack>
             {userIsEditing ? (
               <>
-                <NewTaskInput />
-                <EditableTaskList tasks={FakeMilestoneTasks} />
+                <Typography>Coming Soon</Typography>
+                {/* <NewTaskInput />
+                <EditableTaskList tasks={FakeMilestoneTasks} /> */}
               </>
             ) : sortedMilestoneTasks ? (
               sortedMilestoneTasks.map((t, i) => (
@@ -378,29 +381,29 @@ const EditableTaskItem = ({ title, isDraggable }) => {
     </Grid>
   );
 };
-const EditableTaskList = ({ tasks }) => {
-  const [taskList, setTaskList] = useState(tasks);
+// const EditableTaskList = ({ tasks }) => {
+//   const [taskList, setTaskList] = useState(tasks);
 
-  const onDrop = ({ removedIndex, addedIndex }) => {
-    // console.log({ removedIndex, addedIndex });
-    setTaskList((items) => arrayMoveImmutable(items, removedIndex, addedIndex));
-  };
-  return (
-    <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
-      <Stack spacing={3}>
-        {taskList &&
-          taskList.map((t, i) => (
-            <Draggable key={i}>
-              <EditableTaskItem
-                title={t.title}
-                isDraggable={!t.isSensibleDefault}
-              />
-            </Draggable>
-          ))}
-      </Stack>
-    </Container>
-  );
-};
+//   const onDrop = ({ removedIndex, addedIndex }) => {
+//     // console.log({ removedIndex, addedIndex });
+//     setTaskList((items) => arrayMoveImmutable(items, removedIndex, addedIndex));
+//   };
+//   return (
+//     <Container dragHandleSelector=".drag-handle" lockAxis="y" onDrop={onDrop}>
+//       <Stack spacing={3}>
+//         {taskList &&
+//           taskList.map((t, i) => (
+//             <Draggable key={i}>
+//               <EditableTaskItem
+//                 title={t.title}
+//                 isDraggable={!t.isSensibleDefault}
+//               />
+//             </Draggable>
+//           ))}
+//       </Stack>
+//     </Container>
+//   );
+// };
 
 export async function getServerSideProps() {
   const FakeMilestoneTasks = [

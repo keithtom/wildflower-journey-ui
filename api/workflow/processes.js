@@ -10,6 +10,7 @@ function getAuthHeader() {
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 
 // show me all milestones for a phase
+// DEPRECATED for showMilestones
 async function index({ workflowId, params, config = {} }) {
   let url = `/workflows/${workflowId}/processes`;
   if (params !== undefined) {
@@ -48,8 +49,9 @@ export const showMilestones = {
     return url;
   },
   fetcher: (workflowId, params) => {
+    const config = getAuthHeader();
     return workflowsApi
-      .get(showMilestones.key(workflowId, params), getAuthHeader())
+      .get(showMilestones.key(workflowId, params), config)
       .then((res) => {
         return res;
       })
@@ -60,6 +62,7 @@ export const showMilestones = {
 };
 
 // look at an individual process/milestone
+// DEPRECATED for showMilestone
 async function show(id, config = {}) {
   let response;
   try {
@@ -84,8 +87,9 @@ async function show(id, config = {}) {
 export const showMilestone = {
   key: (id) => `/processes/${id}`,
   fetcher: (id) => {
+    const config = getAuthHeader();
     return workflowsApi
-      .get(showMilestone.key(id), getAuthHeader())
+      .get(showMilestone.key(id), config)
       .then((response) => {
         const included = response.data.included;
         wildflowerApi.loadAllRelationshipsFromIncluded(response.data);

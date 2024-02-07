@@ -21,6 +21,7 @@ const api = axios.create({
   },
 });
 
+// DEPRECATED for showUser
 async function show(id, config) {
   let response;
   try {
@@ -34,8 +35,9 @@ async function show(id, config) {
 export const showUser = {
   key: (userId) => `/v1/users/${userId}`,
   fetcher: (userId) => {
+    const config = getAuthHeader();
     return api
-      .get(`/${userId}`, getAuthHeader())
+      .get(`/${userId}`, config)
       .then((data) => {
         return data;
       })
