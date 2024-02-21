@@ -44,6 +44,7 @@ const PhasePage = () => {
     isValidating,
   } = useMilestones(workflow, {
     phase: phase,
+    omit_include: true,
   });
   // console.log({ milestonesByCurrentPhase });
   // console.log({ isLoadingMilestonesByCurrentPhase });

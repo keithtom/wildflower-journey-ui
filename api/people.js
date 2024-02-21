@@ -8,8 +8,9 @@ function getAuthHeader() {
   return { headers: { Authorization: token } };
 }
 
-// DEPRECATED for showPerson
 function show(personId, params = {}) {
+  const config = getAuthHeader();
+  config.params = params;
   return peopleApi.get(`/${personId}`, { params: params });
 }
 
