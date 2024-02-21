@@ -123,7 +123,6 @@ const AddChip = styled(Chip)`
   width: ${({ theme }) => theme.util.buffer * 6}px;
   height: ${({ theme }) => theme.util.buffer * 6}px;
   background: ${({ theme }) => theme.palette.neutral.lightest};
-
   .MuiChip-label {
     padding: 0;
   }
