@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { styled } from "@mui/material/styles";
+import { FormControlLabel, RadioGroup } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Chip from "@mui/material/Chip";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
 import { Drawer } from "@mui/material";
 
 import {
@@ -25,6 +29,8 @@ import {
   Link,
   Divider,
   IconButton,
+  Select,
+  Switch,
 } from "@ui";
 
 const EditWorkflowPage = () => {
@@ -40,7 +46,7 @@ const EditWorkflowPage = () => {
         </Grid>
         <Grid container>
           <Grid item xs={12}>
-            <Card noPadding>
+            <Card noPadding sx={{ overflow: "visible" }}>
               <List>
                 <Process />
                 <Process />
@@ -95,6 +101,160 @@ const AddChip = styled(Chip)`
   }
 `;
 
+const FormStepper = ({ activeStep }) => {
+  return (
+    <Stepper activeStep={activeStep}>
+      <Step>
+        <StepLabel>Process Info</StepLabel>
+      </Step>
+      <Step>
+        <StepLabel>Steps Info</StepLabel>
+      </Step>
+      <Step>
+        <StepLabel>Add</StepLabel>
+      </Step>
+    </Stepper>
+  );
+};
+
+const ProcessFields = () => {
+  return (
+    <Stack spacing={6}>
+      <TextField
+        label="Title"
+        placeholder="e.g. Complete The Visioning Advice Process"
+        // error={errors.firstName}
+        // helperText={errors && errors.firstName && errors.firstName.message}
+        // {...field}
+      />
+      <TextField
+        multiline
+        label="Description"
+        placeholder="The description of this process"
+        // error={errors.firstName}
+        // helperText={errors && errors.firstName && errors.firstName.message}
+        // {...field}
+      />
+      <Select
+        label="Category"
+        placeholder="Select a category"
+        options={[{ label: "Finance", value: "finance" }]}
+        // error={errors.state}
+        // helperText={
+        //   errors &&
+        //   errors.state &&
+        //   errors.state.type === "required" &&
+        //   "This field is required"
+        // }
+        // {...field}
+      />
+      <Select
+        label="Phase"
+        placeholder="Select an SSJ phase"
+        options={[{ label: "Visioning", value: "visioning" }]}
+        // error={errors.state}
+        // helperText={
+        //   errors &&
+        //   errors.state &&
+        //   errors.state.type === "required" &&
+        //   "This field is required"
+        // }
+        // {...field}
+      />
+      <Select
+        label="Prerequisite"
+        placeholder="Select a prerequisite process"
+        options={[{ label: "Process 1", value: "1234-asdf" }]}
+        // error={errors.state}
+        // helperText={
+        //   errors &&
+        //   errors.state &&
+        //   errors.state.type === "required" &&
+        //   "This field is required"
+        // }
+        // {...field}
+      />
+    </Stack>
+  );
+};
+const StepFields = () => {
+  return (
+    <Stack spacing={6}>
+      <TextField
+        label="Title"
+        placeholder="e.g. Identify and invite advice givers"
+        // error={errors.firstName}
+        // helperText={errors && errors.firstName && errors.firstName.message}
+        // {...field}
+      />
+      <TextField
+        label="Worktime"
+        placeholder="e.g. 2 hours, or 3 minutes"
+        // error={errors.firstName}
+        // helperText={errors && errors.firstName && errors.firstName.message}
+        // {...field}
+      />
+      <TextField
+        multiline
+        label="About"
+        placeholder="About this step"
+        // error={errors.firstName}
+        // helperText={errors && errors.firstName && errors.firstName.message}
+        // {...field}
+      />
+      <TextField
+        label="Resource Link"
+        placeholder="e.g. www.linkToResource.com"
+        // error={errors.firstName}
+        // helperText={errors && errors.firstName && errors.firstName.message}
+        // {...field}
+      />
+      <TextField
+        label="Resource Title"
+        placeholder="e.g. Resource Title"
+        // error={errors.firstName}
+        // helperText={errors && errors.firstName && errors.firstName.message}
+        // {...field}
+      />
+      <Stack spacing={6}>
+        <Typography variant="bodyRegular">Assignment</Typography>
+        <RadioGroup value={"value"}>
+          <FormControlLabel
+            value={"individual"}
+            control={<Radio />}
+            label={
+              "Individual (everyone can assign - everyone should complete)"
+            }
+            // onChange={handleDecisionOptionChange}
+          />
+          <FormControlLabel
+            value={"collaborative"}
+            control={<Radio />}
+            label={
+              "Collaborative (everyone can assign - only one can complete per group)"
+            }
+            // onChange={handleDecisionOptionChange}
+          />
+        </RadioGroup>
+      </Stack>
+      <Switch label="This step is a decision" />
+    </Stack>
+  );
+};
+const DecisionFields = () => {
+  return (
+    <Stack spacing={6}>
+      <TextField
+        label="Title"
+        placeholder="e.g. Continue to the next phase"
+        // error={errors.firstName}
+        // helperText={errors && errors.firstName && errors.firstName.message}
+        // {...field}
+      />
+    </Stack>
+  );
+};
+
 const DecisionDrawer = ({ open, toggle, isAdding }) => {
   const [openInsideDrawer, setOpenInsideDrawer] = useState(false);
   return (
@@ -111,7 +271,7 @@ const DecisionDrawer = ({ open, toggle, isAdding }) => {
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
                 <Typography variant="bodyLarge" bold>
-                  {isAdding ? "Add" : "Edit"} Decision
+                  {isAdding ? "Add" : "Edit"} Decision Option
                 </Typography>
               </Grid>
               <Grid item>
@@ -122,6 +282,7 @@ const DecisionDrawer = ({ open, toggle, isAdding }) => {
             </Grid>
           </Stack>
         </Stack>
+        <DecisionFields />
         <Button onClick={() => setOpenInsideDrawer(!openInsideDrawer)}>
           asdf
         </Button>
@@ -159,6 +320,7 @@ const StepDrawer = ({ open, toggle, isAdding }) => {
             </Grid>
           </Stack>
         </Stack>
+        <StepFields />
         <Button onClick={() => setOpenInsideDrawer(!openInsideDrawer)}>
           asdf
         </Button>
@@ -176,6 +338,7 @@ const StepDrawer = ({ open, toggle, isAdding }) => {
 };
 const ProcessDrawer = ({ open, toggle, isAdding }) => {
   const [openInsideDrawer, setOpenInsideDrawer] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
       <StyledCard noBorder noRadius>
@@ -193,6 +356,14 @@ const ProcessDrawer = ({ open, toggle, isAdding }) => {
                 </IconButton>
               </Grid>
             </Grid>
+            {isAdding ? (
+              <Card variant="lightened">
+                <FormStepper activeStep={activeStep} />
+              </Card>
+            ) : null}
+            {/* This is where all the add new process steps go when adding new proces */}
+            {/* This is where the edit ux goes too */}
+            <ProcessFields />
           </Stack>
         </Stack>
         <Button onClick={() => setOpenInsideDrawer(!openInsideDrawer)}>
@@ -249,6 +420,7 @@ const Process = () => {
             position: "relative",
           }}
         >
+          {/* Show Draggable Grabber */}
           <Grid
             container
             alignItems="center"
