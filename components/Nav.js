@@ -140,13 +140,15 @@ const Navigation = () => {
         </Snackbar>
       ) : null}
 
-      {router.pathname.includes("/admin/") ? (
-        <NavLink
-          variant="primary"
-          to="/admin/ssj"
-          active={router.pathname.includes("/admin/ssj")}
-          label="SSJ Admin"
-        />
+      {router.pathname.includes("/admin") ? (
+        <>
+          <NavLink
+            variant="primary"
+            to="/admin"
+            active={router.asPath === "/admin"}
+            label="Admin Dashboard"
+          />
+        </>
       ) : (
         <>
           <NavLink
