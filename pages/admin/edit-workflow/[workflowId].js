@@ -46,15 +46,11 @@ const EditWorkflowPage = () => {
         </Grid>
         <Grid container>
           <Grid item xs={12}>
-            <Card noPadding sx={{ overflow: "visible" }}>
-              <List>
-                <Process />
-                <Process />
-                <Process />
-                <Process />
-                <Process />
-              </List>
-            </Card>
+            <ProcessOrStepGroup>
+              {FakeProcesses.map((p, i) => (
+                <ProcessItem key={i} number={i} process={p} />
+              ))}
+            </ProcessOrStepGroup>
           </Grid>
         </Grid>
       </Stack>
@@ -96,6 +92,7 @@ const AddChip = styled(Chip)`
   width: ${({ theme }) => theme.util.buffer * 6}px;
   height: ${({ theme }) => theme.util.buffer * 6}px;
   background: ${({ theme }) => theme.palette.neutral.lightest};
+
   .MuiChip-label {
     padding: 0;
   }
@@ -105,13 +102,13 @@ const FormStepper = ({ activeStep }) => {
   return (
     <Stepper activeStep={activeStep}>
       <Step>
-        <StepLabel>Process Info</StepLabel>
+        <StepLabel>Add Process</StepLabel>
       </Step>
       <Step>
-        <StepLabel>Steps Info</StepLabel>
+        <StepLabel>Add Steps</StepLabel>
       </Step>
       <Step>
-        <StepLabel>Add</StepLabel>
+        <StepLabel>Summary</StepLabel>
       </Step>
     </Stepper>
   );
@@ -237,7 +234,6 @@ const StepFields = () => {
           />
         </RadioGroup>
       </Stack>
-      <Switch label="This step is a decision" />
     </Stack>
   );
 };
@@ -256,7 +252,10 @@ const DecisionFields = () => {
 };
 
 const DecisionDrawer = ({ open, toggle, isAdding }) => {
-  const [openInsideDrawer, setOpenInsideDrawer] = useState(false);
+  const handleAddOption = () => {
+    console.log("adding option");
+    toggle();
+  };
   return (
     <CustomDrawer
       anchor="right"
@@ -283,18 +282,35 @@ const DecisionDrawer = ({ open, toggle, isAdding }) => {
           </Stack>
         </Stack>
         <DecisionFields />
-        <Button onClick={() => setOpenInsideDrawer(!openInsideDrawer)}>
-          asdf
-        </Button>
       </StyledCard>
       <ActionsContainer noRadius noBorder>
-        hi
+        <Button full onClick={handleAddOption}>
+          <Typography variant="bodyRegular" bold>
+            Add
+          </Typography>
+        </Button>
       </ActionsContainer>
     </CustomDrawer>
   );
 };
-const StepDrawer = ({ open, toggle, isAdding }) => {
+const StepDrawer = ({ step, open, toggle, isAdding }) => {
+  const [isAddingDecision, setIsAddingDecision] = useState(false);
   const [openInsideDrawer, setOpenInsideDrawer] = useState(false);
+  const [isDecision, setIsDecision] = useState(
+    step.decisionOptions ? true : false
+  );
+
+  const handleAddStep = () => {
+    console.log("adding step");
+    toggle();
+  };
+  const handleRemoveDecision = () => {
+    setIsDecision(false);
+  };
+
+  console.log("step", step);
+  console.log("step decision options in stepDrawer", step.decisionOptions);
+
   return (
     <CustomDrawer
       anchor="right"
@@ -304,7 +320,7 @@ const StepDrawer = ({ open, toggle, isAdding }) => {
       hideBackdrop
     >
       <StyledCard noBorder noRadius>
-        <Stack spacing={12}>
+        <Stack spacing={6}>
           <Stack spacing={6}>
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
@@ -319,14 +335,97 @@ const StepDrawer = ({ open, toggle, isAdding }) => {
               </Grid>
             </Grid>
           </Stack>
+          <StepFields />
+
+          {isDecision ? (
+            <Stack spacing={3}>
+              <Switch
+                label="This step is a decision"
+                checked={isDecision}
+                onChange={handleRemoveDecision}
+              />
+              <ProcessOrStepGroup>
+                <DecisionItem
+                  number={0}
+                  totalOptions={2}
+                  decision={{ title: "Option 1" }}
+                  onClick={() => setOpenInsideDrawer(true)}
+                />
+                <DecisionItem
+                  number={1}
+                  totalOptions={2}
+                  decision={{ title: "Option 2" }}
+                  onClick={() => setOpenInsideDrawer(true)}
+                />
+                {/* {step?.decisionOptions.map((d, i) => {
+                <DecisionItem
+                  key={i}
+                  number={i}
+                  totalOptions={step.decisionOptions.length}
+                  decision={d}
+                />;
+              })} */}
+              </ProcessOrStepGroup>
+            </Stack>
+          ) : (
+            <Switch
+              label="This step is a decision"
+              checked={isAddingDecision}
+              onChange={() => setIsAddingDecision(!isAddingDecision)}
+            />
+          )}
+          {isAddingDecision ? (
+            <Card>
+              <Card noBorder noRadius>
+                <Grid container alignItems="center" justifyContent="center">
+                  <Grid item>
+                    <Typography variant="bodyRegular" lightened>
+                      No options yet
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Card>
+              <Button
+                full
+                variant="lightened"
+                onClick={() => setOpenInsideDrawer(!openInsideDrawer)}
+              >
+                <Typography variant="bodyRegular" bold>
+                  Add decision option
+                </Typography>
+              </Button>
+            </Card>
+          ) : null}
         </Stack>
-        <StepFields />
-        <Button onClick={() => setOpenInsideDrawer(!openInsideDrawer)}>
+        {/* <Button onClick={() => setOpenInsideDrawer(!openInsideDrawer)}>
           asdf
-        </Button>
+        </Button> */}
       </StyledCard>
       <ActionsContainer noRadius noBorder>
-        hi
+        {isAdding ? (
+          <Button full onClick={handleAddStep}>
+            <Typography variant="bodyRegular" bold>
+              Add
+            </Typography>
+          </Button>
+        ) : (
+          <Grid container spacing={4}>
+            <Grid item xs={6}>
+              <Button full onClick={handleAddStep} variant="danger">
+                <Typography variant="bodyRegular" bold>
+                  Remove
+                </Typography>
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button full onClick={handleAddStep} disabled>
+                <Typography variant="bodyRegular" bold>
+                  Update
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        )}
       </ActionsContainer>
       <DecisionDrawer
         open={openInsideDrawer}
@@ -336,9 +435,18 @@ const StepDrawer = ({ open, toggle, isAdding }) => {
     </CustomDrawer>
   );
 };
-const ProcessDrawer = ({ open, toggle, isAdding }) => {
+const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
   const [openInsideDrawer, setOpenInsideDrawer] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const handleNext = () => {
+    setActiveStep(activeStep + 1);
+  };
+  const handlePrev = () => {
+    setActiveStep(activeStep - 1);
+  };
+  const handleAddProcess = () => {
+    console.log("add process");
+  };
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
       <StyledCard noBorder noRadius>
@@ -357,32 +465,138 @@ const ProcessDrawer = ({ open, toggle, isAdding }) => {
               </Grid>
             </Grid>
             {isAdding ? (
-              <Card variant="lightened">
-                <FormStepper activeStep={activeStep} />
-              </Card>
-            ) : null}
-            {/* This is where all the add new process steps go when adding new proces */}
-            {/* This is where the edit ux goes too */}
-            <ProcessFields />
+              <>
+                <Card variant="lightened">
+                  <FormStepper activeStep={activeStep} />
+                </Card>
+                {activeStep === 0 ? (
+                  <>
+                    <ProcessFields />
+                    {/* <AddProcess/> */}
+                  </>
+                ) : activeStep === 1 ? (
+                  <Card>
+                    <Card noBorder noRadius>
+                      <Grid
+                        container
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Grid item>
+                          <Typography variant="bodyRegular" lightened>
+                            No steps yet
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Card>
+                    <Button
+                      full
+                      variant="lightened"
+                      onClick={() => setOpenInsideDrawer(!openInsideDrawer)}
+                    >
+                      <Typography variant="bodyRegular" bold>
+                        Add a step
+                      </Typography>
+                    </Button>
+                  </Card>
+                ) : (
+                  activeStep === 2 && (
+                    <Stack spacing={3}>
+                      <Card size="small">
+                        <Stack direction="row" spacing={3} alignItems="center">
+                          <Typography variant="bodySmall" bold lightened>
+                            PROCESS
+                          </Typography>
+                          <Typography variant="bodyRegular" bold>
+                            Process Name
+                          </Typography>
+                        </Stack>
+                      </Card>
+                      <Card size="small">... list of steps ...</Card>
+                    </Stack>
+                  )
+                )}
+              </>
+            ) : (
+              <Stack spacing={6}>
+                <ProcessFields />
+                <Stack spacing={3}>
+                  <Typography variant="bodyRegular" bold>
+                    Steps
+                  </Typography>
+                  <ProcessOrStepGroup>
+                    {process.steps.map((s, i) => (
+                      <StepItem
+                        key={i}
+                        step={s}
+                        number={i}
+                        totalSteps={process.steps.length}
+                      />
+                    ))}
+                  </ProcessOrStepGroup>
+                </Stack>
+              </Stack>
+            )}
           </Stack>
         </Stack>
-        <Button onClick={() => setOpenInsideDrawer(!openInsideDrawer)}>
-          asdf
-        </Button>
       </StyledCard>
       <ActionsContainer noRadius noBorder>
-        hi
+        {isAdding ? (
+          <Grid
+            container
+            justifyContent={activeStep === 0 ? "flex-end" : "space-between"}
+          >
+            {activeStep === 0 ? null : (
+              <Grid item>
+                <Button type="submit" variant="text" onClick={handlePrev}>
+                  <Typography variant="bodyRegular" bold light>
+                    Prev
+                  </Typography>
+                </Button>
+              </Grid>
+            )}
+            <Grid item>
+              <Button
+                type="submit"
+                onClick={activeStep < 2 ? handleNext : handleAddProcess}
+                //  disabled={!isValid}
+              >
+                <Typography variant="bodyRegular" bold light>
+                  {activeStep < 2 ? "Next" : "Add Process"}
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        ) : (
+          <Grid container spacing={4}>
+            <Grid item xs={6}>
+              <Button variant="danger" full>
+                <Typography variant="bodyRegular" bold>
+                  Remove
+                </Typography>
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button disabled={true} full>
+                <Typography variant="bodyRegular" bold>
+                  Update
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        )}
       </ActionsContainer>
-      <StepDrawer
+      {/* <StepDrawer
+        step={process.step}
         open={openInsideDrawer}
         toggle={() => setOpenInsideDrawer(!openInsideDrawer)}
         isAdding={isAdding}
-      />
+      /> */}
     </CustomDrawer>
   );
 };
 
-const Process = () => {
+const ProcessItem = ({ process, number }) => {
   const [showAddChip, setShowAddChip] = useState(false);
   const [showDraggable, setShowDraggable] = useState(false);
   const [processDrawerOpen, setProcessDrawerOpen] = useState(false);
@@ -434,7 +648,7 @@ const Process = () => {
                 <Icon type="dotsVertical" variant="lightened" hoverable />
               ) : (
                 <Typography variant="bodySmall" bold lightened>
-                  1
+                  {number + 1}
                 </Typography>
               )}
             </Grid>
@@ -455,7 +669,7 @@ const Process = () => {
             alignItems="center"
             justifyContent="center"
           >
-            {showAddChip ? (
+            {showAddChip && number + 1 < FakeProcesses.length ? (
               <AddChip
                 size="small"
                 onClick={handleAddProcess}
@@ -469,11 +683,13 @@ const Process = () => {
           sx={{ borderLeft: "1px solid #eaeaea" }}
           onClick={handleEditProcess}
         >
-          <ListItemText primary="Title of process" />
+          <ListItemText primary={process.title} />
         </ListItemButton>
       </ListItem>
 
       <ProcessDrawer
+        // something like "position" to indicate where it should be added in the array
+        process={process}
         anchor="right"
         open={processDrawerOpen}
         toggle={() => setProcessDrawerOpen(!processDrawerOpen)}
@@ -482,5 +698,303 @@ const Process = () => {
     </>
   );
 };
+const StepItem = ({ step, number, totalSteps }) => {
+  const [showAddChip, setShowAddChip] = useState(false);
+  const [showDraggable, setShowDraggable] = useState(false);
+  const [stepDrawerOpen, setStepDrawerOpen] = useState(false);
+  const [isAddingStep, setIsAddingStep] = useState(true);
 
-const FakeProcesses = [{}];
+  const handleAddStep = () => {
+    setIsAddingStep(true);
+    setStepDrawerOpen(true);
+    console.log("add");
+  };
+  const handleEditStep = () => {
+    // not adding, so editing
+    setIsAddingStep(false);
+    setStepDrawerOpen(true);
+    console.log("edit");
+  };
+
+  console.log("stepDrawerOpen", stepDrawerOpen);
+  console.log("step in StepItem", step);
+
+  return (
+    <>
+      <ListItem
+        disablePadding
+        secondaryAction={
+          <Grid stack>
+            <Chip label="hi" />
+          </Grid>
+        }
+      >
+        <Box
+          sx={{
+            width: "48px",
+            height: "48px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+          }}
+        >
+          {/* Show Draggable Grabber */}
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="center"
+            sx={{ width: "48px", height: "24px" }}
+            onMouseEnter={() => setShowDraggable(true)}
+            onMouseLeave={() => setShowDraggable(false)}
+          >
+            <Grid item>
+              {showDraggable ? (
+                <Icon type="dotsVertical" variant="lightened" hoverable />
+              ) : (
+                <Typography variant="bodySmall" bold lightened>
+                  {number + 1}
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+          {/* Add Chip Container */}
+          <Grid
+            container
+            onMouseLeave={() => setShowAddChip(false)}
+            onMouseEnter={() => setShowAddChip(true)}
+            sx={{
+              width: "48px",
+              height: "24px",
+              position: "absolute",
+              bottom: "-12px",
+              left: 0,
+              zIndex: 15,
+            }}
+            alignItems="center"
+            justifyContent="center"
+          >
+            {showAddChip && number + 1 < totalSteps ? (
+              <AddChip
+                size="small"
+                onClick={handleAddStep}
+                variant="outlined"
+                label={<Icon type="plus" size="small" variant="primary" />}
+              />
+            ) : null}
+          </Grid>
+        </Box>
+        <ListItemButton
+          sx={{ borderLeft: "1px solid #eaeaea" }}
+          onClick={handleEditStep}
+        >
+          <ListItemText primary={step.title} />
+        </ListItemButton>
+      </ListItem>
+      <StepDrawer
+        step={step}
+        open={stepDrawerOpen}
+        toggle={() => setStepDrawerOpen(!stepDrawerOpen)}
+        isAdding={isAddingStep}
+      />
+    </>
+  );
+};
+
+const DecisionItem = ({ decision, number, totalOptions }) => {
+  const [showAddChip, setShowAddChip] = useState(false);
+  const [showDraggable, setShowDraggable] = useState(false);
+  const [decisionDrawerOpen, setDecisionDrawerOpen] = useState(false);
+  const [isAddingDecision, setIsAddingDecision] = useState(true);
+
+  const handleAddDecision = () => {
+    setIsAddingDecision(true);
+    setDecisionDrawerOpen(true);
+    console.log("add");
+  };
+  const handleEditDecision = () => {
+    // not adding, so editing
+    setIsAddingDecision(false);
+    setDecisionDrawerOpen(true);
+    console.log("edit");
+  };
+
+  console.log("decision--------------", decision);
+
+  return (
+    <>
+      <ListItem
+        disablePadding
+        secondaryAction={
+          <Grid stack>
+            <Chip label="hi" />
+          </Grid>
+        }
+      >
+        <Box
+          sx={{
+            width: "48px",
+            height: "48px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+          }}
+        >
+          {/* Show Draggable Grabber */}
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="center"
+            sx={{ width: "48px", height: "24px" }}
+            onMouseEnter={() => setShowDraggable(true)}
+            onMouseLeave={() => setShowDraggable(false)}
+          >
+            <Grid item>
+              {showDraggable ? (
+                <Icon type="dotsVertical" variant="lightened" hoverable />
+              ) : (
+                <Typography variant="bodySmall" bold lightened>
+                  {number + 1}
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+          {/* Add Chip Container */}
+          <Grid
+            container
+            onMouseLeave={() => setShowAddChip(false)}
+            onMouseEnter={() => setShowAddChip(true)}
+            sx={{
+              width: "48px",
+              height: "24px",
+              position: "absolute",
+              bottom: "-12px",
+              left: 0,
+              zIndex: 15,
+            }}
+            alignItems="center"
+            justifyContent="center"
+          >
+            {showAddChip && number + 1 < totalOptions ? (
+              <AddChip
+                size="small"
+                onClick={handleAddDecision}
+                variant="outlined"
+                label={<Icon type="plus" size="small" variant="primary" />}
+              />
+            ) : null}
+          </Grid>
+        </Box>
+        <ListItemButton
+          sx={{ borderLeft: "1px solid #eaeaea" }}
+          onClick={handleEditDecision}
+        >
+          <ListItemText primary={decision.title} />
+        </ListItemButton>
+      </ListItem>
+      {/* <StepDrawer
+        step={step}
+        open={stepDrawerOpen}
+        toggle={() => setStepDrawerOpen(!stepDrawerOpen)}
+        isAdding={isAddingStep}
+      /> */}
+    </>
+  );
+};
+
+const ProcessOrStepGroup = ({ children }) => {
+  const [showStartAddChip, setShowStartAddChip] = useState(false);
+  const [showEndAddChip, setShowEndAddChip] = useState(false);
+  const handleAddAtStart = () => {
+    console.log("add at start");
+  };
+  const handleAddAtEnd = () => {
+    console.log("add at end");
+  };
+  return (
+    <Box sx={{ position: "relative" }}>
+      <Grid
+        container
+        onMouseLeave={() => setShowStartAddChip(false)}
+        onMouseEnter={() => setShowStartAddChip(true)}
+        alignItems="center"
+        justifyContent="center"
+        sx={{
+          width: "48px",
+          height: "24px",
+          position: "absolute",
+          top: "-12px",
+          left: 0,
+          zIndex: 15,
+        }}
+      >
+        {showStartAddChip ? (
+          <AddChip
+            size="small"
+            onClick={handleAddAtStart}
+            variant="outlined"
+            label={<Icon type="plus" size="small" variant="primary" />}
+          />
+        ) : null}
+      </Grid>
+      <Card noPadding>
+        <List>{children}</List>
+      </Card>
+      <Grid
+        container
+        onMouseLeave={() => setShowEndAddChip(false)}
+        onMouseEnter={() => setShowEndAddChip(true)}
+        alignItems="center"
+        justifyContent="center"
+        sx={{
+          width: "48px",
+          height: "24px",
+          position: "absolute",
+          bottom: "-12px",
+          left: 0,
+          zIndex: 15,
+        }}
+      >
+        {showEndAddChip ? (
+          <AddChip
+            size="small"
+            onClick={handleAddAtEnd}
+            variant="outlined"
+            label={<Icon type="plus" size="small" variant="primary" />}
+          />
+        ) : null}
+      </Grid>
+    </Box>
+  );
+};
+
+const FakeProcesses = [
+  {
+    title: "Process 1",
+    steps: [{ title: "Step 1" }, { title: "Step 2" }, { title: "Step 3" }],
+  },
+  {
+    title: "Process 2",
+    steps: [{ title: "Step 1" }, { title: "Step 2" }, { title: "Step 3" }],
+  },
+  {
+    title: "Process 3",
+    steps: [{ title: "Step 1" }, { title: "Step 2" }, { title: "Step 3" }],
+  },
+  {
+    title: "Process 4 -- has decision inside",
+    steps: [
+      {
+        title: "Step 1 -- decision",
+        decisionOptions: [{ title: "Option 1" }, { title: "Option 2" }],
+      },
+      { title: "Step 2" },
+      { title: "Step 3" },
+    ],
+  },
+  {
+    title: "Process 5",
+    steps: [{ title: "Step 1" }, { title: "Step 2" }, { title: "Step 3" }],
+  },
+];
