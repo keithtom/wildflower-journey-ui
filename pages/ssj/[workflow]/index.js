@@ -1372,13 +1372,6 @@ const waysToWorkTogether = [
           "These sessions explore our collective vision for what ‘Liberatory Montessori’ means at Wildflower and how we support our ongoing development in service of our shared purpose for liberation in our schools and communities. ",
       },
       {
-        title: "Engage these Tools for Resilience",
-        url: "https://connected.wildflowerschools.org/series/4687002-tools-for-resilience",
-        type: "Connected Series",
-        description:
-          "This series includes nine, self-guided modules of resilience-building and stress-reducing activities.",
-      },
-      {
         title: "Enroll in equity training",
         url: "https://connected.wildflowerschools.org/series/4527958-series-equity-trainings",
         type: "Connected Series",
