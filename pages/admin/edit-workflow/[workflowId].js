@@ -123,6 +123,7 @@ const AddChip = styled(Chip)`
   width: ${({ theme }) => theme.util.buffer * 6}px;
   height: ${({ theme }) => theme.util.buffer * 6}px;
   background: ${({ theme }) => theme.palette.neutral.lightest};
+
   .MuiChip-label {
     padding: 0;
   }
@@ -892,7 +893,7 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
         open={openInsideDrawer}
         toggle={() => setOpenInsideDrawer(!openInsideDrawer)}
         isAdding={isAdding}
-      />
+      /> */}
     </CustomDrawer>
   );
 };
@@ -1211,6 +1212,11 @@ const DecisionItem = ({ decision, number, totalOptions }) => {
     </>
   );
 };
+const StepItem = ({ step, number, totalSteps }) => {
+  const [showAddChip, setShowAddChip] = useState(false);
+  const [showDraggable, setShowDraggable] = useState(false);
+  const [stepDrawerOpen, setStepDrawerOpen] = useState(false);
+  const [isAddingStep, setIsAddingStep] = useState(true);
 
 const ProcessOrStepGroup = ({ handleAddStep, notEditable, children }) => {
   const [showStartAddChip, setShowStartAddChip] = useState(false);
