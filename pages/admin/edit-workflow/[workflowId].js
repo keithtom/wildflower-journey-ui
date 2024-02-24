@@ -569,6 +569,15 @@ const StepDrawer = ({
 
           <StepFields control={control} errors={errors} />
 
+          <Switch
+            label="This step is a decision"
+            checked={isDecision ? isDecision : isAddingDecision}
+            onChange={
+              isDecision
+                ? handleRemoveDecision
+                : () => setIsAddingDecision(!isAddingDecision)
+            }
+          />
           {isDecision ? (
             <>
               <Switch
