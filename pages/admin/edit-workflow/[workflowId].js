@@ -308,8 +308,8 @@ const StepDrawer = ({ step, open, toggle, isAdding }) => {
     setIsDecision(false);
   };
 
-  console.log("step", step);
-  console.log("step decision options in stepDrawer", step.decisionOptions);
+  // console.log("step", step);
+  // console.log("step decision options in stepDrawer", step.decisionOptions);
 
   return (
     <CustomDrawer
@@ -337,43 +337,27 @@ const StepDrawer = ({ step, open, toggle, isAdding }) => {
           </Stack>
           <StepFields />
 
+          <Switch
+            label="This step is a decision"
+            checked={isDecision ? isDecision : isAddingDecision}
+            onChange={
+              isDecision
+                ? handleRemoveDecision
+                : () => setIsAddingDecision(!isAddingDecision)
+            }
+          />
           {isDecision ? (
-            <Stack spacing={3}>
-              <Switch
-                label="This step is a decision"
-                checked={isDecision}
-                onChange={handleRemoveDecision}
-              />
-              <ProcessOrStepGroup>
-                <DecisionItem
-                  number={0}
-                  totalOptions={2}
-                  decision={{ title: "Option 1" }}
-                  onClick={() => setOpenInsideDrawer(true)}
-                />
-                <DecisionItem
-                  number={1}
-                  totalOptions={2}
-                  decision={{ title: "Option 2" }}
-                  onClick={() => setOpenInsideDrawer(true)}
-                />
-                {/* {step?.decisionOptions.map((d, i) => {
+            <ProcessOrStepGroup>
+              {step.decisionOptions.map((d, i) => (
                 <DecisionItem
                   key={i}
                   number={i}
                   totalOptions={step.decisionOptions.length}
                   decision={d}
-                />;
-              })} */}
-              </ProcessOrStepGroup>
-            </Stack>
-          ) : (
-            <Switch
-              label="This step is a decision"
-              checked={isAddingDecision}
-              onChange={() => setIsAddingDecision(!isAddingDecision)}
-            />
-          )}
+                />
+              ))}
+            </ProcessOrStepGroup>
+          ) : null}
           {isAddingDecision ? (
             <Card>
               <Card noBorder noRadius>
@@ -715,9 +699,6 @@ const StepItem = ({ step, number, totalSteps }) => {
     setStepDrawerOpen(true);
     console.log("edit");
   };
-
-  console.log("stepDrawerOpen", stepDrawerOpen);
-  console.log("step in StepItem", step);
 
   return (
     <>
