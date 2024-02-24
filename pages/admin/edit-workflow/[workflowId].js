@@ -284,11 +284,30 @@ const DecisionDrawer = ({ open, toggle, isAdding }) => {
         <DecisionFields />
       </StyledCard>
       <ActionsContainer noRadius noBorder>
-        <Button full onClick={handleAddOption}>
-          <Typography variant="bodyRegular" bold>
-            Add
-          </Typography>
-        </Button>
+        {isAdding ? (
+          <Button full onClick={handleAddOption}>
+            <Typography variant="bodyRegular" bold>
+              Add
+            </Typography>
+          </Button>
+        ) : (
+          <Grid container spacing={4}>
+            <Grid item xs={6}>
+              <Button full variant="danger">
+                <Typography variant="bodyRegular" bold>
+                  Remove
+                </Typography>
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button full disabled>
+                <Typography variant="bodyRegular" bold>
+                  Update
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        )}
       </ActionsContainer>
     </CustomDrawer>
   );
@@ -307,9 +326,6 @@ const StepDrawer = ({ step, open, toggle, isAdding }) => {
   const handleRemoveDecision = () => {
     setIsDecision(false);
   };
-
-  // console.log("step", step);
-  // console.log("step decision options in stepDrawer", step.decisionOptions);
 
   return (
     <CustomDrawer
@@ -357,8 +373,7 @@ const StepDrawer = ({ step, open, toggle, isAdding }) => {
                 />
               ))}
             </ProcessOrStepGroup>
-          ) : null}
-          {isAddingDecision ? (
+          ) : isAddingDecision ? (
             <Card>
               <Card noBorder noRadius>
                 <Grid container alignItems="center" justifyContent="center">
@@ -381,9 +396,6 @@ const StepDrawer = ({ step, open, toggle, isAdding }) => {
             </Card>
           ) : null}
         </Stack>
-        {/* <Button onClick={() => setOpenInsideDrawer(!openInsideDrawer)}>
-          asdf
-        </Button> */}
       </StyledCard>
       <ActionsContainer noRadius noBorder>
         {isAdding ? (
@@ -414,7 +426,7 @@ const StepDrawer = ({ step, open, toggle, isAdding }) => {
       <DecisionDrawer
         open={openInsideDrawer}
         toggle={() => setOpenInsideDrawer(!openInsideDrawer)}
-        isAdding={isAdding}
+        isAdding={isAddingDecision}
       />
     </CustomDrawer>
   );
@@ -786,21 +798,19 @@ const DecisionItem = ({ decision, number, totalOptions }) => {
   const [showAddChip, setShowAddChip] = useState(false);
   const [showDraggable, setShowDraggable] = useState(false);
   const [decisionDrawerOpen, setDecisionDrawerOpen] = useState(false);
-  const [isAddingDecision, setIsAddingDecision] = useState(true);
+  const [isAddingOption, setIsAddingOption] = useState(true);
 
   const handleAddDecision = () => {
-    setIsAddingDecision(true);
+    setIsAddingOption(true);
     setDecisionDrawerOpen(true);
     console.log("add");
   };
   const handleEditDecision = () => {
     // not adding, so editing
-    setIsAddingDecision(false);
+    setIsAddingOption(false);
     setDecisionDrawerOpen(true);
     console.log("edit");
   };
-
-  console.log("decision--------------", decision);
 
   return (
     <>
@@ -874,12 +884,12 @@ const DecisionItem = ({ decision, number, totalOptions }) => {
           <ListItemText primary={decision.title} />
         </ListItemButton>
       </ListItem>
-      {/* <StepDrawer
-        step={step}
-        open={stepDrawerOpen}
-        toggle={() => setStepDrawerOpen(!stepDrawerOpen)}
-        isAdding={isAddingStep}
-      /> */}
+      <DecisionDrawer
+        step={decision}
+        open={decisionDrawerOpen}
+        toggle={() => setDecisionDrawerOpen(!decisionDrawerOpen)}
+        isAdding={isAddingOption}
+      />
     </>
   );
 };
