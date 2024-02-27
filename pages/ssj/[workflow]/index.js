@@ -871,7 +871,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
   const handleSetOpenDate = () => {
     try {
       teamsApi.setStartDate({
-        id: team?.id,
+        id: team?.data?.data?.id,
         date: moment(dateValue).format("YYYY-MM-DD"),
       }); //send to api
     } catch (err) {
@@ -1016,7 +1016,7 @@ const AddPartnerModal = ({
   });
   async function onSubmit(data) {
     try {
-      const response = await teamsApi.invitePartner(team.id, data);
+      const response = await teamsApi.invitePartner(team?.data?.data?.id, data);
       if (response.status === 200) {
         setSubmittedPartnerRequest(true);
       }
