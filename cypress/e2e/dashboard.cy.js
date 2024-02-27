@@ -42,10 +42,14 @@ describe("dashboard spec", () => {
         url: "/v1/ssj/teams/*/invite_partner",
       }).as("invitePartner");
 
+      const today = new Date();
+      const datestamp = today.toISOString().split("T")[0];
+      const email = "partner" + datestamp + "@test.com";
+
       cy.contains("Add a partner", { timeout: 60000 }).click();
       cy.get('input[name="partnerFirstName"]').clear().type("Donna");
       cy.get('input[name="partnerLastName"]').clear().type("Pascal");
-      cy.get('input[name="partnerEmail"]').clear().type("partner@test.com");
+      cy.get('input[name="partnerEmail"]').clear().type(email);
       cy.get('button[type="submit"]').click();
       cy.contains("Thanks for making a request to add a partner!", {
         timeout: 30000,
