@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-// import { Container, Draggable } from "react-smooth-dnd";
 import { arrayMoveImmutable } from "array-move";
 import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
@@ -357,30 +356,30 @@ const NewTaskInput = ({}) => {
     </form>
   );
 };
-const EditableTaskItem = ({ title, isDraggable }) => {
-  return (
-    <Grid container flexDirection="row" spacing={3} alignItems="center">
-      <Grid item>
-        <Icon
-          type="dotsVertical"
-          className={isDraggable && "drag-handle"}
-          hoverable={isDraggable}
-          variant={!isDraggable && "lightened"}
-        />
-      </Grid>
-      <Grid item flex={1}>
-        <Card size="small" variant="lightened">
-          <Typography varaint="bodyRegular">{title}</Typography>
-        </Card>
-      </Grid>
-      <Grid item>
-        <IconButton disabled={!isDraggable}>
-          <Icon type="close" variant={!isDraggable && "lightened"} />
-        </IconButton>
-      </Grid>
-    </Grid>
-  );
-};
+// const EditableTaskItem = ({ title, isDraggable }) => {
+//   return (
+//     <Grid container flexDirection="row" spacing={3} alignItems="center">
+//       <Grid item>
+//         <Icon
+//           type="dotsVertical"
+//           className={isDraggable && "drag-handle"}
+//           hoverable={isDraggable}
+//           variant={!isDraggable && "lightened"}
+//         />
+//       </Grid>
+//       <Grid item flex={1}>
+//         <Card size="small" variant="lightened">
+//           <Typography varaint="bodyRegular">{title}</Typography>
+//         </Card>
+//       </Grid>
+//       <Grid item>
+//         <IconButton disabled={!isDraggable}>
+//           <Icon type="close" variant={!isDraggable && "lightened"} />
+//         </IconButton>
+//       </Grid>
+//     </Grid>
+//   );
+// };
 // const EditableTaskList = ({ tasks }) => {
 //   const [taskList, setTaskList] = useState(tasks);
 
