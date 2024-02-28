@@ -341,7 +341,6 @@ const StepFields = ({ control, errors }) => {
           />
         )}
       />
-
       <Controller
         name="resource_link"
         control={control}
@@ -569,15 +568,8 @@ const StepDrawer = ({
 
           <StepFields control={control} errors={errors} />
 
-          <Switch
-            label="This step is a decision"
-            checked={isDecision ? isDecision : isAddingDecision}
-            onChange={
-              isDecision
-                ? handleRemoveDecision
-                : () => setIsAddingDecision(!isAddingDecision)
-            }
-          />
+          <StepFields control={control} errors={errors} />
+
           {isDecision ? (
             <>
               <Switch
@@ -902,7 +894,7 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
         open={openInsideDrawer}
         toggle={() => setOpenInsideDrawer(!openInsideDrawer)}
         isAdding={isAdding}
-      /> */}
+      />
     </CustomDrawer>
   );
 };
