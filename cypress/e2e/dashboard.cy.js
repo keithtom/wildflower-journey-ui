@@ -12,7 +12,7 @@ describe("dashboard spec", () => {
     it("should update anticipated open date", () => {
       cy.contains("open date", { matchCase: false, timeout: 60000 }).click();
       const today = new Date();
-      const yyyy = today.getFullYear() + 1;
+      const yyyy = today.getFullYear();
       let mm = today.getMonth() + 1; // Months start at 0!
       let dd = today.getDate();
       if (dd < 10) dd = "0" + dd;
