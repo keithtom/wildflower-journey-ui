@@ -38,7 +38,7 @@ const AdminDashboard = () => {
               </Link>
             </Grid>
             <Grid item>
-              <Link href={`/admin/edit-workflow/${id}`}>
+              <Link href={`/admin/edit-workflow/1`}>
                 <Button>
                   <Typography variant="bodyRegular" light bold>
                     Edit the School Startup Journey

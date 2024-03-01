@@ -15,7 +15,7 @@ export const showWorkflows = {
     return workflowsApi
       .get(showWorkflows.key(), config)
       .then((res) => {
-        return res;
+        return res.data.data;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);

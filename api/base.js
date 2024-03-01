@@ -77,6 +77,7 @@ function register(path, options) {
 function loadAllRelationshipsFromIncluded(data) {
   const arrayOrObject = data.data;
   const included = data.included;
+
   if (Array.isArray(arrayOrObject)) {
     arrayOrObject.forEach((e) => {
       loadAllRelationships(e, included);
@@ -94,6 +95,7 @@ function loadAllRelationshipsFromIncluded(data) {
 function loadAllRelationships(objectWithRelationships, included, depth = 0) {
   // console.log("depth", depth);
   if (depth > 2) return;
+
   if (!objectWithRelationships.relationships) return;
 
   const relationshipKeys = Object.keys(objectWithRelationships.relationships);
