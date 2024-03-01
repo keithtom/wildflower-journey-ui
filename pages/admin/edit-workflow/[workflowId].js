@@ -512,7 +512,7 @@ const StepDrawer = ({
     control,
     handleSubmit,
     reset,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
   } = useForm({
     mode: "onChange",
     defaultValues: !isAdding && {
@@ -535,6 +535,14 @@ const StepDrawer = ({
 
   const handleAddStep = () => {
     console.log("adding step");
+    toggle();
+  };
+  const handleRemoveStep = () => {
+    console.log("remove step");
+    toggle();
+  };
+  const handleUpdateStep = () => {
+    console.log("update step");
     toggle();
   };
   const handleRemoveDecision = () => {
@@ -627,14 +635,14 @@ const StepDrawer = ({
         ) : (
           <Grid container spacing={4}>
             <Grid item xs={6}>
-              <Button full onClick={handleAddStep} variant="danger">
+              <Button full onClick={handleRemoveStep} variant="danger">
                 <Typography variant="bodyRegular" bold>
                   Remove
                 </Typography>
               </Button>
             </Grid>
             <Grid item xs={6}>
-              <Button full onClick={handleAddStep} disabled>
+              <Button full onClick={handleUpdateStep} disabled={!isDirty}>
                 <Typography variant="bodyRegular" bold>
                   Update
                 </Typography>
@@ -673,22 +681,29 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
     setNewProcess({});
     // mutate and add new process to the list
   };
+  const handleRemoveProcess = () => {
+    console.log("remove process");
+    toggle();
+  };
+  const handleUpdateProcess = () => {
+    console.log("update process", newProcess);
+    toggle();
+  };
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
   } = useForm({
     mode: "onChange",
-    defaultValues: open &&
-      !isAdding && {
-        title: process?.attributes?.title,
-        description: process?.attributes?.description,
-        categories: process?.attributes?.categories,
-        phase: process?.attributes?.phase,
-        // TODO: prerequisite: process?.attributes?.prerequisite,
-      },
+    defaultValues: !isAdding && {
+      title: process?.attributes?.title,
+      description: process?.attributes?.description,
+      categories: process?.attributes?.categories,
+      phase: process?.attributes?.phase,
+      // TODO: prerequisite: process?.attributes?.prerequisite,
+    },
   });
 
   const onSubmit = (data) => {
@@ -869,14 +884,14 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
         ) : (
           <Grid container spacing={4}>
             <Grid item xs={6}>
-              <Button variant="danger" full>
+              <Button variant="danger" full onClick={handleRemoveProcess}>
                 <Typography variant="bodyRegular" bold>
                   Remove
                 </Typography>
               </Button>
             </Grid>
             <Grid item xs={6}>
-              <Button disabled={true} full>
+              <Button disabled={!isDirty} full onClick={handleUpdateProcess}>
                 <Typography variant="bodyRegular" bold>
                   Update
                 </Typography>
