@@ -57,4 +57,21 @@ async function index(filter) {
   return data;
 }
 
+// filter example: {{ops_guide: true, rgl: true}} or {{etl: true}} Note that a person cannot be an etl
+export const showPersons = {
+  key: (filter) => `/v1/people?${Object.keys(filter).join("_")}`,
+  fetcher: (filter) => {
+    const config = getAuthHeader();
+    config.params = filter;
+    return peopleApi
+      .get(``, config)
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
+
 export default { show, update, index };

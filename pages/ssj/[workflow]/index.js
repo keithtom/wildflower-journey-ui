@@ -42,6 +42,7 @@ import Resource from "@components/Resource";
 
 import useTeam from "@hooks/useTeam";
 import useUser from "@hooks/useUser";
+import usePersons from "@hooks/usePersons";
 import useSSJProgress from "@hooks/useSSJProgress";
 import useMilestones from "@hooks/useMilestones";
 
@@ -88,6 +89,10 @@ const SSJ = () => {
   const { user, isLoading: userIsLoading } = useUser();
   const teamId = user?.data.attributes.ssj.teamId;
   const { team, isLoading: teamIsLoading } = useTeam(teamId);
+  const { people, isLoading: currentETLsIsLoading } = usePersons({
+    etl: true,
+  });
+  const currentETLs = people?.data;
 
   const {
     progress,
@@ -122,7 +127,8 @@ const SSJ = () => {
     userIsLoading ||
     teamIsLoading ||
     ssjProgressIsLoading ||
-    milestonesForPhaseIsLoading;
+    milestonesForPhaseIsLoading ||
+    currentETLsIsLoading;
 
   // console.log({ user });
   // console.log({ team });
@@ -547,7 +553,7 @@ const SSJ = () => {
                     <Grid item>
                       <Stack>
                         <Typography variant="h3" bold>
-                          There are {FakeETLs.length} other Emerging Teacher
+                          There are {currentETLs.length} other Emerging Teacher
                           Leaders
                         </Typography>
                         <Typography variant="bodyRegular" lightened>
@@ -602,6 +608,7 @@ const SSJ = () => {
       <ViewEtlsModal
         toggle={() => setViewEtlsModalOpen(!viewEtlsModalOpen)}
         open={viewEtlsModalOpen}
+        etls={currentETLs}
       />
       <AddOpenDateModal
         toggle={() => setAddOpenDateModalOpen(!addOpenDateModalOpen)}
@@ -839,15 +846,15 @@ const WaysToWorkCard = ({ waysToWork }) => {
   );
 };
 
-const ETLs = ({}) => {
+const ETLs = ({ etls }) => {
   return (
     <Grid container spacing={3}>
-      {FakeETLs.map((f, i) => (
+      {etls.map((f, i) => (
         <Grid item xs={12} sm={6} key={i}>
           <UserCard
             firstName={f.attributes.firstName}
             lastName={f.attributes.lastName}
-            role={f.roles[0]}
+            role={f.attributes.roleList[0]}
             profileImage={f.attributes.profileImage}
             email={f.attributes.email}
           />
@@ -925,11 +932,11 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
     </Modal>
   );
 };
-const ViewEtlsModal = ({ toggle, open }) => {
+const ViewEtlsModal = ({ toggle, open, etls }) => {
   return (
     <Modal title="Meet your peers" toggle={toggle} open={open}>
       <Stack spacing={3}>
-        <ETLs />
+        <ETLs etls={etls} />
       </Stack>
     </Modal>
   );
@@ -1207,144 +1214,6 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
     </Card>
   );
 };
-
-const FakeETLs = [
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "anedd28@gmail.com ",
-      firstName: "Adassa",
-      lastName: "Brutus",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "chip@pinyonmontessori.org",
-      firstName: "Chip",
-      lastName: "Reichanadter",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "yolson@gmail.com",
-      firstName: "Jarrett",
-      lastName: "Yoliswa",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "jennifer.irvingg@gmail.com",
-      firstName: "Jennifer",
-      lastName: "Irving",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "anneldesir@gmail.com",
-      firstName: "Anne",
-      lastName: "Desir",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "caitlin.reusche@gmail.com",
-      firstName: "Caitlin",
-      lastName: "Reusche",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "allison.bizon@gmail.com",
-      firstName: "Alli",
-      lastName: "Bizon",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "emmccarroll@gmail.com",
-      firstName: "Erin",
-      lastName: "McCarroll",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "brayariana00@gmail.com@gmail.com",
-      firstName: "Ariana",
-      lastName: "Bray",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "sandie.littletree@gmail.com ",
-      firstName: "Sandie",
-      lastName: "Schwehr",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "makenzie.LittleTree@gmail.com",
-      firstName: "Makenzie",
-      lastName: "Schwehr",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "sarahmtupper@gmail.com",
-      firstName: "Sarah",
-      lastName: "Tupper",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "margaretbeagle@gmail.com",
-      firstName: "Margaret",
-      lastName: "Beagle",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "stephaniemerholz@yahoo.com",
-      firstName: "Stephanie",
-      lastName: "Hull",
-    },
-  },
-  {
-    type: "person",
-    roles: ["Emerging Teacher Leader"],
-    attributes: {
-      email: "wildfloweratthelanding@gmail.com ",
-      firstName: "Sachi",
-      lastName: "Sakuray",
-    },
-  },
-];
 
 const waysToWorkTogether = [
   {
