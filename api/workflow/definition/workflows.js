@@ -13,9 +13,9 @@ export const showWorkflows = {
   fetcher: () => {
     const config = getAuthHeader();
     return workflowsApi
-      .get(showMilestones.key(), config)
+      .get(showWorkflows.key(), config)
       .then((res) => {
-        return res;
+        return res.data.data;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);
@@ -28,7 +28,7 @@ export const showWorkflow = {
   fetcher: (id) => {
     const config = getAuthHeader();
     return workflowsApi
-      .get(showMilestone.key(id), config)
+      .get(showWorkflow.key(id), config)
       .then((response) => {
         return response;
       })

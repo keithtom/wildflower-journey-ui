@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { showWorkflows } from "@api/workflow/definition/steps";
+import { showWorkflows } from "@api/workflow/definition/workflows";
 
 const useWorkflows = () => {
   //Fetch the data using SWR

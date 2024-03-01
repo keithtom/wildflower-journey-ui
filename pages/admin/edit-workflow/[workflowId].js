@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { useRouter } from "next/router";
 
 import { styled } from "@mui/material/styles";
 import { FormControlLabel, RadioGroup } from "@mui/material";
@@ -12,6 +13,11 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import { Drawer } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
+
+import useWorkflow from "@hooks/workflow/definition/useWorkflow";
+import useMilestones from "@hooks/workflow/definition/useMilestones";
+import useStep from "@hooks/workflow/definition/useStep";
 
 import {
   Box,
@@ -32,9 +38,20 @@ import {
   IconButton,
   Select,
   Switch,
+  MultiSelect,
 } from "@ui";
 
 const EditWorkflowPage = () => {
+  const router = useRouter();
+  const { workflowId } = router.query;
+
+  const { milestonesByPhase, isLoading: milestonesByPhaseLoading } =
+    useMilestones();
+  const { workflow, isLoading, isError } = useWorkflow(workflowId);
+
+  // console.log({ workflow });
+  // console.log({ milestonesByPhase });
+
   return (
     <PageContainer isAdmin>
       <Stack spacing={6}>
@@ -45,14 +62,27 @@ const EditWorkflowPage = () => {
             </Typography>
           </Grid>
         </Grid>
-        <Grid container>
-          <Grid item xs={12}>
-            <ProcessOrStepGroup>
-              {FakeProcesses.map((p, i) => (
-                <ProcessItem key={i} number={i} process={p} />
-              ))}
-            </ProcessOrStepGroup>
-          </Grid>
+        <Grid container spacing={6}>
+          {milestonesByPhase?.map((m, i) => (
+            <Grid item xs={12}>
+              <Stack spacing={6}>
+                <Typography variant="bodyLarge" bold>
+                  {m.phase}
+                </Typography>
+                <ProcessOrStepGroup key={i}>
+                  {m.milestones.map((p, i) => (
+                    <ProcessItem
+                      isLoading={milestonesByPhaseLoading}
+                      key={i}
+                      number={i}
+                      process={p}
+                      listLength={m.milestones.length}
+                    />
+                  ))}
+                </ProcessOrStepGroup>
+              </Stack>
+            </Grid>
+          ))}
         </Grid>
       </Stack>
     </PageContainer>
@@ -161,7 +191,7 @@ const ProcessFields = ({ control, errors }) => {
       />
 
       <Controller
-        name="category"
+        name="categories"
         control={control}
         rules={{
           required: {
@@ -170,15 +200,20 @@ const ProcessFields = ({ control, errors }) => {
           },
         }}
         render={({ field }) => (
-          <Select
-            label="Category"
-            placeholder="Select a category"
-            options={[{ label: "Finance", value: "finance" }]}
-            error={errors.category}
+          <MultiSelect
+            withCheckbox
+            label="Categories"
+            placeholder="Select categories"
+            options={[
+              { label: "Finance", value: "finance" },
+              { label: "Album", value: "album" },
+            ]}
+            error={errors.categories}
+            defaultValue={[]}
             helperText={
               errors &&
-              errors.category &&
-              errors.category.type === "required" &&
+              errors.categories &&
+              errors.categories.type === "required" &&
               "This field is required"
             }
             {...field}
@@ -198,7 +233,11 @@ const ProcessFields = ({ control, errors }) => {
           <Select
             label="Phase"
             placeholder="Select an SSJ phase"
-            options={[{ label: "Visioning", value: "visioning" }]}
+            options={[
+              { label: "Visioning", value: "visioning" },
+              { label: "Planning", value: "planning" },
+              { label: "Startup", value: "startup" },
+            ]}
             error={errors.phase}
             helperText={
               errors &&
@@ -260,6 +299,28 @@ const StepFields = ({ control, errors }) => {
           />
         )}
       />
+      <Controller
+        name="description"
+        control={control}
+        rules={{
+          required: {
+            value: true,
+            message: "This field is required",
+          },
+        }}
+        render={({ field }) => (
+          <TextField
+            multiline
+            label="Description"
+            placeholder="The description of this step"
+            error={errors.description}
+            helperText={
+              errors && errors.description && errors.description.message
+            }
+            {...field}
+          />
+        )}
+      />
 
       <Controller
         name="worktime"
@@ -280,26 +341,7 @@ const StepFields = ({ control, errors }) => {
           />
         )}
       />
-      <Controller
-        name="about"
-        control={control}
-        rules={{
-          required: {
-            value: true,
-            message: "This field is required",
-          },
-        }}
-        render={({ field }) => (
-          <TextField
-            multiline
-            label="About"
-            placeholder="About this step"
-            error={errors.about}
-            helperText={errors && errors.about && errors.about.message}
-            {...field}
-          />
-        )}
-      />
+
       <Controller
         name="resource_link"
         control={control}
@@ -463,12 +505,26 @@ const StepDrawer = ({
     step?.decisionOptions ? true : false
   );
 
+  if (open) {
+    console.log({ step });
+  }
+
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors, isValid },
-  } = useForm({ mode: "onChange" });
+  } = useForm({
+    mode: "onChange",
+    defaultValues: !isAdding && {
+      title: step?.attributes?.title,
+      //TODO worktime: step?.attributes?.worktime,
+      description: step?.attributes?.description,
+      // resource_link: step?.attributes?.resource_link,
+      // resource_title: step?.attributes?.resource_title,
+      assignment: step?.attributes?.completionType,
+    },
+  });
   const onSubmit = (data) => {
     setNewProcess((newProcess) => {
       return {
@@ -600,6 +656,11 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
   const [newProcess, setNewProcess] = useState({ steps: [] });
   const [openInsideDrawer, setOpenInsideDrawer] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+
+  if (open) {
+    console.log(process);
+  }
+
   const handleNext = () => {
     setActiveStep(activeStep + 1);
   };
@@ -619,7 +680,18 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
     handleSubmit,
     reset,
     formState: { errors, isValid },
-  } = useForm({ mode: "onChange" });
+  } = useForm({
+    mode: "onChange",
+    defaultValues: open &&
+      !isAdding && {
+        title: process?.attributes?.title,
+        description: process?.attributes?.description,
+        categories: process?.attributes?.categories,
+        phase: process?.attributes?.phase,
+        // TODO: prerequisite: process?.attributes?.prerequisite,
+      },
+  });
+
   const onSubmit = (data) => {
     setNewProcess((newProcess) => {
       return {
@@ -634,8 +706,8 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
     console.log(position);
   };
 
-  console.log({ newProcess });
-  console.log({ isValid });
+  // console.log({ newProcess });
+  // console.log({ isValid });
 
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
@@ -660,13 +732,11 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
                   <FormStepper activeStep={activeStep} />
                 </Card>
                 {activeStep === 0 ? (
-                  <>
-                    <ProcessFields
-                      control={control}
-                      reset={reset}
-                      errors={errors}
-                    />
-                  </>
+                  <ProcessFields
+                    control={control}
+                    reset={reset}
+                    errors={errors}
+                  />
                 ) : activeStep === 1 ? (
                   newProcess.steps && newProcess.steps.length > 0 ? (
                     <ProcessOrStepGroup
@@ -743,18 +813,22 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
               </>
             ) : (
               <Stack spacing={6}>
-                <ProcessFields />
+                <ProcessFields
+                  control={control}
+                  reset={reset}
+                  errors={errors}
+                />
                 <Stack spacing={3}>
                   <Typography variant="bodyRegular" bold>
                     Steps
                   </Typography>
                   <ProcessOrStepGroup>
-                    {process.steps.map((s, i) => (
+                    {process.relationships.steps.data.map((s, i) => (
                       <StepItem
                         key={i}
-                        step={s}
+                        stepId={s.id}
                         number={i}
-                        totalSteps={process.steps.length}
+                        totalSteps={process.relationships.steps.data.length}
                       />
                     ))}
                   </ProcessOrStepGroup>
@@ -824,7 +898,7 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
   );
 };
 
-const ProcessItem = ({ process, number }) => {
+const ProcessItem = ({ listLength, process, number }) => {
   const [showAddChip, setShowAddChip] = useState(false);
   const [showDraggable, setShowDraggable] = useState(false);
   const [processDrawerOpen, setProcessDrawerOpen] = useState(false);
@@ -848,7 +922,9 @@ const ProcessItem = ({ process, number }) => {
         disablePadding
         secondaryAction={
           <Grid stack>
-            <Chip label="hi" />
+            {process.attributes.categories.map((c, i) => (
+              <Chip label={c} key={i} />
+            ))}
           </Grid>
         }
       >
@@ -897,7 +973,7 @@ const ProcessItem = ({ process, number }) => {
             alignItems="center"
             justifyContent="center"
           >
-            {showAddChip && number + 1 < FakeProcesses.length ? (
+            {showAddChip && number + 1 < listLength ? (
               <AddChip
                 size="small"
                 onClick={handleAddProcess}
@@ -911,26 +987,31 @@ const ProcessItem = ({ process, number }) => {
           sx={{ borderLeft: "1px solid #eaeaea" }}
           onClick={handleEditProcess}
         >
-          <ListItemText primary={process.title} />
+          <ListItemText primary={process.attributes.title} />
         </ListItemButton>
       </ListItem>
 
-      <ProcessDrawer
-        // something like "position" to indicate where it should be added in the array
-        process={process}
-        anchor="right"
-        open={processDrawerOpen}
-        toggle={() => setProcessDrawerOpen(!processDrawerOpen)}
-        isAdding={isAddingProcess}
-      />
+      {processDrawerOpen && (
+        <ProcessDrawer
+          // something like "position" to indicate where it should be added in the array
+          process={process}
+          anchor="right"
+          open={processDrawerOpen}
+          toggle={() => setProcessDrawerOpen(!processDrawerOpen)}
+          isAdding={isAddingProcess}
+        />
+      )}
     </>
   );
 };
-const StepItem = ({ notEditable, step, number, totalSteps }) => {
+const StepItem = ({ notEditable, stepId, number, totalSteps }) => {
   const [showAddChip, setShowAddChip] = useState(false);
   const [showDraggable, setShowDraggable] = useState(false);
   const [stepDrawerOpen, setStepDrawerOpen] = useState(false);
   const [isAddingStep, setIsAddingStep] = useState(true);
+
+  const { step, isLoading, isError } = useStep(stepId);
+  // console.log({ step });
 
   const handleAddStep = () => {
     setIsAddingStep(true);
@@ -949,9 +1030,9 @@ const StepItem = ({ notEditable, step, number, totalSteps }) => {
       <ListItem
         disablePadding
         secondaryAction={
-          <Grid stack>
-            <Chip label="hi" disabled={notEditable} />
-          </Grid>
+          step?.attributes?.kind === "decision" ? (
+            <Chip label="decision" disabled={notEditable} />
+          ) : null
         }
       >
         <Box
@@ -1014,15 +1095,20 @@ const StepItem = ({ notEditable, step, number, totalSteps }) => {
           sx={{ borderLeft: "1px solid #eaeaea" }}
           onClick={handleEditStep}
         >
-          <ListItemText primary={step.title} />
+          <ListItemText
+            primaryTypographyProps={{ noWrap: true }}
+            primary={step?.attributes?.title}
+          />
         </ListItemButton>
       </ListItem>
-      <StepDrawer
-        step={step}
-        open={stepDrawerOpen}
-        toggle={() => setStepDrawerOpen(!stepDrawerOpen)}
-        isAdding={isAddingStep}
-      />
+      {stepDrawerOpen ? (
+        <StepDrawer
+          step={step}
+          open={stepDrawerOpen}
+          toggle={() => setStepDrawerOpen(!stepDrawerOpen)}
+          isAdding={isAddingStep}
+        />
+      ) : null}
     </>
   );
 };
