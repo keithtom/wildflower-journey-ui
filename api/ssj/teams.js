@@ -67,7 +67,7 @@ export const showTeam = {
     return teamsApi
       .get(showTeam.key(teamId), getAuthHeader())
       .then((data) => {
-        wildflowerApi.loadAllRelationshipsFromIncluded(data);
+        wildflowerApi.loadAllRelationshipsFromIncluded(data.data);
         return data;
       })
       .catch((error) => {
