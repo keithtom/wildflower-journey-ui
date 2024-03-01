@@ -104,8 +104,8 @@ const SSJ = () => {
   });
 
   const partners =
-    team?.data.relationships?.partners?.data?.length >= 1
-      ? team.data.relationships.partners.data.filter((t) => {
+    team?.data.data.relationships?.partners?.data?.length >= 1
+      ? team?.data.data.relationships?.partners?.data?.filter((t) => {
           return t.id !== currentUser?.id;
         })
       : null;
