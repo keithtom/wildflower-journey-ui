@@ -6,8 +6,6 @@ const usePersons = (filter) => {
     showPersons.fetcher(filter)
   );
 
-  // console.log({ data });
-
   return {
     people: data?.data,
     isLoading: !error && !data,
