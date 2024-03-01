@@ -341,7 +341,6 @@ const StepFields = ({ control, errors }) => {
           />
         )}
       />
-
       <Controller
         name="resource_link"
         control={control}
