@@ -19,6 +19,8 @@ import useWorkflow from "@hooks/workflow/definition/useWorkflow";
 import useMilestones from "@hooks/workflow/definition/useMilestones";
 import useStep from "@hooks/workflow/definition/useStep";
 
+import ProcessOrStepGroup from "@components/admin/workflow/ProcessOrStepGroup";
+import ProcessItem from "@components/admin/workflow/ProcessItem";
 import {
   Box,
   PageContainer,
