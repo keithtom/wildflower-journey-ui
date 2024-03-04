@@ -46,8 +46,8 @@ export const showProgress = {
   fetcher: (workflowId) => {
     return workflowsApi
       .get(`/progress?workflow_id=${workflowId}`, getAuthHeader())
-      .then((data) => {
-        return data;
+      .then((response) => {
+        return response;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);
@@ -73,8 +73,8 @@ export const showResources = {
   fetcher: (workflowId) => {
     return workflowsApi
       .get(`/resources?workflow_id=${workflowId}`, getAuthHeader())
-      .then((data) => {
-        return data;
+      .then((response) => {
+        return response;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);

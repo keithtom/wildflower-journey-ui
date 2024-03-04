@@ -21,8 +21,8 @@ export const showPerson = {
     config.params = params;
     return peopleApi
       .get(`/${personId}`, config)
-      .then((data) => {
-        return data;
+      .then((response) => {
+        return response;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);
@@ -65,8 +65,8 @@ export const showPersons = {
     config.params = filter;
     return peopleApi
       .get(``, config)
-      .then((data) => {
-        return data;
+      .then((response) => {
+        return response;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);

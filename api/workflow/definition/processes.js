@@ -38,4 +38,82 @@ export const showMilestone = {
   },
 };
 
-export default { showMilestones, showMilestone };
+// const data =
+// {
+//   process: {
+//     version: '1.0',
+//     title: 'Test Workflow',
+//     description: 'This is a test process',
+//     position: 0,
+//     steps_attributes: [
+//       {
+//         title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
+//         decision_options_attributes: [{description: "option 1"}, {description: "option 2"}],
+//         documents_attributes: [{title: "document title", link: "www.example.com"}]
+//       },
+//       { title: 'Step 2', description: 'This is step 2', kind: 'default', completion_type: 'one_per_group' }
+//     ]
+//   }
+// }
+async function createMilestone(data) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.post(
+      "/definition/processes/",
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+// const data =
+// {
+//   process: {
+//     version: '1.0',
+//     title: 'Test Workflow',
+//     description: 'This is a test process',
+//     position: 0,
+//     steps_attributes: [
+//       {
+//         id: 123, title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
+//         decision_options_attributes: [{external_identifier: '234-d3x', description: "option 1"}, {id: 4, description: "option 2"}],
+//         documents_attributes: [{external_identifier: '234-der', title: "document title", link: "www.example.com"}]
+//       },
+//       { id: 456, title: 'Step 2', description: 'This is step 2', kind: 'default', completion_type: 'one_per_group' }
+//     ]
+//   }
+// }
+async function editMilestone(id, data) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.put(
+      `/definition/processes/${id}`,
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+async function deleteMilestone(id) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.delete(
+      `/definition/processes/${id}`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { createMilestone, editMilestone, deleteMilestone };
