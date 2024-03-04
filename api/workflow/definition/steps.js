@@ -84,7 +84,7 @@ async function editStep(id, data) {
   }
 }
 
-async function deleteMilestone(id) {
+async function deleteStep(id) {
   const config = getAuthHeader();
 
   try {
@@ -98,4 +98,4 @@ async function deleteMilestone(id) {
   }
 }
 
-export default { createStep, editStep };
+export default { createStep, editStep, deleteStep };
