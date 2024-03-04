@@ -13,7 +13,7 @@ export const showSteps = {
   fetcher: () => {
     const config = getAuthHeader();
     return workflowsApi
-      .get(showMilestones.key(), config)
+      .get(showSteps.key(), config)
       .then((res) => {
         return res;
       })
@@ -28,7 +28,7 @@ export const showStep = {
   fetcher: (id) => {
     const config = getAuthHeader();
     return workflowsApi
-      .get(showMilestone.key(id), config)
+      .get(showStep.key(id), config)
       .then((response) => {
         return response;
       })
