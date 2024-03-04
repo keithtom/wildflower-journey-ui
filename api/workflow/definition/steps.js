@@ -38,4 +38,64 @@ export const showStep = {
   },
 };
 
-export default { showSteps, showStep };
+// {
+//   step: {
+//     process_id: 53, title: 'Test Step', description: 'This is a test step', kind: 'default',
+//     position: 1, completion_type: 'each_person', decision_question: 'are you sure?',
+//     decision_options_attributes: [{description: "option 1"}, {description: "option 2"}],
+//     documents_attributes: [{title: "document title", link: "www.example.com"}]
+//   }
+// }
+async function createStep(data) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.post(
+      "/definition/steps/",
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+//   {
+//      step:
+//       {
+//         id: 123, title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
+//         decision_options_attributes: [{external_identifier: 'we4-234', description: "option 1"}, {id: 4, description: "option 2"}],
+//         documents_attributes: [{external_identifier: '234-der', title: "document title", link: "www.example.com"}]
+//       }
+//    }
+async function editStep(id, data) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.put(
+      `/definition/steps/${id}`,
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+async function deleteMilestone(id) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.delete(
+      `/definition/steps/${id}`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { createStep, editStep };

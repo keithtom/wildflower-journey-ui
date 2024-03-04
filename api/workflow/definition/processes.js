@@ -70,6 +70,23 @@ async function createMilestone(data) {
   }
 }
 
+// const data =
+// {
+//   process: {
+//     version: '1.0',
+//     title: 'Test Workflow',
+//     description: 'This is a test process',
+//     position: 0,
+//     steps_attributes: [
+//       {
+//         id: 123, title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
+//         decision_options_attributes: [{external_identifier: '234-d3x', description: "option 1"}, {id: 4, description: "option 2"}],
+//         documents_attributes: [{external_identifier: '234-der', title: "document title", link: "www.example.com"}]
+//       },
+//       { id: 456, title: 'Step 2', description: 'This is step 2', kind: 'default', completion_type: 'one_per_group' }
+//     ]
+//   }
+// }
 async function editMilestone(id, data) {
   const config = getAuthHeader();
 
@@ -84,4 +101,19 @@ async function editMilestone(id, data) {
     wildflowerApi.handleErrors(error);
   }
 }
-export default { createMilestone, editMilestone };
+
+async function deleteMilestone(id) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.delete(
+      `/definition/processes/${id}`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { createMilestone, editMilestone, deleteMilestone };
