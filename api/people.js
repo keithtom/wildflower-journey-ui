@@ -65,8 +65,8 @@ export const showPersons = {
     config.params = filter;
     return peopleApi
       .get(``, config)
-      .then((data) => {
-        return data;
+      .then((response) => {
+        return response;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);
