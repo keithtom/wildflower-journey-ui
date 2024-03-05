@@ -64,18 +64,27 @@ const StepDrawer = ({
     },
   });
   const onSubmit = (data) => {
+    console.log("inside the on submitt");
     setNewProcess((newProcess) => {
       return {
         ...newProcess,
-        steps: [...newProcess.steps, { data }],
+        relationships: {
+          steps: {
+            data: [
+              ...newProcess.relationships.steps.data,
+              { attributes: data },
+            ],
+          },
+        },
       };
     });
-  };
-
-  const handleAddStep = () => {
-    console.log("adding step");
     toggle();
   };
+
+  // const handleAddStep = () => {
+  //   console.log("adding step");
+  //   toggle();
+  // };
   const handleRemoveStep = () => {
     console.log("remove step");
     toggle();
@@ -156,7 +165,7 @@ const StepDrawer = ({
           <form onSubmit={handleSubmit(onSubmit)}>
             <Button
               full
-              onClick={handleAddStep}
+              // onClick={handleAddStep}
               type="submit"
               disabled={!isValid}
             >
