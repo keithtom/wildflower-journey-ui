@@ -56,10 +56,11 @@ const StepDrawer = ({
     mode: "onChange",
     defaultValues: !isAdding && {
       title: step?.attributes?.title,
-      //TODO worktime: step?.attributes?.worktime,
+      worktime: step?.attributes?.maxWorktime,
       description: step?.attributes?.description,
-      // resource_link: step?.attributes?.resource_link,
-      // resource_title: step?.attributes?.resource_title,
+      resource_link: step?.relationships?.documents?.data[0]?.attributes?.link,
+      resource_title:
+        step?.relationships?.documents?.data[0]?.attributes?.title,
       assignment: step?.attributes?.completionType,
     },
   });
