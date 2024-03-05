@@ -33,7 +33,9 @@ const ActionsContainer = styled(Box)`
 `;
 
 const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
-  const [newProcess, setNewProcess] = useState({ steps: [] });
+  const [newProcess, setNewProcess] = useState({
+    relationships: { steps: { data: [] } },
+  });
   const [openInsideDrawer, setOpenInsideDrawer] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
@@ -93,7 +95,9 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
     console.log(position);
   };
 
-  // console.log({ newProcess });
+  console.log({ process });
+
+  console.log({ newProcess });
   // console.log({ isValid });
 
   return (
@@ -125,16 +129,19 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
                     errors={errors}
                   />
                 ) : activeStep === 1 ? (
-                  newProcess.steps && newProcess.steps.length > 0 ? (
+                  newProcess.relationships.steps.data &&
+                  newProcess.relationships.steps.data.length > 0 ? (
                     <ProcessOrStepGroup
                       handleAddStep={handleAddStepToNewProcess}
                     >
-                      {newProcess.steps.map((s, i) => (
+                      {newProcess.relationships.steps.data.map((s, i) => (
                         <StepItem
                           key={i}
                           step={s.data}
                           number={i}
-                          totalSteps={newProcess.steps.length}
+                          totalSteps={
+                            newProcess.relationships.steps.data.length
+                          }
                         />
                       ))}
                     </ProcessOrStepGroup>
@@ -184,13 +191,13 @@ const ProcessDrawer = ({ process, open, toggle, isAdding }) => {
                         notEditable
                         handleAddStep={handleAddStepToNewProcess}
                       >
-                        {newProcess.steps.map((s, i) => (
+                        {newProcess.relationships.steps.data.map((s, i) => (
                           <StepItem
                             notEditable
                             key={i}
-                            step={s.data}
+                            step={s}
                             number={i}
-                            totalSteps={newProcess.steps.length}
+                            totalSteps={process.relationships.steps.data.length}
                           />
                         ))}
                       </ProcessOrStepGroup>

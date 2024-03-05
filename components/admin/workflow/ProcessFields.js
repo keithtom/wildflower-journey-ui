@@ -99,7 +99,6 @@ const ProcessFields = ({ control, errors }) => {
             >
               {categories.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
-                  <Checkbox checked={categories.indexOf(option.value) > -1} />
                   <ListItemText primary={option.label} />
                 </MenuItem>
               ))}

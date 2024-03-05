@@ -105,14 +105,10 @@ const StepItem = ({ notEditable, stepId, number, totalSteps }) => {
           sx={{ borderLeft: "1px solid #eaeaea" }}
           onClick={handleEditStep}
         >
-          {isLoading ? (
-            <Skeleton variant="text" width={200} height={20} />
-          ) : (
-            <ListItemText
-              primaryTypographyProps={{ noWrap: true }}
-              primary={step?.attributes?.title}
-            />
-          )}
+          <ListItemText
+            primaryTypographyProps={{ noWrap: true }}
+            primary={step?.attributes?.title}
+          />
         </ListItemButton>
       </ListItem>
       {stepDrawerOpen ? (
