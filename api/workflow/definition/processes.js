@@ -49,11 +49,17 @@ export const showMilestone = {
 //     position: 0,
 //     steps_attributes: [
 //       {
-//         title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
+//         title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person', min_worktime: 5, max_worktime: 10,
 //         decision_options_attributes: [{description: "option 1"}, {description: "option 2"}],
 //         documents_attributes: [{title: "document title", link: "www.example.com"}]
 //       },
 //       { title: 'Step 2', description: 'This is step 2', kind: 'default', completion_type: 'one_per_group' }
+//     ],
+//     selected_processes_attributes: [
+//       { workflow_id: 35, position: 0}
+//     ],
+//     workable_dependencies_attributes: [
+//       { workflow_id: 35, prerequisite_workable_type: "Workflow::Definition::Process", prerequisite_workable_id: 6},
 //     ]
 //   }
 // }
@@ -80,12 +86,17 @@ async function createMilestone(data) {
 //     position: 0,
 //     steps_attributes: [
 //       {
-//         id: 123, title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
+//         id: 123, title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person', min_worktime: 5, max_worktime: 10,
 //         decision_options_attributes: [{external_identifier: '234-d3x', description: "option 1"}, {id: 4, description: "option 2"}],
 //         documents_attributes: [{external_identifier: '234-der', title: "document title", link: "www.example.com"}]
 //       },
 //       { id: 456, title: 'Step 2', description: 'This is step 2', kind: 'default', completion_type: 'one_per_group' }
-//     ]
+//     ],
+//     selected_processes_attributes: [
+//       { id: 2, workflow_id: 35, position: 0}
+//     ],
+//     workable_dependencies_attributes: [
+//       { id: 25, workflow_id: 35, prerequisite_workable_type: "Workflow::Definition::Process", prerequisite_workable_id: 6},
 //   }
 // }
 async function editMilestone(id, data) {
