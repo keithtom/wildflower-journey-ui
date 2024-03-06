@@ -46,7 +46,6 @@ export const showMilestone = {
 //     version: '1.0',
 //     title: 'Test Workflow',
 //     description: 'This is a test process',
-//     position: 0,
 //     steps_attributes: [
 //       {
 //         title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person', min_worktime: 5, max_worktime: 10,
@@ -83,7 +82,6 @@ async function createMilestone(data) {
 //     version: '1.0',
 //     title: 'Test Workflow',
 //     description: 'This is a test process',
-//     position: 0,
 //     steps_attributes: [
 //       {
 //         id: 123, title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person', min_worktime: 5, max_worktime: 10,
