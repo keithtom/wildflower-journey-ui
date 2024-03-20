@@ -40,6 +40,7 @@ export const showMilestone = {
 
 // const data =
 // {
+// workflowId: 1,
 //   process: {
 //     version: '1.0',
 //     title: 'Test Workflow',
@@ -57,7 +58,6 @@ export const showMilestone = {
 // }
 async function createMilestone(data) {
   const config = getAuthHeader();
-
   try {
     const response = await workflowsApi.post(
       "/definition/processes/",

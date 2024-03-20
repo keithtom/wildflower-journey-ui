@@ -111,7 +111,7 @@ const ProcessItem = ({ listLength, process, number }) => {
           anchor="right"
           open={processDrawerOpen}
           toggle={() => setProcessDrawerOpen(!processDrawerOpen)}
-          isAdding={isAddingProcess}
+          isEditing={!isAddingProcess}
         />
       )}
     </>

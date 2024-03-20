@@ -54,15 +54,19 @@ const StepDrawer = ({
     formState: { errors, isValid, isDirty },
   } = useForm({
     mode: "onChange",
-    defaultValues: !isAdding && {
-      title: step?.attributes?.title,
-      worktime: step?.attributes?.maxWorktime,
-      description: step?.attributes?.description,
-      resource_link: step?.relationships?.documents?.data[0]?.attributes?.link,
-      resource_title:
-        step?.relationships?.documents?.data[0]?.attributes?.title,
-      assignment: step?.attributes?.completionType,
-    },
+    defaultValues: !isAdding
+      ? {
+          title: step?.attributes?.title,
+          worktime: step?.attributes?.maxWorktime,
+          description: step?.attributes?.description,
+          resource_link:
+            step?.relationships?.documents?.data[0]?.attributes?.link,
+          resource_title:
+            step?.relationships?.documents?.data[0]?.attributes?.title,
+          assignment: step?.attributes?.completionType,
+          kind: step?.attributes?.kind === "decision",
+        }
+      : { kind: "default" },
   });
   const onSubmit = (data) => {
     console.log("inside the on submitt");

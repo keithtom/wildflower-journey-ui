@@ -14,13 +14,28 @@ import { Icon } from "@components/ui";
 import StepDrawer from "./StepDrawer";
 import useStep from "@hooks/workflow/definition/useStep";
 
-const StepItem = ({ notEditable, stepId, number, totalSteps }) => {
+const StepItem = ({
+  id,
+  workingStep,
+  notEditable,
+  stepId,
+  number,
+  totalSteps,
+  setNewProcess,
+}) => {
   const [showAddChip, setShowAddChip] = useState(false);
   const [showDraggable, setShowDraggable] = useState(false);
   const [stepDrawerOpen, setStepDrawerOpen] = useState(false);
   const [isAddingStep, setIsAddingStep] = useState(true);
 
-  const { step, isLoading, isError } = useStep(stepId);
+  let step;
+  let isLoading;
+  let isError;
+  if (workingStep) {
+    step = workingStep;
+  } else {
+    ({ step, isLoading, isError } = useStep(id));
+  }
   // console.log({ step });
 
   const handleAddStep = () => {
@@ -113,6 +128,7 @@ const StepItem = ({ notEditable, stepId, number, totalSteps }) => {
       </ListItem>
       {stepDrawerOpen ? (
         <StepDrawer
+          setNewProcess={setNewProcess}
           step={step}
           open={stepDrawerOpen}
           toggle={() => setStepDrawerOpen(!stepDrawerOpen)}

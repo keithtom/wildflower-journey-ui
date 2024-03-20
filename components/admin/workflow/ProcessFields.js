@@ -149,8 +149,7 @@ const ProcessFields = ({ control, errors }) => {
           defaultValue={[]}
           rules={{
             required: {
-              value: true,
-              message: "This field is required",
+              value: false,
             },
           }}
           render={({ field }) => (
@@ -159,12 +158,6 @@ const ProcessFields = ({ control, errors }) => {
               labelId="prerequisite-label"
               id="prerequisite"
               input={<OutlinedInput label="Prerequisite" />}
-              helperText={
-                errors &&
-                errors.prerequisite &&
-                errors.prerequisite.type === "required" &&
-                "This field is required"
-              }
             >
               {prerequisites.map((option) => (
                 <MenuItem key={option.value} value={option.value}>

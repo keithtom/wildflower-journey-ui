@@ -146,7 +146,19 @@ const Navigation = () => {
             variant="primary"
             to="/admin"
             active={router.asPath === "/admin"}
-            label="Admin Dashboard"
+            label="Dashboard"
+          />
+          <NavLink
+            variant="primary"
+            to="/admin/workflows"
+            active={router.asPath === "/admin/workflows"}
+            label="Workflows"
+          />
+          <NavLink
+            variant="primary"
+            to="/admin/schools"
+            active={router.asPath === "/admin/schools"}
+            label="Schools"
           />
         </>
       ) : (

@@ -5,10 +5,11 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Switch,
   Typography,
 } from "@mui/material";
 
-const StepFields = ({ control, errors }) => {
+const StepFields = ({ stepId, control, errors, step }) => {
   return (
     <Stack spacing={6}>
       <Controller
@@ -54,7 +55,7 @@ const StepFields = ({ control, errors }) => {
       />
 
       <Controller
-        name="worktime"
+        name="max_worktime"
         control={control}
         rules={{
           required: {
@@ -118,7 +119,7 @@ const StepFields = ({ control, errors }) => {
       <Stack spacing={2}>
         <Typography variant="bodyRegular">Assignment</Typography>
         <Controller
-          name="assignment"
+          name="completion_type"
           control={control}
           rules={{ required: true, message: "This field is required" }}
           render={({ field: { onChange, value } }) => (
@@ -143,6 +144,24 @@ const StepFields = ({ control, errors }) => {
           )}
         />
       </Stack>
+      <Controller
+        name="kind"
+        control={control}
+        render={({ field }) => (
+          <FormControlLabel
+            label="Is decision"
+            control={
+              <Switch
+                label="Kind"
+                checked={field.value === "decision"}
+                onChange={(e) =>
+                  field.onChange(e.target.checked ? "decision" : "default")
+                }
+              />
+            }
+          />
+        )}
+      />
     </Stack>
   );
 };
