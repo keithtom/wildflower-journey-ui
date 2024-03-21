@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
 
 import { Controller, useForm } from "react-hook-form";
@@ -16,6 +17,10 @@ import {
   FormControlLabel,
   Radio,
   Switch,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
 
@@ -23,11 +28,44 @@ const ProcessId = ({}) => {
   const router = useRouter();
   const isDecision = true;
 
+  const [resourceModalOpen, setResourceModalOpen] = useState(false);
+  const [decisionModalOpen, setDecisionModalOpen] = useState(false);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  // Resource handlers
+  const handleOpenResourceModal = () => {
+    console.log("Open resource modal");
+    setResourceModalOpen(true);
+  };
+  const handleUpdateResource = () => {
+    console.log("Update resource");
+  };
+  const handleRemoveResource = () => {
+    console.log("Remove resource");
+  };
+  const handleAddResource = () => {
+    console.log("Add resource");
+  };
+
+  // Decision handlers
+  const handleOpenDecisionModal = () => {
+    console.log("Open decision modal");
+    setDecisionModalOpen(true);
+  };
+  const handleUpdateDecisionOption = () => {
+    console.log("Update decision option");
+  };
+  const handleRemoveDecisionOption = () => {
+    console.log("Remove decision option");
+  };
+  const handleAddDecisionOption = () => {
+    console.log("Add decision option");
+  };
 
   return (
     <PageContainer isAdmin>
@@ -155,15 +193,24 @@ const ProcessId = ({}) => {
                   id="nested-list-subheader"
                   sx={{ background: "#eaeaea" }}
                 >
-                  Resources
+                  <Grid container justifyContent="space-between">
+                    <Grid item>Resources</Grid>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleOpenResourceModal}
+                      >
+                        Add resource
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </ListSubheader>
               }
             >
-              {/* TODO: Map through decision options */}
+              {/* TODO: Map through resources */}
               <ListItem disablePadding divider>
-                <ListItemButton
-                // onClick={handleEditDecisionOption}
-                >
+                <ListItemButton onClick={handleOpenResourceModal}>
                   <Stack direction="row" spacing={3} alignItems="center">
                     <ListItemText>Visioning Album Template</ListItemText>
                   </Stack>
@@ -201,24 +248,31 @@ const ProcessId = ({}) => {
                   id="nested-list-subheader"
                   sx={{ background: "#eaeaea" }}
                 >
-                  Decision options
+                  <Grid container justifyContent="space-between">
+                    <Grid item>Decision options</Grid>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleOpenDecisionModal}
+                      >
+                        Add decision option
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </ListSubheader>
               }
             >
               {/* TODO: Map through decision options */}
               <ListItem disablePadding divider>
-                <ListItemButton
-                // onClick={handleEditDecisionOption}
-                >
+                <ListItemButton onClick={handleOpenDecisionModal}>
                   <Stack direction="row" spacing={3} alignItems="center">
                     <ListItemText>Yes</ListItemText>
                   </Stack>
                 </ListItemButton>
               </ListItem>
               <ListItem disablePadding divider>
-                <ListItemButton
-                // onClick={handleEditDecisionOption}
-                >
+                <ListItemButton onClick={handleOpenDecisionModal}>
                   <Stack direction="row" spacing={3} alignItems="center">
                     <ListItemText>No</ListItemText>
                   </Stack>
@@ -228,11 +282,70 @@ const ProcessId = ({}) => {
           </Card>
         ) : null}
       </Stack>
+      <ResourceModal
+        open={resourceModalOpen}
+        onClose={() => setResourceModalOpen(false)}
+        handleUpdateResource={handleUpdateResource}
+        handleRemoveResource={handleRemoveResource}
+        handleAddResource={handleAddResource}
+        // resource={resource}
+      />
+      <DecisionOptionModal
+        open={decisionModalOpen}
+        onClose={() => setDecisionModalOpen(false)}
+        handleUpdateResource={handleUpdateDecisionOption}
+        handleRemoveResource={handleRemoveDecisionOption}
+        handleAddResource={handleAddDecisionOption}
+        // decisionOption={decisionOption}
+      />
     </PageContainer>
   );
 };
 
 export default ProcessId;
+
+const ResourceModal = ({
+  open,
+  onClose,
+  handleUpdateResource,
+  handleRemoveResource,
+  handleAddResource,
+}) => {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Resource Modal</DialogTitle>
+      <DialogContent>
+        {/* TODO: Resource title and url fields here */}
+      </DialogContent>
+      <DialogActions>
+        <Stack direction="row" spacing={1}></Stack>
+        <Button onClick={handleUpdateResource}>Update</Button>
+        <Button onClick={handleRemoveResource}>Remove</Button>
+        <Button onClick={handleAddResource}>Add</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+const DecisionOptionModal = ({
+  open,
+  onClose,
+  handleAddDecisionOption,
+  handleRemoveDecisionOption,
+  handleUpdateDecisionOption,
+}) => {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Decision option Modal</DialogTitle>
+      <DialogContent>{/* TODO: Option description field here */}</DialogContent>
+      <DialogActions>
+        <Stack direction="row" spacing={1}></Stack>
+        <Button onClick={handleUpdateDecisionOption}>Update</Button>
+        <Button onClick={handleRemoveDecisionOption}>Remove</Button>
+        <Button onClick={handleAddDecisionOption}>Add</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 const ResourceForm = () => {
   return (

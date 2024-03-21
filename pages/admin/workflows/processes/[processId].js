@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
 
 import { Controller, useForm } from "react-hook-form";
@@ -21,16 +22,38 @@ import {
   MenuItem,
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
+import InlineActionTile from "@components/admin/InlineActionTile";
 
 const ProcessId = ({}) => {
   const router = useRouter();
   const stepId = "zxcv-1234";
+
+  // TODO: Get isDraftingNewVersion state from the API
+  const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
+  const [processHasChanges, setProcessHasChanges] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const handleUpdateProcess = () => {
+    console.log("Update process");
+  };
+  const handleCancelUpdateProcess = () => {
+    console.log("Cancel update process");
+  };
+  const handleAddStep = () => {
+    console.log("Add step");
+  };
+  const handleRemoveStep = (id) => {
+    console.log("Remove step", id);
+  };
+  const handleRepositionStep = (id, position) => {
+    // TODO drag and drop logic here
+    console.log("Reposition step", id, position);
+  };
 
   return (
     <PageContainer isAdmin>
@@ -48,9 +71,20 @@ const ProcessId = ({}) => {
             </Stack>
           </Grid>
           <Grid item>
-            <Button variant="contained" disabled>
-              Update
-            </Button>
+            {processHasChanges ? (
+              <Stack direction="row" spacing={3}>
+                <Button variant="secondary" onClick={handleCancelUpdateProcess}>
+                  Cancel
+                </Button>
+                <Button variant="contained" onClick={handleUpdateProcess}>
+                  Update
+                </Button>
+              </Stack>
+            ) : (
+              <Button variant="contained" disabled>
+                Update
+              </Button>
+            )}
           </Grid>
         </Grid>
 
@@ -209,24 +243,45 @@ const ProcessId = ({}) => {
                 id="nested-list-subheader"
                 sx={{ background: "#eaeaea" }}
               >
-                Steps
+                <Grid container justifyContent="space-between">
+                  <Grid item>Steps</Grid>
+                  {isDraftingNewVersion ? (
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleAddStep}
+                      >
+                        Add step
+                      </Button>
+                    </Grid>
+                  ) : null}
+                </Grid>
               </ListSubheader>
             }
           >
             {/* TODO: Map through processes for section */}
-            <ListItem disablePadding divider>
-              <Stack
-                sx={{
-                  width: "48px",
-                  borderRight: "1px solid #eaeaea",
-                  height: "48px",
-                }}
-                alignItems="center"
-                justifyContent="center"
-              >
-                {/* TODO This is where dragging goes, and where status indicators go */}
-                •
-              </Stack>
+            <ListItem
+              disablePadding
+              divider
+              secondaryAction={
+                !isDraftingNewVersion ? null : (
+                  <Button
+                    variant="text"
+                    color="error"
+                    onClick={() => handleRemoveStep(stepId)}
+                  >
+                    Remove
+                  </Button>
+                )
+              }
+            >
+              <InlineActionTile
+                showAdd={isDraftingNewVersion}
+                status="default"
+                add={handleAddStep}
+                reposition={handleRepositionStep}
+              />
               <ListItemButton
                 onClick={() => router.push(`/admin/workflows/steps/${stepId}`)}
               >
