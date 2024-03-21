@@ -16,14 +16,23 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Skeleton,
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
+import useWorkflow from "@hooks/workflow/definition/useWorkflow";
+import useMilestones from "@hooks/workflow/definition/useMilestones";
 
 const Workflow = ({}) => {
   const router = useRouter();
   const workflowId = router.query.workflowId;
-  const processId = "qwer-5678";
+
+  const { milestonesByPhase, isLoading: milestonesByPhaseLoading } =
+    useMilestones();
+  const { workflow, isLoading, isError } = useWorkflow(workflowId);
+
+  // console.log({ milestonesByPhase });
+  // console.log({ workflow });
 
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
   const [versionHasChanges, setVersionHasChanges] = useState(false);
@@ -105,80 +114,132 @@ const Workflow = ({}) => {
             )}
           </Grid>
         </Grid>
-        <Grid container>
-          <Grid item xs={12}>
-            <Card noPadding>
-              {/* TODO: Map through the sections */}
-              <List
-                subheader={
-                  <ListSubheader
-                    component="div"
-                    id="nested-list-subheader"
-                    sx={{ background: "#eaeaea" }}
-                  >
-                    Visioning
-                  </ListSubheader>
-                }
-              >
-                {/* TODO: Map through processes for section */}
-                <ListItem
-                  disablePadding
-                  divider
-                  secondaryAction={
-                    !isDraftingNewVersion ? null : (
-                      <Stack direction="row" spacing={1}>
-                        {processStatus === "removed" ? (
-                          <Button
-                            variant="text"
-                            onClick={() => handleRestoreProcess(processId)}
+        {milestonesByPhaseLoading
+          ? Array.from({ length: 3 }).map((_, index) => (
+              <Grid container>
+                <Grid item xs={12}>
+                  <Card noPadding>
+                    <List
+                      subheader={
+                        <ListSubheader
+                          component="div"
+                          id="nested-list-subheader"
+                          sx={{
+                            background: "#eaeaea",
+                            paddingX: 4,
+                            paddingY: 3,
+                          }}
+                        >
+                          <Skeleton variant="text" width={120} height={24} />
+                        </ListSubheader>
+                      }
+                    >
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        <ListItem key={index} divider>
+                          <ListItemText>
+                            <Skeleton variant="text" width={120} />
+                          </ListItemText>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Card>
+                </Grid>
+              </Grid>
+            ))
+          : milestonesByPhase.map((phase, i) => (
+              <Grid container key={i}>
+                <Grid item xs={12}>
+                  <Card noPadding>
+                    <List
+                      subheader={
+                        <ListSubheader
+                          component="div"
+                          id="nested-list-subheader"
+                          sx={{ background: "#eaeaea" }}
+                        >
+                          {phase.phase}
+                        </ListSubheader>
+                      }
+                    >
+                      {phase.milestones.map((process, i) => (
+                        <ListItem
+                          key={i}
+                          disablePadding
+                          divider
+                          secondaryAction={
+                            !isDraftingNewVersion ? null : (
+                              <Stack direction="row" spacing={1}>
+                                {processStatus === "removed" ? (
+                                  <Button
+                                    variant="text"
+                                    onClick={() =>
+                                      handleRestoreProcess(process.id)
+                                    }
+                                  >
+                                    Restore
+                                  </Button>
+                                ) : (
+                                  <>
+                                    <Button
+                                      variant="text"
+                                      onClick={() =>
+                                        handleReplaceProcess(process.id)
+                                      }
+                                    >
+                                      Replace
+                                    </Button>
+                                    <Button
+                                      variant="text"
+                                      color="error"
+                                      onClick={() =>
+                                        handleRemoveProcess(process.id)
+                                      }
+                                    >
+                                      Remove
+                                    </Button>
+                                  </>
+                                )}
+                              </Stack>
+                            )
+                          }
+                        >
+                          <InlineActionTile
+                            showAdd={isDraftingNewVersion}
+                            status="default"
+                            add={handleAddProcess}
+                            reposition={handleRepositionProcess}
+                          />
+                          <ListItemButton
+                            onClick={() =>
+                              router.push(
+                                `/admin/workflows/${workflowId}/processes/${process.id}`
+                              )
+                            }
                           >
-                            Restore
-                          </Button>
-                        ) : (
-                          <>
-                            <Button
-                              variant="text"
-                              onClick={() => handleReplaceProcess(processId)}
+                            <Stack
+                              direction="row"
+                              spacing={3}
+                              alignItems="center"
                             >
-                              Replace
-                            </Button>
-                            <Button
-                              variant="text"
-                              color="error"
-                              onClick={() => handleRemoveProcess(processId)}
-                            >
-                              Remove
-                            </Button>
-                          </>
-                        )}
-                      </Stack>
-                    )
-                  }
-                >
-                  <InlineActionTile
-                    showAdd={isDraftingNewVersion}
-                    status="default"
-                    add={handleAddProcess}
-                    reposition={handleRepositionProcess}
-                  />
-                  <ListItemButton
-                    onClick={() =>
-                      router.push(
-                        `/admin/workflows/${workflowId}/processes/${processId}`
-                      )
-                    }
-                  >
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <ListItemText>Develop your visioning album</ListItemText>
-                      <Chip label="2 steps" size="small" />
-                      <Chip label="Album, Advice, & Affiliation" size="small" />
-                    </Stack>
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            </Card>
-          </Grid>
-        </Grid>
+                              <ListItemText>
+                                {process.attributes.title}
+                              </ListItemText>
+                              <Chip
+                                label={`${process.relationships.steps.data.length} steps`}
+                                size="small"
+                              />
+                              {process.attributes.categories.map((c, i) => (
+                                <Chip label={c} size="small" key={i} />
+                              ))}
+                            </Stack>
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Card>
+                </Grid>
+              </Grid>
+            ))}
       </Stack>
       <AddProcessModal
         open={addProcessModalOpen}

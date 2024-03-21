@@ -20,16 +20,24 @@ import {
   Checkbox,
   TextField,
   MenuItem,
+  Skeleton,
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
 import Breadcrumbs from "@components/admin/Breadcrumbs";
+
+import useMilestone from "@hooks/workflow/definition/useMilestone";
+import useStep from "@hooks/workflow/definition/useStep";
 
 const ProcessId = ({}) => {
   const router = useRouter();
   const workflowId = router.query.workflowId;
   const processId = router.query.processId;
   const stepId = "zxcv-1234";
+
+  const { milestone, isLoading, isError } = useMilestone(processId);
+
+  console.log(milestone);
 
   // TODO: Get isDraftingNewVersion state from the API
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
@@ -38,24 +46,27 @@ const ProcessId = ({}) => {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
+
+  useEffect(() => {
+    if (!isLoading) {
+      reset({
+        title: milestone?.attributes?.title,
+        description: milestone?.attributes?.description,
+        prerequisite: milestone?.attributes?.prerequisite,
+        categories: milestone?.attributes?.categories,
+        phase: milestone?.attributes?.phase,
+      });
+    }
+  }, [isLoading, milestone, reset]);
 
   const handleUpdateProcess = () => {
     console.log("Update process");
   };
   const handleCancelUpdateProcess = () => {
     console.log("Cancel update process");
-  };
-  const handleAddStep = () => {
-    console.log("Add step");
-  };
-  const handleRemoveStep = (id) => {
-    console.log("Remove step", id);
-  };
-  const handleRepositionStep = (id, position) => {
-    // TODO drag and drop logic here
-    console.log("Reposition step", id, position);
   };
 
   return (
@@ -93,55 +104,12 @@ const ProcessId = ({}) => {
         </Grid>
 
         {/* FORM */}
-        <Stack spacing={3}>
-          <Controller
-            name="title"
-            control={control}
-            rules={{
-              required: {
-                value: true,
-                message: "This field is required",
-              },
-            }}
-            render={({ field }) => (
-              <TextField
-                label="Title"
-                placeholder="e.g. Complete The Visioning Advice Process"
-                error={errors.title}
-                helperText={errors && errors.title && errors.title.message}
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="description"
-            control={control}
-            rules={{
-              required: {
-                value: true,
-                message: "This field is required",
-              },
-            }}
-            render={({ field }) => (
-              <TextField
-                multiline
-                label="Description"
-                placeholder="The description of this process"
-                error={errors.description}
-                helperText={
-                  errors && errors.description && errors.description.message
-                }
-                {...field}
-              />
-            )}
-          />
-
-          <FormControl fullWidth>
-            <InputLabel id="categories-label">Categories</InputLabel>
+        <form onSubmit={handleSubmit(handleUpdateProcess)}>
+          <Stack spacing={3}>
             <Controller
-              name="categories"
+              name="title"
               control={control}
-              defaultValue={[]}
+              defaultValue=""
               rules={{
                 required: {
                   value: true,
@@ -149,97 +117,135 @@ const ProcessId = ({}) => {
                 },
               }}
               render={({ field }) => (
-                <Select
+                <TextField
+                  label="Title"
+                  placeholder="e.g. Complete The Visioning Advice Process"
+                  error={errors.title}
+                  helperText={errors && errors.title && errors.title.message}
                   {...field}
-                  labelId="categories-label"
-                  id="categories"
-                  multiple
-                  input={<OutlinedInput label="Categories" />}
-                  renderValue={(selected) => selected.join(", ")}
-                  helperText={
-                    errors &&
-                    errors.categories &&
-                    errors.categories.type === "required" &&
-                    "This field is required"
-                  }
-                >
-                  {categories.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      <ListItemText primary={option.label} />
-                    </MenuItem>
-                  ))}
-                </Select>
+                />
               )}
             />
-          </FormControl>
-
-          <FormControl fullWidth>
-            <InputLabel id="prerequisite-label">Prerequisite</InputLabel>
             <Controller
-              name="prerequisite"
+              name="description"
               control={control}
-              defaultValue={[]}
-              rules={{
-                required: {
-                  value: false,
-                },
-              }}
+              defaultValue=""
               render={({ field }) => (
-                <Select
+                <TextField
+                  multiline
+                  label="Description"
+                  placeholder="The description of this process"
                   {...field}
-                  labelId="prerequisite-label"
-                  id="prerequisite"
-                  input={<OutlinedInput label="Prerequisite" />}
-                >
-                  {prerequisites.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      <ListItemText primary={option.label} />
-                    </MenuItem>
-                  ))}
-                </Select>
+                />
               )}
             />
-          </FormControl>
 
-          <FormControl fullWidth>
-            <InputLabel id="phase-label">Phase</InputLabel>
-            <Controller
-              name="phase"
-              control={control}
-              defaultValue={[]}
-              rules={{
-                required: {
-                  value: true,
-                  message: "This field is required",
-                },
-              }}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  labelId="phase-label"
-                  id="phase"
-                  input={<OutlinedInput label="Phase" />}
-                  helperText={
-                    errors &&
-                    errors.phase &&
-                    errors.phase.type === "required" &&
-                    "This field is required"
-                  }
-                >
-                  {phases.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      <ListItemText primary={option.label} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            />
-          </FormControl>
-        </Stack>
+            <FormControl fullWidth>
+              <InputLabel id="categories-label">Categories</InputLabel>
+              <Controller
+                name="categories"
+                control={control}
+                defaultValue={[]}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "This field is required",
+                  },
+                }}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    labelId="categories-label"
+                    id="categories"
+                    multiple
+                    input={<OutlinedInput label="Categories" />}
+                    renderValue={(selected) => selected.join(", ")}
+                    helperText={
+                      errors &&
+                      errors.categories &&
+                      errors.categories.type === "required" &&
+                      "This field is required"
+                    }
+                  >
+                    {categories.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        <ListItemText primary={option.label} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel id="prerequisite-label">Prerequisite</InputLabel>
+              <Controller
+                name="prerequisite"
+                control={control}
+                defaultValue={[]}
+                rules={{
+                  required: {
+                    value: false,
+                  },
+                }}
+                render={({ field }) => (
+                  <Select
+                    disabled={!isDraftingNewVersion}
+                    {...field}
+                    labelId="prerequisite-label"
+                    id="prerequisite"
+                    input={<OutlinedInput label="Prerequisite" />}
+                  >
+                    {prerequisites.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        <ListItemText primary={option.label} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel id="phase-label">Phase</InputLabel>
+              <Controller
+                name="phase"
+                control={control}
+                defaultValue={[]}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "This field is required",
+                  },
+                }}
+                render={({ field }) => (
+                  <Select
+                    disabled={!isDraftingNewVersion}
+                    {...field}
+                    labelId="phase-label"
+                    id="phase"
+                    input={<OutlinedInput label="Phase" />}
+                    helperText={
+                      errors &&
+                      errors.phase &&
+                      errors.phase.type === "required" &&
+                      "This field is required"
+                    }
+                  >
+                    {phases.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        <ListItemText primary={option.label} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            </FormControl>
+          </Stack>
+        </form>
 
         {/* STEPS */}
         <Card noPadding>
-          {/* TODO: Map through the sections */}
           <List
             subheader={
               <ListSubheader
@@ -264,44 +270,21 @@ const ProcessId = ({}) => {
               </ListSubheader>
             }
           >
-            {/* TODO: Map through processes for section */}
-            <ListItem
-              disablePadding
-              divider
-              secondaryAction={
-                !isDraftingNewVersion ? null : (
-                  <Button
-                    variant="text"
-                    color="error"
-                    onClick={() => handleRemoveStep(stepId)}
-                  >
-                    Remove
-                  </Button>
-                )
-              }
-            >
-              <InlineActionTile
-                showAdd={isDraftingNewVersion}
-                status="default"
-                add={handleAddStep}
-                reposition={handleRepositionStep}
-              />
-              <ListItemButton
-                onClick={() =>
-                  router.push(
-                    `/admin/workflows/${workflowId}/processes/${processId}/steps/${stepId}`
-                  )
-                }
-              >
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <ListItemText>Read the visioning album template</ListItemText>
-                  <Chip label="30 minutes" size="small" />
-                  <Chip label="Individual" size="small" />
-                  <Chip label="Default" size="small" />
-                  <Chip label="HasResource" size="small" />
-                </Stack>
-              </ListItemButton>
-            </ListItem>
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, index) => (
+                  <ListItem key={index} divider>
+                    <ListItemText>
+                      <Skeleton variant="text" width={120} />
+                    </ListItemText>
+                  </ListItem>
+                ))
+              : milestone.relationships.steps.data.map((step, i) => (
+                  <StepListItem
+                    key={i}
+                    id={step.id}
+                    isDraftingNewVersion={isDraftingNewVersion}
+                  />
+                ))}
           </List>
         </Card>
       </Stack>
@@ -310,6 +293,87 @@ const ProcessId = ({}) => {
 };
 
 export default ProcessId;
+
+const StepListItem = ({ id, isDraftingNewVersion }) => {
+  const router = useRouter();
+  const workflowId = router.query.workflowId;
+  const processId = router.query.processId;
+  //Fetch step data
+  const { step, isLoading, isError } = useStep(id);
+
+  // console.log({ step });
+
+  const handleAddStep = () => {
+    console.log("Add step");
+  };
+  const handleRemoveStep = (id) => {
+    console.log("Remove step", id);
+  };
+  const handleRepositionStep = (id, position) => {
+    // TODO drag and drop logic here
+    console.log("Reposition step", id, position);
+  };
+  return isLoading ? (
+    <ListItem divider>
+      <ListItemText>
+        <Skeleton variant="text" width={120} />
+      </ListItemText>
+    </ListItem>
+  ) : (
+    <ListItem
+      disablePadding
+      divider
+      secondaryAction={
+        !isDraftingNewVersion ? null : (
+          <Button
+            variant="text"
+            color="error"
+            onClick={() => handleRemoveStep(id)}
+          >
+            Remove
+          </Button>
+        )
+      }
+    >
+      <InlineActionTile
+        showAdd={isDraftingNewVersion}
+        status="default"
+        add={handleAddStep}
+        reposition={handleRepositionStep}
+      />
+      <ListItemButton
+        onClick={() =>
+          router.push(
+            `/admin/workflows/${workflowId}/processes/${processId}/steps/${id}`
+          )
+        }
+      >
+        <Stack direction="row" spacing={3} alignItems="center">
+          <ListItemText>{step.attributes.title}</ListItemText>
+          <Chip label={step.attributes.maxWorktime} size="small" />
+          <Chip
+            label={
+              step.attributes.completionType === "each_person"
+                ? "Individual"
+                : "Collaborative"
+            }
+            size="small"
+          />
+          <Chip
+            label={step.attributes.kind === "default" ? "Default" : "Decision"}
+            size="small"
+          />
+          {step.relationships.documents.data.length ? (
+            <Chip
+              label={`${step.relationships.documents.data.length} Resource`}
+              size="small"
+            />
+          ) : null}
+        </Stack>
+      </ListItemButton>
+    </ListItem>
+  );
+};
 
 const categories = [
   { label: "Finance", value: "finance" },

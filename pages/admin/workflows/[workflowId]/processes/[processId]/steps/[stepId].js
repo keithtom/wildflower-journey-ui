@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 import { Controller, useForm } from "react-hook-form";
@@ -21,13 +21,22 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Skeleton,
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
 import Breadcrumbs from "@components/admin/Breadcrumbs";
 
-const ProcessId = ({}) => {
+import useStep from "@hooks/workflow/definition/useStep";
+
+const StepId = ({}) => {
   const router = useRouter();
   const isDecision = true;
+  const stepId = router.query.stepId;
+
+  //Fetch step data
+  const { step, isLoading, isError } = useStep(stepId);
+
+  // console.log({ step });
 
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
@@ -35,14 +44,26 @@ const ProcessId = ({}) => {
   const {
     control,
     handleSubmit,
+    reset,
+    watch,
     formState: { errors },
   } = useForm();
 
+  useEffect(() => {
+    if (!isLoading) {
+      reset({
+        title: step?.attributes?.title,
+        description: step?.attributes?.description,
+        max_worktime: step?.attributes?.maxWorktime,
+        kind: step?.attributes?.kind,
+        completion_type: step?.attributes?.completionType,
+      });
+    }
+  }, [isLoading, step, reset]);
+
+  const kindField = watch("kind");
+
   // Resource handlers
-  const handleOpenResourceModal = () => {
-    console.log("Open resource modal");
-    setResourceModalOpen(true);
-  };
   const handleUpdateResource = () => {
     console.log("Update resource");
   };
@@ -52,7 +73,10 @@ const ProcessId = ({}) => {
   const handleAddResource = () => {
     console.log("Add resource");
   };
-
+  const handleOpenResourceModal = () => {
+    console.log("Open resource modal");
+    setResourceModalOpen(true);
+  };
   // Decision handlers
   const handleOpenDecisionModal = () => {
     console.log("Open decision modal");
@@ -92,156 +116,127 @@ const ProcessId = ({}) => {
         </Grid>
 
         {/* FORM */}
-        <Stack spacing={6}>
-          <Controller
-            name="title"
-            control={control}
-            rules={{
-              required: {
-                value: true,
-                message: "This field is required",
-              },
-            }}
-            render={({ field }) => (
-              <TextField
-                label="Title"
-                placeholder="e.g. Complete The Visioning Advice Process"
-                error={errors.title}
-                helperText={errors && errors.title && errors.title.message}
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="description"
-            control={control}
-            rules={{
-              required: {
-                value: true,
-                message: "This field is required",
-              },
-            }}
-            render={({ field }) => (
-              <TextField
-                multiline
-                label="Description"
-                placeholder="The description of this step"
-                error={errors.description}
-                helperText={
-                  errors && errors.description && errors.description.message
-                }
-                {...field}
-              />
-            )}
-          />
-
-          <Controller
-            name="max_worktime"
-            control={control}
-            rules={{
-              required: {
-                value: true,
-                message: "This field is required",
-              },
-            }}
-            render={({ field }) => (
-              <TextField
-                label="Worktime"
-                placeholder="e.g. 2 hours, or 3 minutes"
-                error={errors.worktime}
-                helperText={
-                  errors && errors.worktime && errors.worktime.message
-                }
-                {...field}
-              />
-            )}
-          />
-
-          <Stack spacing={2}>
-            <Typography variant="bodyRegular">Assignment</Typography>
+        <form>
+          <Stack spacing={6}>
             <Controller
-              name="completion_type"
+              name="title"
               control={control}
-              rules={{ required: true, message: "This field is required" }}
-              render={({ field: { onChange, value } }) => (
-                <RadioGroup value={value}>
-                  <FormControlLabel
-                    value={"each_person"}
-                    control={<Radio />}
-                    label={
-                      "Individual (everyone can assign - everyone should complete)"
-                    }
-                    onChange={onChange}
-                  />
-                  <FormControlLabel
-                    value={"one_per_group"}
-                    control={<Radio />}
-                    label={
-                      "Collaborative (everyone can assign - only one can complete per group)"
-                    }
-                    onChange={onChange}
-                  />
-                </RadioGroup>
+              defaultValue=""
+              rules={{
+                required: {
+                  value: true,
+                  message: "This field is required",
+                },
+              }}
+              render={({ field }) => (
+                <TextField
+                  label="Title"
+                  placeholder="e.g. Complete The Visioning Advice Process"
+                  error={errors.title}
+                  helperText={errors && errors.title && errors.title.message}
+                  {...field}
+                />
+              )}
+            />
+            <Controller
+              name="description"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: {
+                  value: true,
+                  message: "This field is required",
+                },
+              }}
+              render={({ field }) => (
+                <TextField
+                  multiline
+                  label="Description"
+                  placeholder="The description of this step"
+                  error={errors.description}
+                  helperText={
+                    errors && errors.description && errors.description.message
+                  }
+                  {...field}
+                />
+              )}
+            />
+
+            <Controller
+              name="max_worktime"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: {
+                  value: true,
+                  message: "This field is required",
+                },
+              }}
+              render={({ field }) => (
+                <TextField
+                  label="Worktime"
+                  placeholder="e.g. 2 hours, or 3 minutes"
+                  error={errors.worktime}
+                  helperText={
+                    errors && errors.worktime && errors.worktime.message
+                  }
+                  {...field}
+                />
+              )}
+            />
+
+            <Stack spacing={2}>
+              <Typography variant="bodyRegular">Assignment</Typography>
+              <Controller
+                name="completion_type"
+                control={control}
+                rules={{ required: true, message: "This field is required" }}
+                render={({ field: { onChange, value } }) => (
+                  <RadioGroup value={value}>
+                    <FormControlLabel
+                      value={"each_person"}
+                      control={<Radio />}
+                      label={
+                        "Individual (everyone can assign - everyone should complete)"
+                      }
+                      onChange={onChange}
+                    />
+                    <FormControlLabel
+                      value={"one_per_group"}
+                      control={<Radio />}
+                      label={
+                        "Collaborative (everyone can assign - only one can complete per group)"
+                      }
+                      onChange={onChange}
+                    />
+                  </RadioGroup>
+                )}
+              />
+            </Stack>
+            <Controller
+              name="kind"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  label="Is decision"
+                  control={
+                    <Switch
+                      label="Kind"
+                      checked={field.value === "decision"}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.checked ? "decision" : "default"
+                        )
+                      }
+                    />
+                  }
+                />
               )}
             />
           </Stack>
+        </form>
 
-          {/* RESOURCES */}
-          <Card noPadding>
-            <List
-              subheader={
-                <ListSubheader
-                  component="div"
-                  id="nested-list-subheader"
-                  sx={{ background: "#eaeaea" }}
-                >
-                  <Grid container justifyContent="space-between">
-                    <Grid item>Resources</Grid>
-                    <Grid item>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={handleOpenResourceModal}
-                      >
-                        Add resource
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </ListSubheader>
-              }
-            >
-              {/* TODO: Map through resources */}
-              <ListItem disablePadding divider>
-                <ListItemButton onClick={handleOpenResourceModal}>
-                  <Stack direction="row" spacing={3} alignItems="center">
-                    <ListItemText>Visioning Album Template</ListItemText>
-                  </Stack>
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </Card>
-
-          <Controller
-            name="kind"
-            control={control}
-            render={({ field }) => (
-              <FormControlLabel
-                label="Is decision"
-                control={
-                  <Switch
-                    label="Kind"
-                    checked={field.value === "decision"}
-                    onChange={(e) =>
-                      field.onChange(e.target.checked ? "decision" : "default")
-                    }
-                  />
-                }
-              />
-            )}
-          />
-        </Stack>
-
-        {isDecision ? (
+        {kindField === "decision" ? (
           <Card noPadding>
             <List
               subheader={
@@ -283,6 +278,51 @@ const ProcessId = ({}) => {
             </List>
           </Card>
         ) : null}
+        {/* RESOURCES */}
+        <Card noPadding>
+          <List
+            subheader={
+              <ListSubheader
+                component="div"
+                id="nested-list-subheader"
+                sx={{ background: "#eaeaea" }}
+              >
+                <Grid container justifyContent="space-between">
+                  <Grid item>Resources</Grid>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={handleOpenResourceModal}
+                    >
+                      Add resource
+                    </Button>
+                  </Grid>
+                </Grid>
+              </ListSubheader>
+            }
+          >
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, index) => (
+                  <ListItem key={index} divider>
+                    <ListItemText>
+                      <Skeleton variant="text" width={120} />
+                    </ListItemText>
+                  </ListItem>
+                ))
+              : step.relationships.documents.data.map((resource, i) => (
+                  <ListItem disablePadding divider key={i}>
+                    <ListItemButton
+                      onClick={() => handleOpenResourceModal(resource.id)}
+                    >
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <ListItemText>{resource.attributes.title}</ListItemText>
+                      </Stack>
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+          </List>
+        </Card>
       </Stack>
       <ResourceModal
         open={resourceModalOpen}
@@ -304,7 +344,7 @@ const ProcessId = ({}) => {
   );
 };
 
-export default ProcessId;
+export default StepId;
 
 const ResourceModal = ({
   open,
