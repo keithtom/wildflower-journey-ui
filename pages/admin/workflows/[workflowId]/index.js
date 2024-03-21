@@ -22,6 +22,7 @@ import InlineActionTile from "@components/admin/InlineActionTile";
 
 const Workflow = ({}) => {
   const router = useRouter();
+  const workflowId = router.query.workflowId;
   const processId = "qwer-5678";
 
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
@@ -162,7 +163,9 @@ const Workflow = ({}) => {
                   />
                   <ListItemButton
                     onClick={() =>
-                      router.push(`/admin/workflows/processes/${processId}`)
+                      router.push(
+                        `/admin/workflows/${workflowId}/processes/${processId}`
+                      )
                     }
                   >
                     <Stack direction="row" spacing={3} alignItems="center">

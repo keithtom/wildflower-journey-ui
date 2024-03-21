@@ -23,6 +23,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
+import Breadcrumbs from "@components/admin/Breadcrumbs";
 
 const ProcessId = ({}) => {
   const router = useRouter();
@@ -70,6 +71,7 @@ const ProcessId = ({}) => {
   return (
     <PageContainer isAdmin>
       <Stack spacing={6}>
+        <Breadcrumbs />
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Stack direction="row" spacing={3} alignItems="center">

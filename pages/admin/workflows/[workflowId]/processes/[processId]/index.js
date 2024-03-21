@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 import { Controller, useForm } from "react-hook-form";
@@ -23,9 +23,12 @@ import {
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
+import Breadcrumbs from "@components/admin/Breadcrumbs";
 
 const ProcessId = ({}) => {
   const router = useRouter();
+  const workflowId = router.query.workflowId;
+  const processId = router.query.processId;
   const stepId = "zxcv-1234";
 
   // TODO: Get isDraftingNewVersion state from the API
@@ -58,6 +61,7 @@ const ProcessId = ({}) => {
   return (
     <PageContainer isAdmin>
       <Stack spacing={6}>
+        <Breadcrumbs />
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Stack direction="row" spacing={3} alignItems="center">
@@ -283,7 +287,11 @@ const ProcessId = ({}) => {
                 reposition={handleRepositionStep}
               />
               <ListItemButton
-                onClick={() => router.push(`/admin/workflows/steps/${stepId}`)}
+                onClick={() =>
+                  router.push(
+                    `/admin/workflows/${workflowId}/processes/${processId}/steps/${stepId}`
+                  )
+                }
               >
                 <Stack direction="row" spacing={3} alignItems="center">
                   <ListItemText>Read the visioning album template</ListItemText>
