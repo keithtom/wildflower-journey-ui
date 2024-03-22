@@ -24,7 +24,6 @@ import {
   Skeleton,
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
-import Breadcrumbs from "@components/admin/Breadcrumbs";
 
 import useStep from "@hooks/workflow/definition/useStep";
 
@@ -95,7 +94,6 @@ const StepId = ({}) => {
   return (
     <PageContainer isAdmin>
       <Stack spacing={6}>
-        <Breadcrumbs />
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Stack direction="row" spacing={3} alignItems="center">

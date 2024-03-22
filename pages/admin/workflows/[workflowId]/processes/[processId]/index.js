@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { mutate } from "swr";
 
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -24,8 +25,9 @@ import {
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
-import Breadcrumbs from "@components/admin/Breadcrumbs";
+import DraggableList from "@components/admin/DraggableList";
 
+import processes from "@api/workflow/definition/processes";
 import useMilestone from "@hooks/workflow/definition/useMilestone";
 import useStep from "@hooks/workflow/definition/useStep";
 
@@ -33,78 +35,122 @@ const ProcessId = ({}) => {
   const router = useRouter();
   const workflowId = router.query.workflowId;
   const processId = router.query.processId;
-  const stepId = "zxcv-1234";
 
   const { milestone, isLoading, isError } = useMilestone(processId);
 
-  console.log(milestone);
+  // console.log(milestone);
 
   // TODO: Get isDraftingNewVersion state from the API
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
   const [processHasChanges, setProcessHasChanges] = useState(false);
+  const [originalData, setOriginalData] = useState(false);
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm();
 
   useEffect(() => {
-    if (!isLoading) {
-      reset({
+    setProcessHasChanges(isDirty);
+  }, [isDirty]);
+
+  useEffect(() => {
+    if (!isLoading && milestone) {
+      const defaultValues = {
         title: milestone?.attributes?.title,
         description: milestone?.attributes?.description,
         prerequisite: milestone?.attributes?.prerequisite,
         categories: milestone?.attributes?.categories,
         phase: milestone?.attributes?.phase,
-      });
+      };
+      setOriginalData(defaultValues);
+      reset(defaultValues);
     }
   }, [isLoading, milestone, reset]);
 
-  const handleUpdateProcess = () => {
+  const handleUpdateProcess = async (data) => {
     console.log("Update process");
+    // Update the process
+    try {
+      const response = await processes.editMilestone(milestone.id, data);
+      setProcessHasChanges(false);
+      mutate(`/definition/processes/${milestone.id}`);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
   };
   const handleCancelUpdateProcess = () => {
     console.log("Cancel update process");
+    // Reset form to original data
+    reset(originalData);
   };
+
+  const handleRepositionStep = async (newItems) => {
+    // Iterate over newItems
+    for (let i = 0; i < newItems.length; i++) {
+      const step = newItems[i];
+      const step_params = { step: { position: i + 1 } }; // Assuming position starts from 1
+
+      try {
+        // Make API call to update the position of the step
+        const response = await processes.editStep(
+          processId,
+          step.id,
+          step_params
+        );
+        console.log("in the edit step api call", response);
+      } catch (error) {
+        console.error("There was an error!", error);
+      }
+    }
+
+    // Mutate API data and re-render steps
+    mutate(`/definition/processes/${milestone.id}`);
+  };
+
+  const onSubmit = handleSubmit(handleUpdateProcess);
 
   return (
     <PageContainer isAdmin>
-      <Stack spacing={6}>
-        <Breadcrumbs />
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
-            <Stack direction="row" spacing={3} alignItems="center">
-              <Typography variant="h4" bold>
-                Develop your visioning album
-              </Typography>
-              <Chip label="Live" color="primary" size="small" />
-              <Typography variant="bodyRegular" lightened>
-                Updated 4 weeks ago
-              </Typography>
-            </Stack>
-          </Grid>
-          <Grid item>
-            {processHasChanges ? (
-              <Stack direction="row" spacing={3}>
-                <Button variant="secondary" onClick={handleCancelUpdateProcess}>
-                  Cancel
-                </Button>
-                <Button variant="contained" onClick={handleUpdateProcess}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={6}>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              <Stack direction="row" spacing={3} alignItems="center">
+                <Typography variant="h4" bold>
+                  Develop your visioning album
+                </Typography>
+                <Chip label="Live" color="primary" size="small" />
+                <Typography variant="bodyRegular" lightened>
+                  Updated 4 weeks ago
+                </Typography>
+              </Stack>
+            </Grid>
+            <Grid item>
+              {processHasChanges ? (
+                <Stack direction="row" spacing={3}>
+                  <Button
+                    variant="secondary"
+                    onClick={handleCancelUpdateProcess}
+                  >
+                    Cancel
+                  </Button>
+                  <Button variant="contained" onClick={onSubmit}>
+                    Update
+                  </Button>
+                </Stack>
+              ) : (
+                <Button variant="contained" disabled>
                   Update
                 </Button>
-              </Stack>
-            ) : (
-              <Button variant="contained" disabled>
-                Update
-              </Button>
-            )}
+              )}
+            </Grid>
           </Grid>
-        </Grid>
 
-        {/* FORM */}
-        <form onSubmit={handleSubmit(handleUpdateProcess)}>
+          {/* FORM */}
           <Stack spacing={3}>
             <Controller
               name="title"
@@ -242,52 +288,48 @@ const ProcessId = ({}) => {
               />
             </FormControl>
           </Stack>
-        </form>
 
-        {/* STEPS */}
-        <Card noPadding>
-          <List
-            subheader={
-              <ListSubheader
-                component="div"
-                id="nested-list-subheader"
-                sx={{ background: "#eaeaea" }}
-              >
-                <Grid container justifyContent="space-between">
-                  <Grid item>Steps</Grid>
-                  {isDraftingNewVersion ? (
-                    <Grid item>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={handleAddStep}
-                      >
-                        Add step
-                      </Button>
-                    </Grid>
-                  ) : null}
-                </Grid>
-              </ListSubheader>
-            }
-          >
-            {isLoading
-              ? Array.from({ length: 3 }).map((_, index) => (
+          {/* STEPS */}
+          <Card noPadding>
+            <List
+              subheader={
+                <ListSubheader
+                  component="div"
+                  id="nested-list-subheader"
+                  sx={{ background: "#eaeaea" }}
+                >
+                  Steps
+                </ListSubheader>
+              }
+            >
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, index) => (
                   <ListItem key={index} divider>
                     <ListItemText>
                       <Skeleton variant="text" width={120} />
                     </ListItemText>
                   </ListItem>
                 ))
-              : milestone.relationships.steps.data.map((step, i) => (
-                  <StepListItem
-                    key={i}
-                    id={step.id}
-                    isDraftingNewVersion={isDraftingNewVersion}
-                  />
-                ))}
-          </List>
-        </Card>
-      </Stack>
+              ) : (
+                <DraggableList
+                  items={milestone.relationships.steps.data}
+                  onReorder={(newItems) => {
+                    // console.log({ newItems });
+                    handleRepositionStep(newItems);
+                  }}
+                  renderItem={(step, i) => (
+                    <StepListItem
+                      key={i}
+                      id={step.id}
+                      isDraftingNewVersion={isDraftingNewVersion}
+                    />
+                  )}
+                />
+              )}
+            </List>
+          </Card>
+        </Stack>
+      </form>
     </PageContainer>
   );
 };
@@ -301,7 +343,9 @@ const StepListItem = ({ id, isDraftingNewVersion }) => {
   //Fetch step data
   const { step, isLoading, isError } = useStep(id);
 
-  // console.log({ step });
+  console.log({ step });
+
+  const stepPosition = step?.attributes?.position;
 
   const handleAddStep = () => {
     console.log("Add step");
@@ -334,6 +378,7 @@ const StepListItem = ({ id, isDraftingNewVersion }) => {
           </Button>
         )
       }
+      sx={{ background: "white" }}
     >
       <InlineActionTile
         showAdd={isDraftingNewVersion}

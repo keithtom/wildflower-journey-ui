@@ -90,6 +90,8 @@ async function createMilestone(data) {
 async function editMilestone(id, data) {
   const config = getAuthHeader();
 
+  console.log("in the edit milestone api call", data);
+
   try {
     const response = await workflowsApi.put(
       `/definition/processes/${id}`,
@@ -116,4 +118,19 @@ async function deleteMilestone(id) {
   }
 }
 
-export default { createMilestone, editMilestone, deleteMilestone };
+async function editStep(processId, stepId, stepParams) {
+  const config = getAuthHeader();
+  console.log("in the edit step api call", stepParams);
+  try {
+    const response = await workflowsApi.put(
+      `/definition/processes/${processId}/steps/${stepId}`,
+      stepParams,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { createMilestone, editMilestone, deleteMilestone, editStep };
