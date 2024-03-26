@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { mutate } from "swr";
+import { useSortable } from "@dnd-kit/sortable";
 
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -23,6 +24,7 @@ import {
   MenuItem,
   Skeleton,
 } from "@mui/material";
+import { DragHandle } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
 import DraggableList from "@components/admin/DraggableList";
@@ -343,6 +345,8 @@ const StepListItem = ({ id, isDraftingNewVersion }) => {
   //Fetch step data
   const { step, isLoading, isError } = useStep(id);
 
+  const { attributes, listeners } = useSortable({ id: id });
+
   console.log({ step });
 
   const stepPosition = step?.attributes?.position;
@@ -357,6 +361,15 @@ const StepListItem = ({ id, isDraftingNewVersion }) => {
     // TODO drag and drop logic here
     console.log("Reposition step", id, position);
   };
+
+  const PositionGrabber = ({ ...props }) => {
+    return (
+      <Stack {...props}>
+        <DragHandle />
+      </Stack>
+    );
+  };
+
   return isLoading ? (
     <ListItem divider>
       <ListItemText>
@@ -385,6 +398,7 @@ const StepListItem = ({ id, isDraftingNewVersion }) => {
         status="default"
         add={handleAddStep}
         reposition={handleRepositionStep}
+        dragHandle={<PositionGrabber {...listeners} {...attributes} />}
       />
       <ListItemButton
         onClick={() =>

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Stack } from "@mui/material";
-import { Add as AddIcon, DragHandle } from "@mui/icons-material";
+import { Add as AddIcon } from "@mui/icons-material";
 
-const InlineActionTile = ({ reposition, status, showAdd, add }) => {
+const InlineActionTile = ({ reposition, status, showAdd, add, dragHandle }) => {
   const [isHovering, setIsHovering] = useState(false);
   return (
     <Stack
@@ -18,11 +18,7 @@ const InlineActionTile = ({ reposition, status, showAdd, add }) => {
       onMouseLeave={() => setIsHovering(false)}
     >
       {showAdd && <AddChip onClick={add} />}
-      {isHovering ? (
-        <PositionGrabber onDrop={reposition} />
-      ) : (
-        <StatusLight status={status} />
-      )}
+      {isHovering ? dragHandle : <StatusLight status={status} />}
     </Stack>
   );
 };
@@ -61,14 +57,6 @@ const AddChip = ({ onClick }) => {
       justifyContent="center"
     >
       <AddIcon color="primary" fontSize="small" />
-    </Stack>
-  );
-};
-
-const PositionGrabber = ({ onDrop }) => {
-  return (
-    <Stack onDrop={onDrop}>
-      <DragHandle />
     </Stack>
   );
 };

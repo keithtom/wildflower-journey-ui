@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 import { arrayMove } from "@dnd-kit/sortable";
 
-const SortableItem = ({ id, children }) => {
+const SortableItem = ({ id, renderItem }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
@@ -25,8 +25,8 @@ const SortableItem = ({ id, children }) => {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
+    <div ref={setNodeRef} style={style}>
+      {renderItem}
     </div>
   );
 };
@@ -54,9 +54,12 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
         strategy={verticalListSortingStrategy}
       >
         {items.map((item, i) => (
-          <SortableItem key={item.id} id={item.id}>
-            {renderItem(item, i)}
-          </SortableItem>
+          <SortableItem
+            key={item.id}
+            id={item.id}
+            handle={true}
+            renderItem={renderItem(item, i)}
+          />
         ))}
       </SortableContext>
     </DndContext>
