@@ -27,12 +27,30 @@ const Workflow = ({}) => {
   const router = useRouter();
   const workflowId = router.query.workflowId;
 
-  const { milestonesByPhase, isLoading: milestonesByPhaseLoading } =
-    useMilestones();
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-
-  // console.log({ milestonesByPhase });
   // console.log({ workflow });
+
+  // Transform the data to group by phase
+  function groupByPhase(data) {
+    const phasesOrder = ["visioning", "planning", "startup"];
+    const grouped = data.reduce((acc, item) => {
+      const phase = item.attributes.phase;
+      if (!acc[phase]) {
+        acc[phase] = [];
+      }
+      acc[phase].push(item);
+      return acc;
+    }, {});
+    return phasesOrder.reduce((acc, phase) => {
+      if (grouped[phase]) {
+        acc.push({ phase: phase, milestones: grouped[phase] });
+      }
+      return acc;
+    }, []);
+  }
+
+  const groupedProcesses = groupByPhase(workflow?.relationships.processes.data);
+  // console.log({ groupedProcesses });
 
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
   const [versionHasChanges, setVersionHasChanges] = useState(false);
@@ -114,7 +132,7 @@ const Workflow = ({}) => {
             )}
           </Grid>
         </Grid>
-        {milestonesByPhaseLoading
+        {isLoading
           ? Array.from({ length: 3 }).map((_, index) => (
               <Grid container>
                 <Grid item xs={12}>
@@ -146,7 +164,7 @@ const Workflow = ({}) => {
                 </Grid>
               </Grid>
             ))
-          : milestonesByPhase.map((phase, i) => (
+          : groupedProcesses.map((phase, i) => (
               <Grid container key={i}>
                 <Grid item xs={12}>
                   <Card noPadding>
@@ -225,7 +243,7 @@ const Workflow = ({}) => {
                                 {process.attributes.title}
                               </ListItemText>
                               <Chip
-                                label={`${process.relationships.steps.data.length} steps`}
+                                label={`${process.attributes.numOfSteps} steps`}
                                 size="small"
                               />
                               {process.attributes.categories.map((c, i) => (

@@ -30,6 +30,7 @@ export const showWorkflow = {
     return workflowsApi
       .get(showWorkflow.key(id), config)
       .then((response) => {
+        wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
         return response;
       })
       .catch((error) => {
