@@ -49,7 +49,9 @@ const Workflow = ({}) => {
     }, []);
   }
 
-  const groupedProcesses = groupByPhase(workflow?.relationships.processes.data);
+  const groupedProcesses = groupByPhase(
+    isLoading ? [] : workflow?.relationships.processes.data
+  );
   // console.log({ groupedProcesses });
 
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);

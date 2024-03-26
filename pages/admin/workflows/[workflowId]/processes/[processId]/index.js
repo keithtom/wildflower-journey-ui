@@ -39,7 +39,6 @@ const ProcessId = ({}) => {
   const processId = router.query.processId;
 
   const { milestone, isLoading, isError } = useMilestone(processId);
-
   // console.log(milestone);
 
   // TODO: Get isDraftingNewVersion state from the API
@@ -90,27 +89,27 @@ const ProcessId = ({}) => {
     reset(originalData);
   };
 
-  const handleRepositionStep = async (newItems) => {
-    // Iterate over newItems
-    for (let i = 0; i < newItems.length; i++) {
-      const step = newItems[i];
-      const step_params = { step: { position: i + 1 } }; // Assuming position starts from 1
-
-      try {
-        // Make API call to update the position of the step
-        const response = await processes.editStep(
-          processId,
-          step.id,
-          step_params
-        );
-        console.log("in the edit step api call", response);
-      } catch (error) {
-        console.error("There was an error!", error);
-      }
+  const handleRepositionStep = async (
+    stepId,
+    priorItemPosition,
+    subsequentItemPosition
+  ) => {
+    let newPosition;
+    if (priorItemPosition === null) {
+      newPosition = subsequentItemPosition / 2;
+    } else if (subsequentItemPosition === null) {
+      newPosition = priorItemPosition * 1.5;
+    } else {
+      newPosition = (priorItemPosition + subsequentItemPosition) / 2;
     }
-
-    // Mutate API data and re-render steps
-    mutate(`/definition/processes/${milestone.id}`);
+    const step_params = { step: { position: newPosition } };
+    // console.log({ step_params });
+    try {
+      // Make API call to update the position of the step
+      const response = await processes.editStep(processId, stepId, step_params);
+    } catch (error) {
+      console.error("There was an error!", error);
+    }
   };
 
   const onSubmit = handleSubmit(handleUpdateProcess);
@@ -315,14 +314,27 @@ const ProcessId = ({}) => {
               ) : (
                 <DraggableList
                   items={milestone.relationships.steps.data}
-                  onReorder={(newItems) => {
-                    // console.log({ newItems });
-                    handleRepositionStep(newItems);
+                  onReorder={(
+                    stepId,
+                    priorItemPosition,
+                    subsequentItemPosition
+                  ) => {
+                    // console.log({
+                    //   stepId,
+                    //   priorItemPosition,
+                    //   subsequentItemPosition,
+                    // });
+                    handleRepositionStep(
+                      stepId,
+                      priorItemPosition,
+                      subsequentItemPosition
+                    );
                   }}
                   renderItem={(step, i) => (
                     <StepListItem
                       key={i}
                       id={step.id}
+                      step={step}
                       isDraftingNewVersion={isDraftingNewVersion}
                     />
                   )}
@@ -338,28 +350,20 @@ const ProcessId = ({}) => {
 
 export default ProcessId;
 
-const StepListItem = ({ id, isDraftingNewVersion }) => {
+const StepListItem = ({ isDraftingNewVersion, step }) => {
   const router = useRouter();
   const workflowId = router.query.workflowId;
   const processId = router.query.processId;
-  //Fetch step data
-  const { step, isLoading, isError } = useStep(id);
 
-  const { attributes, listeners } = useSortable({ id: id });
+  // console.log({ step });
 
-  console.log({ step });
-
-  const stepPosition = step?.attributes?.position;
+  const { listeners, attributes, isDragging } = useSortable({ id: step.id });
 
   const handleAddStep = () => {
     console.log("Add step");
   };
   const handleRemoveStep = (id) => {
     console.log("Remove step", id);
-  };
-  const handleRepositionStep = (id, position) => {
-    // TODO drag and drop logic here
-    console.log("Reposition step", id, position);
   };
 
   const PositionGrabber = ({ ...props }) => {
@@ -370,13 +374,7 @@ const StepListItem = ({ id, isDraftingNewVersion }) => {
     );
   };
 
-  return isLoading ? (
-    <ListItem divider>
-      <ListItemText>
-        <Skeleton variant="text" width={120} />
-      </ListItemText>
-    </ListItem>
-  ) : (
+  return (
     <ListItem
       disablePadding
       divider
@@ -385,19 +383,18 @@ const StepListItem = ({ id, isDraftingNewVersion }) => {
           <Button
             variant="text"
             color="error"
-            onClick={() => handleRemoveStep(id)}
+            onClick={() => handleRemoveStep(step.id)}
           >
             Remove
           </Button>
         )
       }
-      sx={{ background: "white" }}
+      sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
         showAdd={isDraftingNewVersion}
         status="default"
         add={handleAddStep}
-        reposition={handleRepositionStep}
         dragHandle={<PositionGrabber {...listeners} {...attributes} />}
       />
       <ListItemButton
