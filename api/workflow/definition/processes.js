@@ -119,14 +119,18 @@ async function deleteMilestone(id) {
   }
 }
 
-async function editStep(processId, stepId, stepParams) {
+async function editStep(processId, stepId, data, stepParams) {
   const config = getAuthHeader();
-  console.log("in the edit step api call", stepParams);
+  console.log("in the edit step api call", data);
+  const params = {
+    ...config,
+    ...stepParams,
+  };
   try {
     const response = await workflowsApi.put(
       `/definition/processes/${processId}/steps/${stepId}`,
-      stepParams,
-      config
+      data,
+      params
     );
     return response;
   } catch (error) {

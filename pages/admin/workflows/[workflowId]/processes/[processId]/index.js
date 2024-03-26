@@ -31,7 +31,6 @@ import DraggableList from "@components/admin/DraggableList";
 
 import processes from "@api/workflow/definition/processes";
 import useMilestone from "@hooks/workflow/definition/useMilestone";
-import useStep from "@hooks/workflow/definition/useStep";
 
 const ProcessId = ({}) => {
   const router = useRouter();
@@ -400,7 +399,7 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
       <ListItemButton
         onClick={() =>
           router.push(
-            `/admin/workflows/${workflowId}/processes/${processId}/steps/${id}`
+            `/admin/workflows/${workflowId}/processes/${processId}/steps/${step.id}`
           )
         }
       >
