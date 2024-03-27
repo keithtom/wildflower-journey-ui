@@ -36,7 +36,8 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
   const [activeId, setActiveId] = useState(null);
   const [theItems, setTheItems] = useState(items ? items : []);
 
-  // console.log({ items });
+  console.log({ items });
+  console.log({ activeId });
 
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
@@ -44,6 +45,7 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
     setActiveId(event.active.id);
   };
   const handleDragEnd = ({ active, over }) => {
+    setActiveId(null);
     if (over) {
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
