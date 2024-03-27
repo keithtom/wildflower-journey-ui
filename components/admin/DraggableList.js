@@ -34,6 +34,7 @@ const SortableItem = ({ id, renderItem }) => {
 
 const DraggableList = ({ items, onReorder, renderItem }) => {
   const [activeId, setActiveId] = useState(null);
+  const [theItems, setTheItems] = useState(items ? items : []);
 
   // console.log({ items });
 
@@ -46,13 +47,15 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
     if (over) {
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
-      arrayMove(items, oldIndex, newIndex); // Perform the move but don't store the result
+      const newItems = arrayMove(items, oldIndex, newIndex); // Store the result
+
+      setTheItems(newItems); // Update the state of your items list
 
       const priorItemPosition =
-        newIndex > 0 ? items[newIndex - 1].attributes.position : null;
+        newIndex > 0 ? newItems[newIndex - 1].attributes.position : null;
       const subsequentItemPosition =
-        newIndex < items.length - 1
-          ? items[newIndex + 1].attributes.position
+        newIndex < newItems.length - 1
+          ? newItems[newIndex + 1].attributes.position
           : null;
 
       onReorder(active.id, priorItemPosition, subsequentItemPosition);
@@ -67,10 +70,10 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
       onDragStart={handleDragStart}
     >
       <SortableContext
-        items={items.map(({ id }) => id)}
+        items={theItems.map(({ id }) => id)}
         strategy={verticalListSortingStrategy}
       >
-        {items.map((item, i) => (
+        {theItems.map((item, i) => (
           <SortableItem
             key={item.id}
             id={item.id}
@@ -89,8 +92,8 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
               }}
             >
               {renderItem(
-                items.find((item) => item.id === activeId),
-                items.findIndex((item) => item.id === activeId)
+                theItems.find((item) => item.id === activeId),
+                theItems.findIndex((item) => item.id === activeId)
               )}
             </div>
           ) : null}
