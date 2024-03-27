@@ -24,11 +24,12 @@ export const showSteps = {
 };
 
 export const showStep = {
-  key: (id) => `/definition/steps/${id}`,
-  fetcher: (id) => {
+  key: (processId, stepId) =>
+    `/definition/processes/${processId}/steps/${stepId}`,
+  fetcher: (processId, stepId) => {
     const config = getAuthHeader();
     return workflowsApi
-      .get(showStep.key(id), config)
+      .get(showStep.key(processId, stepId), config)
       .then((response) => {
         wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
         return response;
@@ -70,14 +71,19 @@ async function createStep(data) {
 //         documents_attributes: [{external_identifier: '234-der', title: "document title", link: "www.example.com"}]
 //       }
 //    }
-async function editStep(id, data) {
-  const config = getAuthHeader();
 
+async function editStep(processId, stepId, data, stepParams) {
+  const config = getAuthHeader();
+  console.log("in the edit step api call", data);
+  const params = {
+    ...config,
+    ...stepParams,
+  };
   try {
     const response = await workflowsApi.put(
-      `/definition/steps/${id}`,
+      `/definition/processes/${processId}/steps/${stepId}`,
       data,
-      config
+      params
     );
     return response;
   } catch (error) {

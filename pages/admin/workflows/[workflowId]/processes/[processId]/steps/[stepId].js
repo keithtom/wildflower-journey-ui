@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
 
-import processes from "@api/workflow/definition/processes";
+import stepsApi from "@api/workflow/definition/steps";
 import useStep from "@hooks/workflow/definition/useStep";
 
 const StepId = ({}) => {
@@ -36,7 +36,7 @@ const StepId = ({}) => {
   const stepId = router.query.stepId;
 
   //Fetch step data
-  const { step, isLoading, isError } = useStep(stepId);
+  const { step, isLoading, isError } = useStep(processId, stepId);
 
   console.log({ step });
 
@@ -80,7 +80,7 @@ const StepId = ({}) => {
   const handleUpdateStep = async (data) => {
     console.log("Update step");
     try {
-      const response = await processes.editStep(processId, step.id, data);
+      const response = await stepsApi.editStep(processId, step.id, data);
       setStepHasChanges(false);
       mutate(`/definition/processes/${processId}/steps/${step.id}`);
       console.log(response);

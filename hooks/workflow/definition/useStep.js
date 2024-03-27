@@ -1,9 +1,10 @@
 import useSWR from "swr";
 import { showStep } from "@api/workflow/definition/steps";
 
-const useStep = (id) => {
-  const { data, error } = useSWR(id ? showStep.key(id) : null, () =>
-    showStep.fetcher(id)
+const useStep = (processId, stepId) => {
+  const { data, error } = useSWR(
+    processId && stepId ? showStep.key(processId, stepId) : null,
+    () => showStep.fetcher(processId, stepId)
   );
 
   // console.log({ data });

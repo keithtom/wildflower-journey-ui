@@ -48,7 +48,7 @@ export const showMilestone = {
 //     description: 'This is a test process',
 //     steps_attributes: [
 //       {
-//         title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person', 
+//         title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
 //          min_worktime: 5, max_worktime: 10, categories_list: ['Community & Family Engagement'], phase_list: ['Visioning'],
 //         decision_options_attributes: [{description: "option 1"}, {description: "option 2"}],
 //         documents_attributes: [{title: "document title", link: "www.example.com"}]
@@ -129,23 +129,4 @@ async function deleteMilestone(id) {
   }
 }
 
-async function editStep(processId, stepId, data, stepParams) {
-  const config = getAuthHeader();
-  console.log("in the edit step api call", data);
-  const params = {
-    ...config,
-    ...stepParams,
-  };
-  try {
-    const response = await workflowsApi.put(
-      `/definition/processes/${processId}/steps/${stepId}`,
-      data,
-      params
-    );
-    return response;
-  } catch (error) {
-    wildflowerApi.handleErrors(error);
-  }
-}
-
-export default { createMilestone, editMilestone, deleteMilestone, editStep };
+export default { createMilestone, editMilestone, deleteMilestone };

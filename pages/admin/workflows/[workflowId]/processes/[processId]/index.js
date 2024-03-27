@@ -30,6 +30,7 @@ import InlineActionTile from "@components/admin/InlineActionTile";
 import DraggableList from "@components/admin/DraggableList";
 
 import processes from "@api/workflow/definition/processes";
+import stepsApi from "@api/workflow/definition/steps";
 import useMilestone from "@hooks/workflow/definition/useMilestone";
 
 const ProcessId = ({}) => {
@@ -105,7 +106,7 @@ const ProcessId = ({}) => {
     // console.log({ step_params });
     try {
       // Make API call to update the position of the step
-      const response = await processes.editStep(processId, stepId, step_params);
+      const response = await stepsApi.editStep(processId, stepId, step_params);
       mutate(`/definition/processes/${processId}/steps`);
     } catch (error) {
       console.error("There was an error!", error);
