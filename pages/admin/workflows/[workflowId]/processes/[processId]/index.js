@@ -107,7 +107,7 @@ const ProcessId = ({}) => {
     try {
       // Make API call to update the position of the step
       const response = await stepsApi.editStep(processId, stepId, step_params);
-      mutate(`/definition/processes/${processId}/steps`);
+      mutate(`/definition/processes/${processId}`);
     } catch (error) {
       console.error("There was an error!", error);
     }

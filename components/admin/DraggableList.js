@@ -37,6 +37,7 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
   const [theItems, setTheItems] = useState(items ? items : []);
 
   console.log({ items });
+  console.log({ theItems });
   console.log({ activeId });
 
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
@@ -45,11 +46,10 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
     setActiveId(event.active.id);
   };
   const handleDragEnd = ({ active, over }) => {
-    setActiveId(null);
     if (over) {
-      const oldIndex = items.findIndex((item) => item.id === active.id);
-      const newIndex = items.findIndex((item) => item.id === over.id);
-      const newItems = arrayMove(items, oldIndex, newIndex); // Store the result
+      const oldIndex = theItems.findIndex((item) => item.id === active.id);
+      const newIndex = theItems.findIndex((item) => item.id === over.id);
+      const newItems = arrayMove(theItems, oldIndex, newIndex); // Store the result
 
       setTheItems(newItems); // Update the state of your items list
 
@@ -62,6 +62,7 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
 
       onReorder(active.id, priorItemPosition, subsequentItemPosition);
     }
+    setActiveId(null);
   };
 
   return (
@@ -80,7 +81,7 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
             key={item.id}
             id={item.id}
             handle={true}
-            renderItem={renderItem(item, i)}
+            renderItem={renderItem(item)}
           />
         ))}
         <DragOverlay>
