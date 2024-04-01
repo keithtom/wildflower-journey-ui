@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { useSortable } from "@dnd-kit/sortable";
 
 import {
   List,
@@ -18,10 +19,13 @@ import {
   DialogActions,
   Skeleton,
 } from "@mui/material";
+import { DragHandle } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
+import DraggableList from "@components/admin/DraggableList";
 import useWorkflow from "@hooks/workflow/definition/useWorkflow";
 import useMilestones from "@hooks/workflow/definition/useMilestones";
+import processApi from "@api/workflow/definition/processes";
 
 const Workflow = ({}) => {
   const router = useRouter();
@@ -52,7 +56,7 @@ const Workflow = ({}) => {
   const groupedProcesses = groupByPhase(
     isLoading ? [] : workflow?.relationships.processes.data
   );
-  // console.log({ groupedProcesses });
+  console.log({ groupedProcesses });
 
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
   const [versionHasChanges, setVersionHasChanges] = useState(false);
@@ -84,9 +88,37 @@ const Workflow = ({}) => {
   const handleReplaceProcess = (id) => {
     console.log("Replace process", id);
   };
-  const handleRepositionProcess = (id, position) => {
-    // TODO drag and drop logic here
-    console.log("Reposition process", id, position);
+  const handleRepositionProcess = async (
+    processId,
+    priorItemPosition,
+    subsequentItemPosition
+  ) => {
+    let newPosition;
+    if (priorItemPosition === null) {
+      newPosition = subsequentItemPosition / 2;
+    } else if (subsequentItemPosition === null) {
+      newPosition = priorItemPosition * 1.5;
+    } else {
+      newPosition = (priorItemPosition + subsequentItemPosition) / 2;
+    }
+    const process_params = {
+      process: {
+        selected_processes_attributes: [
+          { id: processId, workflow_id: workflowId, position: newPosition },
+        ],
+      },
+    };
+
+    try {
+      // Make API call to update the position of the step
+      const response = await processApi.editMilestone(
+        processId,
+        process_params
+      );
+      mutate(`/definition/workflows/${workflowId}`);
+    } catch (error) {
+      console.error("There was an error!", error);
+    }
   };
 
   return (
@@ -181,80 +213,105 @@ const Workflow = ({}) => {
                         </ListSubheader>
                       }
                     >
-                      {phase.milestones.map((process, i) => (
-                        <ListItem
-                          key={i}
-                          disablePadding
-                          divider
-                          secondaryAction={
-                            !isDraftingNewVersion ? null : (
-                              <Stack direction="row" spacing={1}>
-                                {processStatus === "removed" ? (
-                                  <Button
-                                    variant="text"
-                                    onClick={() =>
-                                      handleRestoreProcess(process.id)
-                                    }
-                                  >
-                                    Restore
-                                  </Button>
-                                ) : (
-                                  <>
-                                    <Button
-                                      variant="text"
-                                      onClick={() =>
-                                        handleReplaceProcess(process.id)
-                                      }
-                                    >
-                                      Replace
-                                    </Button>
-                                    <Button
-                                      variant="text"
-                                      color="error"
-                                      onClick={() =>
-                                        handleRemoveProcess(process.id)
-                                      }
-                                    >
-                                      Remove
-                                    </Button>
-                                  </>
-                                )}
-                              </Stack>
-                            )
-                          }
-                        >
-                          <InlineActionTile
-                            showAdd={isDraftingNewVersion}
-                            status="default"
-                            add={handleAddProcess}
-                            reposition={handleRepositionProcess}
+                      <DraggableList
+                        items={phase.milestones}
+                        onReorder={(
+                          processId,
+                          priorItemPosition,
+                          subsequentItemPosition
+                        ) => {
+                          handleRepositionProcess(
+                            processId,
+                            priorItemPosition,
+                            subsequentItemPosition
+                          );
+                        }}
+                        getPosition={(item) =>
+                          item.relationships.selectedProcesses.data.map(
+                            (d) => d.attributes.position
+                          )
+                        }
+                        renderItem={(process, i) => (
+                          <ProcessListItem
+                            key={i}
+                            id={process.id}
+                            process={process}
+                            isDraftingNewVersion={isDraftingNewVersion}
                           />
-                          <ListItemButton
-                            onClick={() =>
-                              router.push(
-                                `/admin/workflows/${workflowId}/processes/${process.id}`
-                              )
-                            }
-                          >
-                            <Stack
-                              direction="row"
-                              spacing={3}
-                              alignItems="center"
-                            >
-                              <ListItemText>
-                                {process.attributes.title}
-                              </ListItemText>
-                              <Chip
-                                label={`${process.attributes.numOfSteps} steps`}
-                                size="small"
-                              />
-                              {process.attributes.categories.map((c, i) => (
-                                <Chip label={c} size="small" key={i} />
-                              ))}
-                            </Stack>
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
+                          // <ListItem
+                          //   key={i}
+                          //   disablePadding
+                          //   divider
+                          //   secondaryAction={
+                          //     !isDraftingNewVersion ? null : (
+                          //       <Stack direction="row" spacing={1}>
+                          //         {processStatus === "removed" ? (
+                          //           <Button
+                          //             variant="text"
+                          //             onClick={() =>
+                          //               handleRestoreProcess(process.id)
+                          //             }
+                          //           >
+                          //             Restore
+                          //           </Button>
+                          //         ) : (
+                          //           <>
+                          //             <Button
+                          //               variant="text"
+                          //               onClick={() =>
+                          //                 handleReplaceProcess(process.id)
+                          //               }
+                          //             >
+                          //               Replace
+                          //             </Button>
+                          //             <Button
+                          //               variant="text"
+                          //               color="error"
+                          //               onClick={() =>
+                          //                 handleRemoveProcess(process.id)
+                          //               }
+                          //             >
+                          //               Remove
+                          //             </Button>
+                          //           </>
+                          //         )}
+                          //       </Stack>
+                          //     )
+                          //   }
+                          // >
+                          //   <InlineActionTile
+                          //     showAdd={isDraftingNewVersion}
+                          //     status="default"
+                          //     add={handleAddProcess}
+                          //     reposition={handleRepositionProcess}
+                          //   />
+                          //   <ListItemButton
+                          //     onClick={() =>
+                          //       router.push(
+                          //         `/admin/workflows/${workflowId}/processes/${process.id}`
+                          //       )
+                          //     }
+                          //   >
+                          //     <Stack
+                          //       direction="row"
+                          //       spacing={3}
+                          //       alignItems="center"
+                          //     >
+                          //       <ListItemText>
+                          //         {process.attributes.title}
+                          //       </ListItemText>
+                          //       <Chip
+                          //         label={`${process.attributes.numOfSteps} steps`}
+                          //         size="small"
+                          //       />
+                          //       {process.attributes.categories.map((c, i) => (
+                          //         <Chip label={c} size="small" key={i} />
+                          //       ))}
+                          //     </Stack>
+                          //   </ListItemButton>
+                          // </ListItem>
+                        )}
+                      />
                     </List>
                   </Card>
                 </Grid>
@@ -286,5 +343,87 @@ const AddProcessModal = ({ open, onClose }) => {
         </DialogActions>
       ) : null}
     </Dialog>
+  );
+};
+
+const ProcessListItem = ({ isDraftingNewVersion, process }) => {
+  const router = useRouter();
+  const workflowId = router.query.workflowId;
+
+  // console.log({ step });
+
+  const { listeners, attributes, isDragging } = useSortable({ id: process.id });
+
+  const handleAddProcess = () => {
+    console.log("Add process");
+  };
+  const handleRemoveProcess = (id) => {
+    console.log("Remove process", id);
+  };
+
+  const PositionGrabber = ({ ...props }) => {
+    return (
+      <Stack {...props}>
+        <DragHandle />
+      </Stack>
+    );
+  };
+
+  return (
+    <ListItem
+      disablePadding
+      divider
+      secondaryAction={
+        !isDraftingNewVersion ? null : (
+          <Stack direction="row" spacing={1}>
+            {processStatus === "removed" ? (
+              <Button
+                variant="text"
+                onClick={() => handleRestoreProcess(process.id)}
+              >
+                Restore
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="text"
+                  onClick={() => handleReplaceProcess(process.id)}
+                >
+                  Replace
+                </Button>
+                <Button
+                  variant="text"
+                  color="error"
+                  onClick={() => handleRemoveProcess(process.id)}
+                >
+                  Remove
+                </Button>
+              </>
+            )}
+          </Stack>
+        )
+      }
+      sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
+    >
+      <InlineActionTile
+        showAdd={isDraftingNewVersion}
+        status="default"
+        add={handleAddProcess}
+        dragHandle={<PositionGrabber {...listeners} {...attributes} />}
+      />
+      <ListItemButton
+        onClick={() =>
+          router.push(`/admin/workflows/${workflowId}/processes/${process.id}`)
+        }
+      >
+        <Stack direction="row" spacing={3} alignItems="center">
+          <ListItemText>{process.attributes.title}</ListItemText>
+          <Chip label={`${process.attributes.numOfSteps} steps`} size="small" />
+          {process.attributes.categories.map((c, i) => (
+            <Chip label={c} size="small" key={i} />
+          ))}
+        </Stack>
+      </ListItemButton>
+    </ListItem>
   );
 };

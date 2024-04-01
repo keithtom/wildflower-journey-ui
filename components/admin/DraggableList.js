@@ -32,7 +32,7 @@ const SortableItem = ({ id, renderItem }) => {
   );
 };
 
-const DraggableList = ({ items, onReorder, renderItem }) => {
+const DraggableList = ({ items, onReorder, renderItem, getPosition }) => {
   const [activeId, setActiveId] = useState(null);
   const [theItems, setTheItems] = useState(items ? items : []);
 
@@ -54,10 +54,10 @@ const DraggableList = ({ items, onReorder, renderItem }) => {
       setTheItems(newItems); // Update the state of your items list
 
       const priorItemPosition =
-        newIndex > 0 ? newItems[newIndex - 1].attributes.position : null;
+        newIndex > 0 ? getPosition(newItems[newIndex - 1]) : null;
       const subsequentItemPosition =
         newIndex < newItems.length - 1
-          ? newItems[newIndex + 1].attributes.position
+          ? getPosition(newItems[newIndex + 1])
           : null;
 
       onReorder(active.id, priorItemPosition, subsequentItemPosition);

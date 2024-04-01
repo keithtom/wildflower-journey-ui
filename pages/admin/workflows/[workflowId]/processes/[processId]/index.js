@@ -320,17 +320,13 @@ const ProcessId = ({}) => {
                     priorItemPosition,
                     subsequentItemPosition
                   ) => {
-                    // console.log({
-                    //   stepId,
-                    //   priorItemPosition,
-                    //   subsequentItemPosition,
-                    // });
                     handleRepositionStep(
                       stepId,
                       priorItemPosition,
                       subsequentItemPosition
                     );
                   }}
+                  getPosition={item => item.attributes.position}
                   renderItem={(step, i) => (
                     <StepListItem
                       key={i}

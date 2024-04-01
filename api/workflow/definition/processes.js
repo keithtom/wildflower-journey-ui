@@ -98,16 +98,20 @@ async function createMilestone(data) {
 //       { id: 25, workflow_id: 35, prerequisite_workable_type: "Workflow::Definition::Process", prerequisite_workable_id: 6},
 //   }
 // }
-async function editMilestone(id, data) {
+async function editMilestone(id, data, processParams) {
   const config = getAuthHeader();
 
   console.log("in the edit milestone api call", data);
+  const params = {
+    ...config,
+    ...processParams,
+  };
 
   try {
     const response = await workflowsApi.put(
       `/definition/processes/${id}`,
       data,
-      config
+      params
     );
     return response;
   } catch (error) {
