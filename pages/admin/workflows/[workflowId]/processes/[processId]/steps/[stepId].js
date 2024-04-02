@@ -44,13 +44,19 @@ const StepId = ({}) => {
   const [originalData, setOriginalData] = useState(false);
 
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
+  const [viewingResource, setViewingResource] = useState(null);
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
+
+  const [resourceParams, setResourceParams] = useState(null);
+  console.log({ resourceParams });
 
   const {
     control,
     handleSubmit,
     reset,
     watch,
+    setValue,
+    getValues,
     formState: { errors, isDirty },
   } = useForm();
 
@@ -66,6 +72,13 @@ const StepId = ({}) => {
         max_worktime: step?.attributes?.maxWorktime,
         kind: step?.attributes?.kind,
         completion_type: step?.attributes?.completionType,
+        // documents_attributes: step?.relationships?.documents?.data?.map(
+        //   (document) => ({
+        //     external_identifier: document.id,
+        //     title: document.attributes?.title,
+        //     link: document.attributes?.link,
+        //   })
+        // ),
       };
       setOriginalData(defaultValues);
       reset(defaultValues);
@@ -79,9 +92,16 @@ const StepId = ({}) => {
   };
   const handleUpdateStep = async (data) => {
     console.log("Update step");
+    console.log("data in handleUpdateStep", data);
     try {
-      const response = await stepsApi.editStep(processId, step.id, data);
+      const response = await stepsApi.editStep(
+        processId,
+        step.id,
+        data,
+        resourceParams
+      );
       setStepHasChanges(false);
+      setResourceParams(null);
       mutate(`/definition/processes/${processId}/steps/${step.id}`);
       console.log(response);
     } catch (error) {
@@ -89,18 +109,50 @@ const StepId = ({}) => {
     }
   };
 
+  // console.log("form values------------", getValues());
+
   // Resource handlers
-  const handleUpdateResource = () => {
-    console.log("Update resource");
+  const handleUpdateResource = (data) => {
+    console.log("Update resource", data);
+    const preparedDataForApi = {
+      external_identifier: data?.resource_id || null,
+      title: data?.resource_title || "",
+      link: data?.resource_link || "",
+    };
+
+    // This could just be updated to add the item to resourceParams, and not do the work of checking if it exists
+    if (resourceParams) {
+      const index = resourceParams.findIndex(
+        (item) => item.external_identifier === preparedDataForApi.resource_id
+      );
+      if (index !== -1) {
+        setResourceParams(
+          resourceParams.map((item) =>
+            item.external_identifier === preparedDataForApi.resource_id
+              ? preparedDataForApi
+              : item
+          )
+        );
+      } else {
+        setResourceParams([...resourceParams, preparedDataForApi]);
+      }
+    } else {
+      setResourceParams([preparedDataForApi]);
+    }
+
+    setStepHasChanges(true);
   };
   const handleRemoveResource = () => {
     console.log("Remove resource");
   };
-  const handleAddResource = () => {
+  const handleAddResource = (data) => {
     console.log("Add resource");
+    // setAddedResource(data);
+    setStepHasChanges(true);
   };
-  const handleOpenResourceModal = () => {
+  const handleOpenResourceModal = (resource) => {
     console.log("Open resource modal");
+    setViewingResource(resource);
     setResourceModalOpen(true);
   };
   // Decision handlers
@@ -332,7 +384,7 @@ const StepId = ({}) => {
                       <Button
                         variant="contained"
                         size="small"
-                        onClick={handleOpenResourceModal}
+                        onClick={() => handleOpenResourceModal(null)}
                       >
                         Add resource
                       </Button>
@@ -352,7 +404,7 @@ const StepId = ({}) => {
                 : step.relationships.documents.data.map((resource, i) => (
                     <ListItem disablePadding divider key={i}>
                       <ListItemButton
-                        onClick={() => handleOpenResourceModal(resource.id)}
+                        onClick={() => handleOpenResourceModal(resource)}
                       >
                         <Stack direction="row" spacing={3} alignItems="center">
                           <ListItemText>
@@ -365,23 +417,23 @@ const StepId = ({}) => {
             </List>
           </Card>
         </Stack>
-        <ResourceModal
-          open={resourceModalOpen}
-          onClose={() => setResourceModalOpen(false)}
-          handleUpdateResource={handleUpdateResource}
-          handleRemoveResource={handleRemoveResource}
-          handleAddResource={handleAddResource}
-          // resource={resource}
-        />
-        <DecisionOptionModal
-          open={decisionModalOpen}
-          onClose={() => setDecisionModalOpen(false)}
-          handleUpdateResource={handleUpdateDecisionOption}
-          handleRemoveResource={handleRemoveDecisionOption}
-          handleAddResource={handleAddDecisionOption}
-          // decisionOption={decisionOption}
-        />
       </form>
+      <ResourceModal
+        open={resourceModalOpen}
+        onClose={() => setResourceModalOpen(false)}
+        handleRemoveResource={handleRemoveResource}
+        handleUpdateResource={handleUpdateResource}
+        handleAddResource={handleAddResource}
+        resource={viewingResource}
+      />
+      <DecisionOptionModal
+        open={decisionModalOpen}
+        onClose={() => setDecisionModalOpen(false)}
+        handleUpdateDecisionOption={handleUpdateDecisionOption}
+        handleRemoveDecisionOption={handleRemoveDecisionOption}
+        handleAddDecisionOption={handleAddDecisionOption}
+        // decisionOption={decisionOption}
+      />
     </PageContainer>
   );
 };
@@ -391,49 +443,95 @@ export default StepId;
 const ResourceModal = ({
   open,
   onClose,
-  handleUpdateResource,
+  resource,
   handleRemoveResource,
+  handleUpdateResource,
   handleAddResource,
 }) => {
+  const [deleteResourceCheck, setDeleteResourceCheck] = useState("");
+
+  console.log({ resource });
+  const isAdding = !resource;
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isDirty },
+  } = useForm();
+
+  useEffect(() => {
+    reset({
+      resource_id: resource?.id || null,
+      resource_link: resource?.attributes?.link || "",
+      resource_title: resource?.attributes?.title || "",
+    });
+  }, [open]);
+
+  useEffect(() => {
+    setDeleteResourceCheck("");
+  }, [onClose]);
+
+  const onSubmit = handleSubmit((data) => {
+    console.log("inside resource modal", data);
+    if (isAdding) {
+      // handleAddResource(data);
+      handleUpdateResource(data);
+    } else {
+      handleUpdateResource(data);
+    }
+    onClose();
+  });
+
+  // console.log("resource in resource modal", resource);
+
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Resource Modal</DialogTitle>
-      <DialogContent>
-        {/* TODO: Resource title and url fields here */}
-      </DialogContent>
-      <DialogActions>
-        <Stack direction="row" spacing={1}></Stack>
-        <Button onClick={handleUpdateResource}>Update</Button>
-        <Button onClick={handleRemoveResource}>Remove</Button>
-        <Button onClick={handleAddResource}>Add</Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
-const DecisionOptionModal = ({
-  open,
-  onClose,
-  handleAddDecisionOption,
-  handleRemoveDecisionOption,
-  handleUpdateDecisionOption,
-}) => {
-  return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Decision option Modal</DialogTitle>
-      <DialogContent>{/* TODO: Option description field here */}</DialogContent>
-      <DialogActions>
-        <Stack direction="row" spacing={1}></Stack>
-        <Button onClick={handleUpdateDecisionOption}>Update</Button>
-        <Button onClick={handleRemoveDecisionOption}>Remove</Button>
-        <Button onClick={handleAddDecisionOption}>Add</Button>
-      </DialogActions>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent>
+          <ResourceForm control={control} errors={errors} />
+          {isAdding ? null : (
+            <Stack mt={3}>
+              <TextField
+                fullWidth
+                name="delete_resource_check"
+                value={deleteResourceCheck}
+                onChange={(e) => setDeleteResourceCheck(e.target.value)}
+                label="To remove, type the resource title"
+                placeholder="e.g. Resource Title"
+              />
+            </Stack>
+          )}
+        </DialogContent>
+        <DialogActions>
+          {isAdding ? null : (
+            <Button
+              color="error"
+              disabled={deleteResourceCheck !== watch("resource_title")}
+              onClick={handleRemoveResource}
+            >
+              Remove
+            </Button>
+          )}
+          <Button type="submit" disabled={!isDirty}>
+            {isAdding ? "Add" : "Update"}
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };
 
-const ResourceForm = () => {
+const ResourceForm = ({ control, errors }) => {
   return (
-    <Stack>
+    <Stack spacing={3}>
+      <Controller
+        name="resource_id"
+        control={control}
+        render={({ field }) => <input type="hidden" {...field} />}
+      />
       <Controller
         name="resource_link"
         control={control}
@@ -477,5 +575,26 @@ const ResourceForm = () => {
         )}
       />
     </Stack>
+  );
+};
+
+const DecisionOptionModal = ({
+  open,
+  onClose,
+  handleAddDecisionOption,
+  handleRemoveDecisionOption,
+  handleUpdateDecisionOption,
+}) => {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Decision option Modal</DialogTitle>
+      <DialogContent>{/* TODO: Option description field here */}</DialogContent>
+      <DialogActions>
+        <Stack direction="row" spacing={1}></Stack>
+        <Button onClick={handleUpdateDecisionOption}>Update</Button>
+        <Button onClick={handleRemoveDecisionOption}>Remove</Button>
+        <Button onClick={handleAddDecisionOption}>Add</Button>
+      </DialogActions>
+    </Dialog>
   );
 };

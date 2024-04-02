@@ -75,6 +75,7 @@ async function createStep(data) {
 async function editStep(processId, stepId, data, stepParams) {
   const config = getAuthHeader();
   console.log("in the edit step api call", data);
+  console.log({ stepParams });
   const params = {
     ...config,
     ...stepParams,

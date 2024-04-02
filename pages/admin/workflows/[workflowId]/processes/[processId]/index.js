@@ -326,7 +326,7 @@ const ProcessId = ({}) => {
                       subsequentItemPosition
                     );
                   }}
-                  getPosition={item => item.attributes.position}
+                  getPosition={(item) => item.attributes.position}
                   renderItem={(step, i) => (
                     <StepListItem
                       key={i}
