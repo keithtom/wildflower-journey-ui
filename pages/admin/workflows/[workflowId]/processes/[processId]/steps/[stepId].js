@@ -220,12 +220,12 @@ const StepId = ({}) => {
             <Grid item>
               <Stack direction="row" spacing={3} alignItems="center">
                 <Typography variant="h4" bold>
-                  Develop your visioning album
+                  {isLoading ? <Skeleton width={64} /> : step.attributes.title}
                 </Typography>
-                <Chip label="Live" color="primary" size="small" />
+                {/* <Chip label="Live" color="primary" size="small" />
                 <Typography variant="bodyRegular" lightened>
                   Updated 4 weeks ago
-                </Typography>
+                </Typography> */}
               </Stack>
             </Grid>
             <Grid item>
