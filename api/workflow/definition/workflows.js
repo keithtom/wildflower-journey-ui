@@ -15,7 +15,7 @@ export const showWorkflows = {
     return workflowsApi
       .get(showWorkflows.key(), config)
       .then((res) => {
-        return res;
+        return res.data.data;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);
@@ -30,6 +30,7 @@ export const showWorkflow = {
     return workflowsApi
       .get(showWorkflow.key(id), config)
       .then((response) => {
+        wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
         return response;
       })
       .catch((error) => {

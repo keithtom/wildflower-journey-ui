@@ -30,6 +30,7 @@ export const showMilestone = {
     return workflowsApi
       .get(showMilestone.key(id), config)
       .then((response) => {
+        wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
         return response;
       })
       .catch((error) => {
@@ -40,13 +41,15 @@ export const showMilestone = {
 
 // const data =
 // {
+// workflowId: 1,
+
 //   process: {
 //     version: '1.0',
 //     title: 'Test Workflow',
 //     description: 'This is a test process',
 //     steps_attributes: [
 //       {
-//         title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person', 
+//         title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
 //          min_worktime: 5, max_worktime: 10, categories_list: ['Community & Family Engagement'], phase_list: ['Visioning'],
 //         decision_options_attributes: [{description: "option 1"}, {description: "option 2"}],
 //         documents_attributes: [{title: "document title", link: "www.example.com"}]
