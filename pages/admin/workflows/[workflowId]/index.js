@@ -32,7 +32,7 @@ const Workflow = ({}) => {
   const workflowId = router.query.workflowId;
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  // console.log({ workflow });
+  console.log({ workflow });
 
   // Transform the data to group by phase
   function groupByPhase(data) {
@@ -151,15 +151,40 @@ const Workflow = ({}) => {
               </Typography>
               <Stack direction="row" spacing={3} alignItems="center">
                 <Typography variant="h4" bold>
-                  Independent
+                  {isLoading ? (
+                    <Skeleton width={64} />
+                  ) : (
+                    workflow.attributes.name
+                  )}
                 </Typography>
-                <Chip label="Sensible default" size="small" />
-                <Chip label="Live" size="small" color="primary" />
+                <Chip
+                  label={
+                    isLoading ? (
+                      <Skeleton width={32} />
+                    ) : (
+                      workflow.attributes.version
+                    )
+                  }
+                  size="small"
+                  variant="outlined"
+                />
+                {/* TODO: Retrieve isSensibleDefault from API */}
+                {/* <Chip label="Sensible default" size="small" /> */}
+                {/* TODO: Retrieve last updated from API */}
+                {/* <Typography>Last updated 3 days ago</Typography> */}
+                {isLoading ? (
+                  <Skeleton variant="rounded" width={120} />
+                ) : workflow.attributes.published ? (
+                  <Chip label="Live" size="small" color="primary" />
+                ) : (
+                  <Chip label="Not Published" size="small" color="secondary" />
+                )}
                 <Typography variant="bodyRegular" lightened>
-                  Last updated 3 days ago
-                </Typography>
-                <Typography variant="bodyRegular" lightened>
-                  V13
+                  {isLoading ? (
+                    <Skeleton width={64} />
+                  ) : (
+                    `${workflow.attributes.numOfInstances} Instances`
+                  )}
                 </Typography>
               </Stack>
             </Stack>

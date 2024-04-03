@@ -20,7 +20,7 @@ const Workflows = ({}) => {
   // Load data
   const { workflows, isLoading, isError } = useWorkflows();
 
-  // console.log({ workflows });
+  console.log({ workflows });
 
   return (
     <PageContainer isAdmin>
@@ -70,18 +70,29 @@ const Workflows = ({}) => {
                               {workflow.attributes.name}
                             </ListItemText>
                             {/* TODO: Retrieve isSensibleDefault from API */}
-                            <Chip label="Sensible default" size="small" />
+                            {/* <Chip label="Sensible default" size="small" /> */}
                             <Chip
                               label={workflow.attributes.version}
                               size="small"
                               variant="outlined"
                             />
-                            {/* TODO: Retrieve status from API */}
-                            <Chip label="Live" color="primary" size="small" />
+
+                            {workflow.attributes.published ? (
+                              <Chip label="Live" size="small" color="primary" />
+                            ) : (
+                              <Chip
+                                label="Not Published"
+                                size="small"
+                                color="secondary"
+                              />
+                            )}
                             {/* TODO: Retrieve last updated from API */}
-                            <Typography>Last updated 3 days ago</Typography>
-                            {/* TODO: Retrieve used by how many schools from API */}
-                            <Typography>Used by 30 schools</Typography>
+                            {/* <Typography>Last updated 3 days ago</Typography> */}
+
+                            <Typography
+                              variant="bodyRegular"
+                              lightened
+                            >{`${workflow.attributes.numOfInstances} Instances`}</Typography>
                           </Stack>
                         </ListItemButton>
                       </ListItem>
