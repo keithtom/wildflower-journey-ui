@@ -149,7 +149,7 @@ const Workflow = ({}) => {
     <PageContainer isAdmin>
       <Stack spacing={6}>
         <Grid container alignItems="flex-end" justifyContent="space-between">
-          <Grid item xs={12} sm={6}>
+          <Grid item>
             <Stack spacing={2}>
               <Typography variant="bodyRegular" bold>
                 School Startup Journey

@@ -46,6 +46,8 @@ const StepId = ({}) => {
   const { step, isLoading, isError } = useStep(processId, stepId);
   console.log({ step });
 
+  const isRollout = false;
+
   const [stepHasChanges, setStepHasChanges] = useState(false);
   const [originalData, setOriginalData] = useState(false);
 
@@ -101,6 +103,7 @@ const StepId = ({}) => {
   const handleCancelUpdateStep = () => {
     reset(originalData);
     setResourceParams([]);
+    setDecisionOptionParams([]);
     setResourcesToDelete([]);
     setStepHasChanges(false);
   };
@@ -108,6 +111,7 @@ const StepId = ({}) => {
     const allData = {
       ...data,
       documents_attributes: resourceParams,
+      decision_options_attributes: decisionOptionParams,
     };
     console.log("allData", allData);
     try {
@@ -118,9 +122,10 @@ const StepId = ({}) => {
         resourcesToDelete.forEach(async (resource) => {
           console.log("deleting resource", resource);
           const response = await stepsApi.deleteDocument(resource);
+          mutate(`/v1/documents/${resource}`);
         });
       }
-      // if ()
+
       mutate(`/definition/processes/${processId}/steps/${step.id}`);
       console.log(response);
     } catch (error) {
@@ -145,7 +150,6 @@ const StepId = ({}) => {
       setResourcesToDelete([...resourcesToDelete, id]);
     }
     setStepHasChanges(true);
-    // console.log({ resourcesToDelete });
   };
   const handleAddResource = () => {
     console.log("Add resource");
@@ -162,11 +166,13 @@ const StepId = ({}) => {
     setDecisionModalOpen(true);
   };
   const handleUpdateDecisionOption = (data) => {
-    console.log("Update decision option");
+    console.log("Update decision option", data);
     const preparedDataForApi = {
+      id: data?.decision_id || "",
       description: data?.decision_option || "",
     };
     setDecisionOptionParams([...decisionOptionParams, preparedDataForApi]);
+    console.log({ decisionOptionParams });
     setStepHasChanges(true);
   };
   const handleRemoveDecisionOption = () => {
@@ -338,115 +344,8 @@ const StepId = ({}) => {
                 )}
               />
             </Stack>
-            <Controller
-              name="kind"
-              defaultValue=""
-              control={control}
-              render={({ field }) => (
-                <FormControlLabel
-                  label="Is decision"
-                  control={
-                    <Switch
-                      label="Kind"
-                      checked={field.value === "decision"}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.checked ? "decision" : "default"
-                        )
-                      }
-                    />
-                  }
-                />
-              )}
-            />
           </Stack>
 
-          {kindField === "decision" ? (
-            <Card>
-              <CardContent>
-                <Stack spacing={6}>
-                  <Controller
-                    name="decision_question"
-                    control={control}
-                    defaultValue=""
-                    rules={{
-                      required: {
-                        value: true,
-                        message: "This field is required",
-                      },
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        label="Decision question"
-                        placeholder="e.g. Will you do A or B?"
-                        error={errors.decision_question}
-                        helperText={
-                          errors &&
-                          errors.decision_question &&
-                          errors.decision_question.message
-                        }
-                        {...field}
-                      />
-                    )}
-                  />
-                  <Card noPadding>
-                    <List
-                      subheader={
-                        <ListSubheader
-                          component="div"
-                          id="nested-list-subheader"
-                          sx={{ background: "#eaeaea" }}
-                        >
-                          <Grid container justifyContent="space-between">
-                            <Grid item>Decision options</Grid>
-                            <Grid item>
-                              <Button
-                                variant="contained"
-                                size="small"
-                                onClick={() => handleOpenDecisionModal(null)}
-                              >
-                                Add decision option
-                              </Button>
-                            </Grid>
-                          </Grid>
-                        </ListSubheader>
-                      }
-                    >
-                      {isLoading
-                        ? Array.from({ length: 3 }).map((_, index) => (
-                            <ListItem key={index} divider>
-                              <ListItemText>
-                                <Skeleton variant="text" width={120} />
-                              </ListItemText>
-                            </ListItem>
-                          ))
-                        : step.relationships.decisionOptions.data.map(
-                            (decisionOption, i) => (
-                              <ListItem disablePadding divider key={i}>
-                                <ListItemButton
-                                  onClick={() =>
-                                    handleOpenDecisionModal(decisionOption)
-                                  }
-                                >
-                                  <Stack
-                                    direction="row"
-                                    spacing={3}
-                                    alignItems="center"
-                                  >
-                                    <ListItemText>
-                                      {decisionOptions.attributes.title}
-                                    </ListItemText>
-                                  </Stack>
-                                </ListItemButton>
-                              </ListItem>
-                            )
-                          )}
-                    </List>
-                  </Card>
-                </Stack>
-              </CardContent>
-            </Card>
-          ) : null}
           {/* RESOURCES */}
           <Card noPadding>
             <List
@@ -486,13 +385,149 @@ const StepId = ({}) => {
                       >
                         <Stack direction="row" spacing={3} alignItems="center">
                           <ListItemText>
-                            {resource.attributes.title}
+                            <Typography
+                              variant="bodyRegular"
+                              struck={resourcesToDelete.includes(resource.id)}
+                            >
+                              {resource.attributes.title}
+                            </Typography>
                           </ListItemText>
                         </Stack>
                       </ListItemButton>
                     </ListItem>
                   ))}
+              {resourceParams.length > 0 &&
+                resourceParams.map((resourceBeingAdded, i) => (
+                  <ListItem disablePadding divider key={i}>
+                    <ListItemButton>
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <ListItemText>
+                          <Typography variant="bodyRegular" lightened>
+                            {resourceBeingAdded.title}
+                          </Typography>
+                        </ListItemText>
+                      </Stack>
+                    </ListItemButton>
+                  </ListItem>
+                ))}
             </List>
+          </Card>
+          {/* DECISION */}
+          <Card>
+            <CardContent>
+              <Stack spacing={6}>
+                <Controller
+                  name="kind"
+                  defaultValue=""
+                  control={control}
+                  render={({ field }) => (
+                    <FormControlLabel
+                      label="Is decision"
+                      control={
+                        <Switch
+                          disabled={!isRollout}
+                          label="Kind"
+                          checked={field.value === "decision"}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.checked ? "decision" : "default"
+                            )
+                          }
+                        />
+                      }
+                    />
+                  )}
+                />
+                {kindField === "decision" ? (
+                  <Stack spacing={3}>
+                    <Controller
+                      name="decision_question"
+                      control={control}
+                      defaultValue=""
+                      rules={{
+                        required: {
+                          value: true,
+                          message: "This field is required",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          label="Decision question"
+                          placeholder="e.g. Will you do A or B?"
+                          error={errors.decision_question}
+                          helperText={
+                            errors &&
+                            errors.decision_question &&
+                            errors.decision_question.message
+                          }
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Card noPadding>
+                      <List
+                        subheader={
+                          <ListSubheader
+                            component="div"
+                            id="nested-list-subheader"
+                            sx={{ background: "#eaeaea" }}
+                          >
+                            <Grid container justifyContent="space-between">
+                              <Grid item>Decision options</Grid>
+                              <Grid item>
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  onClick={() => handleOpenDecisionModal(null)}
+                                  disabled={!isRollout}
+                                >
+                                  Add decision option
+                                </Button>
+                              </Grid>
+                            </Grid>
+                          </ListSubheader>
+                        }
+                      >
+                        {isLoading
+                          ? Array.from({ length: 3 }).map((_, index) => (
+                              <ListItem key={index} divider>
+                                <ListItemText>
+                                  <Skeleton variant="text" width={120} />
+                                </ListItemText>
+                              </ListItem>
+                            ))
+                          : step.relationships.decisionOptions.data.map(
+                              (decisionOption, i) => (
+                                <ListItem disablePadding divider key={i}>
+                                  <ListItemButton
+                                    onClick={() =>
+                                      handleOpenDecisionModal(decisionOption)
+                                    }
+                                  >
+                                    <Stack
+                                      direction="row"
+                                      spacing={3}
+                                      alignItems="center"
+                                    >
+                                      <ListItemText>
+                                        <Typography variant="bodyRegular">
+                                          {
+                                            decisionOption.attributes
+                                              .description
+                                          }
+                                        </Typography>
+                                      </ListItemText>
+                                    </Stack>
+                                  </ListItemButton>
+                                </ListItem>
+                              )
+                            )}
+                      </List>
+                    </Card>
+                  </Stack>
+                ) : null}
+              </Stack>
+            </CardContent>
           </Card>
         </Stack>
       </form>
@@ -505,6 +540,7 @@ const StepId = ({}) => {
         resource={viewingResource}
       />
       <DecisionOptionModal
+        isRollout={isRollout}
         open={decisionModalOpen}
         onClose={() => setDecisionModalOpen(false)}
         handleUpdateDecisionOption={handleUpdateDecisionOption}
@@ -664,9 +700,11 @@ const DecisionOptionModal = ({
   handleAddDecisionOption,
   handleRemoveDecisionOption,
   handleUpdateDecisionOption,
+  isRollout,
 }) => {
-  const isAdding = decisionOption;
-  const isRollout = false;
+  // console.log({ decisionOption });
+  const isAdding = !decisionOption;
+
   const {
     control,
     handleSubmit,
@@ -674,9 +712,20 @@ const DecisionOptionModal = ({
     watch,
     formState: { errors, isDirty },
   } = useForm();
+
+  useEffect(() => {
+    reset({
+      decision_id: decisionOption?.id || null,
+      decision_option: decisionOption?.attributes?.description || "",
+    });
+  }, [open]);
+
   const onSubmit = handleSubmit((data) => {
     if (isRollout) {
       if (isAdding) {
+        console.log("Is adding in rollout");
+      } else {
+        console.log("Is updating in rollout");
       }
     } else {
       handleUpdateDecisionOption(data);
@@ -692,9 +741,10 @@ const DecisionOptionModal = ({
           <DecisionForm control={control} errors={errors} />
         </DialogContent>
         <DialogActions>
-          {isRollout && isAdding ? null : (
+          {isRollout && !isAdding ? (
             <Button onClick={handleRemoveDecisionOption}>Remove</Button>
-          )}
+          ) : null}
+
           <Button type="submit" disabled={!isDirty}>
             {isRollout && isAdding ? "Add" : "Update"}
           </Button>
