@@ -25,6 +25,7 @@ import {
   Skeleton,
   Breadcrumbs,
   Link,
+  Snackbar,
 } from "@mui/material";
 import { DragHandle } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
@@ -47,6 +48,8 @@ const ProcessId = ({}) => {
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
   const [processHasChanges, setProcessHasChanges] = useState(false);
   const [originalData, setOriginalData] = useState(false);
+  const [repositionedSnackbarOpen, setRepositionedSnackbarOpen] =
+    useState(false);
 
   const {
     control,
@@ -109,6 +112,7 @@ const ProcessId = ({}) => {
     try {
       const response = await stepsApi.editStep(processId, stepId, data);
       mutate(`/definition/processes/${processId}`);
+      setRepositionedSnackbarOpen(true);
     } catch (error) {
       console.error("There was an error!", error);
     }
@@ -363,6 +367,13 @@ const ProcessId = ({}) => {
           </Card>
         </Stack>
       </form>
+      <Snackbar
+        autoHideDuration={1000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={repositionedSnackbarOpen}
+        onClose={() => setRepositionedSnackbarOpen(false)}
+        message="Step repositioned and saved."
+      />
     </PageContainer>
   );
 };

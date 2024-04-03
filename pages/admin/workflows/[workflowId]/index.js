@@ -19,6 +19,7 @@ import {
   DialogContent,
   DialogActions,
   Skeleton,
+  Snackbar,
 } from "@mui/material";
 import { DragHandle } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
@@ -61,6 +62,9 @@ const Workflow = ({}) => {
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
   const [versionHasChanges, setVersionHasChanges] = useState(false);
   const [addProcessModalOpen, setAddProcessModalOpen] = useState(false);
+
+  const [repositionedSnackbarOpen, setRepositionedSnackbarOpen] =
+    useState(false);
 
   const processStatus = "unedited";
 
@@ -129,12 +133,13 @@ const Workflow = ({}) => {
       },
     };
 
-    console.log("reposition data", data);
+    // console.log("reposition data", data);
 
     try {
       // Make API call to update the position of the step
       const response = await processApi.editMilestone(processId, data);
       mutate(`/definition/workflows/${workflowId}`);
+      setRepositionedSnackbarOpen(true);
     } catch (error) {
       console.error("There was an error!", error);
     }
@@ -294,6 +299,13 @@ const Workflow = ({}) => {
       <AddProcessModal
         open={addProcessModalOpen}
         onClose={() => setAddProcessModalOpen(false)}
+      />
+      <Snackbar
+        autoHideDuration={1000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={repositionedSnackbarOpen}
+        onClose={() => setRepositionedSnackbarOpen(false)}
+        message="Process repositioned and saved."
       />
     </PageContainer>
   );
