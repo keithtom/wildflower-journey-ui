@@ -42,6 +42,7 @@ export const showMilestone = {
 // const data =
 // {
 // workflowId: 1,
+
 //   process: {
 //     version: '1.0',
 //     title: 'Test Workflow',
@@ -65,6 +66,7 @@ export const showMilestone = {
 // }
 async function createMilestone(data) {
   const config = getAuthHeader();
+
   try {
     const response = await workflowsApi.post(
       "/definition/processes/",
@@ -98,20 +100,14 @@ async function createMilestone(data) {
 //       { id: 25, workflow_id: 35, prerequisite_workable_type: "Workflow::Definition::Process", prerequisite_workable_id: 6},
 //   }
 // }
-async function editMilestone(id, data, processParams) {
+async function editMilestone(id, data) {
   const config = getAuthHeader();
-
-  console.log("in the edit milestone api call", data);
-  const params = {
-    ...config,
-    ...processParams,
-  };
 
   try {
     const response = await workflowsApi.put(
       `/definition/processes/${id}`,
       data,
-      params
+      config
     );
     return response;
   } catch (error) {

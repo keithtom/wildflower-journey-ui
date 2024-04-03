@@ -23,6 +23,8 @@ import {
   TextField,
   MenuItem,
   Skeleton,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import { DragHandle } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
@@ -39,7 +41,7 @@ const ProcessId = ({}) => {
   const processId = router.query.processId;
 
   const { milestone, isLoading, isError } = useMilestone(processId);
-  // console.log(milestone);
+  console.log(milestone);
 
   // TODO: Get isDraftingNewVersion state from the API
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
@@ -102,11 +104,10 @@ const ProcessId = ({}) => {
     } else {
       newPosition = (priorItemPosition + subsequentItemPosition) / 2;
     }
-    const step_params = { step: { position: newPosition } };
-    // console.log({ step_params });
+    const data = { step: { position: newPosition } };
+
     try {
-      // Make API call to update the position of the step
-      const response = await stepsApi.editStep(processId, stepId, step_params);
+      const response = await stepsApi.editStep(processId, stepId, data);
       mutate(`/definition/processes/${processId}`);
     } catch (error) {
       console.error("There was an error!", error);
@@ -119,18 +120,39 @@ const ProcessId = ({}) => {
     <PageContainer isAdmin>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6}>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link
+              underline="hover"
+              color="inherit"
+              href={`/admin/workflows/${workflowId}`}
+            >
+              <Typography variant="bodyRegular" lightened>
+                Workflow
+              </Typography>
+            </Link>
+
+            <Typography variant="bodyRegular">
+              {isLoading ? <Skeleton width={64} /> : milestone.attributes.title}
+            </Typography>
+          </Breadcrumbs>
+
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={3} alignItems="center">
                 <Typography variant="h4" bold>
-                  Develop your visioning album
+                  {isLoading ? (
+                    <Skeleton width={240} />
+                  ) : (
+                    milestone.attributes.title
+                  )}
                 </Typography>
-                <Chip label="Live" color="primary" size="small" />
-                <Typography variant="bodyRegular" lightened>
-                  Updated 4 weeks ago
-                </Typography>
+                {/* <Chip label="Live" color="primary" size="small" /> */}
+                {/* <Typography variant="bodyRegular" lightened>
+                    Updated 4 weeks ago
+                  </Typography> */}
               </Stack>
             </Grid>
+
             <Grid item>
               {processHasChanges ? (
                 <Stack direction="row" spacing={3}>
@@ -326,11 +348,11 @@ const ProcessId = ({}) => {
                       subsequentItemPosition
                     );
                   }}
+                  getId={(item) => item.id}
                   getPosition={(item) => item.attributes.position}
                   renderItem={(step, i) => (
                     <StepListItem
                       key={i}
-                      id={step.id}
                       step={step}
                       isDraftingNewVersion={isDraftingNewVersion}
                     />

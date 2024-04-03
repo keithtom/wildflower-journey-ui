@@ -26,37 +26,6 @@ const AdminDashboard = () => {
             </Typography>
           </Grid>
         </Grid>
-        <Grid container>
-          <Stack spacing={3}>
-            <Grid item>
-              <Link href="/admin/add-school">
-                <Button>
-                  <Typography variant="bodyRegular" light bold>
-                    Add a school
-                  </Typography>
-                </Button>
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href={`/admin/edit-workflow/1`}>
-                <Button>
-                  <Typography variant="bodyRegular" light bold>
-                    Edit the School Startup Journey
-                  </Typography>
-                </Button>
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href={`/admin/edit-workflow/${id}`}>
-                <Button>
-                  <Typography variant="bodyRegular" light bold>
-                    Edit the Open School Checklist
-                  </Typography>
-                </Button>
-              </Link>
-            </Grid>
-          </Stack>
-        </Grid>
       </Stack>
     </PageContainer>
   );

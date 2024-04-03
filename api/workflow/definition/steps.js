@@ -7,6 +7,7 @@ function getAuthHeader() {
 }
 
 const workflowsApi = wildflowerApi.register("/v1/workflow/", {});
+const documentsApi = wildflowerApi.register("/v1/documents/", {});
 
 export const showSteps = {
   key: () => `/definition/steps`,
@@ -63,28 +64,27 @@ async function createStep(data) {
   }
 }
 
-//   {
-//      step:
-//       {
-//         id: 123, title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person',
-//         decision_options_attributes: [{external_identifier: 'we4-234', description: "option 1"}, {id: 4, description: "option 2"}],
-//         documents_attributes: [{external_identifier: '234-der', title: "document title", link: "www.example.com"}]
-//       }
+// const step_params =   {
+//   step:
+//    {
+//      title: 'Step 1', description: 'This is step 1', kind: 'decision', completion_type: 'each_person', position: 3000,
+//      decision_options_attributes: [
+// {id: 3, description: "option 1"},
+// {id: 4, description: "option 2"}
+// ],
+//      documents_attributes: [
+// {id: 88, title: "document title", link: "www.example.com"}
+// ]
 //    }
+// }
 
-async function editStep(processId, stepId, data, stepParams) {
+async function editStep(processId, stepId, data) {
   const config = getAuthHeader();
-  console.log("in the edit step api call", data);
-  console.log({ stepParams });
-  const params = {
-    ...config,
-    ...stepParams,
-  };
   try {
     const response = await workflowsApi.put(
       `/definition/processes/${processId}/steps/${stepId}`,
       data,
-      params
+      config
     );
     return response;
   } catch (error) {
@@ -106,4 +106,15 @@ async function deleteStep(id) {
   }
 }
 
-export default { createStep, editStep, deleteStep };
+async function deleteDocument(id) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await documentsApi.delete(`/${id}`, config);
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { createStep, editStep, deleteStep, deleteDocument };

@@ -32,13 +32,19 @@ const SortableItem = ({ id, renderItem }) => {
   );
 };
 
-const DraggableList = ({ items, onReorder, renderItem, getPosition }) => {
+const DraggableList = ({
+  items,
+  onReorder,
+  renderItem,
+  getPosition,
+  getId,
+}) => {
   const [activeId, setActiveId] = useState(null);
   const [theItems, setTheItems] = useState(items ? items : []);
 
-  console.log({ items });
-  console.log({ theItems });
-  console.log({ activeId });
+  // console.log({ items });
+  // console.log({ theItems });
+  // console.log({ activeId });
 
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 

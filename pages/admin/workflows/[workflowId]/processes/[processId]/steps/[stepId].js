@@ -6,6 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import {
   List,
   Card,
+  CardContent,
   ListItem,
   ListItemText,
   ListItemButton,
@@ -23,21 +24,26 @@ import {
   DialogContent,
   DialogActions,
   Skeleton,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import { PageContainer, Grid, Typography } from "@ui";
 
 import stepsApi from "@api/workflow/definition/steps";
 import useStep from "@hooks/workflow/definition/useStep";
+import useMilestone from "@hooks/workflow/definition/useMilestone";
 
 const StepId = ({}) => {
   const router = useRouter();
-  const isDecision = true;
+  const workflowId = router.query.workflowId;
   const processId = router.query.processId;
   const stepId = router.query.stepId;
 
+  //Fetch milestone data for breadcrumbs
+  const { milestone, isLoading: milestoneIsLoading } = useMilestone(processId);
+  console.log({ milestone });
   //Fetch step data
   const { step, isLoading, isError } = useStep(processId, stepId);
-
   console.log({ step });
 
   const [stepHasChanges, setStepHasChanges] = useState(false);
@@ -45,10 +51,13 @@ const StepId = ({}) => {
 
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const [viewingResource, setViewingResource] = useState(null);
-  const [decisionModalOpen, setDecisionModalOpen] = useState(false);
 
-  const [resourceParams, setResourceParams] = useState(null);
-  console.log({ resourceParams });
+  const [resourceParams, setResourceParams] = useState([]);
+  const [resourcesToDelete, setResourcesToDelete] = useState([]);
+
+  const [decisionModalOpen, setDecisionModalOpen] = useState(false);
+  const [decisionOption, setDecisionOption] = useState(null);
+  const [decisionOptionParams, setDecisionOptionParams] = useState([]);
 
   const {
     control,
@@ -68,10 +77,12 @@ const StepId = ({}) => {
     if (!isLoading && step) {
       const defaultValues = {
         title: step?.attributes?.title,
+        decision_question: step?.attributes?.decisionQuestion,
         description: step?.attributes?.description,
         max_worktime: step?.attributes?.maxWorktime,
         kind: step?.attributes?.kind,
         completion_type: step?.attributes?.completionType,
+        //TODO figure out if it makes sense to edit documents_attributes here
         // documents_attributes: step?.relationships?.documents?.data?.map(
         //   (document) => ({
         //     external_identifier: document.id,
@@ -89,19 +100,27 @@ const StepId = ({}) => {
 
   const handleCancelUpdateStep = () => {
     reset(originalData);
+    setResourceParams([]);
+    setResourcesToDelete([]);
+    setStepHasChanges(false);
   };
   const handleUpdateStep = async (data) => {
-    console.log("Update step");
-    console.log("data in handleUpdateStep", data);
+    const allData = {
+      ...data,
+      documents_attributes: resourceParams,
+    };
+    console.log("allData", allData);
     try {
-      const response = await stepsApi.editStep(
-        processId,
-        step.id,
-        data,
-        resourceParams
-      );
+      const response = await stepsApi.editStep(processId, step.id, allData);
       setStepHasChanges(false);
-      setResourceParams(null);
+      setResourceParams([]);
+      if (resourcesToDelete.length > 0) {
+        resourcesToDelete.forEach(async (resource) => {
+          console.log("deleting resource", resource);
+          const response = await stepsApi.deleteDocument(resource);
+        });
+      }
+      // if ()
       mutate(`/definition/processes/${processId}/steps/${step.id}`);
       console.log(response);
     } catch (error) {
@@ -109,46 +128,27 @@ const StepId = ({}) => {
     }
   };
 
-  // console.log("form values------------", getValues());
-
   // Resource handlers
   const handleUpdateResource = (data) => {
     console.log("Update resource", data);
     const preparedDataForApi = {
-      external_identifier: data?.resource_id || null,
+      id: data?.resource_id || null,
       title: data?.resource_title || "",
       link: data?.resource_link || "",
     };
-
-    // This could just be updated to add the item to resourceParams, and not do the work of checking if it exists
-    if (resourceParams) {
-      const index = resourceParams.findIndex(
-        (item) => item.external_identifier === preparedDataForApi.resource_id
-      );
-      if (index !== -1) {
-        setResourceParams(
-          resourceParams.map((item) =>
-            item.external_identifier === preparedDataForApi.resource_id
-              ? preparedDataForApi
-              : item
-          )
-        );
-      } else {
-        setResourceParams([...resourceParams, preparedDataForApi]);
-      }
-    } else {
-      setResourceParams([preparedDataForApi]);
+    setResourceParams([...resourceParams, preparedDataForApi]);
+    setStepHasChanges(true);
+  };
+  const handleRemoveResource = (id) => {
+    // console.log(id);
+    if (!resourcesToDelete.includes(id)) {
+      setResourcesToDelete([...resourcesToDelete, id]);
     }
-
     setStepHasChanges(true);
+    // console.log({ resourcesToDelete });
   };
-  const handleRemoveResource = () => {
-    console.log("Remove resource");
-  };
-  const handleAddResource = (data) => {
+  const handleAddResource = () => {
     console.log("Add resource");
-    // setAddedResource(data);
-    setStepHasChanges(true);
   };
   const handleOpenResourceModal = (resource) => {
     console.log("Open resource modal");
@@ -156,12 +156,18 @@ const StepId = ({}) => {
     setResourceModalOpen(true);
   };
   // Decision handlers
-  const handleOpenDecisionModal = () => {
+  const handleOpenDecisionModal = (decisionOption) => {
     console.log("Open decision modal");
+    setDecisionOption(decisionOption);
     setDecisionModalOpen(true);
   };
-  const handleUpdateDecisionOption = () => {
+  const handleUpdateDecisionOption = (data) => {
     console.log("Update decision option");
+    const preparedDataForApi = {
+      description: data?.decision_option || "",
+    };
+    setDecisionOptionParams([...decisionOptionParams, preparedDataForApi]);
+    setStepHasChanges(true);
   };
   const handleRemoveDecisionOption = () => {
     console.log("Remove decision option");
@@ -176,6 +182,34 @@ const StepId = ({}) => {
     <PageContainer isAdmin>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6}>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link
+              underline="hover"
+              color="inherit"
+              href={`/admin/workflows/${workflowId}`}
+            >
+              <Typography variant="bodyRegular" lightened>
+                Workflow
+              </Typography>
+            </Link>
+
+            <Link
+              underline="hover"
+              color="inherit"
+              href={`/admin/workflows/${workflowId}/processes/${processId}`}
+            >
+              <Typography variant="bodyRegular" lightened>
+                {milestoneIsLoading ? (
+                  <Skeleton width={64} />
+                ) : (
+                  milestone.attributes.title
+                )}
+              </Typography>
+            </Link>
+            <Typography variant="bodyRegular">
+              {isLoading ? <Skeleton width={64} /> : step.attributes.title}
+            </Typography>
+          </Breadcrumbs>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={3} alignItems="center">
@@ -328,45 +362,89 @@ const StepId = ({}) => {
           </Stack>
 
           {kindField === "decision" ? (
-            <Card noPadding>
-              <List
-                subheader={
-                  <ListSubheader
-                    component="div"
-                    id="nested-list-subheader"
-                    sx={{ background: "#eaeaea" }}
-                  >
-                    <Grid container justifyContent="space-between">
-                      <Grid item>Decision options</Grid>
-                      <Grid item>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          onClick={handleOpenDecisionModal}
+            <Card>
+              <CardContent>
+                <Stack spacing={6}>
+                  <Controller
+                    name="decision_question"
+                    control={control}
+                    defaultValue=""
+                    rules={{
+                      required: {
+                        value: true,
+                        message: "This field is required",
+                      },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Decision question"
+                        placeholder="e.g. Will you do A or B?"
+                        error={errors.decision_question}
+                        helperText={
+                          errors &&
+                          errors.decision_question &&
+                          errors.decision_question.message
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Card noPadding>
+                    <List
+                      subheader={
+                        <ListSubheader
+                          component="div"
+                          id="nested-list-subheader"
+                          sx={{ background: "#eaeaea" }}
                         >
-                          Add decision option
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </ListSubheader>
-                }
-              >
-                {/* TODO: Map through decision options */}
-                <ListItem disablePadding divider>
-                  <ListItemButton onClick={handleOpenDecisionModal}>
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <ListItemText>Yes</ListItemText>
-                    </Stack>
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding divider>
-                  <ListItemButton onClick={handleOpenDecisionModal}>
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <ListItemText>No</ListItemText>
-                    </Stack>
-                  </ListItemButton>
-                </ListItem>
-              </List>
+                          <Grid container justifyContent="space-between">
+                            <Grid item>Decision options</Grid>
+                            <Grid item>
+                              <Button
+                                variant="contained"
+                                size="small"
+                                onClick={() => handleOpenDecisionModal(null)}
+                              >
+                                Add decision option
+                              </Button>
+                            </Grid>
+                          </Grid>
+                        </ListSubheader>
+                      }
+                    >
+                      {isLoading
+                        ? Array.from({ length: 3 }).map((_, index) => (
+                            <ListItem key={index} divider>
+                              <ListItemText>
+                                <Skeleton variant="text" width={120} />
+                              </ListItemText>
+                            </ListItem>
+                          ))
+                        : step.relationships.decisionOptions.data.map(
+                            (decisionOption, i) => (
+                              <ListItem disablePadding divider key={i}>
+                                <ListItemButton
+                                  onClick={() =>
+                                    handleOpenDecisionModal(decisionOption)
+                                  }
+                                >
+                                  <Stack
+                                    direction="row"
+                                    spacing={3}
+                                    alignItems="center"
+                                  >
+                                    <ListItemText>
+                                      {decisionOptions.attributes.title}
+                                    </ListItemText>
+                                  </Stack>
+                                </ListItemButton>
+                              </ListItem>
+                            )
+                          )}
+                    </List>
+                  </Card>
+                </Stack>
+              </CardContent>
             </Card>
           ) : null}
           {/* RESOURCES */}
@@ -432,7 +510,7 @@ const StepId = ({}) => {
         handleUpdateDecisionOption={handleUpdateDecisionOption}
         handleRemoveDecisionOption={handleRemoveDecisionOption}
         handleAddDecisionOption={handleAddDecisionOption}
-        // decisionOption={decisionOption}
+        decisionOption={decisionOption}
       />
     </PageContainer>
   );
@@ -449,8 +527,6 @@ const ResourceModal = ({
   handleAddResource,
 }) => {
   const [deleteResourceCheck, setDeleteResourceCheck] = useState("");
-
-  console.log({ resource });
   const isAdding = !resource;
 
   const {
@@ -474,15 +550,18 @@ const ResourceModal = ({
   }, [onClose]);
 
   const onSubmit = handleSubmit((data) => {
-    console.log("inside resource modal", data);
     if (isAdding) {
-      // handleAddResource(data);
       handleUpdateResource(data);
     } else {
       handleUpdateResource(data);
     }
     onClose();
   });
+
+  const removeResource = (id) => {
+    handleRemoveResource(id);
+    onClose();
+  };
 
   // console.log("resource in resource modal", resource);
 
@@ -510,7 +589,7 @@ const ResourceModal = ({
             <Button
               color="error"
               disabled={deleteResourceCheck !== watch("resource_title")}
-              onClick={handleRemoveResource}
+              onClick={() => removeResource(resource?.id)}
             >
               Remove
             </Button>
@@ -581,20 +660,79 @@ const ResourceForm = ({ control, errors }) => {
 const DecisionOptionModal = ({
   open,
   onClose,
+  decisionOption,
   handleAddDecisionOption,
   handleRemoveDecisionOption,
   handleUpdateDecisionOption,
 }) => {
+  const isAdding = decisionOption;
+  const isRollout = false;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isDirty },
+  } = useForm();
+  const onSubmit = handleSubmit((data) => {
+    if (isRollout) {
+      if (isAdding) {
+      }
+    } else {
+      handleUpdateDecisionOption(data);
+    }
+    onClose();
+  });
+
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Decision option Modal</DialogTitle>
-      <DialogContent>{/* TODO: Option description field here */}</DialogContent>
-      <DialogActions>
-        <Stack direction="row" spacing={1}></Stack>
-        <Button onClick={handleUpdateDecisionOption}>Update</Button>
-        <Button onClick={handleRemoveDecisionOption}>Remove</Button>
-        <Button onClick={handleAddDecisionOption}>Add</Button>
-      </DialogActions>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent>
+          <DecisionForm control={control} errors={errors} />
+        </DialogContent>
+        <DialogActions>
+          {isRollout && isAdding ? null : (
+            <Button onClick={handleRemoveDecisionOption}>Remove</Button>
+          )}
+          <Button type="submit" disabled={!isDirty}>
+            {isRollout && isAdding ? "Add" : "Update"}
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
+  );
+};
+
+const DecisionForm = ({ control, errors }) => {
+  return (
+    <Stack spacing={3}>
+      <Controller
+        name="decision_id"
+        control={control}
+        render={({ field }) => <input type="hidden" {...field} />}
+      />
+      <Controller
+        name="decision_option"
+        control={control}
+        rules={{
+          required: {
+            value: true,
+            message: "This field is required",
+          },
+        }}
+        render={({ field }) => (
+          <TextField
+            label="Decision Option"
+            placeholder="e.g. Yes"
+            error={errors.decision_option}
+            helperText={
+              errors && errors.decision_option && errors.decision_option.message
+            }
+            {...field}
+          />
+        )}
+      />
+    </Stack>
   );
 };
