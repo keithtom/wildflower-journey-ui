@@ -55,6 +55,7 @@ const StepId = ({}) => {
   const [viewingResource, setViewingResource] = useState(null);
 
   const [resourceParams, setResourceParams] = useState([]);
+  console.log({ resourceParams });
   const [resourcesToDelete, setResourcesToDelete] = useState([]);
 
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
@@ -123,6 +124,7 @@ const StepId = ({}) => {
           console.log("deleting resource", resource);
           const response = await stepsApi.deleteDocument(resource);
           mutate(`/v1/documents/${resource}`);
+          mutate(`/definition/processes/${processId}/steps/${step.id}`);
         });
       }
 
@@ -389,14 +391,25 @@ const StepId = ({}) => {
                               variant="bodyRegular"
                               struck={resourcesToDelete.includes(resource.id)}
                             >
-                              {resource.attributes.title}
+                              {resourceParams.find(
+                                (param) => param.id === resource.id
+                              )?.title || resource.attributes.title}
                             </Typography>
                           </ListItemText>
+                          {resourceParams.some(
+                            (param) => param.id === resource.id
+                          ) ? (
+                            <Chip
+                              label="Edited"
+                              size="small"
+                              variant="outlined"
+                            />
+                          ) : null}
                         </Stack>
                       </ListItemButton>
                     </ListItem>
                   ))}
-              {resourceParams.length > 0 &&
+              {resourceParams.filter((param) => param.id === null).length > 0 &&
                 resourceParams.map((resourceBeingAdded, i) => (
                   <ListItem disablePadding divider key={i}>
                     <ListItemButton>
