@@ -4,7 +4,10 @@ import { showStep } from "@api/workflow/definition/steps";
 const useStep = (processId, stepId) => {
   const { data, error } = useSWR(
     processId && stepId ? showStep.key(processId, stepId) : null,
-    () => showStep.fetcher(processId, stepId)
+    () => showStep.fetcher(processId, stepId),
+    {
+      revalidateOnFocus: false,
+    }
   );
 
   // console.log({ data });

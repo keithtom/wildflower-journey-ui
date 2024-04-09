@@ -77,10 +77,17 @@ const ProcessId = ({}) => {
   }, [isLoading, milestone, reset]);
 
   const handleUpdateProcess = async (data) => {
-    console.log("Update process");
+    const structuredData = {
+      ...data,
+      categories: [data.categories],
+    };
+    // console.log("Update process", structuredData);
     // Update the process
     try {
-      const response = await processes.editMilestone(milestone.id, data);
+      const response = await processes.editMilestone(
+        milestone.id,
+        structuredData
+      );
       setProcessHasChanges(false);
       mutate(`/definition/processes/${milestone.id}`);
       console.log(response);
@@ -231,9 +238,7 @@ const ProcessId = ({}) => {
                     {...field}
                     labelId="categories-label"
                     id="categories"
-                    multiple
                     input={<OutlinedInput label="Categories" />}
-                    renderValue={(selected) => selected.join(", ")}
                     helperText={
                       errors &&
                       errors.categories &&
@@ -462,8 +467,22 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
 };
 
 const categories = [
-  { label: "Finance", value: "finance" },
-  { label: "Album", value: "album" },
+  {
+    label: "Albums, Advice & Network Membership",
+    value: "Albums, Advice & Network Membership",
+  },
+  { label: "Finance", value: "Finance" },
+  { label: "Facilities", value: "Facilities" },
+  { label: "Governance & Compliance", value: "Governance & Compliance" },
+  { label: "Human Resources", value: "Human Resources" },
+  {
+    label: "Community & Family Engagement",
+    value: "Community & Family Engagement",
+  },
+  {
+    label: "Classroom & Program Practices",
+    value: "Classroom & Program Practices",
+  },
 ];
 const phases = [
   { label: "Visioning", value: "visioning" },
