@@ -55,7 +55,6 @@ const StepId = ({}) => {
   const [viewingResource, setViewingResource] = useState(null);
 
   const [resourceParams, setResourceParams] = useState([]);
-  console.log({ resourceParams });
   const [resourcesToDelete, setResourcesToDelete] = useState([]);
 
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
@@ -524,12 +523,24 @@ const StepId = ({}) => {
                                     >
                                       <ListItemText>
                                         <Typography variant="bodyRegular">
-                                          {
+                                          {decisionOptionParams.find(
+                                            (param) =>
+                                              param.id === decisionOption.id
+                                          )?.description ||
                                             decisionOption.attributes
-                                              .description
-                                          }
+                                              .description}
                                         </Typography>
                                       </ListItemText>
+                                      {decisionOptionParams.some(
+                                        (param) =>
+                                          param.id === decisionOption.id
+                                      ) ? (
+                                        <Chip
+                                          label="Edited"
+                                          size="small"
+                                          variant="outlined"
+                                        />
+                                      ) : null}
                                     </Stack>
                                   </ListItemButton>
                                 </ListItem>
