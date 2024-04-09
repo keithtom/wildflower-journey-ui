@@ -79,7 +79,7 @@ const ProcessId = ({}) => {
   const handleUpdateProcess = async (data) => {
     const structuredData = {
       ...data,
-      categories: [data.categories],
+      category_list: [data.categories],
     };
     // console.log("Update process", structuredData);
     // Update the process
