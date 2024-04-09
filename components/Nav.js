@@ -155,6 +155,12 @@ const Navigation = () => {
             label="Workflows"
           />
           <NavLink
+            variant="secondary"
+            to="/admin/workflows/processes"
+            active={router.asPath === "/admin/workflows/processes"}
+            label="Processes"
+          />
+          <NavLink
             variant="primary"
             to="/admin/schools"
             active={router.asPath === "/admin/schools"}
