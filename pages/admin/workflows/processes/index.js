@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { mutate } from "swr";
 import { Controller, useForm } from "react-hook-form";
+import { useRouter } from "next/router";
 
 import {
   List,
@@ -32,6 +33,8 @@ import useMilestones from "@hooks/workflow/definition/useMilestones";
 import processes from "@api/workflow/definition/processes";
 
 const ProcessLibrary = () => {
+  const router = useRouter();
+
   const [repositionedSnackbarOpen, setRemoveProcessSnackbarOpen] =
     useState(false);
   const [addProcessModalOpen, setAddProcessModalOpen] = useState(false);
@@ -125,7 +128,13 @@ const ProcessLibrary = () => {
                             </Button>
                           }
                         >
-                          <ListItemButton>
+                          <ListItemButton
+                            onClick={() =>
+                              router.push(
+                                `/admin/workflows/processes/${milestone.id}`
+                              )
+                            }
+                          >
                             <Stack
                               direction="row"
                               spacing={3}

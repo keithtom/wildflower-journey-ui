@@ -35,7 +35,10 @@ import useMilestone from "@hooks/workflow/definition/useMilestone";
 
 const StepId = ({}) => {
   const router = useRouter();
-  const workflowId = router.query.workflowId;
+  let workflowId;
+  if (typeof window !== "undefined") {
+    workflowId = localStorage.getItem("workflowId");
+  }
   const processId = router.query.processId;
   const stepId = router.query.stepId;
 
@@ -190,20 +193,32 @@ const StepId = ({}) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6}>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link
-              underline="hover"
-              color="inherit"
-              href={`/admin/workflows/${workflowId}`}
-            >
-              <Typography variant="bodyRegular" lightened>
-                Workflow
-              </Typography>
-            </Link>
+            {workflowId ? (
+              <Link
+                underline="hover"
+                color="inherit"
+                href={`/admin/workflows/${workflowId}`}
+              >
+                <Typography variant="bodyRegular" lightened>
+                  Workflow
+                </Typography>
+              </Link>
+            ) : (
+              <Link
+                underline="hover"
+                color="inherit"
+                href={`/admin/workflows/processes`}
+              >
+                <Typography variant="bodyRegular" lightened>
+                  Processes
+                </Typography>
+              </Link>
+            )}
 
             <Link
               underline="hover"
               color="inherit"
-              href={`/admin/workflows/${workflowId}/processes/${processId}`}
+              href={`/admin/workflows/processes/${processId}`}
             >
               <Typography variant="bodyRegular" lightened>
                 {milestoneIsLoading ? (

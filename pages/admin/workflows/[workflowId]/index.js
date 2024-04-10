@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useSortable } from "@dnd-kit/sortable";
 import { mutate } from "swr";
@@ -31,6 +31,12 @@ import processApi from "@api/workflow/definition/processes";
 const Workflow = ({}) => {
   const router = useRouter();
   const workflowId = router.query.workflowId;
+
+  useEffect(() => {
+    if (workflowId) {
+      localStorage.setItem("workflowId", workflowId);
+    }
+  }, [workflowId]);
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
   console.log({ workflow });
@@ -397,9 +403,7 @@ const ProcessListItem = ({ isDraftingNewVersion, process }) => {
         dragHandle={<PositionGrabber {...listeners} {...attributes} />}
       />
       <ListItemButton
-        onClick={() =>
-          router.push(`/admin/workflows/${workflowId}/processes/${process.id}`)
-        }
+        onClick={() => router.push(`/admin/workflows/processes/${process.id}`)}
       >
         <Stack direction="row" spacing={3} alignItems="center">
           <ListItemText>{process.attributes.title}</ListItemText>
