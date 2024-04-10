@@ -80,6 +80,7 @@ const ProcessId = ({}) => {
     const structuredData = {
       ...data,
       category_list: [data.categories],
+      phase_list: data.phase,
     };
     // console.log("Update process", structuredData);
     // Update the process
