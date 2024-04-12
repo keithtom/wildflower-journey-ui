@@ -114,22 +114,26 @@ const StepId = ({}) => {
     setStepHasChanges(false);
   };
   const handleUpdateStep = async (data) => {
+    console.log("Updating step", data);
     const allData = {
-      ...data,
+      step: {
+        ...data,
+      },
+
       // documents_attributes: resourceParams,
       // decision_options_attributes: decisionOptionParams,
     };
 
     if (resourceParams.length > 0) {
-      allData.documents_attributes = resourceParams;
+      allData.step.documents_attributes = resourceParams;
     }
     if (decisionOptionParams.length > 0) {
-      allData.decision_options_attributes = decisionOptionParams;
+      allData.step.decision_options_attributes = decisionOptionParams;
     }
 
-    Object.keys(allData).forEach((key) => {
-      if (allData[key] === originalData[key]) {
-        delete allData[key];
+    Object.keys(allData.step).forEach((key) => {
+      if (allData.step[key] === originalData[key]) {
+        delete allData.step[key];
       }
     });
     console.log({ allData });
