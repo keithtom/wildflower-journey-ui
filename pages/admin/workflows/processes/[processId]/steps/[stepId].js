@@ -36,11 +36,14 @@ import useMilestone from "@hooks/workflow/definition/useMilestone";
 const StepId = ({}) => {
   const router = useRouter();
   let workflowId;
-  if (typeof window !== "undefined") {
-    workflowId = localStorage.getItem("workflowId");
-  }
   const processId = router.query.processId;
   const stepId = router.query.stepId;
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      workflowId = localStorage.getItem("workflowId");
+    }
+  }, []);
 
   //Fetch milestone data for breadcrumbs
   const { milestone, isLoading: milestoneIsLoading } = useMilestone(processId);
@@ -113,27 +116,53 @@ const StepId = ({}) => {
   const handleUpdateStep = async (data) => {
     const allData = {
       ...data,
-      documents_attributes: resourceParams,
-      decision_options_attributes: decisionOptionParams,
+      // documents_attributes: resourceParams,
+      // decision_options_attributes: decisionOptionParams,
     };
-    console.log("allData", allData);
-    try {
-      const response = await stepsApi.editStep(processId, step.id, allData);
-      setStepHasChanges(false);
-      setResourceParams([]);
-      if (resourcesToDelete.length > 0) {
+
+    if (resourceParams.length > 0) {
+      allData.documents_attributes = resourceParams;
+    }
+    if (decisionOptionParams.length > 0) {
+      allData.decision_options_attributes = decisionOptionParams;
+    }
+
+    Object.keys(allData).forEach((key) => {
+      if (allData[key] === originalData[key]) {
+        delete allData[key];
+      }
+    });
+    console.log({ allData });
+
+    const hasChanges = Object.keys(allData).some(
+      (key) => allData[key] !== originalData[key]
+    );
+
+    if (hasChanges) {
+      try {
+        const response = await stepsApi.editStep(processId, step.id, allData);
+        setStepHasChanges(false);
+        setResourceParams([]);
+        setDecisionOptionParams([]);
+        mutate(`/definition/processes/${processId}/steps/${step.id}`);
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (resourcesToDelete.length > 0) {
+      try {
         resourcesToDelete.forEach(async (resource) => {
           console.log("deleting resource", resource);
           const response = await stepsApi.deleteDocument(resource);
           mutate(`/v1/documents/${resource}`);
           mutate(`/definition/processes/${processId}/steps/${step.id}`);
+          setResourcesToDelete([]);
         });
+      } catch (error) {
+        console.log(error);
       }
-
-      mutate(`/definition/processes/${processId}/steps/${step.id}`);
-      console.log(response);
-    } catch (error) {
-      console.log(error);
     }
   };
 

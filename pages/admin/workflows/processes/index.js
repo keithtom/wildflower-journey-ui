@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { mutate } from "swr";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
@@ -35,12 +35,19 @@ import processes from "@api/workflow/definition/processes";
 const ProcessLibrary = () => {
   const router = useRouter();
 
+  // set initial state
   const [repositionedSnackbarOpen, setRemoveProcessSnackbarOpen] =
     useState(false);
   const [addProcessModalOpen, setAddProcessModalOpen] = useState(false);
+
   // get data
   const { milestones, isLoading, isError } = useMilestones();
   console.log({ milestones });
+
+  // reset localstorage
+  useEffect(() => {
+    localStorage.removeItem("workflowId");
+  }, []);
 
   const handleRemoveProcess = async (id) => {
     try {

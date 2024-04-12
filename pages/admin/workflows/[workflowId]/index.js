@@ -354,7 +354,7 @@ const ProcessListItem = ({ isDraftingNewVersion, process }) => {
 
   const PositionGrabber = ({ ...props }) => {
     return (
-      <Stack {...props}>
+      <Stack {...props} id={`drag-handle-${process.id}`}>
         <DragHandle />
       </Stack>
     );
@@ -397,6 +397,7 @@ const ProcessListItem = ({ isDraftingNewVersion, process }) => {
       sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
+        id={`inline-action-tile-${process.id}`}
         showAdd={isDraftingNewVersion}
         status="default"
         add={handleAddProcess}

@@ -39,10 +39,13 @@ import useMilestone from "@hooks/workflow/definition/useMilestone";
 const ProcessId = ({}) => {
   const router = useRouter();
   let workflowId;
-  if (typeof window !== "undefined") {
-    workflowId = localStorage.getItem("workflowId");
-  }
   const processId = router.query.processId;
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      workflowId = localStorage.getItem("workflowId");
+    }
+  }, []);
 
   const { milestone, isLoading, isError } = useMilestone(processId);
   console.log(milestone);
@@ -71,8 +74,8 @@ const ProcessId = ({}) => {
         title: milestone?.attributes?.title,
         description: milestone?.attributes?.description,
         prerequisite: milestone?.attributes?.prerequisite,
-        categories: milestone?.attributes?.categories,
-        phase: milestone?.attributes?.phase,
+        category_list: milestone?.attributes?.categories,
+        phase_list: milestone?.attributes?.phase,
       };
       setOriginalData(defaultValues);
       reset(defaultValues);
@@ -80,18 +83,17 @@ const ProcessId = ({}) => {
   }, [isLoading, milestone, reset]);
 
   const handleUpdateProcess = async (data) => {
-    const structuredData = {
-      ...data,
-      category_list: [data.categories],
-      phase_list: data.phase,
-    };
-    // console.log("Update process", structuredData);
+    // Remove unchanged data
+    const updatedData = Object.keys(data).reduce((acc, key) => {
+      if (data[key] !== originalData[key]) {
+        acc[key] = data[key];
+      }
+      return acc;
+    }, {});
+
     // Update the process
     try {
-      const response = await processes.editMilestone(
-        milestone.id,
-        structuredData
-      );
+      const response = await processes.editMilestone(milestone.id, updatedData);
       setProcessHasChanges(false);
       mutate(`/definition/processes/${milestone.id}`);
       console.log(response);
@@ -240,7 +242,7 @@ const ProcessId = ({}) => {
             <FormControl fullWidth>
               <InputLabel id="categories-label">Categories</InputLabel>
               <Controller
-                name="categories"
+                name="category_list"
                 control={control}
                 defaultValue={[]}
                 rules={{
@@ -304,7 +306,7 @@ const ProcessId = ({}) => {
             <FormControl fullWidth>
               <InputLabel id="phase-label">Phase</InputLabel>
               <Controller
-                name="phase"
+                name="phase_list"
                 control={control}
                 defaultValue={[]}
                 rules={{
@@ -418,7 +420,7 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
 
   const PositionGrabber = ({ ...props }) => {
     return (
-      <Stack {...props}>
+      <Stack {...props} id={`drag-handle-${step.id}`}>
         <DragHandle />
       </Stack>
     );
@@ -442,6 +444,7 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
       sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
+        id={`inline-action-tile-${step.id}`}
         showAdd={isDraftingNewVersion}
         status="default"
         add={handleAddStep}
