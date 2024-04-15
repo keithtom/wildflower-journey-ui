@@ -35,14 +35,13 @@ import useMilestone from "@hooks/workflow/definition/useMilestone";
 
 const StepId = ({}) => {
   const router = useRouter();
-  let workflowId;
+  const [workflowId, setWorkflowId] = useState(null);
   const processId = router.query.processId;
   const stepId = router.query.stepId;
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      workflowId = localStorage.getItem("workflowId");
-    }
+    const id = localStorage.getItem("workflowId");
+    setWorkflowId(id);
   }, []);
 
   //Fetch milestone data for breadcrumbs

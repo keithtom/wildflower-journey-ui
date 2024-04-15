@@ -38,17 +38,15 @@ import useMilestone from "@hooks/workflow/definition/useMilestone";
 
 const ProcessId = ({}) => {
   const router = useRouter();
-  let workflowId;
+  const [workflowId, setWorkflowId] = useState(null);
   const processId = router.query.processId;
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      workflowId = localStorage.getItem("workflowId");
-    }
-  }, []);
 
   const { milestone, isLoading, isError } = useMilestone(processId);
   // console.log(milestone);
+  useEffect(() => {
+    const id = localStorage.getItem("workflowId");
+    setWorkflowId(id);
+  }, []);
 
   // TODO: Get isDraftingNewVersion state from the API
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
