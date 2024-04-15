@@ -38,11 +38,17 @@ import useMilestone from "@hooks/workflow/definition/useMilestone";
 
 const ProcessId = ({}) => {
   const router = useRouter();
-  const workflowId = router.query.workflowId;
+  let workflowId;
   const processId = router.query.processId;
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      workflowId = localStorage.getItem("workflowId");
+    }
+  }, []);
+
   const { milestone, isLoading, isError } = useMilestone(processId);
-  console.log(milestone);
+  // console.log(milestone);
 
   // TODO: Get isDraftingNewVersion state from the API
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
@@ -68,8 +74,8 @@ const ProcessId = ({}) => {
         title: milestone?.attributes?.title,
         description: milestone?.attributes?.description,
         prerequisite: milestone?.attributes?.prerequisite,
-        categories: milestone?.attributes?.categories,
-        phase: milestone?.attributes?.phase,
+        category_list: milestone?.attributes?.categories,
+        phase_list: milestone?.attributes?.phase,
       };
       setOriginalData(defaultValues);
       reset(defaultValues);
@@ -77,19 +83,26 @@ const ProcessId = ({}) => {
   }, [isLoading, milestone, reset]);
 
   const handleUpdateProcess = async (data) => {
-    console.log("Update process");
+    // Remove unchanged data
+    const updatedData = Object.keys(data).reduce((acc, key) => {
+      if (data[key] !== originalData[key]) {
+        acc[key] = data[key];
+      }
+      return acc;
+    }, {});
+
     // Update the process
     try {
-      const response = await processes.editMilestone(milestone.id, data);
+      const response = await processes.editMilestone(milestone.id, updatedData);
       setProcessHasChanges(false);
       mutate(`/definition/processes/${milestone.id}`);
-      console.log(response);
+      // console.log(response);
     } catch (error) {
       console.error(error);
     }
   };
   const handleCancelUpdateProcess = () => {
-    console.log("Cancel update process");
+    // console.log("Cancel update process");
     // Reset form to original data
     reset(originalData);
   };
@@ -125,15 +138,27 @@ const ProcessId = ({}) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6}>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link
-              underline="hover"
-              color="inherit"
-              href={`/admin/workflows/${workflowId}`}
-            >
-              <Typography variant="bodyRegular" lightened>
-                Workflow
-              </Typography>
-            </Link>
+            {workflowId ? (
+              <Link
+                underline="hover"
+                color="inherit"
+                href={`/admin/workflows/${workflowId}`}
+              >
+                <Typography variant="bodyRegular" lightened>
+                  Workflow
+                </Typography>
+              </Link>
+            ) : (
+              <Link
+                underline="hover"
+                color="inherit"
+                href={`/admin/workflows/processes`}
+              >
+                <Typography variant="bodyRegular" lightened>
+                  Processes
+                </Typography>
+              </Link>
+            )}
 
             <Typography variant="bodyRegular">
               {isLoading ? <Skeleton width={64} /> : milestone.attributes.title}
@@ -217,7 +242,7 @@ const ProcessId = ({}) => {
             <FormControl fullWidth>
               <InputLabel id="categories-label">Categories</InputLabel>
               <Controller
-                name="categories"
+                name="category_list"
                 control={control}
                 defaultValue={[]}
                 rules={{
@@ -231,9 +256,7 @@ const ProcessId = ({}) => {
                     {...field}
                     labelId="categories-label"
                     id="categories"
-                    multiple
                     input={<OutlinedInput label="Categories" />}
-                    renderValue={(selected) => selected.join(", ")}
                     helperText={
                       errors &&
                       errors.categories &&
@@ -283,7 +306,7 @@ const ProcessId = ({}) => {
             <FormControl fullWidth>
               <InputLabel id="phase-label">Phase</InputLabel>
               <Controller
-                name="phase"
+                name="phase_list"
                 control={control}
                 defaultValue={[]}
                 rules={{
@@ -382,7 +405,6 @@ export default ProcessId;
 
 const StepListItem = ({ isDraftingNewVersion, step }) => {
   const router = useRouter();
-  const workflowId = router.query.workflowId;
   const processId = router.query.processId;
 
   // console.log({ step });
@@ -390,15 +412,15 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
   const { listeners, attributes, isDragging } = useSortable({ id: step.id });
 
   const handleAddStep = () => {
-    console.log("Add step");
+    // console.log("Add step");
   };
   const handleRemoveStep = (id) => {
-    console.log("Remove step", id);
+    // console.log("Remove step", id);
   };
 
   const PositionGrabber = ({ ...props }) => {
     return (
-      <Stack {...props}>
+      <Stack {...props} id={`drag-handle-${step.id}`}>
         <DragHandle />
       </Stack>
     );
@@ -422,6 +444,7 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
       sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
+        id={`inline-action-tile-${step.id}`}
         showAdd={isDraftingNewVersion}
         status="default"
         add={handleAddStep}
@@ -430,7 +453,7 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
       <ListItemButton
         onClick={() =>
           router.push(
-            `/admin/workflows/${workflowId}/processes/${processId}/steps/${step.id}`
+            `/admin/workflows/processes/${processId}/steps/${step.id}`
           )
         }
       >
@@ -462,8 +485,22 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
 };
 
 const categories = [
-  { label: "Finance", value: "finance" },
-  { label: "Album", value: "album" },
+  {
+    label: "Albums, Advice & Network Membership",
+    value: "Albums, Advice & Network Membership",
+  },
+  { label: "Finance", value: "Finance" },
+  { label: "Facilities", value: "Facilities" },
+  { label: "Governance & Compliance", value: "Governance & Compliance" },
+  { label: "Human Resources", value: "Human Resources" },
+  {
+    label: "Community & Family Engagement",
+    value: "Community & Family Engagement",
+  },
+  {
+    label: "Classroom & Program Practices",
+    value: "Classroom & Program Practices",
+  },
 ];
 const phases = [
   { label: "Visioning", value: "visioning" },

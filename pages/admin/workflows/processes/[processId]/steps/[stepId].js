@@ -35,16 +35,22 @@ import useMilestone from "@hooks/workflow/definition/useMilestone";
 
 const StepId = ({}) => {
   const router = useRouter();
-  const workflowId = router.query.workflowId;
+  let workflowId;
   const processId = router.query.processId;
   const stepId = router.query.stepId;
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      workflowId = localStorage.getItem("workflowId");
+    }
+  }, []);
+
   //Fetch milestone data for breadcrumbs
   const { milestone, isLoading: milestoneIsLoading } = useMilestone(processId);
-  console.log({ milestone });
+  // console.log({ milestone });
   //Fetch step data
   const { step, isLoading, isError } = useStep(processId, stepId);
-  console.log({ step });
+  // console.log({ step });
 
   const isRollout = false;
 
@@ -55,7 +61,9 @@ const StepId = ({}) => {
   const [viewingResource, setViewingResource] = useState(null);
 
   const [resourceParams, setResourceParams] = useState([]);
+  // console.log({ resourceParams });
   const [resourcesToDelete, setResourcesToDelete] = useState([]);
+  // console.log({ resourcesToDelete });
 
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
   const [decisionOption, setDecisionOption] = useState(null);
@@ -108,28 +116,63 @@ const StepId = ({}) => {
     setStepHasChanges(false);
   };
   const handleUpdateStep = async (data) => {
+    // console.log("Updating step", data);
     const allData = {
-      ...data,
-      documents_attributes: resourceParams,
-      decision_options_attributes: decisionOptionParams,
+      step: {
+        ...data,
+      },
+
+      // documents_attributes: resourceParams,
+      // decision_options_attributes: decisionOptionParams,
     };
-    console.log("allData", allData);
-    try {
-      const response = await stepsApi.editStep(processId, step.id, allData);
-      setStepHasChanges(false);
-      setResourceParams([]);
-      if (resourcesToDelete.length > 0) {
+
+    if (resourceParams.length > 0) {
+      allData.step.documents_attributes = resourceParams;
+    }
+    if (decisionOptionParams.length > 0) {
+      allData.step.decision_options_attributes = decisionOptionParams;
+    }
+
+    Object.keys(allData.step).forEach((key) => {
+      if (allData.step[key] === originalData[key]) {
+        delete allData.step[key];
+      }
+    });
+    // console.log({ allData });
+
+    const hasChanges = Object.keys(allData.step).some(
+      (key) => allData.step[key] !== originalData[key]
+    );
+
+    if (
+      hasChanges ||
+      resourceParams.length > 0 ||
+      decisionOptionParams.length > 0
+    ) {
+      try {
+        const response = await stepsApi.editStep(processId, step.id, allData);
+        setStepHasChanges(false);
+        setResourceParams([]);
+        setDecisionOptionParams([]);
+        mutate(`/definition/processes/${processId}/steps/${step.id}`);
+        // console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (resourcesToDelete.length > 0) {
+      try {
         resourcesToDelete.forEach(async (resource) => {
           console.log("deleting resource", resource);
           const response = await stepsApi.deleteDocument(resource);
           mutate(`/v1/documents/${resource}`);
+          mutate(`/definition/processes/${processId}/steps/${step.id}`);
+          setResourcesToDelete([]);
         });
+      } catch (error) {
+        console.log(error);
       }
-
-      mutate(`/definition/processes/${processId}/steps/${step.id}`);
-      console.log(response);
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -137,10 +180,12 @@ const StepId = ({}) => {
   const handleUpdateResource = (data) => {
     console.log("Update resource", data);
     const preparedDataForApi = {
-      id: data?.resource_id || null,
       title: data?.resource_title || "",
       link: data?.resource_link || "",
     };
+    if (data?.resource_id !== null) {
+      preparedDataForApi.id = data?.resource_id;
+    }
     setResourceParams([...resourceParams, preparedDataForApi]);
     setStepHasChanges(true);
   };
@@ -152,34 +197,34 @@ const StepId = ({}) => {
     setStepHasChanges(true);
   };
   const handleAddResource = () => {
-    console.log("Add resource");
+    // console.log("Add resource");
   };
   const handleOpenResourceModal = (resource) => {
-    console.log("Open resource modal");
+    // console.log("Open resource modal");
     setViewingResource(resource);
     setResourceModalOpen(true);
   };
   // Decision handlers
   const handleOpenDecisionModal = (decisionOption) => {
-    console.log("Open decision modal");
+    // console.log("Open decision modal");
     setDecisionOption(decisionOption);
     setDecisionModalOpen(true);
   };
   const handleUpdateDecisionOption = (data) => {
-    console.log("Update decision option", data);
+    // console.log("Update decision option", data);
     const preparedDataForApi = {
       id: data?.decision_id || "",
       description: data?.decision_option || "",
     };
     setDecisionOptionParams([...decisionOptionParams, preparedDataForApi]);
-    console.log({ decisionOptionParams });
+    // console.log({ decisionOptionParams });
     setStepHasChanges(true);
   };
   const handleRemoveDecisionOption = () => {
-    console.log("Remove decision option");
+    // console.log("Remove decision option");
   };
   const handleAddDecisionOption = () => {
-    console.log("Add decision option");
+    // console.log("Add decision option");
   };
 
   const onSubmit = handleSubmit(handleUpdateStep);
@@ -189,20 +234,32 @@ const StepId = ({}) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6}>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link
-              underline="hover"
-              color="inherit"
-              href={`/admin/workflows/${workflowId}`}
-            >
-              <Typography variant="bodyRegular" lightened>
-                Workflow
-              </Typography>
-            </Link>
+            {workflowId ? (
+              <Link
+                underline="hover"
+                color="inherit"
+                href={`/admin/workflows/${workflowId}`}
+              >
+                <Typography variant="bodyRegular" lightened>
+                  Workflow
+                </Typography>
+              </Link>
+            ) : (
+              <Link
+                underline="hover"
+                color="inherit"
+                href={`/admin/workflows/processes`}
+              >
+                <Typography variant="bodyRegular" lightened>
+                  Processes
+                </Typography>
+              </Link>
+            )}
 
             <Link
               underline="hover"
               color="inherit"
-              href={`/admin/workflows/${workflowId}/processes/${processId}`}
+              href={`/admin/workflows/processes/${processId}`}
             >
               <Typography variant="bodyRegular" lightened>
                 {milestoneIsLoading ? (
@@ -389,14 +446,25 @@ const StepId = ({}) => {
                               variant="bodyRegular"
                               struck={resourcesToDelete.includes(resource.id)}
                             >
-                              {resource.attributes.title}
+                              {resourceParams.find(
+                                (param) => param.id === resource.id
+                              )?.title || resource.attributes.title}
                             </Typography>
                           </ListItemText>
+                          {resourceParams.some(
+                            (param) => param.id === resource.id
+                          ) ? (
+                            <Chip
+                              label="Edited"
+                              size="small"
+                              variant="outlined"
+                            />
+                          ) : null}
                         </Stack>
                       </ListItemButton>
                     </ListItem>
                   ))}
-              {resourceParams.length > 0 &&
+              {resourceParams.filter((param) => !param.id).length > 0 &&
                 resourceParams.map((resourceBeingAdded, i) => (
                   <ListItem disablePadding divider key={i}>
                     <ListItemButton>
@@ -511,12 +579,24 @@ const StepId = ({}) => {
                                     >
                                       <ListItemText>
                                         <Typography variant="bodyRegular">
-                                          {
+                                          {decisionOptionParams.find(
+                                            (param) =>
+                                              param.id === decisionOption.id
+                                          )?.description ||
                                             decisionOption.attributes
-                                              .description
-                                          }
+                                              .description}
                                         </Typography>
                                       </ListItemText>
+                                      {decisionOptionParams.some(
+                                        (param) =>
+                                          param.id === decisionOption.id
+                                      ) ? (
+                                        <Chip
+                                          label="Edited"
+                                          size="small"
+                                          variant="outlined"
+                                        />
+                                      ) : null}
                                     </Stack>
                                   </ListItemButton>
                                 </ListItem>
@@ -723,9 +803,9 @@ const DecisionOptionModal = ({
   const onSubmit = handleSubmit((data) => {
     if (isRollout) {
       if (isAdding) {
-        console.log("Is adding in rollout");
+        // console.log("Is adding in rollout");
       } else {
-        console.log("Is updating in rollout");
+        // console.log("Is updating in rollout");
       }
     } else {
       handleUpdateDecisionOption(data);

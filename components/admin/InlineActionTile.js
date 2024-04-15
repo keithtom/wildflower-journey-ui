@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Stack } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 
-const InlineActionTile = ({ reposition, status, showAdd, add, dragHandle }) => {
+const InlineActionTile = ({ id, status, showAdd, add, dragHandle }) => {
   const [isHovering, setIsHovering] = useState(false);
   return (
     <Stack
+      id={id}
       sx={{
         width: "48px",
         borderRight: "1px solid #eaeaea",
