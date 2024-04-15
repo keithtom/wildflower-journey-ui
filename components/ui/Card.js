@@ -1,3 +1,4 @@
+import React from "react";
 import { default as MaterialCard } from "@mui/material/Card";
 import { styled, css } from "@mui/material/styles";
 
@@ -115,8 +116,12 @@ const CustomCard = styled(MaterialCard, {
     `}
 `;
 
-const Card = ({ children, ...props }) => {
-  return <CustomCard {...props}>{children}</CustomCard>;
-};
+const Card = React.forwardRef(({ children, ...props }, ref) => {
+  return (
+    <CustomCard ref={ref} {...props}>
+      {children}
+    </CustomCard>
+  );
+});
 
 export default Card;
