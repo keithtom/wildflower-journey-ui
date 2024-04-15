@@ -2,8 +2,12 @@ import useSWR from "swr";
 import { showMilestone } from "@api/workflow/definition/processes";
 
 const useMilestone = (id) => {
-  const { data, error } = useSWR(id ? showMilestone.key(id) : null, () =>
-    showMilestone.fetcher(id)
+  const { data, error } = useSWR(
+    id ? showMilestone.key(id) : null,
+    () => showMilestone.fetcher(id),
+    {
+      revalidateOnFocus: false,
+    }
   );
 
   // console.log({ data });

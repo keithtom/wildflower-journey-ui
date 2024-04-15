@@ -35,7 +35,7 @@ const Header = ({ toggleNavOpen }) => {
   // console.log({ isAdmin });
   // console.log(process.env.APP_ENV);
 
-  const adminView = isAdmin && router.asPath === "/admin/ssj" ? true : false;
+  const adminView = isAdmin && router.asPath.includes("/admin") ? true : false;
 
   return (
     <AppBar env={process.env.APP_ENV} isAdmin={adminView}>
@@ -185,7 +185,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
         {isAdmin ? (
           <>
             <NavLink to="/ssj" label="Home" />
-            <NavLink to="/admin/ssj" label="Admin" />
+            <NavLink to="/admin" label="Admin" />
           </>
         ) : null}
         {/* {showNetwork ? null : <NavLink to="/settings" label="Settings" />} */}

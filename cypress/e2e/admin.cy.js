@@ -12,7 +12,7 @@ describe("admin spec", () => {
   describe("adding a school", () => {
     beforeEach(() => {
       cy.login("test@test.com", "password");
-      cy.visit("/admin/ssj");
+      cy.visit("/admin/schools");
     });
     it("should be able to add a school", () => {
       //open modal

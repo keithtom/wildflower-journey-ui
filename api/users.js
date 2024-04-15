@@ -38,8 +38,8 @@ export const showUser = {
     const config = getAuthHeader();
     return api
       .get(`/${userId}`, config)
-      .then((data) => {
-        return data;
+      .then((response) => {
+        return response;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);
