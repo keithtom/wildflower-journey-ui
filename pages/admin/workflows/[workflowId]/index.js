@@ -20,6 +20,7 @@ import {
   DialogActions,
   Skeleton,
   Snackbar,
+  Popper,
 } from "@mui/material";
 import { DragHandle } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
@@ -39,7 +40,7 @@ const Workflow = ({}) => {
   }, [workflowId]);
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  console.log({ workflow });
+  // console.log({ workflow });
 
   // Transform the data to group by phase
   function groupByPhase(data) {
@@ -63,7 +64,7 @@ const Workflow = ({}) => {
   const groupedProcesses = groupByPhase(
     isLoading ? [] : workflow?.relationships.processes.data
   );
-  console.log({ groupedProcesses });
+  // console.log({ groupedProcesses });
 
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
   const [versionHasChanges, setVersionHasChanges] = useState(false);
@@ -75,28 +76,28 @@ const Workflow = ({}) => {
   const processStatus = "unedited";
 
   const handleStartNewVersion = () => {
-    console.log("Start new version");
+    // console.log("Start new version");
     setIsDraftingNewVersion(true);
   };
   const handleSubmitNewVersion = () => {
-    console.log("Submit new version");
+    // console.log("Submit new version");
   };
   const handleCancelDraft = () => {
-    console.log("Cancel draft");
+    // console.log("Cancel draft");
     setIsDraftingNewVersion(false);
   };
   const handleAddProcess = () => {
-    console.log("Add process");
+    // console.log("Add process");
     setAddProcessModalOpen(true);
   };
   const handleRemoveProcess = (id) => {
-    console.log("Remove process", id);
+    // console.log("Remove process", id);
   };
   const handleRestoreProcess = (id) => {
-    console.log("Restore process", id);
+    // console.log("Restore process", id);
   };
   const handleReplaceProcess = (id) => {
-    console.log("Replace process", id);
+    // console.log("Replace process", id);
   };
   const handleRepositionProcess = async (
     processId,
@@ -157,9 +158,9 @@ const Workflow = ({}) => {
         <Grid container alignItems="flex-end" justifyContent="space-between">
           <Grid item>
             <Stack spacing={2}>
-              <Typography variant="bodyRegular" bold>
+              {/* <Typography variant="bodyRegular" bold>
                 School Startup Journey
-              </Typography>
+              </Typography> */}
               <Stack direction="row" spacing={3} alignItems="center">
                 <Typography variant="h4" bold>
                   {isLoading ? (
@@ -215,7 +216,11 @@ const Workflow = ({}) => {
                 </Button>
               </Stack>
             ) : (
-              <Button variant="contained" onClick={handleStartNewVersion}>
+              <Button
+                variant="contained"
+                onClick={handleStartNewVersion}
+                disabled
+              >
                 Start New Version
               </Button>
             )}
@@ -346,10 +351,10 @@ const ProcessListItem = ({ isDraftingNewVersion, process }) => {
   const { listeners, attributes, isDragging } = useSortable({ id: process.id });
 
   const handleAddProcess = () => {
-    console.log("Add process");
+    // console.log("Add process");
   };
   const handleRemoveProcess = (id) => {
-    console.log("Remove process", id);
+    // console.log("Remove process", id);
   };
 
   const PositionGrabber = ({ ...props }) => {

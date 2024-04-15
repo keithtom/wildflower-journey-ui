@@ -42,7 +42,7 @@ const ProcessLibrary = () => {
 
   // get data
   const { milestones, isLoading, isError } = useMilestones();
-  console.log({ milestones });
+  // console.log({ milestones });
 
   // reset localstorage
   useEffect(() => {
@@ -96,7 +96,7 @@ const ProcessLibrary = () => {
                     sx={{ background: "#eaeaea" }}
                   >
                     <Grid container justifyContent="space-between">
-                      <Grid item>Not in a workflow</Grid>
+                      <Grid item>Not published</Grid>
                       <Grid item>
                         <Button
                           variant="contained"
@@ -119,7 +119,7 @@ const ProcessLibrary = () => {
                       </ListItem>
                     ))
                   : milestones.data.data
-                      .filter((item) => item.attributes.numOfInstances < 1)
+                      .filter((item) => item.attributes.published === false)
                       .map((milestone, i) => (
                         <ListItem
                           disablePadding

@@ -47,10 +47,10 @@ const StepId = ({}) => {
 
   //Fetch milestone data for breadcrumbs
   const { milestone, isLoading: milestoneIsLoading } = useMilestone(processId);
-  console.log({ milestone });
+  // console.log({ milestone });
   //Fetch step data
   const { step, isLoading, isError } = useStep(processId, stepId);
-  console.log({ step });
+  // console.log({ step });
 
   const isRollout = false;
 
@@ -61,7 +61,9 @@ const StepId = ({}) => {
   const [viewingResource, setViewingResource] = useState(null);
 
   const [resourceParams, setResourceParams] = useState([]);
+  // console.log({ resourceParams });
   const [resourcesToDelete, setResourcesToDelete] = useState([]);
+  // console.log({ resourcesToDelete });
 
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
   const [decisionOption, setDecisionOption] = useState(null);
@@ -114,7 +116,7 @@ const StepId = ({}) => {
     setStepHasChanges(false);
   };
   const handleUpdateStep = async (data) => {
-    console.log("Updating step", data);
+    // console.log("Updating step", data);
     const allData = {
       step: {
         ...data,
@@ -136,20 +138,24 @@ const StepId = ({}) => {
         delete allData.step[key];
       }
     });
-    console.log({ allData });
+    // console.log({ allData });
 
-    const hasChanges = Object.keys(allData).some(
-      (key) => allData[key] !== originalData[key]
+    const hasChanges = Object.keys(allData.step).some(
+      (key) => allData.step[key] !== originalData[key]
     );
 
-    if (hasChanges) {
+    if (
+      hasChanges ||
+      resourceParams.length > 0 ||
+      decisionOptionParams.length > 0
+    ) {
       try {
         const response = await stepsApi.editStep(processId, step.id, allData);
         setStepHasChanges(false);
         setResourceParams([]);
         setDecisionOptionParams([]);
         mutate(`/definition/processes/${processId}/steps/${step.id}`);
-        console.log(response);
+        // console.log(response);
       } catch (error) {
         console.log(error);
       }
@@ -174,10 +180,12 @@ const StepId = ({}) => {
   const handleUpdateResource = (data) => {
     console.log("Update resource", data);
     const preparedDataForApi = {
-      id: data?.resource_id || null,
       title: data?.resource_title || "",
       link: data?.resource_link || "",
     };
+    if (data?.resource_id !== null) {
+      preparedDataForApi.id = data?.resource_id;
+    }
     setResourceParams([...resourceParams, preparedDataForApi]);
     setStepHasChanges(true);
   };
@@ -189,34 +197,34 @@ const StepId = ({}) => {
     setStepHasChanges(true);
   };
   const handleAddResource = () => {
-    console.log("Add resource");
+    // console.log("Add resource");
   };
   const handleOpenResourceModal = (resource) => {
-    console.log("Open resource modal");
+    // console.log("Open resource modal");
     setViewingResource(resource);
     setResourceModalOpen(true);
   };
   // Decision handlers
   const handleOpenDecisionModal = (decisionOption) => {
-    console.log("Open decision modal");
+    // console.log("Open decision modal");
     setDecisionOption(decisionOption);
     setDecisionModalOpen(true);
   };
   const handleUpdateDecisionOption = (data) => {
-    console.log("Update decision option", data);
+    // console.log("Update decision option", data);
     const preparedDataForApi = {
       id: data?.decision_id || "",
       description: data?.decision_option || "",
     };
     setDecisionOptionParams([...decisionOptionParams, preparedDataForApi]);
-    console.log({ decisionOptionParams });
+    // console.log({ decisionOptionParams });
     setStepHasChanges(true);
   };
   const handleRemoveDecisionOption = () => {
-    console.log("Remove decision option");
+    // console.log("Remove decision option");
   };
   const handleAddDecisionOption = () => {
-    console.log("Add decision option");
+    // console.log("Add decision option");
   };
 
   const onSubmit = handleSubmit(handleUpdateStep);
@@ -456,7 +464,7 @@ const StepId = ({}) => {
                       </ListItemButton>
                     </ListItem>
                   ))}
-              {resourceParams.filter((param) => param.id === null).length > 0 &&
+              {resourceParams.filter((param) => !param.id).length > 0 &&
                 resourceParams.map((resourceBeingAdded, i) => (
                   <ListItem disablePadding divider key={i}>
                     <ListItemButton>
@@ -795,9 +803,9 @@ const DecisionOptionModal = ({
   const onSubmit = handleSubmit((data) => {
     if (isRollout) {
       if (isAdding) {
-        console.log("Is adding in rollout");
+        // console.log("Is adding in rollout");
       } else {
-        console.log("Is updating in rollout");
+        // console.log("Is updating in rollout");
       }
     } else {
       handleUpdateDecisionOption(data);

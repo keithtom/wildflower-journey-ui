@@ -48,7 +48,7 @@ const ProcessId = ({}) => {
   }, []);
 
   const { milestone, isLoading, isError } = useMilestone(processId);
-  console.log(milestone);
+  // console.log(milestone);
 
   // TODO: Get isDraftingNewVersion state from the API
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
@@ -96,13 +96,13 @@ const ProcessId = ({}) => {
       const response = await processes.editMilestone(milestone.id, updatedData);
       setProcessHasChanges(false);
       mutate(`/definition/processes/${milestone.id}`);
-      console.log(response);
+      // console.log(response);
     } catch (error) {
       console.error(error);
     }
   };
   const handleCancelUpdateProcess = () => {
-    console.log("Cancel update process");
+    // console.log("Cancel update process");
     // Reset form to original data
     reset(originalData);
   };
@@ -412,10 +412,10 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
   const { listeners, attributes, isDragging } = useSortable({ id: step.id });
 
   const handleAddStep = () => {
-    console.log("Add step");
+    // console.log("Add step");
   };
   const handleRemoveStep = (id) => {
-    console.log("Remove step", id);
+    // console.log("Remove step", id);
   };
 
   const PositionGrabber = ({ ...props }) => {

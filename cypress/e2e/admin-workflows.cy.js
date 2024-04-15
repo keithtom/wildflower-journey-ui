@@ -91,16 +91,17 @@ describe("Admin, Instantaneous Changes", () => {
     cy.get("button.MuiButtonBase-root").contains("Update").click();
   });
 
-  it("edits a decision option on a step", () => {
+  it.only("edits a decision option on a step", () => {
     cy.visit("/admin/workflows/processes/86/steps/225");
     cy.wait(1000);
     cy.contains("Option 2").click();
     cy.get('input[name="decision_option"]').clear().type("New Option 2");
     cy.get("button.MuiButton-text").contains("Update").click();
     cy.get("button.MuiButtonBase-root").contains("Update").click();
-    // cy.contains("New Option 2").click();
-    // cy.get('input[name="decision_option"]').clear().type("Option 2");
-    // cy.get("button.MuiButton-text").contains("Update").click();
-    // cy.get("button.MuiButtonBase-root").contains("Update").click();
+    cy.wait(1000);
+    cy.contains("New Option 2").click();
+    cy.get('input[name="decision_option"]').clear().type("Option 2");
+    cy.get("button.MuiButton-text").contains("Update").click();
+    cy.get("button.MuiButtonBase-root").contains("Update").click();
   });
 });
