@@ -20,7 +20,7 @@ const Workflows = ({}) => {
   // Load data
   const { workflows, isLoading, isError } = useWorkflows();
 
-  console.log({ workflows });
+  // console.log({ workflows });
 
   return (
     <PageContainer isAdmin>

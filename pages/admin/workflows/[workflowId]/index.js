@@ -39,6 +39,8 @@ const Workflow = ({}) => {
     }
   }, [workflowId]);
 
+  // console.log({ workflowId });
+
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
   // console.log({ workflow });
 
