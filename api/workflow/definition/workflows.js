@@ -13,9 +13,9 @@ export const showWorkflows = {
   fetcher: () => {
     const config = getAuthHeader();
     return workflowsApi
-      .get(showMilestones.key(), config)
+      .get(showWorkflows.key(), config)
       .then((res) => {
-        return res;
+        return res.data.data;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);
@@ -28,8 +28,9 @@ export const showWorkflow = {
   fetcher: (id) => {
     const config = getAuthHeader();
     return workflowsApi
-      .get(showMilestone.key(id), config)
+      .get(showWorkflow.key(id), config)
       .then((response) => {
+        wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
         return response;
       })
       .catch((error) => {
@@ -38,4 +39,36 @@ export const showWorkflow = {
   },
 };
 
-export default { showWorkflows, showWorkflow };
+// const data = { workflow: {version, name, description }};
+// example: { workflow: { version: '1.0', name: 'Test Workflow', description: 'This is a test workflow' } }
+async function createWorkflow(data) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.post(
+      "/definition/workflows",
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+async function editWorkflow(id, data) {
+  const config = getAuthHeader();
+
+  try {
+    const response = await workflowsApi.put(
+      `/definition/workflows/${id}`,
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { createWorkflow, editWorkflow };
