@@ -2,8 +2,17 @@ import { useState } from "react";
 import { Stack } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 
-const InlineActionTile = ({ id, status, showAdd, add, dragHandle }) => {
+const InlineActionTile = ({
+  id,
+  status,
+  showAdd,
+  add,
+  dragHandle,
+  blank,
+  disabled,
+}) => {
   const [isHovering, setIsHovering] = useState(false);
+
   return (
     <Stack
       id={id}
@@ -12,14 +21,20 @@ const InlineActionTile = ({ id, status, showAdd, add, dragHandle }) => {
         borderRight: "1px solid #eaeaea",
         height: "48px",
         cursor: isHovering ? "pointer" : "default",
+        pointerEvents: disabled ? "none" : "auto",
+        opacity: disabled ? 0.5 : 1,
       }}
       alignItems="center"
       justifyContent="center"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      {showAdd && <AddChip onClick={add} />}
-      {isHovering ? dragHandle : <StatusLight status={status} />}
+      {blank ? null : (
+        <>
+          {showAdd && <AddChip onClick={add} />}
+          {isHovering ? dragHandle : <StatusLight status={status} />}
+        </>
+      )}
     </Stack>
   );
 };

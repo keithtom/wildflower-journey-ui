@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import {
   DndContext,
@@ -41,6 +41,10 @@ const DraggableList = ({
 }) => {
   const [activeId, setActiveId] = useState(null);
   const [theItems, setTheItems] = useState(items ? items : []);
+
+  useEffect(() => {
+    setTheItems(items);
+  }, [items]);
 
   // console.log({ items });
   // console.log({ theItems });
@@ -87,7 +91,7 @@ const DraggableList = ({
             key={item.id}
             id={item.id}
             handle={true}
-            renderItem={renderItem(item)}
+            renderItem={renderItem(item, i)}
           />
         ))}
         <DragOverlay>

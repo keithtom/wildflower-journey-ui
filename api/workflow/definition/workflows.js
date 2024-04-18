@@ -70,5 +70,93 @@ async function editWorkflow(id, data) {
     wildflowerApi.handleErrors(error);
   }
 }
+async function deleteWorkflow(id) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.delete(
+      `/definition/workflows/${id}/`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+async function newVersionWorkflow(id) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.post(
+      `/definition/workflows/${id}/new_version`,
+      {},
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
 
-export default { createWorkflow, editWorkflow };
+async function createProcessInWorkflow(id, data) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.post(
+      `/definition/workflows/${id}/add_process`,
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+async function deleteProcessInWorkflow(workflowId, processId) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.put(
+      `/definition/workflows/${workflowId}/remove_process/${processId}`,
+      {},
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+async function chooseProcessInWorkflow(workflowId, processId, data) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.put(
+      `/definition/workflows/${workflowId}/add_process/${processId}`,
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+async function createNewProcessVersion(workflowId, processId) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.post(
+      `/definition/workflows/${workflowId}/new_version/${processId}`,
+      {},
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default {
+  createWorkflow,
+  editWorkflow,
+  deleteWorkflow,
+  newVersionWorkflow,
+  createNewProcessVersion,
+  createProcessInWorkflow,
+  deleteProcessInWorkflow,
+  chooseProcessInWorkflow,
+};

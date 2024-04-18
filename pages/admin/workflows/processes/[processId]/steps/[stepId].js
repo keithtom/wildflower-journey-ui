@@ -4,6 +4,7 @@ import { mutate } from "swr";
 
 import { Controller, useForm } from "react-hook-form";
 import {
+  Alert,
   List,
   Card,
   CardContent,
@@ -27,11 +28,13 @@ import {
   Breadcrumbs,
   Link,
 } from "@mui/material";
-import { PageContainer, Grid, Typography } from "@ui";
+import { Edit } from "@mui/icons-material";
 
+import { PageContainer, Grid, Typography } from "@ui";
 import stepsApi from "@api/workflow/definition/steps";
 import useStep from "@hooks/workflow/definition/useStep";
 import useMilestone from "@hooks/workflow/definition/useMilestone";
+import useWorkflow from "@hooks/workflow/definition/useWorkflow";
 
 const StepId = ({}) => {
   const router = useRouter();
@@ -39,10 +42,15 @@ const StepId = ({}) => {
   const processId = router.query.processId;
   const stepId = router.query.stepId;
 
+  const { workflow, isLoading: workflowIsLoading } = useWorkflow(workflowId);
+
   useEffect(() => {
     const id = localStorage.getItem("workflowId");
     setWorkflowId(id);
   }, []);
+  useEffect(() => {
+    setIsDraftingNewVersion(workflow?.attributes.published === false);
+  }, [workflow]);
 
   //Fetch milestone data for breadcrumbs
   const { milestone, isLoading: milestoneIsLoading } = useMilestone(processId);
@@ -51,7 +59,7 @@ const StepId = ({}) => {
   const { step, isLoading, isError } = useStep(processId, stepId);
   // console.log({ step });
 
-  const isRollout = false;
+  const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(null);
 
   const [stepHasChanges, setStepHasChanges] = useState(false);
   const [originalData, setOriginalData] = useState(false);
@@ -232,6 +240,13 @@ const StepId = ({}) => {
     <PageContainer isAdmin>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6}>
+          {isDraftingNewVersion ? (
+            <Alert severity="warning" icon={<Edit fontSize="inherit" />}>
+              <Typography variant="bodyRegular">
+                Drafting new rollout
+              </Typography>
+            </Alert>
+          ) : null}
           <Breadcrumbs aria-label="breadcrumb">
             {workflowId ? (
               <Link
@@ -492,7 +507,7 @@ const StepId = ({}) => {
                       label="Is decision"
                       control={
                         <Switch
-                          disabled={!isRollout}
+                          disabled={!isDraftingNewVersion}
                           label="Kind"
                           checked={field.value === "decision"}
                           onChange={(e) =>
@@ -546,7 +561,7 @@ const StepId = ({}) => {
                                   variant="contained"
                                   size="small"
                                   onClick={() => handleOpenDecisionModal(null)}
-                                  disabled={!isRollout}
+                                  disabled={!isDraftingNewVersion}
                                 >
                                   Add decision option
                                 </Button>
@@ -619,7 +634,7 @@ const StepId = ({}) => {
         resource={viewingResource}
       />
       <DecisionOptionModal
-        isRollout={isRollout}
+        isDraftingNewVersion={isDraftingNewVersion}
         open={decisionModalOpen}
         onClose={() => setDecisionModalOpen(false)}
         handleUpdateDecisionOption={handleUpdateDecisionOption}
@@ -779,7 +794,7 @@ const DecisionOptionModal = ({
   handleAddDecisionOption,
   handleRemoveDecisionOption,
   handleUpdateDecisionOption,
-  isRollout,
+  isDraftingNewVersion,
 }) => {
   // console.log({ decisionOption });
   const isAdding = !decisionOption;
@@ -800,7 +815,7 @@ const DecisionOptionModal = ({
   }, [open]);
 
   const onSubmit = handleSubmit((data) => {
-    if (isRollout) {
+    if (isDraftingNewVersion) {
       if (isAdding) {
         // console.log("Is adding in rollout");
       } else {
@@ -820,12 +835,12 @@ const DecisionOptionModal = ({
           <DecisionForm control={control} errors={errors} />
         </DialogContent>
         <DialogActions>
-          {isRollout && !isAdding ? (
+          {isDraftingNewVersion && !isAdding ? (
             <Button onClick={handleRemoveDecisionOption}>Remove</Button>
           ) : null}
 
           <Button type="submit" disabled={!isDirty}>
-            {isRollout && isAdding ? "Add" : "Update"}
+            {isDraftingNewVersion && isAdding ? "Add" : "Update"}
           </Button>
         </DialogActions>
       </form>
