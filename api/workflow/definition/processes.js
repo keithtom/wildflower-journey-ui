@@ -25,7 +25,7 @@ export const showMilestones = {
 
 export const showMilestone = {
   key: (id) => `/definition/processes/${id}`,
-  fetcher: (id) => {
+  fetcher: (id, workflowId) => {
     const config = getAuthHeader();
     return workflowsApi
       .get(showMilestone.key(id), config)

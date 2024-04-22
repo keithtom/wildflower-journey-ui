@@ -39,6 +39,24 @@ export const showWorkflow = {
   },
 };
 
+// GET    /v1/workflow/definition/workflows/:workflow_id/processes/:id
+export const showProcessInWorkflow = {
+  key: (workflowId, processId) =>
+    `definition/workflows/${workflowId}/processes/${processId}`,
+  fetcher: (workflowId, processId) => {
+    const config = getAuthHeader();
+    return workflowsApi
+      .get(showProcessInWorkflow.key(workflowId, processId), config)
+      .then((response) => {
+        wildflowerApi.loadAllRelationshipsFromIncluded(response.data);
+        return response;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
+
 // const data = { workflow: {version, name, description }};
 // example: { workflow: { version: '1.0', name: 'Test Workflow', description: 'This is a test workflow' } }
 async function createWorkflow(data) {
@@ -122,6 +140,21 @@ async function deleteProcessInWorkflow(workflowId, processId) {
     wildflowerApi.handleErrors(error);
   }
 }
+
+async function reinstateProcessInWorkflow(processId) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.put(
+      `definition/selected_processes/${processId}/revert`,
+      {},
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
 async function chooseProcessInWorkflow(workflowId, processId, data) {
   const config = getAuthHeader();
   try {
@@ -149,6 +182,19 @@ async function createNewProcessVersion(workflowId, processId) {
     wildflowerApi.handleErrors(error);
   }
 }
+// delete "/v1/workflow/definition/dependencies/#{dependency.id}"
+async function deleteDependency(dependencyId) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.delete(
+      `/definition/dependencies/${dependencyId}`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
 
 export default {
   createWorkflow,
@@ -158,5 +204,7 @@ export default {
   createNewProcessVersion,
   createProcessInWorkflow,
   deleteProcessInWorkflow,
+  reinstateProcessInWorkflow,
   chooseProcessInWorkflow,
+  deleteDependency,
 };

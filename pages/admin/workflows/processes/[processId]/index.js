@@ -43,8 +43,9 @@ import DraggableList from "@components/admin/DraggableList";
 
 import processes from "@api/workflow/definition/processes";
 import stepsApi from "@api/workflow/definition/steps";
+import processApi from "@api/workflow/definition/processes";
 import workflowApi from "@api/workflow/definition/workflows";
-import useMilestone from "@hooks/workflow/definition/useMilestone";
+import useProcessInWorkflow from "@hooks/workflow/definition/useProcessInWorkflow";
 import useMilestones from "@hooks/workflow/definition/useMilestones";
 import useWorkflow from "@hooks/workflow/definition/useWorkflow";
 
@@ -64,16 +65,29 @@ const ProcessId = ({}) => {
     useState(false);
 
   const { workflow, isLoading: workflowIsLoading } = useWorkflow(workflowId);
-  console.log({ workflow });
-  const { milestone, isLoading, isError } = useMilestone(processId);
-  console.log(milestone);
+  // console.log({ workflow });
+
+  const { processInWorkflow: milestone, isLoading } = useProcessInWorkflow(
+    workflowId,
+    processId
+  );
+  // console.log({ milestone });
+  // console.log({ processId });
+
+  // const { milestone, isLoading, isError } = useMilestone(processId);
+  // console.log(milestone);
+
   useEffect(() => {
     const id = localStorage.getItem("workflowId");
     setWorkflowId(id);
   }, []);
   useEffect(() => {
     setIsDraftingNewVersion(workflow?.attributes.published === false);
-  }, [workflow]);
+    setIsEditingProcess(
+      milestone?.relationships.selectedProcesses.data[0].attributes.state ===
+        "upgraded"
+    );
+  }, [workflow, milestone]);
 
   const {
     control,
@@ -113,7 +127,7 @@ const ProcessId = ({}) => {
     try {
       const response = await processes.editMilestone(milestone.id, updatedData);
       setProcessHasChanges(false);
-      mutate(`/definition/processes/${milestone.id}`);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
       // console.log(response);
     } catch (error) {
       console.error(error);
@@ -142,7 +156,7 @@ const ProcessId = ({}) => {
 
     try {
       const response = await stepsApi.editStep(processId, stepId, data);
-      mutate(`/definition/processes/${processId}`);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
       setRepositionedSnackbarOpen(true);
     } catch (error) {
       console.error("There was an error!", error);
@@ -151,10 +165,10 @@ const ProcessId = ({}) => {
 
   const handleRemoveStep = async (stepId) => {
     // console.log("Remove step", id);
+    setShowRemoveStepCheck(false);
     try {
       const response = await stepsApi.deleteStep(processId, stepId);
-
-      mutate(`/definition/processes/${processId}`);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
     } catch (error) {
       console.log(error);
     }
@@ -173,7 +187,7 @@ const ProcessId = ({}) => {
 
     try {
       const response = await stepsApi.createStep(processId, structuredData);
-      mutate(`/definition/processes/${processId}`);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
     } catch (error) {
       console.log(error);
     }
@@ -182,41 +196,63 @@ const ProcessId = ({}) => {
   const onSubmit = handleSubmit(handleUpdateProcess);
 
   const handleEditProcessInRollout = async () => {
-    // try {
-    //   const response = await workflowApi.createNewProcessVersion(
-    //     workflowId,
-    //     processId
-    //   );
-    //   console.log({ response });
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      const response = await workflowApi.createNewProcessVersion(
+        workflowId,
+        processId
+      );
+      console.log({ response });
+      router.push(`/admin/workflows/processes/${response.data.data.id}`);
+    } catch (error) {
+      console.log(error);
+    }
     setIsEditingProcess(true);
   };
 
-  const handleRevertAllEdits = () => {
+  const handleRevertAllEdits = async (selectedProcessId) => {
+    try {
+      const response = await workflowApi.reinstateProcessInWorkflow(
+        selectedProcessId
+      );
+      console.log({ response });
+      router.push(
+        `/admin/workflows/processes/${response.data.data.attributes.processId}`
+      );
+    } catch (error) {
+      console.log(error);
+    }
     setIsEditingProcess(false);
   };
 
-  const handleAddPrerequisite = (processId) => {
-    console.log("Add prerequisite");
+  const handleAddPrerequisite = async (processId) => {
     const structuredData = {
       process: {
         workable_dependencies_attributes: [
           {
-            id: processId,
-            workflow_id:
-              milestone?.relationships?.selected_processes?.data[0].attributes
-                .workflowId,
+            id: processId, // TODO: clarify that this is the process to add as a prerequisite
+            workflow_id: workflowId,
             prerequisite_workable_type: "Workflow::Definition::Process",
-            //TODO: what is this
-            prerequisite_workable_id: 6,
+            prerequisite_workable_id: "process",
           },
         ],
       },
     };
     try {
-      const response = processApi.editMilestone(processId, structuredData);
+      const response = await processApi.editMilestone(
+        processId,
+        structuredData
+      );
+      // mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeleteDependency = async (dependencyId) => {
+    console.log("Delete dependency", dependencyId);
+    try {
+      const response = await workflowApi.deleteDependency(dependencyId);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
     } catch (error) {
       console.log(error);
     }
@@ -291,18 +327,33 @@ const ProcessId = ({}) => {
                     Update
                   </Button>
                 </Stack>
-              ) : isDraftingNewVersion && !isEditingProcess ? (
-                <Button
-                  variant="contained"
-                  onClick={handleEditProcessInRollout}
-                >
-                  Edit this process
-                </Button>
+              ) : isDraftingNewVersion ? (
+                !isEditingProcess ? (
+                  <Button
+                    variant="contained"
+                    onClick={handleEditProcessInRollout}
+                  >
+                    Edit this process
+                  </Button>
+                ) : (
+                  <Stack direction="row" spacing={3}>
+                    <Button
+                      variant="contained"
+                      onClick={() =>
+                        handleRevertAllEdits(
+                          milestone.relationships.selectedProcesses.data[0].id
+                        )
+                      }
+                    >
+                      Revert all edits
+                    </Button>
+                    <Button variant="contained" disabled>
+                      Update
+                    </Button>
+                  </Stack>
+                )
               ) : (
                 <Stack direction="row" spacing={3}>
-                  <Button variant="contained" onClick={handleRevertAllEdits}>
-                    Revert all edits
-                  </Button>
                   <Button variant="contained" disabled>
                     Update
                   </Button>
@@ -325,7 +376,7 @@ const ProcessId = ({}) => {
               }}
               render={({ field }) => (
                 <TextField
-                  disabled={!isEditingProcess}
+                  disabled={isDraftingNewVersion && !isEditingProcess}
                   label="Title"
                   placeholder="e.g. Complete The Visioning Advice Process"
                   error={errors.title}
@@ -340,7 +391,7 @@ const ProcessId = ({}) => {
               defaultValue=""
               render={({ field }) => (
                 <TextField
-                  disabled={!isEditingProcess}
+                  disabled={isDraftingNewVersion && !isEditingProcess}
                   multiline
                   label="Description"
                   placeholder="The description of this process"
@@ -363,7 +414,7 @@ const ProcessId = ({}) => {
                 }}
                 render={({ field }) => (
                   <Select
-                    disabled={!isEditingProcess}
+                    disabled={isDraftingNewVersion && !isEditingProcess}
                     {...field}
                     labelId="categories-label"
                     id="categories"
@@ -384,35 +435,6 @@ const ProcessId = ({}) => {
                 )}
               />
             </FormControl>
-
-            {/* <FormControl fullWidth>
-              <InputLabel id="prerequisite-label">Prerequisite</InputLabel>
-              <Controller
-                name="prerequisite"
-                control={control}
-                defaultValue={[]}
-                rules={{
-                  required: {
-                    value: false,
-                  },
-                }}
-                render={({ field }) => (
-                  <Select
-                    disabled={!isEditingProcess || !isDraftingNewVersion}
-                    {...field}
-                    labelId="prerequisite-label"
-                    id="prerequisite"
-                    input={<OutlinedInput label="Prerequisite" />}
-                  >
-                    {prerequisites.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        <ListItemText primary={option.label} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl> */}
 
             <FormControl fullWidth>
               <InputLabel id="phase-label">Phase</InputLabel>
@@ -490,14 +512,23 @@ const ProcessId = ({}) => {
                         <Button
                           variant="text"
                           color="error"
-                          // onClick={}
+                          disabled={!isEditingProcess}
+                          onClick={() =>
+                            handleDeleteDependency(
+                              milestone?.relationships.workableDependencies.data.find(
+                                (d) =>
+                                  d.attributes.prerequisiteWorkableId.toString() ===
+                                  p.id
+                              ).id
+                            )
+                          }
                         >
                           Remove
                         </Button>
                       }
                     >
                       <ListItemButton disabled>
-                        <ListItemText>{p.title}</ListItemText>
+                        <ListItemText>{p.attributes.title}</ListItemText>
                       </ListItemButton>
                     </ListItem>
                   ))}
@@ -513,7 +544,23 @@ const ProcessId = ({}) => {
                   id="nested-list-subheader"
                   sx={{ background: "#eaeaea" }}
                 >
-                  Steps
+                  <Grid container justifyContent="space-between">
+                    <Grid item>Steps</Grid>
+                    {isLoading ? (
+                      <Skeleton variant="text" width={120} />
+                    ) : milestone.relationships.steps.data.length ? null : (
+                      <Grid item>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          disabled={!isEditingProcess}
+                          onClick={() => handleStageAddStep(1000)}
+                        >
+                          Add step
+                        </Button>
+                      </Grid>
+                    )}
+                  </Grid>
                 </ListSubheader>
               }
             >
@@ -543,9 +590,10 @@ const ProcessId = ({}) => {
                   getPosition={(item) => item.attributes.position}
                   renderItem={(step, i) => (
                     <StepListItem
-                      key={i}
+                      key={step.id}
                       step={step}
-                      isEditable={isDraftingNewVersion && isEditingProcess}
+                      isEditingProcess={isEditingProcess}
+                      isDraftingNewVersion={isDraftingNewVersion}
                       prevStepPosition={
                         i > 0 &&
                         milestone.relationships.steps.data[i - 1].attributes
@@ -565,6 +613,8 @@ const ProcessId = ({}) => {
         open={showAddPrerequisiteModal}
         onClose={() => setShowAddPrerequisiteModal(false)}
         handleAddPrerequisite={handleAddPrerequisite}
+        workflow={workflow}
+        milestone={milestone}
       />
       <AddStepModal
         open={addStepModalOpen}
@@ -585,13 +635,23 @@ const ProcessId = ({}) => {
 
 export default ProcessId;
 
-const AddPrerequisiteModal = ({ open, onClose, handleAddPrerequisite }) => {
+const AddPrerequisiteModal = ({
+  open,
+  onClose,
+  handleAddPrerequisite,
+  workflow,
+  milestone,
+}) => {
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Add Prerequisite</DialogTitle>
       <DialogContent>
         <Card noPadding variant="outlined">
-          <ChoosePrerequisiteList handleChooseProcess={handleAddPrerequisite} />
+          <ChoosePrerequisiteList
+            handleAddPrerequisite={handleAddPrerequisite}
+            workflow={workflow}
+            milestone={milestone}
+          />
         </Card>
         {/* list of processes */}
       </DialogContent>
@@ -618,7 +678,7 @@ const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
   }, [open]);
 
   const onSubmit = handleSubmit((data) => {
-    console.log({ data });
+    // console.log({ data });
     handleCreateStep(data);
     reset();
     onClose();
@@ -648,7 +708,8 @@ const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
 };
 
 const StepListItem = ({
-  isEditable,
+  isEditingProcess,
+  isDraftingNewVersion,
   handleRemoveStep,
   handleStageAddStep,
   prevStepPosition,
@@ -662,7 +723,7 @@ const StepListItem = ({
 
   const position = (step.attributes.position + prevStepPosition) / 2;
 
-  console.log({ step });
+  // console.log({ step });
 
   const { listeners, attributes, isDragging } = useSortable({ id: step.id });
 
@@ -680,7 +741,7 @@ const StepListItem = ({
       disablePadding
       divider
       secondaryAction={
-        !isEditable ? null : (
+        !isEditingProcess ? null : (
           <Button
             variant="text"
             color="error"
@@ -693,15 +754,15 @@ const StepListItem = ({
       sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
-        disabled={!isEditable}
+        disabled={isDraftingNewVersion && !isEditingProcess}
         id={`inline-action-tile-${step.id}`}
-        showAdd={isEditable}
+        showAdd={isDraftingNewVersion && isEditingProcess}
         status="default"
         add={() => handleStageAddStep(position, step.id)}
         dragHandle={<PositionGrabber {...listeners} {...attributes} />}
       />
       <ListItemButton
-        disabled={!isEditable}
+        disabled={isDraftingNewVersion && !isEditingProcess}
         onClick={() =>
           router.push(
             `/admin/workflows/processes/${processId}/steps/${step.id}`
@@ -738,7 +799,7 @@ const StepListItem = ({
       >
         <DialogTitle>
           {showRemoveStepCheck
-            ? `Remove ${showRemoveStepCheck?.attributes.title}`
+            ? `Remove "${showRemoveStepCheck?.attributes.title}"`
             : null}
         </DialogTitle>
         <DialogContent>
@@ -934,14 +995,30 @@ const StepFields = ({ control, errors }) => {
   );
 };
 
-const ChoosePrerequisiteList = ({ handleAddPrerequisite }) => {
-  // TODO: show only milestones which occur before the current milestone
-  const { milestonesByPhase, isLoadingMilestonesByPhase } = useMilestones();
-  // console.log({ milestonesByPhase });
+const ChoosePrerequisiteList = ({
+  handleAddPrerequisite,
+  workflow,
+  milestone,
+}) => {
+  //  TODO: get the workflow, show processes from that workflow, and then filter out processes greater than the current processes position
+
+  // console.log({ workflow });
+
+  const milestonePosition =
+    milestone.relationships.selectedProcesses.data[0].attributes.position;
+
+  const filteredProcesses = workflow.relationships.processes.data.filter(
+    (process) =>
+      process.relationships.selectedProcesses.data[0].attributes.position >
+        milestonePosition &&
+      process.attributes.phase === milestone.attributes.phase
+  );
+
+  // console.log({ filteredProcesses });
 
   return (
     <List>
-      {isLoadingMilestonesByPhase
+      {!filteredProcesses
         ? Array.from({ length: 12 }).map((_, index) => (
             <ListItem key={index} divider>
               <ListItemText>
@@ -949,28 +1026,24 @@ const ChoosePrerequisiteList = ({ handleAddPrerequisite }) => {
               </ListItemText>
             </ListItem>
           ))
-        : milestonesByPhase?.map((m) =>
-            m.milestones.map((process, i) => (
-              <ListItem disablePadding divider key={i}>
-                <ListItemButton
-                  onClick={() => handleAddPrerequisite(process.id)}
-                >
-                  <Stack direction="row" spacing={3} alignItems="center">
-                    <ListItemText>
-                      <Typography noWrap>{process.attributes.title}</Typography>
-                    </ListItemText>
-                    <Chip
-                      label={`${process.relationships.steps.data.length} steps`}
-                      size="small"
-                    />
-                    {process.attributes.categories.map((c, i) => (
-                      <Chip label={c} size="small" key={i} />
-                    ))}
-                  </Stack>
-                </ListItemButton>
-              </ListItem>
-            ))
-          )}
+        : filteredProcesses?.map((process, i) => (
+            <ListItem disablePadding divider key={i}>
+              <ListItemButton onClick={() => handleAddPrerequisite(process.id)}>
+                <Stack direction="row" spacing={3} alignItems="center">
+                  <ListItemText>
+                    <Typography noWrap>{process.attributes.title}</Typography>
+                  </ListItemText>
+                  <Chip
+                    label={`${process.attributes.numOfSteps} steps`}
+                    size="small"
+                  />
+                  {process.attributes.categories.map((c, i) => (
+                    <Chip label={c} size="small" key={i} />
+                  ))}
+                </Stack>
+              </ListItemButton>
+            </ListItem>
+          ))}
     </List>
   );
 };

@@ -75,6 +75,7 @@ const StepId = ({}) => {
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
   const [decisionOption, setDecisionOption] = useState(null);
   const [decisionOptionParams, setDecisionOptionParams] = useState([]);
+  console.log({ decisionOptionParams });
 
   const {
     control,
@@ -218,20 +219,24 @@ const StepId = ({}) => {
     setDecisionModalOpen(true);
   };
   const handleUpdateDecisionOption = (data) => {
-    // console.log("Update decision option", data);
-    const preparedDataForApi = {
+    const structuredData = {
       id: data?.decision_id || "",
       description: data?.decision_option || "",
     };
-    setDecisionOptionParams([...decisionOptionParams, preparedDataForApi]);
-    // console.log({ decisionOptionParams });
+    setDecisionOptionParams([...decisionOptionParams, structuredData]);
     setStepHasChanges(true);
+    color = "error";
   };
-  const handleRemoveDecisionOption = () => {
+  const handleRemoveDecisionOption = (optionId) => {
     // console.log("Remove decision option");
   };
-  const handleAddDecisionOption = () => {
-    // console.log("Add decision option");
+  const handleAddDecisionOption = (data) => {
+    const structuredData = {
+      id: data?.decision_id || "",
+      description: data?.decision_option || "",
+    };
+    setDecisionOptionParams([...decisionOptionParams, structuredData]);
+    setStepHasChanges(true);
   };
 
   const onSubmit = handleSubmit(handleUpdateStep);
@@ -570,6 +575,39 @@ const StepId = ({}) => {
                           </ListSubheader>
                         }
                       >
+                        {decisionOptionParams
+                          ? decisionOptionParams
+                              .filter((d) => !d.id)
+                              .map((d, i) => (
+                                <ListItem disablePadding divider key={i}>
+                                  <ListItemButton>
+                                    <Stack
+                                      direction="row"
+                                      spacing={3}
+                                      alignItems="center"
+                                    >
+                                      <ListItemText>
+                                        <Typography
+                                          variant="bodyRegular"
+                                          lightened
+                                        >
+                                          {d.description}
+                                        </Typography>
+                                      </ListItemText>
+                                      {decisionOptionParams.some(
+                                        (param) => param.id === d.id
+                                      ) ? (
+                                        <Chip
+                                          label="Added"
+                                          size="small"
+                                          variant="outlined"
+                                        />
+                                      ) : null}
+                                    </Stack>
+                                  </ListItemButton>
+                                </ListItem>
+                              ))
+                          : null}
                         {isLoading
                           ? Array.from({ length: 3 }).map((_, index) => (
                               <ListItem key={index} divider>
@@ -580,7 +618,23 @@ const StepId = ({}) => {
                             ))
                           : step.relationships.decisionOptions.data.map(
                               (decisionOption, i) => (
-                                <ListItem disablePadding divider key={i}>
+                                <ListItem
+                                  disablePadding
+                                  divider
+                                  key={i}
+                                  secondaryAction={
+                                    <Button
+                                      color="error"
+                                      onClick={() =>
+                                        handleRemoveDecisionOption(
+                                          decisionOption.id
+                                        )
+                                      }
+                                    >
+                                      Remove
+                                    </Button>
+                                  }
+                                >
                                   <ListItemButton
                                     onClick={() =>
                                       handleOpenDecisionModal(decisionOption)
@@ -798,6 +852,8 @@ const DecisionOptionModal = ({
 }) => {
   // console.log({ decisionOption });
   const isAdding = !decisionOption;
+  // console.log({ isAdding });
+  // console.log({ isDraftingNewVersion });
 
   const {
     control,
@@ -815,13 +871,15 @@ const DecisionOptionModal = ({
   }, [open]);
 
   const onSubmit = handleSubmit((data) => {
+    console.log({ data });
     if (isDraftingNewVersion) {
       if (isAdding) {
-        // console.log("Is adding in rollout");
+        handleAddDecisionOption(data);
       } else {
-        // console.log("Is updating in rollout");
+        handleUpdateDecisionOption(data);
       }
     } else {
+      console.log({ data });
       handleUpdateDecisionOption(data);
     }
     onClose();
@@ -835,10 +893,6 @@ const DecisionOptionModal = ({
           <DecisionForm control={control} errors={errors} />
         </DialogContent>
         <DialogActions>
-          {isDraftingNewVersion && !isAdding ? (
-            <Button onClick={handleRemoveDecisionOption}>Remove</Button>
-          ) : null}
-
           <Button type="submit" disabled={!isDirty}>
             {isDraftingNewVersion && isAdding ? "Add" : "Update"}
           </Button>

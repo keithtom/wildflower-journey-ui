@@ -72,7 +72,11 @@ const Workflows = ({}) => {
                             {/* TODO: Retrieve isSensibleDefault from API */}
                             {/* <Chip label="Sensible default" size="small" /> */}
                             <Chip
-                              label={workflow.attributes.version}
+                              label={
+                                workflow.attributes.published
+                                  ? workflow.attributes.version
+                                  : `Drafting ${workflow.attributes.version}`
+                              }
                               size="small"
                               variant="outlined"
                             />

@@ -179,11 +179,21 @@ const Workflow = ({}) => {
         workflowId,
         processId
       );
+      console.log({ response });
       mutate(`/definition/workflows/${workflowId}`);
     } catch (error) {
       console.log(error);
     }
     // console.log("Remove process", id);
+  };
+  const handleReinstateProcess = (processId) => {
+    // console.log("Reinstate process", processId);
+    try {
+      const response = workflowApi.reinstateProcessInWorkflow(processId);
+      mutate(`/definition/workflows/${workflowId}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleRepositionProcess = async (
@@ -394,7 +404,7 @@ const Workflow = ({}) => {
                         }
                         renderItem={(process, i) => (
                           <ProcessListItem
-                            key={i}
+                            key={process.id}
                             process={process}
                             prevProcessPosition={
                               phaseIndex > 0 &&
@@ -404,6 +414,7 @@ const Workflow = ({}) => {
                             isDraftingNewVersion={isDraftingNewVersion}
                             handleStageAddProcess={handleStageAddProcess}
                             handleRemoveProcess={handleRemoveProcess}
+                            handleReinstateProcess={handleReinstateProcess}
                           />
                         )}
                       />
@@ -551,6 +562,7 @@ const ProcessListItem = ({
   isDraftingNewVersion,
   handleStageAddProcess,
   handleRemoveProcess,
+  handleReinstateProcess,
   prevProcessPosition,
   process,
 }) => {
@@ -589,7 +601,16 @@ const ProcessListItem = ({
         !isDraftingNewVersion ? null : (
           <Stack direction="row" spacing={1}>
             {isRemoved ? (
-              <Button variant="text">Reinstate</Button>
+              <Button
+                variant="text"
+                onClick={() =>
+                  handleReinstateProcess(
+                    process.relationships.selectedProcess.data[0].id
+                  )
+                }
+              >
+                Reinstate
+              </Button>
             ) : (
               <Button
                 variant="text"
