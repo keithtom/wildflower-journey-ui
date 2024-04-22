@@ -370,7 +370,7 @@ const Workflow = ({}) => {
           : groupedProcesses.map((phase, phaseIndex) => (
               <Grid container key={phaseIndex}>
                 <Grid item xs={12}>
-                  <Card noPadding>
+                  <Card noPadding sx={{ overflow: "visible" }}>
                     <List
                       subheader={
                         <ListSubheader
@@ -378,7 +378,8 @@ const Workflow = ({}) => {
                           id="nested-list-subheader"
                           sx={{ background: "#eaeaea" }}
                         >
-                          {phase.phase}
+                          {phase.phase.charAt(0).toUpperCase() +
+                            phase.phase.slice(1)}
                         </ListSubheader>
                       }
                     >
@@ -411,6 +412,7 @@ const Workflow = ({}) => {
                               phase.milestones[phaseIndex - 1].relationships
                                 .selectedProcesses.data[0].attributes.position
                             }
+                            isLast={i === phase.milestones.length - 1}
                             isDraftingNewVersion={isDraftingNewVersion}
                             handleStageAddProcess={handleStageAddProcess}
                             handleRemoveProcess={handleRemoveProcess}
@@ -565,16 +567,20 @@ const ProcessListItem = ({
   handleReinstateProcess,
   prevProcessPosition,
   process,
+  isLast,
 }) => {
   // console.log({ prevProcessPosition });
 
   // console.log({ process });
   const router = useRouter();
 
+  const status =
+    process.relationships.selectedProcesses?.data[0].attributes.state;
   const selectedProcesses = process.relationships.selectedProcesses?.data;
 
-  const processPosition =
-    (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
+  const processPosition = isLast
+    ? selectedProcesses[0].attributes.position + 1000
+    : (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
   // console.log({ processPosition });
 
   const isRemoved = selectedProcesses.some(
@@ -605,7 +611,7 @@ const ProcessListItem = ({
                 variant="text"
                 onClick={() =>
                   handleReinstateProcess(
-                    process.relationships.selectedProcess.data[0].id
+                    process.relationships.selectedProcesses.data[0].id
                   )
                 }
               >
@@ -626,10 +632,11 @@ const ProcessListItem = ({
       sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
+        isLast={isLast}
         disabled={isRemoved}
         id={`inline-action-tile-${process.id}`}
         showAdd={isRemoved ? null : isDraftingNewVersion}
-        status="default"
+        status={status}
         add={() =>
           handleStageAddProcess(processPosition, process.attributes.phase)
         }

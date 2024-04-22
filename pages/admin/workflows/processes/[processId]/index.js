@@ -536,7 +536,7 @@ const ProcessId = ({}) => {
           </Card>
 
           {/* STEPS */}
-          <Card noPadding>
+          <Card noPadding sx={{ overflow: "visible" }}>
             <List
               subheader={
                 <ListSubheader
@@ -598,6 +598,9 @@ const ProcessId = ({}) => {
                         i > 0 &&
                         milestone.relationships.steps.data[i - 1].attributes
                           .position
+                      }
+                      isLast={
+                        i === milestone.relationships.steps.data.length - 1
                       }
                       handleRemoveStep={handleRemoveStep}
                       handleStageAddStep={handleStageAddStep}
@@ -714,6 +717,7 @@ const StepListItem = ({
   handleStageAddStep,
   prevStepPosition,
   step,
+  isLast,
 }) => {
   const [showRemoveStepCheck, setShowRemoveStepCheck] = useState(null);
   const [deleteStepCheck, setDeleteStepCheck] = useState("");
@@ -721,7 +725,9 @@ const StepListItem = ({
   const router = useRouter();
   const processId = router.query.processId;
 
-  const position = (step.attributes.position + prevStepPosition) / 2;
+  const position = isLast
+    ? step.attributes.position + 1000
+    : (step.attributes.position + prevStepPosition) / 2;
 
   // console.log({ step });
 
@@ -754,6 +760,7 @@ const StepListItem = ({
       sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
+        isLast={isLast}
         disabled={isDraftingNewVersion && !isEditingProcess}
         id={`inline-action-tile-${step.id}`}
         showAdd={isDraftingNewVersion && isEditingProcess}
