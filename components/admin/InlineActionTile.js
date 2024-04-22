@@ -20,10 +20,9 @@ const InlineActionTile = ({
       sx={{
         width: "48px",
         borderRight: "1px solid #eaeaea",
-        height: "48px",
+        height: "44px",
         cursor: isHovering ? "pointer" : "default",
         pointerEvents: disabled ? "none" : "auto",
-        opacity: disabled ? 0.75 : 1,
       }}
       alignItems="center"
       justifyContent="center"
@@ -44,7 +43,6 @@ const InlineActionTile = ({
 export default InlineActionTile;
 
 const StatusLight = ({ status }) => {
-  console.log({ status });
   return (
     <Stack
       sx={{
@@ -77,7 +75,7 @@ const AddChip = ({ onClick, isLast }) => {
         position: "absolute",
         top: isLast ? null : "-12px",
         bottom: isLast ? "-12px" : null,
-        zIndex: 2,
+        zIndex: 1,
         cursor: "pointer",
         "&:hover": {
           backgroundColor: "#eaeaea",

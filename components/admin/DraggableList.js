@@ -42,9 +42,9 @@ const DraggableList = ({
   const [activeId, setActiveId] = useState(null);
   const [theItems, setTheItems] = useState(items ? items : []);
 
-  console.log({ activeId });
-  console.log({ theItems });
-  console.log({ items });
+  // console.log({ activeId });
+  // console.log({ theItems });
+  // console.log({ items });
 
   useEffect(() => {
     setTheItems(items);

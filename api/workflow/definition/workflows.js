@@ -182,12 +182,26 @@ async function createNewProcessVersion(workflowId, processId) {
     wildflowerApi.handleErrors(error);
   }
 }
-// delete "/v1/workflow/definition/dependencies/#{dependency.id}"
+
 async function deleteDependency(dependencyId) {
   const config = getAuthHeader();
   try {
     const response = await workflowsApi.delete(
       `/definition/dependencies/${dependencyId}`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+// PUT /v1/workflow/definition/workflows/#{workflow_id}/publish
+async function publishWorkflow(workflowId) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.put(
+      `/definition/workflows/${workflowId}/publish`,
+      {},
       config
     );
     return response;
@@ -207,4 +221,5 @@ export default {
   reinstateProcessInWorkflow,
   chooseProcessInWorkflow,
   deleteDependency,
+  publishWorkflow,
 };

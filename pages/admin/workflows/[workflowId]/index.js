@@ -52,24 +52,10 @@ const Workflow = ({}) => {
   const [repositionedSnackbarOpen, setRepositionedSnackbarOpen] =
     useState(false);
   const [groupedProcesses, setGroupedProcesses] = useState([]);
-  console.log({ groupedProcesses });
+  // console.log({ groupedProcesses });
   const [stagedProcessPosition, setStagedProcessPosition] = useState(null);
-  console.log({ stagedProcessPosition });
+  // console.log({ stagedProcessPosition });
   const [phaseAddedInto, setPhaseAddedInto] = useState(null);
-
-  const checkForChanges = () => {
-    if (
-      !workflow ||
-      !workflow.relationships ||
-      !workflow.relationships.process
-    ) {
-      return false;
-    }
-
-    return workflow.relationships.process.some(
-      (process) => process.state !== "replicated"
-    );
-  };
 
   useEffect(() => {
     if (workflowId) {
@@ -88,8 +74,8 @@ const Workflow = ({}) => {
       workflow?.relationships.processes.data.some((process) => {
         return process.relationships.selectedProcesses.data.some(
           (selectedProcess) =>
-            selectedProcess.id === process.id &&
-            selectedProcess.state !== "replicated"
+            selectedProcess.attributes.processId.toString() === process.id &&
+            selectedProcess.attributes.state !== "replicated"
         );
       })
     );
@@ -141,7 +127,7 @@ const Workflow = ({}) => {
     }
   };
   const handleSubmitNewVersion = () => {
-    // console.log("Submit new version");
+    router.push(`/admin/workflows/${workflowId}/submit-version`);
   };
   const handleStageAddProcess = (position, phase) => {
     setAddProcessModalOpen(true);
@@ -160,7 +146,7 @@ const Workflow = ({}) => {
         ],
       },
     };
-    console.log({ structuredData });
+    // console.log({ structuredData });
     try {
       const response = await workflowApi.createProcessInWorkflow(
         workflowId,
@@ -653,7 +639,7 @@ const ProcessListItem = ({
           sx={isRemoved ? { opacity: 0.2 } : null}
         >
           <ListItemText>
-            <Typography struck={isRemoved}>
+            <Typography struck={isRemoved} variant="bodyRegular">
               {process.attributes.title}
             </Typography>
           </ListItemText>

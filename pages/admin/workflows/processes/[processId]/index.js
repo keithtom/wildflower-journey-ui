@@ -777,7 +777,11 @@ const StepListItem = ({
         }
       >
         <Stack direction="row" spacing={3} alignItems="center">
-          <ListItemText>{step.attributes.title}</ListItemText>
+          <ListItemText>
+            <Typography variant="bodyRegular">
+              {step.attributes.title}
+            </Typography>
+          </ListItemText>
           <Chip label={step.attributes.maxWorktime} size="small" />
           <Chip
             label={
