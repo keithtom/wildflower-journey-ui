@@ -61,7 +61,9 @@ const PhasePage = () => {
                 ? planningHero
                 : phase === "visioning"
                 ? visioningHero
-                : phase === "startup" && startupHero
+                : phase === "startup"
+                ? startupHero
+                : undefined
             }
           />
           <Typography variant="h2" bold capitalize id={`${phase}-header`}>
