@@ -33,6 +33,10 @@ const CustomDrawer = styled(Drawer)`
     margin-top: 0;
     width: ${({ theme }) => theme.util.infoDrawerWidth}px;
     height: ${({ theme }) => `100vh - ${theme.util.appBarHeight}px`};
+
+    @media (max-width: 600px) {
+      width: 95vw;
+    }
   }
 `;
 
@@ -89,7 +93,7 @@ const InfoDrawer = ({
             <Typography variant="bodyLarge" bold struck={isComplete}>
               {title}
             </Typography>
-            <Stack direction="row" spacing={4}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={4}>
               {taskId &&
                 (assignees.length ? (
                   <Stack spacing={2}>
@@ -146,7 +150,9 @@ const InfoDrawer = ({
                   <Typography variant="bodyMini" lightened bold>
                     WORKTIME
                   </Typography>
-                  <WorktimeChip size="small" worktime={worktime} withIcon />
+                  <Stack direction="row">
+                    <WorktimeChip size="small" worktime={worktime} withIcon />
+                  </Stack>
                 </Stack>
               ) : null}
             </Stack>
