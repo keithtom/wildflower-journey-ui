@@ -37,6 +37,7 @@ import {
   Switch,
 } from "@mui/material";
 import ssj_categories from "@lib/ssj/categories";
+import CategoryChip from "@components/CategoryChip";
 import { DragHandle, Edit, Warning } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
@@ -59,6 +60,8 @@ const ProcessId = ({}) => {
   const [processHasChanges, setProcessHasChanges] = useState(false);
   const [originalData, setOriginalData] = useState(false);
   const [repositionedSnackbarOpen, setRepositionedSnackbarOpen] =
+    useState(false);
+  const [updatedProcessSnackbarOpen, setUpdatedProcessSnackbarOpen] =
     useState(false);
   const [addStepModalOpen, setAddStepModalOpen] = useState(false);
   const [addStepPosition, setAddStepPosition] = useState(null);
@@ -128,6 +131,7 @@ const ProcessId = ({}) => {
     try {
       const response = await processes.editMilestone(milestone.id, updatedData);
       setProcessHasChanges(false);
+      setUpdatedProcessSnackbarOpen(true);
       mutate(`definition/workflows/${workflowId}/processes/${processId}`);
       // console.log(response);
     } catch (error) {
@@ -633,6 +637,13 @@ const ProcessId = ({}) => {
         onClose={() => setRepositionedSnackbarOpen(false)}
         message="Step repositioned and saved."
       />
+      <Snackbar
+        autoHideDuration={1000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={updatedProcessSnackbarOpen}
+        onClose={() => setUpdatedProcessSnackbarOpen(false)}
+        message="Process updated."
+      />
     </PageContainer>
   );
 };
@@ -1036,7 +1047,7 @@ const ChoosePrerequisiteList = ({
                     size="small"
                   />
                   {process.attributes.categories.map((c, i) => (
-                    <Chip label={c} size="small" key={i} />
+                    <CategoryChip category={c} key={i} size="small" />
                   ))}
                 </Stack>
               </ListItemButton>

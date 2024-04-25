@@ -4,6 +4,7 @@ import { mutate } from "swr";
 
 import { Controller, useForm } from "react-hook-form";
 import {
+  Snackbar,
   Alert,
   List,
   Card,
@@ -65,6 +66,7 @@ const StepId = ({}) => {
   const [originalData, setOriginalData] = useState(false);
 
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
+  const [updatedStepSnackbarOpen, setUpdatedStepSnackbarOpen] = useState(false);
   const [viewingResource, setViewingResource] = useState(null);
 
   const [resourceParams, setResourceParams] = useState([]);
@@ -160,6 +162,7 @@ const StepId = ({}) => {
       try {
         const response = await stepsApi.editStep(processId, step.id, allData);
         setStepHasChanges(false);
+        setUpdatedStepSnackbarOpen(true);
         setResourceParams([]);
         setDecisionOptionParams([]);
         mutate(`/definition/processes/${processId}/steps/${step.id}`);
@@ -174,6 +177,7 @@ const StepId = ({}) => {
         resourcesToDelete.forEach(async (resource) => {
           console.log("deleting resource", resource);
           const response = await stepsApi.deleteDocument(resource);
+          setUpdatedStepSnackbarOpen(true);
           mutate(`/v1/documents/${resource}`);
           mutate(`/definition/processes/${processId}/steps/${step.id}`);
           setResourcesToDelete([]);
@@ -696,6 +700,13 @@ const StepId = ({}) => {
         handleAddDecisionOption={handleAddDecisionOption}
         decisionOption={decisionOption}
       />
+      <Snackbar
+        autoHideDuration={1000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={updatedStepSnackbarOpen}
+        onClose={() => setUpdatedStepSnackbarOpen(false)}
+        message="Step updated."
+      />
     </PageContainer>
   );
 };
@@ -803,11 +814,15 @@ const ResourceForm = ({ control, errors }) => {
             value: true,
             message: "This field is required",
           },
+          pattern: {
+            value: /^(ftp|http|https):\/\/[^ "]+$/,
+            message: "Invalid URL, must include https://",
+          },
         }}
         render={({ field }) => (
           <TextField
             label="Resource Link"
-            placeholder="e.g. www.linkToResource.com"
+            placeholder="e.g. https://www.google.com"
             error={errors.resource_link}
             helperText={
               errors && errors.resource_link && errors.resource_link.message
