@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Stack } from "@mui/material";
+import { Stack, Tooltip } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 
 const InlineActionTile = ({
@@ -21,8 +21,7 @@ const InlineActionTile = ({
         width: "48px",
         borderRight: "1px solid #eaeaea",
         height: "44px",
-        cursor: isHovering ? "pointer" : "default",
-        pointerEvents: disabled ? "none" : "auto",
+        cursor: isHovering && !disabled ? "pointer" : "default",
       }}
       alignItems="center"
       justifyContent="center"
@@ -32,7 +31,11 @@ const InlineActionTile = ({
       {blank ? null : (
         <>
           {showAdd && <AddChip onClick={add} />}
-          {isHovering ? dragHandle : <StatusLight status={status} />}
+          {isHovering && !disabled ? (
+            dragHandle
+          ) : (
+            <StatusLight status={status} disabled={disabled} />
+          )}
           {showAdd && isLast && <AddChip onClick={add} isLast={isLast} />}
         </>
       )}
@@ -42,26 +45,45 @@ const InlineActionTile = ({
 
 export default InlineActionTile;
 
-const StatusLight = ({ status }) => {
+const StatusLight = ({ status, disabled }) => {
   return (
-    <Stack
-      sx={{
-        width: "8px",
-        height: "8px",
-        borderRadius: "50%",
-        backgroundColor:
-          status === "replicated"
-            ? "gray"
-            : status === "upgraded"
-            ? "#F7D538"
-            : status === "removed"
-            ? "#F26C23"
-            : status === "new"
-            ? "#BBD758"
-            : "gray",
-      }}
-    />
+    <ConditionalTooltip
+      display={disabled}
+      title={
+        status === "replicated"
+          ? "No Changes"
+          : status === "upgraded"
+          ? "Updated"
+          : status === "removed"
+          ? "Removed"
+          : status === "new" && "New"
+      }
+    >
+      <span>
+        <Stack
+          sx={{
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            backgroundColor:
+              status === "replicated"
+                ? "gray"
+                : status === "upgraded"
+                ? "#F7D538"
+                : status === "removed"
+                ? "#F26C23"
+                : status === "new"
+                ? "#BBD758"
+                : "gray",
+          }}
+        />
+      </span>
+    </ConditionalTooltip>
   );
+};
+
+const ConditionalTooltip = ({ title, children, display }) => {
+  return display ? <Tooltip title={title}>{children}</Tooltip> : children;
 };
 
 const AddChip = ({ onClick, isLast }) => {
