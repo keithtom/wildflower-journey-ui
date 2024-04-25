@@ -5,6 +5,7 @@ import { mutate } from "swr";
 import { useForm, Controller } from "react-hook-form";
 
 import {
+  Tooltip,
   Alert,
   List,
   Card,
@@ -66,7 +67,11 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  console.log({ workflow });
+  // console.log({ workflow });
+
+  const rolloutInProgress =
+    workflow?.attributes.rolloutStartedAt !== null &&
+    workflow?.attributes.rolloutCompletedAt === null;
 
   useEffect(() => {
     setIsDraftingNewVersion(workflow?.attributes.published === false);
@@ -273,6 +278,13 @@ const Workflow = ({}) => {
                 {/* <Typography>Last updated 3 days ago</Typography> */}
                 {isLoading ? (
                   <Skeleton variant="rounded" width={120} />
+                ) : rolloutInProgress ? (
+                  <Chip
+                    label="Publishing in progress"
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                  />
                 ) : workflow.attributes.published ? (
                   <Chip label="Published" size="small" color="primary" />
                 ) : (
@@ -314,7 +326,7 @@ const Workflow = ({}) => {
               <Button
                 variant="contained"
                 onClick={handleStartNewVersion}
-                // disabled
+                disabled={rolloutInProgress}
               >
                 Draft New Version
               </Button>
