@@ -56,7 +56,9 @@ const StatusLight = ({ status }) => {
             ? "#F7D538"
             : status === "removed"
             ? "#F26C23"
-            : status === "new" && "#BBD758",
+            : status === "new"
+            ? "#BBD758"
+            : "gray",
       }}
     />
   );

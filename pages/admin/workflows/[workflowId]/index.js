@@ -31,6 +31,8 @@ import {
   OutlinedInput,
   MenuItem,
 } from "@mui/material";
+import ssj_categories from "@lib/ssj/categories";
+import CategoryChip from "@components/CategoryChip";
 import { DragHandle, Edit } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
@@ -48,7 +50,7 @@ const Workflow = ({}) => {
   // TODO: Set versionHasChanges from backend
   //  look through all selected processes and look for state, if any do not say "replicated" there are changes
   const [versionHasChanges, setVersionHasChanges] = useState(false);
-  console.log({ versionHasChanges });
+  // console.log({ versionHasChanges });
   const [addProcessModalOpen, setAddProcessModalOpen] = useState(false);
   const [repositionedSnackbarOpen, setRepositionedSnackbarOpen] =
     useState(false);
@@ -657,7 +659,7 @@ const ProcessListItem = ({
           </ListItemText>
           <Chip label={`${process.attributes.numOfSteps} steps`} size="small" />
           {process.attributes.categories.map((c, i) => (
-            <Chip label={c} size="small" key={i} />
+            <CategoryChip category={c} size="small" key={i} />
           ))}
         </Stack>
       </ListItemButton>
@@ -840,24 +842,11 @@ const ChooseProcessList = ({ handleChooseProcess, phaseAddedInto }) => {
   );
 };
 
-const categories = [
-  {
-    label: "Albums, Advice & Network Membership",
-    value: "Albums, Advice & Network Membership",
-  },
-  { label: "Finance", value: "Finance" },
-  { label: "Facilities", value: "Facilities" },
-  { label: "Governance & Compliance", value: "Governance & Compliance" },
-  { label: "Human Resources", value: "Human Resources" },
-  {
-    label: "Community & Family Engagement",
-    value: "Community & Family Engagement",
-  },
-  {
-    label: "Classroom & Program Practices",
-    value: "Classroom & Program Practices",
-  },
-];
+const categories = Object.values(ssj_categories).map((category) => ({
+  label: category,
+  value: category,
+}));
+
 const ssjPhases = [
   { label: "Visioning", value: "visioning" },
   { label: "Planning", value: "planning" },

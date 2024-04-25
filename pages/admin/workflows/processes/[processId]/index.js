@@ -36,6 +36,7 @@ import {
   FormHelperText,
   Switch,
 } from "@mui/material";
+import ssj_categories from "@lib/ssj/categories";
 import { DragHandle, Edit, Warning } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
@@ -850,24 +851,10 @@ const StepListItem = ({
   );
 };
 
-const categories = [
-  {
-    label: "Albums, Advice & Network Membership",
-    value: "Albums, Advice & Network Membership",
-  },
-  { label: "Finance", value: "Finance" },
-  { label: "Facilities", value: "Facilities" },
-  { label: "Governance & Compliance", value: "Governance & Compliance" },
-  { label: "Human Resources", value: "Human Resources" },
-  {
-    label: "Community & Family Engagement",
-    value: "Community & Family Engagement",
-  },
-  {
-    label: "Classroom & Program Practices",
-    value: "Classroom & Program Practices",
-  },
-];
+const categories = Object.values(ssj_categories).map((category) => ({
+  label: category,
+  value: category,
+}));
 const phases = [
   { label: "Visioning", value: "visioning" },
   { label: "Planning", value: "planning" },
