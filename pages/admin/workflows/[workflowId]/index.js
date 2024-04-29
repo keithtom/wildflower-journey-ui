@@ -68,7 +68,7 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  // console.log({ workflow });
+  console.log({ workflow });
 
   const rolloutInProgress =
     workflow?.attributes.rolloutStartedAt !== null &&
@@ -164,9 +164,9 @@ const Workflow = ({}) => {
     }
     console.log({ data });
   };
-  const handleRemoveProcess = (processId) => {
+  const handleRemoveProcess = async (processId) => {
     try {
-      const response = workflowApi.deleteProcessInWorkflow(
+      const response = await workflowApi.deleteProcessInWorkflow(
         workflowId,
         processId
       );
@@ -177,10 +177,10 @@ const Workflow = ({}) => {
     }
     // console.log("Remove process", id);
   };
-  const handleReinstateProcess = (processId) => {
+  const handleReinstateProcess = async (processId) => {
     // console.log("Reinstate process", processId);
     try {
-      const response = workflowApi.reinstateProcessInWorkflow(processId);
+      const response = await workflowApi.reinstateProcessInWorkflow(processId);
       mutate(`/definition/workflows/${workflowId}`);
     } catch (error) {
       console.log(error);
@@ -407,8 +407,8 @@ const Workflow = ({}) => {
                             key={process.id}
                             process={process}
                             prevProcessPosition={
-                              phaseIndex > 0 &&
-                              phase.milestones[phaseIndex - 1].relationships
+                              i > 0 &&
+                              phase.milestones[i - 1].relationships
                                 .selectedProcesses.data[0].attributes.position
                             }
                             isLast={i === phase.milestones.length - 1}
@@ -456,6 +456,8 @@ const AddProcessModal = ({
 }) => {
   const [addType, setAddType] = useState(null);
 
+  console.log({ stagedProcessPosition });
+
   const handleClose = () => {
     onClose();
     setAddType(null);
@@ -484,7 +486,6 @@ const AddProcessModal = ({
   });
 
   const handleChooseProcess = async (processId) => {
-    // console.log(id);
     const structuredData = {
       process: {
         selected_processes_attributes: [
@@ -508,7 +509,6 @@ const AddProcessModal = ({
     } catch (error) {
       console.log(error);
     }
-    onClose();
   };
   return (
     <Dialog open={open} onClose={handleClose} fullWidth scroll="paper">
@@ -581,10 +581,15 @@ const ProcessListItem = ({
     process.relationships.selectedProcesses?.data[0].attributes.state;
   const selectedProcesses = process.relationships.selectedProcesses?.data;
 
-  const processPosition = isLast
-    ? selectedProcesses[0].attributes.position + 1000
-    : (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
+  console.log(process.attributes.title, {
+    ownPosition: selectedProcesses[0].attributes.position,
+    prevProcessPosition: prevProcessPosition,
+  });
+
+  const processPosition =
+    (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
   // console.log({ processPosition });
+  const lastProcessPosition = selectedProcesses[0].attributes.position + 1000;
 
   const isRemoved = selectedProcesses.some(
     (process) => process.attributes.state === "removed"
@@ -642,6 +647,9 @@ const ProcessListItem = ({
         status={isDraftingNewVersion ? status : "replicated"}
         add={() =>
           handleStageAddProcess(processPosition, process.attributes.phase)
+        }
+        lastAdd={() =>
+          handleStageAddProcess(lastProcessPosition, process.attributes.phase)
         }
         dragHandle={<PositionGrabber {...listeners} {...attributes} />}
       />

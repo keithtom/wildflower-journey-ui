@@ -11,6 +11,7 @@ const InlineActionTile = ({
   blank,
   disabled,
   isLast,
+  lastAdd,
 }) => {
   const [isHovering, setIsHovering] = useState(false);
 
@@ -36,7 +37,7 @@ const InlineActionTile = ({
           ) : (
             <StatusLight status={status} disabled={disabled} />
           )}
-          {showAdd && isLast && <AddChip onClick={add} isLast={isLast} />}
+          {showAdd && isLast && <AddChip onClick={lastAdd} isLast={isLast} />}
         </>
       )}
     </Stack>
