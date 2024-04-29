@@ -122,7 +122,11 @@ const ProcessId = ({}) => {
     // Remove unchanged data
     const updatedData = Object.keys(data).reduce((acc, key) => {
       if (data[key] !== originalData[key]) {
-        acc[key] = data[key];
+        if (key === "category_list" && !Array.isArray(data[key])) {
+          acc[key] = [data[key]];
+        } else {
+          acc[key] = data[key];
+        }
       }
       return acc;
     }, {});
@@ -229,15 +233,14 @@ const ProcessId = ({}) => {
     setIsEditingProcess(false);
   };
 
-  const handleAddPrerequisite = async (processId) => {
+  const handleAddPrerequisite = async (id) => {
     const structuredData = {
       process: {
         workable_dependencies_attributes: [
           {
-            id: processId, // TODO: clarify that this is the process to add as a prerequisite
             workflow_id: workflowId,
             prerequisite_workable_type: "Workflow::Definition::Process",
-            prerequisite_workable_id: "process",
+            prerequisite_workable_id: id,
           },
         ],
       },
@@ -247,7 +250,8 @@ const ProcessId = ({}) => {
         processId,
         structuredData
       );
-      // mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+      setShowAddPrerequisiteModal(false);
     } catch (error) {
       console.log(error);
     }
@@ -1018,7 +1022,7 @@ const ChoosePrerequisiteList = ({
 
   const filteredProcesses = workflow.relationships.processes.data.filter(
     (process) =>
-      process.relationships.selectedProcesses.data[0].attributes.position >
+      process.relationships.selectedProcesses.data[0].attributes.position <
         milestonePosition &&
       process.attributes.phase === milestone.attributes.phase
   );
@@ -1027,32 +1031,42 @@ const ChoosePrerequisiteList = ({
 
   return (
     <List>
-      {!filteredProcesses
-        ? Array.from({ length: 12 }).map((_, index) => (
-            <ListItem key={index} divider>
-              <ListItemText>
-                <Skeleton variant="text" width={120} />
-              </ListItemText>
-            </ListItem>
-          ))
-        : filteredProcesses?.map((process, i) => (
-            <ListItem disablePadding divider key={i}>
-              <ListItemButton onClick={() => handleAddPrerequisite(process.id)}>
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <ListItemText>
-                    <Typography noWrap>{process.attributes.title}</Typography>
-                  </ListItemText>
-                  <Chip
-                    label={`${process.attributes.numOfSteps} steps`}
-                    size="small"
-                  />
-                  {process.attributes.categories.map((c, i) => (
-                    <CategoryChip category={c} key={i} size="small" />
-                  ))}
-                </Stack>
-              </ListItemButton>
-            </ListItem>
-          ))}
+      {!filteredProcesses ? (
+        Array.from({ length: 12 }).map((_, index) => (
+          <ListItem key={index} divider>
+            <ListItemText>
+              <Skeleton variant="text" width={120} />
+            </ListItemText>
+          </ListItem>
+        ))
+      ) : !filteredProcesses.length ? (
+        <ListItem divider>
+          <ListItemText>
+            <Typography variant="bodyRegular">
+              No prerequisites available
+            </Typography>
+          </ListItemText>
+        </ListItem>
+      ) : (
+        filteredProcesses?.map((process, i) => (
+          <ListItem disablePadding divider key={i}>
+            <ListItemButton onClick={() => handleAddPrerequisite(process.id)}>
+              <Stack direction="row" spacing={3} alignItems="center">
+                <ListItemText>
+                  <Typography noWrap>{process.attributes.title}</Typography>
+                </ListItemText>
+                <Chip
+                  label={`${process.attributes.numOfSteps} steps`}
+                  size="small"
+                />
+                {process.attributes.categories.map((c, i) => (
+                  <CategoryChip category={c} key={i} size="small" />
+                ))}
+              </Stack>
+            </ListItemButton>
+          </ListItem>
+        ))
+      )}
     </List>
   );
 };

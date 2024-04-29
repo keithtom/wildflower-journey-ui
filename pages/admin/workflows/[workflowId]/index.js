@@ -47,18 +47,17 @@ const Workflow = ({}) => {
   const workflowId = router.query.workflowId;
 
   const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
-  // TODO: Set versionHasChanges from backend
-  //  look through all selected processes and look for state, if any do not say "replicated" there are changes
   const [versionHasChanges, setVersionHasChanges] = useState(false);
-  console.log({ versionHasChanges });
   const [addProcessModalOpen, setAddProcessModalOpen] = useState(false);
   const [repositionedSnackbarOpen, setRepositionedSnackbarOpen] =
     useState(false);
   const [groupedProcesses, setGroupedProcesses] = useState([]);
-  // console.log({ groupedProcesses });
   const [stagedProcessPosition, setStagedProcessPosition] = useState(null);
-  // console.log({ stagedProcessPosition });
   const [phaseAddedInto, setPhaseAddedInto] = useState(null);
+
+  // console.log({ versionHasChanges });
+  // console.log({ groupedProcesses });
+  // console.log({ stagedProcessPosition });
 
   useEffect(() => {
     if (workflowId) {
@@ -159,7 +158,6 @@ const Workflow = ({}) => {
         workflowId,
         structuredData
       );
-      console.log();
       mutate(`/definition/workflows/${workflowId}`);
     } catch (error) {
       console.log(error);
@@ -231,6 +229,7 @@ const Workflow = ({}) => {
     };
     try {
       // Make API call to update the position of the step
+      console.log({ data });
       const response = await processApi.editMilestone(processId, data);
       mutate(`/definition/workflows/${workflowId}`);
       setRepositionedSnackbarOpen(true);
@@ -479,6 +478,7 @@ const AddProcessModal = ({
   const onSubmit = handleSubmit((data) => {
     // console.log({ data });
     handleCreateProcess(data);
+    setAddType(null);
     reset();
     onClose();
   });
@@ -501,6 +501,9 @@ const AddProcessModal = ({
         processId,
         structuredData
       );
+      setAddType(null);
+      reset();
+      onClose();
       mutate(`/definition/workflows/${workflowId}`);
     } catch (error) {
       console.log(error);
@@ -636,7 +639,7 @@ const ProcessListItem = ({
         disabled={isRemoved}
         id={`inline-action-tile-${process.id}`}
         showAdd={isRemoved ? null : isDraftingNewVersion}
-        status={status}
+        status={isDraftingNewVersion ? status : "replicated"}
         add={() =>
           handleStageAddProcess(processPosition, process.attributes.phase)
         }

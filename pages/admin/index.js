@@ -52,7 +52,7 @@ const AdminDashboard = () => {
           </Grid>
         </Grid>
         <Grid container spacing={6}>
-          <Grid item xs={6} sm={4}>
+          <Grid item sm={6} md={4}>
             <Card>
               <Link href="/admin/workflows">
                 <CardActionArea>

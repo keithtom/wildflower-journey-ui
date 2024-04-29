@@ -117,4 +117,23 @@ async function deleteDocument(id) {
   }
 }
 
-export default { createStep, editStep, deleteStep, deleteDocument };
+async function deleteDecisionOption(id) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.delete(
+      `/decision_options/${id}`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default {
+  createStep,
+  editStep,
+  deleteStep,
+  deleteDocument,
+  deleteDecisionOption,
+};

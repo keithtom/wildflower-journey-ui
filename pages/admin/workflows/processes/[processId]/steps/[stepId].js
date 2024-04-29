@@ -231,8 +231,14 @@ const StepId = ({}) => {
     setStepHasChanges(true);
     color = "error";
   };
-  const handleRemoveDecisionOption = (optionId) => {
+  const handleRemoveDecisionOption = async (optionId) => {
     // console.log("Remove decision option");
+    try {
+      const response = await stepsApi.deleteDecisionOption(optionId);
+      mutate(`/definition/processes/${processId}/steps/${step.id}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleAddDecisionOption = (data) => {
     const structuredData = {
@@ -861,7 +867,6 @@ const DecisionOptionModal = ({
   onClose,
   decisionOption,
   handleAddDecisionOption,
-  handleRemoveDecisionOption,
   handleUpdateDecisionOption,
   isDraftingNewVersion,
 }) => {

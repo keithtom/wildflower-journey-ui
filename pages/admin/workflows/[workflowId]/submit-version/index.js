@@ -88,7 +88,7 @@ const SubmitVersionPage = () => {
     try {
       const response = await workflowApi.publishWorkflow(workflowId);
       console.log({ response });
-      // router.push(`/admin/workflows/${workflowId}`)
+      router.push(`/admin/workflows/${workflowId}`);
     } catch (error) {
       console.log(error);
     }
