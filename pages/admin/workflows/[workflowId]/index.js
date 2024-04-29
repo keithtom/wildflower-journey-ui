@@ -308,7 +308,6 @@ const Workflow = ({}) => {
               ) : (
                 <Stack direction="row" spacing={3}>
                   <Button
-                    variant="contained"
                     onClick={handleCancelDraft}
                     disabled={!workflow.attributes.previousVersionId}
                   >
@@ -319,7 +318,7 @@ const Workflow = ({}) => {
                     disabled={!versionHasChanges}
                     onClick={handleSubmitNewVersion}
                   >
-                    Submit New Version
+                    Review New Version
                   </Button>
                 </Stack>
               )
@@ -327,7 +326,7 @@ const Workflow = ({}) => {
               <Button
                 variant="contained"
                 onClick={handleStartNewVersion}
-                disabled={rolloutInProgress}
+                disabled={rolloutInProgress || isLoading}
               >
                 Draft New Version
               </Button>
@@ -407,9 +406,11 @@ const Workflow = ({}) => {
                             key={process.id}
                             process={process}
                             prevProcessPosition={
-                              i > 0 &&
-                              phase.milestones[i - 1].relationships
-                                .selectedProcesses.data[0].attributes.position
+                              i > 0
+                                ? phase?.milestones[i - 1]?.relationships
+                                    .selectedProcesses.data[0].attributes
+                                    .position
+                                : null
                             }
                             isLast={i === phase.milestones.length - 1}
                             isDraftingNewVersion={isDraftingNewVersion}
@@ -429,6 +430,7 @@ const Workflow = ({}) => {
         workflowId={workflowId}
         open={addProcessModalOpen}
         stagedProcessPosition={stagedProcessPosition}
+        setStagedProcessPosition={setStagedProcessPosition}
         onClose={() => setAddProcessModalOpen(false)}
         handleCreateProcess={handleCreateProcess}
         phaseAddedInto={phaseAddedInto}
@@ -449,6 +451,7 @@ export default Workflow;
 const AddProcessModal = ({
   open,
   stagedProcessPosition,
+  setStagedProcessPosition,
   handleCreateProcess,
   onClose,
   workflowId,
@@ -461,6 +464,7 @@ const AddProcessModal = ({
   const handleClose = () => {
     onClose();
     setAddType(null);
+    setStagedProcessPosition(null);
   };
 
   const {
@@ -496,6 +500,8 @@ const AddProcessModal = ({
         ],
       },
     };
+
+    // console.log("structuredData==================", structuredData);
     try {
       const response = await workflowApi.chooseProcessInWorkflow(
         workflowId,

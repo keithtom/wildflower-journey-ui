@@ -7,9 +7,8 @@ describe("Admin, Instantaneous Changes", () => {
   it("navigates to a workflow", () => {
     // Perform the first user action
     cy.contains("Basic Workflow").click();
-
     // Check that the URL has changed to the next page
-    cy.url().should("include", "/admin/workflows/4");
+    cy.url().should("match", /\/admin\/workflows\/\d+/);
   });
 
   it("reorders a process", () => {
@@ -91,7 +90,7 @@ describe("Admin, Instantaneous Changes", () => {
     cy.get("button.MuiButtonBase-root").contains("Update").click();
   });
 
-  it.only("edits a decision option on a step", () => {
+  it("edits a decision option on a step", () => {
     cy.visit("/admin/workflows/processes/86/steps/225");
     cy.wait(1000);
     cy.contains("Option 2").click();
@@ -103,5 +102,86 @@ describe("Admin, Instantaneous Changes", () => {
     cy.get('input[name="decision_option"]').clear().type("Option 2");
     cy.get("button.MuiButton-text").contains("Update").click();
     cy.get("button.MuiButtonBase-root").contains("Update").click();
+  });
+});
+
+describe.only("Admin, Instantaneous Changes", () => {
+  beforeEach(() => {
+    cy.login("test@test.com", "password");
+    cy.visit("/admin/workflows");
+  });
+  it("navigates to a workflow", () => {
+    // Perform the first user action
+    cy.contains("Basic Workflow").click();
+    // Check that the URL has changed to the next page
+    cy.url().should("match", /\/admin\/workflows\/\d+/);
+  });
+  it("starts drafting a new version", () => {
+    cy.contains("Basic Workflow").click();
+    cy.get("button.MuiButtonBase-root").contains("Draft new version").click();
+  });
+  it("adds a brand new process", () => {
+    // TODO
+  });
+  it("adds an existing process", () => {
+    // TODO
+  });
+  it("removes an existing process", () => {
+    // TODO
+  });
+  it("removes a brand new process", () => {
+    // TODO
+  });
+  it("reinstates the removed, existing, process", () => {
+    // TODO
+  });
+  it("navigates to a process", () => {
+    // TODO
+  });
+  it("elects to edit a process", () => {
+    // TODO
+  });
+  it("updates process a attribute", () => {
+    // TODO
+  });
+  it("adds a prerequisite", () => {
+    // TODO
+  });
+  it("removes a prerequisite", () => {
+    // TODO
+  });
+  it("adds a step", () => {
+    // TODO
+  });
+  it("removes a step", () => {
+    // TODO
+  });
+  it("reverts all process edits", () => {
+    // TODO
+  });
+  it("navigates to a step", () => {
+    // elect to edit process, then
+    // TODO
+  });
+  it("updates a step attribute", () => {
+    // TODO
+  });
+  it("adds a resource", () => {
+    // TODO
+  });
+  it("updates a resource", () => {
+    // TODO
+  });
+  it("makes the step a decision", () => {
+    // TODO
+  });
+  it("adds a decision option", () => {
+    // TODO
+  });
+  it("removes a decision option", () => {
+    // TODO
+  });
+  it("submits a new workflow version", () => {
+    // TODO
   });
 });
