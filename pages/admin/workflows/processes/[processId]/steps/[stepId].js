@@ -229,7 +229,6 @@ const StepId = ({}) => {
     };
     setDecisionOptionParams([...decisionOptionParams, structuredData]);
     setStepHasChanges(true);
-    color = "error";
   };
   const handleRemoveDecisionOption = async (optionId) => {
     // console.log("Remove decision option");
@@ -576,7 +575,6 @@ const StepId = ({}) => {
                                   variant="contained"
                                   size="small"
                                   onClick={() => handleOpenDecisionModal(null)}
-                                  disabled={!isDraftingNewVersion}
                                 >
                                   Add decision option
                                 </Button>
