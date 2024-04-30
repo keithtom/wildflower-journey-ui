@@ -68,7 +68,7 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  console.log({ workflow });
+  // console.log({ workflow });
 
   const rolloutInProgress =
     workflow?.attributes.rolloutStartedAt !== null &&
@@ -459,7 +459,7 @@ const AddProcessModal = ({
 }) => {
   const [addType, setAddType] = useState(null);
 
-  console.log({ stagedProcessPosition });
+  // console.log({ stagedProcessPosition });
 
   const handleClose = () => {
     onClose();
@@ -501,7 +501,6 @@ const AddProcessModal = ({
       },
     };
 
-    // console.log("structuredData==================", structuredData);
     try {
       const response = await workflowApi.chooseProcessInWorkflow(
         workflowId,
@@ -587,10 +586,10 @@ const ProcessListItem = ({
     process.relationships.selectedProcesses?.data[0].attributes.state;
   const selectedProcesses = process.relationships.selectedProcesses?.data;
 
-  console.log(process.attributes.title, {
-    ownPosition: selectedProcesses[0].attributes.position,
-    prevProcessPosition: prevProcessPosition,
-  });
+  // console.log(process.attributes.title, {
+  //   ownPosition: selectedProcesses[0].attributes.position,
+  //   prevProcessPosition: prevProcessPosition,
+  // });
 
   const processPosition =
     (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;

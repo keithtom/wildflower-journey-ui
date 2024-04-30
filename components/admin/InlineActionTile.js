@@ -16,38 +16,6 @@ const InlineActionTile = ({
   const [isHovering, setIsHovering] = useState(false);
 
   return (
-    <Stack
-      id={id}
-      sx={{
-        width: "48px",
-        borderRight: "1px solid #eaeaea",
-        height: "44px",
-        cursor: isHovering && !disabled ? "pointer" : "default",
-      }}
-      alignItems="center"
-      justifyContent="center"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
-      {blank ? null : (
-        <>
-          {showAdd && <AddChip onClick={add} />}
-          {isHovering && !disabled ? (
-            dragHandle
-          ) : (
-            <StatusLight status={status} disabled={disabled} />
-          )}
-          {showAdd && isLast && <AddChip onClick={lastAdd} isLast={isLast} />}
-        </>
-      )}
-    </Stack>
-  );
-};
-
-export default InlineActionTile;
-
-const StatusLight = ({ status, disabled }) => {
-  return (
     <ConditionalTooltip
       display={disabled}
       title={
@@ -57,29 +25,67 @@ const StatusLight = ({ status, disabled }) => {
           ? "Updated"
           : status === "removed"
           ? "Removed"
-          : status === "new" && "New"
+          : status === "repositioned"
+          ? "Repositioned"
+          : status === "added" && "Added"
       }
     >
       <span>
         <Stack
+          id={id}
           sx={{
-            width: "8px",
-            height: "8px",
-            borderRadius: "50%",
-            backgroundColor:
-              status === "replicated"
-                ? "gray"
-                : status === "upgraded"
-                ? "#F7D538"
-                : status === "removed"
-                ? "#F26C23"
-                : status === "new"
-                ? "#BBD758"
-                : "gray",
+            width: "48px",
+            borderRight: "1px solid #eaeaea",
+            height: "44px",
+            cursor: isHovering && !disabled ? "pointer" : "default",
           }}
-        />
+          alignItems="center"
+          justifyContent="center"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          {blank ? null : (
+            <>
+              {showAdd && <AddChip onClick={add} />}
+              {isHovering && !disabled ? (
+                dragHandle
+              ) : (
+                <StatusLight status={status} disabled={disabled} />
+              )}
+              {showAdd && isLast && (
+                <AddChip onClick={lastAdd} isLast={isLast} />
+              )}
+            </>
+          )}
+        </Stack>
       </span>
     </ConditionalTooltip>
+  );
+};
+
+export default InlineActionTile;
+
+const StatusLight = ({ status, disabled }) => {
+  return (
+    <Stack
+      sx={{
+        width: "8px",
+        height: "8px",
+        borderRadius: "50%",
+        backgroundColor:
+          status === "replicated"
+            ? "gray"
+            : status === "upgraded"
+            ? "#F7D538"
+            : status === "removed"
+            ? "#F26C23"
+            : status === "added"
+            ? "#BBD758"
+            : status === "repositioned"
+            ? "black"
+            : "gray",
+      }}
+    />
   );
 };
 
