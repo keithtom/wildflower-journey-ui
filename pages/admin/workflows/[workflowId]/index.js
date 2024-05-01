@@ -630,8 +630,8 @@ const ProcessListItem = ({
         !isDraftingNewVersion ? null : (
           <Stack direction="row" spacing={1} alignItems="center">
             {status === "repositioned" ? (
-            <Chip label="Repositioned" size="small" variant="outlined" />
-          ) : null}
+              <Chip label="Repositioned" size="small" variant="outlined" />
+            ) : null}
             {isRemoved ? (
               <Button
                 variant="text"
@@ -659,7 +659,7 @@ const ProcessListItem = ({
     >
       <InlineActionTile
         isLast={isLast}
-        disabled={isRemoved || status === "added"}
+        disabled={isRemoved}
         id={`inline-action-tile-${process.id}`}
         showAdd={isRemoved ? null : isDraftingNewVersion}
         status={isDraftingNewVersion ? status : "replicated"}
