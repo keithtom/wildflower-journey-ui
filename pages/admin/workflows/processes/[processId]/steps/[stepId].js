@@ -633,6 +633,7 @@ const StepId = ({}) => {
                                   secondaryAction={
                                     <Button
                                       color="error"
+                                      id={`remove-decision-option-${i}`}
                                       onClick={() =>
                                         handleRemoveDecisionOption(
                                           decisionOption.id

@@ -516,9 +516,11 @@ const ProcessId = ({}) => {
                   ))
                 : milestone.relationships.prerequisites.data.map((p, i) => (
                     <ListItem
+                      key={i}
                       disablePadding
                       secondaryAction={
                         <Button
+                          id={`remove-prerequisite-${i}`}
                           variant="text"
                           color="error"
                           disabled={!isEditingProcess}
@@ -744,6 +746,7 @@ const StepListItem = ({
   const position = isLast
     ? step.attributes.position + 1000
     : (step.attributes.position + prevStepPosition) / 2;
+  const lastStepPosition = step.attributes.position + 1000;
 
   // console.log({ step });
 
@@ -782,6 +785,7 @@ const StepListItem = ({
         showAdd={isDraftingNewVersion && isEditingProcess}
         status="default"
         add={() => handleStageAddStep(position, step.id)}
+        lastAdd={() => handleStageAddStep(lastStepPosition, step.id)}
         dragHandle={<PositionGrabber {...listeners} {...attributes} />}
       />
       <ListItemButton

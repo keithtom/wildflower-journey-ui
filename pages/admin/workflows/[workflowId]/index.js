@@ -647,6 +647,7 @@ const ProcessListItem = ({
               <Button
                 variant="text"
                 color="error"
+                // id={`remove-process-${process.id}`}
                 onClick={() => handleRemoveProcess(process.id)}
               >
                 Remove

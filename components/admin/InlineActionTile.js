@@ -96,6 +96,7 @@ const ConditionalTooltip = ({ title, children, display }) => {
 const AddChip = ({ onClick, isLast }) => {
   return (
     <Stack
+      id="inline-action-tile-add-chip"
       onClick={onClick}
       sx={{
         width: "24px",
