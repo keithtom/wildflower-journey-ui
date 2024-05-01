@@ -82,7 +82,7 @@ const StatusLight = ({ status, disabled }) => {
             : status === "added"
             ? "#BBD758"
             : status === "repositioned"
-            ? "black"
+            ? "gray"
             : "gray",
       }}
     />

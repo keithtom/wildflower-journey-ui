@@ -68,7 +68,7 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  // console.log({ workflow });
+  console.log({ workflow });
 
   const rolloutInProgress =
     workflow?.attributes.rolloutStartedAt !== null &&
@@ -220,17 +220,27 @@ const Workflow = ({}) => {
         selected_processes_attributes: [
           {
             //pass the selected process id
-            id: selectedProcessId,
+            id: Number(selectedProcessId),
             workflow_id: workflowId,
             position: newPosition,
           },
         ],
       },
     };
+    const repositionInProcessData = {
+      selected_process: { position: newPosition },
+    };
     try {
       // Make API call to update the position of the step
-      console.log({ data });
-      const response = await processApi.editMilestone(processId, data);
+      // console.log({ data });
+      if (isDraftingNewVersion) {
+        const response = await workflowApi.repositionProcessInRollout(
+          Number(selectedProcessId),
+          repositionInProcessData
+        );
+      } else {
+        const response = await processApi.editMilestone(processId, data);
+      }
       mutate(`/definition/workflows/${workflowId}`);
       setRepositionedSnackbarOpen(true);
     } catch (error) {
@@ -618,7 +628,10 @@ const ProcessListItem = ({
       divider
       secondaryAction={
         !isDraftingNewVersion ? null : (
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            {status === "repositioned" ? (
+            <Chip label="Repositioned" size="small" variant="outlined" />
+          ) : null}
             {isRemoved ? (
               <Button
                 variant="text"
@@ -646,7 +659,7 @@ const ProcessListItem = ({
     >
       <InlineActionTile
         isLast={isLast}
-        disabled={isRemoved}
+        disabled={isRemoved || status === "added"}
         id={`inline-action-tile-${process.id}`}
         showAdd={isRemoved ? null : isDraftingNewVersion}
         status={isDraftingNewVersion ? status : "replicated"}

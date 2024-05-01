@@ -75,7 +75,7 @@ const ProcessId = ({}) => {
     workflowId,
     processId
   );
-  // console.log({ milestone });
+  console.log({ milestone });
   // console.log({ processId });
 
   // const { milestone, isLoading, isError } = useMilestone(processId);
