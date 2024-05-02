@@ -49,12 +49,12 @@ export const showStep = {
 //     documents_attributes: [{title: "document title", link: "www.example.com"}]
 //   }
 // }
-async function createStep(data) {
+async function createStep(processId, data) {
   const config = getAuthHeader();
 
   try {
     const response = await workflowsApi.post(
-      "/definition/steps/",
+      `/definition/processes/${processId}/steps`,
       data,
       config
     );
@@ -92,12 +92,12 @@ async function editStep(processId, stepId, data) {
   }
 }
 
-async function deleteStep(id) {
+async function deleteStep(processId, stepId) {
   const config = getAuthHeader();
 
   try {
     const response = await workflowsApi.delete(
-      `/definition/steps/${id}`,
+      `/definition/processes/${processId}/steps/${stepId}`,
       config
     );
     return response;
@@ -117,4 +117,23 @@ async function deleteDocument(id) {
   }
 }
 
-export default { createStep, editStep, deleteStep, deleteDocument };
+async function deleteDecisionOption(id) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.delete(
+      `/decision_options/${id}`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default {
+  createStep,
+  editStep,
+  deleteStep,
+  deleteDocument,
+  deleteDecisionOption,
+};

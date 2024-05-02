@@ -36,7 +36,7 @@ const AdminSSJ = ({}) => {
   const router = useRouter();
 
   const { teams, isLoading } = useAllTeams();
-  console.log({ teams });
+  // console.log({ teams });
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 

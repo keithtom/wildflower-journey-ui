@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { mutate } from "swr";
 import { useSortable } from "@dnd-kit/sortable";
-
 import { Controller, useForm } from "react-hook-form";
 import {
   List,
@@ -26,34 +25,73 @@ import {
   Breadcrumbs,
   Link,
   Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormHelperText,
+  Switch,
 } from "@mui/material";
-import { DragHandle } from "@mui/icons-material";
+import ssj_categories from "@lib/ssj/categories";
+import CategoryChip from "@components/CategoryChip";
+import { DragHandle, Edit, Warning } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
 import DraggableList from "@components/admin/DraggableList";
 
 import processes from "@api/workflow/definition/processes";
 import stepsApi from "@api/workflow/definition/steps";
-import useMilestone from "@hooks/workflow/definition/useMilestone";
+import processApi from "@api/workflow/definition/processes";
+import workflowApi from "@api/workflow/definition/workflows";
+import useProcessInWorkflow from "@hooks/workflow/definition/useProcessInWorkflow";
+import useMilestones from "@hooks/workflow/definition/useMilestones";
+import useWorkflow from "@hooks/workflow/definition/useWorkflow";
 
 const ProcessId = ({}) => {
   const router = useRouter();
-  const [workflowId, setWorkflowId] = useState(null);
   const processId = router.query.processId;
-
-  const { milestone, isLoading, isError } = useMilestone(processId);
-  // console.log(milestone);
-  useEffect(() => {
-    const id = localStorage.getItem("workflowId");
-    setWorkflowId(id);
-  }, []);
-
-  // TODO: Get isDraftingNewVersion state from the API
-  const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(false);
+  const [workflowId, setWorkflowId] = useState(null);
+  const [isEditingProcess, setIsEditingProcess] = useState(false);
+  const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(null);
   const [processHasChanges, setProcessHasChanges] = useState(false);
   const [originalData, setOriginalData] = useState(false);
   const [repositionedSnackbarOpen, setRepositionedSnackbarOpen] =
     useState(false);
+  const [updatedProcessSnackbarOpen, setUpdatedProcessSnackbarOpen] =
+    useState(false);
+  const [addStepModalOpen, setAddStepModalOpen] = useState(false);
+  const [addStepPosition, setAddStepPosition] = useState(null);
+  const [showAddPrerequisiteModal, setShowAddPrerequisiteModal] =
+    useState(false);
+
+  const { workflow, isLoading: workflowIsLoading } = useWorkflow(workflowId);
+  // console.log({ workflow });
+
+  const { processInWorkflow: milestone, isLoading } = useProcessInWorkflow(
+    workflowId,
+    processId
+  );
+  console.log({ milestone });
+  // console.log({ processId });
+
+  // const { milestone, isLoading, isError } = useMilestone(processId);
+  // console.log(milestone);
+
+  useEffect(() => {
+    const id = localStorage.getItem("workflowId");
+    setWorkflowId(id);
+  }, []);
+  useEffect(() => {
+    setIsDraftingNewVersion(workflow?.attributes.published === false);
+    setIsEditingProcess(
+      milestone?.relationships.selectedProcesses.data[0].attributes.state ===
+        "upgraded"
+    );
+  }, [workflow, milestone]);
 
   const {
     control,
@@ -84,7 +122,11 @@ const ProcessId = ({}) => {
     // Remove unchanged data
     const updatedData = Object.keys(data).reduce((acc, key) => {
       if (data[key] !== originalData[key]) {
-        acc[key] = data[key];
+        if (key === "category_list" && !Array.isArray(data[key])) {
+          acc[key] = [data[key]];
+        } else {
+          acc[key] = data[key];
+        }
       }
       return acc;
     }, {});
@@ -93,7 +135,8 @@ const ProcessId = ({}) => {
     try {
       const response = await processes.editMilestone(milestone.id, updatedData);
       setProcessHasChanges(false);
-      mutate(`/definition/processes/${milestone.id}`);
+      setUpdatedProcessSnackbarOpen(true);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
       // console.log(response);
     } catch (error) {
       console.error(error);
@@ -122,19 +165,119 @@ const ProcessId = ({}) => {
 
     try {
       const response = await stepsApi.editStep(processId, stepId, data);
-      mutate(`/definition/processes/${processId}`);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
       setRepositionedSnackbarOpen(true);
     } catch (error) {
       console.error("There was an error!", error);
     }
   };
 
+  const handleRemoveStep = async (stepId) => {
+    // console.log("Remove step", id);
+    setShowRemoveStepCheck(false);
+    try {
+      const response = await stepsApi.deleteStep(processId, stepId);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleStageAddStep = (position) => {
+    setAddStepPosition(position);
+    setAddStepModalOpen(true);
+  };
+  const handleCreateStep = async (data) => {
+    // console.log("Add step", data);
+    const structuredData = {
+      step: {
+        ...data,
+      },
+    };
+
+    try {
+      const response = await stepsApi.createStep(processId, structuredData);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const onSubmit = handleSubmit(handleUpdateProcess);
+
+  const handleEditProcessInRollout = async () => {
+    try {
+      const response = await workflowApi.createNewProcessVersion(
+        workflowId,
+        processId
+      );
+      console.log({ response });
+      router.push(`/admin/workflows/processes/${response.data.data.id}`);
+    } catch (error) {
+      console.log(error);
+    }
+    setIsEditingProcess(true);
+  };
+
+  const handleRevertAllEdits = async (selectedProcessId) => {
+    try {
+      const response = await workflowApi.reinstateProcessInWorkflow(
+        selectedProcessId
+      );
+      console.log({ response });
+      router.push(
+        `/admin/workflows/processes/${response.data.data.attributes.processId}`
+      );
+    } catch (error) {
+      console.log(error);
+    }
+    setIsEditingProcess(false);
+  };
+
+  const handleAddPrerequisite = async (id) => {
+    const structuredData = {
+      process: {
+        workable_dependencies_attributes: [
+          {
+            workflow_id: workflowId,
+            prerequisite_workable_type: "Workflow::Definition::Process",
+            prerequisite_workable_id: id,
+          },
+        ],
+      },
+    };
+    try {
+      const response = await processApi.editMilestone(
+        processId,
+        structuredData
+      );
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+      setShowAddPrerequisiteModal(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDeleteDependency = async (dependencyId) => {
+    console.log("Delete dependency", dependencyId);
+    try {
+      const response = await workflowApi.deleteDependency(dependencyId);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <PageContainer isAdmin>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6}>
+          {isDraftingNewVersion ? (
+            <Alert severity="warning" icon={<Edit fontSize="inherit" />}>
+              <Typography variant="bodyRegular">
+                Drafting new rollout
+              </Typography>
+            </Alert>
+          ) : null}
           <Breadcrumbs aria-label="breadcrumb">
             {workflowId ? (
               <Link
@@ -193,10 +336,37 @@ const ProcessId = ({}) => {
                     Update
                   </Button>
                 </Stack>
+              ) : isDraftingNewVersion ? (
+                !isEditingProcess ? (
+                  <Button
+                    variant="contained"
+                    onClick={handleEditProcessInRollout}
+                  >
+                    Edit this process
+                  </Button>
+                ) : (
+                  <Stack direction="row" spacing={3}>
+                    <Button
+                      variant="contained"
+                      onClick={() =>
+                        handleRevertAllEdits(
+                          milestone.relationships.selectedProcesses.data[0].id
+                        )
+                      }
+                    >
+                      Revert all edits
+                    </Button>
+                    <Button variant="contained" disabled>
+                      Update
+                    </Button>
+                  </Stack>
+                )
               ) : (
-                <Button variant="contained" disabled>
-                  Update
-                </Button>
+                <Stack direction="row" spacing={3}>
+                  <Button variant="contained" disabled>
+                    Update
+                  </Button>
+                </Stack>
               )}
             </Grid>
           </Grid>
@@ -215,6 +385,7 @@ const ProcessId = ({}) => {
               }}
               render={({ field }) => (
                 <TextField
+                  disabled={isDraftingNewVersion && !isEditingProcess}
                   label="Title"
                   placeholder="e.g. Complete The Visioning Advice Process"
                   error={errors.title}
@@ -229,6 +400,7 @@ const ProcessId = ({}) => {
               defaultValue=""
               render={({ field }) => (
                 <TextField
+                  disabled={isDraftingNewVersion && !isEditingProcess}
                   multiline
                   label="Description"
                   placeholder="The description of this process"
@@ -251,6 +423,7 @@ const ProcessId = ({}) => {
                 }}
                 render={({ field }) => (
                   <Select
+                    disabled={isDraftingNewVersion && !isEditingProcess}
                     {...field}
                     labelId="categories-label"
                     id="categories"
@@ -263,35 +436,6 @@ const ProcessId = ({}) => {
                     }
                   >
                     {categories.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        <ListItemText primary={option.label} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-            </FormControl>
-
-            <FormControl fullWidth>
-              <InputLabel id="prerequisite-label">Prerequisite</InputLabel>
-              <Controller
-                name="prerequisite"
-                control={control}
-                defaultValue={[]}
-                rules={{
-                  required: {
-                    value: false,
-                  },
-                }}
-                render={({ field }) => (
-                  <Select
-                    disabled={!isDraftingNewVersion}
-                    {...field}
-                    labelId="prerequisite-label"
-                    id="prerequisite"
-                    input={<OutlinedInput label="Prerequisite" />}
-                  >
-                    {prerequisites.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         <ListItemText primary={option.label} />
                       </MenuItem>
@@ -315,7 +459,7 @@ const ProcessId = ({}) => {
                 }}
                 render={({ field }) => (
                   <Select
-                    disabled={!isDraftingNewVersion}
+                    disabled={!isEditingProcess || !isDraftingNewVersion}
                     {...field}
                     labelId="phase-label"
                     id="phase"
@@ -338,7 +482,6 @@ const ProcessId = ({}) => {
             </FormControl>
           </Stack>
 
-          {/* STEPS */}
           <Card noPadding>
             <List
               subheader={
@@ -347,7 +490,88 @@ const ProcessId = ({}) => {
                   id="nested-list-subheader"
                   sx={{ background: "#eaeaea" }}
                 >
-                  Steps
+                  <Grid container justifyContent="space-between">
+                    <Grid item>Prerequisite</Grid>
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        disabled={!isEditingProcess}
+                        onClick={() => setShowAddPrerequisiteModal(true)}
+                      >
+                        Add prerequisite
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </ListSubheader>
+              }
+            >
+              {isLoading
+                ? Array.from({ length: 1 }).map((_, index) => (
+                    <ListItem key={index} divider>
+                      <ListItemText>
+                        <Skeleton variant="text" width={120} />
+                      </ListItemText>
+                    </ListItem>
+                  ))
+                : milestone.relationships.prerequisites.data.map((p, i) => (
+                    <ListItem
+                      key={i}
+                      disablePadding
+                      secondaryAction={
+                        <Button
+                          id={`remove-prerequisite-${i}`}
+                          variant="text"
+                          color="error"
+                          disabled={!isEditingProcess}
+                          onClick={() =>
+                            handleDeleteDependency(
+                              milestone?.relationships.workableDependencies.data.find(
+                                (d) =>
+                                  d.attributes.prerequisiteWorkableId.toString() ===
+                                  p.id
+                              ).id
+                            )
+                          }
+                        >
+                          Remove
+                        </Button>
+                      }
+                    >
+                      <ListItemButton disabled>
+                        <ListItemText>{p.attributes.title}</ListItemText>
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+            </List>
+          </Card>
+
+          {/* STEPS */}
+          <Card noPadding sx={{ overflow: "visible" }}>
+            <List
+              subheader={
+                <ListSubheader
+                  component="div"
+                  id="nested-list-subheader"
+                  sx={{ background: "#eaeaea" }}
+                >
+                  <Grid container justifyContent="space-between">
+                    <Grid item>Steps</Grid>
+                    {isLoading ? (
+                      <Skeleton variant="text" width={120} />
+                    ) : milestone.relationships.steps.data.length ? null : (
+                      <Grid item>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          disabled={!isEditingProcess}
+                          onClick={() => handleStageAddStep(1000)}
+                        >
+                          Add step
+                        </Button>
+                      </Grid>
+                    )}
+                  </Grid>
                 </ListSubheader>
               }
             >
@@ -377,9 +601,20 @@ const ProcessId = ({}) => {
                   getPosition={(item) => item.attributes.position}
                   renderItem={(step, i) => (
                     <StepListItem
-                      key={i}
+                      key={step.id}
                       step={step}
+                      isEditingProcess={isEditingProcess}
                       isDraftingNewVersion={isDraftingNewVersion}
+                      prevStepPosition={
+                        i > 0 &&
+                        milestone.relationships.steps.data[i - 1].attributes
+                          .position
+                      }
+                      isLast={
+                        i === milestone.relationships.steps.data.length - 1
+                      }
+                      handleRemoveStep={handleRemoveStep}
+                      handleStageAddStep={handleStageAddStep}
                     />
                   )}
                 />
@@ -388,6 +623,19 @@ const ProcessId = ({}) => {
           </Card>
         </Stack>
       </form>
+      <AddPrerequisiteModal
+        open={showAddPrerequisiteModal}
+        onClose={() => setShowAddPrerequisiteModal(false)}
+        handleAddPrerequisite={handleAddPrerequisite}
+        workflow={workflow}
+        milestone={milestone}
+      />
+      <AddStepModal
+        open={addStepModalOpen}
+        addStepPosition={addStepPosition}
+        handleCreateStep={handleCreateStep}
+        onClose={() => setAddStepModalOpen(false)}
+      />
       <Snackbar
         autoHideDuration={1000}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -395,26 +643,114 @@ const ProcessId = ({}) => {
         onClose={() => setRepositionedSnackbarOpen(false)}
         message="Step repositioned and saved."
       />
+      <Snackbar
+        autoHideDuration={1000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={updatedProcessSnackbarOpen}
+        onClose={() => setUpdatedProcessSnackbarOpen(false)}
+        message="Process updated."
+      />
     </PageContainer>
   );
 };
 
 export default ProcessId;
 
-const StepListItem = ({ isDraftingNewVersion, step }) => {
+const AddPrerequisiteModal = ({
+  open,
+  onClose,
+  handleAddPrerequisite,
+  workflow,
+  milestone,
+}) => {
+  return (
+    <Dialog open={open} onClose={onClose} fullWidth>
+      <DialogTitle>Add Prerequisite</DialogTitle>
+      <DialogContent>
+        <Card noPadding variant="outlined">
+          <ChoosePrerequisiteList
+            handleAddPrerequisite={handleAddPrerequisite}
+            workflow={workflow}
+            milestone={milestone}
+          />
+        </Card>
+        {/* list of processes */}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
+  const handleClose = () => {
+    onClose();
+  };
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isDirty },
+  } = useForm();
+
+  useEffect(() => {
+    reset({
+      position: addStepPosition,
+    });
+  }, [open]);
+
+  const onSubmit = handleSubmit((data) => {
+    // console.log({ data });
+    handleCreateStep(data);
+    reset();
+    onClose();
+  });
+  return (
+    <Dialog open={open} onClose={handleClose} fullWidth scroll="paper">
+      <DialogTitle>Add Step</DialogTitle>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent>
+          <Controller
+            name="position"
+            control={control}
+            defaultValue=""
+            render={({ field }) => <input type="hidden" {...field} />}
+          />
+          <StepFields control={control} errors={errors} />
+        </DialogContent>
+        <DialogActions>
+          <Button type="submit" disabled={!isDirty}>
+            Create step
+          </Button>
+          {/* Step add button */}
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+};
+
+const StepListItem = ({
+  isEditingProcess,
+  isDraftingNewVersion,
+  handleRemoveStep,
+  handleStageAddStep,
+  prevStepPosition,
+  step,
+  isLast,
+}) => {
+  const [showRemoveStepCheck, setShowRemoveStepCheck] = useState(null);
+  const [deleteStepCheck, setDeleteStepCheck] = useState("");
+  // console.log({ prevStepPosition });
   const router = useRouter();
   const processId = router.query.processId;
+
+  const position = isLast
+    ? step.attributes.position + 1000
+    : (step.attributes.position + prevStepPosition) / 2;
+  const lastStepPosition = step.attributes.position + 1000;
 
   // console.log({ step });
 
   const { listeners, attributes, isDragging } = useSortable({ id: step.id });
-
-  const handleAddStep = () => {
-    // console.log("Add step");
-  };
-  const handleRemoveStep = (id) => {
-    // console.log("Remove step", id);
-  };
 
   const PositionGrabber = ({ ...props }) => {
     return (
@@ -424,16 +760,17 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
     );
   };
 
+  // handleRemoveStep(step.id);
   return (
     <ListItem
       disablePadding
       divider
       secondaryAction={
-        !isDraftingNewVersion ? null : (
+        !isEditingProcess ? null : (
           <Button
             variant="text"
             color="error"
-            onClick={() => handleRemoveStep(step.id)}
+            onClick={() => setShowRemoveStepCheck(step)}
           >
             Remove
           </Button>
@@ -442,13 +779,17 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
       sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
+        isLast={isLast}
+        disabled={isDraftingNewVersion && !isEditingProcess}
         id={`inline-action-tile-${step.id}`}
-        showAdd={isDraftingNewVersion}
+        showAdd={isDraftingNewVersion && isEditingProcess}
         status="default"
-        add={handleAddStep}
+        add={() => handleStageAddStep(position, step.id)}
+        lastAdd={() => handleStageAddStep(lastStepPosition, step.id)}
         dragHandle={<PositionGrabber {...listeners} {...attributes} />}
       />
       <ListItemButton
+        disabled={isDraftingNewVersion && !isEditingProcess}
         onClick={() =>
           router.push(
             `/admin/workflows/processes/${processId}/steps/${step.id}`
@@ -456,7 +797,11 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
         }
       >
         <Stack direction="row" spacing={3} alignItems="center">
-          <ListItemText>{step.attributes.title}</ListItemText>
+          <ListItemText>
+            <Typography variant="bodyRegular">
+              {step.attributes.title}
+            </Typography>
+          </ListItemText>
           <Chip label={step.attributes.maxWorktime} size="small" />
           <Chip
             label={
@@ -478,28 +823,57 @@ const StepListItem = ({ isDraftingNewVersion, step }) => {
           ) : null}
         </Stack>
       </ListItemButton>
+      <Dialog
+        fullWidth
+        open={showRemoveStepCheck}
+        onClose={() => setShowRemoveStepCheck(false)}
+      >
+        <DialogTitle>
+          {showRemoveStepCheck
+            ? `Remove "${showRemoveStepCheck?.attributes.title}"`
+            : null}
+        </DialogTitle>
+        <DialogContent>
+          <Stack mt={3} spacing={3}>
+            <TextField
+              fullWidth
+              name="delete_step_check"
+              value={deleteStepCheck}
+              onChange={(e) => setDeleteStepCheck(e.target.value)}
+              label="To remove, type the step title"
+              placeholder="e.g. Step Title"
+            />
+            <Stack direction="row" spacing={3}>
+              <Warning color="primary" />
+              <Typography variant="bodyRegular">
+                Note that once removed, a step is gone and cannot be retrieved.
+                If you need the content of this step you should save it
+                elsewhere first.
+              </Typography>
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => handleRemoveStep(step.id)}
+            color="error"
+            disabled={
+              showRemoveStepCheck &&
+              deleteStepCheck !== showRemoveStepCheck?.attributes.title
+            }
+          >
+            Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ListItem>
   );
 };
 
-const categories = [
-  {
-    label: "Albums, Advice & Network Membership",
-    value: "Albums, Advice & Network Membership",
-  },
-  { label: "Finance", value: "Finance" },
-  { label: "Facilities", value: "Facilities" },
-  { label: "Governance & Compliance", value: "Governance & Compliance" },
-  { label: "Human Resources", value: "Human Resources" },
-  {
-    label: "Community & Family Engagement",
-    value: "Community & Family Engagement",
-  },
-  {
-    label: "Classroom & Program Practices",
-    value: "Classroom & Program Practices",
-  },
-];
+const categories = Object.values(ssj_categories).map((category) => ({
+  label: category,
+  value: category,
+}));
 const phases = [
   { label: "Visioning", value: "visioning" },
   { label: "Planning", value: "planning" },
@@ -509,3 +883,194 @@ const prerequisites = [
   { label: "Process 1", value: "asdf-1234" },
   { label: "Process 2", value: "asdf-5678" },
 ];
+
+const StepFields = ({ control, errors }) => {
+  return (
+    <Stack spacing={6}>
+      <Controller
+        name="title"
+        control={control}
+        defaultValue=""
+        rules={{
+          required: {
+            value: true,
+            message: "This field is required",
+          },
+        }}
+        render={({ field }) => (
+          <TextField
+            label="Title"
+            placeholder="e.g. Complete The Visioning Advice Process"
+            error={errors.title}
+            helperText={errors && errors.title && errors.title.message}
+            {...field}
+          />
+        )}
+      />
+      <Controller
+        name="description"
+        control={control}
+        defaultValue=""
+        rules={{
+          required: {
+            value: true,
+            message: "This field is required",
+          },
+        }}
+        render={({ field }) => (
+          <TextField
+            multiline
+            label="Description"
+            placeholder="The description of this step"
+            error={errors.description}
+            helperText={
+              errors && errors.description && errors.description.message
+            }
+            {...field}
+          />
+        )}
+      />
+
+      <Controller
+        name="max_worktime"
+        control={control}
+        defaultValue=""
+        rules={{
+          required: {
+            value: true,
+            message: "This field is required",
+          },
+        }}
+        render={({ field }) => (
+          <TextField
+            label="Worktime"
+            placeholder="e.g. 2 hours, or 3 minutes"
+            error={errors.max_worktime}
+            helperText={
+              errors && errors.max_worktime && errors.max_worktime.message
+            }
+            {...field}
+          />
+        )}
+      />
+
+      <Stack spacing={2}>
+        <Typography variant="bodyRegular">Assignment</Typography>
+        <Controller
+          name="completion_type"
+          defaultValue=""
+          control={control}
+          rules={{ required: true, message: "This field is required" }}
+          render={({ field: { onChange, value } }) => (
+            <RadioGroup value={value}>
+              <FormControlLabel
+                value="each_person"
+                control={<Radio />}
+                label={
+                  "Individual (everyone can assign - everyone should complete)"
+                }
+                onChange={onChange}
+              />
+              <FormControlLabel
+                value="one_per_group"
+                control={<Radio />}
+                label={
+                  "Collaborative (everyone can assign - only one can complete per group)"
+                }
+                onChange={onChange}
+              />
+              <FormHelperText error={errors.completion_type}>
+                {errors &&
+                  errors.completion_type &&
+                  errors.completion_type.type === "required" &&
+                  "This field is required"}
+              </FormHelperText>
+            </RadioGroup>
+          )}
+        />
+      </Stack>
+      <Controller
+        name="kind"
+        defaultValue="default"
+        control={control}
+        render={({ field }) => (
+          <FormControlLabel
+            label="Is decision"
+            control={
+              <Switch
+                label="Kind"
+                checked={field.value === "decision"}
+                onChange={(e) =>
+                  field.onChange(e.target.checked ? "decision" : "default")
+                }
+              />
+            }
+          />
+        )}
+      />
+    </Stack>
+  );
+};
+
+const ChoosePrerequisiteList = ({
+  handleAddPrerequisite,
+  workflow,
+  milestone,
+}) => {
+  //  TODO: get the workflow, show processes from that workflow, and then filter out processes greater than the current processes position
+
+  // console.log({ workflow });
+
+  const milestonePosition =
+    milestone.relationships.selectedProcesses.data[0].attributes.position;
+
+  const filteredProcesses = workflow.relationships.processes.data.filter(
+    (process) =>
+      process.relationships.selectedProcesses.data[0].attributes.position <
+        milestonePosition &&
+      process.attributes.phase === milestone.attributes.phase
+  );
+
+  // console.log({ filteredProcesses });
+
+  return (
+    <List>
+      {!filteredProcesses ? (
+        Array.from({ length: 12 }).map((_, index) => (
+          <ListItem key={index} divider>
+            <ListItemText>
+              <Skeleton variant="text" width={120} />
+            </ListItemText>
+          </ListItem>
+        ))
+      ) : !filteredProcesses.length ? (
+        <ListItem divider>
+          <ListItemText>
+            <Typography variant="bodyRegular">
+              No prerequisites available
+            </Typography>
+          </ListItemText>
+        </ListItem>
+      ) : (
+        filteredProcesses?.map((process, i) => (
+          <ListItem disablePadding divider key={i}>
+            <ListItemButton onClick={() => handleAddPrerequisite(process.id)}>
+              <Stack direction="row" spacing={3} alignItems="center">
+                <ListItemText>
+                  <Typography noWrap>{process.attributes.title}</Typography>
+                </ListItemText>
+                <Chip
+                  label={`${process.attributes.numOfSteps} steps`}
+                  size="small"
+                />
+                {process.attributes.categories.map((c, i) => (
+                  <CategoryChip category={c} key={i} size="small" />
+                ))}
+              </Stack>
+            </ListItemButton>
+          </ListItem>
+        ))
+      )}
+    </List>
+  );
+};

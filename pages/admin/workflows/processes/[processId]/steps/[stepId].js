@@ -4,6 +4,8 @@ import { mutate } from "swr";
 
 import { Controller, useForm } from "react-hook-form";
 import {
+  Snackbar,
+  Alert,
   List,
   Card,
   CardContent,
@@ -27,11 +29,13 @@ import {
   Breadcrumbs,
   Link,
 } from "@mui/material";
-import { PageContainer, Grid, Typography } from "@ui";
+import { Edit } from "@mui/icons-material";
 
+import { PageContainer, Grid, Typography } from "@ui";
 import stepsApi from "@api/workflow/definition/steps";
 import useStep from "@hooks/workflow/definition/useStep";
 import useMilestone from "@hooks/workflow/definition/useMilestone";
+import useWorkflow from "@hooks/workflow/definition/useWorkflow";
 
 const StepId = ({}) => {
   const router = useRouter();
@@ -39,10 +43,15 @@ const StepId = ({}) => {
   const processId = router.query.processId;
   const stepId = router.query.stepId;
 
+  const { workflow, isLoading: workflowIsLoading } = useWorkflow(workflowId);
+
   useEffect(() => {
     const id = localStorage.getItem("workflowId");
     setWorkflowId(id);
   }, []);
+  useEffect(() => {
+    setIsDraftingNewVersion(workflow?.attributes.published === false);
+  }, [workflow]);
 
   //Fetch milestone data for breadcrumbs
   const { milestone, isLoading: milestoneIsLoading } = useMilestone(processId);
@@ -51,12 +60,13 @@ const StepId = ({}) => {
   const { step, isLoading, isError } = useStep(processId, stepId);
   // console.log({ step });
 
-  const isRollout = false;
+  const [isDraftingNewVersion, setIsDraftingNewVersion] = useState(null);
 
   const [stepHasChanges, setStepHasChanges] = useState(false);
   const [originalData, setOriginalData] = useState(false);
 
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
+  const [updatedStepSnackbarOpen, setUpdatedStepSnackbarOpen] = useState(false);
   const [viewingResource, setViewingResource] = useState(null);
 
   const [resourceParams, setResourceParams] = useState([]);
@@ -67,6 +77,7 @@ const StepId = ({}) => {
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
   const [decisionOption, setDecisionOption] = useState(null);
   const [decisionOptionParams, setDecisionOptionParams] = useState([]);
+  console.log({ decisionOptionParams });
 
   const {
     control,
@@ -151,6 +162,7 @@ const StepId = ({}) => {
       try {
         const response = await stepsApi.editStep(processId, step.id, allData);
         setStepHasChanges(false);
+        setUpdatedStepSnackbarOpen(true);
         setResourceParams([]);
         setDecisionOptionParams([]);
         mutate(`/definition/processes/${processId}/steps/${step.id}`);
@@ -165,6 +177,7 @@ const StepId = ({}) => {
         resourcesToDelete.forEach(async (resource) => {
           console.log("deleting resource", resource);
           const response = await stepsApi.deleteDocument(resource);
+          setUpdatedStepSnackbarOpen(true);
           mutate(`/v1/documents/${resource}`);
           mutate(`/definition/processes/${processId}/steps/${step.id}`);
           setResourcesToDelete([]);
@@ -210,20 +223,29 @@ const StepId = ({}) => {
     setDecisionModalOpen(true);
   };
   const handleUpdateDecisionOption = (data) => {
-    // console.log("Update decision option", data);
-    const preparedDataForApi = {
+    const structuredData = {
       id: data?.decision_id || "",
       description: data?.decision_option || "",
     };
-    setDecisionOptionParams([...decisionOptionParams, preparedDataForApi]);
-    // console.log({ decisionOptionParams });
+    setDecisionOptionParams([...decisionOptionParams, structuredData]);
     setStepHasChanges(true);
   };
-  const handleRemoveDecisionOption = () => {
+  const handleRemoveDecisionOption = async (optionId) => {
     // console.log("Remove decision option");
+    try {
+      const response = await stepsApi.deleteDecisionOption(optionId);
+      mutate(`/definition/processes/${processId}/steps/${step.id}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
-  const handleAddDecisionOption = () => {
-    // console.log("Add decision option");
+  const handleAddDecisionOption = (data) => {
+    const structuredData = {
+      id: data?.decision_id || "",
+      description: data?.decision_option || "",
+    };
+    setDecisionOptionParams([...decisionOptionParams, structuredData]);
+    setStepHasChanges(true);
   };
 
   const onSubmit = handleSubmit(handleUpdateStep);
@@ -232,6 +254,13 @@ const StepId = ({}) => {
     <PageContainer isAdmin>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={6}>
+          {isDraftingNewVersion ? (
+            <Alert severity="warning" icon={<Edit fontSize="inherit" />}>
+              <Typography variant="bodyRegular">
+                Drafting new rollout
+              </Typography>
+            </Alert>
+          ) : null}
           <Breadcrumbs aria-label="breadcrumb">
             {workflowId ? (
               <Link
@@ -492,7 +521,7 @@ const StepId = ({}) => {
                       label="Is decision"
                       control={
                         <Switch
-                          disabled={!isRollout}
+                          disabled={!isDraftingNewVersion}
                           label="Kind"
                           checked={field.value === "decision"}
                           onChange={(e) =>
@@ -546,7 +575,6 @@ const StepId = ({}) => {
                                   variant="contained"
                                   size="small"
                                   onClick={() => handleOpenDecisionModal(null)}
-                                  disabled={!isRollout}
                                 >
                                   Add decision option
                                 </Button>
@@ -555,6 +583,39 @@ const StepId = ({}) => {
                           </ListSubheader>
                         }
                       >
+                        {decisionOptionParams
+                          ? decisionOptionParams
+                              .filter((d) => !d.id)
+                              .map((d, i) => (
+                                <ListItem disablePadding divider key={i}>
+                                  <ListItemButton>
+                                    <Stack
+                                      direction="row"
+                                      spacing={3}
+                                      alignItems="center"
+                                    >
+                                      <ListItemText>
+                                        <Typography
+                                          variant="bodyRegular"
+                                          lightened
+                                        >
+                                          {d.description}
+                                        </Typography>
+                                      </ListItemText>
+                                      {decisionOptionParams.some(
+                                        (param) => param.id === d.id
+                                      ) ? (
+                                        <Chip
+                                          label="Added"
+                                          size="small"
+                                          variant="outlined"
+                                        />
+                                      ) : null}
+                                    </Stack>
+                                  </ListItemButton>
+                                </ListItem>
+                              ))
+                          : null}
                         {isLoading
                           ? Array.from({ length: 3 }).map((_, index) => (
                               <ListItem key={index} divider>
@@ -565,7 +626,24 @@ const StepId = ({}) => {
                             ))
                           : step.relationships.decisionOptions.data.map(
                               (decisionOption, i) => (
-                                <ListItem disablePadding divider key={i}>
+                                <ListItem
+                                  disablePadding
+                                  divider
+                                  key={i}
+                                  secondaryAction={
+                                    <Button
+                                      color="error"
+                                      id={`remove-decision-option-${i}`}
+                                      onClick={() =>
+                                        handleRemoveDecisionOption(
+                                          decisionOption.id
+                                        )
+                                      }
+                                    >
+                                      Remove
+                                    </Button>
+                                  }
+                                >
                                   <ListItemButton
                                     onClick={() =>
                                       handleOpenDecisionModal(decisionOption)
@@ -619,13 +697,20 @@ const StepId = ({}) => {
         resource={viewingResource}
       />
       <DecisionOptionModal
-        isRollout={isRollout}
+        isDraftingNewVersion={isDraftingNewVersion}
         open={decisionModalOpen}
         onClose={() => setDecisionModalOpen(false)}
         handleUpdateDecisionOption={handleUpdateDecisionOption}
         handleRemoveDecisionOption={handleRemoveDecisionOption}
         handleAddDecisionOption={handleAddDecisionOption}
         decisionOption={decisionOption}
+      />
+      <Snackbar
+        autoHideDuration={1000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={updatedStepSnackbarOpen}
+        onClose={() => setUpdatedStepSnackbarOpen(false)}
+        message="Step updated."
       />
     </PageContainer>
   );
@@ -734,11 +819,15 @@ const ResourceForm = ({ control, errors }) => {
             value: true,
             message: "This field is required",
           },
+          pattern: {
+            value: /^(ftp|http|https):\/\/[^ "]+$/,
+            message: "Invalid URL, must include https://",
+          },
         }}
         render={({ field }) => (
           <TextField
             label="Resource Link"
-            placeholder="e.g. www.linkToResource.com"
+            placeholder="e.g. https://www.google.com"
             error={errors.resource_link}
             helperText={
               errors && errors.resource_link && errors.resource_link.message
@@ -777,12 +866,13 @@ const DecisionOptionModal = ({
   onClose,
   decisionOption,
   handleAddDecisionOption,
-  handleRemoveDecisionOption,
   handleUpdateDecisionOption,
-  isRollout,
+  isDraftingNewVersion,
 }) => {
   // console.log({ decisionOption });
   const isAdding = !decisionOption;
+  // console.log({ isAdding });
+  // console.log({ isDraftingNewVersion });
 
   const {
     control,
@@ -800,13 +890,15 @@ const DecisionOptionModal = ({
   }, [open]);
 
   const onSubmit = handleSubmit((data) => {
-    if (isRollout) {
+    console.log({ data });
+    if (isDraftingNewVersion) {
       if (isAdding) {
-        // console.log("Is adding in rollout");
+        handleAddDecisionOption(data);
       } else {
-        // console.log("Is updating in rollout");
+        handleUpdateDecisionOption(data);
       }
     } else {
+      console.log({ data });
       handleUpdateDecisionOption(data);
     }
     onClose();
@@ -820,12 +912,8 @@ const DecisionOptionModal = ({
           <DecisionForm control={control} errors={errors} />
         </DialogContent>
         <DialogActions>
-          {isRollout && !isAdding ? (
-            <Button onClick={handleRemoveDecisionOption}>Remove</Button>
-          ) : null}
-
           <Button type="submit" disabled={!isDirty}>
-            {isRollout && isAdding ? "Add" : "Update"}
+            {isDraftingNewVersion && isAdding ? "Add" : "Update"}
           </Button>
         </DialogActions>
       </form>
