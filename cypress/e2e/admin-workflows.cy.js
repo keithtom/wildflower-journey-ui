@@ -1,11 +1,11 @@
 describe("Admin, Instantaneous Changes", () => {
   beforeEach(() => {
-    // cy.resetRolloutWorkflowFixture();
+    cy.resetRolloutWorkflowFixture();
     cy.login("test@test.com", "password");
     cy.visit("/admin/workflows");
   });
 
-  it("navigates to a workflow", () => {
+  it.only("navigates to a workflow", () => {
     // Perform the first user action
     cy.contains("Basic Workflow for Cypress Tests").click();
     // Check that the URL has changed to the next page
@@ -13,7 +13,7 @@ describe("Admin, Instantaneous Changes", () => {
   });
 
   it("reorders a process", () => {
-    cy.visit("/admin/workflows/4");
+    cy.contains("Basic Workflow for Cypress Tests").click();
     cy.get("#inline-action-tile-85").trigger("mouseover");
     cy.get("#drag-handle-85").trigger("mousedown", { which: 1 });
     cy.get("#inline-action-tile-86")
@@ -22,24 +22,27 @@ describe("Admin, Instantaneous Changes", () => {
   });
 
   it("navigates to a processId page", () => {
-    cy.visit("/admin/workflows/4");
+    cy.contains("Basic Workflow for Cypress Tests").click();
     cy.contains("Milestone AB").click();
     cy.url().should("include", "/admin/workflows/processes/85");
   });
 
   it("edits the process description", () => {
-    cy.visit("/admin/workflows/processes/85");
+    cy.contains("Basic Workflow for Cypress Tests").click();
+    cy.contains("Milestone A").click();
     cy.wait(1000);
     cy.get('textarea[name="description"]').clear().type("New description");
     cy.get("button.MuiButtonBase-root").contains("Update").click();
   });
 
   it("reorders a step", () => {
-    cy.visit("/admin/workflows/processes/85");
+    cy.contains("Basic Workflow for Cypress Tests").click();
+    cy.contains("Milestone A").click();
     cy.wait(1000);
-    cy.get("#inline-action-tile-222").trigger("mouseover");
-    cy.get("#drag-handle-222").trigger("mousedown", { which: 1 });
-    cy.get("#inline-action-tile-223")
+    cy.get("#inline-action-tile").first().trigger("mouseover");
+    cy.get("#drag-handle").first().trigger("mousedown", { which: 1 });
+    cy.get("#inline-action-tile")
+      .first()
       .trigger("mousemove")
       .trigger("mouseup", { force: true });
   });

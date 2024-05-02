@@ -55,6 +55,7 @@ const Workflow = ({}) => {
   const [stagedProcessPosition, setStagedProcessPosition] = useState(null);
   const [phaseAddedInto, setPhaseAddedInto] = useState(null);
 
+  console.log(isDraftingNewVersion);
   // console.log({ versionHasChanges });
   // console.log({ groupedProcesses });
   // console.log({ stagedProcessPosition });
@@ -75,7 +76,9 @@ const Workflow = ({}) => {
     workflow?.attributes.rolloutCompletedAt === null;
 
   useEffect(() => {
-    setIsDraftingNewVersion(workflow?.attributes.published === false);
+    setIsDraftingNewVersion(
+      workflow?.attributes.published === false && !rolloutInProgress
+    );
     setVersionHasChanges(
       workflow?.relationships.processes.data.some((process) => {
         return process.relationships.selectedProcesses.data.some(
@@ -274,7 +277,8 @@ const Workflow = ({}) => {
                   label={
                     isLoading ? (
                       <Skeleton width={32} />
-                    ) : workflow.attributes.published === false ? (
+                    ) : workflow.attributes.published === false &&
+                      !rolloutInProgress ? (
                       `Drafting ${workflow.attributes.version}`
                     ) : (
                       workflow.attributes.version
@@ -336,7 +340,7 @@ const Workflow = ({}) => {
               <Button
                 variant="contained"
                 onClick={handleStartNewVersion}
-                disabled={rolloutInProgress || isLoading}
+                disabled={isLoading}
               >
                 Draft New Version
               </Button>
@@ -413,6 +417,7 @@ const Workflow = ({}) => {
                         }
                         renderItem={(process, i) => (
                           <ProcessListItem
+                            disabled={rolloutInProgress}
                             key={process.id}
                             process={process}
                             prevProcessPosition={
@@ -586,6 +591,7 @@ const ProcessListItem = ({
   prevProcessPosition,
   process,
   isLast,
+  disabled,
 }) => {
   // console.log({ prevProcessPosition });
 
@@ -660,7 +666,7 @@ const ProcessListItem = ({
     >
       <InlineActionTile
         isLast={isLast}
-        disabled={isRemoved}
+        disabled={isRemoved || disabled}
         id={`inline-action-tile-${process.id}`}
         showAdd={isRemoved ? null : isDraftingNewVersion}
         status={isDraftingNewVersion ? status : "replicated"}
@@ -674,6 +680,7 @@ const ProcessListItem = ({
       />
 
       <ListItemButton
+        disabled={disabled}
         onClick={() => router.push(`/admin/workflows/processes/${process.id}`)}
       >
         <Stack
