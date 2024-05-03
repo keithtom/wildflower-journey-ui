@@ -87,6 +87,7 @@ const MilestonesByCategory = ({ workflow }) => {
     workflow,
     { omit_include: true }
   );
+
   return isLoadingMilestonesByCategory ? (
     <Stack spacing={6}>
       {Array.from({ length: 12 }, (_, i) => (
@@ -137,6 +138,11 @@ const MilestonesByCategory = ({ workflow }) => {
 const MilestonesByPhase = ({ workflow }) => {
   const { isLoadingMilestonesByPhase, milestonesByPhase } =
     useMilestones(workflow);
+  // console.log({ milestonesByPhase });
+  const phaseOrder = ["Visioning", "Planning", "Startup"];
+  milestonesByPhase?.sort(
+    (a, b) => phaseOrder.indexOf(a.phase) - phaseOrder.indexOf(b.phase)
+  );
   return isLoadingMilestonesByPhase ? (
     <Stack spacing={6}>
       {Array.from({ length: 12 }, (_, i) => (
