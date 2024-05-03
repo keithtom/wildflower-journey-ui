@@ -172,16 +172,16 @@ const ProcessId = ({}) => {
     }
   };
 
-  const handleRemoveStep = async (stepId) => {
-    // console.log("Remove step", id);
-    setShowRemoveStepCheck(false);
-    try {
-      const response = await stepsApi.deleteStep(processId, stepId);
-      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const handleRemoveStep = async (stepId) => {
+  //   console.log("Remove step", stepId);
+  //   setShowRemoveStepCheck(false);
+  //   try {
+  //     const response = await stepsApi.deleteStep(processId, stepId);
+  //     mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   const handleStageAddStep = (position) => {
     setAddStepPosition(position);
     setAddStepModalOpen(true);
@@ -601,6 +601,7 @@ const ProcessId = ({}) => {
                   getPosition={(item) => item.attributes.position}
                   renderItem={(step, i) => (
                     <StepListItem
+                      workflowId={workflowId}
                       key={step.id}
                       step={step}
                       isEditingProcess={isEditingProcess}
@@ -613,7 +614,7 @@ const ProcessId = ({}) => {
                       isLast={
                         i === milestone.relationships.steps.data.length - 1
                       }
-                      handleRemoveStep={handleRemoveStep}
+                      // handleRemoveStep={handleRemoveStep}
                       handleStageAddStep={handleStageAddStep}
                     />
                   )}
@@ -731,11 +732,11 @@ const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
 const StepListItem = ({
   isEditingProcess,
   isDraftingNewVersion,
-  handleRemoveStep,
   handleStageAddStep,
   prevStepPosition,
   step,
   isLast,
+  workflowId,
 }) => {
   const [showRemoveStepCheck, setShowRemoveStepCheck] = useState(null);
   const [deleteStepCheck, setDeleteStepCheck] = useState("");
@@ -758,6 +759,17 @@ const StepListItem = ({
         <DragHandle />
       </Stack>
     );
+  };
+
+  const handleRemoveStep = async (stepId) => {
+    console.log("Remove step", stepId);
+    setShowRemoveStepCheck(false);
+    try {
+      const response = await stepsApi.deleteStep(processId, stepId);
+      mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // handleRemoveStep(step.id);
