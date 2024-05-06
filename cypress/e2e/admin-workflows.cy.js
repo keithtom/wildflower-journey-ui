@@ -110,7 +110,7 @@ describe("Admin, Instantaneous Changes", () => {
     cy.get("button.MuiButtonBase-root").contains("Update").click();
   });
 
-  it("edits a decision option on a step", () => {
+  it("edits a decision option on a step and deletes it", () => {
     cy.contains("Basic Workflow for Cypress Tests").click();
     cy.contains("Milestone C-X").click();
     cy.wait("@getProcess");
@@ -123,6 +123,7 @@ describe("Admin, Instantaneous Changes", () => {
     cy.get("button.MuiButton-text").contains("Update").click();
     cy.get("button.MuiButtonBase-root").contains("Update").click();
     cy.wait(1000);
+    cy.get("#remove-decision-option-0").contains("Remove").click();
   });
 });
 
