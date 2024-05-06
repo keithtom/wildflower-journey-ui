@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { mutate } from "swr";
 import { useForm, Controller } from "react-hook-form";
 
+import { snakeCase } from "@lib/utils/snakeCase";
 import {
   Tooltip,
   Alert,
@@ -622,7 +623,10 @@ const ProcessListItem = ({
 
   const PositionGrabber = ({ ...props }) => {
     return (
-      <Stack {...props} id={`drag-handle-${process.id}`}>
+      <Stack
+        {...props}
+        id={`drag-handle-${snakeCase(process.attributes.title)}`}
+      >
         <DragHandle />
       </Stack>
     );
@@ -667,7 +671,7 @@ const ProcessListItem = ({
       <InlineActionTile
         isLast={isLast}
         disabled={isRemoved || disabled}
-        id={`inline-action-tile-${process.id}`}
+        id={`inline-action-tile-${snakeCase(process.attributes.title)}`}
         showAdd={isRemoved ? null : isDraftingNewVersion}
         status={isDraftingNewVersion ? status : "replicated"}
         add={() =>

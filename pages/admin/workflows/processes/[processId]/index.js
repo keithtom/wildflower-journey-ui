@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { mutate } from "swr";
 import { useSortable } from "@dnd-kit/sortable";
 import { Controller, useForm } from "react-hook-form";
+
+import { snakeCase } from "@lib/utils/snakeCase";
 import {
   List,
   Card,
@@ -755,7 +757,7 @@ const StepListItem = ({
 
   const PositionGrabber = ({ ...props }) => {
     return (
-      <Stack {...props} id={`drag-handle-${step.id}`}>
+      <Stack {...props} id={`drag-handle-${snakeCase(step.attributes.title)}`}>
         <DragHandle />
       </Stack>
     );
@@ -793,7 +795,7 @@ const StepListItem = ({
       <InlineActionTile
         isLast={isLast}
         disabled={isDraftingNewVersion && !isEditingProcess}
-        id={`inline-action-tile-${step.id}`}
+        id={`inline-action-tile-${snakeCase(step.attributes.title)}`}
         showAdd={isDraftingNewVersion && isEditingProcess}
         status="default"
         add={() => handleStageAddStep(position, step.id)}
