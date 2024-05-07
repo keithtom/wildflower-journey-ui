@@ -70,6 +70,9 @@ const ProcessId = ({}) => {
   const [showAddPrerequisiteModal, setShowAddPrerequisiteModal] =
     useState(false);
 
+  console.log({ isDraftingNewVersion });
+  console.log({ isEditingProcess });
+
   const { workflow, isLoading: workflowIsLoading } = useWorkflow(workflowId);
   // console.log({ workflow });
 
@@ -91,7 +94,9 @@ const ProcessId = ({}) => {
     setIsDraftingNewVersion(workflow?.attributes.published === false);
     setIsEditingProcess(
       milestone?.relationships.selectedProcesses.data[0].attributes.state ===
-        "upgraded" || "added"
+        "upgraded" ||
+        milestone?.relationships.selectedProcesses.data[0].attributes.state ===
+          "added"
     );
   }, [workflow, milestone]);
 
