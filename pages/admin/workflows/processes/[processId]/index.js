@@ -502,7 +502,7 @@ const ProcessId = ({}) => {
                       <Button
                         variant="contained"
                         size="small"
-                        disabled={!isEditingProcess}
+                        disabled={!isDraftingNewVersion || !isEditingProcess}
                         onClick={() => setShowAddPrerequisiteModal(true)}
                       >
                         Add Prerequisite
@@ -570,7 +570,7 @@ const ProcessId = ({}) => {
                         <Button
                           variant="contained"
                           size="small"
-                          disabled={!isEditingProcess}
+                          disabled={!isDraftingNewVersion || !isEditingProcess}
                           onClick={() => handleStageAddStep(1000)}
                         >
                           Add step
