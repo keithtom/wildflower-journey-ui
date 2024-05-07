@@ -87,8 +87,8 @@ const SubmitVersionPage = () => {
   const handleSubmitNewVersion = async () => {
     try {
       const response = await workflowApi.publishWorkflow(workflowId);
-      console.log({ response });
-      router.push(`/admin/workflows/${workflowId}`);
+      // console.log({ response });
+      router.push(`/admin/workflows`);
     } catch (error) {
       console.log(error);
     }
@@ -130,7 +130,7 @@ const SubmitVersionPage = () => {
                 <Button>Go back</Button>
               </Link>
               <Button variant="contained" onClick={handleSubmitNewVersion}>
-                Confirm and submit
+                Confirm And Submit
               </Button>
             </Stack>
           </Grid>
