@@ -576,7 +576,7 @@ const StepId = ({}) => {
                                   size="small"
                                   onClick={() => handleOpenDecisionModal(null)}
                                 >
-                                  Add decision option
+                                  Add Decision Option
                                 </Button>
                               </Grid>
                             </Grid>

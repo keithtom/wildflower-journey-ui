@@ -344,7 +344,7 @@ const ProcessId = ({}) => {
                     variant="contained"
                     onClick={handleEditProcessInRollout}
                   >
-                    Edit this process
+                    Edit This Process
                   </Button>
                 ) : (
                   <Stack direction="row" spacing={3}>
@@ -356,7 +356,7 @@ const ProcessId = ({}) => {
                         )
                       }
                     >
-                      Revert all edits
+                      Revert All Edits
                     </Button>
                     <Button variant="contained" disabled>
                       Update
@@ -501,7 +501,7 @@ const ProcessId = ({}) => {
                         disabled={!isEditingProcess}
                         onClick={() => setShowAddPrerequisiteModal(true)}
                       >
-                        Add prerequisite
+                        Add Prerequisite
                       </Button>
                     </Grid>
                   </Grid>
@@ -722,7 +722,7 @@ const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
         </DialogContent>
         <DialogActions>
           <Button type="submit" disabled={!isDirty}>
-            Create step
+            Create Step
           </Button>
           {/* Step add button */}
         </DialogActions>
@@ -785,6 +785,7 @@ const StepListItem = ({
             variant="text"
             color="error"
             onClick={() => setShowRemoveStepCheck(step)}
+            id={`remove-step-${snakeCase(step.attributes.title)}`}
           >
             Remove
           </Button>
@@ -892,10 +893,6 @@ const phases = [
   { label: "Visioning", value: "visioning" },
   { label: "Planning", value: "planning" },
   { label: "Startup", value: "startup" },
-];
-const prerequisites = [
-  { label: "Process 1", value: "asdf-1234" },
-  { label: "Process 2", value: "asdf-5678" },
 ];
 
 const StepFields = ({ control, errors }) => {
