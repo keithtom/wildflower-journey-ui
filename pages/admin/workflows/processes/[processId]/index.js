@@ -91,7 +91,7 @@ const ProcessId = ({}) => {
     setIsDraftingNewVersion(workflow?.attributes.published === false);
     setIsEditingProcess(
       milestone?.relationships.selectedProcesses.data[0].attributes.state ===
-        "upgraded"
+        "upgraded" || "added"
     );
   }, [workflow, milestone]);
 
@@ -349,6 +349,10 @@ const ProcessId = ({}) => {
                 ) : (
                   <Stack direction="row" spacing={3}>
                     <Button
+                      disabled={
+                        milestone?.relationships.selectedProcesses.data[0]
+                          .attributes.state === "added"
+                      }
                       variant="contained"
                       onClick={() =>
                         handleRevertAllEdits(
