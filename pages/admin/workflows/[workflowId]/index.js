@@ -108,11 +108,13 @@ const Workflow = ({}) => {
   ) => {
     let newPosition;
     if (priorItemPosition === null) {
-      newPosition = subsequentItemPosition / 2;
+      newPosition = Math.floor(subsequentItemPosition / 2);
     } else if (subsequentItemPosition === null) {
-      newPosition = priorItemPosition * 1.5;
+      newPosition = Math.floor(priorItemPosition * 1.5);
     } else {
-      newPosition = (priorItemPosition + subsequentItemPosition) / 2;
+      newPosition = Math.floor(
+        (priorItemPosition + subsequentItemPosition) / 2
+      );
     }
     // using the processId, find the process in the workflow
     const process = workflow.relationships.processes.data.find(
@@ -129,24 +131,16 @@ const Workflow = ({}) => {
       // get the selected process id
       selectedProcessId = process.relationships.selectedProcesses.data[0].id;
     }
-    const data = {
-      process: {
-        selected_processes_attributes: [
-          {
-            //pass the selected process id
-            id: selectedProcessId,
-            workflow_id: workflowId,
-            position: newPosition,
-          },
-        ],
-      },
+
+    const repositionInProcessData = {
+      selected_process: { position: Number(newPosition) },
     };
-
-    // console.log("reposition data", data);
-
     try {
-      // Make API call to update the position of the step
-      const response = await processApi.editMilestone(processId, data);
+      const response = await workflowApi.repositionProcessInRollout(
+        Number(selectedProcessId),
+        repositionInProcessData
+      );
+
       mutate(`/definition/workflows/${workflowId}`);
       setRepositionedSnackbarOpen(true);
     } catch (error) {
