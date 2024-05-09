@@ -28,6 +28,7 @@ import InlineActionTile from "@components/admin/InlineActionTile";
 import DraggableList from "@components/admin/DraggableList";
 import useWorkflow from "@hooks/workflow/definition/useWorkflow";
 import processApi from "@api/workflow/definition/processes";
+import workflowApi from "@api/workflow/definition/workflows";
 
 const Workflow = ({}) => {
   const router = useRouter();
