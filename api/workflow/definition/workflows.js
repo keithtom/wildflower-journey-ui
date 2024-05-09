@@ -140,6 +140,7 @@ async function deleteProcessInWorkflow(workflowId, processId) {
     wildflowerApi.handleErrors(error);
   }
 }
+
 async function repositionProcessInRollout(selectedProcessId, params) {
   const config = getAuthHeader();
   const data = { ...params };
