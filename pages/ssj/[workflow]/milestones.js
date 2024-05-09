@@ -88,6 +88,17 @@ const MilestonesByCategory = ({ workflow }) => {
     { omit_include: true }
   );
 
+  const phaseOrder = ["visioning", "planning", "startup"];
+  const sortedMilestonesByCategory = milestonesByCategory?.map((category) => ({
+    ...category,
+    milestones: category.milestones.sort((a, b) => {
+      return (
+        phaseOrder.indexOf(a.attributes.phase) -
+        phaseOrder.indexOf(b.attributes.phase)
+      );
+    }),
+  }));
+
   return isLoadingMilestonesByCategory ? (
     <Stack spacing={6}>
       {Array.from({ length: 12 }, (_, i) => (
@@ -104,7 +115,7 @@ const MilestonesByCategory = ({ workflow }) => {
       ))}
     </Stack>
   ) : (
-    milestonesByCategory?.map((a, i) =>
+    sortedMilestonesByCategory?.map((a, i) =>
       a.milestones.length ? (
         <Card key={i}>
           <Stack spacing={6}>
