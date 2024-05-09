@@ -71,4 +71,19 @@ async function editWorkflow(id, data) {
   }
 }
 
-export default { createWorkflow, editWorkflow };
+async function repositionProcessInRollout(selectedProcessId, params) {
+  const config = getAuthHeader();
+  const data = { ...params };
+  try {
+    const response = await workflowsApi.put(
+      `/definition/selected_processes/${selectedProcessId}`,
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { createWorkflow, editWorkflow, repositionProcessInRollout };
