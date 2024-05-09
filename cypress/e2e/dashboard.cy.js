@@ -44,7 +44,8 @@ describe("dashboard spec", () => {
 
       const today = new Date();
       const datestamp = today.toISOString().split("T")[0];
-      const email = "newemail_partner_" + datestamp + "@test.com";
+      const timestamp = Date.now();
+      const email = "newemail_partner_" + datestamp + timestamp + "@test.com";
 
       cy.contains("Add a partner", { timeout: 60000 }).click();
       cy.get('input[name="partnerFirstName"]').clear().type("Donna");
