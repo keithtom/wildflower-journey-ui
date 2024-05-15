@@ -56,7 +56,7 @@ const Workflow = ({}) => {
   const [stagedProcessPosition, setStagedProcessPosition] = useState(null);
   const [phaseAddedInto, setPhaseAddedInto] = useState(null);
 
-  console.log(isDraftingNewVersion);
+  // console.log(isDraftingNewVersion);
   // console.log({ versionHasChanges });
   // console.log({ groupedProcesses });
   // console.log({ stagedProcessPosition });
@@ -580,19 +580,11 @@ const ProcessListItem = ({
   isLast,
   disabled,
 }) => {
-  // console.log({ prevProcessPosition });
-
-  // console.log({ process });
   const router = useRouter();
 
   const status =
     process.relationships.selectedProcesses?.data[0].attributes.state;
   const selectedProcesses = process.relationships.selectedProcesses?.data;
-
-  // console.log(process.attributes.title, {
-  //   ownPosition: selectedProcesses[0].attributes.position,
-  //   prevProcessPosition: prevProcessPosition,
-  // });
 
   const processPosition =
     (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
@@ -602,8 +594,15 @@ const ProcessListItem = ({
   const isRemoved = selectedProcesses.some(
     (process) => process.attributes.state === "removed"
   );
-  // removed, added, upgraded
-  // replicated
+
+  const numOfPrerequisites = process?.attributes.prerequisiteTitles.length;
+
+  // console.log({ process });
+  // console.log({ prevProcessPosition });
+  // console.log(process.attributes.title, {
+  //   ownPosition: selectedProcesses[0].attributes.position,
+  //   prevProcessPosition: prevProcessPosition,
+  // });
 
   const { listeners, attributes, isDragging } = useSortable({ id: process.id });
 
@@ -643,7 +642,7 @@ const ProcessListItem = ({
               <Button
                 variant="text"
                 color="error"
-                // id={`remove-process-${process.id}`}
+                disabled={process?.attributes.isPrerequisite}
                 onClick={() => handleRemoveProcess(process.id)}
               >
                 Remove
@@ -688,6 +687,25 @@ const ProcessListItem = ({
           {process.attributes.categories.map((c, i) => (
             <CategoryChip category={c} size="small" key={i} />
           ))}
+          {numOfPrerequisites ? (
+            <Tooltip
+              title={
+                <Stack>
+                  {process?.attributes.prerequisiteTitles.map((t, i) => (
+                    <span>{t}</span>
+                  ))}
+                </Stack>
+              }
+            >
+              <Chip
+                label={`${numOfPrerequisites} prerequisite${
+                  numOfPrerequisites > 1 ? "s" : ""
+                }`}
+                size="small"
+                variant="outlined"
+              />
+            </Tooltip>
+          ) : null}
         </Stack>
       </ListItemButton>
     </ListItem>
