@@ -296,7 +296,7 @@ const Workflow = ({}) => {
                   {isLoading ? (
                     <Skeleton width={64} />
                   ) : (
-                    `${workflow.attributes.numOfInstances} Instances`
+                    `Used by ${workflow.attributes.numOfInstances} schools`
                   )}
                 </Typography>
               </Stack>
