@@ -389,8 +389,8 @@ const StepId = ({}) => {
               }}
               render={({ field }) => (
                 <TextField
-                  label="Worktime"
-                  placeholder="e.g. 2 hours, or 3 minutes"
+                  label="Worktime (in hours)"
+                  placeholder="e.g. 2"
                   error={errors.worktime}
                   helperText={
                     errors && errors.worktime && errors.worktime.message
