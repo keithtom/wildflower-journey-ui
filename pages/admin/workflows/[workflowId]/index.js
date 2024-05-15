@@ -639,14 +639,21 @@ const ProcessListItem = ({
                 Reinstate
               </Button>
             ) : (
-              <Button
-                variant="text"
-                color="error"
-                disabled={process?.attributes.isPrerequisite}
-                onClick={() => handleRemoveProcess(process.id)}
+              <ConditionalTooltip
+                display={process?.attributes.isPrerequisite}
+                title="Can't remove a process that is a prerequisite"
               >
-                Remove
-              </Button>
+                <span>
+                  <Button
+                    variant="text"
+                    color="error"
+                    disabled={process?.attributes.isPrerequisite}
+                    onClick={() => handleRemoveProcess(process.id)}
+                  >
+                    Remove
+                  </Button>
+                </span>
+              </ConditionalTooltip>
             )}
           </Stack>
         )
@@ -885,6 +892,9 @@ const ChooseProcessList = ({ handleChooseProcess, phaseAddedInto }) => {
           )}
     </List>
   );
+};
+const ConditionalTooltip = ({ title, children, display }) => {
+  return display ? <Tooltip title={title}>{children}</Tooltip> : children;
 };
 
 const categories = Object.values(ssj_categories).map((category) => ({
