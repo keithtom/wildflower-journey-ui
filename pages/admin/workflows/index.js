@@ -96,7 +96,7 @@ const Workflows = ({}) => {
                             <Typography
                               variant="bodyRegular"
                               lightened
-                            >{`${workflow.attributes.numOfInstances} Instances`}</Typography>
+                            >{`Used by ${workflow.attributes.numOfInstances} schools`}</Typography>
                           </Stack>
                         </ListItemButton>
                       </ListItem>

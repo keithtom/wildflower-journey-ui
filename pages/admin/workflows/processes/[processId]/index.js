@@ -162,13 +162,15 @@ const ProcessId = ({}) => {
   ) => {
     let newPosition;
     if (priorItemPosition === null) {
-      newPosition = subsequentItemPosition / 2;
+      newPosition = Math.floor(subsequentItemPosition / 2);
     } else if (subsequentItemPosition === null) {
-      newPosition = priorItemPosition * 1.5;
+      newPosition = Math.floor(priorItemPosition * 1.5);
     } else {
-      newPosition = (priorItemPosition + subsequentItemPosition) / 2;
+      newPosition = Math.floor(
+        (priorItemPosition + subsequentItemPosition) / 2
+      );
     }
-    const data = { step: { position: newPosition } };
+    const data = { step: { position: Number(newPosition) } };
 
     try {
       const response = await stepsApi.editStep(processId, stepId, data);
@@ -963,8 +965,8 @@ const StepFields = ({ control, errors }) => {
         }}
         render={({ field }) => (
           <TextField
-            label="Worktime"
-            placeholder="e.g. 2 hours, or 3 minutes"
+            label="Worktime (in hours)"
+            placeholder="e.g. 2"
             error={errors.max_worktime}
             helperText={
               errors && errors.max_worktime && errors.max_worktime.message
