@@ -292,13 +292,15 @@ const Workflow = ({}) => {
                 ) : (
                   <Chip label="Not Published" size="small" color="secondary" />
                 )}
-                <Typography variant="bodyRegular" lightened>
-                  {isLoading ? (
-                    <Skeleton width={64} />
-                  ) : (
-                    `Used by ${workflow.attributes.numOfInstances} schools`
-                  )}
-                </Typography>
+                {workflow.attributes.published ? (
+                  <Typography variant="bodyRegular" lightened>
+                    {isLoading ? (
+                      <Skeleton width={64} />
+                    ) : (
+                      `Used by ${workflow.attributes.numOfInstances} schools`
+                    )}
+                  </Typography>
+                ) : null}
               </Stack>
             </Stack>
           </Grid>
