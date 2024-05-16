@@ -531,13 +531,13 @@ const AddProcessModal = ({
               >
                 Create: Create a brand new process
               </Button>
-              <Button
+              {/* <Button
                 onClick={() => setAddType("choose")}
                 fullWidth
                 variant="outlined"
               >
                 Choose: Choose an existing process
-              </Button>
+              </Button> */}
             </Stack>
           ) : addType === "create" ? (
             <>
