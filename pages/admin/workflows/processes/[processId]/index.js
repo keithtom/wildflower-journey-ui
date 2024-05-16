@@ -965,8 +965,8 @@ const StepFields = ({ control, errors }) => {
         }}
         render={({ field }) => (
           <TextField
-            label="Worktime (in hours)"
-            placeholder="e.g. 2"
+            label="Worktime (in minutes)"
+            placeholder="e.g. 60 for 1 hour"
             error={errors.max_worktime}
             helperText={
               errors && errors.max_worktime && errors.max_worktime.message
