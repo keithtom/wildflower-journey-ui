@@ -31,6 +31,9 @@ import {
   Highlight,
   ListUl,
   HomeHeart,
+  CalendarStar,
+  Calendar,
+  CalendarWeek,
 } from "@styled-icons/boxicons-regular";
 import {
   BuildingHouse,
@@ -225,12 +228,15 @@ export default function Icon({ ...props }) {
     filter: <Filter />,
     minus: <Minus />,
     map: <Map />,
-    calendar: <CalendarAlt />,
+    calendar: <Calendar />,
+    calendarAlt: <CalendarAlt />,
+    calendarWeek: <CalendarWeek />,
     loader: <Loader />,
     highlight: <Highlight />,
     group: <Group />,
     listUl: <ListUl />,
     homeHeart: <HomeHeart />,
+    calendarStar: <CalendarStar />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;
