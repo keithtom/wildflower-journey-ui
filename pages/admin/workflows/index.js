@@ -93,10 +93,12 @@ const Workflows = ({}) => {
                             {/* TODO: Retrieve last updated from API */}
                             {/* <Typography>Last updated 3 days ago</Typography> */}
 
-                            <Typography
-                              variant="bodyRegular"
-                              lightened
-                            >{`Used by ${workflow.attributes.numOfInstances} schools`}</Typography>
+                            {workflow.attributes.published ? (
+                              <Typography
+                                variant="bodyRegular"
+                                lightened
+                              >{`Used by ${workflow.attributes.numOfInstances} schools`}</Typography>
+                            ) : null}
                           </Stack>
                         </ListItemButton>
                       </ListItem>

@@ -288,17 +288,15 @@ const Workflow = ({}) => {
                     color="primary"
                   />
                 ) : workflow.attributes.published ? (
-                  <Chip label="Published" size="small" color="primary" />
+                  <Stack direction="row" spacing={3}>
+                    <Chip label="Published" size="small" color="primary" />
+                    <Typography variant="bodyRegular" lightened>
+                      Used by {workflow.attributes.numOfInstances} schools
+                    </Typography>
+                  </Stack>
                 ) : (
                   <Chip label="Not Published" size="small" color="secondary" />
                 )}
-                <Typography variant="bodyRegular" lightened>
-                  {isLoading ? (
-                    <Skeleton width={64} />
-                  ) : (
-                    `Used by ${workflow.attributes.numOfInstances} schools`
-                  )}
-                </Typography>
               </Stack>
             </Stack>
           </Grid>
