@@ -1050,7 +1050,9 @@ const ChoosePrerequisiteList = ({
     (process) =>
       process.relationships.selectedProcesses.data[0].attributes.position <
         milestonePosition &&
-      process.attributes.phase === milestone.attributes.phase
+      process.attributes.phase === milestone.attributes.phase &&
+      process.relationships.selectedProcesses.data[0].attributes.state !==
+        "removed"
   );
 
   // console.log({ filteredProcesses });
