@@ -319,7 +319,12 @@ const OpenSchoolNavigation = () => {
         label="Checklist"
         icon="layer"
         secondaryAction={
-          <Chip size="small" label="New" variant="primaryLightened" />
+          <Chip
+            size="small"
+            label="New"
+            variant="primary"
+            sx={{ pointerEvents: "none" }}
+          />
         }
       />
       {router.pathname.includes("/open-school/checklist") ? (
