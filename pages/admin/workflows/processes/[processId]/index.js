@@ -1067,12 +1067,11 @@ const ChoosePrerequisiteList = ({
     (process) =>
       process.relationships.selectedProcesses.data[0].attributes.position <
         milestonePosition &&
-      process.attributes.phase === milestone.attributes.phase &&
       process.relationships.selectedProcesses.data[0].attributes.state !==
         "removed"
   );
 
-  // console.log({ filteredProcesses });
+  console.log({ filteredProcesses });
 
   return (
     <List>
@@ -1100,6 +1099,11 @@ const ChoosePrerequisiteList = ({
                 <ListItemText>
                   <Typography noWrap>{process.attributes.title}</Typography>
                 </ListItemText>
+                <Chip
+                  label={`${process.attributes.phase}`}
+                  size="small"
+                  variant="outlined"
+                />
                 <Chip
                   label={`${process.attributes.numOfSteps} steps`}
                   size="small"
