@@ -107,6 +107,8 @@ const ProcessId = ({}) => {
     formState: { errors, isDirty },
   } = useForm();
 
+  console.log({ errors });
+
   useEffect(() => {
     setProcessHasChanges(isDirty);
   }, [isDirty]);
@@ -397,14 +399,18 @@ const ProcessId = ({}) => {
                 },
               }}
               render={({ field }) => (
-                <TextField
-                  disabled={isDraftingNewVersion && !isEditingProcess}
-                  label="Title"
-                  placeholder="e.g. Complete The Visioning Advice Process"
-                  error={errors.title}
-                  helperText={errors && errors.title && errors.title.message}
-                  {...field}
-                />
+                <>
+                  <TextField
+                    disabled={isDraftingNewVersion && !isEditingProcess}
+                    label="Title"
+                    placeholder="e.g. Complete The Visioning Advice Process"
+                    error={errors.title}
+                    {...field}
+                  />
+                  <FormHelperText error={errors.title}>
+                    {errors && errors.title && errors.title.message}
+                  </FormHelperText>
+                </>
               )}
             />
             <Controller
@@ -435,25 +441,27 @@ const ProcessId = ({}) => {
                   },
                 }}
                 render={({ field }) => (
-                  <Select
-                    disabled={isDraftingNewVersion && !isEditingProcess}
-                    {...field}
-                    labelId="categories-label"
-                    id="categories"
-                    input={<OutlinedInput label="Categories" />}
-                    helperText={
-                      errors &&
-                      errors.categories &&
-                      errors.categories.type === "required" &&
-                      "This field is required"
-                    }
-                  >
-                    {categories.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        <ListItemText primary={option.label} />
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <>
+                    <Select
+                      disabled={isDraftingNewVersion && !isEditingProcess}
+                      {...field}
+                      labelId="categories-label"
+                      id="categories"
+                      input={<OutlinedInput label="Categories" />}
+                    >
+                      {categories.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          <ListItemText primary={option.label} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <FormHelperText error={errors.categories}>
+                      {errors &&
+                        errors.categories &&
+                        errors.categories.type === "required" &&
+                        "This field is required"}
+                    </FormHelperText>
+                  </>
                 )}
               />
             </FormControl>
@@ -469,27 +477,36 @@ const ProcessId = ({}) => {
                     value: true,
                     message: "This field is required",
                   },
+                  validate: {
+                    hasPrerequisites: (value) =>
+                      (milestone.relationships.prerequisites?.data?.length ||
+                        0) === 0 || "Cannot submit if there are prerequisites",
+                  },
                 }}
                 render={({ field }) => (
-                  <Select
-                    disabled={!isEditingProcess || !isDraftingNewVersion}
-                    {...field}
-                    labelId="phase-label"
-                    id="phase"
-                    input={<OutlinedInput label="Phase" />}
-                    helperText={
-                      errors &&
-                      errors.phase &&
-                      errors.phase.type === "required" &&
-                      "This field is required"
-                    }
-                  >
-                    {phases.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        <ListItemText primary={option.label} />
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <>
+                    <Select
+                      disabled={!isEditingProcess || !isDraftingNewVersion}
+                      {...field}
+                      labelId="phase-label"
+                      id="phase"
+                      input={<OutlinedInput label="Phase" />}
+                    >
+                      {phases.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          <ListItemText primary={option.label} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <FormHelperText error={errors.phase_list}>
+                      {errors &&
+                        errors.phase_list &&
+                        ((errors.phase_list.type === "required" &&
+                          "This field is required") ||
+                          (errors.phase_list.type === "hasPrerequisites" &&
+                            "Remove prerequisites to update the phase of this process"))}
+                    </FormHelperText>
+                  </>
                 )}
               />
             </FormControl>
@@ -1050,7 +1067,9 @@ const ChoosePrerequisiteList = ({
     (process) =>
       process.relationships.selectedProcesses.data[0].attributes.position <
         milestonePosition &&
-      process.attributes.phase === milestone.attributes.phase
+      process.attributes.phase === milestone.attributes.phase &&
+      process.relationships.selectedProcesses.data[0].attributes.state !==
+        "removed"
   );
 
   // console.log({ filteredProcesses });

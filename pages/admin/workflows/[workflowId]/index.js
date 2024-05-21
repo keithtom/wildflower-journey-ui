@@ -287,8 +287,15 @@ const Workflow = ({}) => {
                     variant="outlined"
                     color="primary"
                   />
+                ) : workflow.attributes.needsSupport ? (
+                  <Chip
+                    label="Needs Support"
+                    size="small"
+                    variant="outlined"
+                    color="error"
+                  />
                 ) : workflow.attributes.published ? (
-                  <Stack direction="row" spacing={3}>
+                  <Stack direction="row" spacing={3} alignItems="center">
                     <Chip label="Published" size="small" color="primary" />
                     <Typography variant="bodyRegular" lightened>
                       Used by {workflow.attributes.numOfInstances} schools
