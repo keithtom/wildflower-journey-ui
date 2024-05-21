@@ -70,7 +70,7 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  console.log({ workflow });
+  // console.log({ workflow });
 
   const rolloutInProgress =
     workflow?.attributes.rolloutStartedAt !== null &&
@@ -321,7 +321,9 @@ const Workflow = ({}) => {
                   </Button>
                   <Button
                     variant="contained"
-                    disabled={!versionHasChanges}
+                    disabled={
+                      !versionHasChanges || workflow?.attributes.needsSupport
+                    }
                     onClick={handleSubmitNewVersion}
                   >
                     Review New Version
@@ -332,7 +334,11 @@ const Workflow = ({}) => {
               <Button
                 variant="contained"
                 onClick={handleStartNewVersion}
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  workflow?.attributes.needsSupport ||
+                  rolloutInProgress
+                }
               >
                 Draft New Version
               </Button>
@@ -409,7 +415,10 @@ const Workflow = ({}) => {
                         }
                         renderItem={(process, i) => (
                           <ProcessListItem
-                            disabled={rolloutInProgress}
+                            disabled={
+                              rolloutInProgress ||
+                              workflow?.attributes.needsSupport
+                            }
                             key={process.id}
                             process={process}
                             prevProcessPosition={
