@@ -20,7 +20,7 @@ const Workflows = ({}) => {
   // Load data
   const { workflows, isLoading, isError } = useWorkflows();
 
-  // console.log({ workflows });
+  console.log({ workflows });
 
   return (
     <PageContainer isAdmin>
@@ -34,7 +34,7 @@ const Workflows = ({}) => {
         </Grid>
         <Grid container>
           <Grid item xs={12}>
-            <Card noPadding>
+            <Card sx={{ padding: 0 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -72,13 +72,50 @@ const Workflows = ({}) => {
                             {/* TODO: Retrieve isSensibleDefault from API */}
                             {/* <Chip label="Sensible default" size="small" /> */}
                             <Chip
-                              label={workflow.attributes.version}
+                              label={
+                                workflow.attributes.published
+                                  ? workflow.attributes.version
+                                  : `Drafting ${workflow.attributes.version}`
+                              }
                               size="small"
                               variant="outlined"
                             />
 
-                            {workflow.attributes.published ? (
-                              <Chip label="Live" size="small" color="primary" />
+                            {isLoading ? (
+                              <Skeleton variant="rounded" width={120} />
+                            ) : workflow?.attributes.needsSupport ? (
+                              <Chip
+                                label="Needs Support"
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                              />
+                            ) : workflow?.attributes.rolloutStartedAt !==
+                                null &&
+                              workflow?.attributes.rolloutCompletedAt ===
+                                null ? (
+                              <Chip
+                                label="Publishing in progress"
+                                size="small"
+                                variant="outlined"
+                                color="primary"
+                              />
+                            ) : workflow.attributes.published ? (
+                              <Stack
+                                direction="row"
+                                spacing={3}
+                                alignItems="center"
+                              >
+                                <Chip
+                                  label="Published"
+                                  size="small"
+                                  color="primary"
+                                />
+                                <Typography variant="bodyRegular" lightened>
+                                  Used by {workflow.attributes.numOfInstances}{" "}
+                                  schools
+                                </Typography>
+                              </Stack>
                             ) : (
                               <Chip
                                 label="Not Published"
@@ -86,13 +123,18 @@ const Workflows = ({}) => {
                                 color="secondary"
                               />
                             )}
+
+                            {/* {workflow.attributes.published ? (
+                              <Chip label="Live" size="small" color="primary" />
+                            ) : (
+                              <Chip
+                                label="Not Published"
+                                size="small"
+                                color="secondary"
+                              />
+                            )} */}
                             {/* TODO: Retrieve last updated from API */}
                             {/* <Typography>Last updated 3 days ago</Typography> */}
-
-                            <Typography
-                              variant="bodyRegular"
-                              lightened
-                            >{`${workflow.attributes.numOfInstances} Instances`}</Typography>
                           </Stack>
                         </ListItemButton>
                       </ListItem>
