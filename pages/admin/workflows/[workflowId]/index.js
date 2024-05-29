@@ -280,19 +280,19 @@ const Workflow = ({}) => {
                 {/* <Typography>Last updated 3 days ago</Typography> */}
                 {isLoading ? (
                   <Skeleton variant="rounded" width={120} />
-                ) : rolloutInProgress ? (
-                  <Chip
-                    label="Publishing in progress"
-                    size="small"
-                    variant="outlined"
-                    color="primary"
-                  />
                 ) : workflow.attributes.needsSupport ? (
                   <Chip
                     label="Needs Support"
                     size="small"
                     variant="outlined"
                     color="error"
+                  />
+                ) : rolloutInProgress ? (
+                  <Chip
+                    label="Publishing in progress"
+                    size="small"
+                    variant="outlined"
+                    color="primary"
                   />
                 ) : workflow.attributes.published ? (
                   <Stack direction="row" spacing={3} alignItems="center">

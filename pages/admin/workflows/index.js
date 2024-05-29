@@ -83,6 +83,13 @@ const Workflows = ({}) => {
 
                             {isLoading ? (
                               <Skeleton variant="rounded" width={120} />
+                            ) : workflow?.attributes.needsSupport ? (
+                              <Chip
+                                label="Needs Support"
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                              />
                             ) : workflow?.attributes.rolloutStartedAt !==
                                 null &&
                               workflow?.attributes.rolloutCompletedAt ===
@@ -92,13 +99,6 @@ const Workflows = ({}) => {
                                 size="small"
                                 variant="outlined"
                                 color="primary"
-                              />
-                            ) : workflow.attributes.needsSupport ? (
-                              <Chip
-                                label="Needs Support"
-                                size="small"
-                                variant="outlined"
-                                color="error"
                               />
                             ) : workflow.attributes.published ? (
                               <Stack
