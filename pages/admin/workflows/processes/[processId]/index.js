@@ -512,7 +512,7 @@ const ProcessId = ({}) => {
             </FormControl>
           </Stack>
 
-          <Card noPadding>
+          <Card sx={{ padding: 0 }}>
             <List
               subheader={
                 <ListSubheader
@@ -577,7 +577,7 @@ const ProcessId = ({}) => {
           </Card>
 
           {/* STEPS */}
-          <Card noPadding sx={{ overflow: "visible" }}>
+          <Card sx={{ overflow: "visible", padding: 0 }}>
             <List
               subheader={
                 <ListSubheader
@@ -698,7 +698,7 @@ const AddPrerequisiteModal = ({
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Add Prerequisite</DialogTitle>
       <DialogContent>
-        <Card noPadding variant="outlined">
+        <Card sx={{ padding: 0 }} variant="outlined">
           <ChoosePrerequisiteList
             handleAddPrerequisite={handleAddPrerequisite}
             workflow={workflow}
@@ -768,7 +768,8 @@ const StepListItem = ({
   isLast,
   workflowId,
 }) => {
-  const [showRemoveStepCheck, setShowRemoveStepCheck] = useState(null);
+  const [showRemoveStepCheck, setShowRemoveStepCheck] = useState(false);
+  const [stepCheckValue, setSetepCheckValue] = useState(null);
   const [deleteStepCheck, setDeleteStepCheck] = useState("");
   // console.log({ prevStepPosition });
   const router = useRouter();
@@ -812,7 +813,10 @@ const StepListItem = ({
           <Button
             variant="text"
             color="error"
-            onClick={() => setShowRemoveStepCheck(step)}
+            onClick={(e) => {
+              setSetepCheckValue(step);
+              setShowRemoveStepCheck(true);
+            }}
             id={`remove-step-${snakeCase(step.attributes.title)}`}
           >
             Remove
@@ -873,7 +877,7 @@ const StepListItem = ({
       >
         <DialogTitle>
           {showRemoveStepCheck
-            ? `Remove "${showRemoveStepCheck?.attributes.title}"`
+            ? `Remove "${stepCheckValue?.attributes.title}"`
             : null}
         </DialogTitle>
         <DialogContent>
@@ -902,7 +906,7 @@ const StepListItem = ({
             color="error"
             disabled={
               showRemoveStepCheck &&
-              deleteStepCheck !== showRemoveStepCheck?.attributes.title
+              deleteStepCheck !== stepCheckValue?.attributes.title
             }
           >
             Remove

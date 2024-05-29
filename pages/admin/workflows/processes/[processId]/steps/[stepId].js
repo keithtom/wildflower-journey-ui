@@ -432,7 +432,7 @@ const StepId = ({}) => {
           </Stack>
 
           {/* RESOURCES */}
-          <Card noPadding>
+          <Card sx={{ padding: 0 }}>
             <List
               subheader={
                 <ListSubheader
@@ -560,7 +560,7 @@ const StepId = ({}) => {
                         />
                       )}
                     />
-                    <Card noPadding>
+                    <Card sx={{ padding: 0 }}>
                       <List
                         subheader={
                           <ListSubheader
