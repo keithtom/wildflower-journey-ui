@@ -347,9 +347,9 @@ const Workflow = ({}) => {
         </Grid>
         {isLoading
           ? Array.from({ length: 3 }).map((_, index) => (
-              <Grid container>
+              <Grid container key={index}>
                 <Grid item xs={12}>
-                  <Card noPadding>
+                  <Card sx={{ padding: 0 }}>
                     <List
                       subheader={
                         <ListSubheader
@@ -380,7 +380,7 @@ const Workflow = ({}) => {
           : groupedProcesses.map((phase, phaseIndex) => (
               <Grid container key={phaseIndex}>
                 <Grid item xs={12}>
-                  <Card noPadding sx={{ overflow: "visible" }}>
+                  <Card sx={{ overflow: "visible", padding: 0 }}>
                     <List
                       subheader={
                         <ListSubheader
@@ -565,7 +565,7 @@ const AddProcessModal = ({
             </>
           ) : (
             addType === "choose" && (
-              <Card noPadding variant="outlined">
+              <Card sx={{ padding: 0 }} variant="outlined">
                 <ChooseProcessList
                   handleChooseProcess={handleChooseProcess}
                   phaseAddedInto={phaseAddedInto}
@@ -713,7 +713,7 @@ const ProcessListItem = ({
               title={
                 <Stack>
                   {process?.attributes.prerequisiteTitles.map((t, i) => (
-                    <span>{t}</span>
+                    <span key={i}>{t}</span>
                   ))}
                 </Stack>
               }

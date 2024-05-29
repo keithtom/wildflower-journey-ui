@@ -34,7 +34,7 @@ const Workflows = ({}) => {
         </Grid>
         <Grid container>
           <Grid item xs={12}>
-            <Card noPadding>
+            <Card sx={{ padding: 0 }}>
               <List
                 subheader={
                   <ListSubheader
