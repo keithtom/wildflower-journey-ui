@@ -157,14 +157,14 @@ const Navigation = () => {
             onClick={() => localStorage.removeItem("workflowId")}
             icon="layer"
           />
-          <NavLink
+          {/* <NavLink
             variant="primary"
             to="/admin/workflows/processes"
             active={router.asPath === "/admin/workflows/processes"}
             label="Processes"
             onClick={() => localStorage.removeItem("workflowId")}
             icon={true}
-          />
+          /> */}
           <NavLink
             variant="primary"
             to="/admin/schools"
