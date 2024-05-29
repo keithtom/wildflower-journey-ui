@@ -2,8 +2,10 @@ import useSWR from "swr";
 import { showWorkflow } from "@api/workflow/definition/workflows";
 
 const useWorkflow = (id) => {
-  const { data, error } = useSWR(id ? showWorkflow.key(id) : null, () =>
-    showWorkflow.fetcher(id)
+  const { data, error } = useSWR(
+    id ? showWorkflow.key(id) : null,
+    () => showWorkflow.fetcher(id),
+    { revalidateOnFocus: false }
   );
 
   // console.log({ data });

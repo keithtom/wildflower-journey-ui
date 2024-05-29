@@ -65,8 +65,8 @@ const StepFields = ({ stepId, control, errors, step }) => {
         }}
         render={({ field }) => (
           <TextField
-            label="Worktime"
-            placeholder="e.g. 2 hours, or 3 minutes"
+            label="Worktime (in minutes)"
+            placeholder="e.g. 60 for 1 hour"
             error={errors.worktime}
             helperText={errors && errors.worktime && errors.worktime.message}
             {...field}

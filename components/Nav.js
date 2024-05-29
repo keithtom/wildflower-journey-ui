@@ -147,6 +147,7 @@ const Navigation = () => {
             to="/admin"
             active={router.asPath === "/admin"}
             label="Dashboard"
+            icon="home"
           />
           <NavLink
             variant="primary"
@@ -154,19 +155,22 @@ const Navigation = () => {
             active={router.asPath === "/admin/workflows"}
             label="Workflows"
             onClick={() => localStorage.removeItem("workflowId")}
+            icon="layer"
           />
-          <NavLink
-            variant="secondary"
+          {/* <NavLink
+            variant="primary"
             to="/admin/workflows/processes"
             active={router.asPath === "/admin/workflows/processes"}
             label="Processes"
             onClick={() => localStorage.removeItem("workflowId")}
-          />
+            icon={true}
+          /> */}
           <NavLink
             variant="primary"
             to="/admin/schools"
             active={router.asPath === "/admin/schools"}
             label="Schools"
+            icon="buildingHouse"
           />
         </>
       ) : (

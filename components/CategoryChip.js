@@ -13,6 +13,7 @@ const CategoryChip = ({ category, withIcon, ...props }) => {
     [ssj_categories.HUMAN_RESOURCES]: theme.color.highlights.green,
     [ssj_categories.COMMUNITY_FAMILY_ENGAGEMENT]: theme.color.highlights.blue,
     [ssj_categories.CLASSROOM_PROGRAM_PRACTICES]: theme.color.highlights.purple,
+    [ssj_categories.FUNDRAISING]: theme.color.highlights.brown,
   };
 
   return (

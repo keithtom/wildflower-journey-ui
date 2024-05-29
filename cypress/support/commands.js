@@ -131,6 +131,13 @@ Cypress.Commands.add("logout", () => {
   window.cookieStore.delete("workflowId");
 });
 
+Cypress.Commands.add("resetRolloutWorkflowFixture", () => {
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("apiUrl")}/reset_rollout_workflow_fixture`,
+  });
+});
+
 const resizeObserverLoopErrRe = /^[^(ResizeObserver loop limit exceeded)]/;
 Cypress.on("uncaught:exception", (err) => {
   /* returning false here prevents Cypress from failing the test */
