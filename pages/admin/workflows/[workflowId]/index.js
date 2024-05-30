@@ -70,7 +70,7 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  // console.log({ workflow });
+  console.log({ workflow });
 
   const rolloutInProgress =
     workflow?.attributes.rolloutStartedAt !== null &&
@@ -415,6 +415,7 @@ const Workflow = ({}) => {
                         }
                         renderItem={(process, i) => (
                           <ProcessListItem
+                            workflow={workflow}
                             disabled={
                               rolloutInProgress ||
                               workflow?.attributes.needsSupport
@@ -585,6 +586,7 @@ const AddProcessModal = ({
 };
 
 const ProcessListItem = ({
+  workflow,
   isDraftingNewVersion,
   handleStageAddProcess,
   handleRemoveProcess,
@@ -600,10 +602,31 @@ const ProcessListItem = ({
     process.relationships.selectedProcesses?.data[0].attributes.state;
   const selectedProcesses = process.relationships.selectedProcesses?.data;
 
-  const processPosition =
+  let processPosition =
     (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
-  // console.log({ processPosition });
-  const lastProcessPosition = selectedProcesses[0].attributes.position + 1000;
+  let lastProcessPosition = selectedProcesses[0].attributes.position + 1000;
+
+  if (
+    //check for duplicate position in selectedProcess, and if so, add 2
+    workflow.relationships.processes.data.some(
+      (process) =>
+        process.relationships.selectedProcesses.data[0].attributes.position ===
+        processPosition
+    )
+  ) {
+    processPosition += 2;
+  }
+
+  if (
+    //check for duplicate position in selectedProcess, and if so, add 2
+    workflow.relationships.processes.data.some(
+      (process) =>
+        process.relationships.selectedProcesses.data[0].attributes.position ===
+        lastProcessPosition
+    )
+  ) {
+    lastProcessPosition += 2;
+  }
 
   const isRemoved = selectedProcesses.some(
     (process) => process.attributes.state === "removed"
@@ -611,6 +634,8 @@ const ProcessListItem = ({
 
   const numOfPrerequisites = process?.attributes.prerequisiteTitles.length;
 
+  // console.log(processPosition);
+  // console.log(lastProcessPosition);
   // console.log({ process });
   // console.log({ prevProcessPosition });
   // console.log(process.attributes.title, {
