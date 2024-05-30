@@ -70,7 +70,7 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  console.log({ workflow });
+  // console.log({ workflow });
 
   const rolloutInProgress =
     workflow?.attributes.rolloutStartedAt !== null &&
@@ -602,30 +602,26 @@ const ProcessListItem = ({
     process.relationships.selectedProcesses?.data[0].attributes.state;
   const selectedProcesses = process.relationships.selectedProcesses?.data;
 
-  let processPosition =
+  const currentProcessIndex = workflow.relationships.processes.data.findIndex(
+    (process) =>
+      process.relationships.selectedProcesses.data[0].id ===
+      selectedProcesses[0].id
+  );
+  const subsequentProcess =
+    workflow.relationships.processes.data[currentProcessIndex + 1];
+
+  const processPosition =
     (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
-  let lastProcessPosition = selectedProcesses[0].attributes.position + 1000;
 
-  if (
-    //check for duplicate position in selectedProcess, and if so, add 2
-    workflow.relationships.processes.data.some(
-      (process) =>
-        process.relationships.selectedProcesses.data[0].attributes.position ===
-        processPosition
-    )
-  ) {
-    processPosition += 2;
-  }
-
-  if (
-    //check for duplicate position in selectedProcess, and if so, add 2
-    workflow.relationships.processes.data.some(
-      (process) =>
-        process.relationships.selectedProcesses.data[0].attributes.position ===
-        lastProcessPosition
-    )
-  ) {
-    lastProcessPosition += 2;
+  let lastProcessPosition;
+  if (subsequentProcess) {
+    lastProcessPosition =
+      (selectedProcesses[0].attributes.position +
+        subsequentProcess.relationships.selectedProcesses.data[0].attributes
+          .position) /
+      2;
+  } else {
+    lastProcessPosition = selectedProcesses[0].attributes.position + 1000;
   }
 
   const isRemoved = selectedProcesses.some(
@@ -634,6 +630,8 @@ const ProcessListItem = ({
 
   const numOfPrerequisites = process?.attributes.prerequisiteTitles.length;
 
+  // console.log({ currentProcessIndex });
+  // console.log({ subsequentProcess });
   // console.log(processPosition);
   // console.log(lastProcessPosition);
   // console.log({ process });
