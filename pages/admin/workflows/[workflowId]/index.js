@@ -415,6 +415,7 @@ const Workflow = ({}) => {
                         }
                         renderItem={(process, i) => (
                           <ProcessListItem
+                            workflow={workflow}
                             disabled={
                               rolloutInProgress ||
                               workflow?.attributes.needsSupport
@@ -585,6 +586,7 @@ const AddProcessModal = ({
 };
 
 const ProcessListItem = ({
+  workflow,
   isDraftingNewVersion,
   handleStageAddProcess,
   handleRemoveProcess,
@@ -600,10 +602,27 @@ const ProcessListItem = ({
     process.relationships.selectedProcesses?.data[0].attributes.state;
   const selectedProcesses = process.relationships.selectedProcesses?.data;
 
+  const currentProcessIndex = workflow.relationships.processes.data.findIndex(
+    (process) =>
+      process.relationships.selectedProcesses.data[0].id ===
+      selectedProcesses[0].id
+  );
+  const subsequentProcess =
+    workflow.relationships.processes.data[currentProcessIndex + 1];
+
   const processPosition =
     (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
-  // console.log({ processPosition });
-  const lastProcessPosition = selectedProcesses[0].attributes.position + 1000;
+
+  let lastProcessPosition;
+  if (subsequentProcess) {
+    lastProcessPosition =
+      (selectedProcesses[0].attributes.position +
+        subsequentProcess.relationships.selectedProcesses.data[0].attributes
+          .position) /
+      2;
+  } else {
+    lastProcessPosition = selectedProcesses[0].attributes.position + 1000;
+  }
 
   const isRemoved = selectedProcesses.some(
     (process) => process.attributes.state === "removed"
@@ -611,6 +630,10 @@ const ProcessListItem = ({
 
   const numOfPrerequisites = process?.attributes.prerequisiteTitles.length;
 
+  // console.log({ currentProcessIndex });
+  // console.log({ subsequentProcess });
+  // console.log(processPosition);
+  // console.log(lastProcessPosition);
   // console.log({ process });
   // console.log({ prevProcessPosition });
   // console.log(process.attributes.title, {
