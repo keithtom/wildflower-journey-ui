@@ -69,9 +69,15 @@ const ProcessId = ({}) => {
   const [addStepPosition, setAddStepPosition] = useState(null);
   const [showAddPrerequisiteModal, setShowAddPrerequisiteModal] =
     useState(false);
+  const [showChoosePositionModal, setShowChoosePositionModal] = useState({
+    state: false,
+    intent: false,
+  });
+  const [updateProcessPositionData, setUpdateProcessPositionData] =
+    useState(null);
 
-  console.log({ isDraftingNewVersion });
-  console.log({ isEditingProcess });
+  // console.log({ isDraftingNewVersion });
+  // console.log({ isEditingProcess });
 
   const { workflow, isLoading: workflowIsLoading } = useWorkflow(workflowId);
   // console.log({ workflow });
@@ -80,7 +86,7 @@ const ProcessId = ({}) => {
     workflowId,
     processId
   );
-  console.log({ milestone });
+  // console.log({ milestone });
   // console.log({ processId });
 
   // const { milestone, isLoading, isError } = useMilestone(processId);
@@ -104,10 +110,11 @@ const ProcessId = ({}) => {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isDirty },
   } = useForm();
 
-  console.log({ errors });
+  // console.log({ errors });
 
   useEffect(() => {
     setProcessHasChanges(isDirty);
@@ -131,7 +138,10 @@ const ProcessId = ({}) => {
     // Remove unchanged data
     const updatedData = Object.keys(data).reduce((acc, key) => {
       if (data[key] !== originalData[key]) {
-        if (key === "category_list" && !Array.isArray(data[key])) {
+        if (
+          (key === "category_list" || key === "phase_list") &&
+          !Array.isArray(data[key])
+        ) {
           acc[key] = [data[key]];
         } else {
           acc[key] = data[key];
@@ -139,6 +149,13 @@ const ProcessId = ({}) => {
       }
       return acc;
     }, {});
+    console.log({ updatedData });
+    console.log({ updateProcessPositionData });
+
+    if (updateProcessPositionData) {
+      updatedData.selected_processes_attributes =
+        updateProcessPositionData.process.selected_processes_attributes;
+    }
 
     // Update the process
     try {
@@ -183,16 +200,6 @@ const ProcessId = ({}) => {
     }
   };
 
-  // const handleRemoveStep = async (stepId) => {
-  //   console.log("Remove step", stepId);
-  //   setShowRemoveStepCheck(false);
-  //   try {
-  //     const response = await stepsApi.deleteStep(processId, stepId);
-  //     mutate(`definition/workflows/${workflowId}/processes/${processId}`);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
   const handleStageAddStep = (position) => {
     setAddStepPosition(position);
     setAddStepModalOpen(true);
@@ -221,7 +228,7 @@ const ProcessId = ({}) => {
         workflowId,
         processId
       );
-      console.log({ response });
+      // console.log({ response });
       router.push(`/admin/workflows/processes/${response.data.data.id}`);
     } catch (error) {
       console.log(error);
@@ -276,6 +283,44 @@ const ProcessId = ({}) => {
     } catch (error) {
       console.log(error);
     }
+  };
+  const phaseListField = watch("phase_list");
+
+  useEffect(() => {
+    if (showChoosePositionModal.intent === true) {
+      setShowChoosePositionModal((prevState) => ({
+        ...prevState,
+        state: true,
+      }));
+    }
+  }, [phaseListField]);
+
+  const handleChoosePosition = async (position, phase) => {
+    // console.log(position);
+    const structuredData = {
+      process: {
+        phase_list: [`${phase}`],
+        selected_processes_attributes: [
+          { workflow_id: workflow.id, position: position },
+        ],
+      },
+    };
+    setUpdateProcessPositionData(structuredData);
+    // console.log({ structuredData });
+    // try {
+    //   const response = await processApi.editMilestone(
+    //     processId,
+    //     structuredData
+    //   );
+    //   mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+    //   setShowChoosePositionModal((prevState) => ({
+    //     ...prevState,
+    //     state: false,
+    //     intent: false,
+    //   }));
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   return (
@@ -490,6 +535,12 @@ const ProcessId = ({}) => {
                       {...field}
                       labelId="phase-label"
                       id="phase"
+                      onClick={() =>
+                        setShowChoosePositionModal((prevState) => ({
+                          ...prevState,
+                          intent: true,
+                        }))
+                      }
                       input={<OutlinedInput label="Phase" />}
                     >
                       {phases.map((option) => (
@@ -654,6 +705,20 @@ const ProcessId = ({}) => {
           </Card>
         </Stack>
       </form>
+      <ChoosePositionModal
+        open={showChoosePositionModal.state}
+        onClose={() =>
+          setShowChoosePositionModal((prevState) => ({
+            ...prevState,
+            intent: false,
+            state: false,
+          }))
+        }
+        handleChoosePosition={handleChoosePosition}
+        workflow={workflow}
+        milestone={milestone}
+        stagedPhase={phaseListField ? phaseListField : null}
+      />
       <AddPrerequisiteModal
         open={showAddPrerequisiteModal}
         onClose={() => setShowAddPrerequisiteModal(false)}
@@ -705,7 +770,6 @@ const AddPrerequisiteModal = ({
             milestone={milestone}
           />
         </Card>
-        {/* list of processes */}
       </DialogContent>
     </Dialog>
   );
@@ -793,7 +857,7 @@ const StepListItem = ({
   };
 
   const handleRemoveStep = async (stepId) => {
-    console.log("Remove step", stepId);
+    // console.log("Remove step", stepId);
     setShowRemoveStepCheck(false);
     try {
       const response = await stepsApi.deleteStep(processId, stepId);
@@ -1075,7 +1139,7 @@ const ChoosePrerequisiteList = ({
         "removed"
   );
 
-  console.log({ filteredProcesses });
+  // console.log({ filteredProcesses });
 
   return (
     <List>
@@ -1121,5 +1185,153 @@ const ChoosePrerequisiteList = ({
         ))
       )}
     </List>
+  );
+};
+
+const ChoosePositionModal = ({
+  open,
+  onClose,
+  handleChoosePosition,
+  workflow,
+  milestone,
+  stagedPhase,
+}) => {
+  // console.log(stagedPhase);
+
+  return (
+    <Dialog open={open} fullWidth>
+      <DialogTitle>Choose new position</DialogTitle>
+      <DialogContent>
+        <Card sx={{ overflow: "visible", padding: 0 }}>
+          <ChoosePositionList
+            onClose={onClose}
+            stagedPhase={stagedPhase}
+            workflow={workflow}
+            milestone={milestone}
+            handleChoosePosition={handleChoosePosition}
+          />
+        </Card>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const ChoosePositionList = ({
+  stagedPhase,
+  workflow,
+  handleChoosePosition,
+  onClose,
+}) => {
+  const stagedPhaseProcessesArray =
+    workflow.relationships.processes.data.filter(
+      (process) => process.attributes.phase === stagedPhase
+    );
+  // console.log({ stagedPhaseProcessesArray });
+
+  // for the selected phase, show only the phase milestones
+  // use handleChoosePosition with the plus buttons to add a position in the new phase
+  // close the modal on selection of position
+  // clear any prereqs
+
+  return (
+    <List
+      subheader={
+        <ListSubheader
+          component="div"
+          id="nested-list-subheader"
+          sx={{ background: "#eaeaea" }}
+        >
+          {stagedPhase.charAt(0).toUpperCase() + stagedPhase.slice(1)}
+        </ListSubheader>
+      }
+    >
+      {stagedPhaseProcessesArray.map((process, i) => (
+        <ChoosePositionListItem
+          onClose={onClose}
+          isLast={i === stagedPhaseProcessesArray.length - 1}
+          workflow={workflow}
+          handleChoosePosition={handleChoosePosition}
+          process={process}
+          key={i}
+          phase={stagedPhase}
+        />
+      ))}
+    </List>
+  );
+};
+
+const ChoosePositionListItem = ({
+  workflow,
+  handleChoosePosition,
+  process,
+  isLast,
+  phase,
+  onClose,
+}) => {
+  // console.log({ workflow });
+
+  const selectedProcesses = process.relationships.selectedProcesses?.data;
+
+  const currentProcessIndex = workflow?.relationships.processes.data.findIndex(
+    (process) =>
+      process.relationships.selectedProcesses.data[0].id ===
+      selectedProcesses[0].id
+  );
+
+  const prevProcessPosition = workflow?.relationships.processes.data[
+    currentProcessIndex - 1
+  ]
+    ? workflow?.relationships.processes.data[currentProcessIndex - 1]
+        .relationships.selectedProcesses.data[0].attributes.position
+    : null;
+
+  const subsequentProcess =
+    workflow?.relationships.processes.data[currentProcessIndex + 1];
+
+  const processPosition =
+    (selectedProcesses[0].attributes.position + prevProcessPosition) / 2;
+
+  let lastProcessPosition;
+  if (subsequentProcess) {
+    lastProcessPosition =
+      (selectedProcesses[0].attributes.position +
+        subsequentProcess.relationships.selectedProcesses.data[0].attributes
+          .position) /
+      2;
+  } else {
+    lastProcessPosition = selectedProcesses[0].attributes.position + 1000;
+  }
+
+  // console.log(processPosition);
+  // console.log(lastProcessPosition);
+
+  return (
+    <ListItem disablePadding divider>
+      <InlineActionTile
+        disabled
+        isLast={isLast}
+        id={`inline-action-tile-${snakeCase(process.attributes.title)}`}
+        showAdd={true}
+        add={() => {
+          handleChoosePosition(processPosition, phase);
+          onClose();
+        }}
+        lastAdd={() => {
+          handleChoosePosition(lastProcessPosition, phase);
+          onClose();
+        }}
+      />
+      <ListItemButton disabled>
+        <ListItemText>
+          <Typography variant="bodyRegular">
+            {process.attributes.title}
+          </Typography>
+        </ListItemText>
+        <Chip label={`${process.attributes.numOfSteps} steps`} size="small" />
+        {process.attributes.categories.map((c, i) => (
+          <CategoryChip category={c} key={i} size="small" />
+        ))}
+      </ListItemButton>
+    </ListItem>
   );
 };
