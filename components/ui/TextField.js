@@ -40,7 +40,7 @@ const TextField = React.forwardRef(
             </Typography>
           )}
           {helperText && (
-            <FormHelperText error={error}>{helperText}</FormHelperText>
+            <FormHelperText error={!!error}>{helperText}</FormHelperText>
           )}
         </FormControl>
       </Stack>
