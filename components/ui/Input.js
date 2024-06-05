@@ -19,7 +19,7 @@ const StyledInput = styled(InputBase)`
 `;
 
 const Input = React.forwardRef(({ error, ...props }, ref) => {
-  return <StyledInput ref={ref} error={error} {...props} />;
+  return <StyledInput ref={ref} error={!!error} {...props} />;
 });
 
 export default Input;

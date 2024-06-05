@@ -121,6 +121,10 @@ const SSJ = () => {
   const regionalGrowthLead =
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
+  useEffect(() => {
+    setOpenDate(team?.data?.data?.attributes?.expectedStartDate);
+  }, [team]);
+
   useAuth("/login");
 
   const isLoading =
@@ -385,7 +389,10 @@ const SSJ = () => {
                     </Typography>
                   </Grid>
                   <Grid item>
-                    <IconButton onClick={() => setAddPartnerModalOpen(true)}>
+                    <IconButton
+                      onClick={() => setAddPartnerModalOpen(true)}
+                      disabled={team?.data.data.attributes.invitedPartner}
+                    >
                       <Icon type="plus" variant="lightened" />
                     </IconButton>
                   </Grid>
@@ -407,7 +414,11 @@ const SSJ = () => {
                   ) : (
                     <Grid item xs={12} sm={4}>
                       <AddPartnerCard
-                        submittedPartnerRequest={submittedPartnerRequest}
+                        team={team}
+                        submittedPartnerRequest={
+                          submittedPartnerRequest ||
+                          team?.data?.data?.attributes?.invitedPartner
+                        }
                         onClick={() => setAddPartnerModalOpen(true)}
                       />
                     </Grid>
@@ -703,7 +714,7 @@ const OnboardingCard = ({
 };
 
 const ProgressBar = ({ processes }) => {
-  const numberOfProcesses = processes.length;
+  const numberOfProcesses = processes?.length;
   const StyledProcessIndicator = styled(Box)`
     width: calc(100% / ${numberOfProcesses});
     height: ${({ theme }) => theme.util.buffer}px;
@@ -1021,6 +1032,9 @@ const AddPartnerModal = ({
       partnerEmail: "",
     },
   });
+
+  // console.log({ errors });
+
   async function onSubmit(data) {
     try {
       const response = await teamsApi.invitePartner(team?.data?.data?.id, data);
@@ -1075,18 +1089,18 @@ const AddPartnerModal = ({
                   <Controller
                     name="partnerFirstName"
                     control={control}
-                    rules={{ required: true }}
+                    rules={{
+                      required: {
+                        value: true,
+                        message: "This field is required",
+                      },
+                    }}
                     render={({ field }) => (
                       <TextField
                         label="Your Partner's First Name"
                         placeholder="e.g. Cathy"
                         error={errors.partnerFirstName}
-                        helperText={
-                          errors &&
-                          errors.partnerFirstName &&
-                          errors.partnerFirstName &&
-                          "This field is required"
-                        }
+                        helperText={errors?.partnerFirstName?.message || ""}
                         {...field}
                       />
                     )}
@@ -1094,18 +1108,18 @@ const AddPartnerModal = ({
                   <Controller
                     name="partnerLastName"
                     control={control}
-                    rules={{ required: true }}
+                    rules={{
+                      required: {
+                        value: true,
+                        message: "This field is required",
+                      },
+                    }}
                     render={({ field }) => (
                       <TextField
                         label="Your Partner's Last Name"
                         placeholder="e.g. Lee"
                         error={errors.partnerLastName}
-                        helperText={
-                          errors &&
-                          errors.partnerLastName &&
-                          errors.partnerLastName &&
-                          "This field is required"
-                        }
+                        helperText={errors?.partnerLastName?.message || ""}
                         {...field}
                       />
                     )}
@@ -1114,25 +1128,22 @@ const AddPartnerModal = ({
                     name="partnerEmail"
                     control={control}
                     rules={{
-                      required: true,
-                      pattern:
-                        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                      required: {
+                        value: true,
+                        message: "This field is required",
+                      },
+                      pattern: {
+                        value:
+                          /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                        message: "Invalid email format",
+                      },
                     }}
                     render={({ field }) => (
                       <TextField
                         label="Your Partner's Email"
                         placeholder="e.g. cathylee@gmail.com"
                         error={errors.partnerEmail}
-                        helperText={
-                          errors &&
-                          errors.partnerEmail &&
-                          errors.partnerEmail.type === "required"
-                            ? "This field is required"
-                            : errors &&
-                              errors.partnerEmail &&
-                              errors.partnerEmail.type === "pattern" &&
-                              "Please enter a valid email"
-                        }
+                        helperText={errors?.partnerEmail?.message || ""}
                         {...field}
                       />
                     )}
@@ -1140,7 +1151,9 @@ const AddPartnerModal = ({
                 </Stack>
                 <Grid container justifyContent="space-between">
                   <Grid item>
-                    <Button variant="text">Cancel</Button>
+                    <Button variant="text" onClick={toggle}>
+                      Cancel
+                    </Button>
                   </Grid>
                   <Grid item>
                     <Button type="submit" disabled={isSubmitting}>
@@ -1171,8 +1184,8 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
     <Card
       variant={submittedPartnerRequest ? "lightened" : "primaryOutlined"}
       size="small"
-      hoverable
-      onClick={onClick}
+      hoverable={!submittedPartnerRequest}
+      onClick={submittedPartnerRequest ? null : onClick}
     >
       {submittedPartnerRequest ? (
         <Grid container spacing={3} alignItems="center">
