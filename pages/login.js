@@ -72,7 +72,6 @@ const Login = ({}) => {
             personRoleList: personRoleList,
             personIsOnboarded: personIsOnboarded,
           });
-
           RedirectUser({
             router: router,
             roleList: personRoleList,
