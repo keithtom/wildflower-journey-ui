@@ -53,38 +53,32 @@ const Login = ({}) => {
   const onSubmit = async (data) => {
     try {
       const downcasedEmail = data.email.toLowerCase();
-      await authApi
-        .login(downcasedEmail, data.password)
-        .then(function (response) {
-          const userAttributes = response.data.data.attributes;
-          const personId = response.data.data.relationships.person.data.id;
-          const personRoleList = response?.data?.included?.find((a) => {
-            return a.id === personId;
-          })?.attributes?.roleList;
-          const personIsOnboarded = response?.data?.included?.find((a) => {
-            return a.id === personId;
-          })?.attributes?.isOnboarded;
+      const response = await authApi.login(downcasedEmail, data.password);
 
-          setCurrentUser({
-            id: personId,
-            type: response.data.data.type,
-            attributes: userAttributes,
-            personRoleList: personRoleList,
-            personIsOnboarded: personIsOnboarded,
-          });
+      const userAttributes = response.data.data.attributes;
+      const personId = response.data.data.relationships.person.data.id;
+      const personData = response?.data?.included?.find(
+        (a) => a.id === personId
+      )?.attributes;
+      const personRoleList = personData?.roleList;
+      const personIsOnboarded = personData?.isOnboarded;
 
-          RedirectUser({
-            router: router,
-            roleList: personRoleList,
-            isOnboarded: personIsOnboarded,
-          });
-        });
-      // Process successful login response
+      setCurrentUser({
+        id: personId,
+        type: response.data.data.type,
+        attributes: userAttributes,
+        personRoleList: personRoleList,
+        personIsOnboarded: personIsOnboarded,
+      });
+
+      RedirectUser({
+        router: router,
+        roleList: personRoleList,
+        isOnboarded: personIsOnboarded,
+      });
     } catch (error) {
-      // handle error
       console.log(error);
-      // console.log(error.response.data); // error message
-      if (error.response.status === 401) {
+      if (error.response?.status === 401) {
         clearLoggedInState({});
         setError("email", {
           type: "invalid",
@@ -94,6 +88,9 @@ const Login = ({}) => {
           type: "invalid",
           message: error.response.data,
         });
+      } else {
+        // General error handler
+        console.error("An error occurred:", error);
       }
     }
   };
