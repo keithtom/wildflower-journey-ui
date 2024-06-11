@@ -146,8 +146,8 @@ const ProcessId = ({}) => {
       }
       return acc;
     }, {});
-    console.log({ updatedData });
-    console.log({ updateProcessPositionData });
+    // console.log({ updatedData });
+    // console.log({ updateProcessPositionData });
 
     if (updateProcessPositionData) {
       updatedData.selected_processes_attributes =
@@ -238,7 +238,7 @@ const ProcessId = ({}) => {
       const response = await workflowApi.reinstateProcessInWorkflow(
         selectedProcessId
       );
-      console.log({ response });
+      // console.log({ response });
       router.push(
         `/admin/workflows/processes/${response.data.data.attributes.processId}`
       );
@@ -273,7 +273,7 @@ const ProcessId = ({}) => {
   };
 
   const handleDeleteDependency = async (dependencyId) => {
-    console.log("Delete dependency", dependencyId);
+    // console.log("Delete dependency", dependencyId);
     try {
       const response = await workflowApi.deleteDependency(dependencyId);
       mutate(`definition/workflows/${workflowId}/processes/${processId}`);
@@ -306,7 +306,7 @@ const ProcessId = ({}) => {
         ],
       },
     };
-    console.log({ structuredData });
+    // console.log({ structuredData });
     setUpdateProcessPositionData(structuredData);
   };
 
@@ -1184,8 +1184,6 @@ const ChoosePositionModal = ({
   stagedPhase,
 }) => {
   // console.log(stagedPhase);
-
-  console.log({ milestone });
 
   const currentProcessSelectedProcessId =
     milestone?.relationships.selectedProcesses.data[0].id;
