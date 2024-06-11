@@ -41,7 +41,6 @@ import CategoryChip from "@components/CategoryChip";
 import Resource from "@components/Resource";
 
 import useTeam from "@hooks/useTeam";
-import useUser from "@hooks/useUser";
 import usePersons from "@hooks/usePersons";
 import useSSJProgress from "@hooks/useSSJProgress";
 import useMilestones from "@hooks/useMilestones";
@@ -71,7 +70,7 @@ const SSJ = () => {
   const [userOnboardedprogress, setUserOnboardedProgress] = useState(
     !isFirstTimeUser
   );
-  const [openDate, setOpenDate] = useState();
+  const [openDate, setOpenDate] = useState(null);
   // const [team, setTeam] = useState();
 
   const toggleOnboardingPeers = () => {
@@ -85,9 +84,7 @@ const SSJ = () => {
     router.push(`/ssj/${workflow}/visioning`);
   };
 
-  // Data
-  const { user, isLoading: userIsLoading } = useUser();
-  const teamId = user?.data.attributes.ssj.teamId;
+  const teamId = currentUser?.attributes.ssj.teamId;
   const { team, isLoading: teamIsLoading } = useTeam(teamId);
   const { people, isLoading: currentETLsIsLoading } = usePersons({
     etl: true,
@@ -122,13 +119,16 @@ const SSJ = () => {
     currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
 
   useEffect(() => {
-    setOpenDate(team?.data?.data?.attributes?.expectedStartDate);
+    if (team?.data?.data?.attributes?.expectedStartDate) {
+      setOpenDate(team?.data?.data?.attributes?.expectedStartDate);
+    } else {
+      setOpenDate(null);
+    }
   }, [team]);
 
   useAuth("/login");
 
   const isLoading =
-    userIsLoading ||
     teamIsLoading ||
     ssjProgressIsLoading ||
     milestonesForPhaseIsLoading ||

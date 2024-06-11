@@ -94,6 +94,8 @@ const Header = ({ toggleNavOpen }) => {
 export default Header;
 
 const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
+  const router = useRouter();
+
   const [profileNavOpen, setProfileNavOpen] = useState(false);
   const handleOpen = (event) => {
     setProfileNavOpen(event.currentTarget);
@@ -135,15 +137,14 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
     try {
       const res = await registrationsAPI.logout();
       console.log(res);
+    } catch (err) {
+      if (err?.response?.status !== 401) {
+        console.error("Error logging out:", err);
+      }
+    } finally {
+      router.push("/logged-out");
       clearLoggedInState({});
       setCurrentUser(null);
-      Router.push("/logged-out");
-    } catch (err) {
-      if (err?.response?.status === 401) {
-        clearLoggedInState({});
-        setCurrentUser(null);
-        Router.push("/logged-out");
-      }
     }
   }
 
