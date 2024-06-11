@@ -295,32 +295,21 @@ const ProcessId = ({}) => {
     }
   }, [phaseListField]);
 
-  const handleChoosePosition = async (position, phase) => {
+  const handleChoosePosition = async (position, phase, selectedProcessId) => {
     // console.log(position);
     const structuredData = {
       process: {
         phase_list: [`${phase}`],
         selected_processes_attributes: [
-          { workflow_id: workflow.id, position: position },
+          {
+            workflow_id: workflow.id,
+            position: position,
+            id: selectedProcessId,
+          },
         ],
       },
     };
     setUpdateProcessPositionData(structuredData);
-    // console.log({ structuredData });
-    // try {
-    //   const response = await processApi.editMilestone(
-    //     processId,
-    //     structuredData
-    //   );
-    //   mutate(`definition/workflows/${workflowId}/processes/${processId}`);
-    //   setShowChoosePositionModal((prevState) => ({
-    //     ...prevState,
-    //     state: false,
-    //     intent: false,
-    //   }));
-    // } catch (error) {
-    //   console.log(error);
-    // }
   };
 
   return (
@@ -1198,12 +1187,18 @@ const ChoosePositionModal = ({
 }) => {
   // console.log(stagedPhase);
 
+  console.log({ milestone });
+
+  const currentProcessSelectedProcessId =
+    milestone?.relationships.selectedProcesses.data[0].id;
+
   return (
     <Dialog open={open} fullWidth>
       <DialogTitle>Choose new position</DialogTitle>
       <DialogContent>
         <Card sx={{ overflow: "visible", padding: 0 }}>
           <ChoosePositionList
+            currentProcessSelectedProcessId={currentProcessSelectedProcessId}
             onClose={onClose}
             stagedPhase={stagedPhase}
             workflow={workflow}
@@ -1221,6 +1216,7 @@ const ChoosePositionList = ({
   workflow,
   handleChoosePosition,
   onClose,
+  currentProcessSelectedProcessId,
 }) => {
   const stagedPhaseProcessesArray =
     workflow.relationships.processes.data.filter(
@@ -1247,6 +1243,7 @@ const ChoosePositionList = ({
     >
       {stagedPhaseProcessesArray.map((process, i) => (
         <ChoosePositionListItem
+          currentProcessSelectedProcessId={currentProcessSelectedProcessId}
           onClose={onClose}
           isLast={i === stagedPhaseProcessesArray.length - 1}
           workflow={workflow}
@@ -1267,6 +1264,7 @@ const ChoosePositionListItem = ({
   isLast,
   phase,
   onClose,
+  currentProcessSelectedProcessId,
 }) => {
   // console.log({ workflow });
 
@@ -1303,6 +1301,7 @@ const ChoosePositionListItem = ({
   }
 
   // console.log(processPosition);
+  // console.log(selectedProcesses);
   // console.log(lastProcessPosition);
 
   return (
@@ -1313,11 +1312,19 @@ const ChoosePositionListItem = ({
         id={`inline-action-tile-${snakeCase(process.attributes.title)}`}
         showAdd={true}
         add={() => {
-          handleChoosePosition(processPosition, phase);
+          handleChoosePosition(
+            processPosition,
+            phase,
+            currentProcessSelectedProcessId
+          );
           onClose();
         }}
         lastAdd={() => {
-          handleChoosePosition(lastProcessPosition, phase);
+          handleChoosePosition(
+            lastProcessPosition,
+            phase,
+            currentProcessSelectedProcessId
+          );
           onClose();
         }}
       />
