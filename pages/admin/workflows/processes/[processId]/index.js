@@ -138,10 +138,7 @@ const ProcessId = ({}) => {
     // Remove unchanged data
     const updatedData = Object.keys(data).reduce((acc, key) => {
       if (data[key] !== originalData[key]) {
-        if (
-          (key === "category_list" || key === "phase_list") &&
-          !Array.isArray(data[key])
-        ) {
+        if (key === "category_list" && !Array.isArray(data[key])) {
           acc[key] = [data[key]];
         } else {
           acc[key] = data[key];
@@ -299,7 +296,7 @@ const ProcessId = ({}) => {
     // console.log(position);
     const structuredData = {
       process: {
-        phase_list: [`${phase}`],
+        phase_list: phase,
         selected_processes_attributes: [
           {
             workflow_id: workflow.id,
@@ -309,6 +306,7 @@ const ProcessId = ({}) => {
         ],
       },
     };
+    console.log({ structuredData });
     setUpdateProcessPositionData(structuredData);
   };
 
