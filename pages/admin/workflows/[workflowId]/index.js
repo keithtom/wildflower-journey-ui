@@ -315,7 +315,10 @@ const Workflow = ({}) => {
                 <Stack direction="row" spacing={3}>
                   <Button
                     onClick={handleCancelDraft}
-                    disabled={!workflow.attributes.previousVersionId}
+                    disabled={
+                      !workflow.attributes.previousVersionId ||
+                      workflow?.attributes.needsSupport
+                    }
                   >
                     Cancel Draft
                   </Button>
