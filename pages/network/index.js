@@ -55,8 +55,6 @@ const Network = () => {
   const { currentUser } = useUserContext();
   const { screenSize } = getScreenSize();
 
-  if (error) return <PageContainer>failed to load</PageContainer>;
-
   const profileFallback = "/assets/images/avatar-fallback.svg";
   const schoolFallback = "/assets/images/school-placeholder.png";
 
@@ -111,6 +109,7 @@ const Network = () => {
   // console.log({ inView });
   // console.log("hasMore------------------------", hasMore);
   // console.log({ filters });
+  if (error) return <PageContainer>failed to load</PageContainer>;
 
   return (
     <PageContainer isLoading={!currentUser} hideNav={!currentUser}>
