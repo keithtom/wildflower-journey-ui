@@ -114,7 +114,7 @@ const ProcessId = ({}) => {
     formState: { errors, isDirty },
   } = useForm();
 
-  // console.log({ errors });
+  console.log({ errors });
 
   useEffect(() => {
     setProcessHasChanges(isDirty);
@@ -309,6 +309,11 @@ const ProcessId = ({}) => {
     // console.log({ structuredData });
     setUpdateProcessPositionData(structuredData);
   };
+
+  // console.log({ originalData });
+  // console.log({ phaseListField });
+
+  const phaseChanged = originalData.phase_list !== phaseListField;
 
   return (
     <PageContainer isAdmin>
@@ -510,9 +515,16 @@ const ProcessId = ({}) => {
                     message: "This field is required",
                   },
                   validate: {
-                    hasPrerequisites: (value) =>
-                      (milestone.relationships.prerequisites?.data?.length ||
-                        0) === 0 || "Cannot submit if there are prerequisites",
+                    hasPrerequisites: (value) => {
+                      if (!phaseChanged) {
+                        return true;
+                      }
+
+                      return (
+                        (milestone.relationships.prerequisites?.data?.length ||
+                          0) === 0 || "Cannot submit if there are prerequisites"
+                      );
+                    },
                   },
                 }}
                 render={({ field }) => (
