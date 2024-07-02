@@ -70,7 +70,7 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  // console.log({ workflow });
+  console.log({ workflow });
 
   const rolloutInProgress =
     workflow?.attributes.rolloutStartedAt !== null &&
