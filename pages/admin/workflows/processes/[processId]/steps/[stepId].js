@@ -45,6 +45,8 @@ const StepId = ({}) => {
 
   const { workflow, isLoading: workflowIsLoading } = useWorkflow(workflowId);
 
+  const isRecurring = workflow?.attributes.recurring;
+
   useEffect(() => {
     const id = localStorage.getItem("workflowId");
     setWorkflowId(id);
@@ -509,183 +511,187 @@ const StepId = ({}) => {
             </List>
           </Card>
           {/* DECISION */}
-          <Card>
-            <CardContent>
-              <Stack spacing={6}>
-                <Controller
-                  name="kind"
-                  defaultValue=""
-                  control={control}
-                  render={({ field }) => (
-                    <FormControlLabel
-                      label="Is decision"
-                      control={
-                        <Switch
-                          disabled={!isDraftingNewVersion}
-                          label="Kind"
-                          checked={field.value === "decision"}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.checked ? "decision" : "default"
-                            )
-                          }
-                        />
-                      }
-                    />
-                  )}
-                />
-                {kindField === "decision" ? (
-                  <Stack spacing={3}>
-                    <Controller
-                      name="decision_question"
-                      control={control}
-                      defaultValue=""
-                      rules={{
-                        required: {
-                          value: true,
-                          message: "This field is required",
-                        },
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          label="Decision question"
-                          placeholder="e.g. Will you do A or B?"
-                          error={errors.decision_question}
-                          helperText={
-                            errors &&
-                            errors.decision_question &&
-                            errors.decision_question.message
-                          }
-                          {...field}
-                        />
-                      )}
-                    />
-                    <Card sx={{ padding: 0 }}>
-                      <List
-                        subheader={
-                          <ListSubheader
-                            component="div"
-                            id="nested-list-subheader"
-                            sx={{ background: "#eaeaea" }}
-                          >
-                            <Grid container justifyContent="space-between">
-                              <Grid item>Decision options</Grid>
-                              <Grid item>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  onClick={() => handleOpenDecisionModal(null)}
-                                >
-                                  Add Decision Option
-                                </Button>
-                              </Grid>
-                            </Grid>
-                          </ListSubheader>
+          {isRecurring ? null : (
+            <Card>
+              <CardContent>
+                <Stack spacing={6}>
+                  <Controller
+                    name="kind"
+                    defaultValue=""
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        label="Is decision"
+                        control={
+                          <Switch
+                            disabled={!isDraftingNewVersion}
+                            label="Kind"
+                            checked={field.value === "decision"}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.checked ? "decision" : "default"
+                              )
+                            }
+                          />
                         }
-                      >
-                        {decisionOptionParams
-                          ? decisionOptionParams
-                              .filter((d) => !d.id)
-                              .map((d, i) => (
-                                <ListItem disablePadding divider key={i}>
-                                  <ListItemButton>
-                                    <Stack
-                                      direction="row"
-                                      spacing={3}
-                                      alignItems="center"
-                                    >
-                                      <ListItemText>
-                                        <Typography
-                                          variant="bodyRegular"
-                                          lightened
-                                        >
-                                          {d.description}
-                                        </Typography>
-                                      </ListItemText>
-                                      {decisionOptionParams.some(
-                                        (param) => param.id === d.id
-                                      ) ? (
-                                        <Chip
-                                          label="Added"
-                                          size="small"
-                                          variant="outlined"
-                                        />
-                                      ) : null}
-                                    </Stack>
-                                  </ListItemButton>
-                                </ListItem>
-                              ))
-                          : null}
-                        {isLoading
-                          ? Array.from({ length: 3 }).map((_, index) => (
-                              <ListItem key={index} divider>
-                                <ListItemText>
-                                  <Skeleton variant="text" width={120} />
-                                </ListItemText>
-                              </ListItem>
-                            ))
-                          : step.relationships.decisionOptions.data.map(
-                              (decisionOption, i) => (
-                                <ListItem
-                                  disablePadding
-                                  divider
-                                  key={i}
-                                  secondaryAction={
-                                    <Button
-                                      color="error"
-                                      id={`remove-decision-option-${i}`}
-                                      onClick={() =>
-                                        handleRemoveDecisionOption(
-                                          decisionOption.id
-                                        )
-                                      }
-                                    >
-                                      Remove
-                                    </Button>
-                                  }
-                                >
-                                  <ListItemButton
+                      />
+                    )}
+                  />
+                  {kindField === "decision" ? (
+                    <Stack spacing={3}>
+                      <Controller
+                        name="decision_question"
+                        control={control}
+                        defaultValue=""
+                        rules={{
+                          required: {
+                            value: true,
+                            message: "This field is required",
+                          },
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            label="Decision question"
+                            placeholder="e.g. Will you do A or B?"
+                            error={errors.decision_question}
+                            helperText={
+                              errors &&
+                              errors.decision_question &&
+                              errors.decision_question.message
+                            }
+                            {...field}
+                          />
+                        )}
+                      />
+                      <Card sx={{ padding: 0 }}>
+                        <List
+                          subheader={
+                            <ListSubheader
+                              component="div"
+                              id="nested-list-subheader"
+                              sx={{ background: "#eaeaea" }}
+                            >
+                              <Grid container justifyContent="space-between">
+                                <Grid item>Decision options</Grid>
+                                <Grid item>
+                                  <Button
+                                    variant="contained"
+                                    size="small"
                                     onClick={() =>
-                                      handleOpenDecisionModal(decisionOption)
+                                      handleOpenDecisionModal(null)
                                     }
                                   >
-                                    <Stack
-                                      direction="row"
-                                      spacing={3}
-                                      alignItems="center"
-                                    >
-                                      <ListItemText>
-                                        <Typography variant="bodyRegular">
-                                          {decisionOptionParams.find(
-                                            (param) =>
-                                              param.id === decisionOption.id
-                                          )?.description ||
-                                            decisionOption.attributes
-                                              .description}
-                                        </Typography>
-                                      </ListItemText>
-                                      {decisionOptionParams.some(
-                                        (param) =>
-                                          param.id === decisionOption.id
-                                      ) ? (
-                                        <Chip
-                                          label="Edited"
-                                          size="small"
-                                          variant="outlined"
-                                        />
-                                      ) : null}
-                                    </Stack>
-                                  </ListItemButton>
+                                    Add Decision Option
+                                  </Button>
+                                </Grid>
+                              </Grid>
+                            </ListSubheader>
+                          }
+                        >
+                          {decisionOptionParams
+                            ? decisionOptionParams
+                                .filter((d) => !d.id)
+                                .map((d, i) => (
+                                  <ListItem disablePadding divider key={i}>
+                                    <ListItemButton>
+                                      <Stack
+                                        direction="row"
+                                        spacing={3}
+                                        alignItems="center"
+                                      >
+                                        <ListItemText>
+                                          <Typography
+                                            variant="bodyRegular"
+                                            lightened
+                                          >
+                                            {d.description}
+                                          </Typography>
+                                        </ListItemText>
+                                        {decisionOptionParams.some(
+                                          (param) => param.id === d.id
+                                        ) ? (
+                                          <Chip
+                                            label="Added"
+                                            size="small"
+                                            variant="outlined"
+                                          />
+                                        ) : null}
+                                      </Stack>
+                                    </ListItemButton>
+                                  </ListItem>
+                                ))
+                            : null}
+                          {isLoading
+                            ? Array.from({ length: 3 }).map((_, index) => (
+                                <ListItem key={index} divider>
+                                  <ListItemText>
+                                    <Skeleton variant="text" width={120} />
+                                  </ListItemText>
                                 </ListItem>
-                              )
-                            )}
-                      </List>
-                    </Card>
-                  </Stack>
-                ) : null}
-              </Stack>
-            </CardContent>
-          </Card>
+                              ))
+                            : step.relationships.decisionOptions.data.map(
+                                (decisionOption, i) => (
+                                  <ListItem
+                                    disablePadding
+                                    divider
+                                    key={i}
+                                    secondaryAction={
+                                      <Button
+                                        color="error"
+                                        id={`remove-decision-option-${i}`}
+                                        onClick={() =>
+                                          handleRemoveDecisionOption(
+                                            decisionOption.id
+                                          )
+                                        }
+                                      >
+                                        Remove
+                                      </Button>
+                                    }
+                                  >
+                                    <ListItemButton
+                                      onClick={() =>
+                                        handleOpenDecisionModal(decisionOption)
+                                      }
+                                    >
+                                      <Stack
+                                        direction="row"
+                                        spacing={3}
+                                        alignItems="center"
+                                      >
+                                        <ListItemText>
+                                          <Typography variant="bodyRegular">
+                                            {decisionOptionParams.find(
+                                              (param) =>
+                                                param.id === decisionOption.id
+                                            )?.description ||
+                                              decisionOption.attributes
+                                                .description}
+                                          </Typography>
+                                        </ListItemText>
+                                        {decisionOptionParams.some(
+                                          (param) =>
+                                            param.id === decisionOption.id
+                                        ) ? (
+                                          <Chip
+                                            label="Edited"
+                                            size="small"
+                                            variant="outlined"
+                                          />
+                                        ) : null}
+                                      </Stack>
+                                    </ListItemButton>
+                                  </ListItem>
+                                )
+                              )}
+                        </List>
+                      </Card>
+                    </Stack>
+                  ) : null}
+                </Stack>
+              </CardContent>
+            </Card>
+          )}
         </Stack>
       </form>
       <ResourceModal

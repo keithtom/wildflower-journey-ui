@@ -5,6 +5,7 @@ import { mutate } from "swr";
 import { useForm, Controller } from "react-hook-form";
 
 import { snakeCase } from "@lib/utils/snakeCase";
+import { periods } from "@lib/utils/open-school-checklist-periods";
 import {
   Tooltip,
   Alert,
@@ -54,7 +55,7 @@ const Workflow = ({}) => {
     useState(false);
   const [groupedProcesses, setGroupedProcesses] = useState([]);
   const [stagedProcessPosition, setStagedProcessPosition] = useState(null);
-  const [phaseAddedInto, setPhaseAddedInto] = useState(null);
+  const [groupAddedInto, setGroupAddedInto] = useState(null);
 
   // console.log(isDraftingNewVersion);
   // console.log({ versionHasChanges });
@@ -71,6 +72,8 @@ const Workflow = ({}) => {
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
   console.log({ workflow });
+
+  const isRecurring = workflow?.attributes.recurring;
 
   const rolloutInProgress =
     workflow?.attributes.rolloutStartedAt !== null &&
@@ -104,16 +107,55 @@ const Workflow = ({}) => {
     }, {});
     return phasesOrder.reduce((acc, phase) => {
       if (grouped[phase]) {
-        acc.push({ phase: phase, milestones: grouped[phase] });
+        acc.push({ groupName: phase, milestones: grouped[phase] });
       }
       return acc;
     }, []);
   }
 
+  function groupByPeriod(data) {
+    const grouped = data.reduce((acc, item) => {
+      // periods comes from /utils/open-school-checklist-periods
+      const period = periods.find(
+        (period) =>
+          period.value.due_months.every((month) =>
+            item.attributes.dueMonths.includes(month)
+          ) &&
+          item.attributes.dueMonths.every((month) =>
+            period.value.due_months.includes(month)
+          ) &&
+          period.value.duration === item.attributes.duration
+      );
+      if (period) {
+        if (!acc[period.value.id]) {
+          acc[period.value.id] = [];
+        }
+        acc[period.value.id].push(item);
+      }
+      return acc;
+    }, {});
+
+    const periodOrder = Object.keys(grouped).reduce((acc, period) => {
+      acc.push({
+        groupName: period,
+        milestones: grouped[period],
+      });
+      return acc;
+    }, []);
+
+    return periodOrder;
+  }
+
   useEffect(() => {
-    setGroupedProcesses(
-      groupByPhase(isLoading ? [] : workflow?.relationships.processes.data)
-    );
+    if (isRecurring) {
+      setGroupedProcesses(
+        groupByPeriod(isLoading ? [] : workflow?.relationships.processes.data)
+      );
+    } else {
+      setGroupedProcesses(
+        groupByPhase(isLoading ? [] : workflow?.relationships.processes.data)
+      );
+    }
   }, [workflow]);
   // console.log({ groupedProcesses });
 
@@ -139,9 +181,25 @@ const Workflow = ({}) => {
   const handleSubmitNewVersion = () => {
     router.push(`/admin/workflows/${workflowId}/submit-version`);
   };
-  const handleStageAddProcess = (position, phase) => {
+  const handleStageAddProcess = (position, group) => {
     setAddProcessModalOpen(true);
-    setPhaseAddedInto(phase);
+    if (isRecurring) {
+      // lookup the period in the periods array that matches the values in group
+      const period = periods.find(
+        (period) =>
+          period.value.due_months.every((month) =>
+            group.dueMonths.includes(month)
+          ) &&
+          group.dueMonths.every((month) =>
+            period.value.due_months.includes(month)
+          ) &&
+          period.value.duration === group.duration
+      );
+      // set the phase to be the period id
+      setGroupAddedInto(period.value.id);
+    } else {
+      setGroupAddedInto(group);
+    }
     setStagedProcessPosition(position);
   };
   const handleCreateProcess = async (data) => {
@@ -325,7 +383,9 @@ const Workflow = ({}) => {
                   <Button
                     variant="contained"
                     disabled={
-                      !versionHasChanges || workflow?.attributes.needsSupport
+                      !versionHasChanges ||
+                      workflow?.attributes.needsSupport ||
+                      isRecurring
                     }
                     onClick={handleSubmitNewVersion}
                   >
@@ -380,8 +440,8 @@ const Workflow = ({}) => {
                 </Grid>
               </Grid>
             ))
-          : groupedProcesses.map((phase, phaseIndex) => (
-              <Grid container key={phaseIndex}>
+          : groupedProcesses.map((group, groupIndex) => (
+              <Grid container key={groupIndex}>
                 <Grid item xs={12}>
                   <Card sx={{ overflow: "visible", padding: 0 }}>
                     <List
@@ -391,13 +451,13 @@ const Workflow = ({}) => {
                           id="nested-list-subheader"
                           sx={{ background: "#eaeaea" }}
                         >
-                          {phase.phase.charAt(0).toUpperCase() +
-                            phase.phase.slice(1)}
+                          {group.groupName.charAt(0).toUpperCase() +
+                            group.groupName.slice(1)}
                         </ListSubheader>
                       }
                     >
                       <DraggableList
-                        items={phase.milestones}
+                        items={group.milestones}
                         onReorder={(
                           processId,
                           priorItemPosition,
@@ -427,16 +487,17 @@ const Workflow = ({}) => {
                             process={process}
                             prevProcessPosition={
                               i > 0
-                                ? phase?.milestones[i - 1]?.relationships
+                                ? group?.milestones[i - 1]?.relationships
                                     .selectedProcesses.data[0].attributes
                                     .position
                                 : null
                             }
-                            isLast={i === phase.milestones.length - 1}
+                            isLast={i === group.milestones.length - 1}
                             isDraftingNewVersion={isDraftingNewVersion}
                             handleStageAddProcess={handleStageAddProcess}
                             handleRemoveProcess={handleRemoveProcess}
                             handleReinstateProcess={handleReinstateProcess}
+                            isRecurring={isRecurring}
                           />
                         )}
                       />
@@ -453,7 +514,8 @@ const Workflow = ({}) => {
         setStagedProcessPosition={setStagedProcessPosition}
         onClose={() => setAddProcessModalOpen(false)}
         handleCreateProcess={handleCreateProcess}
-        phaseAddedInto={phaseAddedInto}
+        groupAddedInto={groupAddedInto}
+        isRecurring={isRecurring}
       />
       <Snackbar
         autoHideDuration={1000}
@@ -475,7 +537,8 @@ const AddProcessModal = ({
   handleCreateProcess,
   onClose,
   workflowId,
-  phaseAddedInto,
+  groupAddedInto,
+  isRecurring,
 }) => {
   const [addType, setAddType] = useState(null);
 
@@ -496,10 +559,13 @@ const AddProcessModal = ({
 
   useEffect(() => {
     reset({
-      phase: phaseAddedInto,
+      phase: groupAddedInto,
       position: stagedProcessPosition,
+      period: groupAddedInto,
     });
   }, [open]);
+
+  // console.log(groupAddedInto);
 
   const onSubmit = handleSubmit((data) => {
     // console.log({ data });
@@ -565,14 +631,18 @@ const AddProcessModal = ({
                 defaultValue=""
                 render={({ field }) => <input type="hidden" {...field} />}
               />
-              <AddProcessFields control={control} errors={errors} />
+              <AddProcessFields
+                control={control}
+                errors={errors}
+                isRecurring={isRecurring}
+              />
             </>
           ) : (
             addType === "choose" && (
               <Card sx={{ padding: 0 }} variant="outlined">
                 <ChooseProcessList
                   handleChooseProcess={handleChooseProcess}
-                  phaseAddedInto={phaseAddedInto}
+                  groupAddedInto={groupAddedInto}
                 />
               </Card>
             )
@@ -598,6 +668,7 @@ const ProcessListItem = ({
   process,
   isLast,
   disabled,
+  isRecurring,
 }) => {
   const router = useRouter();
 
@@ -707,10 +778,26 @@ const ProcessListItem = ({
         showAdd={isRemoved ? null : isDraftingNewVersion}
         status={isDraftingNewVersion ? status : "replicated"}
         add={() =>
-          handleStageAddProcess(processPosition, process.attributes.phase)
+          handleStageAddProcess(
+            processPosition,
+            isRecurring
+              ? {
+                  dueMonths: process.attributes.dueMonths,
+                  duration: process.attributes.duration,
+                }
+              : process.attributes.phase
+          )
         }
         lastAdd={() =>
-          handleStageAddProcess(lastProcessPosition, process.attributes.phase)
+          handleStageAddProcess(
+            processPosition,
+            isRecurring
+              ? {
+                  dueMonths: process.attributes.dueMonths,
+                  duration: process.attributes.duration,
+                }
+              : process.attributes.phase
+          )
         }
         dragHandle={<PositionGrabber {...listeners} {...attributes} />}
       />
@@ -759,7 +846,7 @@ const ProcessListItem = ({
   );
 };
 
-const AddProcessFields = ({ control, errors }) => {
+const AddProcessFields = ({ control, errors, isRecurring }) => {
   return (
     <Grid container>
       <Grid item xs={12}>
@@ -833,54 +920,92 @@ const AddProcessFields = ({ control, errors }) => {
             />
           </FormControl>
 
-          <FormControl fullWidth>
-            <InputLabel id="phase-label">Phase</InputLabel>
-            <Controller
-              name="phase"
-              control={control}
-              defaultValue={[]}
-              rules={{
-                required: {
-                  value: true,
-                  message: "This field is required",
-                },
-              }}
-              render={({ field }) => (
-                <Select
-                  disabled
-                  {...field}
-                  labelId="phase-label"
-                  id="phase"
-                  input={<OutlinedInput label="Phase" />}
-                  helperText={
-                    errors &&
-                    errors.phase &&
-                    errors.phase.type === "required" &&
-                    "This field is required"
-                  }
-                >
-                  {ssjPhases.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      <ListItemText primary={option.label} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            />
-          </FormControl>
+          {isRecurring ? (
+            <FormControl fullWidth>
+              <InputLabel id="period-label">Period</InputLabel>
+              <Controller
+                name="period"
+                control={control}
+                defaultValue={[]}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "This field is required",
+                  },
+                }}
+                render={({ field }) => (
+                  <Select
+                    disabled
+                    {...field}
+                    labelId="period-label"
+                    id="period"
+                    input={<OutlinedInput label="Period" />}
+                    helperText={
+                      errors &&
+                      errors.period &&
+                      errors.period.type === "required" &&
+                      "This field is required"
+                    }
+                  >
+                    {periods.map((option) => (
+                      <MenuItem key={option.value.id} value={option.value.id}>
+                        <ListItemText primary={option.label} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            </FormControl>
+          ) : (
+            <FormControl fullWidth>
+              <InputLabel id="phase-label">Phase</InputLabel>
+              <Controller
+                name="phase"
+                control={control}
+                defaultValue={[]}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "This field is required",
+                  },
+                }}
+                render={({ field }) => (
+                  <Select
+                    disabled
+                    {...field}
+                    labelId="phase-label"
+                    id="phase"
+                    input={<OutlinedInput label="Phase" />}
+                    helperText={
+                      errors &&
+                      errors.phase &&
+                      errors.phase.type === "required" &&
+                      "This field is required"
+                    }
+                  >
+                    {ssjPhases.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        <ListItemText primary={option.label} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            </FormControl>
+          )}
         </Stack>
       </Grid>
     </Grid>
   );
 };
 
-const ChooseProcessList = ({ handleChooseProcess, phaseAddedInto }) => {
+const ChooseProcessList = ({ handleChooseProcess, groupAddedInto }) => {
   const [milestonesInPhase, setMilestonesInPhase] = useState(null);
   // console.log({ milestonesInPhase });
   const { milestonesByPhase, isLoadingMilestonesByPhase } = useMilestones();
   // console.log({ milestonesByPhase });
   const capitalizedPhaseAddedInto =
-    phaseAddedInto.charAt(0).toUpperCase() + phaseAddedInto.slice(1);
+    groupAddedInto.charAt(0).toUpperCase() + groupAddedInto.slice(1);
 
   useEffect(() => {
     setMilestonesInPhase(
