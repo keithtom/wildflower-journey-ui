@@ -203,6 +203,8 @@ const Workflow = ({}) => {
     setStagedProcessPosition(position);
   };
   const handleCreateProcess = async (data) => {
+    // console.log(data);
+
     const structuredData = {
       process: {
         category_list: data.categories,
@@ -214,11 +216,25 @@ const Workflow = ({}) => {
         ],
       },
     };
-    // console.log({ structuredData });
+
+    const structuredRecurringProcessData = {
+      process: {
+        category_list: data.categories,
+        title: data.title,
+        description: data.description,
+        recurring: true,
+        duration: periods.find((period) => period.value.id === data.period)
+          ?.value.duration,
+        due_months: periods.find((period) => period.value.id === data.period)
+          ?.value.due_months,
+      },
+    };
+    // console.log({ structuredRecurringProcessData });
+    // debugger;
     try {
       const response = await workflowApi.createProcessInWorkflow(
         workflowId,
-        structuredData
+        isRecurring ? structuredRecurringProcessData : structuredData
       );
       mutate(`/definition/workflows/${workflowId}`);
     } catch (error) {
@@ -568,7 +584,7 @@ const AddProcessModal = ({
   // console.log(groupAddedInto);
 
   const onSubmit = handleSubmit((data) => {
-    // console.log({ data });
+    console.log({ data });
     handleCreateProcess(data);
     setAddType(null);
     reset();
@@ -772,6 +788,7 @@ const ProcessListItem = ({
       sx={{ background: "white", opacity: isDragging ? 0.5 : 1 }}
     >
       <InlineActionTile
+        isRecurring={isRecurring}
         isLast={isLast}
         disabled={isRemoved || disabled}
         id={`inline-action-tile-${snakeCase(process.attributes.title)}`}

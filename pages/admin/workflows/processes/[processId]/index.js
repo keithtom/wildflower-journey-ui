@@ -124,16 +124,18 @@ const ProcessId = ({}) => {
     setProcessHasChanges(isDirty);
   }, [isDirty]);
 
-  const processPeriod = periods.find(
-    (period) =>
-      period.value.due_months.every((month) =>
-        milestone?.attributes.dueMonths.includes(month)
-      ) &&
-      milestone?.attributes.dueMonths.every((month) =>
-        period.value.due_months.includes(month)
-      ) &&
-      period.value.duration === milestone?.attributes.duration
-  );
+  const processPeriod = isRecurring
+    ? periods.find(
+        (period) =>
+          period.value.due_months.every((month) =>
+            milestone?.attributes.dueMonths.includes(month)
+          ) &&
+          milestone?.attributes.dueMonths.every((month) =>
+            period.value.due_months.includes(month)
+          ) &&
+          period.value.duration === milestone?.attributes.duration
+      )
+    : null;
 
   useEffect(() => {
     if (!isLoading && milestone) {
@@ -143,7 +145,7 @@ const ProcessId = ({}) => {
         prerequisite: milestone?.attributes?.prerequisite,
         category_list: milestone?.attributes?.categories,
         phase_list: milestone?.attributes?.phase,
-        period: processPeriod.value.id,
+        period: isRecurring ? processPeriod.value.id : null,
       };
       setOriginalData(defaultValues);
       reset(defaultValues);
@@ -162,6 +164,17 @@ const ProcessId = ({}) => {
       }
       return acc;
     }, {});
+
+    // if updatedData includes period, reshape it to no longer include period, and instead include due_months and duration
+    if (updatedData.period) {
+      const selectedPeriod = periods.find(
+        (period) => period.value.id === updatedData.period
+      );
+      updatedData.duration = selectedPeriod?.value.duration;
+      updatedData.due_months = selectedPeriod?.value.due_months;
+      delete updatedData.period;
+    }
+
     // console.log({ updatedData });
     // console.log({ updateProcessPositionData });
 
@@ -800,6 +813,7 @@ const ProcessId = ({}) => {
         addStepPosition={addStepPosition}
         handleCreateStep={handleCreateStep}
         onClose={() => setAddStepModalOpen(false)}
+        isRecurring={isRecurring}
       />
       <Snackbar
         autoHideDuration={1000}
@@ -844,7 +858,13 @@ const AddPrerequisiteModal = ({
   );
 };
 
-const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
+const AddStepModal = ({
+  open,
+  addStepPosition,
+  handleCreateStep,
+  onClose,
+  isRecurring,
+}) => {
   const handleClose = () => {
     onClose();
   };
@@ -879,7 +899,11 @@ const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
             defaultValue=""
             render={({ field }) => <input type="hidden" {...field} />}
           />
-          <StepFields control={control} errors={errors} />
+          <StepFields
+            control={control}
+            errors={errors}
+            isRecurring={isRecurring}
+          />
         </DialogContent>
         <DialogActions>
           <Button type="submit" disabled={!isDirty}>
@@ -1060,7 +1084,7 @@ const phases = [
   { label: "Startup", value: "startup" },
 ];
 
-const StepFields = ({ control, errors }) => {
+const StepFields = ({ control, errors, isRecurring }) => {
   return (
     <Stack spacing={6}>
       <Controller
@@ -1165,6 +1189,7 @@ const StepFields = ({ control, errors }) => {
           )}
         />
       </Stack>
+
       <Controller
         name="kind"
         defaultValue="default"
@@ -1176,6 +1201,7 @@ const StepFields = ({ control, errors }) => {
               <Switch
                 label="Kind"
                 checked={field.value === "decision"}
+                disabled={isRecurring}
                 onChange={(e) =>
                   field.onChange(e.target.checked ? "decision" : "default")
                 }
