@@ -12,6 +12,7 @@ const InlineActionTile = ({
   disabled,
   isLast,
   lastAdd,
+  isRecurring,
 }) => {
   const [isHovering, setIsHovering] = useState(false);
 
@@ -47,7 +48,7 @@ const InlineActionTile = ({
           {blank ? null : (
             <>
               {showAdd && <AddChip onClick={add} />}
-              {isHovering && !disabled ? (
+              {isHovering && !disabled && !isRecurring ? (
                 dragHandle
               ) : (
                 <StatusLight status={status} disabled={disabled} />
