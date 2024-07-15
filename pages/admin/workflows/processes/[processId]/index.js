@@ -5,6 +5,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { Controller, useForm } from "react-hook-form";
 
 import { snakeCase } from "@lib/utils/snakeCase";
+import { periods } from "@lib/utils/open-school-checklist-periods";
 import {
   List,
   Card,
@@ -87,6 +88,9 @@ const ProcessId = ({}) => {
     processId
   );
   // console.log({ milestone });
+
+  const isRecurring = milestone?.attributes.recurring;
+
   // console.log({ processId });
 
   // const { milestone, isLoading, isError } = useMilestone(processId);
@@ -114,11 +118,24 @@ const ProcessId = ({}) => {
     formState: { errors, isDirty },
   } = useForm();
 
-  console.log({ errors });
+  // console.log({ errors });
 
   useEffect(() => {
     setProcessHasChanges(isDirty);
   }, [isDirty]);
+
+  const processPeriod = isRecurring
+    ? periods.find(
+        (period) =>
+          period.value.due_months.every((month) =>
+            milestone?.attributes.dueMonths.includes(month)
+          ) &&
+          milestone?.attributes.dueMonths.every((month) =>
+            period.value.due_months.includes(month)
+          ) &&
+          period.value.duration === milestone?.attributes.duration
+      )
+    : null;
 
   useEffect(() => {
     if (!isLoading && milestone) {
@@ -128,6 +145,7 @@ const ProcessId = ({}) => {
         prerequisite: milestone?.attributes?.prerequisite,
         category_list: milestone?.attributes?.categories,
         phase_list: milestone?.attributes?.phase,
+        period: isRecurring ? processPeriod.value.id : null,
       };
       setOriginalData(defaultValues);
       reset(defaultValues);
@@ -146,6 +164,17 @@ const ProcessId = ({}) => {
       }
       return acc;
     }, {});
+
+    // if updatedData includes period, reshape it to no longer include period, and instead include due_months and duration
+    if (updatedData.period) {
+      const selectedPeriod = periods.find(
+        (period) => period.value.id === updatedData.period
+      );
+      updatedData.duration = selectedPeriod?.value.duration;
+      updatedData.due_months = selectedPeriod?.value.due_months;
+      delete updatedData.period;
+    }
+
     // console.log({ updatedData });
     // console.log({ updateProcessPositionData });
 
@@ -503,128 +532,180 @@ const ProcessId = ({}) => {
               />
             </FormControl>
 
-            <FormControl fullWidth>
-              <InputLabel id="phase-label">Phase</InputLabel>
-              <Controller
-                name="phase_list"
-                control={control}
-                defaultValue={[]}
-                rules={{
-                  required: {
-                    value: true,
-                    message: "This field is required",
-                  },
-                  validate: {
-                    hasPrerequisites: (value) => {
-                      if (!phaseChanged) {
-                        return true;
-                      }
-
-                      return (
-                        (milestone.relationships.prerequisites?.data?.length ||
-                          0) === 0 || "Cannot submit if there are prerequisites"
-                      );
+            {isRecurring ? (
+              <FormControl fullWidth>
+                <InputLabel id="period-label">Period</InputLabel>
+                <Controller
+                  name="period"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "This field is required",
                     },
-                  },
-                }}
-                render={({ field }) => (
-                  <>
-                    <Select
-                      disabled={!isEditingProcess || !isDraftingNewVersion}
-                      {...field}
-                      labelId="phase-label"
-                      id="phase"
-                      onClick={() =>
-                        setShowChoosePositionModal((prevState) => ({
-                          ...prevState,
-                          intent: true,
-                        }))
-                      }
-                      input={<OutlinedInput label="Phase" />}
-                    >
-                      {phases.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          <ListItemText primary={option.label} />
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    <FormHelperText error={errors.phase_list}>
-                      {errors &&
-                        errors.phase_list &&
-                        ((errors.phase_list.type === "required" &&
-                          "This field is required") ||
-                          (errors.phase_list.type === "hasPrerequisites" &&
-                            "Remove prerequisites to update the phase of this process"))}
-                    </FormHelperText>
-                  </>
-                )}
-              />
-            </FormControl>
+                  }}
+                  render={({ field }) => (
+                    <>
+                      <Select
+                        disabled={!isEditingProcess || !isDraftingNewVersion}
+                        {...field}
+                        labelId="period-label"
+                        id="period-input"
+                        // onClick={() =>
+                        //   setShowChoosePositionModal((prevState) => ({
+                        //     ...prevState,
+                        //     intent: true,
+                        //   }))
+                        // }
+                        input={<OutlinedInput label="Period" />}
+                      >
+                        {periods.map((option) => (
+                          <MenuItem
+                            key={option.value.id}
+                            value={option.value.id}
+                          >
+                            <ListItemText primary={option.label} />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <FormHelperText error={errors.period}>
+                        {errors &&
+                          errors.period &&
+                          errors.period.type === "required" &&
+                          "This field is required"}
+                      </FormHelperText>
+                    </>
+                  )}
+                />
+              </FormControl>
+            ) : (
+              <FormControl fullWidth>
+                <InputLabel id="phase-label">Phase</InputLabel>
+                <Controller
+                  name="phase_list"
+                  control={control}
+                  defaultValue={[]}
+                  rules={{
+                    required: {
+                      value: true,
+                      message: "This field is required",
+                    },
+                    validate: {
+                      hasPrerequisites: (value) => {
+                        if (!phaseChanged) {
+                          return true;
+                        }
+
+                        return (
+                          (milestone.relationships.prerequisites?.data
+                            ?.length || 0) === 0 ||
+                          "Cannot submit if there are prerequisites"
+                        );
+                      },
+                    },
+                  }}
+                  render={({ field }) => (
+                    <>
+                      <Select
+                        disabled={!isEditingProcess || !isDraftingNewVersion}
+                        {...field}
+                        labelId="phase-label"
+                        id="phase"
+                        onClick={() =>
+                          setShowChoosePositionModal((prevState) => ({
+                            ...prevState,
+                            intent: true,
+                          }))
+                        }
+                        input={<OutlinedInput label="Phase" />}
+                      >
+                        {phases.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            <ListItemText primary={option.label} />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <FormHelperText error={errors.phase_list}>
+                        {errors &&
+                          errors.phase_list &&
+                          ((errors.phase_list.type === "required" &&
+                            "This field is required") ||
+                            (errors.phase_list.type === "hasPrerequisites" &&
+                              "Remove prerequisites to update the phase of this process"))}
+                      </FormHelperText>
+                    </>
+                  )}
+                />
+              </FormControl>
+            )}
           </Stack>
 
-          <Card sx={{ padding: 0 }}>
-            <List
-              subheader={
-                <ListSubheader
-                  component="div"
-                  id="nested-list-subheader"
-                  sx={{ background: "#eaeaea" }}
-                >
-                  <Grid container justifyContent="space-between">
-                    <Grid item>Prerequisite</Grid>
-                    <Grid item>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        disabled={!isDraftingNewVersion || !isEditingProcess}
-                        onClick={() => setShowAddPrerequisiteModal(true)}
-                      >
-                        Add Prerequisite
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </ListSubheader>
-              }
-            >
-              {isLoading
-                ? Array.from({ length: 1 }).map((_, index) => (
-                    <ListItem key={index} divider>
-                      <ListItemText>
-                        <Skeleton variant="text" width={120} />
-                      </ListItemText>
-                    </ListItem>
-                  ))
-                : milestone.relationships.prerequisites.data.map((p, i) => (
-                    <ListItem
-                      key={i}
-                      disablePadding
-                      secondaryAction={
+          {isRecurring ? null : (
+            <Card sx={{ padding: 0 }}>
+              <List
+                subheader={
+                  <ListSubheader
+                    component="div"
+                    id="nested-list-subheader"
+                    sx={{ background: "#eaeaea" }}
+                  >
+                    <Grid container justifyContent="space-between">
+                      <Grid item>Prerequisite</Grid>
+                      <Grid item>
                         <Button
-                          id={`remove-prerequisite-${i}`}
-                          variant="text"
-                          color="error"
-                          disabled={!isEditingProcess}
-                          onClick={() =>
-                            handleDeleteDependency(
-                              milestone?.relationships.workableDependencies.data.find(
-                                (d) =>
-                                  d.attributes.prerequisiteWorkableId.toString() ===
-                                  p.id
-                              ).id
-                            )
-                          }
+                          variant="contained"
+                          size="small"
+                          disabled={!isDraftingNewVersion || !isEditingProcess}
+                          onClick={() => setShowAddPrerequisiteModal(true)}
                         >
-                          Remove
+                          Add Prerequisite
                         </Button>
-                      }
-                    >
-                      <ListItemButton disabled>
-                        <ListItemText>{p.attributes.title}</ListItemText>
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-            </List>
-          </Card>
+                      </Grid>
+                    </Grid>
+                  </ListSubheader>
+                }
+              >
+                {isLoading
+                  ? Array.from({ length: 1 }).map((_, index) => (
+                      <ListItem key={index} divider>
+                        <ListItemText>
+                          <Skeleton variant="text" width={120} />
+                        </ListItemText>
+                      </ListItem>
+                    ))
+                  : milestone.relationships.prerequisites.data.map((p, i) => (
+                      <ListItem
+                        key={i}
+                        disablePadding
+                        secondaryAction={
+                          <Button
+                            id={`remove-prerequisite-${i}`}
+                            variant="text"
+                            color="error"
+                            disabled={!isEditingProcess}
+                            onClick={() =>
+                              handleDeleteDependency(
+                                milestone?.relationships.workableDependencies.data.find(
+                                  (d) =>
+                                    d.attributes.prerequisiteWorkableId.toString() ===
+                                    p.id
+                                ).id
+                              )
+                            }
+                          >
+                            Remove
+                          </Button>
+                        }
+                      >
+                        <ListItemButton disabled>
+                          <ListItemText>{p.attributes.title}</ListItemText>
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+              </List>
+            </Card>
+          )}
 
           {/* STEPS */}
           <Card sx={{ overflow: "visible", padding: 0 }}>
@@ -704,20 +785,22 @@ const ProcessId = ({}) => {
           </Card>
         </Stack>
       </form>
-      <ChoosePositionModal
-        open={showChoosePositionModal.state}
-        onClose={() =>
-          setShowChoosePositionModal((prevState) => ({
-            ...prevState,
-            intent: false,
-            state: false,
-          }))
-        }
-        handleChoosePosition={handleChoosePosition}
-        workflow={workflow}
-        milestone={milestone}
-        stagedPhase={phaseListField ? phaseListField : null}
-      />
+      {isRecurring ? null : (
+        <ChoosePositionModal
+          open={showChoosePositionModal.state}
+          onClose={() =>
+            setShowChoosePositionModal((prevState) => ({
+              ...prevState,
+              intent: false,
+              state: false,
+            }))
+          }
+          handleChoosePosition={handleChoosePosition}
+          workflow={workflow}
+          milestone={milestone}
+          stagedPhase={phaseListField ? phaseListField : null}
+        />
+      )}
       <AddPrerequisiteModal
         open={showAddPrerequisiteModal}
         onClose={() => setShowAddPrerequisiteModal(false)}
@@ -730,6 +813,7 @@ const ProcessId = ({}) => {
         addStepPosition={addStepPosition}
         handleCreateStep={handleCreateStep}
         onClose={() => setAddStepModalOpen(false)}
+        isRecurring={isRecurring}
       />
       <Snackbar
         autoHideDuration={1000}
@@ -774,7 +858,13 @@ const AddPrerequisiteModal = ({
   );
 };
 
-const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
+const AddStepModal = ({
+  open,
+  addStepPosition,
+  handleCreateStep,
+  onClose,
+  isRecurring,
+}) => {
   const handleClose = () => {
     onClose();
   };
@@ -809,7 +899,11 @@ const AddStepModal = ({ open, addStepPosition, handleCreateStep, onClose }) => {
             defaultValue=""
             render={({ field }) => <input type="hidden" {...field} />}
           />
-          <StepFields control={control} errors={errors} />
+          <StepFields
+            control={control}
+            errors={errors}
+            isRecurring={isRecurring}
+          />
         </DialogContent>
         <DialogActions>
           <Button type="submit" disabled={!isDirty}>
@@ -990,7 +1084,7 @@ const phases = [
   { label: "Startup", value: "startup" },
 ];
 
-const StepFields = ({ control, errors }) => {
+const StepFields = ({ control, errors, isRecurring }) => {
   return (
     <Stack spacing={6}>
       <Controller
@@ -1095,6 +1189,7 @@ const StepFields = ({ control, errors }) => {
           )}
         />
       </Stack>
+
       <Controller
         name="kind"
         defaultValue="default"
@@ -1106,6 +1201,7 @@ const StepFields = ({ control, errors }) => {
               <Switch
                 label="Kind"
                 checked={field.value === "decision"}
+                disabled={isRecurring}
                 onChange={(e) =>
                   field.onChange(e.target.checked ? "decision" : "default")
                 }
