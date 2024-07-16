@@ -1135,12 +1135,12 @@ const StepFields = ({ control, errors, isRecurring }) => {
         name="max_worktime"
         control={control}
         defaultValue=""
-        rules={{
-          required: {
-            value: true,
-            message: "This field is required",
-          },
-        }}
+        // rules={{
+        //   required: {
+        //     value: true,
+        //     message: "This field is required",
+        //   },
+        // }}
         render={({ field }) => (
           <TextField
             label="Worktime (in minutes)"

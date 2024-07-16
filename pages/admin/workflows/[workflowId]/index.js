@@ -138,7 +138,7 @@ const Workflow = ({}) => {
 
     const periodOrder = Object.keys(grouped).reduce((acc, period) => {
       acc.push({
-        groupName: period,
+        groupName: period.replace("_", " + "),
         milestones: grouped[period],
       });
       return acc;
@@ -429,7 +429,7 @@ const Workflow = ({}) => {
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
             <Typography variant="bodyLarge" lightened>
-              {groupedProcesses?.length} processes
+              {workflow?.relationships.processes.data.length} processes
             </Typography>
           </Grid>
           <Grid item>
@@ -516,8 +516,13 @@ const Workflow = ({}) => {
                         id="nested-list-subheader"
                         sx={{ background: "#eaeaea" }}
                       >
-                        {group.groupName.charAt(0).toUpperCase() +
-                          group.groupName.slice(1)}
+                        {group.groupName
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")}
                       </ListSubheader>
                     }
                   >
