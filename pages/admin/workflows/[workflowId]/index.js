@@ -7,6 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import { snakeCase } from "@lib/utils/snakeCase";
 import { periods } from "@lib/utils/open-school-checklist-periods";
 import {
+  Divider,
   Tooltip,
   Alert,
   List,
@@ -137,7 +138,7 @@ const Workflow = ({}) => {
 
     const periodOrder = Object.keys(grouped).reduce((acc, period) => {
       acc.push({
-        groupName: period,
+        groupName: period.replace("_", " + "),
         milestones: grouped[period],
       });
       return acc;
@@ -424,111 +425,167 @@ const Workflow = ({}) => {
             )}
           </Grid>
         </Grid>
-        {isLoading
-          ? Array.from({ length: 3 }).map((_, index) => (
-              <Grid container key={index}>
-                <Grid item xs={12}>
-                  <Card sx={{ padding: 0 }}>
-                    <List
-                      subheader={
-                        <ListSubheader
-                          component="div"
-                          id="nested-list-subheader"
-                          sx={{
-                            background: "#eaeaea",
-                            paddingX: 4,
-                            paddingY: 3,
-                          }}
-                        >
-                          <Skeleton variant="text" width={120} height={24} />
-                        </ListSubheader>
-                      }
-                    >
-                      {Array.from({ length: 3 }).map((_, index) => (
-                        <ListItem key={index} divider>
-                          <ListItemText>
-                            <Skeleton variant="text" width={120} />
-                          </ListItemText>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Card>
-                </Grid>
+        <Divider />
+        <Grid container alignItems="center" justifyContent="space-between">
+          <Grid item>
+            <Typography variant="bodyLarge" lightened>
+              {workflow?.relationships.processes.data.length} processes
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => setAddProcessModalOpen(true)}
+              disabled={
+                rolloutInProgress ||
+                workflow?.attributes.needsSupport ||
+                workflow?.attributes.published
+              }
+            >
+              Add a process
+            </Button>
+          </Grid>
+        </Grid>
+
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <Grid container key={index}>
+              <Grid item xs={12}>
+                <Card sx={{ padding: 0 }}>
+                  <List
+                    subheader={
+                      <ListSubheader
+                        component="div"
+                        id="nested-list-subheader"
+                        sx={{
+                          background: "#eaeaea",
+                          paddingX: 4,
+                          paddingY: 3,
+                        }}
+                      >
+                        <Skeleton variant="text" width={120} height={24} />
+                      </ListSubheader>
+                    }
+                  >
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <ListItem key={index} divider>
+                        <ListItemText>
+                          <Skeleton variant="text" width={120} />
+                        </ListItemText>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Card>
               </Grid>
-            ))
-          : groupedProcesses.map((group, groupIndex) => (
-              <Grid container key={groupIndex}>
-                <Grid item xs={12}>
-                  <Card sx={{ overflow: "visible", padding: 0 }}>
-                    <List
-                      subheader={
-                        <ListSubheader
-                          component="div"
-                          id="nested-list-subheader"
-                          sx={{ background: "#eaeaea" }}
-                        >
-                          {group.groupName.charAt(0).toUpperCase() +
-                            group.groupName.slice(1)}
-                        </ListSubheader>
-                      }
-                    >
-                      <DraggableList
-                        items={group.milestones}
-                        onReorder={(
+            </Grid>
+          ))
+        ) : groupedProcesses.length === 0 ? (
+          <Grid container justifyContent="center">
+            <Grid item mt={24}>
+              <Stack alignItems="center" spacing={3}>
+                <Typography variant="h4" bold>
+                  No processes
+                </Typography>
+                <Typography variant="bodyLarge" lightened>
+                  Get started by adding one!
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={() => setAddProcessModalOpen(true)}
+                  disabled={
+                    isLoading ||
+                    workflow?.attributes.needsSupport ||
+                    rolloutInProgress
+                  }
+                >
+                  Add a process
+                </Button>
+              </Stack>
+            </Grid>
+          </Grid>
+        ) : (
+          groupedProcesses.map((group, groupIndex) => (
+            <Grid container key={groupIndex}>
+              <Grid item xs={12}>
+                <Card sx={{ overflow: "visible", padding: 0 }}>
+                  <List
+                    subheader={
+                      <ListSubheader
+                        component="div"
+                        id="nested-list-subheader"
+                        sx={{ background: "#eaeaea" }}
+                      >
+                        {group.groupName
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")}
+                      </ListSubheader>
+                    }
+                  >
+                    <DraggableList
+                      items={group.milestones}
+                      onReorder={(
+                        processId,
+                        priorItemPosition,
+                        subsequentItemPosition
+                      ) => {
+                        handleRepositionProcess(
                           processId,
                           priorItemPosition,
                           subsequentItemPosition
-                        ) => {
-                          handleRepositionProcess(
-                            processId,
-                            priorItemPosition,
-                            subsequentItemPosition
-                          );
-                        }}
-                        getId={(item) =>
-                          item.relationships.selectedProcesses.data[0].id
-                        }
-                        getPosition={(item) =>
-                          item.relationships.selectedProcesses.data[0]
-                            .attributes.position
-                        }
-                        renderItem={(process, i) => (
-                          <ProcessListItem
-                            workflow={workflow}
-                            disabled={
-                              rolloutInProgress ||
-                              workflow?.attributes.needsSupport
-                            }
-                            key={process.id}
-                            process={process}
-                            prevProcessPosition={
-                              i > 0
-                                ? group?.milestones[i - 1]?.relationships
-                                    .selectedProcesses.data[0].attributes
-                                    .position
-                                : null
-                            }
-                            isLast={i === group.milestones.length - 1}
-                            isDraftingNewVersion={isDraftingNewVersion}
-                            handleStageAddProcess={handleStageAddProcess}
-                            handleRemoveProcess={handleRemoveProcess}
-                            handleReinstateProcess={handleReinstateProcess}
-                            isRecurring={isRecurring}
-                          />
-                        )}
-                      />
-                    </List>
-                  </Card>
-                </Grid>
+                        );
+                      }}
+                      getId={(item) =>
+                        item.relationships.selectedProcesses.data[0].id
+                      }
+                      getPosition={(item) =>
+                        item.relationships.selectedProcesses.data[0].attributes
+                          .position
+                      }
+                      renderItem={(process, i) => (
+                        <ProcessListItem
+                          workflow={workflow}
+                          disabled={
+                            rolloutInProgress ||
+                            workflow?.attributes.needsSupport
+                          }
+                          key={process.id}
+                          process={process}
+                          prevProcessPosition={
+                            i > 0
+                              ? group?.milestones[i - 1]?.relationships
+                                  .selectedProcesses.data[0].attributes.position
+                              : null
+                          }
+                          isLast={i === group.milestones.length - 1}
+                          isDraftingNewVersion={isDraftingNewVersion}
+                          handleStageAddProcess={handleStageAddProcess}
+                          handleRemoveProcess={handleRemoveProcess}
+                          handleReinstateProcess={handleReinstateProcess}
+                          isRecurring={isRecurring}
+                        />
+                      )}
+                    />
+                  </List>
+                </Card>
               </Grid>
-            ))}
+            </Grid>
+          ))
+        )}
       </Stack>
       <AddProcessModal
         workflowId={workflowId}
         open={addProcessModalOpen}
         stagedProcessPosition={stagedProcessPosition}
         setStagedProcessPosition={setStagedProcessPosition}
-        onClose={() => setAddProcessModalOpen(false)}
+        onClose={() => {
+          setAddProcessModalOpen(false);
+          setGroupAddedInto(false);
+        }}
         handleCreateProcess={handleCreateProcess}
         groupAddedInto={groupAddedInto}
         isRecurring={isRecurring}
@@ -651,6 +708,7 @@ const AddProcessModal = ({
                 control={control}
                 errors={errors}
                 isRecurring={isRecurring}
+                groupAddedInto={groupAddedInto}
               />
             </>
           ) : (
@@ -863,7 +921,7 @@ const ProcessListItem = ({
   );
 };
 
-const AddProcessFields = ({ control, errors, isRecurring }) => {
+const AddProcessFields = ({ control, errors, isRecurring, groupAddedInto }) => {
   return (
     <Grid container>
       <Grid item xs={12}>
@@ -952,7 +1010,7 @@ const AddProcessFields = ({ control, errors, isRecurring }) => {
                 }}
                 render={({ field }) => (
                   <Select
-                    disabled
+                    disabled={groupAddedInto}
                     {...field}
                     labelId="period-label"
                     id="period"
@@ -988,7 +1046,7 @@ const AddProcessFields = ({ control, errors, isRecurring }) => {
                 }}
                 render={({ field }) => (
                   <Select
-                    disabled
+                    disabled={groupAddedInto}
                     {...field}
                     labelId="phase-label"
                     id="phase"
