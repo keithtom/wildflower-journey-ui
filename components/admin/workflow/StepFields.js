@@ -34,12 +34,12 @@ const StepFields = ({ stepId, control, errors, step }) => {
       <Controller
         name="description"
         control={control}
-        rules={{
-          required: {
-            value: true,
-            message: "This field is required",
-          },
-        }}
+        // rules={{
+        //   required: {
+        //     value: true,
+        //     message: "This field is required",
+        //   },
+        // }}
         render={({ field }) => (
           <TextField
             multiline
