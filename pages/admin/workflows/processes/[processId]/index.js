@@ -1006,7 +1006,9 @@ const StepListItem = ({
               {step.attributes.title}
             </Typography>
           </ListItemText>
-          <Chip label={step.attributes.maxWorktime} size="small" />
+          {step.attributes.maxWorktime ? (
+            <Chip label={step.attributes.maxWorktime} size="small" />
+          ) : null}
           <Chip
             label={
               step.attributes.completionType === "each_person"

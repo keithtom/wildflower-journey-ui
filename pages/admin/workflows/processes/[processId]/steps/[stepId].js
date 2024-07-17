@@ -66,6 +66,7 @@ const StepId = ({}) => {
 
   const [stepHasChanges, setStepHasChanges] = useState(false);
   const [originalData, setOriginalData] = useState(false);
+  // console.log({ originalData });
 
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const [updatedStepSnackbarOpen, setUpdatedStepSnackbarOpen] = useState(false);
@@ -79,7 +80,7 @@ const StepId = ({}) => {
   const [decisionModalOpen, setDecisionModalOpen] = useState(false);
   const [decisionOption, setDecisionOption] = useState(null);
   const [decisionOptionParams, setDecisionOptionParams] = useState([]);
-  console.log({ decisionOptionParams });
+  // console.log({ decisionOptionParams });
 
   const {
     control,
@@ -101,7 +102,10 @@ const StepId = ({}) => {
         title: step?.attributes?.title,
         decision_question: step?.attributes?.decisionQuestion,
         description: step?.attributes?.description,
-        max_worktime: step?.attributes?.maxWorktime,
+        max_worktime:
+          step?.attributes?.maxWorktime === null
+            ? ""
+            : step?.attributes?.maxWorktime,
         kind: step?.attributes?.kind,
         completion_type: step?.attributes?.completionType,
         //TODO figure out if it makes sense to edit documents_attributes here
@@ -383,19 +387,19 @@ const StepId = ({}) => {
               name="max_worktime"
               control={control}
               defaultValue=""
-              rules={{
-                required: {
-                  value: true,
-                  message: "This field is required",
-                },
-              }}
+              // rules={{
+              //   required: {
+              //     value: true,
+              //     message: "This field is required",
+              //   },
+              // }}
               render={({ field }) => (
                 <TextField
                   label="Worktime (in minutes)"
                   placeholder="e.g. 60 for 1 hour"
-                  error={errors.worktime}
+                  error={errors.max_worktime}
                   helperText={
-                    errors && errors.worktime && errors.worktime.message
+                    errors && errors.max_worktime && errors.max_worktime.message
                   }
                   {...field}
                 />
