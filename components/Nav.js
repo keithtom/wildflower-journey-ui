@@ -327,51 +327,6 @@ const OpenSchoolNavigation = () => {
           />
         }
       />
-      {router.pathname.includes("/open-school/checklist") ? (
-        <Stack>
-          <Divider />
-          <NavLink
-            variant="tertiary"
-            to={`/open-school/checklist/this-month`}
-            active={router.pathname.includes(
-              "/open-school/checklist/this-month"
-            )}
-            label="This Month"
-            icon="calendarStar"
-          />
-          <NavLink
-            variant="tertiary"
-            to={`/open-school/checklist/this-quarter`}
-            active={router.pathname.includes(
-              "/open-school/checklist/this-quarter"
-            )}
-            label="This Quarter"
-            icon="calendarWeek"
-          />
-          <NavLink
-            variant="tertiary"
-            to={`/open-school/checklist/this-year`}
-            active={router.pathname.includes(
-              "/open-school/checklist/this-year"
-            )}
-            label="This Year"
-            icon="calendar"
-          />
-          <Divider />
-          {months.map((month, i) => (
-            <NavLink
-              key={i}
-              variant="tertiary"
-              to={`/open-school/checklist/${month.toLowerCase()}`}
-              active={router.pathname.includes(
-                `/open-school/checklist/${month.toLowerCase()}`
-              )}
-              label={month}
-              icon={true}
-            />
-          ))}
-        </Stack>
-      ) : null}
       <NavLink
         variant="secondary"
         to={`/open-school/enrollment-and-communications`}
