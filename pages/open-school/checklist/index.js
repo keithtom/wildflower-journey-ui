@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
+import { fr } from "date-fns/locale";
 
 import {
   Collapse,
@@ -15,7 +16,7 @@ import { useUserContext, useAssignViewingSchool } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 import useAuth from "@lib/utils/useAuth";
-
+import useMilestones from "@hooks/useMilestones";
 import {
   PageContainer,
   Grid,
@@ -30,13 +31,67 @@ import {
   Box,
   Link,
 } from "@ui";
-import { fr } from "date-fns/locale";
+import Milestone from "@components/Milestone";
 
 const AdminChecklist = () => {
   const { currentUser } = useUserContext();
   const router = useRouter();
 
-  // console.log({ currentUser });
+  const workflowId = currentUser?.attributes.schools[0].workflowId;
+  // get the current date
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+
+  const { milestones, isLoading } = useMilestones(workflowId, {
+    // timeframe: formattedDate,
+    timeframe: "2024-09-01",
+    omit_include: true,
+  });
+
+  function groupMilestones(milestones) {
+    // First, group by status
+    const groupedByStatus = milestones.data.data.reduce((acc, item) => {
+      const status = item.attributes.status.replace(/\s+/g, "_");
+      if (!acc[status]) {
+        acc[status] = [];
+      }
+      acc[status].push(item);
+      return acc;
+    }, {});
+
+    // Then, within each status group, group by recurringType
+    for (let status in groupedByStatus) {
+      groupedByStatus[status] = groupedByStatus[status].reduce((acc, item) => {
+        let recurringType = item.attributes.recurringType;
+        // If the recurringType is "annually_month_specific" or "monthly", use a common key
+        if (
+          recurringType === "annually_month_specific" ||
+          recurringType === "monthly"
+        ) {
+          recurringType = "monthlyCombined";
+        }
+        if (!acc[recurringType]) {
+          acc[recurringType] = [];
+        }
+        // If the recurringType is "annually_month_specific", unshift (add to the beginning) the item
+        if (item.attributes.recurringType === "annually_month_specific") {
+          acc[recurringType].unshift(item);
+        } else {
+          acc[recurringType].push(item);
+        }
+        return acc;
+      }, {});
+    }
+
+    return groupedByStatus;
+  }
+
+  // Assuming `milestones` is your data object
+  const groupedMilestones = isLoading ? null : groupMilestones(milestones);
+
+  console.log({ groupedMilestones });
+  console.log({ milestones });
+  console.log({ currentUser });
   // useAuth("/login");
 
   return (
@@ -62,24 +117,48 @@ const AdminChecklist = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <Card noPadding>
-            <List
-              subheader={
-                <Card variant="lightened" size="small" noRadius>
-                  <Typography variant="bodyRegular" bold>
-                    In Progress
-                  </Typography>
-                </Card>
-              }
-            >
-              <MilestoneGroup />
-              <MilestoneGroup />
-              <MilestoneGroup />
-            </List>
-          </Card>
-        </Grid>
-        <Grid item xs={12}>
+        {!isLoading && groupedMilestones.to_do ? (
+          <Grid item xs={12}>
+            <Card noPadding>
+              <List
+                subheader={
+                  <Card variant="lightened" size="small" noRadius>
+                    <Typography variant="bodyRegular" bold>
+                      To Do
+                    </Typography>
+                  </Card>
+                }
+              >
+                {groupedMilestones.to_do.past_months && (
+                  <MilestoneGroup
+                    periodName="Past Months"
+                    milestones={groupedMilestones.to_do.past_months}
+                  />
+                )}
+                {groupedMilestones.to_do.monthlyCombined && (
+                  <MilestoneGroup
+                    periodName="This Month"
+                    milestones={groupedMilestones.to_do.monthlyCombined}
+                  />
+                )}
+                {groupedMilestones.to_do.quarterly && (
+                  <MilestoneGroup
+                    periodName="This Quarter"
+                    milestones={groupedMilestones.to_do.quarterly}
+                  />
+                )}
+                {groupedMilestones.to_do.annually && (
+                  <MilestoneGroup
+                    periodName="This Year"
+                    milestones={groupedMilestones.to_do.annually}
+                  />
+                )}
+              </List>
+            </Card>
+          </Grid>
+        ) : null}
+
+        {/* <Grid item xs={12}>
           <Card noPadding>
             <List
               subheader={
@@ -129,7 +208,7 @@ const AdminChecklist = () => {
               <MilestoneGroup />
             </List>
           </Card>
-        </Grid>
+        </Grid> */}
       </Grid>
     </PageContainer>
   );
@@ -137,7 +216,7 @@ const AdminChecklist = () => {
 
 export default AdminChecklist;
 
-const MilestoneGroup = ({}) => {
+const MilestoneGroup = ({ milestones, periodName }) => {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -156,19 +235,31 @@ const MilestoneGroup = ({}) => {
           />
         </ListItemIcon>
         <ListItemText>
-          <Typography variant="bodySmall">This Month</Typography>
+          <Typography variant="bodySmall">{periodName}</Typography>
         </ListItemText>
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <ListItemButton>
-            <ListItemIcon sx={{ minWidth: "48px" }} />
-            <ListItemText>
-              <Typography variant="bodyRegular" bold>
-                Process Title
-              </Typography>
-            </ListItemText>
-          </ListItemButton>
+          {milestones.map((m, i) => (
+            <Milestone
+              // link={`${m.id}`}
+              title={m.attributes.title}
+              description={m.attributes.description}
+              categories={m.attributes.categories}
+              status={m.attributes.status}
+            />
+            // <ListItemButton>
+            //   <ListItemIcon sx={{ minWidth: "48px" }} />
+            //   <ListItemText>
+            //     <Typography variant="bodyRegular" bold>
+            //       {m.attributes.title}{" "}
+            //       {m.attributes.recurringType === "monthly" ? (
+            //         <Chip label="Recurring" size="small" />
+            //       ) : null}
+            //     </Typography>
+            //   </ListItemText>
+            // </ListItemButton>
+          ))}
         </List>
       </Collapse>
     </>
