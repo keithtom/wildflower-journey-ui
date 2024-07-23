@@ -114,7 +114,7 @@ const Navigation = () => {
   }, []);
 
   const isTeacherLeader =
-    currentUser?.personRoleList?.join() === ["Teacher Leader"].join() &&
+    currentUser?.personRoleList?.some((role) => role === "Teacher Leader") &&
     !currentUser?.personRoleList?.includes("Emerging Teacher Leader");
   // console.log({ ogViewingSchool });
   // console.log({ isTeacherLeader });
