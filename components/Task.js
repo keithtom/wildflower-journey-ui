@@ -9,6 +9,14 @@ import { mutate } from "swr";
 import { useRouter } from "next/router";
 
 import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemButton,
+} from "@mui/material";
+
+import {
   Typography,
   Grid,
   Box,
@@ -263,92 +271,72 @@ const Task = ({
 
   return (
     <>
-      <StyledTask onClick={() => setInfoDrawerOpen(true)} variant={variant}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid
-            item
-            flex={1}
-            sx={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              width: 0,
-            }}
-          >
-            <Stack direction="row" spacing={4} alignItems="center">
-              {isDecision ? (
-                <>
-                  <Icon
-                    type="zap"
-                    variant={isDecided ? "primary" : "lightened"}
-                  />
-                  <Chip
-                    label={isDecided ? "Decided" : "Decision"}
-                    size="small"
-                    variant={isDecided && "primary"}
-                  />
-                  <Typography
-                    variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
-                    struck={isDecided}
-                    bold
-                  >
-                    {title}
-                  </Typography>
-                </>
+      <ListItem
+        disablePadding
+        secondaryAction={
+          <Stack direction="row" spacing={3} alignItems="center">
+            {processName && <Chip label={processName} size="small" />}
+            {taskAssignees &&
+              taskAssignees.map((assignee) => (
+                <AvatarWrapper
+                  key={assignee.id}
+                  src={assignee?.attributes?.imageUrl}
+                  badgeContent={
+                    assignee?.attributes?.completedAt && (
+                      <Icon
+                        className="checkCircleAssignee"
+                        type="checkCircle"
+                        size="small"
+                        variant="primary"
+                        filled
+                      />
+                    )
+                  }
+                />
+              ))}
+          </Stack>
+        }
+      >
+        <ListItemButton onClick={() => setInfoDrawerOpen(true)}>
+          <ListItemIcon
+            sx={{ minWidth: "48px", paddingLeft: "1px" }}
+            children={
+              isDecision ? (
+                <Icon
+                  type="zap"
+                  variant={isDecided ? "primary" : "lightened"}
+                />
               ) : (
-                <Stack direction="row" spacing={4} alignItems="center">
-                  <Icon
-                    type={taskIsComplete ? "checkCircle" : "circleSolid"}
-                    variant={taskIsComplete ? "primary" : "lightest"}
-                    className={
-                      taskIsComplete ? "completedTask" : "uncompletedTask"
-                    }
-                  />
-                  <Typography
-                    variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
-                    bold
-                    struck={taskIsComplete}
-                  >
-                    {title}
-                  </Typography>
-                </Stack>
-              )}
-            </Stack>
-          </Grid>
-          {/* {isNext && (
-            <Grid item mr={2}>
-              <Button small>
-                <Typography light variant="bodySmall">
-                  Start
-                </Typography>
-              </Button>
-            </Grid>
-          )} */}
-          <Grid item>
+                <Icon
+                  type={taskIsComplete ? "checkCircle" : "circleSolid"}
+                  variant={taskIsComplete ? "primary" : "lightest"}
+                  className={
+                    taskIsComplete ? "completedTask" : "uncompletedTask"
+                  }
+                />
+              )
+            }
+          />
+          <ListItemText>
             <Stack direction="row" spacing={3} alignItems="center">
-              {processName && <Chip label={processName} size="small" />}
-              {taskAssignees &&
-                taskAssignees.map((assignee) => (
-                  <AvatarWrapper
-                    key={assignee.id}
-                    src={assignee?.attributes?.imageUrl}
-                    badgeContent={
-                      assignee?.attributes?.completedAt && (
-                        <Icon
-                          className="checkCircleAssignee"
-                          type="checkCircle"
-                          size="small"
-                          variant="primary"
-                          filled
-                        />
-                      )
-                    }
-                  />
-                ))}
+              <Typography
+                variant={variant === "small" ? "bodySmall" : "bodyRegular"}
+                struck={isDecided || taskIsComplete}
+              >
+                {title}
+              </Typography>
+              {isDecision ? (
+                <Chip
+                  label={isDecided ? "Decided" : "Decision"}
+                  size="small"
+                  variant={isDecided && "primary"}
+                />
+              ) : null}
             </Stack>
-          </Grid>
-        </Grid>
-      </StyledTask>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+
       <InfoDrawer
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}

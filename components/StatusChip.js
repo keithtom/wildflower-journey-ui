@@ -27,7 +27,7 @@ const StatusChip = ({ status, withIcon, ...props }) => {
           />
         ) : null
       }
-      label={status}
+      label={status.replace(/\b\w/g, (c) => c.toUpperCase())}
       {...props}
     />
   );

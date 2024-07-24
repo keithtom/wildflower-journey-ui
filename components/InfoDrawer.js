@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
 
@@ -67,7 +68,49 @@ const InfoDrawer = ({
   isComplete,
   worktime,
 }) => {
-  const { isOperationsGuide } = useUserContext();
+  const { currentUser, isOperationsGuide } = useUserContext();
+  console.log({ currentUser });
+  console.log({ isOperationsGuide });
+  const router = useRouter();
+  const { workflow } = router.query;
+  console.log({ workflow });
+
+  const isTL = currentUser?.personRoleList.some(
+    (role) => role === "Teacher Leader"
+  );
+  console.log({ isTL });
+  const isETL = currentUser?.attributes.ssj ? true : false;
+  console.log({ isETL });
+  // const isETL = currentUser?.personRoleList.some(
+  //   (role) => role === "Emerging Teacher Leader"
+  // );
+
+  let showActions = false;
+
+  if (isOperationsGuide) {
+    if (
+      // is a teacher leader, who is looking at their own checklist
+      isTL &&
+      router.pathname.includes("open-school/checklist") &&
+      currentUser.attributes.schools[0].workflowId === workflow
+    ) {
+      showActions = true;
+    } else if (
+      // is an emerging teacher leader, who is looking at their SSJ
+      isETL &&
+      router.pathname.includes("ssj") &&
+      currentUser.attributes.ssj.workflowId === workflow
+    ) {
+      showActions = true;
+    } else {
+      // is simply an ops guide looking at a school
+      showActions = false;
+    }
+  } else {
+    showActions = true;
+  }
+
+  // console.log({ showActions });
 
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
@@ -183,11 +226,11 @@ const InfoDrawer = ({
         </Stack>
       </StyledInfoCard>
 
-      {isOperationsGuide ? null : (
+      {showActions ? (
         <ActionsContainer noBorder noPadding noRadius>
           {actions}
         </ActionsContainer>
-      )}
+      ) : null}
     </CustomDrawer>
   );
 };

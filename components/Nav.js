@@ -315,7 +315,7 @@ const OpenSchoolNavigation = () => {
       <NavLink
         variant="secondary"
         to={`/open-school/checklist`}
-        active={router.asPath === "/open-school/checklist"}
+        active={router.pathname.includes("/open-school/checklist")}
         label="Checklist"
         icon="layer"
         secondaryAction={
