@@ -91,14 +91,14 @@ const InfoDrawer = ({
     if (
       // is a teacher leader, who is looking at their own checklist
       isTL &&
-      router.pathname.includes("open-school/checklist") &&
+      router.pathname.startsWith("/open-school/") &&
       currentUser.attributes.schools[0].workflowId === workflow
     ) {
       showActions = true;
     } else if (
       // is an emerging teacher leader, who is looking at their SSJ
       isETL &&
-      router.pathname.includes("ssj") &&
+      router.pathname.startsWith("/ssj/") &&
       currentUser.attributes.ssj.workflowId === workflow
     ) {
       showActions = true;
@@ -110,7 +110,7 @@ const InfoDrawer = ({
     showActions = true;
   }
 
-  // console.log({ showActions });
+  console.log({ showActions });
 
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>

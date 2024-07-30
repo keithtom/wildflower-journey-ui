@@ -219,7 +219,7 @@ const MilestoneGroup = ({ workflowId, milestones, periodName }) => {
           {milestones.map((m, i) => (
             <Milestone
               key={i}
-              link={`/open-school/checklist/${workflow}/${m.id}`}
+              link={`/open-school/${workflow}/checklist/${m.id}`}
               title={m.attributes.title}
               description={m.attributes.description}
               categories={m.attributes.categories}

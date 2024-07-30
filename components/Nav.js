@@ -119,6 +119,7 @@ const Navigation = () => {
   // console.log({ ogViewingSchool });
   // console.log({ isTeacherLeader });
   // console.log({ currentUser });
+  console.log({ workflow });
 
   return currentUser ? (
     <Box>
@@ -188,14 +189,14 @@ const Navigation = () => {
             <NavLink
               variant="primary"
               to="/open-school"
-              active={router.asPath === `/open-school`}
-              label="Your School Dashboard" //TODO: Make actual school name
+              active={router.asPath === `/open-school/${workflow}`}
+              label={currentUser?.attributes.schools[0].name}
               icon="home"
             />
           ) : null}
 
           {router.pathname.includes("/open-school") ? (
-            <OpenSchoolNavigation />
+            <OpenSchoolNavigation openSchoolWorkflowId={workflow} />
           ) : null}
 
           {!isOperationsGuide && currentUser?.attributes?.ssj ? (
@@ -258,7 +259,10 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
       <NavLink
         variant="secondary"
         to={`/ssj/${SSJworkflowId}/to-do-list`}
-        active={router.pathname.includes("/to-do-list")}
+        active={
+          router.pathname.startsWith("/ssj/") &&
+          router.pathname.includes("/to-do-list")
+        }
         label="To do list"
         icon="calendarCheck"
         secondaryAction={
@@ -308,77 +312,95 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   );
 };
 
-const OpenSchoolNavigation = () => {
+const OpenSchoolNavigation = ({ openSchoolWorkflowId }) => {
   const router = useRouter();
+  const { workflow } = router.query;
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
   return (
     <Box>
       <NavLink
         variant="secondary"
-        to={`/open-school/checklist`}
-        active={router.pathname.includes("/open-school/checklist")}
+        to={`/open-school/${openSchoolWorkflowId}/to-do-list`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/to-do-list")
+        }
+        label="To do list"
+        icon="calendarCheck"
+        secondaryAction={
+          isLoading ? null : !assignedSteps.length ? null : (
+            <Chip size="small" label={assignedSteps.length} variant="primary" />
+          )
+        }
+      />
+      <NavLink
+        variant="secondary"
+        to={`/open-school/${openSchoolWorkflowId}/checklist`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/checklist")
+        }
         label="Checklist"
         icon="layer"
         secondaryAction={
           <Chip
             size="small"
             label="New"
-            variant="primary"
+            variant="lightened"
             sx={{ pointerEvents: "none" }}
           />
         }
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/enrollment-and-communications`}
-        active={router.pathname.includes(
-          "/open-school/enrollment-and-communications"
-        )}
+        to={`/open-school/${openSchoolWorkflowId}/enrollment-and-communications`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/enrollment-and-communications")
+        }
         label="Enrollment & Family Comms"
         icon="loader"
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/finance-and-operations`}
-        active={router.pathname.includes("/open-school/finance-and-operations")}
+        to={`/open-school/${openSchoolWorkflowId}/finance-and-operations`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/finance-and-operations")
+        }
         label="Finance & Operations"
         icon="loader"
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/my-board`}
-        active={router.pathname.includes("/open-school/my-board")}
+        to={`/open-school/${openSchoolWorkflowId}/my-board`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/my-board")
+        }
         label="My Board"
         icon="loader"
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/resources`}
-        active={router.pathname.includes("/open-school/resources")}
+        to={`/open-school/${openSchoolWorkflowId}/resources`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/resources")
+        }
         label="Resources"
         icon="loader"
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/support`}
-        active={router.pathname.includes("/open-school/support")}
+        to={`/open-school/${openSchoolWorkflowId}/support`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/support")
+        }
         label="Support@"
         icon="loader"
       />
     </Box>
   );
 };
-
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];

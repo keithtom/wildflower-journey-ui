@@ -53,7 +53,7 @@ const OpenSchoolMilestonePage = ({}) => {
         <Grid container>
           <Grid item>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Link href={`/open-school/checklist/${workflow}`}>
+              <Link href={`/open-school/${workflow}/checklist`}>
                 <IconButton>
                   <Icon type="chevronLeft" />
                 </IconButton>
