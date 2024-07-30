@@ -42,7 +42,9 @@ const OpenSchoolToDoList = ({}) => {
   const [teamAssignments, setTeamAssignments] = useState([]);
 
   const { currentUser, isOperationsGuide } = useUserContext();
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
+    current_user: true,
+  });
   const { milestonesToDo, isLoadingMilestonesToDo } = useMilestones(workflow, {
     phase,
     omit_include: true,

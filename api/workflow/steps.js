@@ -81,11 +81,10 @@ async function assigned(workflowId, config = {}) {
 }
 
 export const showAssigned = {
-  key: (workflowId) => `/workflows/${workflowId}/assigned_steps`,
-  fetcher: (workflowId) => {
+  key: (workflowId, params) => `/workflows/${workflowId}/assigned_steps`,
+  fetcher: (workflowId, params) => {
     const config = getAuthHeader();
-    const isOg = getCookie("isOg");
-    config.params = { current_user: isOg ? null : true };
+    config.params = params;
     return workflowsApi
       .get(showAssigned.key(workflowId), config)
       .then((res) => {
