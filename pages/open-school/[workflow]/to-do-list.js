@@ -57,12 +57,17 @@ const OpenSchoolToDoList = ({}) => {
 
   useAuth("/login");
 
-  console.log({ currentUser });
+  const mySteps = assignedSteps?.filter(
+    (step) => step.relationships.assignees.data[0].id === currentUser?.id
+  );
+
+  // console.log({ currentUser });
   // console.log({ assignedIsError });
   // console.log({ assignedIsLoading });
-  console.log({ assignedSteps });
+  // console.log({ assignedSteps });
+  // console.log({ mySteps });
   // console.log({ steps });
-  // console.log({ teamAssignments });
+  // console.log({ teamAssignments })
 
   return (
     <PageContainer>
@@ -77,7 +82,7 @@ const OpenSchoolToDoList = ({}) => {
               ))}
             </Stack>
           </Stack>
-        ) : assignedSteps.length ? (
+        ) : mySteps.length ? (
           <Card noPadding>
             <List
               subheader={
@@ -100,7 +105,7 @@ const OpenSchoolToDoList = ({}) => {
                   ))}
                 </>
               ) : (
-                assignedSteps?.map((step, i) => {
+                mySteps?.map((step, i) => {
                   return (
                     <Task
                       key={step.id}

@@ -36,8 +36,8 @@ import Milestone from "@components/Milestone";
 const AdminChecklist = () => {
   const { currentUser } = useUserContext();
   const router = useRouter();
-
   const workflowId = currentUser?.attributes.schools[0].workflowId;
+
   // get the current date
   const currentDate = new Date();
   const formattedDate = currentDate.toISOString().split("T")[0];
@@ -117,6 +117,59 @@ const AdminChecklist = () => {
             </Grid>
           </Grid>
         </Grid>
+        {!isLoading && groupedMilestones.in_progress ? (
+          <Grid item xs={12}>
+            <Card noPadding>
+              <List
+                subheader={
+                  <Card variant="lightened" size="small" noRadius>
+                    <Stack
+                      direction="row"
+                      spacing={5}
+                      pl={1}
+                      alignItems="center"
+                    >
+                      <Icon type="rightArrowCircleSolid" variant="primary" />
+                      <Typography variant="bodyRegular" bold>
+                        In Progress
+                      </Typography>
+                      <Typography variant="bodyRegular" lightened>
+                        {Object.values(
+                          groupedMilestones?.in_progress || {}
+                        ).reduce((total, array) => total + array.length, 0)}
+                      </Typography>
+                    </Stack>
+                  </Card>
+                }
+              >
+                {groupedMilestones.in_progress.past_months && (
+                  <MilestoneGroup
+                    periodName="Past Months"
+                    milestones={groupedMilestones.in_progress.past_months}
+                  />
+                )}
+                {groupedMilestones.in_progress.monthlyCombined && (
+                  <MilestoneGroup
+                    periodName="This Month"
+                    milestones={groupedMilestones.in_progress.monthlyCombined}
+                  />
+                )}
+                {groupedMilestones.in_progress.quarterly && (
+                  <MilestoneGroup
+                    periodName="This Quarter"
+                    milestones={groupedMilestones.in_progress.quarterly}
+                  />
+                )}
+                {groupedMilestones.in_progress.annually && (
+                  <MilestoneGroup
+                    periodName="This Year"
+                    milestones={groupedMilestones.in_progress.annually}
+                  />
+                )}
+              </List>
+            </Card>
+          </Grid>
+        ) : null}
         {!isLoading && groupedMilestones.to_do ? (
           <Grid item xs={12}>
             <Card noPadding>
@@ -169,6 +222,60 @@ const AdminChecklist = () => {
                   <MilestoneGroup
                     periodName="This Year"
                     milestones={groupedMilestones.to_do.annually}
+                  />
+                )}
+              </List>
+            </Card>
+          </Grid>
+        ) : null}
+
+        {!isLoading && groupedMilestones.done ? (
+          <Grid item xs={12}>
+            <Card noPadding>
+              <List
+                subheader={
+                  <Card variant="lightened" size="small" noRadius>
+                    <Stack
+                      direction="row"
+                      spacing={5}
+                      pl={1}
+                      alignItems="center"
+                    >
+                      <Typography variant="bodyRegular" bold>
+                        Done
+                      </Typography>
+                      <Typography variant="bodyRegular" lightened>
+                        {Object.values(groupedMilestones?.done || {}).reduce(
+                          (total, array) => total + array.length,
+                          0
+                        )}
+                      </Typography>
+                    </Stack>
+                  </Card>
+                }
+              >
+                {groupedMilestones.done.past_months && (
+                  <MilestoneGroup
+                    periodName="Past Months"
+                    milestones={groupedMilestones.done.past_months}
+                  />
+                )}
+                {groupedMilestones.done.monthlyCombined && (
+                  <MilestoneGroup
+                    periodName="This Month"
+                    milestones={groupedMilestones.done.monthlyCombined}
+                  />
+                )}
+                {groupedMilestones.done.quarterly && (
+                  <MilestoneGroup
+                    periodName="This Quarter"
+                    milestones={groupedMilestones.done.quarterly}
+                  />
+                )}
+                {groupedMilestones.done.annually && (
+                  <MilestoneGroup
+                    periodName="This Year"
+                    milestones={groupedMilestones.done.annually}
                   />
                 )}
               </List>

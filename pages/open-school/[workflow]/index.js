@@ -29,7 +29,7 @@ const OpenSchool = () => {
   const personId = currentUser?.id;
 
   const { data, error, isLoading, mutate } = useSWR(
-    personId ? `/api/person/${personId}` : null,
+    personId ? `/v1/people/${personId}` : null,
     () => peopleApi.show(personId, { network: true }).then((res) => res.data),
     {
       onErrorRetry: (error) => {

@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
-import stepsApi from "@api/workflow/steps";
-import { useUserContext } from "@lib/useUserContext";
 import Router from "next/router";
-import { clearLoggedInState } from "@lib/handleLogout";
 import { mutate } from "swr";
 import { useRouter } from "next/router";
 
@@ -15,7 +12,6 @@ import {
   ListItemText,
   ListItemButton,
 } from "@mui/material";
-
 import {
   Typography,
   Grid,
@@ -29,8 +25,16 @@ import {
   Card,
   Radio,
   Badge,
+  Divider,
 } from "./ui";
 import InfoDrawer from "./InfoDrawer";
+import stepsApi from "@api/workflow/steps";
+import usePerson from "@hooks/usePerson";
+import useSchool from "@hooks/useSchool";
+import useTeam from "@hooks/useTeam";
+import { useUserContext } from "@lib/useUserContext";
+import { clearLoggedInState } from "@lib/handleLogout";
+import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 
 const StyledTask = styled(Box)`
   width: 100%;
@@ -66,13 +70,34 @@ const Task = ({
   removeStep,
   processName,
 }) => {
-  const { currentUser } = useUserContext(); // why doesn't this work?
+  const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow, milestone } = router.query;
+
+  let assignableUsers;
+  // Fetch the current user's data
+  const { data: person, isLoading: personIsLoading } = usePerson(
+    currentUser?.id
+  );
+  // Extract the school ID from the user's data
+  const userSchoolId = person?.data?.relationships.schools.data[0].id;
+  if (router.pathname.startsWith("/open-school/")) {
+    // If the current route starts with '/open-school', fetch the school's data and use it to set assignableUsers
+    const { data: school, isLoading: schoolIsLoading } =
+      useSchool(userSchoolId);
+    assignableUsers = school?.included.filter((item) => item.type === "person");
+  } else if (router.pathname.startsWith("/ssj/")) {
+    // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
+    const teamId = currentUser?.attributes.ssj.teamId;
+    const { team, isLoading: teamIsLoading } = useTeam(teamId);
+    assignableUsers = team?.data?.data?.relationships?.partners?.data;
+  }
 
   // Common interface that all invokations of Task should use.
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
   // If you have props that depend on where they are being called from, put them as inputs for Task
+
+  // console.log({ task });
 
   const taskId = task.id;
   const title = task.attributes.title;
@@ -80,6 +105,12 @@ const Task = ({
   const worktime = task.attributes.maxWorktime;
 
   const resources = task.relationships.documents.data;
+
+  const [taskIsAssigned, setTaskIsAssigned] = useState(
+    task?.relationships?.assignees?.data[0]?.attributes?.firstName
+      ? task?.relationships?.assignees?.data[0]?.attributes?.firstName
+      : false
+  );
 
   const [taskIsAssignedToMe, setTaskIsAssignedToMe] = useState(
     task.attributes.isAssignedToMe
@@ -184,9 +215,9 @@ const Task = ({
       }
     }
   }
-  async function handleAssignUser() {
+  async function handleAssignUser(assigneeId) {
     try {
-      const response = await stepsApi.assign(taskId);
+      const response = await stepsApi.assign(taskId, assigneeId);
       const task = response.data.data;
 
       setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
@@ -322,6 +353,7 @@ const Task = ({
               <Typography
                 variant={variant === "small" ? "bodySmall" : "bodyRegular"}
                 struck={isDecided || taskIsComplete}
+                noWrap
               >
                 {title}
               </Typography>
@@ -353,6 +385,8 @@ const Task = ({
         actions={
           isDecision ? (
             <DecisionDrawerActions
+              assignableUsers={assignableUsers}
+              taskIsAssigned={taskIsAssigned}
               taskIsAssignedToMe={taskIsAssignedToMe}
               isDecided={isDecided}
               decisionQuestion={decisionQuestion}
@@ -368,6 +402,8 @@ const Task = ({
             />
           ) : (
             <TaskDrawerActions
+              assignableUsers={assignableUsers}
+              taskIsAssigned={taskIsAssigned}
               taskIsAssignedToMe={taskIsAssignedToMe}
               taskIsComplete={taskIsComplete}
               canAssignTask={canAssignTask}
@@ -404,6 +440,8 @@ const Task = ({
 export default Task;
 
 const DecisionDrawerActions = ({
+  assignableUsers,
+  taskIsAssigned,
   taskIsAssignedToMe,
   isDecided,
   decisionQuestion,
@@ -526,6 +564,19 @@ const DecisionDrawerActions = ({
               </Grid>
             </>
           )
+        ) : taskIsAsigned ? (
+          <Grid item xs={12}>
+            <Button
+              full
+              variant="text"
+              disabled={!canUnassignTask}
+              onClick={handleUnassignUser}
+            >
+              <Typography variant="bodyRegular" bold>
+                Assigned to {taskIsAssigned}
+              </Typography>
+            </Button>
+          </Grid>
         ) : (
           <Grid item xs={12}>
             {isDecided ? (
@@ -536,11 +587,17 @@ const DecisionDrawerActions = ({
                 </Typography>
               </Button>
             ) : (
-              <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
-                <Typography light bold variant="bodyRegular">
-                  Add to my to do list
-                </Typography>
-              </Button>
+              <AssignmentRoster
+                canAssignTask={canAssignTask}
+                assignableUsers={assignableUsers}
+                handleAssignUser={handleAssignUser}
+              />
+
+              // <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
+              //   <Typography light bold variant="bodyRegular">
+              //     Add to my to do list
+              //   </Typography>
+              // </Button>
             )}
           </Grid>
         )}
@@ -550,6 +607,8 @@ const DecisionDrawerActions = ({
 };
 
 const TaskDrawerActions = ({
+  assignableUsers,
+  taskIsAssigned,
   taskIsAssignedToMe,
   taskIsComplete,
   canAssignTask,
@@ -615,6 +674,19 @@ const TaskDrawerActions = ({
             </Grid>
           </>
         )
+      ) : taskIsAssigned ? (
+        <Grid item xs={12}>
+          <Button
+            full
+            variant="text"
+            disabled={!canUnassignTask}
+            onClick={handleUnassignUser}
+          >
+            <Typography variant="bodyRegular" bold>
+              Assigned to {taskIsAssigned}
+            </Typography>
+          </Button>
+        </Grid>
       ) : (
         // TODO: don't let someone assign a completed task (collaborative task)
         <Grid item xs={12}>
@@ -626,15 +698,73 @@ const TaskDrawerActions = ({
               </Typography>
             </Button>
           ) : (
-            <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
-              <Typography light bold variant="bodyRegular">
-                Add to my to do list
-              </Typography>
-            </Button>
+            <AssignmentRoster
+              canAssignTask={canAssignTask}
+              assignableUsers={assignableUsers}
+              handleAssignUser={handleAssignUser}
+            />
           )}
         </Grid>
       )}
     </Grid>
+  );
+};
+
+const AssignmentRoster = ({
+  canAssignTask,
+  assignableUsers,
+  handleAssignUser,
+}) => {
+  const [viewRoster, setViewRoster] = useState(false);
+  console.log({ assignableUsers });
+
+  return (
+    <>
+      {viewRoster ? (
+        <Stack spacing={6}>
+          <Stack spacing={3}>
+            {assignableUsers.map((user, i) => (
+              <Card
+                size="small"
+                variant="lightened"
+                key={i}
+                hoverable
+                onClick={() => handleAssignUser(user.id)}
+              >
+                <Stack direction="row" spacing={3} alignItems="center">
+                  <Avatar size="sm" src={user.attributes.imageUrl} />
+                  <Typography variant="bodyRegular">
+                    {user.attributes.firstName} {user.attributes.lastName}
+                  </Typography>
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+
+          <Button
+            full
+            variant="text"
+            onClick={() => setViewRoster(false)}
+            // onClick={handleAssignUser}
+          >
+            <Typography bold variant="bodyRegular">
+              Stop assigning
+            </Typography>
+          </Button>
+        </Stack>
+      ) : (
+        <Button
+          full
+          disabled={!canAssignTask}
+          onClick={() => setViewRoster(true)}
+          // onClick={handleAssignUser}
+        >
+          <Typography light bold variant="bodyRegular">
+            Assign this task
+          </Typography>
+        </Button>
+      )}
+    </>
   );
 };
 

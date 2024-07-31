@@ -115,11 +115,15 @@ async function create(processId, title) {
   // if response good, great.  else.  error out?
 }
 
-async function assign(taskId) {
+async function assign(taskId, assignee_id) {
   const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/assign`, {}, config);
+    response = await workflowsApi.put(
+      `/steps/${taskId}/assign`,
+      { person_id: assignee_id },
+      config
+    );
   } catch (error) {
     return Promise.reject(error);
   }
@@ -128,11 +132,15 @@ async function assign(taskId) {
   // if response good, great.  else.  error out?
 }
 
-async function unassign(taskId) {
+async function unassign(taskId, assignee_id) {
   const config = getAuthHeader();
   let response;
   try {
-    response = await workflowsApi.put(`/steps/${taskId}/unassign`, {}, config);
+    response = await workflowsApi.put(
+      `/steps/${taskId}/unassign`,
+      { person_id: assignee_id },
+      config
+    );
   } catch (error) {
     return Promise.reject(error);
   }

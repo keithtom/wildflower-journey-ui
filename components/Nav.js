@@ -119,7 +119,7 @@ const Navigation = () => {
   // console.log({ ogViewingSchool });
   // console.log({ isTeacherLeader });
   // console.log({ currentUser });
-  console.log({ workflow });
+  // console.log({ workflow });
 
   return currentUser ? (
     <Box>

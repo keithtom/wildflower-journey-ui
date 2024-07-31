@@ -69,21 +69,15 @@ const InfoDrawer = ({
   worktime,
 }) => {
   const { currentUser, isOperationsGuide } = useUserContext();
-  console.log({ currentUser });
-  console.log({ isOperationsGuide });
+
   const router = useRouter();
   const { workflow } = router.query;
-  console.log({ workflow });
 
   const isTL = currentUser?.personRoleList.some(
     (role) => role === "Teacher Leader"
   );
-  console.log({ isTL });
+
   const isETL = currentUser?.attributes.ssj ? true : false;
-  console.log({ isETL });
-  // const isETL = currentUser?.personRoleList.some(
-  //   (role) => role === "Emerging Teacher Leader"
-  // );
 
   let showActions = false;
 
@@ -109,8 +103,6 @@ const InfoDrawer = ({
   } else {
     showActions = true;
   }
-
-  console.log({ showActions });
 
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
