@@ -64,7 +64,7 @@ const OpenSchoolToDoList = ({}) => {
   // console.log({ currentUser });
   // console.log({ assignedIsError });
   // console.log({ assignedIsLoading });
-  // console.log({ assignedSteps });
+  console.log({ assignedSteps });
   // console.log({ mySteps });
   // console.log({ steps });
   // console.log({ teamAssignments })

@@ -196,7 +196,10 @@ const Navigation = () => {
           ) : null}
 
           {router.pathname.includes("/open-school") ? (
-            <OpenSchoolNavigation openSchoolWorkflowId={workflow} />
+            <OpenSchoolNavigation
+              openSchoolWorkflowId={workflow}
+              currentUserId={currentUser?.id}
+            />
           ) : null}
 
           {!isOperationsGuide && currentUser?.attributes?.ssj ? (
@@ -312,10 +315,15 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   );
 };
 
-const OpenSchoolNavigation = ({ openSchoolWorkflowId }) => {
+const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
   const router = useRouter();
   const { workflow } = router.query;
   const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
+
+  const assignedToMe = assignedSteps?.filter(
+    (step) => step.relationships.assignees.data[0].id === currentUserId
+  );
+
   return (
     <Box>
       <NavLink
@@ -328,8 +336,8 @@ const OpenSchoolNavigation = ({ openSchoolWorkflowId }) => {
         label="To do list"
         icon="calendarCheck"
         secondaryAction={
-          isLoading ? null : !assignedSteps.length ? null : (
-            <Chip size="small" label={assignedSteps.length} variant="primary" />
+          isLoading ? null : !assignedToMe.length ? null : (
+            <Chip size="small" label={assignedToMe.length} variant="primary" />
           )
         }
       />
