@@ -56,7 +56,7 @@ const Milestone = ({
             <Stack direction="row" spacing={1}>
               {phase && (
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <PhaseChip size="small" phase={phase} withIcon />
+                  <PhaseChip size="small" phase={phase} />
                 </Stack>
               )}
               {categories && !hideCategoryChip && (

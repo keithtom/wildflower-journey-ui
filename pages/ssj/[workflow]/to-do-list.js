@@ -50,7 +50,7 @@ const ToDoList = ({}) => {
 
   // console.log({ assignedIsError });
   // console.log({ assignedIsLoading });
-  console.log({ assignedSteps });
+  // console.log({ assignedSteps });
   // console.log({ steps });
   // console.log({ teamAssignments });
 
