@@ -35,6 +35,7 @@ const Milestone = ({
   stepsAssignedCount,
   completedStepsCount,
   variant,
+  flag,
 }) => {
   const { screenSize } = getScreenSize();
 
@@ -53,7 +54,8 @@ const Milestone = ({
       <Link href={link}>
         <ListItem
           secondaryAction={
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              {flag && <Chip label={flag} size="small" />}
               {phase && (
                 <Stack direction="row" spacing={2} alignItems="center">
                   <PhaseChip size="small" phase={phase} />
