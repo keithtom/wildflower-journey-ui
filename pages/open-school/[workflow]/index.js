@@ -7,6 +7,7 @@ import { useUserContext, useAssignViewingSchool } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 import useAuth from "@lib/utils/useAuth";
+import usePerson from "@hooks/usePerson";
 
 import {
   PageContainer,
@@ -25,37 +26,21 @@ import {
 const OpenSchool = () => {
   const { currentUser } = useUserContext();
   const router = useRouter();
+  const { workflow } = router.query;
 
   const personId = currentUser?.id;
+  // Fetch data
+  const { data: personData, isLoading } = usePerson(personId, {
+    network: true,
+  });
 
-  const { data, error, isLoading, mutate } = useSWR(
-    personId ? `/v1/people/${personId}` : null,
-    () => peopleApi.show(personId, { network: true }).then((res) => res.data),
-    {
-      onErrorRetry: (error) => {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
-      },
-    }
-  );
-  if (error)
-    return (
-      <PageContainer isLoading={true}>
-        failed to load ${error.message}
-      </PageContainer>
-    );
-  if (isLoading || !data) return <PageContainer isLoading={true} />;
+  if (isLoading || !personData) return <PageContainer isLoading={true} />;
 
-  const person = data.data;
-  const included = data.included;
-  const hasSchool = person.relationships.schools.length;
+  const included = personData?.included;
+  const hasSchool = personData?.data?.relationships?.schools?.length;
   const userSchool = handleFindMatchingItems(
     included,
-    person.relationships.schools.data,
+    personData?.data?.relationships?.schools?.data,
     "id"
   );
   const school = userSchool[0];
@@ -105,67 +90,66 @@ const OpenSchool = () => {
           </Card>
         </Grid>
         <Grid item xs={12}>
-          <Card
-            elevated
-            variant="primaryOutlined"
-            size="large"
-            sx={{ overflow: "hidden" }}
-          >
-            <Grid container spacing={16}>
-              <Grid item xs={12} sm={6}>
-                <Stack
-                  justifyContent="space-between"
-                  sx={{ height: "100%" }}
-                  spacing={6}
-                >
-                  <Stack direction="row" spacing={3} alignItems="center">
-                    <Icon type="calendar" variant="primary" />
-                    <Typography variant="bodyLarge">Admin Checklist</Typography>
-                    <Chip label="Coming Q1 2024" size="small" />
-                  </Stack>
-                  <Stack spacing={3}>
-                    <Typography variant="h3" bold>
-                      Collaboratively manage your school's tasks in a single,
-                      simple place.
-                    </Typography>
-                    <Typography variant="bodyLarge" lightened>
-                      The admin checklists you're already familiar with are
-                      getting a facelift. Assign, sort, and complete tasks right
-                      here in My Wildflower, together.
-                    </Typography>
-                  </Stack>
-                  <Stack>
-                    <Grid>
-                      <Stack direction="row" spacing={3}>
-                        <Link href="/open-school/admin-checklist">
+          <Link href={`/open-school/${workflow}/checklist`}>
+            <Card elevated size="large" sx={{ overflow: "hidden" }}>
+              <Grid container spacing={16}>
+                <Grid item xs={12} sm={6}>
+                  <Stack
+                    justifyContent="space-between"
+                    sx={{ height: "100%" }}
+                    spacing={6}
+                  >
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Icon type="calendar" variant="primary" />
+                      <Typography variant="bodyLarge">
+                        Open School Checklist
+                      </Typography>
+                      <Chip label="New" size="small" />
+                    </Stack>
+                    <Stack spacing={3}>
+                      <Typography variant="h3" bold>
+                        Collaboratively manage your school's tasks in a single,
+                        simple place.
+                      </Typography>
+                      <Typography variant="bodyLarge" lightened>
+                        The checklists you're already familiar with are here in
+                        My Wildflower. Assign, sort, and complete tasks right
+                        here, together.
+                      </Typography>
+                    </Stack>
+                    <Stack>
+                      <Grid>
+                        <Stack direction="row" spacing={3}>
+                          {/* <Link href={`/open-school/${workflow}/checklist`}> */}
                           <Button>
                             <Typography variant="bodyRegular" bold light>
-                              View More
+                              Get started
                             </Typography>
                           </Button>
-                        </Link>
-                        <Link href="https://forms.gle/KrpzuLvtUkhvQWAN8">
+                          {/* </Link> */}
+                          {/* <Link href="https://forms.gle/KrpzuLvtUkhvQWAN8">
                           <Button variant="text">
                             <Typography variant="bodyRegular" bold>
                               Offer feedback
                             </Typography>
                           </Button>
-                        </Link>
-                      </Stack>
-                    </Grid>
+                        </Link> */}
+                        </Stack>
+                      </Grid>
+                    </Stack>
                   </Stack>
-                </Stack>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Box sx={{ maxHeight: "360px" }}>
+                    <img
+                      src="/assets/images/open-school/monthly-checklist.png"
+                      style={{ height: "640px" }}
+                    />
+                  </Box>
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <Box sx={{ maxHeight: "360px" }}>
-                  <img
-                    src="/assets/images/open-school/monthly-checklist.png"
-                    style={{ height: "640px" }}
-                  />
-                </Box>
-              </Grid>
-            </Grid>
-          </Card>
+            </Card>
+          </Link>
         </Grid>
         <Grid item>
           <Stack spacing={3}>
