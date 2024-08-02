@@ -79,8 +79,10 @@ const Task = ({
   const { data: person, isLoading: personIsLoading } = usePerson(
     currentUser?.id
   );
+  console.log({ person });
   // Extract the school ID from the user's data
-  const userSchoolId = person?.data?.relationships.schools.data[0].id;
+  const userSchoolId =
+    person?.data?.relationships?.schools?.data?.[0]?.id || undefined;
   if (router.pathname.startsWith("/open-school/")) {
     // If the current route starts with '/open-school', fetch the school's data and use it to set assignableUsers
     const { data: school, isLoading: schoolIsLoading } =
@@ -675,18 +677,47 @@ const TaskDrawerActions = ({
           </>
         )
       ) : taskIsAssigned ? (
-        <Grid item xs={12}>
-          <Button
-            full
-            variant="text"
-            disabled={!canUnassignTask}
-            onClick={handleUnassignUser}
-          >
-            <Typography variant="bodyRegular" bold>
-              Assigned to {taskIsAssigned}
-            </Typography>
-          </Button>
-        </Grid>
+        canAssignTask ? (
+          <Grid item xs={12}>
+            <AssignmentRoster
+              canAssignTask={canAssignTask}
+              assignableUsers={assignableUsers}
+              handleAssignUser={handleAssignUser}
+            />
+          </Grid>
+        ) : taskIsComplete ? (
+          <>
+            <Grid item xs={12}>
+              <Button
+                full
+                variant="danger"
+                disabled={!canUncompleteTask}
+                onClick={handleUncompleteTask}
+              >
+                <Typography bold>
+                  {canUncompleteTask
+                    ? "Mark incomplete"
+                    : `Completed by ${
+                        completedBy && completedBy.attributes.firstName
+                      } ${completedBy && completedBy.attributes.lastName}`}
+                </Typography>
+              </Button>
+            </Grid>
+          </>
+        ) : (
+          <Grid item xs={12}>
+            <Button
+              full
+              variant="text"
+              disabled={!canUnassignTask}
+              onClick={handleUnassignUser}
+            >
+              <Typography variant="bodyRegular" bold>
+                Assigned to {taskIsAssigned}
+              </Typography>
+            </Button>
+          </Grid>
+        )
       ) : (
         // TODO: don't let someone assign a completed task (collaborative task)
         <Grid item xs={12}>
@@ -725,6 +756,7 @@ const AssignmentRoster = ({
           <Stack spacing={3}>
             {assignableUsers.map((user, i) => (
               <Card
+                className="assignable-user"
                 size="small"
                 variant="lightened"
                 key={i}
