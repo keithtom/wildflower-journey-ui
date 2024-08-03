@@ -79,7 +79,8 @@ const Task = ({
   const { data: person, isLoading: personIsLoading } = usePerson(
     currentUser?.id
   );
-  console.log({ person });
+  // console.log({ person });
+  // console.log({ currentUser });
   // Extract the school ID from the user's data
   const userSchoolId =
     person?.data?.relationships?.schools?.data?.[0]?.id || undefined;
@@ -90,9 +91,13 @@ const Task = ({
     assignableUsers = school?.included.filter((item) => item.type === "person");
   } else if (router.pathname.startsWith("/ssj/")) {
     // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
-    const teamId = currentUser?.attributes.ssj.teamId;
+    const teamId = currentUser?.attributes?.ssj?.teamId;
     const { team, isLoading: teamIsLoading } = useTeam(teamId);
-    assignableUsers = team?.data?.data?.relationships?.partners?.data;
+    // add together partners and currentUser to form assignableUsers
+    assignableUsers = [
+      currentUser,
+      ...(team?.data?.data?.relationships?.partners?.data || []),
+    ];
   }
 
   // Common interface that all invokations of Task should use.
@@ -109,9 +114,9 @@ const Task = ({
   const resources = task.relationships.documents.data;
 
   const [taskIsAssigned, setTaskIsAssigned] = useState(
-    task?.relationships?.assignees?.data[0]?.attributes?.firstName
-      ? task?.relationships?.assignees?.data[0]?.attributes?.firstName
-      : false
+    task?.relationships?.assignees?.data
+      ? task?.relationships?.assignees?.data
+      : null
   );
 
   const [taskIsAssignedToMe, setTaskIsAssignedToMe] = useState(
@@ -222,6 +227,7 @@ const Task = ({
       const response = await stepsApi.assign(taskId, assigneeId);
       const task = response.data.data;
 
+      setTaskIsAssigned(task?.relationships?.assignees?.data);
       setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
       setCanAssignTask(task.attributes.canAssign);
       setCanUnassignTask(task.attributes.canUnassign);
@@ -593,6 +599,7 @@ const DecisionDrawerActions = ({
                 canAssignTask={canAssignTask}
                 assignableUsers={assignableUsers}
                 handleAssignUser={handleAssignUser}
+                taskIsAssigned={taskIsAssigned}
               />
 
               // <Button full disabled={!canAssignTask} onClick={handleAssignUser}>
@@ -627,6 +634,7 @@ const TaskDrawerActions = ({
   // NOTE: canUncompleteTask is not the same as "Completed by me" because sometimes we can't uncomplete a step because the process is completed even though we completed the step.
 
   // is it assigned ot me,
+
   return (
     <Grid container spacing={4}>
       {taskIsAssignedToMe ? (
@@ -683,6 +691,7 @@ const TaskDrawerActions = ({
               canAssignTask={canAssignTask}
               assignableUsers={assignableUsers}
               handleAssignUser={handleAssignUser}
+              taskIsAssigned={taskIsAssigned}
             />
           </Grid>
         ) : taskIsComplete ? (
@@ -733,6 +742,7 @@ const TaskDrawerActions = ({
               canAssignTask={canAssignTask}
               assignableUsers={assignableUsers}
               handleAssignUser={handleAssignUser}
+              taskIsAssigned={taskIsAssigned}
             />
           )}
         </Grid>
@@ -745,9 +755,11 @@ const AssignmentRoster = ({
   canAssignTask,
   assignableUsers,
   handleAssignUser,
+  taskIsAssigned,
 }) => {
   const [viewRoster, setViewRoster] = useState(false);
   console.log({ assignableUsers });
+  console.log({ taskIsAssigned });
 
   return (
     <>
@@ -758,7 +770,11 @@ const AssignmentRoster = ({
               <Card
                 className="assignable-user"
                 size="small"
-                variant="lightened"
+                variant={
+                  taskIsAssigned.some((task) => task.id === user.id)
+                    ? "primaryOutlined"
+                    : "lightened"
+                }
                 key={i}
                 hoverable
                 onClick={() => handleAssignUser(user.id)}

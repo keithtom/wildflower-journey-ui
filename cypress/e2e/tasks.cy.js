@@ -22,7 +22,8 @@ describe("tasks", () => {
 
         // Assign to Step 1
         cy.contains("Step 1").click();
-        cy.contains("Add to my to do list").click();
+        cy.contains("Assign this task").click();
+        cy.get(".assignable-user").first().click();
         cy.contains("TASK ADDED").should("be.visible");
         cy.get(".MuiSnackbar-root span svg").click({ force: true });
         cy.contains("ASSIGNEE");
@@ -34,7 +35,8 @@ describe("tasks", () => {
 
         // // Assign to Step 2
         cy.contains("Step 2").click();
-        cy.contains("Add to my to do list").click();
+        cy.contains("Assign this task").click();
+        cy.get(".assignable-user").first().click();
         cy.contains("TASK ADDED").should("be.visible");
         cy.get(".MuiSnackbar-root span svg").click({ force: true });
         cy.contains("ASSIGNEE");
