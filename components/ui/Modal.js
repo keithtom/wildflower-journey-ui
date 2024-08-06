@@ -30,6 +30,13 @@ const FixedActions = styled(Box)`
   border-top: 1px solid ${({ theme }) => theme.color.neutral.main};
   padding: ${({ theme }) => theme.util.buffer * 3}px;
 `;
+const FixedMenu = styled(Box)`
+  position: sticky;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: ${({ theme }) => theme.color.neutral.lightest};
+`;
 
 export default function Modal({
   title,
@@ -37,13 +44,14 @@ export default function Modal({
   children,
   noPadding,
   fixedActions,
+  fixedMenu,
   ...props
 }) {
   return (
     <CustomModal {...props} onClose={toggle}>
       <ModalCard elevated noPadding fixedActions={fixedActions}>
-        <Card noPadding={noPadding} noBorder>
-          <Stack spacing={4}>
+        <Stack spacing={4}>
+          <Card noBorder sx={{ paddingBottom: 0 }}>
             <Grid container alignItems="center" justifyContent="flex-end">
               {title && (
                 <Grid item flex={1}>
@@ -58,9 +66,20 @@ export default function Modal({
                 </IconButton>
               </Grid>
             </Grid>
-            {children}
-          </Stack>
-        </Card>
+          </Card>
+          <Grid container>
+            {fixedMenu ? (
+              <Grid item xs={4} sx={{ borderRight: "1px solid #f1f1f1" }}>
+                <FixedMenu>{fixedMenu}</FixedMenu>
+              </Grid>
+            ) : null}
+            <Grid item flex={1}>
+              <Card noPadding={noPadding} noBorder noRadius>
+                {children}
+              </Card>
+            </Grid>
+          </Grid>
+        </Stack>
         {fixedActions ? <FixedActions>{fixedActions}</FixedActions> : null}
       </ModalCard>
     </CustomModal>

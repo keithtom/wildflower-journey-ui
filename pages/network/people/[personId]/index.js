@@ -3,7 +3,13 @@ import { mutate } from "swr";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
-import { Skeleton } from "@mui/material";
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Skeleton,
+} from "@mui/material";
 
 import { styled } from "@mui/material/styles";
 import { FilePond, registerPlugin } from "react-filepond";
@@ -374,6 +380,7 @@ const EditProfileModal = ({
   const [profileImage, setProfileImage] = useState();
   const [showError, setShowError] = useState();
   const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
+  const [currentFieldGroup, setCurrentFieldGroup] = useState("general");
   const handleFileError = (error) => {
     setShowError(error);
   };
@@ -500,606 +507,31 @@ const EditProfileModal = ({
       });
   };
 
-  const watchFields = watch();
-  const isCertifiedOrSeeking =
-    watchFields.montessoriCertified === "Yes" ||
-    watchFields.montessoriCertified === "Currently Seeking Certification";
-  const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
-    "A not-listed or more specific ethnicity"
-  );
-  const showCustomLanguageField = watchFields.primaryLanguage === "other";
-  const showCustomGenderField =
-    watchFields.gender === "A not-listed or more specific gender identity";
-  const showCustomPronounsField =
-    watchFields.pronouns === "Not-listed or more specific pronouns";
-
+  const renderFieldGroup = () => {
+    switch (currentFieldGroup) {
+      case "general":
+        return <GeneralFields />;
+      case "demographic":
+        return <DemographicFields />;
+      case "certification_and_role":
+        return <CertificationAndRoleFields />;
+      case "school_history":
+        return <SchoolHistoryFields />;
+      case "board_history":
+        return <BoardHistoryFields />;
+      default:
+        return null;
+    }
+  };
   return (
-    <Modal toggle={toggle} open={open} title="Edit your profile">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={6}>
-          <Controller
-            name="firstName"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="First name"
-                placeholder="e.g. Jane"
-                error={errors.firstName}
-                helperText={
-                  errors &&
-                  errors.firstName &&
-                  errors.firstName.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="lastName"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="Last name"
-                placeholder="e.g. Smith"
-                error={errors.lastName}
-                helperText={
-                  errors &&
-                  errors.lastName &&
-                  errors.lastName.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="city"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="City"
-                placeholder="e.g. Boston"
-                error={errors.city}
-                helperText={
-                  errors &&
-                  errors.city &&
-                  errors.city.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="state"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select
-                label="State"
-                placeholder="e.g. Massachusetts"
-                options={unitedStatesOptions}
-                error={errors.state}
-                helperText={
-                  errors &&
-                  errors.state &&
-                  errors.state.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="Email"
-                placeholder="e.g. jane.smith@gmail.com"
-                error={errors.email}
-                helperText={
-                  errors &&
-                  errors.email &&
-                  errors.email.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="phone"
-            control={control}
-            rules={{ required: false }}
-            render={({ field }) => (
-              <TextField
-                label="Phone"
-                placeholder="e.g. (123) 456 7890"
-                error={errors.phone}
-                helperText={
-                  errors &&
-                  errors.phone &&
-                  errors.phone.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="about"
-            control={control}
-            rules={{ required: false }}
-            render={({ field }) => (
-              <TextField
-                label="About"
-                placeholder="e.g. Your bio"
-                multiline={true}
-                rows={4}
-                error={errors.about}
-                helperText={
-                  errors &&
-                  errors.about &&
-                  errors.about.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-
-          <Controller
-            name="primaryLanguage"
-            control={control}
-            render={({ field }) => (
-              <Select
-                label="What is your primary language?"
-                placeholder="Select a language..."
-                options={languageOptions}
-                error={errors.primaryLanguage}
-                helperText={
-                  errors &&
-                  errors.primaryLanguage &&
-                  errors.primaryLanguage.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          {showCustomLanguageField ? (
-            <Controller
-              name="primaryLanguageOther"
-              control={control}
-              rules={{
-                required: false,
-              }}
-              render={({ field }) => (
-                <TextField
-                  label="Other language"
-                  placeholder="e.g. Your language"
-                  error={errors.primaryLanguageOther}
-                  helperText={
-                    errors &&
-                    errors.primaryLanguageOther &&
-                    errors.primaryLanguageOther.type === "required" &&
-                    "This field is required"
-                  }
-                  {...field}
-                />
-              )}
-            />
-          ) : null}
-          <Controller
-            name="raceEthnicity"
-            control={control}
-            render={({ field }) => (
-              <MultiSelect
-                withCheckbox
-                label="What is your ethnicity?"
-                placeholder="Select as many as you like..."
-                options={ethnicityOptions}
-                error={errors.raceEthnicity}
-                defaultValue={[]}
-                helperText={
-                  errors &&
-                  errors.raceEthnicity &&
-                  errors.raceEthnicity.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          {showCustomEthnicityField ? (
-            <Controller
-              name="raceEthnicityOther"
-              control={control}
-              rules={{
-                required: false,
-              }}
-              render={({ field }) => (
-                <TextField
-                  label="Other ethnicity"
-                  placeholder="e.g. Your ethnicity"
-                  error={errors.raceEthnicityOther}
-                  helperText={
-                    errors &&
-                    errors.raceEthnicityOther &&
-                    errors.raceEthnicityOther.type === "required" &&
-                    "This field is required"
-                  }
-                  {...field}
-                />
-              )}
-            />
-          ) : null}
-          <Stack spacing={1}>
-            <Typography variant="bodyRegular">
-              Do you identify as a member of the LGBTQIA community?
-            </Typography>
-            <Controller
-              name="lgbtqia"
-              control={control}
-              rules={{ required: false }}
-              render={({ field: { onChange, value } }) => (
-                <RadioGroup value={value}>
-                  {lgbtqiaOptions?.map((o, i) => (
-                    <FormControlLabel
-                      key={i}
-                      value={o.value}
-                      control={<Radio />}
-                      label={o.label}
-                      onChange={onChange}
-                    />
-                  ))}
-                </RadioGroup>
-              )}
-            />
-            <FormHelperText error={errors.lgbtqia}>
-              {errors &&
-                errors.lgbtqia &&
-                errors.lgbtqia.type === "required" &&
-                "This field is required"}
-            </FormHelperText>
-          </Stack>
-          <Controller
-            name="gender"
-            control={control}
-            render={({ field }) => (
-              <Select
-                label="What is your gender identity?"
-                placeholder="Select one..."
-                options={genderOptions}
-                error={errors.gender}
-                helperText={
-                  errors &&
-                  errors.gender &&
-                  errors.gender.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          {showCustomGenderField ? (
-            <Controller
-              name="genderOther"
-              control={control}
-              rules={{
-                required: false,
-              }}
-              render={({ field }) => (
-                <TextField
-                  label="Other gender"
-                  placeholder="e.g. Your gender"
-                  error={errors.genderOther}
-                  helperText={
-                    errors &&
-                    errors.genderOther &&
-                    errors.genderOther.type === "required" &&
-                    "This field is required"
-                  }
-                  {...field}
-                />
-              )}
-            />
-          ) : null}
-          <Controller
-            name="pronouns"
-            control={control}
-            render={({ field }) => (
-              <Select
-                label="What are your pronouns?"
-                placeholder="Select one..."
-                options={pronounsOptions}
-                error={errors.pronouns}
-                helperText={
-                  errors &&
-                  errors.pronouns &&
-                  errors.pronouns.type === "required" &&
-                  "This field is required"
-                }
-                value={field.value}
-                {...field}
-              />
-            )}
-          />
-          {showCustomPronounsField ? (
-            <Controller
-              name="pronounsOther"
-              control={control}
-              rules={{
-                required: false,
-              }}
-              render={({ field }) => (
-                <TextField
-                  label="Other pronouns"
-                  placeholder="e.g. Your pronouns"
-                  error={errors.pronounsOther}
-                  helperText={
-                    errors &&
-                    errors.pronounsOther &&
-                    errors.pronounsOther.type === "required" &&
-                    "This field is required"
-                  }
-                  {...field}
-                />
-              )}
-            />
-          ) : null}
-          <Stack spacing={1}>
-            <Typography variant="bodyRegular">
-              How would you describe the economic situation in your household
-              while you were growing up?
-            </Typography>
-            <Typography variant="bodyRegular" lightened>
-              As a reference point, today a family of four with a family income
-              of $47,638/year is the limit to receive subsidies.
-            </Typography>
-            <Typography variant="bodySmall" lightened>
-              NOTE: This answer will not appear publicly or on your profile in
-              the Wildflower network.
-            </Typography>
-            <Controller
-              name="householdIncome"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <RadioGroup value={value}>
-                  {incomeOptions?.map((o, i) => (
-                    <FormControlLabel
-                      key={i}
-                      value={o.value}
-                      control={<Radio />}
-                      label={o.label}
-                      onChange={onChange}
-                    />
-                  ))}
-                </RadioGroup>
-              )}
-            />
-            <FormHelperText error={errors.householdIncome}>
-              {errors &&
-                errors.householdIncome &&
-                errors.householdIncome.type === "required" &&
-                "This field is required"}
-            </FormHelperText>
-          </Stack>
-          <Stack spacing={1}>
-            <Typography variant="bodyRegular">
-              Are you Montessori Certified?
-            </Typography>
-            <Controller
-              name="montessoriCertified"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <RadioGroup value={value}>
-                  {montessoriCertificationOptions?.map((o, i) => (
-                    <FormControlLabel
-                      key={i}
-                      value={o.value}
-                      control={<Radio />}
-                      label={o.label}
-                      onChange={onChange}
-                    />
-                  ))}
-                </RadioGroup>
-              )}
-            />
-            <FormHelperText error={errors.montessoriCertified}>
-              {errors &&
-                errors.montessoriCertified &&
-                errors.montessoriCertified.type === "required" &&
-                "This field is required"}
-            </FormHelperText>
-          </Stack>
-          {isCertifiedOrSeeking ? (
-            <Controller
-              name="montessoriCertifiedLevels"
-              control={control}
-              rules={{ required: isCertifiedOrSeeking ? true : false }}
-              render={({ field }) => (
-                <MultiSelect
-                  withCheckbox
-                  label="What Levels are you certified (or seeking certification) for?"
-                  placeholder="Select as many as you like..."
-                  options={levelsOfMontessoriCertification}
-                  error={errors.montessoriCertifiedLevels}
-                  defaultValue={[]}
-                  helperText={
-                    errors &&
-                    errors.montessoriCertifiedLevels &&
-                    errors.montessoriCertifiedLevels.type === "required" &&
-                    "This field is required"
-                  }
-                  {...field}
-                />
-              )}
-            />
-          ) : null}
-          <Controller
-            name="role"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <MultiSelect
-                withCheckbox
-                label="What is your role at Wildflower Schools?"
-                placeholder="Select all roles you hold..."
-                options={roleOptions}
-                error={errors.role}
-                defaultValue={[]}
-                helperText={
-                  errors &&
-                  errors.role &&
-                  errors.role.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-
-          <Divider />
-          {showError ? (
-            <Grid container>
-              <Grid item xs={12}>
-                <Alert severity="error">
-                  <Stack>
-                    {showError.main}
-                    <Typography variant="bodySmall" error>
-                      {showError.sub}
-                    </Typography>
-                  </Stack>
-                </Alert>
-              </Grid>
-            </Grid>
-          ) : null}
-          <Typography variant="bodyRegular">Add a new profile image</Typography>
-          <Grid container justifyContent="center">
-            <Grid item xs={12} sm={8} md={6}>
-              <StyledFilePond
-                files={profilePicture}
-                allowReorder={false}
-                allowMultiple={false}
-                maxFileSize="5MB"
-                acceptedFileTypes={["image/*"]}
-                onupdatefiles={setProfilePicture}
-                onaddfilestart={() => setIsUpdatingPicture(true)}
-                onprocessfiles={() => setIsUpdatingPicture(false)}
-                stylePanelAspectRatio="1:1"
-                onerror={handleFileError}
-                stylePanelLayout="circle"
-                server={{
-                  process: (
-                    fieldName,
-                    file,
-                    metadata,
-                    load,
-                    error,
-                    progress,
-                    abort,
-                    transfer,
-                    options
-                  ) => {
-                    // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
-                    FileChecksum.create(file, (checksum_error, checksum) => {
-                      if (checksum_error) {
-                        console.error(checksum_error);
-                        error();
-                      }
-                      axios
-                        .post(
-                          `${process.env.API_URL}/rails/active_storage/direct_uploads`,
-                          {
-                            blob: {
-                              filename: file.name,
-                              content_type: file.type,
-                              byte_size: file.size,
-                              checksum: checksum,
-                            },
-                          }
-                        )
-                        .then((response) => {
-                          if (!response.data) {
-                            return error;
-                          }
-                          const signed_id = response.data.signed_id;
-                          axios
-                            .put(response.data.direct_upload.url, file, {
-                              headers: response.data.direct_upload.headers,
-                              onUploadProgress: (progressEvent) => {
-                                progress(
-                                  progressEvent.lengthComputable,
-                                  progressEvent.loaded,
-                                  progressEvent.total
-                                );
-                              },
-                              // need to remove default Authorization header when sending to s3
-                              transformRequest: (data, headers) => {
-                                if (process.env !== "local") {
-                                  delete headers.common["Authorization"];
-                                }
-                                return data;
-                              },
-                            })
-                            .then((response) => {
-                              setProfileImage(signed_id);
-                              load(signed_id);
-                            })
-                            .catch((error) => {
-                              if (!axios.isCancel(error)) {
-                                console.error(error);
-                                // error();
-                              }
-                            });
-                        })
-                        .catch((error) => {
-                          console.log(error);
-                          console.error(error);
-                        });
-                    });
-                    return {
-                      abort: () => {
-                        // This function is entered if the user has tapped the cancel button
-                        // request.abort(); TODO: is there an active storage abort?
-
-                        // Let FilePond know the request has been cancelled
-                        abort();
-                      },
-                    };
-                  },
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                  ondata: (formData) => {
-                    formData.append("blob", value);
-                    return formData;
-                  },
-                  onload: () => {
-                    props.onUploadComplete();
-                  },
-                }}
-                credits={false}
-                labelIdle='Drag & Drop your profile picture or <span class="filepond--label-action">Browse</span>'
-              />
-            </Grid>
-          </Grid>
-          <Divider />
-        </Stack>
-        <Card
-          noBorder
-          noRadius
-          sx={{
-            position: "sticky",
-            bottom: -24,
-            zIndex: 2,
-            paddingLeft: 0,
-          }}
-        >
-          <Stack direction="row" spacing={3} alignItems="center">
+    <Modal
+      toggle={toggle}
+      open={open}
+      title="Edit your profile"
+      noPadding
+      fixedActions={
+        <Grid container justifyContent="flex-end">
+          <Grid item>
             <Button
               small
               disabled={!isDirty || isUpdatingPicture || isSubmitting}
@@ -1114,9 +546,715 @@ const EditProfileModal = ({
                 Updating profile image...
               </Typography>
             )}
-          </Stack>
-        </Card>
-      </form>
+          </Grid>
+        </Grid>
+      }
+      fixedMenu={
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("general")}
+              selected={currentFieldGroup === "general"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">General</Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("demographic")}
+              selected={currentFieldGroup === "demographic"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">Demographic</Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("certification_and_role")}
+              selected={currentFieldGroup === "certification_and_role"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">
+                  Certification & Role
+                </Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("school_history")}
+              selected={currentFieldGroup === "school_history"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">School History</Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("board_history")}
+              selected={currentFieldGroup === "board_history"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">Board History</Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+        </List>
+      }
+    >
+      <Grid container sx={{ borderTop: "1px solid #f1f1f1" }}>
+        <Grid item flex={1}>
+          {renderFieldGroup()}
+        </Grid>
+      </Grid>
     </Modal>
+  );
+};
+
+const GeneralFields = ({}) => {
+  const [profilePicture, setProfilePicture] = useState();
+  const [profileImage, setProfileImage] = useState();
+  const [showError, setShowError] = useState();
+  const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
+  const handleFileError = (error) => {
+    setShowError(error);
+  };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm();
+  return (
+    <Card size="small" noRadius noBorder>
+      <Stack spacing={3}>
+        <Controller
+          name="firstName"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="First name"
+              placeholder="e.g. Jane"
+              error={errors.firstName}
+              helperText={
+                errors &&
+                errors.firstName &&
+                errors.firstName.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="lastName"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="Last name"
+              placeholder="e.g. Smith"
+              error={errors.lastName}
+              helperText={
+                errors &&
+                errors.lastName &&
+                errors.lastName.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="city"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="City"
+              placeholder="e.g. Boston"
+              error={errors.city}
+              helperText={
+                errors &&
+                errors.city &&
+                errors.city.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="state"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <Select
+              label="State"
+              placeholder="e.g. Massachusetts"
+              options={unitedStatesOptions}
+              error={errors.state}
+              helperText={
+                errors &&
+                errors.state &&
+                errors.state.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="Email"
+              placeholder="e.g. jane.smith@gmail.com"
+              error={errors.email}
+              helperText={
+                errors &&
+                errors.email &&
+                errors.email.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="phone"
+          control={control}
+          rules={{ required: false }}
+          render={({ field }) => (
+            <TextField
+              label="Phone"
+              placeholder="e.g. (123) 456 7890"
+              error={errors.phone}
+              helperText={
+                errors &&
+                errors.phone &&
+                errors.phone.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="about"
+          control={control}
+          rules={{ required: false }}
+          render={({ field }) => (
+            <TextField
+              label="About"
+              placeholder="e.g. Your bio"
+              multiline={true}
+              rows={4}
+              error={errors.about}
+              helperText={
+                errors &&
+                errors.about &&
+                errors.about.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+
+        {showError ? (
+          <Grid container>
+            <Grid item xs={12}>
+              <Alert severity="error">
+                <Stack>
+                  {showError.main}
+                  <Typography variant="bodySmall" error>
+                    {showError.sub}
+                  </Typography>
+                </Stack>
+              </Alert>
+            </Grid>
+          </Grid>
+        ) : null}
+        <Typography variant="bodyRegular">Add a new profile image</Typography>
+        <Grid container justifyContent="center">
+          <Grid item xs={12} sm={8} md={6}>
+            <StyledFilePond
+              files={profilePicture}
+              allowReorder={false}
+              allowMultiple={false}
+              maxFileSize="5MB"
+              acceptedFileTypes={["image/*"]}
+              onupdatefiles={setProfilePicture}
+              onaddfilestart={() => setIsUpdatingPicture(true)}
+              onprocessfiles={() => setIsUpdatingPicture(false)}
+              stylePanelAspectRatio="1:1"
+              onerror={handleFileError}
+              stylePanelLayout="circle"
+              server={{
+                process: (
+                  fieldName,
+                  file,
+                  metadata,
+                  load,
+                  error,
+                  progress,
+                  abort,
+                  transfer,
+                  options
+                ) => {
+                  // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
+                  FileChecksum.create(file, (checksum_error, checksum) => {
+                    if (checksum_error) {
+                      console.error(checksum_error);
+                      error();
+                    }
+                    axios
+                      .post(
+                        `${process.env.API_URL}/rails/active_storage/direct_uploads`,
+                        {
+                          blob: {
+                            filename: file.name,
+                            content_type: file.type,
+                            byte_size: file.size,
+                            checksum: checksum,
+                          },
+                        }
+                      )
+                      .then((response) => {
+                        if (!response.data) {
+                          return error;
+                        }
+                        const signed_id = response.data.signed_id;
+                        axios
+                          .put(response.data.direct_upload.url, file, {
+                            headers: response.data.direct_upload.headers,
+                            onUploadProgress: (progressEvent) => {
+                              progress(
+                                progressEvent.lengthComputable,
+                                progressEvent.loaded,
+                                progressEvent.total
+                              );
+                            },
+                            // need to remove default Authorization header when sending to s3
+                            transformRequest: (data, headers) => {
+                              if (process.env !== "local") {
+                                delete headers.common["Authorization"];
+                              }
+                              return data;
+                            },
+                          })
+                          .then((response) => {
+                            setProfileImage(signed_id);
+                            load(signed_id);
+                          })
+                          .catch((error) => {
+                            if (!axios.isCancel(error)) {
+                              console.error(error);
+                              // error();
+                            }
+                          });
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        console.error(error);
+                      });
+                  });
+                  return {
+                    abort: () => {
+                      // This function is entered if the user has tapped the cancel button
+                      // request.abort(); TODO: is there an active storage abort?
+
+                      // Let FilePond know the request has been cancelled
+                      abort();
+                    },
+                  };
+                },
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+                ondata: (formData) => {
+                  formData.append("blob", value);
+                  return formData;
+                },
+                onload: () => {
+                  props.onUploadComplete();
+                },
+              }}
+              credits={false}
+              labelIdle='Drag & Drop your profile picture or <span class="filepond--label-action">Browse</span>'
+            />
+          </Grid>
+        </Grid>
+      </Stack>
+    </Card>
+  );
+};
+const DemographicFields = ({}) => {
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm();
+  const watchFields = watch();
+  const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
+    "A not-listed or more specific ethnicity"
+  );
+  const showCustomLanguageField = watchFields.primaryLanguage === "other";
+  const showCustomGenderField =
+    watchFields.gender === "A not-listed or more specific gender identity";
+  const showCustomPronounsField =
+    watchFields.pronouns === "Not-listed or more specific pronouns";
+  return (
+    <Card size="small" noRadius noBorder>
+      <Stack spacing={3}>
+        <Controller
+          name="primaryLanguage"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label="What is your primary language?"
+              placeholder="Select a language..."
+              options={languageOptions}
+              error={errors.primaryLanguage}
+              helperText={
+                errors &&
+                errors.primaryLanguage &&
+                errors.primaryLanguage.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        {showCustomLanguageField ? (
+          <Controller
+            name="primaryLanguageOther"
+            control={control}
+            rules={{
+              required: false,
+            }}
+            render={({ field }) => (
+              <TextField
+                label="Other language"
+                placeholder="e.g. Your language"
+                error={errors.primaryLanguageOther}
+                helperText={
+                  errors &&
+                  errors.primaryLanguageOther &&
+                  errors.primaryLanguageOther.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+        ) : null}
+        <Controller
+          name="raceEthnicity"
+          control={control}
+          render={({ field }) => (
+            <MultiSelect
+              withCheckbox
+              label="What is your ethnicity?"
+              placeholder="Select as many as you like..."
+              options={ethnicityOptions}
+              error={errors.raceEthnicity}
+              defaultValue={[]}
+              helperText={
+                errors &&
+                errors.raceEthnicity &&
+                errors.raceEthnicity.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        {showCustomEthnicityField ? (
+          <Controller
+            name="raceEthnicityOther"
+            control={control}
+            rules={{
+              required: false,
+            }}
+            render={({ field }) => (
+              <TextField
+                label="Other ethnicity"
+                placeholder="e.g. Your ethnicity"
+                error={errors.raceEthnicityOther}
+                helperText={
+                  errors &&
+                  errors.raceEthnicityOther &&
+                  errors.raceEthnicityOther.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+        ) : null}
+        <Stack spacing={1}>
+          <Typography variant="bodyRegular">
+            Do you identify as a member of the LGBTQIA community?
+          </Typography>
+          <Controller
+            name="lgbtqia"
+            control={control}
+            rules={{ required: false }}
+            render={({ field: { onChange, value } }) => (
+              <RadioGroup value={value}>
+                {lgbtqiaOptions?.map((o, i) => (
+                  <FormControlLabel
+                    key={i}
+                    value={o.value}
+                    control={<Radio />}
+                    label={o.label}
+                    onChange={onChange}
+                  />
+                ))}
+              </RadioGroup>
+            )}
+          />
+          <FormHelperText error={errors.lgbtqia}>
+            {errors &&
+              errors.lgbtqia &&
+              errors.lgbtqia.type === "required" &&
+              "This field is required"}
+          </FormHelperText>
+        </Stack>
+        <Controller
+          name="gender"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label="What is your gender identity?"
+              placeholder="Select one..."
+              options={genderOptions}
+              error={errors.gender}
+              helperText={
+                errors &&
+                errors.gender &&
+                errors.gender.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        {showCustomGenderField ? (
+          <Controller
+            name="genderOther"
+            control={control}
+            rules={{
+              required: false,
+            }}
+            render={({ field }) => (
+              <TextField
+                label="Other gender"
+                placeholder="e.g. Your gender"
+                error={errors.genderOther}
+                helperText={
+                  errors &&
+                  errors.genderOther &&
+                  errors.genderOther.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+        ) : null}
+        <Controller
+          name="pronouns"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label="What are your pronouns?"
+              placeholder="Select one..."
+              options={pronounsOptions}
+              error={errors.pronouns}
+              helperText={
+                errors &&
+                errors.pronouns &&
+                errors.pronouns.type === "required" &&
+                "This field is required"
+              }
+              value={field.value}
+              {...field}
+            />
+          )}
+        />
+        {showCustomPronounsField ? (
+          <Controller
+            name="pronounsOther"
+            control={control}
+            rules={{
+              required: false,
+            }}
+            render={({ field }) => (
+              <TextField
+                label="Other pronouns"
+                placeholder="e.g. Your pronouns"
+                error={errors.pronounsOther}
+                helperText={
+                  errors &&
+                  errors.pronounsOther &&
+                  errors.pronounsOther.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+        ) : null}
+        <Stack spacing={1}>
+          <Typography variant="bodyRegular">
+            How would you describe the economic situation in your household
+            while you were growing up?
+          </Typography>
+          <Typography variant="bodyRegular" lightened>
+            As a reference point, today a family of four with a family income of
+            $47,638/year is the limit to receive subsidies.
+          </Typography>
+          <Typography variant="bodySmall" lightened>
+            NOTE: This answer will not appear publicly or on your profile in the
+            Wildflower network.
+          </Typography>
+          <Controller
+            name="householdIncome"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <RadioGroup value={value}>
+                {incomeOptions?.map((o, i) => (
+                  <FormControlLabel
+                    key={i}
+                    value={o.value}
+                    control={<Radio />}
+                    label={o.label}
+                    onChange={onChange}
+                  />
+                ))}
+              </RadioGroup>
+            )}
+          />
+          <FormHelperText error={errors.householdIncome}>
+            {errors &&
+              errors.householdIncome &&
+              errors.householdIncome.type === "required" &&
+              "This field is required"}
+          </FormHelperText>
+        </Stack>
+      </Stack>
+    </Card>
+  );
+};
+const CertificationAndRoleFields = ({}) => {
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm();
+  const watchFields = watch();
+  const isCertifiedOrSeeking =
+    watchFields.montessoriCertified === "Yes" ||
+    watchFields.montessoriCertified === "Currently Seeking Certification";
+  return (
+    <Card size="small" noRadius noBorder>
+      <Stack spacing={3}>
+        <Stack spacing={1}>
+          <Typography variant="bodyRegular">
+            Are you Montessori Certified?
+          </Typography>
+          <Controller
+            name="montessoriCertified"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <RadioGroup value={value}>
+                {montessoriCertificationOptions?.map((o, i) => (
+                  <FormControlLabel
+                    key={i}
+                    value={o.value}
+                    control={<Radio />}
+                    label={o.label}
+                    onChange={onChange}
+                  />
+                ))}
+              </RadioGroup>
+            )}
+          />
+          <FormHelperText error={errors.montessoriCertified}>
+            {errors &&
+              errors.montessoriCertified &&
+              errors.montessoriCertified.type === "required" &&
+              "This field is required"}
+          </FormHelperText>
+        </Stack>
+        {isCertifiedOrSeeking ? (
+          <Controller
+            name="montessoriCertifiedLevels"
+            control={control}
+            rules={{ required: isCertifiedOrSeeking ? true : false }}
+            render={({ field }) => (
+              <MultiSelect
+                withCheckbox
+                label="What Levels are you certified (or seeking certification) for?"
+                placeholder="Select as many as you like..."
+                options={levelsOfMontessoriCertification}
+                error={errors.montessoriCertifiedLevels}
+                defaultValue={[]}
+                helperText={
+                  errors &&
+                  errors.montessoriCertifiedLevels &&
+                  errors.montessoriCertifiedLevels.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+        ) : null}
+        <Controller
+          name="role"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <MultiSelect
+              withCheckbox
+              label="What is your role at Wildflower Schools?"
+              placeholder="Select all roles you hold..."
+              options={roleOptions}
+              error={errors.role}
+              defaultValue={[]}
+              helperText={
+                errors &&
+                errors.role &&
+                errors.role.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+      </Stack>
+    </Card>
+  );
+};
+const SchoolHistoryFields = ({}) => {
+  return (
+    <div>
+      <div>School History</div>
+    </div>
+  );
+};
+const BoardHistoryFields = ({}) => {
+  return (
+    <div>
+      <div>Board History</div>
+    </div>
   );
 };
