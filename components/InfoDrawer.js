@@ -19,6 +19,7 @@ import WorktimeChip from "./WorktimeChip";
 import CategoryChip from "./CategoryChip";
 import StatusChip from "./StatusChip";
 import Resource from "./Resource";
+import AssigneeRoster from "@components/AssigneeRoster";
 import { useUserContext } from "@lib/useUserContext";
 
 const CustomDrawer = styled(Drawer)`
@@ -67,6 +68,9 @@ const InfoDrawer = ({
   isDecision,
   isComplete,
   worktime,
+  handleAssignUser,
+  handleUnassignUser,
+  assignableUsers,
 }) => {
   const { currentUser, isOperationsGuide } = useUserContext();
 
@@ -129,12 +133,18 @@ const InfoDrawer = ({
               {title}
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={4}>
-              {taskId &&
-                (assignees.length ? (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      ASSIGNEE
-                    </Typography>
+              {taskId && (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    ASSIGNEE
+                  </Typography>
+                  <AssigneeRoster
+                    handleAssignUser={handleAssignUser}
+                    handleUnassignUser={handleUnassignUser}
+                    assignableUsers={assignableUsers}
+                    assignees={assignees}
+                  />
+                  {/* {assignees.length ? (
                     <Stack spacing={2} direction="row">
                       {assignees.map((assignee, i) => (
                         <AvatarWrapper
@@ -153,8 +163,18 @@ const InfoDrawer = ({
                         />
                       ))}
                     </Stack>
-                  </Stack>
-                ) : null)}
+                  ) : (
+                    <AssigneeRoster
+                      handleAssignUser={handleAssignUser}
+                      handleUnassignUser={handleUnassignUser}
+                      assignableUsers={assignableUsers}
+                      assignees={assignees}
+                    />
+                    // TODO: show a the assignable users in a popover here
+                    // <Icon type="userCircle" variant="lightened" />
+                  )} */}
+                </Stack>
+              )}
               {status && (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
@@ -163,7 +183,7 @@ const InfoDrawer = ({
                   <StatusChip status={status} size="small" withIcon />
                 </Stack>
               )}
-              {categories && (
+              {categories?.length ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     CATEGORY
@@ -179,7 +199,7 @@ const InfoDrawer = ({
                     ))}
                   </Stack>
                 </Stack>
-              )}
+              ) : null}
               {worktime ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>

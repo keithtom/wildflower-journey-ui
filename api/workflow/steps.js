@@ -138,7 +138,7 @@ async function unassign(taskId, assignee_id) {
   try {
     response = await workflowsApi.put(
       `/steps/${taskId}/unassign`,
-      { person_id: assignee_id },
+      { assignee_id: assignee_id },
       config
     );
   } catch (error) {

@@ -34,7 +34,7 @@ const ToDoList = ({}) => {
 
   const { currentUser, isOperationsGuide } = useUserContext();
   const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
-    current_user: currentUser && isOperationsGuide ? null : true,
+    current_user: isOperationsGuide ? null : true,
   });
   const { milestonesToDo, isLoadingMilestonesToDo } = useMilestones(workflow, {
     phase,

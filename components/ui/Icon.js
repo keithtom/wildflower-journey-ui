@@ -59,6 +59,7 @@ import {
   Map,
   CalendarAlt,
   Group,
+  UserCircle,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -237,6 +238,7 @@ export default function Icon({ ...props }) {
     listUl: <ListUl />,
     homeHeart: <HomeHeart />,
     calendarStar: <CalendarStar />,
+    userCircle: <UserCircle />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

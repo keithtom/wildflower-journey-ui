@@ -121,7 +121,36 @@ const OpenSchoolToDoList = ({}) => {
               )}
             </List>
           </Card>
-        ) : null}
+        ) : (
+          <Card>
+            <Grid container spacing={6}>
+              <Grid item>
+                <Stack spacing={6}>
+                  <Icon type="calendarCheck" variant="primary" />
+                  <Typography variant="h3" bold>
+                    Looks like you don't have any tasks on your to do list!
+                  </Typography>
+                  <Typography variant="bodyLarge" lightened>
+                    Get started managing your school by using the Open School
+                    Checklist.
+                  </Typography>
+                  <div>
+                    <Button
+                      variant="primary"
+                      onClick={() =>
+                        router.push(`/open-school/${workflow}/checklist`)
+                      }
+                    >
+                      <Typography variant="bodyRegular" bold light>
+                        Get started
+                      </Typography>
+                    </Button>
+                  </div>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Card>
+        )}
       </Stack>
     </PageContainer>
   );

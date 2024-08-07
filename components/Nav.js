@@ -255,8 +255,10 @@ const Navigation = () => {
 const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   const router = useRouter();
   const { workflow } = router.query;
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
-  // console.log(assignedSteps);
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
+    current_user: true,
+  });
+
   return (
     <Box>
       <NavLink
