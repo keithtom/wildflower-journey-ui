@@ -20,6 +20,7 @@ import {
   Icon,
   Snackbar,
   Chip,
+  Divider,
 } from "./ui/index";
 import Header from "./Header";
 import useAssignedSteps from "@hooks/useAssignedSteps";
@@ -113,11 +114,12 @@ const Navigation = () => {
   }, []);
 
   const isTeacherLeader =
-    currentUser?.personRoleList?.join() === ["Teacher Leader"].join() &&
+    currentUser?.personRoleList?.some((role) => role === "Teacher Leader") &&
     !currentUser?.personRoleList?.includes("Emerging Teacher Leader");
   // console.log({ ogViewingSchool });
   // console.log({ isTeacherLeader });
   // console.log({ currentUser });
+  // console.log({ workflow });
 
   return currentUser ? (
     <Box>
@@ -187,14 +189,17 @@ const Navigation = () => {
             <NavLink
               variant="primary"
               to="/open-school"
-              active={router.asPath === `/open-school`}
-              label="Your School Dashboard" //TODO: Make actual school name
+              active={router.asPath === `/open-school/${workflow}`}
+              label={currentUser?.attributes.schools[0].name}
               icon="home"
             />
           ) : null}
 
           {router.pathname.includes("/open-school") ? (
-            <OpenSchoolNavigation />
+            <OpenSchoolNavigation
+              openSchoolWorkflowId={workflow}
+              currentUserId={currentUser?.id}
+            />
           ) : null}
 
           {!isOperationsGuide && currentUser?.attributes?.ssj ? (
@@ -250,14 +255,19 @@ const Navigation = () => {
 const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   const router = useRouter();
   const { workflow } = router.query;
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
-  // console.log(assignedSteps);
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
+    current_user: true,
+  });
+
   return (
     <Box>
       <NavLink
         variant="secondary"
         to={`/ssj/${SSJworkflowId}/to-do-list`}
-        active={router.pathname.includes("/to-do-list")}
+        active={
+          router.pathname.startsWith("/ssj/") &&
+          router.pathname.includes("/to-do-list")
+        }
         label="To do list"
         icon="calendarCheck"
         secondaryAction={
@@ -307,54 +317,97 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   );
 };
 
-const OpenSchoolNavigation = () => {
+const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
   const router = useRouter();
+  const { workflow } = router.query;
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
+
+  const assignedToMe = assignedSteps?.filter(
+    (step) => step.relationships.assignees.data[0].id === currentUserId
+  );
+
   return (
     <Box>
       <NavLink
         variant="secondary"
-        to={`/open-school/admin-checklist`}
-        active={router.pathname.includes("/open-school/admin-checklist")}
-        label="Admin Checklist"
-        secondaryAction={
-          <Chip size="small" label="Q1 2024" variant="lightened" />
+        to={`/open-school/${openSchoolWorkflowId}/to-do-list`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/to-do-list")
         }
-        icon="loader"
+        label="To do list"
+        icon="calendarCheck"
+        secondaryAction={
+          isLoading ? null : !assignedToMe.length ? null : (
+            <Chip size="small" label={assignedToMe.length} variant="primary" />
+          )
+        }
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/enrollment-and-communications`}
-        active={router.pathname.includes(
-          "/open-school/enrollment-and-communications"
-        )}
+        to={`/open-school/${openSchoolWorkflowId}/checklist`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/checklist")
+        }
+        label="Checklist"
+        icon="layer"
+        secondaryAction={
+          <Chip
+            size="small"
+            label="New"
+            variant="lightened"
+            sx={{ pointerEvents: "none" }}
+          />
+        }
+      />
+      <NavLink
+        variant="secondary"
+        to={`/open-school/${openSchoolWorkflowId}/enrollment-and-communications`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/enrollment-and-communications")
+        }
         label="Enrollment & Family Comms"
         icon="loader"
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/finance-and-operations`}
-        active={router.pathname.includes("/open-school/finance-and-operations")}
+        to={`/open-school/${openSchoolWorkflowId}/finance-and-operations`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/finance-and-operations")
+        }
         label="Finance & Operations"
         icon="loader"
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/my-board`}
-        active={router.pathname.includes("/open-school/my-board")}
+        to={`/open-school/${openSchoolWorkflowId}/my-board`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/my-board")
+        }
         label="My Board"
         icon="loader"
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/resources`}
-        active={router.pathname.includes("/open-school/resources")}
+        to={`/open-school/${openSchoolWorkflowId}/resources`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/resources")
+        }
         label="Resources"
         icon="loader"
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/support`}
-        active={router.pathname.includes("/open-school/support")}
+        to={`/open-school/${openSchoolWorkflowId}/support`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/support")
+        }
         label="Support@"
         icon="loader"
       />
