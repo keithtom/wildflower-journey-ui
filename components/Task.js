@@ -78,7 +78,8 @@ const Task = ({
   let assignableUsers;
   // Fetch the current user's data
   const { data: person, isLoading: personIsLoading } = usePerson(
-    currentUser?.id
+    currentUser?.id,
+    { network: true }
   );
   // console.log({ person });
   // console.log({ currentUser });
@@ -89,16 +90,22 @@ const Task = ({
     // If the current route starts with '/open-school', fetch the school's data and use it to set assignableUsers
     const { data: school, isLoading: schoolIsLoading } =
       useSchool(userSchoolId);
-    assignableUsers = school?.included.filter((item) => item.type === "person");
+    if (!schoolIsLoading) {
+      assignableUsers = school?.included.filter(
+        (item) => item.type === "person"
+      );
+    }
   } else if (router.pathname.startsWith("/ssj/")) {
     // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
     const teamId = currentUser?.attributes?.ssj?.teamId;
     const { team, isLoading: teamIsLoading } = useTeam(teamId);
     // add together partners and currentUser to form assignableUsers
-    assignableUsers = [
-      currentUser,
-      ...(team?.data?.data?.relationships?.partners?.data || []),
-    ];
+    if (!teamIsLoading) {
+      assignableUsers = [
+        currentUser,
+        ...(team?.data?.data?.relationships?.partners?.data || []),
+      ];
+    }
   }
 
   // Common interface that all invokations of Task should use.
@@ -132,7 +139,8 @@ const Task = ({
   );
 
   const [taskIsComplete, setTaskIsComplete] = useState(
-    task.attributes.isComplete
+    // task.attributes.isComplete
+    task.relationships.completers.data.length > 0
   );
   const [canCompleteTask, setCanCompleteTask] = useState(
     task.attributes.canComplete
@@ -322,6 +330,7 @@ const Task = ({
                 handleUnassignUser={handleUnassignUser}
                 assignableUsers={assignableUsers}
                 assignees={taskAssignees}
+                completers={taskCompleters}
               />
             ) : null}
             {/* {taskAssignees &&
@@ -611,6 +620,7 @@ const DecisionDrawerActions = ({
 };
 
 const TaskDrawerActions = ({
+  taskIsAssigned,
   taskIsAssignedToMe,
   taskIsComplete,
   canAssignTask,
@@ -629,26 +639,213 @@ const TaskDrawerActions = ({
 
   return (
     <Grid container spacing={4}>
-      {taskIsAssignedToMe ? (
-        taskIsComplete ? (
-          <>
+      {taskIsComplete ? (
+        // the task is complete by someone
+        taskIsAssignedToMe ? (
+          canCompleteTask ? (
+            // the task is complete, assigned to me, and I can still complete it
+            <>
+              <Grid item xs={6}>
+                <Button
+                  full
+                  variant="danger"
+                  onClick={() => handleUnassignUser(currentUser?.id)}
+                >
+                  <Typography variant="bodyRegular" bold>
+                    Remove from to do list
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item xs={6}>
+                <Button full onClick={handleCompleteTask}>
+                  <Typography variant="bodyRegular" light bold>
+                    Mark task complete
+                  </Typography>
+                </Button>
+              </Grid>
+            </>
+          ) : canUncompleteTask ? (
+            // the task is complete, assigned to me, I can't complete it, and I can uncomplete it
             <Grid item xs={12}>
+              <Button full variant="danger" onClick={handleUncompleteTask}>
+                <Typography bold>Mark incomplete</Typography>
+              </Button>
+            </Grid>
+          ) : (
+            // the task is complete, assigned to me, I can't complete it, and I can't uncomplete it
+            // TODO: in this scenario, the task should be unassigned from the person that can't complete it
+            <Grid item xs={12}>
+              <Button full variant="danger" disabled>
+                <Typography bold>
+                  {`Completed by ${
+                    completedBy && completedBy.attributes.firstName
+                  } ${completedBy && completedBy.attributes.lastName}`}
+                </Typography>
+              </Button>
+            </Grid>
+          )
+        ) : // the task is complete, not assigned to me
+        canAssignTask ? (
+          // the task is complete, not assigned to me, and I can assign it
+          canCompleteTask ? (
+            <>
+              <Grid item xs={6}>
+                <Button
+                  variant="lightened"
+                  full
+                  disabled={!canAssignTask}
+                  onClick={() => handleAssignUser(currentUser?.id)}
+                >
+                  <Typography bold variant="bodyRegular">
+                    Add to my to do list
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item xs={6}>
+                <Button
+                  full
+                  disabled={!canAssignTask}
+                  onClick={handleCompleteTask}
+                >
+                  <Typography light bold variant="bodyRegular">
+                    Mark task complete
+                  </Typography>
+                </Button>
+              </Grid>
+            </>
+          ) : (
+            <div>?</div>
+          )
+        ) : (
+          // the task is complete, not assigned to me, but I can't assign it
+          <div>?</div>
+        )
+      ) : // the task is not complete
+      taskIsAssigned ? (
+        // the task is not complete, and is assigned to someone
+        taskIsAssignedToMe ? (
+          // the task is not complete, and it is assigned to me
+          canUnassignTask ? (
+            // the task is not complete, and it is assigned to me, and I can unassign it
+            <>
+              <Grid item xs={6}>
+                <Button
+                  full
+                  variant="danger"
+                  onClick={() => handleUnassignUser(currentUser?.id)}
+                >
+                  <Typography variant="bodyRegular" bold>
+                    Remove from to do list
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item xs={6}>
+                <Button full onClick={handleCompleteTask}>
+                  <Typography variant="bodyRegular" light bold>
+                    Mark task complete
+                  </Typography>
+                </Button>
+              </Grid>
+            </>
+          ) : (
+            // the task is not complete, and it is assigned to me, and I can't unassign it
+            <div>?</div>
+          )
+        ) : (
+          // the task is not complete, and it isn't assigned to me
+          <>
+            <Grid item xs={6}>
+              <Button
+                variant="lightened"
+                full
+                disabled={!canAssignTask}
+                onClick={() => handleAssignUser(currentUser?.id)}
+              >
+                <Typography bold variant="bodyRegular">
+                  Add to my to do list
+                </Typography>
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
               <Button
                 full
-                variant="danger"
-                disabled={!canUncompleteTask}
-                onClick={handleUncompleteTask}
+                disabled={!canAssignTask}
+                onClick={handleCompleteTask}
               >
-                <Typography bold>
-                  {canUncompleteTask
-                    ? "Mark incomplete"
-                    : `Completed by ${
-                        completedBy && completedBy.attributes.firstName
-                      } ${completedBy && completedBy.attributes.lastName}`}
+                <Typography light bold variant="bodyRegular">
+                  Mark task complete
                 </Typography>
               </Button>
             </Grid>
           </>
+        )
+      ) : // the task is not complete, and isn't assigned to anyone
+      canAssignTask ? (
+        // the task is not complete, and isn't assigned to anyone, and I can assign it
+        <>
+          <Grid item xs={6}>
+            <Button
+              variant="lightened"
+              full
+              onClick={() => handleAssignUser(currentUser?.id)}
+            >
+              <Typography bold variant="bodyRegular">
+                Add to my to do list
+              </Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={6}>
+            <Button full onClick={handleCompleteTask}>
+              <Typography light bold variant="bodyRegular">
+                Mark task complete
+              </Typography>
+            </Button>
+          </Grid>
+        </>
+      ) : (
+        // the task is not complete, and isn't assigned to anyone, and I can't assign it
+        <>
+          <Grid item xs={6}>
+            <Button
+              variant="lightened"
+              full
+              disabled
+              onClick={() => handleAssignUser(currentUser?.id)}
+            >
+              <Typography bold variant="bodyRegular">
+                Add to my to do list
+              </Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={6}>
+            <Button full disabled onClick={handleCompleteTask}>
+              <Typography light bold variant="bodyRegular">
+                Mark task complete
+              </Typography>
+            </Button>
+          </Grid>
+        </>
+      )}
+      {/* {taskIsAssignedToMe ? (
+        taskIsComplete ? (
+          canUncompleteTask ? (
+            <Grid item xs={12}>
+              <Button full variant="danger" onClick={handleUncompleteTask}>
+                <Typography bold>Mark incomplete</Typography>
+              </Button>
+            </Grid>
+          ) : (
+            // cannot uncomplete task
+            <Grid item xs={12}>
+              <Button full variant="danger" disabled>
+                <Typography bold>
+                  {`Completed by ${
+                    completedBy && completedBy.attributes.firstName
+                  } ${completedBy && completedBy.attributes.lastName}`}
+                </Typography>
+              </Button>
+            </Grid>
+          )
         ) : (
           <>
             <Grid item xs={6}>
@@ -714,7 +911,7 @@ const TaskDrawerActions = ({
             </Grid>
           )}
         </Grid>
-      )}
+      )} */}
     </Grid>
   );
 };

@@ -24,6 +24,7 @@ const StyledAssigneeRoster = styled(Popover)`
 
 const AssigneeRoster = ({
   assignees,
+  completers,
   assignableUsers,
   handleAssignUser,
   handleUnassignUser,
@@ -55,35 +56,40 @@ const AssigneeRoster = ({
     assignees.forEach((assignee) => handleUnassignUser(assignee.id));
   };
 
-  const isComplete = assignees.some(
-    (assignee) => assignee?.attributes?.completedAt
-  );
+  const isComplete = completers.length;
 
-  // console.log({ assignees });
-  console.log({ assignableUsers });
+  console.log({ completers });
+  console.log({ assignees });
+  // console.log({ assignableUsers });
 
   return (
     <>
       <Box onClick={handleClick} sx={{ cursor: "pointer" }}>
-        {assignees.length ? (
+        {assignees?.length ? (
           <Stack direction="row" spacing={1} aria-describedby={id}>
-            {assignees.map((assignee) => (
-              <AvatarWrapper
-                key={assignee.id}
-                src={assignee?.attributes?.imageUrl}
-                badgeContent={
-                  assignee?.attributes?.completedAt && (
-                    <Icon
-                      className="checkCircleAssignee"
-                      type="checkCircle"
-                      size="small"
-                      variant="primary"
-                      filled
-                    />
-                  )
-                }
-              />
-            ))}
+            {assignees
+              .sort((a, b) =>
+                a.attributes.lastName.localeCompare(b.attributes.lastName)
+              )
+              .map((assignee) => (
+                <AvatarWrapper
+                  key={assignee.id}
+                  src={assignee?.attributes?.imageUrl}
+                  badgeContent={
+                    completers.some(
+                      (completer) => completer.id === assignee.id
+                    ) && (
+                      <Icon
+                        className="checkCircleAssignee"
+                        type="checkCircle"
+                        size="small"
+                        variant="primary"
+                        filled
+                      />
+                    )
+                  }
+                />
+              ))}
           </Stack>
         ) : (
           <Icon type="userCircle" variant="lightened" aria-describedby={id} />
@@ -111,62 +117,60 @@ const AssigneeRoster = ({
               </Typography>
             </ListItemText>
           </ListItem>
-          {assignableUsers.map((user, i) => (
-            <ListItem
-              disablePadding
-              key={i}
-              secondaryAction={
-                assignees.some((assignee) => assignee.id === user.id) ? (
-                  <Icon
-                    type="check"
-                    variant={
-                      assignees.some((assignee) =>
-                        assignee.id === user.id
-                          ? assignee?.attributes?.completedAt
-                          : null
-                      ) && "lightened"
-                    }
-                  />
-                ) : null
-              }
-            >
-              <ListItemText>
-                <ListItemButton
-                  onClick={() => handleToggleAssignment(user.id)}
-                  disabled={assignees.some((assignee) =>
-                    assignee.id === user.id
-                      ? assignee?.attributes?.completedAt
-                      : null
-                  )}
-                >
-                  <Stack direction="row" spacing={3} alignItems="center ">
-                    <AvatarWrapper
-                      key={user.id}
-                      src={user?.attributes?.imageUrl}
-                      badgeContent={
-                        assignees.some((assignee) =>
-                          assignee.id === user.id
-                            ? assignee?.attributes?.completedAt
-                            : null
-                        ) && (
-                          <Icon
-                            className="checkCircleAssignee"
-                            type="checkCircle"
-                            size="small"
-                            variant="primary"
-                            filled
-                          />
-                        )
+          {assignableUsers
+            .sort((a, b) =>
+              a.attributes.lastName.localeCompare(b.attributes.lastName)
+            )
+            .map((user, i) => (
+              <ListItem
+                disablePadding
+                key={i}
+                secondaryAction={
+                  assignees.some((assignee) => assignee.id === user.id) ? (
+                    <Icon
+                      type="check"
+                      variant={
+                        completers.some(
+                          (completer) => completer.id === user.id
+                        ) && "lightened"
                       }
                     />
-                    <Typography variant="bodyRegular">
-                      {user.attributes.firstName} {user.attributes.lastName}
-                    </Typography>
-                  </Stack>
-                </ListItemButton>
-              </ListItemText>
-            </ListItem>
-          ))}
+                  ) : null
+                }
+              >
+                <ListItemText>
+                  <ListItemButton
+                    onClick={() => handleToggleAssignment(user.id)}
+                    disabled={completers.some(
+                      (completer) => completer.id === user.id
+                    )}
+                  >
+                    <Stack direction="row" spacing={3} alignItems="center ">
+                      <AvatarWrapper
+                        key={user.id}
+                        src={user?.attributes?.imageUrl}
+                        badgeContent={
+                          completers.some(
+                            (completer) => completer.id === user.id
+                          ) && (
+                            <Icon
+                              className="checkCircleAssignee"
+                              type="checkCircle"
+                              size="small"
+                              variant="primary"
+                              filled
+                            />
+                          )
+                        }
+                      />
+                      <Typography variant="bodyRegular">
+                        {user.attributes.firstName} {user.attributes.lastName}
+                      </Typography>
+                    </Stack>
+                  </ListItemButton>
+                </ListItemText>
+              </ListItem>
+            ))}
           <ListItem disablePadding>
             <ListItemText>
               <ListItemButton onClick={handleUnassignAll} disabled={isComplete}>

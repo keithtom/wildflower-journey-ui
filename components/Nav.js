@@ -320,11 +320,16 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
 const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
   const router = useRouter();
   const { workflow } = router.query;
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
+    current_user: true,
+  });
 
   const assignedToMe = assignedSteps?.filter(
     (step) => step.relationships.assignees.data[0].id === currentUserId
   );
+
+  const thisMonth = new Date().getMonth();
+  const thisYear = new Date().getFullYear();
 
   return (
     <Box>
@@ -345,7 +350,7 @@ const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/${openSchoolWorkflowId}/checklist`}
+        to={`/open-school/${openSchoolWorkflowId}/checklist/${thisYear}/${thisMonth}`}
         active={
           router.pathname.startsWith("/open-school/") &&
           router.pathname.includes("/checklist")
