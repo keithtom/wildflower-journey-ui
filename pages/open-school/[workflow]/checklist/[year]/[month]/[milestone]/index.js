@@ -29,7 +29,7 @@ import useMilestone from "@hooks/useMilestone";
 
 const OpenSchoolMilestonePage = ({}) => {
   const router = useRouter();
-  const { workflow, milestone: milestoneQuery } = router.query;
+  const { workflow, milestone: milestoneQuery, year, month } = router.query;
 
   const { milestone, isLoading } = useMilestone(milestoneQuery);
 
@@ -53,7 +53,9 @@ const OpenSchoolMilestonePage = ({}) => {
         <Grid container>
           <Grid item>
             <Stack direction="row" spacing={2} alignItems="center">
-              <Link href={`/open-school/${workflow}/checklist`}>
+              <Link
+                href={`/open-school/${workflow}/checklist/${year}/${month}`}
+              >
                 <IconButton>
                   <Icon type="chevronLeft" />
                 </IconButton>

@@ -328,6 +328,9 @@ const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
     (step) => step.relationships.assignees.data[0].id === currentUserId
   );
 
+  const thisMonth = new Date().getMonth();
+  const thisYear = new Date().getFullYear();
+
   return (
     <Box>
       <NavLink
@@ -347,7 +350,7 @@ const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
       />
       <NavLink
         variant="secondary"
-        to={`/open-school/${openSchoolWorkflowId}/checklist`}
+        to={`/open-school/${openSchoolWorkflowId}/checklist/${thisYear}/${thisMonth}`}
         active={
           router.pathname.startsWith("/open-school/") &&
           router.pathname.includes("/checklist")

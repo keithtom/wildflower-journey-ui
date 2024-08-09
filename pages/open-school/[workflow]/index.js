@@ -44,6 +44,9 @@ const OpenSchool = () => {
   );
   const school = userSchool[0];
 
+  const thisMonth = new Date().getMonth();
+  const thisYear = new Date().getFullYear();
+
   // console.log({ included });
   // useAuth("/login");
   // console.log({ userSchool });
@@ -89,7 +92,9 @@ const OpenSchool = () => {
           </Card>
         </Grid>
         <Grid item xs={12}>
-          <Link href={`/open-school/${workflow}/checklist`}>
+          <Link
+            href={`/open-school/${workflow}/checklist/${thisYear}/${thisMonth}`}
+          >
             <Card elevated size="large" sx={{ overflow: "hidden" }}>
               <Grid container spacing={16}>
                 <Grid item xs={12} sm={6}>
@@ -119,13 +124,12 @@ const OpenSchool = () => {
                     <Stack>
                       <Grid>
                         <Stack direction="row" spacing={3}>
-                          {/* <Link href={`/open-school/${workflow}/checklist`}> */}
                           <Button>
                             <Typography variant="bodyRegular" bold light>
                               Get started
                             </Typography>
                           </Button>
-                          {/* </Link> */}
+
                           {/* <Link href="https://forms.gle/KrpzuLvtUkhvQWAN8">
                           <Button variant="text">
                             <Typography variant="bodyRegular" bold>

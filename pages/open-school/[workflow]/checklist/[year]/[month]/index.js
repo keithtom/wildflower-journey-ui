@@ -40,62 +40,90 @@ const AdminChecklist = () => {
   const router = useRouter();
   const workflowId = currentUser?.attributes.schools[0].workflowId;
 
-  // get the current date
-  // const currentDate = new Date();
-  // const formattedTodayDate = currentDate.toISOString().split("T")[0];
-
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const { year: yearQuery, month: monthQuery } = router.query;
 
   const [isToday, setIsToday] = useState(false);
 
   useEffect(() => {
     const now = new Date();
-    if (currentMonth === now.getMonth() && currentYear === now.getFullYear()) {
+    if (
+      Number(monthQuery) === now.getMonth() &&
+      Number(yearQuery) === now.getFullYear()
+    ) {
       setIsToday(true);
     } else {
       setIsToday(false);
     }
-  }, [currentMonth, currentYear]);
+  }, [monthQuery, yearQuery]);
 
   const handleIncrementMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0); // Reset to January
-      setCurrentYear((prevYear) => prevYear + 1); // Increment the year
+    if (Number(monthQuery) === 11) {
+      router.push({
+        pathname: router.pathname,
+        query: {
+          workflow: workflowId,
+          month: 0,
+          year: Number(yearQuery) + 1,
+        },
+      });
     } else {
-      setCurrentMonth((prevMonth) => prevMonth + 1); // Increment the month
+      router.push({
+        pathname: router.pathname,
+        query: {
+          workflow: workflowId,
+          month: Number(monthQuery) + 1,
+          year: Number(yearQuery),
+        },
+      });
     }
   };
 
   const handleDecrementMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11); // Reset to December
-      setCurrentYear((prevYear) => prevYear - 1); // Decrement the year
+    if (Number(monthQuery) === 0) {
+      router.push({
+        pathname: router.pathname,
+        query: {
+          workflow: workflowId,
+          month: 11,
+          year: Number(yearQuery) - 1,
+        },
+      });
     } else {
-      setCurrentMonth((prevMonth) => prevMonth - 1); // Decrement the month
+      router.push({
+        pathname: router.pathname,
+        query: {
+          workflow: workflowId,
+          month: Number(monthQuery) - 1,
+          year: Number(yearQuery),
+        },
+      });
     }
   };
 
   const handleResetDate = () => {
-    setCurrentMonth(new Date().getMonth());
-    setCurrentYear(new Date().getFullYear());
+    router.push({
+      pathname: router.pathname,
+      query: {
+        workflow: workflowId,
+        month: new Date().getMonth(),
+        year: new Date().getFullYear(),
+      },
+    });
   };
 
-  // Create a new Date object with the currentYear and currentMonth
-  const timeframeDate = new Date(currentYear, currentMonth);
+  // Create a new Date object with the yearQuery and monthQuery
+  const timeframeDate = new Date(yearQuery, monthQuery);
 
   // Format the Date object as "YYYY-MM-DD"
   const timeframe = `${timeframeDate.getFullYear()}-${String(
     timeframeDate.getMonth() + 1
   ).padStart(2, "0")}-01`;
 
-  console.log({ timeframe });
-
   const [year, month] = timeframe.split("-");
   const nonZeroBasedDate = new Date(year, month - 1);
 
   const { milestones, isLoading } = useMilestones(workflowId, {
-    // timeframe: currentMonth,
+    // timeframe: monthQuery,
     timeframe,
     omit_include: true,
   });
@@ -152,9 +180,9 @@ const AdminChecklist = () => {
   // Assuming `milestones` is your data object
   const groupedMilestones = isLoading ? null : groupMilestones(milestones);
 
-  console.log({ groupedMilestones });
-  console.log({ milestones });
-  console.log({ currentUser });
+  // console.log({ groupedMilestones });
+  // console.log({ milestones });
+  // console.log({ currentUser });
   // useAuth("/login");
 
   return (
@@ -164,10 +192,14 @@ const AdminChecklist = () => {
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
               <Typography variant="h3" bold>
-                {new Date(nonZeroBasedDate).toLocaleString("default", {
-                  month: "long",
-                  year: "numeric",
-                })}
+                {isLoading ? (
+                  <Skeleton width={120} />
+                ) : (
+                  new Date(nonZeroBasedDate).toLocaleString("default", {
+                    month: "long",
+                    year: "numeric",
+                  })
+                )}
               </Typography>
             </Grid>
             <Grid item>
@@ -425,7 +457,7 @@ export default AdminChecklist;
 
 const MilestoneGroup = ({ workflowId, milestones, periodName }) => {
   const router = useRouter();
-  const { workflow } = router.query;
+  const { workflow, year, month } = router.query;
 
   const [open, setOpen] = useState(true);
   return (
@@ -460,7 +492,7 @@ const MilestoneGroup = ({ workflowId, milestones, periodName }) => {
           {milestones.map((m, i) => (
             <Milestone
               key={i}
-              link={`/open-school/${workflow}/checklist/${m.id}`}
+              link={`/open-school/${workflow}/checklist/${year}/${month}/${m.id}`}
               title={m.attributes.title}
               description={m.attributes.description}
               categories={m.attributes.categories}
