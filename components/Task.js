@@ -78,7 +78,8 @@ const Task = ({
   let assignableUsers;
   // Fetch the current user's data
   const { data: person, isLoading: personIsLoading } = usePerson(
-    currentUser?.id
+    currentUser?.id,
+    { network: true }
   );
   // console.log({ person });
   // console.log({ currentUser });

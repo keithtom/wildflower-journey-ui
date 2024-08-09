@@ -37,11 +37,12 @@ const OpenSchool = () => {
   if (isLoading || !personData) return <PageContainer isLoading={true} />;
 
   const included = personData?.included;
-  const userSchool = handleFindMatchingItems(
-    included,
-    personData?.data?.relationships?.schools?.data,
-    "id"
-  );
+  const schools = personData?.data?.relationships?.schools?.data;
+
+  const userSchool =
+    isLoading || !personData
+      ? []
+      : handleFindMatchingItems(included, schools, "id");
   const school = userSchool[0];
 
   const thisMonth = new Date().getMonth();
