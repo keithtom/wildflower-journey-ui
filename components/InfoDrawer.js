@@ -58,6 +58,7 @@ const InfoDrawer = ({
   toggle,
   open,
   assignees,
+  completers,
   about,
   taskId,
   title,
@@ -143,6 +144,7 @@ const InfoDrawer = ({
                     handleUnassignUser={handleUnassignUser}
                     assignableUsers={assignableUsers}
                     assignees={assignees}
+                    completers={completers}
                   />
                 </Stack>
               )}

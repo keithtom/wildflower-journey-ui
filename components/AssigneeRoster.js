@@ -24,6 +24,7 @@ const StyledAssigneeRoster = styled(Popover)`
 
 const AssigneeRoster = ({
   assignees,
+  completers,
   assignableUsers,
   handleAssignUser,
   handleUnassignUser,
@@ -55,11 +56,10 @@ const AssigneeRoster = ({
     assignees.forEach((assignee) => handleUnassignUser(assignee.id));
   };
 
-  const isComplete = assignees.some(
-    (assignee) => assignee?.attributes?.completedAt
-  );
+  const isComplete = completers.length;
 
-  // console.log({ assignees });
+  console.log({ completers });
+  console.log({ assignees });
   // console.log({ assignableUsers });
 
   return (
@@ -76,7 +76,9 @@ const AssigneeRoster = ({
                   key={assignee.id}
                   src={assignee?.attributes?.imageUrl}
                   badgeContent={
-                    assignee?.attributes?.completedAt && (
+                    completers.some(
+                      (completer) => completer.id === assignee.id
+                    ) && (
                       <Icon
                         className="checkCircleAssignee"
                         type="checkCircle"
@@ -128,10 +130,8 @@ const AssigneeRoster = ({
                     <Icon
                       type="check"
                       variant={
-                        assignees.some((assignee) =>
-                          assignee.id === user.id
-                            ? assignee?.attributes?.completedAt
-                            : null
+                        completers.some(
+                          (completer) => completer.id === user.id
                         ) && "lightened"
                       }
                     />
@@ -141,10 +141,8 @@ const AssigneeRoster = ({
                 <ListItemText>
                   <ListItemButton
                     onClick={() => handleToggleAssignment(user.id)}
-                    disabled={assignees.some((assignee) =>
-                      assignee.id === user.id
-                        ? assignee?.attributes?.completedAt
-                        : null
+                    disabled={completers.some(
+                      (completer) => completer.id === user.id
                     )}
                   >
                     <Stack direction="row" spacing={3} alignItems="center ">
@@ -152,10 +150,8 @@ const AssigneeRoster = ({
                         key={user.id}
                         src={user?.attributes?.imageUrl}
                         badgeContent={
-                          assignees.some((assignee) =>
-                            assignee.id === user.id
-                              ? assignee?.attributes?.completedAt
-                              : null
+                          completers.some(
+                            (completer) => completer.id === user.id
                           ) && (
                             <Icon
                               className="checkCircleAssignee"
