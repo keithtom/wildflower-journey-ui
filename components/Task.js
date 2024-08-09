@@ -89,16 +89,22 @@ const Task = ({
     // If the current route starts with '/open-school', fetch the school's data and use it to set assignableUsers
     const { data: school, isLoading: schoolIsLoading } =
       useSchool(userSchoolId);
-    assignableUsers = school?.included.filter((item) => item.type === "person");
+    if (!schoolIsLoading) {
+      assignableUsers = school?.included.filter(
+        (item) => item.type === "person"
+      );
+    }
   } else if (router.pathname.startsWith("/ssj/")) {
     // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
     const teamId = currentUser?.attributes?.ssj?.teamId;
     const { team, isLoading: teamIsLoading } = useTeam(teamId);
     // add together partners and currentUser to form assignableUsers
-    assignableUsers = [
-      currentUser,
-      ...(team?.data?.data?.relationships?.partners?.data || []),
-    ];
+    if (!teamIsLoading) {
+      assignableUsers = [
+        currentUser,
+        ...(team?.data?.data?.relationships?.partners?.data || []),
+      ];
+    }
   }
 
   // Common interface that all invokations of Task should use.

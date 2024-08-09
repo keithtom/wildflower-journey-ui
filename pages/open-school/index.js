@@ -8,7 +8,7 @@ import { PageContainer } from "@components/ui";
 // The purpose of this page is to:
 // Insert the workflow ID into the query params
 
-const SSJWorkflow = ({}) => {
+const OpenSchoolWorkflow = ({}) => {
   const router = useRouter();
 
   const { currentUser } = useUserContext();
@@ -21,9 +21,8 @@ const SSJWorkflow = ({}) => {
   }, [currentUser]);
 
   // console.log(currentUser);
-  // console.log(SSJWorkflowId);
 
   return <PageContainer hideNav isLoading={true}></PageContainer>;
 };
 
-export default SSJWorkflow;
+export default OpenSchoolWorkflow;

@@ -33,7 +33,7 @@ const ToDoList = ({}) => {
   const [teamAssignments, setTeamAssignments] = useState([]);
 
   const { currentUser, isOperationsGuide } = useUserContext();
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
+  const { assignedSteps, isLoading } = useAssignedSteps(workflow, {
     current_user: isOperationsGuide ? null : true,
   });
   const { milestonesToDo, isLoadingMilestonesToDo } = useMilestones(workflow, {

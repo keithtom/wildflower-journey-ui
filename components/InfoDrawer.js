@@ -66,7 +66,7 @@ const InfoDrawer = ({
   categories,
   actions,
   isDecision,
-  isComplete,
+  taskIsComplete,
   worktime,
   handleAssignUser,
   handleUnassignUser,
@@ -129,7 +129,7 @@ const InfoDrawer = ({
               </Grid>
             </Grid>
 
-            <Typography variant="bodyLarge" bold struck={isComplete}>
+            <Typography variant="bodyLarge" bold>
               {title}
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={4}>
@@ -144,35 +144,6 @@ const InfoDrawer = ({
                     assignableUsers={assignableUsers}
                     assignees={assignees}
                   />
-                  {/* {assignees.length ? (
-                    <Stack spacing={2} direction="row">
-                      {assignees.map((assignee, i) => (
-                        <AvatarWrapper
-                          key={i}
-                          badgeContent={
-                            assignee.attributes.completedAt && (
-                              <Icon
-                                type="checkCircle"
-                                size="small"
-                                variant="primary"
-                                filled
-                              />
-                            )
-                          }
-                          src={assignee?.attributes?.imageUrl}
-                        />
-                      ))}
-                    </Stack>
-                  ) : (
-                    <AssigneeRoster
-                      handleAssignUser={handleAssignUser}
-                      handleUnassignUser={handleUnassignUser}
-                      assignableUsers={assignableUsers}
-                      assignees={assignees}
-                    />
-                    // TODO: show a the assignable users in a popover here
-                    // <Icon type="userCircle" variant="lightened" />
-                  )} */}
                 </Stack>
               )}
               {status && (

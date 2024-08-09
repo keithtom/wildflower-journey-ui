@@ -320,7 +320,9 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
 const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
   const router = useRouter();
   const { workflow } = router.query;
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
+    current_user: true,
+  });
 
   const assignedToMe = assignedSteps?.filter(
     (step) => step.relationships.assignees.data[0].id === currentUserId

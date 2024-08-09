@@ -37,7 +37,6 @@ const OpenSchool = () => {
   if (isLoading || !personData) return <PageContainer isLoading={true} />;
 
   const included = personData?.included;
-  const hasSchool = personData?.data?.relationships?.schools?.length;
   const userSchool = handleFindMatchingItems(
     included,
     personData?.data?.relationships?.schools?.data,
@@ -45,8 +44,8 @@ const OpenSchool = () => {
   );
   const school = userSchool[0];
 
+  // console.log({ included });
   // useAuth("/login");
-
   // console.log({ userSchool });
   // console.log({ data });
 
