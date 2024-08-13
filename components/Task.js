@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FormControlLabel, RadioGroup } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
 import Router from "next/router";
@@ -111,7 +111,7 @@ const Task = ({
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
   // If you have props that depend on where they are being called from, put them as inputs for Task
 
-  // console.log({ task });
+  console.log({ task });
   // console.log({ assignableUsers });
 
   const taskId = task.id;
@@ -139,8 +139,7 @@ const Task = ({
   );
 
   const [taskIsComplete, setTaskIsComplete] = useState(
-    // task.attributes.isComplete
-    task.relationships.completers.data.length > 0
+    task.attributes.isComplete
   );
   const [canCompleteTask, setCanCompleteTask] = useState(
     task.attributes.canComplete
@@ -150,6 +149,9 @@ const Task = ({
   );
   const [taskCompleters, setTaskCompleters] = useState(
     task.relationships.completers.data || []
+  );
+  const [completionType, setCompletionType] = useState(
+    task.attributes.completionType
   );
 
   // default to a selected option if selected in assignments.
@@ -165,22 +167,27 @@ const Task = ({
   const [assignToastOpen, setAssignToastOpen] = useState(false);
   const [unassignToastOpen, setUnassignToastOpen] = useState(false);
 
+  // when the task is mutated, reset interface state
+  useEffect(() => {
+    setTaskIsAssigned(task?.relationships?.assignees?.data || null);
+    setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
+    setCanAssignTask(task.attributes.canAssign);
+    setCanUnassignTask(task.attributes.canUnassign);
+    setTaskAssignees(task.relationships.assignees.data || []);
+    setTaskIsComplete(task.attributes.isComplete);
+    setCanCompleteTask(task.attributes.canComplete);
+    setCanUncompleteTask(task.attributes.canUncomplete);
+    setTaskCompleters(task.relationships.completers.data || []);
+    setCompletionType(task.attributes.completionType);
+    setIsDecided(task.attributes.isComplete);
+  }, [task]);
+
   async function handleCompleteTask() {
     // api call, backend determiens state. needs spinner and error management.
     try {
       // if checking, complete, if unchecking, uncomplete.
       const response = await stepsApi.complete(taskId);
       const task = response.data.data;
-
-      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
-      setCanAssignTask(task.attributes.canAssign);
-      setCanUnassignTask(task.attributes.canUnassign);
-      setTaskAssignees(task.relationships.assignees.data || []);
-
-      setTaskIsComplete(task.attributes.isComplete);
-      setCanCompleteTask(task.attributes.canComplete);
-      setCanUncompleteTask(task.attributes.canUncomplete);
-      setTaskCompleters(task.relationships.completers.data || []);
 
       setInfoDrawerOpen(false);
       mutate(`/processes/${milestone}`);
@@ -211,15 +218,6 @@ const Task = ({
       const response = await stepsApi.uncomplete(taskId);
       const task = response.data.data;
 
-      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
-      setCanAssignTask(task.attributes.canAssign);
-      setCanUnassignTask(task.attributes.canUnassign);
-      setTaskAssignees(task.relationships.assignees.data || []); // we use assignee.attributes.completedAt in InfoDrawer for the checkmark
-
-      setTaskIsComplete(task.attributes.isComplete);
-      setCanCompleteTask(task.attributes.canComplete);
-      setCanUncompleteTask(task.attributes.canUncomplete);
-      setTaskCompleters(task.relationships.completers.data || []);
       mutate(`/processes/${milestone}`);
       mutate(`/workflows/${workflow}/assigned_steps`);
     } catch (err) {
@@ -235,13 +233,6 @@ const Task = ({
     try {
       const response = await stepsApi.assign(taskId, assigneeId);
       const task = response.data.data;
-
-      setTaskIsAssigned(task?.relationships?.assignees?.data);
-      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
-      setCanAssignTask(task.attributes.canAssign);
-      setCanUnassignTask(task.attributes.canUnassign);
-
-      setTaskAssignees(task.relationships.assignees.data || []);
       mutate(`/processes/${milestone}`);
       mutate(`/workflows/${workflow}/assigned_steps`);
     } catch (err) {
@@ -258,13 +249,6 @@ const Task = ({
     try {
       const response = await stepsApi.unassign(taskId, assigneeId);
       const task = response.data.data;
-
-      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
-      setCanAssignTask(task.attributes.canAssign);
-      setCanUnassignTask(task.attributes.canUnassign);
-      setTaskAssignees(task.relationships.assignees.data || []);
-
-      // setInfoDrawerOpen(false);
       mutate(`/processes/${milestone}`);
       mutate(`/workflows/${workflow}/assigned_steps`);
       if (removeStep) {
@@ -290,18 +274,10 @@ const Task = ({
       );
       const task = response.data.data;
 
-      setTaskIsAssignedToMe(task.attributes.isAssignedToMe);
-      setCanAssignTask(task.attributes.canAssign);
-      setCanUnassignTask(task.attributes.canUnassign);
-      setTaskAssignees(task.relationships.assignees.data || []);
-
-      setTaskIsComplete(task.attributes.isComplete);
-      setCanCompleteTask(task.attributes.canComplete);
-      setCanUncompleteTask(task.attributes.canUncomplete);
-      setTaskCompleters(task.relationships.completers.data || []);
-
-      setIsDecided(true);
+      mutate(`/processes/${milestone}`);
+      mutate(`/workflows/${workflow}/assigned_steps`);
       setInfoDrawerOpen(false);
+
       if (removeStep) {
         removeStep(taskId);
         mutate(`/processes/${milestone}`);
@@ -331,26 +307,9 @@ const Task = ({
                 assignableUsers={assignableUsers}
                 assignees={taskAssignees}
                 completers={taskCompleters}
+                completionType={completionType}
               />
             ) : null}
-            {/* {taskAssignees &&
-              taskAssignees.map((assignee) => (
-                <AvatarWrapper
-                  key={assignee.id}
-                  src={assignee?.attributes?.imageUrl}
-                  badgeContent={
-                    assignee?.attributes?.completedAt && (
-                      <Icon
-                        className="checkCircleAssignee"
-                        type="checkCircle"
-                        size="small"
-                        variant="primary"
-                        filled
-                      />
-                    )
-                  }
-                />
-              ))} */}
           </Stack>
         }
       >
@@ -411,9 +370,11 @@ const Task = ({
         handleAssignUser={handleAssignUser}
         handleUnassignUser={handleUnassignUser}
         assignableUsers={assignableUsers}
+        completionType={completionType}
         actions={
           isDecision ? (
             <DecisionDrawerActions
+              completionType={completionType}
               assignableUsers={assignableUsers}
               taskIsAssigned={taskIsAssigned}
               taskIsAssignedToMe={taskIsAssignedToMe}
@@ -431,6 +392,7 @@ const Task = ({
             />
           ) : (
             <TaskDrawerActions
+              completionType={completionType}
               assignableUsers={assignableUsers}
               taskIsAssigned={taskIsAssigned}
               taskIsAssignedToMe={taskIsAssignedToMe}
@@ -481,6 +443,7 @@ const DecisionDrawerActions = ({
   handleUnassignUser,
   handleMakeDecision,
   taskCompleters,
+  completionType,
 }) => {
   const handleDecisionOptionChange = (e) => {
     setDecisionOption(e.target.value);
@@ -632,10 +595,12 @@ const TaskDrawerActions = ({
   handleUnassignUser,
   handleCompleteTask,
   handleUncompleteTask,
+  completionType,
 }) => {
   const { currentUser } = useUserContext();
-  const completedBy = taskCompleters[0]; // just take the first since only used when its not me
+  // const completedBy = taskCompleters[0]; // just take the first since only used when its not me
   // NOTE: canUncompleteTask is not the same as "Completed by me" because sometimes we can't uncomplete a step because the process is completed even though we completed the step.
+  console.log({ taskCompleters });
 
   return (
     <Grid container spacing={4}>
@@ -677,9 +642,10 @@ const TaskDrawerActions = ({
             <Grid item xs={12}>
               <Button full variant="danger" disabled>
                 <Typography bold>
-                  {`Completed by ${
-                    completedBy && completedBy.attributes.firstName
-                  } ${completedBy && completedBy.attributes.lastName}`}
+                  {`Completed by ${taskCompleters.map(
+                    (completer, i) =>
+                      `${completer.attributes.firstName} ${completer.attributes.lastName}`
+                  )}`}
                 </Typography>
               </Button>
             </Grid>
@@ -718,7 +684,16 @@ const TaskDrawerActions = ({
           )
         ) : (
           // the task is complete, not assigned to me, but I can't assign it
-          <div>?</div>
+          <Grid item xs={12}>
+            <Button full variant="danger" disabled>
+              <Typography bold>
+                {`Completed by ${taskCompleters.map(
+                  (completer, i) =>
+                    `${completer.attributes.firstName} ${completer.attributes.lastName}`
+                )}`}
+              </Typography>
+            </Button>
+          </Grid>
         )
       ) : // the task is not complete
       taskIsAssigned ? (

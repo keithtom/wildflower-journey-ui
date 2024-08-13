@@ -28,6 +28,7 @@ const AssigneeRoster = ({
   assignableUsers,
   handleAssignUser,
   handleUnassignUser,
+  completionType,
 }) => {
   // popover settings
   const [anchorEl, setAnchorEl] = useState(null);
@@ -58,9 +59,13 @@ const AssigneeRoster = ({
 
   const isComplete = completers.length;
 
-  // console.log({ completers });
+  const cantAssign = completionType === "one_per_group" && completers.length;
+
+  console.log({ completers });
   // console.log({ assignees });
-  // console.log({ assignableUsers });
+  console.log({ completionType });
+  console.log({ assignableUsers });
+  console.log({ cantAssign });
 
   return (
     <>
@@ -141,9 +146,10 @@ const AssigneeRoster = ({
                 <ListItemText>
                   <ListItemButton
                     onClick={() => handleToggleAssignment(user.id)}
-                    disabled={completers.some(
-                      (completer) => completer.id === user.id
-                    )}
+                    disabled={
+                      cantAssign ||
+                      completers.some((completer) => completer.id === user.id)
+                    }
                   >
                     <Stack direction="row" spacing={3} alignItems="center ">
                       <AvatarWrapper
