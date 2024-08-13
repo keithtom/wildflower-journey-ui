@@ -72,6 +72,7 @@ const InfoDrawer = ({
   handleAssignUser,
   handleUnassignUser,
   assignableUsers,
+  completionType,
 }) => {
   const { currentUser, isOperationsGuide } = useUserContext();
 
@@ -145,6 +146,7 @@ const InfoDrawer = ({
                     assignableUsers={assignableUsers}
                     assignees={assignees}
                     completers={completers}
+                    completionType={completionType}
                   />
                 </Stack>
               )}
