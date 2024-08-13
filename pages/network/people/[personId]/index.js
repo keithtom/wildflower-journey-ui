@@ -381,6 +381,7 @@ const EditProfileModal = ({
   const [showError, setShowError] = useState();
   const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
   const [currentFieldGroup, setCurrentFieldGroup] = useState("general");
+  const [isAddingSchool, setIsAddingSchool] = useState(false);
   const handleFileError = (error) => {
     setShowError(error);
   };
@@ -516,7 +517,12 @@ const EditProfileModal = ({
       case "certification_and_role":
         return <CertificationAndRoleFields />;
       case "school_history":
-        return <SchoolHistoryFields />;
+        return (
+          <SchoolHistoryFields
+            isAddingSchool={isAddingSchool}
+            setIsAddingSchool={setIsAddingSchool}
+          />
+        );
       case "board_history":
         return <BoardHistoryFields />;
       default:
@@ -529,26 +535,27 @@ const EditProfileModal = ({
       open={open}
       title="Edit your profile"
       noPadding
-      fixedActions={
-        <Grid container justifyContent="flex-end">
-          <Grid item>
-            <Button
-              small
-              disabled={!isDirty || isUpdatingPicture || isSubmitting}
-              type="submit"
-            >
-              <Typography variant="bodyRegular" bold>
-                Save
-              </Typography>
-            </Button>
-            {isUpdatingPicture && (
-              <Typography variant="bodyRegular" lightened>
-                Updating profile image...
-              </Typography>
-            )}
-          </Grid>
-        </Grid>
-      }
+      fixedHeight
+      // fixedActions={
+      //   <Grid container justifyContent="flex-end">
+      //     <Grid item>
+      //       <Button
+      //         small
+      //         disabled={!isDirty || isUpdatingPicture || isSubmitting}
+      //         type="submit"
+      //       >
+      //         <Typography variant="bodyRegular" bold>
+      //           Save
+      //         </Typography>
+      //       </Button>
+      //       {isUpdatingPicture && (
+      //         <Typography variant="bodyRegular" lightened>
+      //           Updating profile image...
+      //         </Typography>
+      //       )}
+      //     </Grid>
+      //   </Grid>
+      // }
       fixedMenu={
         <List>
           <ListItem disablePadding>
@@ -606,7 +613,7 @@ const EditProfileModal = ({
         </List>
       }
     >
-      <Grid container sx={{ borderTop: "1px solid #f1f1f1" }}>
+      <Grid container sx={{ borderTop: "1px solid #eaeaea" }}>
         <Grid item flex={1}>
           {renderFieldGroup()}
         </Grid>
@@ -1244,11 +1251,180 @@ const CertificationAndRoleFields = ({}) => {
     </Card>
   );
 };
-const SchoolHistoryFields = ({}) => {
+const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm();
+  const schools = [1, 2, 3];
   return (
-    <div>
-      <div>School History</div>
-    </div>
+    <>
+      <Card noBorder noRadius>
+        <Grid container spacing={6}>
+          <Grid item xs={12}>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Button
+                  variant="lightened"
+                  small
+                  onClick={() => setIsAddingSchool(true)}
+                >
+                  <Typography variant="bodySmall" bold>
+                    Add experience
+                  </Typography>
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={12} justifyContent="center">
+            {isAddingSchool ? (
+              <Grid container>
+                <Grid item xs={12}>
+                  <Stack spacing={3}>
+                    <Controller
+                      name="school"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          label="School"
+                          placeholder="e.g. Wild Rose Montessori"
+                          options={schoolOptions}
+                          error={errors.school}
+                          helperText={
+                            errors &&
+                            errors.school &&
+                            errors.school.type === "required" &&
+                            "This field is required"
+                          }
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="dateJoined"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          label="Date joined"
+                          placeholder="e.g. Fall 2022"
+                          options={dateJoinedOptions}
+                          error={errors.dateJoined}
+                          helperText={
+                            errors &&
+                            errors.dateJoined &&
+                            errors.dateJoined.type === "required" &&
+                            "This field is required"
+                          }
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="dateLeft"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          label="Date left"
+                          placeholder="e.g. Spring 2023"
+                          options={dateLeftOptions}
+                          error={errors.dateLeft}
+                          helperText={
+                            errors &&
+                            errors.dateLeft &&
+                            errors.dateLeft.type === "required" &&
+                            "This field is required"
+                          }
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="schoolTitle"
+                      control={control}
+                      rules={{
+                        required: false,
+                      }}
+                      render={({ field }) => (
+                        <TextField
+                          label="Title"
+                          placeholder="e.g. Chief Financial Officer"
+                          error={errors.schoolTitle}
+                          helperText={
+                            errors &&
+                            errors.schoolTitle &&
+                            errors.schoolTitle.type === "required" &&
+                            "This field is required"
+                          }
+                          {...field}
+                        />
+                      )}
+                    />
+                  </Stack>
+                </Grid>
+              </Grid>
+            ) : schools.length ? (
+              <Grid container>
+                {/* Map through experience */}
+                <Grid item xs={12}>
+                  <Stack>
+                    <Grid container justifyContent="space-between">
+                      <Grid item>
+                        <Typography variant="bodyRegular" bold>
+                          Wild Rose Montessori
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <Stack direction="row" spacing={3}>
+                          <Typography variant="bodyRegular" lightened>
+                            Edit
+                          </Typography>
+                          <Typography variant="bodyRegular" lightened>
+                            Remove
+                          </Typography>
+                        </Stack>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="bodyRegular" lightened>
+                      Chief Financial Officer
+                    </Typography>
+                    <Typography variant="bodyRegular" lightened>
+                      2018 - 2019
+                    </Typography>
+                  </Stack>
+                </Grid>
+              </Grid>
+            ) : (
+              <Card noBorder noRadius size="large">
+                <Stack spacing={6} alignItems="center">
+                  <img src="/assets/images/wildflower-logo.png" />
+                  <Button onClick={() => setIsAddingSchool(true)}>
+                    <Typography variant="bodyRegular" bold>
+                      Add experience
+                    </Typography>
+                  </Button>
+                </Stack>
+              </Card>
+            )}
+          </Grid>
+        </Grid>
+      </Card>
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 0,
+          right: 0,
+          left: 0,
+          borderTop: "1px solid #eaeaea",
+        }}
+      >
+        hi
+      </Box>
+    </>
   );
 };
 const BoardHistoryFields = ({}) => {
@@ -1258,3 +1434,16 @@ const BoardHistoryFields = ({}) => {
     </div>
   );
 };
+
+const schoolOptions = [
+  { label: "Wild Rose Montessori", value: "Wild Rose Montessori" },
+  { label: "ASDF Montessori", value: "ASDF Montessori" },
+];
+const dateJoinedOptions = [
+  { label: "Fall 2022", value: "Fall 20202" },
+  { label: "Winter 2022", value: "Winter 2022" },
+];
+const dateLeftOptions = [
+  { label: "Fall 2022", value: "Fall 20202" },
+  { label: "Winter 2022", value: "Winter 2022" },
+];

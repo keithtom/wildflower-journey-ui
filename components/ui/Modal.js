@@ -15,11 +15,12 @@ const ModalCard = styled(Card, {
   overflow-y: scroll;
   overflow-x: hidden;
   max-width: 90%;
+  height: ${(props) => props.fixedHeight && "640px"};
   ${(props) =>
     props.fixedActions &&
     css`
       padding-bottom: 0;
-    `}
+    `};
 `;
 const FixedActions = styled(Box)`
   position: sticky;
@@ -36,6 +37,7 @@ const FixedMenu = styled(Box)`
   bottom: 0;
   left: 0;
   background: ${({ theme }) => theme.color.neutral.lightest};
+  border-top: 1px solid ${({ theme }) => theme.color.neutral.main};
 `;
 
 export default function Modal({
@@ -45,13 +47,19 @@ export default function Modal({
   noPadding,
   fixedActions,
   fixedMenu,
+  fixedHeight,
   ...props
 }) {
   return (
     <CustomModal {...props} onClose={toggle}>
-      <ModalCard elevated noPadding fixedActions={fixedActions}>
+      <ModalCard
+        elevated
+        noPadding
+        fixedActions={fixedActions}
+        fixedHeight={fixedHeight}
+      >
         <Stack spacing={4}>
-          <Card noBorder sx={{ paddingBottom: 0 }}>
+          <Card noBorder noRadius sx={{ paddingBottom: 0 }}>
             <Grid container alignItems="center" justifyContent="flex-end">
               {title && (
                 <Grid item flex={1}>
