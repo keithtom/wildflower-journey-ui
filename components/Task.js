@@ -99,10 +99,9 @@ const Task = ({
     // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
     const teamId = currentUser?.attributes?.ssj?.teamId;
     const { team, isLoading: teamIsLoading } = useTeam(teamId);
-    // add together partners and currentUser to form assignableUsers
+    // set assignable users as partners
     if (!teamIsLoading) {
       assignableUsers = [
-        currentUser,
         ...(team?.data?.data?.relationships?.partners?.data || []),
       ];
     }
@@ -112,7 +111,8 @@ const Task = ({
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
   // If you have props that depend on where they are being called from, put them as inputs for Task
 
-  console.log({ task });
+  // console.log({ task });
+  // console.log({ assignableUsers });
 
   const taskId = task.id;
   const title = task.attributes.title;
