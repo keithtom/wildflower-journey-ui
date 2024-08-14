@@ -61,10 +61,13 @@ const OpenSchoolToDoList = ({}) => {
     (step) => step.relationships.assignees.data[0].id === currentUser?.id
   );
 
+  const thisMonth = new Date().getMonth();
+  const thisYear = new Date().getFullYear();
+
   // console.log({ currentUser });
   // console.log({ assignedIsError });
   // console.log({ assignedIsLoading });
-  console.log({ assignedSteps });
+  // console.log({ assignedSteps });
   // console.log({ mySteps });
   // console.log({ steps });
   // console.log({ teamAssignments })
@@ -138,7 +141,9 @@ const OpenSchoolToDoList = ({}) => {
                     <Button
                       variant="primary"
                       onClick={() =>
-                        router.push(`/open-school/${workflow}/checklist`)
+                        router.push(
+                          `/open-school/${workflow}/checklist/${thisYear}/${thisMonth}`
+                        )
                       }
                     >
                       <Typography variant="bodyRegular" bold light>
