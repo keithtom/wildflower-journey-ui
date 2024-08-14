@@ -1,10 +1,10 @@
 import useSWR from "swr";
 import { showAssigned } from "@api/workflow/steps";
 
-const useAssignedSteps = (workflowId) => {
+const useAssignedSteps = (workflowId, params) => {
   const { data, error } = useSWR(
-    workflowId ? showAssigned.key(workflowId) : null,
-    () => showAssigned.fetcher(workflowId)
+    workflowId ? showAssigned.key(workflowId, params) : null,
+    () => showAssigned.fetcher(workflowId, params)
   );
 
   return {

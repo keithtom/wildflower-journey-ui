@@ -20,6 +20,7 @@ import {
   Icon,
   Snackbar,
   Chip,
+  Divider,
 } from "./ui/index";
 import Header from "./Header";
 import useAssignedSteps from "@hooks/useAssignedSteps";
@@ -113,11 +114,12 @@ const Navigation = () => {
   }, []);
 
   const isTeacherLeader =
-    currentUser?.personRoleList?.join() === ["Teacher Leader"].join() &&
+    currentUser?.personRoleList?.some((role) => role === "Teacher Leader") &&
     !currentUser?.personRoleList?.includes("Emerging Teacher Leader");
   // console.log({ ogViewingSchool });
   // console.log({ isTeacherLeader });
   // console.log({ currentUser });
+  // console.log({ workflow });
 
   return currentUser ? (
     <Box>
@@ -187,14 +189,19 @@ const Navigation = () => {
             <NavLink
               variant="primary"
               to="/open-school"
-              active={router.asPath === `/open-school`}
-              label="Your School Dashboard" //TODO: Make actual school name
+              active={router.asPath === `/open-school/${workflow}`}
+              label="Open School"
+              // label={currentUser?.attributes.schools[0].name}
               icon="home"
             />
           ) : null}
 
           {router.pathname.includes("/open-school") ? (
-            <OpenSchoolNavigation />
+            <OpenSchoolNavigation
+              openSchoolWorkflowId={workflow}
+              currentUserId={currentUser?.id}
+              currentUserEmail={currentUser?.attributes.email}
+            />
           ) : null}
 
           {!isOperationsGuide && currentUser?.attributes?.ssj ? (
@@ -250,19 +257,28 @@ const Navigation = () => {
 const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   const router = useRouter();
   const { workflow } = router.query;
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
-  // console.log(assignedSteps);
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
+    current_user: true,
+  });
+
   return (
     <Box>
       <NavLink
         variant="secondary"
         to={`/ssj/${SSJworkflowId}/to-do-list`}
-        active={router.pathname.includes("/to-do-list")}
+        active={
+          router.pathname.startsWith("/ssj/") &&
+          router.pathname.includes("/to-do-list")
+        }
         label="To do list"
         icon="calendarCheck"
         secondaryAction={
           isLoading ? null : !assignedSteps.length ? null : (
-            <Chip size="small" label={assignedSteps.length} variant="primary" />
+            <Chip
+              size="small"
+              label={assignedSteps.length}
+              variant="lightened"
+            />
           )
         }
       />
@@ -307,57 +323,130 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   );
 };
 
-const OpenSchoolNavigation = () => {
+const OpenSchoolNavigation = ({
+  openSchoolWorkflowId,
+  currentUserId,
+  currentUserEmail,
+}) => {
   const router = useRouter();
+  const { workflow } = router.query;
+  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
+    current_user: true,
+  });
+
+  const assignedToMe = assignedSteps?.filter(
+    (step) => step.relationships.assignees.data[0].id === currentUserId
+  );
+
+  const thisMonth = new Date().getMonth();
+  const thisYear = new Date().getFullYear();
+
+  const approvedEmails = [
+    "judy@alliummontessori.org",
+    "chip@pinyonmontessori.org",
+    "brandi@pinyonmontessori.org",
+    "joyce@wildrosemontessori.org",
+    "angelina@astermontessori.org",
+    "katelyn.shore@wildflowerschools.org",
+  ];
+
   return (
     <Box>
-      <NavLink
-        variant="secondary"
-        to={`/open-school/admin-checklist`}
-        active={router.pathname.includes("/open-school/admin-checklist")}
-        label="Admin Checklist"
-        secondaryAction={
-          <Chip size="small" label="Q1 2024" variant="lightened" />
-        }
-        icon="loader"
-      />
-      <NavLink
-        variant="secondary"
-        to={`/open-school/enrollment-and-communications`}
-        active={router.pathname.includes(
-          "/open-school/enrollment-and-communications"
-        )}
-        label="Enrollment & Family Comms"
-        icon="loader"
-      />
-      <NavLink
-        variant="secondary"
-        to={`/open-school/finance-and-operations`}
-        active={router.pathname.includes("/open-school/finance-and-operations")}
-        label="Finance & Operations"
-        icon="loader"
-      />
-      <NavLink
-        variant="secondary"
-        to={`/open-school/my-board`}
-        active={router.pathname.includes("/open-school/my-board")}
-        label="My Board"
-        icon="loader"
-      />
-      <NavLink
-        variant="secondary"
-        to={`/open-school/resources`}
-        active={router.pathname.includes("/open-school/resources")}
-        label="Resources"
-        icon="loader"
-      />
-      <NavLink
-        variant="secondary"
-        to={`/open-school/support`}
-        active={router.pathname.includes("/open-school/support")}
-        label="Support@"
-        icon="loader"
-      />
+      {approvedEmails.includes(currentUserEmail) ? (
+        <>
+          <NavLink
+            variant="secondary"
+            to={`/open-school/${openSchoolWorkflowId}/to-do-list`}
+            active={
+              router.pathname.startsWith("/open-school/") &&
+              router.pathname.includes("/to-do-list")
+            }
+            label="To do list"
+            icon="calendarCheck"
+            secondaryAction={
+              isLoading ? null : !assignedToMe.length ? null : (
+                <Chip
+                  size="small"
+                  label={assignedToMe.length}
+                  variant="lightened"
+                />
+              )
+            }
+          />
+          <NavLink
+            variant="secondary"
+            to={`/open-school/${openSchoolWorkflowId}/checklist/${thisYear}/${thisMonth}`}
+            active={
+              router.pathname.startsWith("/open-school/") &&
+              router.pathname.includes("/checklist")
+            }
+            label="Checklist"
+            icon="layer"
+            secondaryAction={
+              <Chip
+                size="small"
+                label="New"
+                variant="primary"
+                sx={{ pointerEvents: "none" }}
+              />
+            }
+          />
+        </>
+      ) : null}
+      {approvedEmails.includes(currentUserEmail) ? null : (
+        <>
+          <NavLink
+            variant="secondary"
+            to={`/open-school/${openSchoolWorkflowId}/enrollment-and-communications`}
+            active={
+              router.pathname.startsWith("/open-school/") &&
+              router.pathname.includes("/enrollment-and-communications")
+            }
+            label="Enrollment & Family Comms"
+            icon="loader"
+          />
+          <NavLink
+            variant="secondary"
+            to={`/open-school/${openSchoolWorkflowId}/finance-and-operations`}
+            active={
+              router.pathname.startsWith("/open-school/") &&
+              router.pathname.includes("/finance-and-operations")
+            }
+            label="Finance & Operations"
+            icon="loader"
+          />
+          <NavLink
+            variant="secondary"
+            to={`/open-school/${openSchoolWorkflowId}/my-board`}
+            active={
+              router.pathname.startsWith("/open-school/") &&
+              router.pathname.includes("/my-board")
+            }
+            label="My Board"
+            icon="loader"
+          />
+          <NavLink
+            variant="secondary"
+            to={`/open-school/${openSchoolWorkflowId}/resources`}
+            active={
+              router.pathname.startsWith("/open-school/") &&
+              router.pathname.includes("/resources")
+            }
+            label="Resources"
+            icon="loader"
+          />
+          <NavLink
+            variant="secondary"
+            to={`/open-school/${openSchoolWorkflowId}/support`}
+            active={
+              router.pathname.startsWith("/open-school/") &&
+              router.pathname.includes("/support")
+            }
+            label="Support@"
+            icon="loader"
+          />
+        </>
+      )}
     </Box>
   );
 };

@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
 
@@ -18,6 +19,7 @@ import WorktimeChip from "./WorktimeChip";
 import CategoryChip from "./CategoryChip";
 import StatusChip from "./StatusChip";
 import Resource from "./Resource";
+import AssigneeRoster from "@components/AssigneeRoster";
 import { useUserContext } from "@lib/useUserContext";
 
 const CustomDrawer = styled(Drawer)`
@@ -56,6 +58,7 @@ const InfoDrawer = ({
   toggle,
   open,
   assignees,
+  completers,
   about,
   taskId,
   title,
@@ -64,10 +67,48 @@ const InfoDrawer = ({
   categories,
   actions,
   isDecision,
-  isComplete,
+  taskIsComplete,
   worktime,
+  handleAssignUser,
+  handleUnassignUser,
+  assignableUsers,
+  completionType,
 }) => {
-  const { isOperationsGuide } = useUserContext();
+  const { currentUser, isOperationsGuide } = useUserContext();
+
+  const router = useRouter();
+  const { workflow } = router.query;
+
+  const isTL = currentUser?.personRoleList.some(
+    (role) => role === "Teacher Leader"
+  );
+
+  const isETL = currentUser?.attributes.ssj ? true : false;
+
+  let showActions = false;
+
+  if (isOperationsGuide) {
+    if (
+      // is a teacher leader, who is looking at their own checklist
+      isTL &&
+      router.pathname.startsWith("/open-school/") &&
+      currentUser.attributes.schools[0].workflowId === workflow
+    ) {
+      showActions = true;
+    } else if (
+      // is an emerging teacher leader, who is looking at their SSJ
+      isETL &&
+      router.pathname.startsWith("/ssj/") &&
+      currentUser.attributes.ssj.workflowId === workflow
+    ) {
+      showActions = true;
+    } else {
+      // is simply an ops guide looking at a school
+      showActions = false;
+    }
+  } else {
+    showActions = true;
+  }
 
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
@@ -90,36 +131,25 @@ const InfoDrawer = ({
               </Grid>
             </Grid>
 
-            <Typography variant="bodyLarge" bold struck={isComplete}>
+            <Typography variant="bodyLarge" bold>
               {title}
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={4}>
-              {taskId &&
-                (assignees.length ? (
-                  <Stack spacing={2}>
-                    <Typography variant="bodyMini" lightened bold>
-                      ASSIGNEE
-                    </Typography>
-                    <Stack spacing={2} direction="row">
-                      {assignees.map((assignee, i) => (
-                        <AvatarWrapper
-                          key={i}
-                          badgeContent={
-                            assignee.attributes.completedAt && (
-                              <Icon
-                                type="checkCircle"
-                                size="small"
-                                variant="primary"
-                                filled
-                              />
-                            )
-                          }
-                          src={assignee?.attributes?.imageUrl}
-                        />
-                      ))}
-                    </Stack>
-                  </Stack>
-                ) : null)}
+              {taskId && (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold>
+                    ASSIGNEE
+                  </Typography>
+                  <AssigneeRoster
+                    handleAssignUser={handleAssignUser}
+                    handleUnassignUser={handleUnassignUser}
+                    assignableUsers={assignableUsers}
+                    assignees={assignees}
+                    completers={completers}
+                    completionType={completionType}
+                  />
+                </Stack>
+              )}
               {status && (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
@@ -128,7 +158,7 @@ const InfoDrawer = ({
                   <StatusChip status={status} size="small" withIcon />
                 </Stack>
               )}
-              {categories && (
+              {categories?.length ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     CATEGORY
@@ -144,7 +174,7 @@ const InfoDrawer = ({
                     ))}
                   </Stack>
                 </Stack>
-              )}
+              ) : null}
               {worktime ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
@@ -183,11 +213,11 @@ const InfoDrawer = ({
         </Stack>
       </StyledInfoCard>
 
-      {isOperationsGuide ? null : (
+      {showActions ? (
         <ActionsContainer noBorder noPadding noRadius>
           {actions}
         </ActionsContainer>
-      )}
+      ) : null}
     </CustomDrawer>
   );
 };
