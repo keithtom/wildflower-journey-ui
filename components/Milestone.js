@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemButton,
+} from "@mui/material";
 
 import { getScreenSize } from "../hooks/react-responsive";
 import {
@@ -28,6 +35,7 @@ const Milestone = ({
   stepsAssignedCount,
   completedStepsCount,
   variant,
+  flag,
 }) => {
   const { screenSize } = getScreenSize();
 
@@ -43,23 +51,40 @@ const Milestone = ({
 
   return (
     <>
-      <Link href={link ? link : "/"}>
-        <Card
-          variant="lightened"
-          hoverable
-          size="small"
-          noRadius={variant === "small" ? true : false}
+      <Link href={link}>
+        <ListItem
+          secondaryAction={
+            <Stack direction="row" spacing={1} alignItems="center">
+              {flag && <Chip label={flag} size="small" />}
+              {phase && (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <PhaseChip size="small" phase={phase} />
+                </Stack>
+              )}
+              {categories && !hideCategoryChip && (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Stack direction="row" spacing={2}>
+                    {categories.map((m, i) => (
+                      <CategoryChip category={m} size="small" key={i} />
+                    ))}
+                  </Stack>
+                </Stack>
+              )}
+              <IconButton
+                size="small"
+                onMouseDown={() => setInfoDrawerOpen(true)}
+              >
+                <Icon type="dotsVertical" variant="lightened" />
+              </IconButton>
+            </Stack>
+          }
+          disablePadding
         >
-          <Grid
-            container
-            spacing={3}
-            alignItems="center"
-            justifyContent="space-between"
-            flexWrap="noWrap"
-          >
-            <Grid item xs={10} sm={8} md={7}>
-              <Stack direction="row" spacing={3} alignItems="center">
-                <Grid item>
+          <ListItemButton>
+            <ListItemIcon
+              sx={{ minWidth: "48px", paddingLeft: "1px" }}
+              children={
+                <>
                   {status === "done" && (
                     <Icon type="checkCircle" variant="success" />
                   )}
@@ -67,10 +92,7 @@ const Milestone = ({
                     <Icon type="circle" variant="lightened" />
                   )}
                   {status === "in progress" && (
-                    <Icon
-                      type="rightArrowCircleSolid"
-                      variant="lightened"
-                    />
+                    <Icon type="rightArrowCircleSolid" variant="primary" />
                   )}
                   {status === "to do" && (
                     <Icon
@@ -79,10 +101,13 @@ const Milestone = ({
                       variant="primary"
                     />
                   )}
-                </Grid>
+                </>
+              }
+            />
+            <ListItemText>
+              <Stack direction="row" spacing={1} alignItems="center">
                 <Typography
-                  variant={variant === "small" ? "bodyRegular" : "bodyLarge"}
-                  bold
+                  variant={variant === "small" ? "bodySmall" : "bodyRegular"}
                   lightened={status === "up next"}
                   noWrap
                 >
@@ -119,47 +144,10 @@ const Milestone = ({
                   />
                 ) : null}
               </Stack>
-            </Grid>
-
-            <Grid item xs={2} sm={4} md={5}>
-              <Grid
-                container
-                justifyContent="flex-end"
-                alignItems="center"
-                spacing={3}
-                flexWrap="noWrap"
-              >
-                {screenSize.isSm ? null : (
-                  <Grid item>
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      {phase && (
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <PhaseChip size="small" phase={phase} withIcon />
-                        </Stack>
-                      )}
-                      {categories && !hideCategoryChip && (
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Stack direction="row" spacing={2}>
-                            {categories.map((m, i) => (
-                              <CategoryChip category={m} size="small" key={i} />
-                            ))}
-                          </Stack>
-                        </Stack>
-                      )}
-                    </Stack>
-                  </Grid>
-                )}
-                <Grid item>
-                  <IconButton onMouseDown={() => setInfoDrawerOpen(true)}>
-                    <Icon type="dotsVertical" variant="lightened" />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Card>
+            </ListItemText>
+          </ListItemButton>
+        </ListItem>
       </Link>
-
       <InfoDrawer
         open={infoDrawerOpen}
         toggle={() => setInfoDrawerOpen(!infoDrawerOpen)}

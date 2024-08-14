@@ -6,7 +6,7 @@ import { arrayMoveImmutable } from "array-move";
 import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import Skeleton from "@mui/material/Skeleton";
+import { List, Skeleton } from "@mui/material";
 
 import useAuth from "@lib/utils/useAuth";
 import {
@@ -24,8 +24,7 @@ import {
   TextField,
 } from "@ui";
 import Task from "@components/Task";
-import CategoryChip from "@components/CategoryChip";
-import StatusChip from "@components/StatusChip";
+import MilestonePageHead from "@components/MilestonePageHead";
 import Milestone from "@components/Milestone";
 import useMilestone from "@hooks/useMilestone";
 
@@ -135,67 +134,13 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
             </Grid> */}
           </Grid>
 
-          {isLoading ? (
-            <Stack spacing={8}>
-              <Skeleton height={64} width={320} m={0} />
-              <Stack spacing={2}>
-                <Skeleton height={24} m={0} />
-                <Skeleton height={24} m={0} />
-                <Skeleton height={24} m={0} />
-              </Stack>
-            </Stack>
-          ) : (
-            <>
-              <Stack spacing={8}>
-                <Typography variant="h2" bold capitalize>
-                  {milestone.attributes.title}
-                </Typography>
-                <Typography variant="bodyLarge" lightened>
-                  {milestone.attributes.description}
-                </Typography>
-                <Stack direction="row" spacing={6} alignItems="center">
-                  {milestoneAttributes.status ? (
-                    <Stack spacing={2}>
-                      <Typography variant="bodyMini" lightened bold>
-                        STATUS
-                      </Typography>
-                      <StatusChip
-                        status={milestoneAttributes.status}
-                        size="small"
-                        withIcon
-                      />
-                    </Stack>
-                  ) : null}
-                  {milestoneAttributes.categories.length && false ? (
-                    <Stack spacing={2}>
-                      <Typography variant="bodyMini" lightened bold>
-                        CATEGORY
-                      </Typography>
-                      <Stack direction="row" spacing={2}>
-                        {milestoneAttributes.categories.map((m, i) => (
-                          <CategoryChip
-                            category={m}
-                            size="small"
-                            withIcon
-                            key={i}
-                          />
-                        ))}
-                      </Stack>
-                    </Stack>
-                  ) : null}
-
-                  {milestoneAttributes.author ? (
-                    <Stack spacing={2}>
-                      <Typography variant="bodyMini" lightened bold>
-                        AUTHOR
-                      </Typography>
-                      <Avatar size="mini" />
-                    </Stack>
-                  ) : null}
-                </Stack>
-              </Stack>
-            </>
-          )}
+          <MilestonePageHead
+            isLoading={isLoading}
+            title={milestone?.attributes.title}
+            description={milestone?.attributes.description}
+            status={milestone?.attributes.status}
+            categories={milestone?.attributes.categories}
+          />
         </Stack>
 
         {isLoading ? (
@@ -207,12 +152,6 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
           </Stack>
         ) : (
           <Stack>
-            <Stack direction="row" spacing={3} alignItems="center">
-              <Icon type="checkDouble" variant="primary" size="large" />
-              <Typography variant="h4" bold>
-                Tasks
-              </Typography>
-            </Stack>
             {userIsEditing ? (
               <>
                 <Typography>Coming Soon</Typography>
@@ -220,16 +159,36 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
                 <EditableTaskList tasks={FakeMilestoneTasks} /> */}
               </>
             ) : sortedMilestoneTasks ? (
-              sortedMilestoneTasks.map((t, i) => (
-                <Task
-                  key={t.id}
-                  task={t}
-                  isLast={i + 1 === sortedMilestoneTasks.length}
-                  isNext={isUpNext}
-                  handleCompleteMilestone={handleCompleteMilestone}
-                  categories={milestoneAttributes.categories}
-                />
-              ))
+              <Card noPadding>
+                <List
+                  subheader={
+                    <Card variant="lightened" size="small" noRadius>
+                      <Stack
+                        direction="row"
+                        spacing={5}
+                        pl={1}
+                        alignItems="center"
+                      >
+                        <Icon type="checkDouble" variant="primary" />
+                        <Typography variant="bodyRegular" bold>
+                          Tasks
+                        </Typography>
+                      </Stack>
+                    </Card>
+                  }
+                >
+                  {sortedMilestoneTasks.map((t, i) => (
+                    <Task
+                      key={t.id}
+                      task={t}
+                      isLast={i + 1 === sortedMilestoneTasks.length}
+                      isNext={isUpNext}
+                      handleCompleteMilestone={handleCompleteMilestone}
+                      categories={milestone.attributes.categories}
+                    />
+                  ))}
+                </List>
+              </Card>
             ) : (
               <Card hoverable elevated size="small">
                 <Grid

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Skeleton from "@mui/material/Skeleton";
 import { mutate } from "swr";
 import { getCookie } from "cookies-next";
+import { List, ListItem, Skeleton } from "@mui/material";
 
 import {
   PageContainer,
@@ -33,7 +33,9 @@ const ToDoList = ({}) => {
   const [teamAssignments, setTeamAssignments] = useState([]);
 
   const { currentUser, isOperationsGuide } = useUserContext();
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow);
+  const { assignedSteps, isLoading } = useAssignedSteps(workflow, {
+    current_user: isOperationsGuide ? null : true,
+  });
   const { milestonesToDo, isLoadingMilestonesToDo } = useMilestones(workflow, {
     phase,
     omit_include: true,
@@ -96,32 +98,44 @@ const ToDoList = ({}) => {
             </Stack>
           ))
         ) : assignedSteps.length ? (
-          <Stack spacing={12}>
-            <Stack spacing={6} direction="row" alignItems="center">
-              <Icon type="calendarCheck" variant="primary" size="large" />
-              <Typography variant="h3" bold>
-                Your to do list
-              </Typography>
-              <Typography variant="h3" lightened>
-                {assignedSteps.length ? assignedSteps.length : null}
-              </Typography>
-            </Stack>
-            <Stack>
-              {assignedSteps?.map((step, i) => {
-                return (
-                  <Task
-                    key={step.id}
-                    task={step}
-                    processName={
-                      step.relationships.process.data.attributes.title
-                    }
-                    isNext={i === 0}
-                    removeStep={removeStep}
-                  />
-                );
-              })}
-            </Stack>
-          </Stack>
+          <Card noPadding>
+            <List
+              subheader={
+                <Card variant="lightened" size="small" noRadius>
+                  <Stack direction="row" spacing={5} pl={1} alignItems="center">
+                    <Icon type="calendarCheck" variant="primary" />
+                    <Typography variant="bodyRegular" bold>
+                      Your to do list
+                    </Typography>
+                  </Stack>
+                </Card>
+              }
+            >
+              {isLoading ? (
+                <>
+                  {Array.from({ length: 5 }, (_, j) => (
+                    <ListItem>
+                      <Skeleton width={240} height={24} />
+                    </ListItem>
+                  ))}
+                </>
+              ) : (
+                assignedSteps?.map((step, i) => {
+                  return (
+                    <Task
+                      key={step.id}
+                      task={step}
+                      processName={
+                        step.relationships.process.data.attributes.title
+                      }
+                      isNext={i === 0}
+                      removeStep={removeStep}
+                    />
+                  );
+                })
+              )}
+            </List>
+          </Card>
         ) : (
           <Card noPadding>
             <Grid container spacing={24}>

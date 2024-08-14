@@ -17,11 +17,13 @@ describe("tasks part 2", () => {
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
+
       cy.visit("/ssj");
       cy.contains("a li div p", /^Startup$/).click();
       cy.contains("Milestone D-E-F").click();
       cy.contains("Collaborative Step 1").click();
-      cy.contains("Add to my to do list").click();
+      cy.contains("Assign this task").click();
+      cy.get(".assignable-user").first().click();
       cy.contains("ASSIGNEE");
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
@@ -42,7 +44,8 @@ describe("tasks part 2", () => {
 
       // assign task to partner 2
       cy.contains("Collaborative Step 1").click();
-      cy.contains("Add to my to do list").click();
+      cy.contains("Assign this task").click();
+      cy.get(".assignable-user").eq(1).click();
       cy.contains("ASSIGNEE");
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
@@ -58,49 +61,56 @@ describe("tasks part 2", () => {
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.contains("a li div p", /^Startup$/).click();
-      cy.contains("Milestone D-E-F").click();
-      cy.contains("Collaborative Step 1").click();
-      cy.contains("Add to my to do list").click();
-      cy.contains("Mark task complete").click();
-      cy.get("span.completedTask").should("be.visible");
-      cy.logout();
+      cy.getCookie("lastName").then((cookie) => {
+        const lastName = cookie.value;
 
-      // login as partner 2 and navigate to that same step and check that partner's avatar icon appears
-      cy.get("@partner2Email").then((email) => {
-        cy.login(email, "password");
-      });
-      cy.visit("/ssj");
-      cy.contains("a li div p", /^Startup$/).click();
-      cy.contains("Milestone D-E-F").click();
-      cy.get("span.completedTask").should("have.length", 1);
-      cy.contains("Collaborative Step 1").should(
-        "have.css",
-        "text-decoration-line",
-        "line-through"
-      );
-      cy.contains("Collaborative Step 1").click();
-      cy.contains("Completed by").should("be.visible");
-      cy.contains("Add to my to do list").should("not.exist");
-      cy.contains("Mark incomplete").should("not.exist");
-      cy.logout();
+        cy.visit("/ssj");
+        cy.contains("a li div p", /^Startup$/).click();
+        cy.contains("Milestone D-E-F").click();
+        cy.contains("Collaborative Step 1").click();
+        cy.contains("Assign this task").click();
 
-      //login as partner 1 and incomplete and unassign it
-      cy.get("@partner1Email").then((email) => {
-        cy.login(email, "password");
+        cy.get(".assignable-user").contains(lastName).click();
+
+        cy.contains("Mark task complete").click();
+        cy.get("span.completedTask").should("be.visible");
+        cy.logout();
+
+        // login as partner 2 and navigate to that same step and check that partner's avatar icon appears
+        cy.get("@partner2Email").then((email) => {
+          cy.login(email, "password");
+        });
+        cy.visit("/ssj");
+        cy.contains("a li div p", /^Startup$/).click();
+        cy.contains("Milestone D-E-F").click();
+        cy.get("span.completedTask").should("have.length", 1);
+        cy.contains("Collaborative Step 1").should(
+          "have.css",
+          "text-decoration-line",
+          "line-through"
+        );
+        cy.contains("Collaborative Step 1").click();
+        cy.contains("Completed by").should("be.visible");
+        cy.contains("Assign this task").should("not.exist");
+        cy.contains("Stop assigning").should("not.exist");
+        cy.logout();
+
+        //login as partner 1 and incomplete and unassign it
+        cy.get("@partner1Email").then((email) => {
+          cy.login(email, "password");
+        });
+        cy.visit("/ssj");
+        cy.contains("a li div p", /^Startup$/).click();
+        cy.contains("Milestone D-E-F").click();
+        cy.contains("Collaborative Step 1").click();
+        cy.contains("Mark incomplete").click();
+        cy.contains("Remove from to do list").click();
+        cy.get("span.completedTask").should("not.exist");
+        cy.logout();
       });
-      cy.visit("/ssj");
-      cy.contains("a li div p", /^Startup$/).click();
-      cy.contains("Milestone D-E-F").click();
-      cy.contains("Collaborative Step 1").click();
-      cy.contains("Mark incomplete").click();
-      cy.contains("Remove from to do list").click();
-      cy.get("span.completedTask").should("not.exist");
-      cy.logout();
     });
 
-    it.only("can have prerequisites", () => {
+    it("can have prerequisites", () => {
       // login as partner 1 and assign task to themselves. check that avatar icon appears
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
@@ -114,8 +124,10 @@ describe("tasks part 2", () => {
       cy.contains("Milestone D").click();
       cy.contains("h2", /^Milestone D$/);
       cy.contains("Step 1").click();
-      cy.contains("Add to my to do list").click();
+      cy.contains("Assign this task").click();
+      cy.get(".assignable-user").first().click();
       cy.contains("Mark task complete").click();
+      // cy.contains("Stop assigning").click();
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({
@@ -128,8 +140,8 @@ describe("tasks part 2", () => {
       cy.contains("Milestone E").click();
       cy.contains("h2", /^Milestone E$/);
       cy.contains("Step 1").click();
-      cy.contains("Add to my to do list").click();
-      cy.contains("Mark task complete").click();
+      cy.contains("Assign this task").click();
+      cy.contains("Stop assigning").click();
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({

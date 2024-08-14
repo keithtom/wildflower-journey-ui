@@ -31,6 +31,9 @@ import {
   Highlight,
   ListUl,
   HomeHeart,
+  CalendarStar,
+  Calendar,
+  CalendarWeek,
 } from "@styled-icons/boxicons-regular";
 import {
   BuildingHouse,
@@ -56,6 +59,7 @@ import {
   Map,
   CalendarAlt,
   Group,
+  UserCircle,
 } from "@styled-icons/boxicons-solid";
 import { styled, css } from "@mui/material/styles";
 
@@ -225,12 +229,16 @@ export default function Icon({ ...props }) {
     filter: <Filter />,
     minus: <Minus />,
     map: <Map />,
-    calendar: <CalendarAlt />,
+    calendar: <Calendar />,
+    calendarAlt: <CalendarAlt />,
+    calendarWeek: <CalendarWeek />,
     loader: <Loader />,
     highlight: <Highlight />,
     group: <Group />,
     listUl: <ListUl />,
     homeHeart: <HomeHeart />,
+    calendarStar: <CalendarStar />,
+    userCircle: <UserCircle />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

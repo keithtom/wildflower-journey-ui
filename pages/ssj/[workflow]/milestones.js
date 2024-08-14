@@ -3,7 +3,7 @@ import { getCookie } from "cookies-next";
 import ssj_categories from "@lib/ssj/categories";
 import processesApi from "@api/workflow/processes";
 import { useRouter } from "next/router";
-import Skeleton from "@mui/material/Skeleton";
+import { List, ListItem, Skeleton } from "@mui/material";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
@@ -117,30 +117,33 @@ const MilestonesByCategory = ({ workflow }) => {
   ) : (
     sortedMilestonesByCategory?.map((a, i) =>
       a.milestones.length ? (
-        <Card key={i}>
-          <Stack spacing={6}>
-            <Stack direction="row" spacing={6} alignItems="center">
-              <CategoryChip category={a.category} size="large" />
-              <Typography variant="h4" lightened>
-                {a.milestones.length}
-              </Typography>
-            </Stack>
-            <Stack spacing={3}>
-              {a.milestones?.map((m, i) => (
-                <Milestone
-                  link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                  key={i}
-                  status={m.attributes.status}
-                  description={m.attributes.description}
-                  categories={m.attributes.categories}
-                  hideCategoryChip
-                  phase={m.attributes.phase}
-                  title={m.attributes.title}
-                  stepCount={m.attributes.stepsCount}
-                />
-              ))}
-            </Stack>
-          </Stack>
+        <Card key={i} noPadding>
+          <List
+            subheader={
+              <Card variant="lightened" size="small" noRadius>
+                <Stack direction="row" spacing={5} pl={1} alignItems="center">
+                  <CategoryChip category={a.category} size="small" />
+                  <Typography variant="bodyRegular" lightened>
+                    {a.milestones.length}
+                  </Typography>
+                </Stack>
+              </Card>
+            }
+          >
+            {a.milestones?.map((m, i) => (
+              <Milestone
+                link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                key={i}
+                status={m.attributes.status}
+                description={m.attributes.description}
+                categories={m.attributes.categories}
+                hideCategoryChip
+                phase={m.attributes.phase}
+                title={m.attributes.title}
+                stepCount={m.attributes.stepsCount}
+              />
+            ))}
+          </List>
         </Card>
       ) : null
     )
@@ -171,28 +174,31 @@ const MilestonesByPhase = ({ workflow }) => {
     </Stack>
   ) : (
     milestonesByPhase?.map((m, i) => (
-      <Card key={i}>
-        <Stack spacing={6}>
-          <Stack direction="row" spacing={6} alignItems="center">
-            <PhaseChip phase={m.phase} size="large" />
-            <Typography variant="h4" lightened>
-              {m.milestones.length}
-            </Typography>
-          </Stack>
-          <Stack spacing={3}>
-            {m.milestones?.map((m, i) => (
-              <Milestone
-                link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
-                key={i}
-                status={m.attributes.status}
-                description={m.attributes.description}
-                categories={m.attributes.categories}
-                title={m.attributes.title}
-                stepCount={m.attributes.stepsCount}
-              />
-            ))}
-          </Stack>
-        </Stack>
+      <Card key={i} noPadding>
+        <List
+          subheader={
+            <Card variant="lightened" size="small" noRadius>
+              <Stack direction="row" spacing={5} pl={1} alignItems="center">
+                <PhaseChip phase={m.phase} size="small" />
+                <Typography variant="bodyRegular" lightened>
+                  {m.milestones.length}
+                </Typography>
+              </Stack>
+            </Card>
+          }
+        >
+          {m.milestones?.map((m, i) => (
+            <Milestone
+              link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+              key={i}
+              status={m.attributes.status}
+              description={m.attributes.description}
+              categories={m.attributes.categories}
+              title={m.attributes.title}
+              stepCount={m.attributes.stepsCount}
+            />
+          ))}
+        </List>
       </Card>
     ))
   );
