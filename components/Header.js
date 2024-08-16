@@ -185,7 +185,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
 
         {isAdmin ? (
           <>
-            <NavLink to="/ssj" label="Home" />
+            <NavLink to="/network" label="Home" />
             <NavLink to="/admin" label="Admin" />
           </>
         ) : null}
