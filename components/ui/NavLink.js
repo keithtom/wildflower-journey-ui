@@ -10,6 +10,15 @@ const NavLink = ({ to, icon, active, variant, label, ...props }) => {
       background: ${({ theme }) => theme.color.neutral.lightened};
     }
 
+    //deEmphasized
+    ${(props) =>
+      props.deEmphasized &&
+      css`
+        opacity: 0.5;
+        &:hover {
+          background: ${props.theme.color.neutral.lightened};
+        }
+      `}
     //Primary
     ${(props) =>
       props.variant === "primary" &&
