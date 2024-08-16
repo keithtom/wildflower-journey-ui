@@ -113,9 +113,12 @@ const Navigation = () => {
     }
   }, []);
 
+  const isEmergingTeacherLeader = currentUser?.personRoleList?.includes(
+    "Emerging Teacher Leader"
+  );
   const isTeacherLeader =
-    currentUser?.personRoleList?.some((role) => role === "Teacher Leader") &&
-    !currentUser?.personRoleList?.includes("Emerging Teacher Leader");
+    currentUser?.personRoleList?.includes("Teacher Leader");
+
   // console.log({ ogViewingSchool });
   // console.log({ isTeacherLeader });
   // console.log({ currentUser });
@@ -204,8 +207,9 @@ const Navigation = () => {
             />
           ) : null}
 
-          {!isOperationsGuide && currentUser?.attributes?.ssj ? (
+          {!isOperationsGuide && isEmergingTeacherLeader ? (
             <NavLink
+              deEmphasized={isTeacherLeader}
               variant="primary"
               to={`/ssj/${currentUser?.attributes?.ssj?.workflowId}`}
               active={router.asPath === `/ssj/${workflow}`}
@@ -213,6 +217,7 @@ const Navigation = () => {
               icon="home"
             />
           ) : null}
+
           {isOperationsGuide ? (
             <Stack spacing={3}>
               <NavLink
