@@ -48,6 +48,39 @@ const OpenSchool = () => {
   const thisMonth = new Date().getMonth();
   const thisYear = new Date().getFullYear();
 
+  const FutureFeatures = [
+    {
+      name: "Enrollment & Family Communications",
+      iconType: "highlight",
+      imageUrl: "/assets/images/open-school/enrollment-comms.png",
+      ctaLink: `/open-school/${workflow}/enrollment-and-communications`,
+    },
+    {
+      name: "Finance & Operations",
+      iconType: "pieChart",
+      imageUrl: "/assets/images/open-school/finance-ops.png",
+      ctaLink: `/open-school/${workflow}/finance-and-operations`,
+    },
+    {
+      name: "My Board",
+      iconType: "group",
+      imageUrl: "/assets/images/open-school/board.png",
+      ctaLink: `/open-school/${workflow}/my-board`,
+    },
+    {
+      name: "Resources",
+      iconType: "listUl",
+      imageUrl: "/assets/images/open-school/resources.png",
+      ctaLink: `/open-school/${workflow}/resources`,
+    },
+    {
+      name: "Support@",
+      iconType: "homeHeart",
+      imageUrl: "/assets/images/open-school/support.png",
+      ctaLink: `/open-school/${workflow}/support`,
+    },
+  ];
+
   // console.log({ included });
   // useAuth("/login");
   // console.log({ userSchool });
@@ -242,36 +275,3 @@ const OpenSchool = () => {
 };
 
 export default OpenSchool;
-
-const FutureFeatures = [
-  {
-    name: "Enrollment & Family Communications",
-    iconType: "highlight",
-    imageUrl: "/assets/images/open-school/enrollment-comms.png",
-    ctaLink: "/open-school/enrollment-and-communications",
-  },
-  {
-    name: "Finance & Operations",
-    iconType: "pieChart",
-    imageUrl: "/assets/images/open-school/finance-ops.png",
-    ctaLink: "/open-school/finance-and-operations",
-  },
-  {
-    name: "My Board",
-    iconType: "group",
-    imageUrl: "/assets/images/open-school/board.png",
-    ctaLink: "/open-school/my-board",
-  },
-  {
-    name: "Resources",
-    iconType: "listUl",
-    imageUrl: "/assets/images/open-school/resources.png",
-    ctaLink: "/open-school/resources",
-  },
-  {
-    name: "Support@",
-    iconType: "homeHeart",
-    imageUrl: "/assets/images/open-school/support.png",
-    ctaLink: "/open-school/support",
-  },
-];
