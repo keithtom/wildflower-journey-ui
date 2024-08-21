@@ -375,138 +375,21 @@ const EditProfileModal = ({
   toggle,
   open,
 }) => {
-  const { currentUser, setCurrentUser } = useUserContext();
-  const [profilePicture, setProfilePicture] = useState();
-  const [profileImage, setProfileImage] = useState();
-  const [showError, setShowError] = useState();
-  const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
+  // modal for editing profile
+  // many fields for editing profile
+  // so fields are grouped
+
+  // the modal should have a fixed menu on the left
+  // showing the individual field groups
+
+  // each group has its own instance of react-hook-form
+  // which should validate the fields for which it is responsible
+  // each group may submit to a different endpoint
+  // the submit button should be within the field group
+  // rather than global for all the field groups in the modal
+
   const [currentFieldGroup, setCurrentFieldGroup] = useState("general");
   const [isAddingSchool, setIsAddingSchool] = useState(false);
-  const handleFileError = (error) => {
-    setShowError(error);
-  };
-
-  const {
-    control,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm({
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      city: "",
-      state: "",
-      email: "",
-      primaryLanguage: "",
-      primaryLanguageOther: "",
-      raceEthnicity: [],
-      raceEthnicityOther: "",
-      lgbtqia: "",
-      gender: "",
-      genderOther: "",
-      pronouns: "",
-      pronounsOther: "",
-      householdIncome: "",
-      montessoriCertified: "",
-      montessoriCertifiedLevels: [],
-      classroomAge: [],
-      role: [],
-      about: "",
-      phone: "",
-    },
-  });
-
-  useEffect(() => {
-    if (currentUser) {
-      peopleApi.show(currentUser.id).then((response) => {
-        const person = response.data.data;
-
-        // SAVEPOINT this request is working.  need to make sure data is persisted and returned
-        // and then loaded into form.  then we are done here.
-        reset({
-          firstName: currentUser?.attributes.firstName,
-          lastName: currentUser?.attributes.lastName,
-          city: currentUser?.personAddress.city,
-          state: currentUser?.personAddress.state,
-          email: currentUser?.attributes.email,
-          primaryLanguage: person?.attributes?.primaryLanguage || "",
-          primaryLanguageOther: person?.attributes?.primaryLanguageOther || "",
-          raceEthnicity: person?.attributes?.raceEthnicityList || [],
-          raceEthnicityOther: person?.attributes?.raceEthnicityOther || "",
-          lgbtqia: person?.attributes?.lgbtqia || "",
-          gender: person?.attributes?.gender || "",
-          genderOther: person?.attributes?.genderOther || "",
-          pronouns: person?.attributes?.pronouns || "",
-          pronounsOther: person?.attributes?.pronounsOther || "",
-          householdIncome: person?.attributes?.householdIncome || "",
-          montessoriCertified: person?.attributes?.montessoriCertified || "",
-          montessoriCertifiedLevels:
-            person?.attributes?.montessoriCertifiedLevelList || [],
-          classroomAge: person?.attributes?.classroomAgeList || [],
-          role: person?.attributes?.roleList || [],
-          about: person?.attributes?.about || "",
-          phone: person?.attributes?.phone || "",
-        });
-      });
-    }
-  }, [currentUser]);
-
-  const onSubmit = (data) => {
-    peopleApi
-      .update(currentUser.id, {
-        person: {
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          address_attributes: {
-            city: data.city,
-            state: data.state,
-          },
-          primary_language: data.primaryLanguage,
-          primary_language_other: data.primaryLanguageOther,
-          race_ethnicity_list: data.raceEthnicity, // FIX: multi select with other, it uses tags, how is this sent when multiple options?
-          race_ethnicity_other: data.raceEthnicityOther,
-          lgbtqia: data.lgbtqia,
-          gender: data.gender,
-          gender_other: data.genderOther,
-          pronouns: data.pronouns,
-          pronouns_other: data.pronounsOther,
-          household_income: data.householdIncome,
-          montessori_certified: data.montessoriCertified,
-          montessori_certified_level_list: data.montessoriCertifiedLevels,
-          classroom_age_list: data.classroomAge,
-          role_list: data.role,
-          about: data.about,
-          phone: data.phone,
-          profile_image: profileImage,
-        },
-      })
-      .then((response) => {
-        if (response.error) {
-          console.error(error);
-        } else {
-          // const person = response.data.attributes;
-          // currentUser.attributes.firstName = person.firstName;
-          // currentUser.attributes.lastName = person.lastName;
-          // currentUser.attributes.email = person.email;
-          // currentUser.attributes.imageUrl = person.attributes.imageUrl;
-          setProfilePicture(null);
-          setCurrentUser(currentUser);
-          mutate();
-          setEditProfileModalOpen(false);
-        }
-      })
-      .catch((error) => {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
-      });
-  };
 
   const renderFieldGroup = () => {
     switch (currentFieldGroup) {
@@ -534,29 +417,7 @@ const EditProfileModal = ({
       toggle={toggle}
       open={open}
       title="Edit your profile"
-      noPadding
-      fixedHeight
-      // fixedActions={
-      //   <Grid container justifyContent="flex-end">
-      //     <Grid item>
-      //       <Button
-      //         small
-      //         disabled={!isDirty || isUpdatingPicture || isSubmitting}
-      //         type="submit"
-      //       >
-      //         <Typography variant="bodyRegular" bold>
-      //           Save
-      //         </Typography>
-      //       </Button>
-      //       {isUpdatingPicture && (
-      //         <Typography variant="bodyRegular" lightened>
-      //           Updating profile image...
-      //         </Typography>
-      //       )}
-      //     </Grid>
-      //   </Grid>
-      // }
-      fixedMenu={
+      fixedDrawer={
         <List>
           <ListItem disablePadding>
             <ListItemButton
@@ -613,30 +474,87 @@ const EditProfileModal = ({
         </List>
       }
     >
-      <Grid container sx={{ borderTop: "1px solid #eaeaea" }}>
-        <Grid item flex={1}>
-          {renderFieldGroup()}
-        </Grid>
-      </Grid>
+      {renderFieldGroup()}
     </Modal>
   );
 };
 
-const GeneralFields = ({}) => {
+const GeneralFields = () => {
   const [profilePicture, setProfilePicture] = useState();
   const [profileImage, setProfileImage] = useState();
   const [showError, setShowError] = useState();
   const [isUpdatingPicture, setIsUpdatingPicture] = useState(false);
+
+  const { currentUser, setCurrentUser } = useUserContext();
+  const { data: personData, isLoading } = usePerson(currentUser?.id, {
+    network: true,
+  });
+
   const handleFileError = (error) => {
     setShowError(error);
   };
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      firstName: currentUser?.attributes.firstName,
+      lastName: currentUser?.attributes.lastName,
+      city: currentUser?.personAddress.city,
+      state: currentUser?.personAddress.state,
+      email: currentUser?.attributes.email,
+      about: personData?.data?.attributes?.about || "",
+      phone: personData?.data?.attributes?.phone || "",
+    },
+  });
+
+  const onSubmit = (data) => {
+    peopleApi
+      .update(currentUser.id, {
+        person: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          address_attributes: {
+            city: data.city,
+            state: data.state,
+          },
+          about: data.about,
+          phone: data.phone,
+          profile_image: profileImage,
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          console.error(error);
+        } else {
+          setProfilePicture(null);
+          mutate();
+          reset({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            city: data.city,
+            state: data.state,
+            about: data.about,
+            phone: data.phone,
+            profileImage: profileImage,
+          });
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      });
+  };
   return (
-    <Card size="small" noRadius noBorder>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
         <Controller
           name="firstName"
@@ -896,16 +814,63 @@ const GeneralFields = ({}) => {
           </Grid>
         </Grid>
       </Stack>
-    </Card>
+      <Box sx={{ position: "sticky", bottom: 0, left: 0, right: 0 }}>
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              {/* <Button variant="lightened" small onClick={}>
+                <Typography variant="bodyRegular" bold>
+                  Cancel
+                </Typography>
+              </Button> */}
+            </Grid>
+            <Grid item>
+              <Button
+                variant="primary"
+                small
+                type="submit"
+                disabled={!isDirty || isSubmitting}
+              >
+                <Typography variant="bodyRegular" bold>
+                  Save
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </Card>
+      </Box>
+    </form>
   );
 };
 const DemographicFields = ({}) => {
+  const { currentUser, setCurrentUser } = useUserContext();
+  const { data: personData, isLoading } = usePerson(currentUser?.id, {
+    network: true,
+  });
+
   const {
     control,
     handleSubmit,
     watch,
+    reset,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      primaryLanguage: personData?.data?.attributes?.primaryLanguage || "",
+      primaryLanguageOther:
+        personData?.data?.attributes?.primaryLanguageOther || "",
+      raceEthnicity: personData?.data?.attributes?.raceEthnicityList || [],
+      raceEthnicityOther:
+        personData?.data?.attributes?.raceEthnicityOther || "",
+      lgbtqia: personData?.data?.attributes?.lgbtqia || "",
+      gender: personData?.data?.attributes?.gender || "",
+      genderOther: personData?.data?.attributes?.genderOther || "",
+      pronouns: personData?.data?.attributes?.pronouns || "",
+      pronounsOther: personData?.data?.attributes?.pronounsOther || "",
+      householdIncome: personData?.data?.attributes?.householdIncome || "",
+    },
+  });
+
   const watchFields = watch();
   const showCustomEthnicityField = watchFields?.raceEthnicity?.includes(
     "A not-listed or more specific ethnicity"
@@ -915,8 +880,53 @@ const DemographicFields = ({}) => {
     watchFields.gender === "A not-listed or more specific gender identity";
   const showCustomPronounsField =
     watchFields.pronouns === "Not-listed or more specific pronouns";
+
+  const onSubmit = (data) => {
+    peopleApi
+      .update(currentUser.id, {
+        person: {
+          primary_language: data.primaryLanguage,
+          primary_language_other: data.primaryLanguageOther,
+          race_ethnicity_list: data.raceEthnicity, // FIX: multi select with other, it uses tags, how is this sent when multiple options?
+          race_ethnicity_other: data.raceEthnicityOther,
+          lgbtqia: data.lgbtqia,
+          gender: data.gender,
+          gender_other: data.genderOther,
+          pronouns: data.pronouns,
+          pronouns_other: data.pronounsOther,
+          household_income: data.householdIncome,
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          console.error(error);
+        } else {
+          mutate();
+          reset({
+            primaryLanguage: data.primaryLanguage,
+            primaryLanguageOther: data.primaryLanguageOther,
+            raceEthnicity: data.raceEthnicity,
+            raceEthnicityOther: data.raceEthnicityOther,
+            lgbtqia: data.lgbtqia,
+            gender: data.gender,
+            genderOther: data.genderOther,
+            pronouns: data.pronouns,
+            pronounsOther: data.pronounsOther,
+            householdIncome: data.householdIncome,
+          });
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      });
+  };
   return (
-    <Card size="small" noRadius noBorder>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
         <Controller
           name="primaryLanguage"
@@ -1156,22 +1166,95 @@ const DemographicFields = ({}) => {
           </FormHelperText>
         </Stack>
       </Stack>
-    </Card>
+      <Box sx={{ position: "sticky", bottom: 0, left: 0, right: 0 }}>
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              {/* <Button variant="lightened" small onClick={}>
+                <Typography variant="bodyRegular" bold>
+                  Cancel
+                </Typography>
+              </Button> */}
+            </Grid>
+            <Grid item>
+              <Button
+                variant="primary"
+                small
+                type="submit"
+                disabled={!isDirty || isSubmitting}
+              >
+                <Typography variant="bodyRegular" bold>
+                  Save
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </Card>
+      </Box>
+    </form>
   );
 };
 const CertificationAndRoleFields = ({}) => {
+  const { currentUser, setCurrentUser } = useUserContext();
+  const { data: personData, isLoading } = usePerson(currentUser?.id, {
+    network: true,
+  });
   const {
     control,
     handleSubmit,
     watch,
+    reset,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      montessoriCertified:
+        personData?.data?.attributes?.montessoriCertified || "",
+      montessoriCertifiedLevels:
+        personData?.data?.attributes?.montessoriCertifiedLevelList || [],
+      classroomAge: personData?.data?.attributes?.classroomAgeList || [],
+      role: personData?.data?.attributes?.roleList || [],
+    },
+  });
   const watchFields = watch();
   const isCertifiedOrSeeking =
     watchFields.montessoriCertified === "Yes" ||
     watchFields.montessoriCertified === "Currently Seeking Certification";
+
+  const onSubmit = (data) => {
+    peopleApi
+      .update(currentUser.id, {
+        person: {
+          montessori_certified: data.montessoriCertified,
+          montessori_certified_level_list: data.montessoriCertifiedLevels,
+          classroom_age_list: data.classroomAge,
+          role_list: data.role,
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          console.error(error);
+        } else {
+          mutate();
+          reset({
+            montessoriCertified: data.montessoriCertified,
+            montessoriCertifiedLevels: data.montessoriCertifiedLevels,
+            classroomAge: data.classroomAge,
+            role: data.role,
+          });
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      });
+  };
+
   return (
-    <Card size="small" noRadius noBorder>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
         <Stack spacing={1}>
           <Typography variant="bodyRegular">
@@ -1248,10 +1331,266 @@ const CertificationAndRoleFields = ({}) => {
           )}
         />
       </Stack>
-    </Card>
+      <Box sx={{ position: "sticky", bottom: 0, left: 0, right: 0 }}>
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              {/* <Button variant="lightened" small onClick={}>
+                <Typography variant="bodyRegular" bold>
+                  Cancel
+                </Typography>
+              </Button> */}
+            </Grid>
+            <Grid item>
+              <Button
+                variant="primary"
+                small
+                type="submit"
+                disabled={!isDirty || isSubmitting}
+              >
+                <Typography variant="bodyRegular" bold>
+                  Save
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </Card>
+      </Box>
+    </form>
   );
 };
 const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
+  const { currentUser, setCurrentUser } = useUserContext();
+  const { data: personData, isLoading } = usePerson(currentUser?.id, {
+    network: true,
+  });
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    // peopleApi
+    //   .update(currentUser.id, {
+    //     person: {
+    //       montessori_certified: data.montessoriCertified,
+    //       montessori_certified_level_list: data.montessoriCertifiedLevels,
+    //       classroom_age_list: data.classroomAge,
+    //       role_list: data.role,
+    //     },
+    //   })
+    //   .then((response) => {
+    //     if (response.error) {
+    //       console.error(error);
+    //     } else {
+    //       mutate();
+    //       reset({
+    //         montessoriCertified: data.montessoriCertified,
+    //         montessoriCertifiedLevels: data.montessoriCertifiedLevels,
+    //         classroomAge: data.classroomAge,
+    //         role: data.role,
+    //       });
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     if (error?.response?.status === 401) {
+    //       clearLoggedInState({});
+    //       router.push("/login");
+    //     } else {
+    //       console.error(error);
+    //     }
+    //   });
+  };
+
+  const schools = personData?.included
+    ?.filter((i) => i.type === "schoolRelationship")
+    ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+
+  console.log("schools", schools);
+  console.log("personData", personData);
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Grid container spacing={6}>
+        <Grid item xs={12}>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Button
+                variant="lightened"
+                small
+                onClick={() => setIsAddingSchool(true)}
+              >
+                <Typography variant="bodySmall" bold>
+                  Add experience
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
+        <Grid item xs={12} justifyContent="center">
+          {isAddingSchool ? (
+            <Grid container>
+              <Grid item xs={12}>
+                <Stack spacing={3}>
+                  <Controller
+                    name="school"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        label="School"
+                        placeholder="e.g. Wild Rose Montessori"
+                        options={schoolOptions}
+                        error={errors.school}
+                        helperText={
+                          errors &&
+                          errors.school &&
+                          errors.school.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="dateJoined"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        label="Date joined"
+                        placeholder="e.g. Fall 2022"
+                        options={dateJoinedOptions}
+                        error={errors.dateJoined}
+                        helperText={
+                          errors &&
+                          errors.dateJoined &&
+                          errors.dateJoined.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="dateLeft"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        label="Date left"
+                        placeholder="e.g. Spring 2023"
+                        options={dateLeftOptions}
+                        error={errors.dateLeft}
+                        helperText={
+                          errors &&
+                          errors.dateLeft &&
+                          errors.dateLeft.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="schoolTitle"
+                    control={control}
+                    rules={{
+                      required: false,
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Title"
+                        placeholder="e.g. Chief Financial Officer"
+                        error={errors.schoolTitle}
+                        helperText={
+                          errors &&
+                          errors.schoolTitle &&
+                          errors.schoolTitle.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                </Stack>
+              </Grid>
+            </Grid>
+          ) : schools.length ? (
+            <Grid container spacing={6}>
+              {schools.map((school, i) => (
+                <Grid item xs={12} key={i}>
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                    spacing={6}
+                  >
+                    <Grid item xs={8}>
+                      <Typography
+                        variant="bodyRegular"
+                        bold
+                        noWrap
+                        sx={{ width: "100%" }}
+                      >
+                        {school.attributes.name}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Stack direction="row" spacing={3}>
+                        <Typography variant="bodyRegular" lightened>
+                          Edit
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          Remove
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                  <Stack>
+                    <Typography variant="bodyRegular" lightened>
+                      {school.attributes.roleList.length
+                        ? school.attributes.roleList.map(
+                            (r, i) =>
+                              r +
+                              (i < school.attributes.roleList.length - 1
+                                ? ", "
+                                : "")
+                          )
+                        : "Role"}
+                    </Typography>
+                    <Typography variant="bodyRegular" lightened>
+                      {school.attributes.startDate
+                        ? school.attributes.startDate
+                        : "Before"}{" "}
+                      -{" "}
+                      {school.attributes.endDate
+                        ? school.attributes.endDate
+                        : "Present"}
+                    </Typography>
+                  </Stack>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Card noBorder noRadius size="large">
+              <Stack spacing={6} alignItems="center">
+                <img src="/assets/images/wildflower-logo.png" />
+                <Button onClick={() => setIsAddingSchool(true)}>
+                  <Typography variant="bodyRegular" bold>
+                    Add experience
+                  </Typography>
+                </Button>
+              </Stack>
+            </Card>
+          )}
+        </Grid>
+      </Grid>
+    </form>
+  );
+};
+const BoardHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
   const {
     control,
     handleSubmit,
@@ -1260,178 +1599,158 @@ const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
   } = useForm();
   const schools = [1, 2, 3];
   return (
-    <>
-      <Card noBorder noRadius>
-        <Grid container spacing={6}>
-          <Grid item xs={12}>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Button
-                  variant="lightened"
-                  small
-                  onClick={() => setIsAddingSchool(true)}
-                >
-                  <Typography variant="bodySmall" bold>
+    <Card noBorder noRadius>
+      <Grid container spacing={6}>
+        <Grid item xs={12}>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Button
+                variant="lightened"
+                small
+                onClick={() => setIsAddingSchool(true)}
+              >
+                <Typography variant="bodySmall" bold>
+                  Add experience
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
+        <Grid item xs={12} justifyContent="center">
+          {isAddingSchool ? (
+            <Grid container>
+              <Grid item xs={12}>
+                <Stack spacing={3}>
+                  <Controller
+                    name="school"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        label="School"
+                        placeholder="e.g. Wild Rose Montessori"
+                        options={schoolOptions}
+                        error={errors.school}
+                        helperText={
+                          errors &&
+                          errors.school &&
+                          errors.school.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="dateJoined"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        label="Date joined"
+                        placeholder="e.g. Fall 2022"
+                        options={dateJoinedOptions}
+                        error={errors.dateJoined}
+                        helperText={
+                          errors &&
+                          errors.dateJoined &&
+                          errors.dateJoined.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="dateLeft"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        label="Date left"
+                        placeholder="e.g. Spring 2023"
+                        options={dateLeftOptions}
+                        error={errors.dateLeft}
+                        helperText={
+                          errors &&
+                          errors.dateLeft &&
+                          errors.dateLeft.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="schoolTitle"
+                    control={control}
+                    rules={{
+                      required: false,
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        label="Title"
+                        placeholder="e.g. Chief Financial Officer"
+                        error={errors.schoolTitle}
+                        helperText={
+                          errors &&
+                          errors.schoolTitle &&
+                          errors.schoolTitle.type === "required" &&
+                          "This field is required"
+                        }
+                        {...field}
+                      />
+                    )}
+                  />
+                </Stack>
+              </Grid>
+            </Grid>
+          ) : schools.length ? (
+            <Grid container>
+              {/* Map through experience */}
+              <Grid item xs={12}>
+                <Stack>
+                  <Grid container justifyContent="space-between">
+                    <Grid item>
+                      <Typography variant="bodyRegular" bold>
+                        Wild Rose Montessori
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Stack direction="row" spacing={3}>
+                        <Typography variant="bodyRegular" lightened>
+                          Edit
+                        </Typography>
+                        <Typography variant="bodyRegular" lightened>
+                          Remove
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                  <Typography variant="bodyRegular" lightened>
+                    Chief Financial Officer
+                  </Typography>
+                  <Typography variant="bodyRegular" lightened>
+                    2018 - 2019
+                  </Typography>
+                </Stack>
+              </Grid>
+            </Grid>
+          ) : (
+            <Card noBorder noRadius size="large">
+              <Stack spacing={6} alignItems="center">
+                <img src="/assets/images/wildflower-logo.png" />
+                <Button onClick={() => setIsAddingSchool(true)}>
+                  <Typography variant="bodyRegular" bold>
                     Add experience
                   </Typography>
                 </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <Divider />
-          </Grid>
-          <Grid item xs={12} justifyContent="center">
-            {isAddingSchool ? (
-              <Grid container>
-                <Grid item xs={12}>
-                  <Stack spacing={3}>
-                    <Controller
-                      name="school"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          label="School"
-                          placeholder="e.g. Wild Rose Montessori"
-                          options={schoolOptions}
-                          error={errors.school}
-                          helperText={
-                            errors &&
-                            errors.school &&
-                            errors.school.type === "required" &&
-                            "This field is required"
-                          }
-                          {...field}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="dateJoined"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          label="Date joined"
-                          placeholder="e.g. Fall 2022"
-                          options={dateJoinedOptions}
-                          error={errors.dateJoined}
-                          helperText={
-                            errors &&
-                            errors.dateJoined &&
-                            errors.dateJoined.type === "required" &&
-                            "This field is required"
-                          }
-                          {...field}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="dateLeft"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          label="Date left"
-                          placeholder="e.g. Spring 2023"
-                          options={dateLeftOptions}
-                          error={errors.dateLeft}
-                          helperText={
-                            errors &&
-                            errors.dateLeft &&
-                            errors.dateLeft.type === "required" &&
-                            "This field is required"
-                          }
-                          {...field}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="schoolTitle"
-                      control={control}
-                      rules={{
-                        required: false,
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          label="Title"
-                          placeholder="e.g. Chief Financial Officer"
-                          error={errors.schoolTitle}
-                          helperText={
-                            errors &&
-                            errors.schoolTitle &&
-                            errors.schoolTitle.type === "required" &&
-                            "This field is required"
-                          }
-                          {...field}
-                        />
-                      )}
-                    />
-                  </Stack>
-                </Grid>
-              </Grid>
-            ) : schools.length ? (
-              <Grid container>
-                {/* Map through experience */}
-                <Grid item xs={12}>
-                  <Stack>
-                    <Grid container justifyContent="space-between">
-                      <Grid item>
-                        <Typography variant="bodyRegular" bold>
-                          Wild Rose Montessori
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Stack direction="row" spacing={3}>
-                          <Typography variant="bodyRegular" lightened>
-                            Edit
-                          </Typography>
-                          <Typography variant="bodyRegular" lightened>
-                            Remove
-                          </Typography>
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                    <Typography variant="bodyRegular" lightened>
-                      Chief Financial Officer
-                    </Typography>
-                    <Typography variant="bodyRegular" lightened>
-                      2018 - 2019
-                    </Typography>
-                  </Stack>
-                </Grid>
-              </Grid>
-            ) : (
-              <Card noBorder noRadius size="large">
-                <Stack spacing={6} alignItems="center">
-                  <img src="/assets/images/wildflower-logo.png" />
-                  <Button onClick={() => setIsAddingSchool(true)}>
-                    <Typography variant="bodyRegular" bold>
-                      Add experience
-                    </Typography>
-                  </Button>
-                </Stack>
-              </Card>
-            )}
-          </Grid>
+              </Stack>
+            </Card>
+          )}
         </Grid>
-      </Card>
-      <Box
-        sx={{
-          position: "fixed",
-          bottom: 0,
-          right: 0,
-          left: 0,
-          borderTop: "1px solid #eaeaea",
-        }}
-      >
-        hi
-      </Box>
-    </>
-  );
-};
-const BoardHistoryFields = ({}) => {
-  return (
-    <div>
-      <div>Board History</div>
-    </div>
+      </Grid>
+    </Card>
   );
 };
 
