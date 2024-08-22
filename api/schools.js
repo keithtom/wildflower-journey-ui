@@ -13,6 +13,20 @@ async function index() {
   return schoolsApi.get();
 }
 
+export const showSchools = {
+  key: () => `/`,
+  fetcher: () => {
+    return schoolsApi
+      .get(showSchools.key(), getAuthHeader())
+      .then((data) => {
+        return data;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
+
 // DEPRECATED for showSchool
 async function show(id, params = {}) {
   return schoolsApi.get(`/${id}`, params);

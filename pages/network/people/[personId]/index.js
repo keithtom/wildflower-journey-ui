@@ -9,7 +9,11 @@ import {
   ListItemButton,
   ListItemText,
   Skeleton,
+  Autocomplete,
+  TextField as MaterialTextField,
+  CircularProgress,
 } from "@mui/material";
+import { format } from "date-fns";
 
 import { styled } from "@mui/material/styles";
 import { FilePond, registerPlugin } from "react-filepond";
@@ -74,7 +78,11 @@ import ProfileHero from "@components/ProfileHero";
 import AttributesCard from "@components/AttributesCard";
 import SchoolCard from "@components/SchoolCard";
 import peopleApi from "@api/people";
+import schoolRelationshipsApi from "@api/school_relationships";
 import usePerson from "@hooks/usePerson";
+import useSchool from "@hooks/useSchool";
+import useSchools from "@hooks/useSchools";
+import { DataArea } from "styled-icons/fluentui-system-filled";
 
 const Person = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
@@ -108,10 +116,78 @@ const Person = ({}) => {
     return matchingItems;
   };
 
+  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+
   let hasInfo;
   let userSchool;
+  let schoolsWhereRoleTeacherLeader;
+  let schoolHistory;
+  let schoolsWhereRoleBoardMember;
+  let boardHistory;
 
   if (!isLoading) {
+    const includedSchools = included.filter((item) => item.type === "school");
+
+    schoolsWhereRoleTeacherLeader = included.filter(
+      (item) =>
+        item.type === "schoolRelationship" &&
+        item.attributes.roleList.includes("Teacher Leader")
+    );
+
+    schoolHistory = includedSchools
+      .map((school) => {
+        const relationship = schoolsWhereRoleTeacherLeader.find(
+          (relationship) =>
+            relationship.relationships.school.data.id === school.id
+        );
+
+        if (relationship) {
+          return {
+            ...school,
+            startDate: relationship.attributes.startDate,
+            endDate: relationship.attributes.endDate,
+          };
+        }
+
+        return null; // Return null if no matching relationship is found
+      })
+      .filter((school) => school !== null) // Filter out null values
+      .sort((a, b) => {
+        if (!a.endDate) return -1;
+        if (!b.endDate) return 1;
+        return 0;
+      });
+
+    schoolsWhereRoleBoardMember = included.filter(
+      (item) =>
+        item.type === "schoolRelationship" &&
+        item.attributes.roleList.includes("Board Member")
+    );
+
+    boardHistory = includedSchools
+      .map((school) => {
+        const relationship = schoolsWhereRoleBoardMember.find(
+          (relationship) =>
+            relationship.relationships.school.data.id === school.id
+        );
+
+        if (relationship) {
+          return {
+            ...school,
+            startDate: relationship.attributes.startDate,
+            endDate: relationship.attributes.endDate,
+          };
+        }
+
+        return null; // Return null if no matching relationship is found
+      })
+      .filter((school) => school !== null) // Filter out null values
+      .sort((a, b) => {
+        if (!a.endDate) return -1;
+        if (!b.endDate) return 1;
+        return 0;
+      });
+
     userSchool = findMatchingItems(
       included,
       person?.relationships.schools.data,
@@ -124,7 +200,11 @@ const Person = ({}) => {
       userSchool;
   }
 
-  // console.log({ person });
+  console.log({ schoolHistory });
+  console.log({ personData });
+  console.log({ schoolsWhereRoleTeacherLeader });
+  console.log({ schoolsWhereRoleBoardMember });
+  console.log({ boardHistory });
   // console.log({ currentUser });
   // console.log({ included });
   // console.log({ userSchool });
@@ -297,17 +377,22 @@ const Person = ({}) => {
                       </Grid>
                     ) : null}
 
-                    {userSchool.length ? (
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
+                    {schoolHistory.length ? (
+                      <Grid container spacing={6}>
+                        <Grid item sm={12} md={4}>
                           <Typography variant="h4" bold>
-                            School
+                            School History
                           </Typography>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item sm={12} md={8}>
                           <Stack spacing={3}>
-                            {userSchool?.map((s, i) => (
+                            {schoolHistory?.map((s, i) => (
                               <SchoolCard
+                                subtitle={`${formatHumanDate(s.startDate)} - ${
+                                  s.endDate
+                                    ? formatHumanDate(s.endDate)
+                                    : "Present"
+                                }`}
                                 key={i}
                                 schoolName={s.attributes.name}
                                 logo={s.attributes.logoUrl}
@@ -319,22 +404,27 @@ const Person = ({}) => {
                         </Grid>
                       </Grid>
                     ) : null}
-                    {person?.attributes?.boardMemberOf ? (
-                      <Grid container>
-                        <Grid item xs={12} sm={6}>
+                    {boardHistory.length ? (
+                      <Grid container spacing={6}>
+                        <Grid item sm={12} md={4}>
                           <Typography variant="h4" bold>
-                            Board member
+                            Board History
                           </Typography>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item sm={12} md={8}>
                           <Stack spacing={3}>
-                            {person.attributes.boardMemberOf?.map((b, i) => (
+                            {boardHistory?.map((s, i) => (
                               <SchoolCard
+                                subtitle={`${formatHumanDate(s.startDate)} - ${
+                                  s.endDate
+                                    ? formatHumanDate(s.endDate)
+                                    : "Present"
+                                }`}
                                 key={i}
-                                schoolName={b.name}
-                                logo={b.logoUrl}
-                                location={b.location}
-                                link={`/network/schools/${b.id}`}
+                                schoolName={s.attributes.name}
+                                logo={s.attributes.logoUrl}
+                                location={s.attributes.location}
+                                link={`/network/schools/${s.id}`}
                               />
                             ))}
                           </Stack>
@@ -389,38 +479,31 @@ const EditProfileModal = ({
   // rather than global for all the field groups in the modal
 
   const [currentFieldGroup, setCurrentFieldGroup] = useState("general");
-  const [isAddingSchool, setIsAddingSchool] = useState(false);
-  const [isAddingBoardHistory, setIsAddingBoardHistory] = useState(false);
 
+  const handleToggle = () => {
+    toggle();
+    setCurrentFieldGroup("general");
+  };
   const renderFieldGroup = () => {
     switch (currentFieldGroup) {
       case "general":
-        return <GeneralFields />;
+        return <GeneralFields handleToggle={handleToggle} />;
       case "demographic":
-        return <DemographicFields />;
+        return <DemographicFields handleToggle={handleToggle} />;
       case "certification_and_role":
-        return <CertificationAndRoleFields />;
+        return <CertificationAndRoleFields handleToggle={handleToggle} />;
       case "school_history":
-        return (
-          <SchoolHistoryFields
-            isAddingSchool={isAddingSchool}
-            setIsAddingSchool={setIsAddingSchool}
-          />
-        );
+        return <SchoolHistoryFields handleToggle={handleToggle} />;
       case "board_history":
-        return (
-          <BoardHistoryFields
-            isAddingBoardHistory={isAddingBoardHistory}
-            setIsAddingBoardHistory={setIsAddingBoardHistory}
-          />
-        );
+        return <BoardHistoryFields handleToggle={handleToggle} />;
       default:
         return null;
     }
   };
+
   return (
     <Modal
-      toggle={toggle}
+      toggle={handleToggle}
       open={open}
       title="Edit your profile"
       fixedDrawer={
@@ -485,7 +568,7 @@ const EditProfileModal = ({
   );
 };
 
-const GeneralFields = () => {
+const GeneralFields = ({ handleToggle }) => {
   const [profilePicture, setProfilePicture] = useState();
   const [profileImage, setProfileImage] = useState();
   const [showError, setShowError] = useState();
@@ -537,7 +620,7 @@ const GeneralFields = () => {
           console.error(error);
         } else {
           setProfilePicture(null);
-          mutate();
+          mutate(`/v1/people/${currentUser?.id}`);
           reset({
             firstName: data.firstName,
             lastName: data.lastName,
@@ -832,11 +915,9 @@ const GeneralFields = () => {
         <Card size="small" elevated>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
-              {/* <Button variant="lightened" small onClick={}>
-                <Typography variant="bodyRegular" bold>
-                  Cancel
-                </Typography>
-              </Button> */}
+              <Button variant="text" small onClick={handleToggle}>
+                <Typography variant="bodyRegular">Cancel</Typography>
+              </Button>
             </Grid>
             <Grid item>
               <Button
@@ -856,7 +937,7 @@ const GeneralFields = () => {
     </form>
   );
 };
-const DemographicFields = ({}) => {
+const DemographicFields = ({ handleToggle }) => {
   const { currentUser, setCurrentUser } = useUserContext();
   const { data: personData, isLoading } = usePerson(currentUser?.id, {
     network: true,
@@ -915,7 +996,7 @@ const DemographicFields = ({}) => {
         if (response.error) {
           console.error(error);
         } else {
-          mutate();
+          mutate(`/v1/people/${currentUser?.id}`);
           reset({
             primaryLanguage: data.primaryLanguage,
             primaryLanguageOther: data.primaryLanguageOther,
@@ -1192,11 +1273,9 @@ const DemographicFields = ({}) => {
         <Card size="small" elevated>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
-              {/* <Button variant="lightened" small onClick={}>
-                <Typography variant="bodyRegular" bold>
-                  Cancel
-                </Typography>
-              </Button> */}
+              <Button variant="text" small onClick={handleToggle}>
+                <Typography variant="bodyRegular">Cancel</Typography>
+              </Button>
             </Grid>
             <Grid item>
               <Button
@@ -1216,7 +1295,7 @@ const DemographicFields = ({}) => {
     </form>
   );
 };
-const CertificationAndRoleFields = ({}) => {
+const CertificationAndRoleFields = ({ handleToggle }) => {
   const { currentUser, setCurrentUser } = useUserContext();
   const { data: personData, isLoading } = usePerson(currentUser?.id, {
     network: true,
@@ -1233,6 +1312,8 @@ const CertificationAndRoleFields = ({}) => {
         personData?.data?.attributes?.montessoriCertified || "",
       montessoriCertifiedLevels:
         personData?.data?.attributes?.montessoriCertifiedLevelList || [],
+      montessoriCertifiedYear:
+        personData?.data?.attributes?.montessoriCertifiedYear || "",
       classroomAge: personData?.data?.attributes?.classroomAgeList || [],
       role: personData?.data?.attributes?.roleList || [],
     },
@@ -1248,6 +1329,7 @@ const CertificationAndRoleFields = ({}) => {
         person: {
           montessori_certified: data.montessoriCertified,
           montessori_certified_level_list: data.montessoriCertifiedLevels,
+          montessori_certified_year: data.montessoriCertifiedYear,
           classroom_age_list: data.classroomAge,
           role_list: data.role,
         },
@@ -1256,10 +1338,11 @@ const CertificationAndRoleFields = ({}) => {
         if (response.error) {
           console.error(error);
         } else {
-          mutate();
+          mutate(`/v1/people/${currentUser?.id}`);
           reset({
             montessoriCertified: data.montessoriCertified,
             montessoriCertifiedLevels: data.montessoriCertifiedLevels,
+            montessoriCertifiedYear: data.montessoriCertifiedYear,
             classroomAge: data.classroomAge,
             role: data.role,
           });
@@ -1274,6 +1357,9 @@ const CertificationAndRoleFields = ({}) => {
         }
       });
   };
+
+  console.log({ personData });
+  // console.log({ watchFields });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -1307,28 +1393,59 @@ const CertificationAndRoleFields = ({}) => {
           </FormHelperText>
         </Stack>
         {isCertifiedOrSeeking ? (
-          <Controller
-            name="montessoriCertifiedLevels"
-            control={control}
-            rules={{ required: isCertifiedOrSeeking ? true : false }}
-            render={({ field }) => (
-              <MultiSelect
-                withCheckbox
-                label="What Levels are you certified (or seeking certification) for?"
-                placeholder="Select as many as you like..."
-                options={levelsOfMontessoriCertification}
-                error={errors.montessoriCertifiedLevels}
-                defaultValue={[]}
-                helperText={
-                  errors &&
-                  errors.montessoriCertifiedLevels &&
-                  errors.montessoriCertifiedLevels.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
+          <>
+            <Controller
+              name="montessoriCertifiedLevels"
+              control={control}
+              rules={{ required: isCertifiedOrSeeking ? true : false }}
+              render={({ field }) => (
+                <MultiSelect
+                  withCheckbox
+                  label="What Levels are you certified (or seeking certification) for?"
+                  placeholder="Select as many as you like..."
+                  options={levelsOfMontessoriCertification}
+                  error={errors.montessoriCertifiedLevels}
+                  defaultValue={[]}
+                  helperText={
+                    errors &&
+                    errors.montessoriCertifiedLevels &&
+                    errors.montessoriCertifiedLevels.type === "required" &&
+                    "This field is required"
+                  }
+                  {...field}
+                />
+              )}
+            />
+            <Controller
+              name="montessoriCertifiedYear"
+              control={control}
+              rules={{ required: isCertifiedOrSeeking ? true : false }}
+              render={({ field }) => {
+                const selectedLevels = watch("montessoriCertifiedLevels") || [];
+                const formattedText = selectedLevels
+                  .map((level) => `${level} - (Year)`)
+                  .join("\n");
+
+                return (
+                  <TextField
+                    label="For each certification, what year were you (or will you be) certified?"
+                    placeholder="e.g. Primary/Early Childhood - (2020)"
+                    multiline={true}
+                    rows={4}
+                    error={errors.montessoriCertifiedYear}
+                    helperText={
+                      errors &&
+                      errors.montessoriCertifiedYear &&
+                      errors.montessoriCertifiedYear.type === "required" &&
+                      "This field is required"
+                    }
+                    {...field}
+                    defaultValue={formattedText}
+                  />
+                );
+              }}
+            />
+          </>
         ) : null}
         <Controller
           name="role"
@@ -1355,21 +1472,19 @@ const CertificationAndRoleFields = ({}) => {
       </Stack>
       <Box
         sx={{
-          position: "absolute",
-          bottom: "24px",
-          left: "224px",
-          right: "24px",
+          position: "sticky",
+          bottom: 0,
+          left: 0,
+          right: 0,
           paddingTop: "24px",
         }}
       >
         <Card size="small" elevated>
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
-              {/* <Button variant="lightened" small onClick={}>
-                <Typography variant="bodyRegular" bold>
-                  Cancel
-                </Typography>
-              </Button> */}
+              <Button variant="text" small onClick={handleToggle}>
+                <Typography variant="bodyRegular">Cancel</Typography>
+              </Button>
             </Grid>
             <Grid item>
               <Button
@@ -1389,57 +1504,165 @@ const CertificationAndRoleFields = ({}) => {
     </form>
   );
 };
-const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
+const SchoolHistoryFields = ({ handleToggle }) => {
+  const [isAddingSchool, setIsAddingSchool] = useState(false);
+  const [isEditingSchool, setIsEditingSchool] = useState(false);
+  const [currentSchool, setCurrentSchool] = useState(null);
   const { currentUser, setCurrentUser } = useUserContext();
   const { data: personData, isLoading } = usePerson(currentUser?.id, {
     network: true,
   });
+  const { data: schoolsData, isLoading: schoolsIsLoading } = useSchools();
+  const schoolOptions = schoolsIsLoading
+    ? []
+    : schoolsData?.data?.map((s) => ({
+        label: s.attributes.name,
+        value: s.id,
+      }));
+
   const {
     control,
     handleSubmit,
+    reset,
     watch,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm();
+    formState: { errors, touchedFields, isSubmitting, isDirty },
+  } = useForm({});
+
+  useEffect(() => {
+    if (currentSchool) {
+      // console.log({currentSchool})
+      reset({
+        school: schoolOptions?.find(
+          (option) =>
+            option.value === currentSchool.relationships.school.data.id
+        ),
+        dateJoined: currentSchool.attributes.startDate,
+        dateLeft: currentSchool.attributes.endDate,
+        schoolTitle: currentSchool.attributes.title,
+      });
+    }
+  }, [currentSchool]);
+
+  const handleCancel = () => {
+    setIsAddingSchool(false);
+    setIsEditingSchool(false);
+    setCurrentSchool(null);
+    reset({
+      school: null,
+      dateJoined: "",
+      dateLeft: "",
+      schoolTitle: "",
+    });
+  };
+
+  const handleDeleteSchoolRelationship = async (schoolId) => {
+    try {
+      const response = await schoolRelationshipsApi.destroy(schoolId);
+      mutate(`/v1/people/${currentUser?.id}`);
+      reset();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAddSchoolRelationship = async (data) => {
+    const formattedStartDate = data.dateJoined
+      ? format(new Date(data.dateJoined), "yyyy-MM-dd")
+      : null;
+    const formattedEndDate = data.dateLeft
+      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
+      : null;
+
+    try {
+      const response = await schoolRelationshipsApi.create({
+        school_relationship: {
+          name: data.school.label,
+          description: null,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+          title: data.schoolTitle,
+          role_list: ["Teacher Leader"],
+          school_id: data.school.value,
+          person_id: currentUser.id,
+        },
+      });
+      mutate(`/v1/people/${currentUser?.id}`);
+      setIsAddingSchool(false);
+      setIsEditingSchool(false);
+      reset({
+        school: null,
+        dateJoined: "",
+        dateLeft: "",
+        schoolTitle: "",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpdateSchoolRelationship = async (data) => {
+    const formattedStartDate = data.dateJoined
+      ? format(new Date(data.dateJoined), "yyyy-MM-dd")
+      : null;
+    const formattedEndDate = data.dateLeft
+      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
+      : null;
+
+    try {
+      await schoolRelationshipsApi.update(currentSchool.id, {
+        school_relationship: {
+          name: data.school.label,
+          description: null,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+          title: data.schoolTitle,
+          role_list: ["Teacher Leader"],
+          // school_id: data.school.value,
+          // person_id: currentUser.id,
+        },
+      });
+      mutate(`/v1/people/${currentUser?.id}`);
+      setIsAddingSchool(false);
+      setIsEditingSchool(false);
+      setCurrentSchool(null);
+      reset({
+        school: null,
+        dateJoined: "",
+        dateLeft: "",
+        schoolTitle: "",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const onSubmit = (data) => {
-    // peopleApi
-    //   .update(currentUser.id, {
-    //     person: {
-    //       montessori_certified: data.montessoriCertified,
-    //       montessori_certified_level_list: data.montessoriCertifiedLevels,
-    //       classroom_age_list: data.classroomAge,
-    //       role_list: data.role,
-    //     },
-    //   })
-    //   .then((response) => {
-    //     if (response.error) {
-    //       console.error(error);
-    //     } else {
-    //       mutate();
-    //       reset({
-    //         montessoriCertified: data.montessoriCertified,
-    //         montessoriCertifiedLevels: data.montessoriCertifiedLevels,
-    //         classroomAge: data.classroomAge,
-    //         role: data.role,
-    //       });
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     if (error?.response?.status === 401) {
-    //       clearLoggedInState({});
-    //       router.push("/login");
-    //     } else {
-    //       console.error(error);
-    //     }
-    //   });
+    console.log({ data });
+    if (isEditingSchool) {
+      handleUpdateSchoolRelationship(data);
+    } else {
+      handleAddSchoolRelationship(data);
+    }
   };
 
   const schools = personData?.included
-    ?.filter((i) => i.type === "schoolRelationship")
+    ?.filter(
+      (i) =>
+        i.type === "schoolRelationship" &&
+        i.attributes.roleList.includes("Teacher Leader")
+    )
     ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
 
-  console.log("schools", schools);
-  console.log("personData", personData);
+  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+
+  const watchFields = watch();
+  // console.log({ watchFields });
+  // console.log({ currentSchool });
+  // console.log({ schoolsData });
+  // console.log({ schoolOptions });
+  // console.log({ personData });
+  // console.log("schools", schools);
+  // console.log("personData", personData);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={6}>
@@ -1451,60 +1674,108 @@ const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
                   <Controller
                     name="school"
                     control={control}
+                    rules={{ required: "This field is required" }}
                     render={({ field }) => (
-                      <Select
-                        label="School"
-                        placeholder="e.g. Wild Rose Montessori"
-                        options={schoolOptions}
-                        error={errors.school}
-                        helperText={
-                          errors &&
-                          errors.school &&
-                          errors.school.type === "required" &&
-                          "This field is required"
-                        }
+                      <Autocomplete
                         {...field}
+                        onChange={(_, newValue) => field.onChange(newValue)}
+                        options={schoolOptions}
+                        getOptionLabel={(option) => option.label || ""} // Adjust based on your data structure
+                        value={field.value || ""}
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            label="School"
+                            placeholder="e.g. Wild Rose Montessori"
+                            error={touchedFields.school && errors.school}
+                            helperText={
+                              touchedFields.dateJoined &&
+                              errors &&
+                              errors.school &&
+                              errors.school.type === "required" &&
+                              "This field is required"
+                            }
+                            InputProps={{
+                              ...params.InputProps,
+                              endAdornment: (
+                                <>
+                                  {schoolsIsLoading ? (
+                                    <CircularProgress
+                                      color="inherit"
+                                      size={20}
+                                    />
+                                  ) : null}
+                                  {params.InputProps.endAdornment}
+                                </>
+                              ),
+                            }}
+                          />
+                        )}
                       />
                     )}
                   />
                   <Controller
                     name="dateJoined"
                     control={control}
+                    defaultValue={null}
                     render={({ field }) => (
-                      <Select
+                      <DatePicker
                         label="Date joined"
-                        placeholder="e.g. Fall 2022"
-                        options={dateJoinedOptions}
-                        error={errors.dateJoined}
-                        helperText={
-                          errors &&
-                          errors.dateJoined &&
-                          errors.dateJoined.type === "required" &&
-                          "This field is required"
-                        }
-                        {...field}
+                        value={field.value}
+                        onChange={(date) => {
+                          field.onChange(date);
+                        }}
+                        maxDate={new Date()}
+                        minDate={new Date("2014-01-01")}
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            error={
+                              touchedFields.dateJoined && !!errors.dateJoined
+                            }
+                            helperText={
+                              touchedFields.dateJoined &&
+                              errors &&
+                              errors.dateJoined &&
+                              errors.dateJoined.type === "required" &&
+                              "This field is required"
+                            }
+                          />
+                        )}
                       />
                     )}
+                    rules={{ required: "This field is required" }}
                   />
                   <Controller
                     name="dateLeft"
                     control={control}
+                    defaultValue={null}
                     render={({ field }) => (
-                      <Select
+                      <DatePicker
                         label="Date left"
-                        placeholder="e.g. Spring 2023"
-                        options={dateLeftOptions}
-                        error={errors.dateLeft}
-                        helperText={
-                          errors &&
-                          errors.dateLeft &&
-                          errors.dateLeft.type === "required" &&
-                          "This field is required"
-                        }
-                        {...field}
+                        value={field.value}
+                        onChange={(date) => {
+                          field.onChange(date);
+                        }}
+                        maxDate={new Date()}
+                        minDate={new Date("2014-01-01")}
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            error={errors.dateLeft}
+                            helperText={
+                              errors &&
+                              errors.dateLeft &&
+                              errors.dateLeft.type === "required" &&
+                              "This field is required"
+                            }
+                          />
+                        )}
                       />
                     )}
+                    rules={{ required: false }}
                   />
+
                   <Controller
                     name="schoolTitle"
                     control={control}
@@ -1512,7 +1783,7 @@ const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
                       required: false,
                     }}
                     render={({ field }) => (
-                      <TextField
+                      <MaterialTextField
                         label="Title"
                         placeholder="e.g. Chief Financial Officer"
                         error={errors.schoolTitle}
@@ -1535,48 +1806,64 @@ const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
                 <Grid item xs={12} key={i}>
                   <Grid
                     container
+                    direction="row"
                     justifyContent="space-between"
                     alignItems="center"
-                    spacing={6}
+                    spacing={3}
                   >
                     <Grid item xs={8}>
                       <Typography
                         variant="bodyRegular"
                         bold
                         noWrap
-                        sx={{ width: "100%" }}
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
                       >
                         {school.attributes.name}
                       </Typography>
                     </Grid>
-                    <Grid item>
+                    <Grid item alignItems="flex-end">
                       <Stack direction="row" spacing={3}>
-                        <Typography variant="bodyRegular" lightened>
+                        <Typography
+                          variant="bodyRegular"
+                          lightened
+                          hoverable
+                          onClick={() => {
+                            setIsEditingSchool(true);
+                            setCurrentSchool(school);
+                            setIsAddingSchool(true);
+                          }}
+                        >
                           Edit
                         </Typography>
-                        <Typography variant="bodyRegular" lightened>
+
+                        <Typography
+                          variant="bodyRegular"
+                          lightened
+                          hoverable
+                          onClick={() =>
+                            handleDeleteSchoolRelationship(school.id)
+                          }
+                        >
                           Remove
                         </Typography>
                       </Stack>
                     </Grid>
                   </Grid>
                   <Stack>
-                    {school.attributes.roleList.length ? (
+                    {school.attributes.title ? (
                       <Typography variant="bodyRegular" lightened>
-                        {school.attributes.roleList.map(
-                          (r, i) =>
-                            r +
-                            (i < school.attributes.roleList.length - 1
-                              ? ", "
-                              : "")
-                        )}
+                        {school.attributes.title}
                       </Typography>
                     ) : null}
                     {school.attributes.startDate ? (
                       <Typography variant="bodyRegular" lightened>
-                        {school.attributes.startDate}-{" "}
+                        {formatHumanDate(school.attributes.startDate)} -{" "}
                         {school.attributes.endDate
-                          ? school.attributes.endDate
+                          ? formatHumanDate(school.attributes.endDate)
                           : "Present"}
                       </Typography>
                     ) : null}
@@ -1588,6 +1875,7 @@ const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
             <Card noBorder noRadius size="large">
               <Stack spacing={6} alignItems="center">
                 <img src="/assets/images/wildflower-logo.png" />
+                <Typography variant="h4">Add your school history</Typography>
                 <Button onClick={() => setIsAddingSchool(true)}>
                   <Typography variant="bodyRegular" bold>
                     Add experience
@@ -1598,254 +1886,400 @@ const SchoolHistoryFields = ({ isAddingSchool, setIsAddingSchool }) => {
           )}
         </Grid>
       </Grid>
-      {schools.length ? (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: "24px",
-            left: "224px",
-            right: "24px",
-            paddingTop: "24px",
-          }}
-        >
-          <Card size="small" elevated>
-            <Grid container justifyContent="space-between" alignItems="center">
-              {isAddingSchool ? (
-                <>
-                  <Grid item>
-                    <Button
-                      variant="text"
-                      small
-                      onClick={() => setIsAddingSchool(false)}
-                    >
-                      <Typography variant="bodyRegular" bold>
-                        Cancel
-                      </Typography>
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      variant="primary"
-                      small
-                      type="submit"
-                      disabled={!isDirty || isSubmitting}
-                    >
-                      <Typography variant="bodyRegular" bold>
-                        Add
-                      </Typography>
-                    </Button>
-                  </Grid>
-                </>
-              ) : (
-                <>
-                  <Grid item></Grid>
-                  <Grid item>
-                    <Button
-                      variant="lightened"
-                      small
-                      onClick={() => setIsAddingSchool(true)}
-                    >
-                      <Typography variant="bodyRegular" bold>
-                        Add experience
-                      </Typography>
-                    </Button>
-                  </Grid>
-                </>
-              )}
-            </Grid>
-          </Card>
-        </Box>
-      ) : null}
+
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "16px",
+          left: "224px",
+          right: "24px",
+          paddingTop: "24px",
+        }}
+      >
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            {isAddingSchool ? (
+              <>
+                <Grid item>
+                  <Button variant="text" small onClick={handleCancel}>
+                    <Typography variant="bodyRegular" bold>
+                      Cancel
+                    </Typography>
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="primary"
+                    small
+                    type="submit"
+                    disabled={!isDirty || isSubmitting}
+                  >
+                    <Typography variant="bodyRegular" bold>
+                      {isEditingSchool ? "Save" : "Add"}
+                    </Typography>
+                  </Button>
+                </Grid>
+              </>
+            ) : (
+              <>
+                <Grid item>
+                  <Button variant="text" small onClick={handleToggle}>
+                    <Typography variant="bodyRegular">Cancel</Typography>
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button small onClick={() => setIsAddingSchool(true)}>
+                    <Typography variant="bodyRegular" bold>
+                      Add
+                    </Typography>
+                  </Button>
+                </Grid>
+              </>
+            )}
+          </Grid>
+        </Card>
+      </Box>
     </form>
   );
 };
-const BoardHistoryFields = ({
-  isAddingBoardHistory,
-  setIsAddingBoardHistory,
-}) => {
+const BoardHistoryFields = ({ handleToggle }) => {
+  const [isAddingSchool, setIsAddingSchool] = useState(false);
+  const [isEditingSchool, setIsEditingSchool] = useState(false);
+  const [currentSchool, setCurrentSchool] = useState(null);
   const { currentUser, setCurrentUser } = useUserContext();
   const { data: personData, isLoading } = usePerson(currentUser?.id, {
     network: true,
   });
+  const { data: schoolsData, isLoading: schoolsIsLoading } = useSchools();
+  const schoolOptions = schoolsIsLoading
+    ? []
+    : schoolsData?.data?.map((s) => ({
+        label: s.attributes.name,
+        value: s.id,
+      }));
+
   const {
     control,
     handleSubmit,
+    reset,
     watch,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm();
+    formState: { errors, touchedFields, isSubmitting, isDirty },
+  } = useForm({});
 
-  const onSubmit = (data) => {
-    // peopleApi
-    //   .update(currentUser.id, {
-    //     person: {
-    //       montessori_certified: data.montessoriCertified,
-    //       montessori_certified_level_list: data.montessoriCertifiedLevels,
-    //       classroom_age_list: data.classroomAge,
-    //       role_list: data.role,
-    //     },
-    //   })
-    //   .then((response) => {
-    //     if (response.error) {
-    //       console.error(error);
-    //     } else {
-    //       mutate();
-    //       reset({
-    //         montessoriCertified: data.montessoriCertified,
-    //         montessoriCertifiedLevels: data.montessoriCertifiedLevels,
-    //         classroomAge: data.classroomAge,
-    //         role: data.role,
-    //       });
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     if (error?.response?.status === 401) {
-    //       clearLoggedInState({});
-    //       router.push("/login");
-    //     } else {
-    //       console.error(error);
-    //     }
-    //   });
+  useEffect(() => {
+    if (currentSchool) {
+      // console.log({currentSchool})
+      reset({
+        school: schoolOptions?.find(
+          (option) =>
+            option.value === currentSchool.relationships.school.data.id
+        ),
+        dateJoined: currentSchool.attributes.startDate,
+        dateLeft: currentSchool.attributes.endDate,
+      });
+    }
+  }, [currentSchool]);
+
+  const handleCancel = () => {
+    setIsAddingSchool(false);
+    setIsEditingSchool(false);
+    setCurrentSchool(null);
+    reset({
+      school: null,
+      dateJoined: "",
+      dateLeft: "",
+    });
   };
 
-  const schoolsOnBoard = personData?.included
+  const handleDeleteSchoolRelationship = async (schoolId) => {
+    try {
+      const response = await schoolRelationshipsApi.destroy(schoolId);
+      mutate(`/v1/people/${currentUser?.id}`);
+      reset();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAddSchoolRelationship = async (data) => {
+    const formattedStartDate = data.dateJoined
+      ? format(new Date(data.dateJoined), "yyyy-MM-dd")
+      : null;
+    const formattedEndDate = data.dateLeft
+      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
+      : null;
+
+    try {
+      const response = await schoolRelationshipsApi.create({
+        school_relationship: {
+          name: data.school.label,
+          description: null,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+
+          role_list: ["Board Member"],
+          school_id: data.school.value,
+          person_id: currentUser.id,
+        },
+      });
+      mutate(`/v1/people/${currentUser?.id}`);
+      setIsAddingSchool(false);
+      setIsEditingSchool(false);
+      reset({
+        school: null,
+        dateJoined: "",
+        dateLeft: "",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpdateSchoolRelationship = async (data) => {
+    const formattedStartDate = data.dateJoined
+      ? format(new Date(data.dateJoined), "yyyy-MM-dd")
+      : null;
+    const formattedEndDate = data.dateLeft
+      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
+      : null;
+
+    try {
+      await schoolRelationshipsApi.update(currentSchool.id, {
+        school_relationship: {
+          name: data.school.label,
+          description: null,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+
+          role_list: ["Board Member"],
+          // school_id: data.school.value,
+          // person_id: currentUser.id,
+        },
+      });
+      mutate(`/v1/people/${currentUser?.id}`);
+      setIsAddingSchool(false);
+      setIsEditingSchool(false);
+      setCurrentSchool(null);
+      reset({
+        school: null,
+        dateJoined: "",
+        dateLeft: "",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onSubmit = (data) => {
+    console.log({ data });
+    if (isEditingSchool) {
+      handleUpdateSchoolRelationship(data);
+    } else {
+      handleAddSchoolRelationship(data);
+    }
+  };
+
+  const schools = personData?.included
     ?.filter(
       (i) =>
         i.type === "schoolRelationship" &&
-        i.attributes.roleList?.includes("Board Member")
+        i.attributes.roleList.includes("Board Member")
     )
     ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
 
-  console.log("schoolsOnBoard", schoolsOnBoard);
-  console.log("personData", personData);
+  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+
+  const watchFields = watch();
+  // console.log({ watchFields });
+  // console.log({ currentSchool });
+  // console.log({ schoolsData });
+  // console.log({ schoolOptions });
+  // console.log({ personData });
+  // console.log("schools", schools);
+  // console.log("personData", personData);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={6}>
         <Grid item xs={12} justifyContent="center">
-          {isAddingBoardHistory ? (
+          {isAddingSchool ? (
             <Grid container>
               <Grid item xs={12}>
                 <Stack spacing={3}>
                   <Controller
                     name="school"
                     control={control}
+                    rules={{ required: "This field is required" }}
                     render={({ field }) => (
-                      <Select
-                        label="School"
-                        placeholder="e.g. Wild Rose Montessori"
-                        options={schoolOptions}
-                        error={errors.school}
-                        helperText={
-                          errors &&
-                          errors.school &&
-                          errors.school.type === "required" &&
-                          "This field is required"
-                        }
+                      <Autocomplete
                         {...field}
+                        onChange={(_, newValue) => field.onChange(newValue)}
+                        options={schoolOptions}
+                        getOptionLabel={(option) => option.label || ""} // Adjust based on your data structure
+                        value={field.value || ""}
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            label="School"
+                            placeholder="e.g. Wild Rose Montessori"
+                            error={touchedFields.school && errors.school}
+                            helperText={
+                              touchedFields.dateJoined &&
+                              errors &&
+                              errors.school &&
+                              errors.school.type === "required" &&
+                              "This field is required"
+                            }
+                            InputProps={{
+                              ...params.InputProps,
+                              endAdornment: (
+                                <>
+                                  {schoolsIsLoading ? (
+                                    <CircularProgress
+                                      color="inherit"
+                                      size={20}
+                                    />
+                                  ) : null}
+                                  {params.InputProps.endAdornment}
+                                </>
+                              ),
+                            }}
+                          />
+                        )}
                       />
                     )}
                   />
                   <Controller
                     name="dateJoined"
                     control={control}
+                    defaultValue={null}
                     render={({ field }) => (
-                      <Select
+                      <DatePicker
                         label="Date joined"
-                        placeholder="e.g. Fall 2022"
-                        options={dateJoinedOptions}
-                        error={errors.dateJoined}
-                        helperText={
-                          errors &&
-                          errors.dateJoined &&
-                          errors.dateJoined.type === "required" &&
-                          "This field is required"
-                        }
-                        {...field}
+                        value={field.value}
+                        onChange={(date) => {
+                          field.onChange(date);
+                        }}
+                        maxDate={new Date()}
+                        minDate={new Date("2014-01-01")}
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            error={
+                              touchedFields.dateJoined && !!errors.dateJoined
+                            }
+                            helperText={
+                              touchedFields.dateJoined &&
+                              errors &&
+                              errors.dateJoined &&
+                              errors.dateJoined.type === "required" &&
+                              "This field is required"
+                            }
+                          />
+                        )}
                       />
                     )}
+                    rules={{ required: "This field is required" }}
                   />
                   <Controller
                     name="dateLeft"
                     control={control}
+                    defaultValue={null}
                     render={({ field }) => (
-                      <Select
+                      <DatePicker
                         label="Date left"
-                        placeholder="e.g. Spring 2023"
-                        options={dateLeftOptions}
-                        error={errors.dateLeft}
-                        helperText={
-                          errors &&
-                          errors.dateLeft &&
-                          errors.dateLeft.type === "required" &&
-                          "This field is required"
-                        }
-                        {...field}
+                        value={field.value}
+                        onChange={(date) => {
+                          field.onChange(date);
+                        }}
+                        maxDate={new Date()}
+                        minDate={new Date("2014-01-01")}
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            error={errors.dateLeft}
+                            helperText={
+                              errors &&
+                              errors.dateLeft &&
+                              errors.dateLeft.type === "required" &&
+                              "This field is required"
+                            }
+                          />
+                        )}
                       />
                     )}
-                  />
-                  <Controller
-                    name="schoolTitle"
-                    control={control}
-                    rules={{
-                      required: false,
-                    }}
-                    render={({ field }) => (
-                      <TextField
-                        label="Title"
-                        placeholder="e.g. Chief Financial Officer"
-                        error={errors.schoolTitle}
-                        helperText={
-                          errors &&
-                          errors.schoolTitle &&
-                          errors.schoolTitle.type === "required" &&
-                          "This field is required"
-                        }
-                        {...field}
-                      />
-                    )}
+                    rules={{ required: false }}
                   />
                 </Stack>
               </Grid>
             </Grid>
-          ) : schoolsOnBoard.length ? (
-            <Grid container>
-              {schoolsOnBoard.map((school, i) => (
+          ) : schools.length ? (
+            <Grid container spacing={6}>
+              {schools.map((school, i) => (
                 <Grid item xs={12} key={i}>
                   <Grid
                     container
+                    direction="row"
                     justifyContent="space-between"
                     alignItems="center"
-                    spacing={6}
+                    spacing={3}
                   >
                     <Grid item xs={8}>
                       <Typography
                         variant="bodyRegular"
                         bold
                         noWrap
-                        sx={{ width: "100%" }}
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
                       >
                         {school.attributes.name}
                       </Typography>
                     </Grid>
-                    <Grid item>
+                    <Grid item alignItems="flex-end">
                       <Stack direction="row" spacing={3}>
-                        <Typography variant="bodyRegular" lightened>
+                        <Typography
+                          variant="bodyRegular"
+                          lightened
+                          hoverable
+                          onClick={() => {
+                            setIsEditingSchool(true);
+                            setCurrentSchool(school);
+                            setIsAddingSchool(true);
+                          }}
+                        >
                           Edit
                         </Typography>
-                        <Typography variant="bodyRegular" lightened>
+
+                        <Typography
+                          variant="bodyRegular"
+                          lightened
+                          hoverable
+                          onClick={() =>
+                            handleDeleteSchoolRelationship(school.id)
+                          }
+                        >
                           Remove
                         </Typography>
                       </Stack>
                     </Grid>
                   </Grid>
-                  <Typography variant="bodyRegular" lightened>
-                    {school.attributes.startDate
-                      ? school.attributes.startDate
-                      : "Before"}{" "}
-                    -{" "}
-                    {school.attributes.endDate
-                      ? school.attributes.endDate
-                      : "Present"}
-                  </Typography>
+                  <Stack>
+                    {school.attributes.title ? (
+                      <Typography variant="bodyRegular" lightened>
+                        {school.attributes.title}
+                      </Typography>
+                    ) : null}
+                    {school.attributes.startDate ? (
+                      <Typography variant="bodyRegular" lightened>
+                        {formatHumanDate(school.attributes.startDate)} -{" "}
+                        {school.attributes.endDate
+                          ? formatHumanDate(school.attributes.endDate)
+                          : "Present"}
+                      </Typography>
+                    ) : null}
+                  </Stack>
                 </Grid>
               ))}
             </Grid>
@@ -1853,6 +2287,7 @@ const BoardHistoryFields = ({
             <Card noBorder noRadius size="large">
               <Stack spacing={6} alignItems="center">
                 <img src="/assets/images/wildflower-logo.png" />
+                <Typography variant="h4">Add your board history</Typography>
                 <Button onClick={() => setIsAddingSchool(true)}>
                   <Typography variant="bodyRegular" bold>
                     Add experience
@@ -1863,77 +2298,59 @@ const BoardHistoryFields = ({
           )}
         </Grid>
       </Grid>
-      {schoolsOnBoard.length ? (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: "24px",
-            left: "224px",
-            right: "24px",
-            paddingTop: "24px",
-          }}
-        >
-          <Card size="small" elevated>
-            <Grid container justifyContent="space-between" alignItems="center">
-              {isAddingBoardHistory ? (
-                <>
-                  <Grid item>
-                    <Button
-                      variant="text"
-                      small
-                      onClick={() => setIsAddingBoardHistory(false)}
-                    >
-                      <Typography variant="bodyRegular" bold>
-                        Cancel
-                      </Typography>
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      variant="primary"
-                      small
-                      type="submit"
-                      disabled={!isDirty || isSubmitting}
-                    >
-                      <Typography variant="bodyRegular" bold>
-                        Add
-                      </Typography>
-                    </Button>
-                  </Grid>
-                </>
-              ) : (
-                <>
-                  <Grid item></Grid>
-                  <Grid item>
-                    <Button
-                      variant="lightened"
-                      small
-                      onClick={() => setIsAddingBoardHistory(true)}
-                    >
-                      <Typography variant="bodyRegular" bold>
-                        Add experience
-                      </Typography>
-                    </Button>
-                  </Grid>
-                </>
-              )}
-            </Grid>
-          </Card>
-        </Box>
-      ) : null}
+
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "16px",
+          left: "224px",
+          right: "24px",
+          paddingTop: "24px",
+        }}
+      >
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            {isAddingSchool ? (
+              <>
+                <Grid item>
+                  <Button variant="text" small onClick={handleCancel}>
+                    <Typography variant="bodyRegular" bold>
+                      Cancel
+                    </Typography>
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="primary"
+                    small
+                    type="submit"
+                    disabled={!isDirty || isSubmitting}
+                  >
+                    <Typography variant="bodyRegular" bold>
+                      {isEditingSchool ? "Save" : "Add"}
+                    </Typography>
+                  </Button>
+                </Grid>
+              </>
+            ) : (
+              <>
+                <Grid item>
+                  <Button variant="text" small onClick={handleToggle}>
+                    <Typography variant="bodyRegular">Cancel</Typography>
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button small onClick={() => setIsAddingSchool(true)}>
+                    <Typography variant="bodyRegular" bold>
+                      Add
+                    </Typography>
+                  </Button>
+                </Grid>
+              </>
+            )}
+          </Grid>
+        </Card>
+      </Box>
     </form>
   );
 };
-
-const schoolOptions = [
-  { label: "Wild Rose Montessori", value: "Wild Rose Montessori" },
-  { label: "ASDF Montessori", value: "ASDF Montessori" },
-];
-const dateJoinedOptions = [
-  { label: "Fall 2022", value: "Fall 20202" },
-  { label: "Winter 2022", value: "Winter 2022" },
-];
-const dateLeftOptions = [
-  { label: "Fall 2022", value: "Fall 20202" },
-  { label: "Winter 2022", value: "Winter 2022" },
-];
