@@ -53,4 +53,18 @@ async function update(id, params = {}) {
   return schoolsApi.put(`/${id}`, params, config);
 }
 
-export default { index, show, update };
+async function invitePartner(schoolId, data) {
+  const config = getAuthHeader();
+  try {
+    const response = await schoolsApi.post(
+      `/${schoolId}/invite_partner`,
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { index, show, update, invitePartner };

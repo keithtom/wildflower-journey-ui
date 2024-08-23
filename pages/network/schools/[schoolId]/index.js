@@ -1,8 +1,17 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { mutate } from "swr";
-import Skeleton from "@mui/material/Skeleton";
-
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Skeleton,
+  Autocomplete,
+  TextField as MaterialTextField,
+  CircularProgress,
+} from "@mui/material";
+import { format } from "date-fns";
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
@@ -33,7 +42,7 @@ import axios from "axios";
 const token = getCookie("auth");
 
 import schoolApi from "@api/schools";
-
+import schoolRelationshipsApi from "@api/school_relationships";
 import {
   Divider,
   Alert,
@@ -62,6 +71,8 @@ import AttributesCard from "@components/AttributesCard";
 import SchoolCard from "@components/SchoolCard";
 import UserCard from "@components/UserCard";
 import useSchool from "@hooks/useSchool";
+import useSchools from "@hooks/useSchools";
+import useSearch from "@hooks/useSearch";
 
 const School = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
@@ -70,6 +81,16 @@ const School = ({}) => {
 
   const router = useRouter();
   const { schoolId } = router.query;
+
+  // const { data: schoolsData, isLoading: isLoadingSchools } = useSchools();
+  // console.log({ schoolsData });
+
+  // useEffect(() => {
+  //   const charterSchools = schoolsData?.data.filter(
+  //     (s) => s.attributes.charterString
+  //   );
+  //   console.log({ charterSchools });
+  // }, [schoolsData]);
 
   const { data: schoolData, isLoading } = useSchool(schoolId, {
     network: true,
@@ -99,13 +120,64 @@ const School = ({}) => {
   let allSisterSchools;
   let sisterSchools;
   let isCharter;
+  let boardMembers;
 
   if (!isLoading) {
-    schoolLeaders = handleFindMatchingItems(
-      included,
-      school?.relationships.people.data,
-      "id"
+    const teacherLeaderRelationships = schoolData?.included?.filter(
+      (rel) =>
+        rel.type === "schoolRelationship" &&
+        rel.attributes.roleList.includes("Teacher Leader") &&
+        rel.attributes.startDate &&
+        !rel.attributes.endDate
     );
+
+    schoolLeaders = schoolData?.included
+      ?.filter((i) => i.type === "person")
+      ?.map((teacher) => {
+        const schoolRelationship = teacherLeaderRelationships.find(
+          (rel) => rel.relationships.person.data.id === teacher.id
+        );
+        return {
+          ...teacher,
+          schoolRelationshipAttributes: schoolRelationship?.attributes,
+          schoolRealtionshipId: schoolRelationship?.id,
+        };
+      })
+      ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are board members
+      ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
+      ?.sort((a, b) => {
+        if (!a.endDate) return -1;
+        if (!b.endDate) return 1;
+        return 0;
+      });
+
+    const boardMemberRelationships = schoolData?.included?.filter(
+      (rel) =>
+        rel.type === "schoolRelationship" &&
+        rel.attributes.roleList.includes("Board Member") &&
+        rel.attributes.startDate &&
+        !rel.attributes.endDate
+    );
+
+    boardMembers = schoolData?.included
+      ?.filter((i) => i.type === "person")
+      ?.map((teacher) => {
+        const schoolRelationship = boardMemberRelationships.find(
+          (rel) => rel.relationships.person.data.id === teacher.id
+        );
+        return {
+          ...teacher,
+          schoolRelationshipAttributes: schoolRelationship?.attributes,
+          schoolRealtionshipId: schoolRelationship?.id,
+        };
+      })
+      ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are board members
+      ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
+      ?.sort((a, b) => {
+        if (!a.endDate) return -1;
+        if (!b.endDate) return 1;
+        return 0;
+      });
     isCharter = school?.attributes.charterString;
     allSisterSchools = handleFindMatchingItems(
       included,
@@ -115,12 +187,16 @@ const School = ({}) => {
     sisterSchools = allSisterSchools.filter((s) => s.id !== school.id);
   }
 
+  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+
   // console.log({ currentUser });
   // console.log({ isMySchool });
   // console.log({ included });
   // console.log({ schoolLeaders });
+  // console.log({ boardMembers });
   // console.log({ school });
   // console.log({ sisterSchools });
+  // console.log({ schoolData });
 
   return (
     <>
@@ -214,6 +290,7 @@ const School = ({}) => {
                       agesServed={school?.attributes?.agesServedList}
                       governance={school?.attributes?.governanceType}
                       maxEnrollment={school?.attributes?.maxEnrollment}
+                      numClassrooms={school?.attributes?.numClassrooms}
                     />
                   ) : null}
                   {isCharter ? (
@@ -287,7 +364,7 @@ const School = ({}) => {
                 </Stack>
               </Grid>
               {hasInfo ? (
-                <Grid item xs={12} sm={8}>
+                <Grid item xs={12} md={8}>
                   <Stack spacing={12}>
                     {school?.attributes?.about ? (
                       <Stack spacing={3}>
@@ -301,12 +378,12 @@ const School = ({}) => {
                     ) : null}
                     {isCharter && sisterSchools.length ? (
                       <Grid container>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} md={6}>
                           <Typography variant="h4" bold>
                             Our Charter Community
                           </Typography>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} md={6}>
                           <Stack spacing={3}>
                             {sisterSchools?.map((s, i) => (
                               <SchoolCard
@@ -321,29 +398,34 @@ const School = ({}) => {
                         </Grid>
                       </Grid>
                     ) : null}
-
-                    {/* <Grid container>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="h4" bold>
-                      School Board
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Stack spacing={3}>
-                      {FakeBoardMembers?.map((f, i) => (
-                        <UserCard
-                          link={`/network/people/${f.attributes.id}`}
-                          firstName={f.attributes.firstName}
-                          lastName={f.attributes.lastName}
-                          email={f.attributes.email}
-                          phone={f.attributes.phone}
-                          role={f.attributes.role}
-                          profileImage={f.attributes.imageSrc}
-                        />
-                      ))}
-                    </Stack>
-                  </Grid>
-                </Grid> */}
+                    {boardMembers.length ? (
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Typography variant="h4" bold>
+                            Our School Board
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={3}>
+                            {boardMembers?.map((f, i) => (
+                              <UserCard
+                                key={i}
+                                subtitle={`${formatHumanDate(
+                                  f.schoolRelationshipAttributes.startDate
+                                )} - Present`}
+                                link={`/network/people/${f.attributes.id}`}
+                                firstName={f.attributes.firstName}
+                                lastName={f.attributes.lastName}
+                                email={f.attributes.email}
+                                phone={f.attributes.phone}
+                                role={f.attributes.role}
+                                profileImage={f.attributes.imageSrc}
+                              />
+                            ))}
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    ) : null}
                   </Stack>
                 </Grid>
               ) : null}
@@ -420,6 +502,93 @@ const EditProfileModal = ({
   mutate,
   setEditProfileModalOpen,
 }) => {
+  const [currentFieldGroup, setCurrentFieldGroup] = useState("general");
+
+  const handleToggle = () => {
+    toggle();
+    setCurrentFieldGroup("general");
+  };
+  const renderFieldGroup = () => {
+    switch (currentFieldGroup) {
+      case "general":
+        return (
+          <GeneralFields
+            handleToggle={handleToggle}
+            school={school}
+            address={address}
+          />
+        );
+      case "enrollment":
+        return <EnrollmentFields handleToggle={handleToggle} school={school} />;
+      case "teacherLeaders":
+        return (
+          <TeacherLeaderFields handleToggle={handleToggle} school={school} />
+        );
+      case "boardMembers":
+        return (
+          <BoardMemberFields handleToggle={handleToggle} school={school} />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Modal
+      toggle={handleToggle}
+      open={open}
+      title="Edit school profile"
+      fixedDrawer={
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("general")}
+              selected={currentFieldGroup === "general"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">General</Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("enrollment")}
+              selected={currentFieldGroup === "enrollment"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">Enrollment</Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("teacherLeaders")}
+              selected={currentFieldGroup === "teacherLeaders"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">Teacher Leaders</Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => setCurrentFieldGroup("boardMembers")}
+              selected={currentFieldGroup === "boardMembers"}
+            >
+              <ListItemText sx={{ paddingX: "8px" }}>
+                <Typography variant="bodyRegular">Board Members</Typography>
+              </ListItemText>
+            </ListItemButton>
+          </ListItem>
+        </List>
+      }
+    >
+      {renderFieldGroup()}
+    </Modal>
+  );
+};
+
+const GeneralFields = ({ handleToggle, school, address }) => {
   const [showError, setShowError] = useState();
 
   const [city, setCity] = useState(address?.attributes?.city);
@@ -437,27 +606,6 @@ const EditProfileModal = ({
   const [openDate, setOpenDate] = useState(school.attributes.openedOn);
   const handleOpenDate = (event) => {
     setOpenDate(event.target.value);
-  };
-
-  const [agesServedList, setAgesServedList] = useState(
-    school.attributes.agesServedList
-  );
-  const handleAgesServedList = (event) => {
-    setAgesServedList(event.target.value);
-  };
-
-  const [governanceType, setGovernanceType] = useState(
-    school.attributes.governanceType
-  );
-  const handleGovernanceType = (event) => {
-    setGovernanceType(event.target.value);
-  };
-
-  const [maxEnrollment, setMaxEnrollment] = useState(
-    school.attributes.maxEnrollment
-  );
-  const handleMaxEnrollment = (event) => {
-    setMaxEnrollment(event.target.value);
   };
 
   const [about, setAbout] = useState(school.attributes.about);
@@ -496,23 +644,18 @@ const EditProfileModal = ({
       city: city,
       state: locationState,
       openDate: openDate,
-      agesServedList: agesServedList,
-      governanceType: governanceType,
-      maxEnrollment: maxEnrollment,
+
       about: about,
     },
   });
 
   const onSubmit = (data) => {
-    // console.log(data);
+    console.log(data);
     schoolApi
       .update(school.id, {
         school: {
           about: data.about,
           opened_on: data.openDate,
-          ages_served_list: data.agesServedList,
-          governance_type: data.governanceType,
-          max_enrollment: data.maxEnrollment,
           address_attributes: {
             city: data.city,
             state: data.state,
@@ -532,465 +675,1928 @@ const EditProfileModal = ({
           // console.log("successfully updated", response.data);
           setBannerPicture(null);
           setSchoolLogoPicture(null);
-          mutate();
-          setEditProfileModalOpen(false);
+          mutate(`/v1/schools/${school.id}`);
+          reset({
+            about: data.about,
+            opened_on: data.openDate,
+            city: data.city,
+            state: data.state,
+            logo_image: schoolLogoImage,
+            banner_image: bannerImage,
+          });
+          // setEditProfileModalOpen(false);
         }
       });
   };
-
   return (
-    <Modal toggle={toggle} open={open} title="Edit your school's profile">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={3}>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack spacing={3}>
+        <Controller
+          name="city"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="City"
+              placeholder="e.g. Boston"
+              value={city}
+              error={errors.city}
+              onChange={handleCityChange}
+              helperText={
+                errors &&
+                errors.city &&
+                errors.city.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="state"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <Select
+              label="State"
+              placeholder="e.g. Massachusetts"
+              options={unitedStatesOptions}
+              error={errors.state}
+              helperText={
+                errors &&
+                errors.state &&
+                errors.state.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Stack spacing={2}>
+          <Typography variant="bodyRegular">Your open date</Typography>
           <Controller
-            name="city"
+            name="openDate"
             control={control}
             render={({ field }) => (
-              <TextField
-                label="City"
-                placeholder="e.g. Boston"
-                value={city}
-                error={errors.city}
-                onChange={handleCityChange}
+              <DatePicker
+                label="Your open date"
+                id="open-date"
+                error={errors.openDate}
+                value={openDate}
+                onChange={handleOpenDate}
                 helperText={
                   errors &&
-                  errors.city &&
-                  errors.city.type === "required" &&
+                  errors.openDate &&
+                  errors.openDate.type === "required" &&
                   "This field is required"
                 }
                 {...field}
+                // value={parseISO(dateValue)}
+                // onChange={handleDateValueChange}
               />
             )}
           />
+        </Stack>
+
+        <Controller
+          name="about"
+          control={control}
+          rules={{ required: false }}
+          render={({ field }) => (
+            <TextField
+              label="About our school"
+              placeholder="e.g. Your school's profile"
+              multiline={true}
+              rows={4}
+              value={about}
+              onChange={handleAbout}
+              error={errors.about}
+              helperText={
+                errors &&
+                errors.about &&
+                errors.about.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+
+        <Stack spacing={3}>
+          <Divider />
+          {showLogoError ? (
+            <Grid container>
+              <Grid item xs={12}>
+                <Alert severity="error">
+                  <Stack>
+                    {showLogoError.main}
+                    <Typography variant="bodySmall" error>
+                      {showLogoError.sub}
+                    </Typography>
+                  </Stack>
+                </Alert>
+              </Grid>
+            </Grid>
+          ) : null}
+          <Typography variant="bodyRegular">
+            Add a new school logo image
+          </Typography>
+          <Grid container justifyContent="center">
+            <Grid item xs={12} sm={8} md={6}>
+              <StyledFilePond
+                name="schoolLogo"
+                files={schoolLogoPicture}
+                allowReorder={false}
+                allowMultiple={false}
+                maxFileSize="5MB"
+                acceptedFileTypes={["image/*"]}
+                onupdatefiles={setSchoolLogoPicture}
+                onaddfilestart={() => setIsUpdatingSchoolLogoImage(true)}
+                onprocessfiles={() => setIsUpdatingSchoolLogoImage(false)}
+                onerror={handleLogoError}
+                stylePanelAspectRatio="1:1"
+                stylePanelLayout="circle"
+                server={{
+                  process: (
+                    fieldName,
+                    file,
+                    metadata,
+                    load,
+                    error,
+                    progress,
+                    abort,
+                    transfer,
+                    options
+                  ) => {
+                    // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
+                    FileChecksum.create(file, (checksum_error, checksum) => {
+                      if (checksum_error) {
+                        console.error(checksum_error);
+                        error();
+                      }
+                      axios
+                        .post(
+                          `${process.env.API_URL}/rails/active_storage/direct_uploads`,
+                          {
+                            blob: {
+                              filename: file.name,
+                              content_type: file.type,
+                              byte_size: file.size,
+                              checksum: checksum,
+                            },
+                          }
+                        )
+                        .then((response) => {
+                          if (!response.data) {
+                            return error;
+                          }
+                          const signed_id = response.data.signed_id;
+                          axios
+                            .put(response.data.direct_upload.url, file, {
+                              headers: response.data.direct_upload.headers,
+                              onUploadProgress: (progressEvent) => {
+                                progress(
+                                  progressEvent.lengthComputable,
+                                  progressEvent.loaded,
+                                  progressEvent.total
+                                );
+                              },
+                              // need to remove default Authorization header when sending to s3
+                              transformRequest: (data, headers) => {
+                                if (process.env !== "local") {
+                                  delete headers.common["Authorization"];
+                                }
+                                return data;
+                              },
+                            })
+                            .then((response) => {
+                              setSchoolLogoImage(signed_id);
+                              load(signed_id);
+                            })
+                            .catch((error) => {
+                              if (!axios.isCancel(error)) {
+                                console.error(error);
+                                // error();
+                              }
+                            });
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                        });
+                    });
+                    return {
+                      abort: () => {
+                        // This function is entered if the user has tapped the cancel button
+                        // request.abort(); TODO: is there an active storage abort?
+
+                        // Let FilePond know the request has been cancelled
+                        abort();
+                      },
+                    };
+                  },
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                  ondata: (formData) => {
+                    formData.append("blob", value);
+                    return formData;
+                  },
+                  onload: () => {
+                    props.onUploadComplete();
+                  },
+                }}
+                credits={false}
+                labelIdle='Drag & Drop your school logo image or <span class="filepond--label-action">Browse</span>'
+              />
+            </Grid>
+          </Grid>
+          <Divider />
+        </Stack>
+
+        <Stack spacing={3}>
+          {showBannerError ? (
+            <Grid container>
+              <Grid item xs={12}>
+                <Alert severity="error">
+                  <Stack>
+                    {showBannerError.main}
+                    <Typography variant="bodySmall" error>
+                      {showBannerError.sub}
+                    </Typography>
+                  </Stack>
+                </Alert>
+              </Grid>
+            </Grid>
+          ) : null}
+          <Typography variant="bodyRegular">Add a new banner image</Typography>
+          <Grid container justifyContent="center">
+            <Grid item xs={12} sm={8} md={6}>
+              <StyledFilePond
+                name="bannerImage"
+                files={bannerPicture}
+                allowReorder={false}
+                allowMultiple={false}
+                maxFileSize="5MB"
+                acceptedFileTypes={["image/*"]}
+                onupdatefiles={setBannerPicture}
+                onaddfilestart={() => setIsUpdatingBannerImage(true)}
+                onprocessfiles={() => setIsUpdatingBannerImage(false)}
+                onerror={handleBannerError}
+                stylePanelAspectRatio="4:1"
+                stylePanelLayout="integrated"
+                server={{
+                  process: (
+                    fieldName,
+                    file,
+                    metadata,
+                    load,
+                    error,
+                    progress,
+                    abort,
+                    transfer,
+                    options
+                  ) => {
+                    // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
+                    FileChecksum.create(file, (checksum_error, checksum) => {
+                      if (checksum_error) {
+                        console.error(checksum_error);
+                        error();
+                      }
+                      axios
+                        .post(
+                          `${process.env.API_URL}/rails/active_storage/direct_uploads`,
+                          {
+                            blob: {
+                              filename: file.name,
+                              content_type: file.type,
+                              byte_size: file.size,
+                              checksum: checksum,
+                            },
+                          }
+                        )
+                        .then((response) => {
+                          if (!response.data) {
+                            return error;
+                          }
+                          const signed_id = response.data.signed_id;
+                          axios
+                            .put(response.data.direct_upload.url, file, {
+                              headers: response.data.direct_upload.headers,
+                              onUploadProgress: (progressEvent) => {
+                                progress(
+                                  progressEvent.lengthComputable,
+                                  progressEvent.loaded,
+                                  progressEvent.total
+                                );
+                              },
+                              // need to remove default Authorization header when sending to s3
+                              transformRequest: (data, headers) => {
+                                if (process.env !== "local") {
+                                  delete headers.common["Authorization"];
+                                }
+                                return data;
+                              },
+                            })
+                            .then((response) => {
+                              setBannerImage(signed_id);
+                              load(signed_id);
+                            })
+                            .catch((error) => {
+                              if (!axios.isCancel(error)) {
+                                console.error(error);
+                                // error();
+                              }
+                            });
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                        });
+                    });
+                    return {
+                      abort: () => {
+                        // This function is entered if the user has tapped the cancel button
+                        // request.abort(); TODO: is there an active storage abort?
+
+                        // Let FilePond know the request has been cancelled
+                        abort();
+                      },
+                    };
+                  },
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                  ondata: (formData) => {
+                    formData.append("blob", value);
+                    return formData;
+                  },
+                  onload: () => {
+                    props.onUploadComplete();
+                  },
+                }}
+                credits={false}
+                labelIdle='Drag & Drop your school banner image or <span class="filepond--label-action">Browse</span>'
+              />
+            </Grid>
+          </Grid>
+        </Stack>
+      </Stack>
+      <Box
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingTop: "24px",
+        }}
+      >
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              <Button variant="text" small onClick={handleToggle}>
+                <Typography variant="bodyRegular">Cancel</Typography>
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="primary"
+                small
+                disabled={
+                  !isDirty ||
+                  isUpdatingBannerImage ||
+                  isUpdatingSchoolLogoImage ||
+                  isSubmitting
+                }
+                type="submit"
+              >
+                <Typography variant="bodyRegular" bold>
+                  Save
+                </Typography>
+              </Button>
+              {(isUpdatingBannerImage || isUpdatingSchoolLogoImage) && (
+                <Typography variant="bodyRegular" lightened>
+                  Updating image...
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Card>
+      </Box>
+    </form>
+  );
+};
+const EnrollmentFields = ({ handleToggle, school }) => {
+  const [agesServedList, setAgesServedList] = useState(
+    school.attributes.agesServedList
+  );
+  const handleAgesServedList = (event) => {
+    setAgesServedList(event.target.value);
+  };
+
+  const [governanceType, setGovernanceType] = useState(
+    school.attributes.governanceType
+  );
+  const handleGovernanceType = (event) => {
+    setGovernanceType(event.target.value);
+  };
+
+  const [maxEnrollment, setMaxEnrollment] = useState(
+    school.attributes.maxEnrollment
+  );
+  const handleMaxEnrollment = (event) => {
+    setMaxEnrollment(event.target.value);
+  };
+  const [numClassrooms, setNumClassrooms] = useState(
+    school.attributes.numClassrooms
+  );
+  const handleNumClassrooms = (event) => {
+    setNumClassrooms(event.target.value);
+  };
+  const [charterString, setCharterString] = useState(
+    school.attributes.charterString
+  );
+  const handleCharterString = (event) => {
+    setCharterString(event.target.value);
+  };
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm({
+    defaultValues: {
+      agesServedList: agesServedList,
+      governanceType: governanceType,
+      maxEnrollment: maxEnrollment,
+      numClassrooms: numClassrooms,
+      charterString: charterString,
+    },
+  });
+
+  const watchFields = watch();
+
+  const onSubmit = (data) => {
+    // console.log(data);
+    schoolApi
+      .update(school.id, {
+        school: {
+          ages_served_list: data.agesServedList,
+          governance_type: data.governanceType,
+          max_enrollment: data.maxEnrollment,
+          num_classrooms: data.numClassrooms,
+          charter_string: data.charterString,
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          if (response.status === 401) {
+            clearLoggedInState({});
+            Router.push("/login");
+          }
+          console.error(response.error);
+        } else {
+          reset({
+            agesServedList: data.agesServedList,
+            governanceType: data.governanceType,
+            maxEnrollment: data.maxEnrollment,
+            numClassrooms: data.numClassrooms,
+            charterString: data.charterString,
+          });
+          mutate();
+        }
+      });
+  };
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack spacing={3}>
+        <Controller
+          name="agesServedList"
+          control={control}
+          render={({ field }) => (
+            <MultiSelect
+              withCheckbox
+              label="Ages served"
+              placeholder="Select the ages your school serves..."
+              options={agesServed.options}
+              error={errors.agesServed}
+              defaultValue={[]}
+              value={agesServedList}
+              onChange={handleAgesServedList}
+              helperText={
+                errors &&
+                errors.agesServed &&
+                errors.agesServed.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="governanceType"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label="Governance type"
+              placeholder="Select your school's governance..."
+              options={governance.options}
+              value={governanceType}
+              onChange={handleGovernanceType}
+              error={errors.governance}
+              helperText={
+                errors &&
+                errors.governance &&
+                errors.governance.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        {watchFields.governanceType === "Charter" ? (
           <Controller
-            name="state"
+            name="charterString"
             control={control}
-            rules={{ required: true }}
             render={({ field }) => (
               <Select
-                label="State"
-                placeholder="e.g. Massachusetts"
-                options={unitedStatesOptions}
-                error={errors.state}
+                label="Charter Group"
+                placeholder="e.g. Colorado Charter"
+                options={charter.options}
+                value={charterString}
+                onChange={handleCharterString}
+                error={errors.charterString}
                 helperText={
                   errors &&
-                  errors.state &&
-                  errors.state.type === "required" &&
+                  errors.charterString &&
+                  errors.charterString.type === "required" &&
                   "This field is required"
                 }
                 {...field}
               />
             )}
           />
-          <Stack spacing={2}>
-            <Typography variant="bodyRegular">Your open date</Typography>
-            <Controller
-              name="openDate"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  label="Your open date"
-                  id="open-date"
-                  error={errors.openDate}
-                  value={openDate}
-                  onChange={handleOpenDate}
+        ) : null}
+        <Controller
+          name="maxEnrollment"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="Maximum enrollment"
+              placeholder="e.g. 30"
+              value={maxEnrollment}
+              onChange={handleMaxEnrollment}
+              error={errors.maxEnrollment}
+              helperText={
+                errors &&
+                errors.maxEnrollment &&
+                errors.maxEnrollment.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="numClassrooms"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label="Number of classrooms"
+              placeholder="e.g. 4"
+              value={numClassrooms}
+              onChange={handleNumClassrooms}
+              error={errors.numClassrooms}
+              helperText={
+                errors &&
+                errors.numClassrooms &&
+                errors.numClassrooms.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+      </Stack>
+      <Box
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingTop: "24px",
+        }}
+      >
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              <Button variant="text" small onClick={handleToggle}>
+                <Typography variant="bodyRegular">Cancel</Typography>
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="primary"
+                small
+                disabled={!isDirty || isSubmitting}
+                type="submit"
+              >
+                <Typography variant="bodyRegular" bold>
+                  Save
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </Card>
+      </Box>
+    </form>
+  );
+};
+const TeacherLeaderFields = ({ handleToggle, school }) => {
+  const [isAddingTeacher, setIsAddingTeacher] = useState(false);
+  const [isEditingTeacher, setIsEditingTeacher] = useState(false);
+  const [currentTeacher, setCurrentTeacher] = useState(null);
+  const [isInvitingTeacher, setIsInvitingTeacher] = useState(false);
+
+  const { data: schoolData, isLoading: isLoadingSchoolData } = useSchool(
+    school.id
+  );
+
+  const {
+    query,
+    setQuery,
+    results,
+    noResults,
+    isSearching,
+    setPerPage,
+    setFilters,
+  } = useSearch();
+  useEffect(() => {
+    setQuery("*");
+    setPerPage(100);
+    setFilters({
+      models: "people",
+      "people_filters[roles]": ["Teacher Leader"],
+    });
+  }, []);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, touchedFields, isSubmitting, isDirty },
+  } = useForm({});
+
+  useEffect(() => {
+    if (currentTeacher) {
+      reset({
+        teacher: results?.find((option) => option.id === currentTeacher.id),
+        dateJoined: currentTeacher.schoolRelationshipAttributes.startDate,
+        dateLeft: currentTeacher.schoolRelationshipAttributes.endDate,
+        schoolTitle: currentTeacher.schoolRelationshipAttributes.title,
+      });
+    }
+  }, [currentTeacher]);
+
+  const handleCancel = () => {
+    setIsAddingTeacher(false);
+    setIsEditingTeacher(false);
+    setCurrentTeacher(null);
+    reset({
+      school: null,
+      dateJoined: "",
+      dateLeft: "",
+      schoolTitle: "",
+    });
+  };
+
+  const handleDeleteSchoolRelationship = async (schoolId) => {
+    try {
+      const response = await schoolRelationshipsApi.destroy(schoolId);
+      mutate(`/v1/schools/${school.id}`);
+      reset();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAddTeacherRelationship = async (data) => {
+    const formattedStartDate = data.dateJoined
+      ? format(new Date(data.dateJoined), "yyyy-MM-dd")
+      : null;
+    const formattedEndDate = data.dateLeft
+      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
+      : null;
+
+    try {
+      const response = await schoolRelationshipsApi.create({
+        school_relationship: {
+          name: school.attributes.name,
+          description: null,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+          title: data.schoolTitle, // the title the teacher had while at the school
+          role_list: ["Teacher Leader"],
+          school_id: school.id,
+          person_id: data.teacher.id,
+        },
+      });
+      mutate(`/v1/schools/${school?.id}`);
+      setIsAddingTeacher(false);
+      setIsEditingTeacher(false);
+      reset({
+        teacher: null,
+        dateJoined: "",
+        dateLeft: "",
+        schoolTitle: "",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpdateTeacherRelationship = async (data) => {
+    const formattedStartDate = data.dateJoined
+      ? format(new Date(data.dateJoined), "yyyy-MM-dd")
+      : null;
+    const formattedEndDate = data.dateLeft
+      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
+      : null;
+
+    try {
+      await schoolRelationshipsApi.update(currentTeacher.schoolRealtionshipId, {
+        school_relationship: {
+          name: school.attributes.name,
+          description: null,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+          title: data.schoolTitle,
+          role_list: ["Teacher Leader"],
+          // school_id: data.school.value,
+          // person_id: currentUser.id,
+        },
+      });
+      mutate(`/v1/schools/${school?.id}`);
+      setIsAddingTeacher(false);
+      setIsEditingTeacher(false);
+      setCurrentTeacher(null);
+      reset({
+        school: null,
+        dateJoined: "",
+        dateLeft: "",
+        schoolTitle: "",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onSubmit = (data) => {
+    console.log({ data });
+    if (isEditingTeacher) {
+      handleUpdateTeacherRelationship(data);
+    } else {
+      handleAddTeacherRelationship(data);
+    }
+  };
+
+  const teacherLeaderRelationships = schoolData?.included?.filter(
+    (rel) =>
+      rel.type === "schoolRelationship" &&
+      rel.attributes.roleList.includes("Teacher Leader")
+  );
+
+  const teachers = schoolData?.included
+    ?.filter((i) => i.type === "person")
+    ?.map((teacher) => {
+      const schoolRelationship = teacherLeaderRelationships.find(
+        (rel) => rel.relationships.person.data.id === teacher.id
+      );
+      return {
+        ...teacher,
+        schoolRelationshipAttributes: schoolRelationship?.attributes,
+        schoolRealtionshipId: schoolRelationship?.id,
+      };
+    })
+    ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are board members
+    ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
+    ?.sort((a, b) => {
+      if (!a.endDate) return -1;
+      if (!b.endDate) return 1;
+      return 0;
+    });
+
+  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+
+  const watchFields = watch();
+
+  // console.log({ results });
+  // console.log({ teachers });
+  // console.log({ currentTeacher });
+
+  return (
+    <>
+      {isInvitingTeacher ? (
+        <InviteTeacherFields
+          school={school}
+          isInvitingTeacher={isInvitingTeacher}
+          setIsInvitingTeacher={setIsInvitingTeacher}
+          setIsAddingTeacher={setIsAddingTeacher}
+        />
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={6}>
+            <Grid item xs={12} justifyContent="center">
+              {isAddingTeacher ? (
+                <Grid container>
+                  <Grid item xs={12}>
+                    <Stack spacing={3}>
+                      <Controller
+                        name="teacher"
+                        control={control}
+                        rules={{ required: "This field is required" }}
+                        defaultValue=""
+                        render={({
+                          field,
+                          fieldState: { error, isTouched },
+                        }) => (
+                          <Autocomplete
+                            {...field}
+                            inputValue={query && query ? query : ""}
+                            onChange={(_, newValue) => {
+                              field.onChange(newValue);
+                              setQuery(newValue);
+                            }}
+                            onInputChange={(_, newInputValue) => {
+                              setQuery(newInputValue);
+                            }}
+                            options={results}
+                            getOptionLabel={(option) =>
+                              option && option.attributes
+                                ? `${option.attributes.firstName} ${option.attributes.lastName}`
+                                : ""
+                            }
+                            renderOption={(props, option) => {
+                              const { key, ...optionProps } = props;
+                              return (
+                                <ListItem
+                                  key={key}
+                                  {...optionProps}
+                                  disablePadding
+                                >
+                                  <Stack
+                                    direction="row"
+                                    alignItems="center"
+                                    spacing={2}
+                                  >
+                                    <Avatar
+                                      src={option.attributes.imageUrl}
+                                      size="mini"
+                                    />
+                                    <Typography variant="bodyRegular">
+                                      {option.attributes.firstName}{" "}
+                                      {option.attributes.lastName}
+                                    </Typography>
+                                  </Stack>
+                                </ListItem>
+                              );
+                            }}
+                            isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                            }
+                            renderInput={(params) => (
+                              <MaterialTextField
+                                {...params}
+                                label="Search for a Teacher Leader"
+                                error={isTouched && !!error}
+                                placeholder="e.g. Katelyn Shore"
+                                helperText={
+                                  isTouched &&
+                                  error?.type === "required" &&
+                                  "This field is required"
+                                }
+                                InputProps={{
+                                  ...params.InputProps,
+                                  endAdornment: (
+                                    <>
+                                      {isSearching ? (
+                                        <CircularProgress
+                                          color="inherit"
+                                          size={20}
+                                        />
+                                      ) : null}
+                                      {params.InputProps.endAdornment}
+                                    </>
+                                  ),
+                                }}
+                              />
+                            )}
+                          />
+                        )}
+                      />
+                      <Controller
+                        name="dateJoined"
+                        control={control}
+                        defaultValue={null}
+                        render={({ field }) => (
+                          <DatePicker
+                            label="Date joined"
+                            value={field.value}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            maxDate={new Date()}
+                            minDate={new Date("2014-01-01")}
+                            renderInput={(params) => (
+                              <MaterialTextField
+                                {...params}
+                                error={
+                                  touchedFields.dateJoined &&
+                                  !!errors.dateJoined
+                                }
+                                helperText={
+                                  touchedFields.dateJoined &&
+                                  errors &&
+                                  errors.dateJoined &&
+                                  errors.dateJoined.type === "required" &&
+                                  "This field is required"
+                                }
+                              />
+                            )}
+                          />
+                        )}
+                        rules={{ required: "This field is required" }}
+                      />
+                      <Controller
+                        name="dateLeft"
+                        control={control}
+                        defaultValue={null}
+                        render={({ field }) => (
+                          <DatePicker
+                            label="Date left"
+                            value={field.value}
+                            onChange={(date) => {
+                              field.onChange(date);
+                            }}
+                            maxDate={new Date()}
+                            minDate={new Date("2014-01-01")}
+                            renderInput={(params) => (
+                              <MaterialTextField
+                                {...params}
+                                error={errors.dateLeft}
+                                helperText={
+                                  errors &&
+                                  errors.dateLeft &&
+                                  errors.dateLeft.type === "required" &&
+                                  "This field is required"
+                                }
+                              />
+                            )}
+                          />
+                        )}
+                        rules={{ required: false }}
+                      />
+
+                      <Controller
+                        name="schoolTitle"
+                        control={control}
+                        rules={{
+                          required: false,
+                        }}
+                        render={({ field }) => (
+                          <MaterialTextField
+                            label="Title"
+                            placeholder="e.g. Chief Financial Officer"
+                            error={errors.schoolTitle}
+                            helperText={
+                              errors &&
+                              errors.schoolTitle &&
+                              errors.schoolTitle.type === "required" &&
+                              "This field is required"
+                            }
+                            {...field}
+                          />
+                        )}
+                      />
+                    </Stack>
+                  </Grid>
+                </Grid>
+              ) : teachers.length ? (
+                <Grid container spacing={6}>
+                  <Grid item>
+                    <Card variant="lightened" size="small">
+                      <Grid container spacing={3}>
+                        <Grid item>
+                          <Icon type="flag" variant="primary" />
+                        </Grid>
+                        <Grid item flex={1}>
+                          <Typography variant="bodyRegular" bold>
+                            Note about display
+                          </Typography>
+                          <Typography variant="bodyRegular" lightened>
+                            Your profile will only show Teacher Leaders that are
+                            presently at your school.
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  </Grid>
+                  {teachers.map((teacher, i) => (
+                    <Grid item xs={12} key={i}>
+                      <Grid
+                        container
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        spacing={3}
+                      >
+                        <Grid item xs={8}>
+                          <Typography
+                            variant="bodyRegular"
+                            bold
+                            noWrap
+                            style={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {teacher.attributes.firstName}{" "}
+                            {teacher.attributes.lastName}
+                          </Typography>
+                        </Grid>
+                        <Grid item alignItems="flex-end">
+                          <Stack direction="row" spacing={3}>
+                            <Typography
+                              variant="bodyRegular"
+                              lightened
+                              hoverable
+                              onClick={() => {
+                                setIsEditingTeacher(true);
+                                setCurrentTeacher(teacher);
+                                setIsAddingTeacher(true);
+                              }}
+                            >
+                              Edit
+                            </Typography>
+
+                            <Typography
+                              variant="bodyRegular"
+                              lightened
+                              hoverable
+                              onClick={() =>
+                                handleDeleteSchoolRelationship(
+                                  teacher?.schoolRealtionshipId
+                                )
+                              }
+                            >
+                              Remove
+                            </Typography>
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                      <Stack>
+                        {teacher?.schoolRelationshipAttributes?.title ? (
+                          <Typography variant="bodyRegular" lightened>
+                            {teacher.schoolRelationshipAttributes.title}
+                          </Typography>
+                        ) : null}
+
+                        {teacher.schoolRelationshipAttributes.startDate ? (
+                          <Typography variant="bodyRegular" lightened>
+                            {formatHumanDate(
+                              teacher.schoolRelationshipAttributes.startDate
+                            )}{" "}
+                            -{" "}
+                            {teacher.schoolRelationshipAttributes.endDate
+                              ? formatHumanDate(
+                                  teacher.schoolRelationshipAttributes.endDate
+                                )
+                              : "Present"}
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                <Card noBorder noRadius size="large">
+                  <Stack spacing={6} alignItems="center">
+                    <img src="/assets/images/wildflower-logo.png" />
+                    <Typography variant="h4">
+                      Add your teacher history
+                    </Typography>
+                    <Button onClick={() => setIsAddingTeacher(true)}>
+                      <Typography variant="bodyRegular" bold>
+                        Add teacher
+                      </Typography>
+                    </Button>
+                  </Stack>
+                </Card>
+              )}
+            </Grid>
+          </Grid>
+          {isInvitingTeacher ? null : (
+            <Box
+              sx={{
+                position: "sticky",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                paddingTop: "24px",
+              }}
+            >
+              <Stack spacing={3}>
+                <Card size="small" elevated>
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    {isAddingTeacher ? (
+                      <>
+                        <Grid item>
+                          <Button variant="text" small onClick={handleCancel}>
+                            <Typography variant="bodyRegular" bold>
+                              Cancel
+                            </Typography>
+                          </Button>
+                        </Grid>
+                        <Grid item>
+                          <Button
+                            variant="primary"
+                            small
+                            type="submit"
+                            disabled={!isDirty || isSubmitting}
+                          >
+                            <Typography variant="bodyRegular" bold>
+                              {isEditingTeacher ? "Save" : "Add"}
+                            </Typography>
+                          </Button>
+                        </Grid>
+                      </>
+                    ) : (
+                      <>
+                        <Grid item>
+                          <Button variant="text" small onClick={handleToggle}>
+                            <Typography variant="bodyRegular">
+                              Cancel
+                            </Typography>
+                          </Button>
+                        </Grid>
+                        <Grid item>
+                          <Button
+                            small
+                            onClick={() => setIsAddingTeacher(true)}
+                          >
+                            <Typography variant="bodyRegular" bold>
+                              Add
+                            </Typography>
+                          </Button>
+                        </Grid>
+                      </>
+                    )}
+                  </Grid>
+                </Card>
+                {isAddingTeacher && !isInvitingTeacher && (
+                  <Card size="small">
+                    <Grid container justifyContent="space-between">
+                      <Grid item flex={1}>
+                        <Stack>
+                          <Typography variant="bodyRegular" bold>
+                            Can't find who you're looking for?
+                          </Typography>
+                          <Typography variant="bodyRegular" lightened>
+                            Invite a Teacher Leader to the network.
+                          </Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid item>
+                        <Button
+                          small
+                          variant="secondary"
+                          onClick={() => setIsInvitingTeacher(true)}
+                        >
+                          <Typography variant="bodyRegular" bold>
+                            Invite
+                          </Typography>
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Card>
+                )}
+              </Stack>
+            </Box>
+          )}
+        </form>
+      )}
+    </>
+  );
+};
+
+const InviteTeacherFields = ({
+  school,
+  isInvitingTeacher,
+  setIsInvitingTeacher,
+  setIsAddingTeacher,
+}) => {
+  console.log("school in invite teacher leader fields", school);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, touchedFields, isSubmitting, isDirty },
+  } = useForm({
+    defaultValues: {
+      partnerFirstName: "",
+      partnerLastName: "",
+      partnerEmail: "",
+      schoolTitle: "",
+      dateJoined: null,
+    },
+  });
+
+  async function onSubmit(data) {
+    console.log({ data });
+    const structuredData = {
+      person: {
+        email: data.partnerEmail,
+        first_name: data.partnerFirstName,
+        last_name: data.partnerLastName,
+      },
+      school_relationship: {
+        title: data.schoolTitle,
+        start_date: data.dateJoined,
+        end_date: null,
+      },
+    };
+    try {
+      const response = schoolApi.invitePartner(school.id, structuredData);
+      mutate(`/v1/schools/${school.id}`);
+      reset();
+      setIsInvitingTeacher(false);
+      setIsAddingTeacher(false);
+    } catch (error) {
+      console.log({ error });
+    }
+    // POST /v1/schools/[:school_id]/invite_partner
+    // payload:
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack spacing={3}>
+        <Controller
+          name="partnerFirstName"
+          control={control}
+          rules={{
+            required: {
+              value: true,
+              message: "This field is required",
+            },
+          }}
+          render={({ field }) => (
+            <TextField
+              label="Your Partner's First Name"
+              placeholder="e.g. Cathy"
+              error={errors.partnerFirstName}
+              helperText={errors?.partnerFirstName?.message || ""}
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="partnerLastName"
+          control={control}
+          rules={{
+            required: {
+              value: true,
+              message: "This field is required",
+            },
+          }}
+          render={({ field }) => (
+            <TextField
+              label="Your Partner's Last Name"
+              placeholder="e.g. Lee"
+              error={errors.partnerLastName}
+              helperText={errors?.partnerLastName?.message || ""}
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="partnerEmail"
+          control={control}
+          rules={{
+            required: {
+              value: true,
+              message: "This field is required",
+            },
+            pattern: {
+              value:
+                /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+              message: "Invalid email format",
+            },
+          }}
+          render={({ field }) => (
+            <TextField
+              label="Your Partner's Email"
+              placeholder="e.g. cathylee@gmail.com"
+              error={errors.partnerEmail}
+              helperText={errors?.partnerEmail?.message || ""}
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="schoolTitle"
+          control={control}
+          rules={{
+            required: false,
+          }}
+          render={({ field }) => (
+            <MaterialTextField
+              label="Title"
+              placeholder="e.g. Chief Financial Officer"
+              error={errors.schoolTitle}
+              helperText={
+                errors &&
+                errors.schoolTitle &&
+                errors.schoolTitle.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          name="dateJoined"
+          control={control}
+          defaultValue={null}
+          render={({ field }) => (
+            <DatePicker
+              label="Date joined"
+              value={field.value}
+              onChange={(date) => {
+                field.onChange(date);
+              }}
+              maxDate={new Date()}
+              minDate={new Date("2014-01-01")}
+              renderInput={(params) => (
+                <MaterialTextField
+                  {...params}
+                  error={touchedFields.dateJoined && !!errors.dateJoined}
                   helperText={
+                    touchedFields.dateJoined &&
                     errors &&
-                    errors.openDate &&
-                    errors.openDate.type === "required" &&
+                    errors.dateJoined &&
+                    errors.dateJoined.type === "required" &&
                     "This field is required"
                   }
-                  {...field}
-                  // value={parseISO(dateValue)}
-                  // onChange={handleDateValueChange}
                 />
               )}
             />
-          </Stack>
-          <Controller
-            name="agesServedList"
-            control={control}
-            render={({ field }) => (
-              <MultiSelect
-                withCheckbox
-                label="Ages served"
-                placeholder="Select the ages your school serves..."
-                options={agesServed.options}
-                error={errors.agesServed}
-                defaultValue={[]}
-                value={agesServedList}
-                onChange={handleAgesServedList}
-                helperText={
-                  errors &&
-                  errors.agesServed &&
-                  errors.agesServed.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="governanceType"
-            control={control}
-            render={({ field }) => (
-              <Select
-                label="Governance type"
-                placeholder="Select your school's governance..."
-                options={governance.options}
-                value={governanceType}
-                onChange={handleGovernanceType}
-                error={errors.governance}
-                helperText={
-                  errors &&
-                  errors.governance &&
-                  errors.governance.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="maxEnrollment"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                label="Maximum enrollment"
-                placeholder="e.g. 30"
-                value={maxEnrollment}
-                onChange={handleMaxEnrollment}
-                error={errors.maxEnrollment}
-                helperText={
-                  errors &&
-                  errors.maxEnrollment &&
-                  errors.maxEnrollment.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="about"
-            control={control}
-            rules={{ required: false }}
-            render={({ field }) => (
-              <TextField
-                label="About our school"
-                placeholder="e.g. Your school's profile"
-                multiline={true}
-                rows={4}
-                value={about}
-                onChange={handleAbout}
-                error={errors.about}
-                helperText={
-                  errors &&
-                  errors.about &&
-                  errors.about.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
-              />
-            )}
-          />
-
-          <Stack spacing={3}>
-            <Divider />
-            {showLogoError ? (
-              <Grid container>
-                <Grid item xs={12}>
-                  <Alert severity="error">
-                    <Stack>
-                      {showLogoError.main}
-                      <Typography variant="bodySmall" error>
-                        {showLogoError.sub}
-                      </Typography>
-                    </Stack>
-                  </Alert>
-                </Grid>
-              </Grid>
-            ) : null}
-            <Typography variant="bodyRegular">
-              Add a new school logo image
-            </Typography>
-            <Grid container justifyContent="center">
-              <Grid item xs={12} sm={8} md={6}>
-                <StyledFilePond
-                  name="schoolLogo"
-                  files={schoolLogoPicture}
-                  allowReorder={false}
-                  allowMultiple={false}
-                  maxFileSize="5MB"
-                  acceptedFileTypes={["image/*"]}
-                  onupdatefiles={setSchoolLogoPicture}
-                  onaddfilestart={() => setIsUpdatingSchoolLogoImage(true)}
-                  onprocessfiles={() => setIsUpdatingSchoolLogoImage(false)}
-                  onerror={handleLogoError}
-                  stylePanelAspectRatio="1:1"
-                  stylePanelLayout="circle"
-                  server={{
-                    process: (
-                      fieldName,
-                      file,
-                      metadata,
-                      load,
-                      error,
-                      progress,
-                      abort,
-                      transfer,
-                      options
-                    ) => {
-                      // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
-                      FileChecksum.create(file, (checksum_error, checksum) => {
-                        if (checksum_error) {
-                          console.error(checksum_error);
-                          error();
-                        }
-                        axios
-                          .post(
-                            `${process.env.API_URL}/rails/active_storage/direct_uploads`,
-                            {
-                              blob: {
-                                filename: file.name,
-                                content_type: file.type,
-                                byte_size: file.size,
-                                checksum: checksum,
-                              },
-                            }
-                          )
-                          .then((response) => {
-                            if (!response.data) {
-                              return error;
-                            }
-                            const signed_id = response.data.signed_id;
-                            axios
-                              .put(response.data.direct_upload.url, file, {
-                                headers: response.data.direct_upload.headers,
-                                onUploadProgress: (progressEvent) => {
-                                  progress(
-                                    progressEvent.lengthComputable,
-                                    progressEvent.loaded,
-                                    progressEvent.total
-                                  );
-                                },
-                                // need to remove default Authorization header when sending to s3
-                                transformRequest: (data, headers) => {
-                                  if (process.env !== "local") {
-                                    delete headers.common["Authorization"];
-                                  }
-                                  return data;
-                                },
-                              })
-                              .then((response) => {
-                                setSchoolLogoImage(signed_id);
-                                load(signed_id);
-                              })
-                              .catch((error) => {
-                                if (!axios.isCancel(error)) {
-                                  console.error(error);
-                                  // error();
-                                }
-                              });
-                          })
-                          .catch((error) => {
-                            console.log(error);
-                          });
-                      });
-                      return {
-                        abort: () => {
-                          // This function is entered if the user has tapped the cancel button
-                          // request.abort(); TODO: is there an active storage abort?
-
-                          // Let FilePond know the request has been cancelled
-                          abort();
-                        },
-                      };
-                    },
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    ondata: (formData) => {
-                      formData.append("blob", value);
-                      return formData;
-                    },
-                    onload: () => {
-                      props.onUploadComplete();
-                    },
-                  }}
-                  credits={false}
-                  labelIdle='Drag & Drop your school logo image or <span class="filepond--label-action">Browse</span>'
-                />
-              </Grid>
+          )}
+          rules={{ required: "This field is required" }}
+        />
+      </Stack>
+      <Box
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingTop: "24px",
+        }}
+      >
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Grid item>
+              <Button
+                variant="text"
+                small
+                onClick={() => setIsInvitingTeacher(false)}
+              >
+                <Typography variant="bodyRegular" bold>
+                  Cancel
+                </Typography>
+              </Button>
             </Grid>
-            <Divider />
-          </Stack>
-
-          <Stack spacing={3}>
-            <Divider />
-            {showBannerError ? (
-              <Grid container>
-                <Grid item xs={12}>
-                  <Alert severity="error">
-                    <Stack>
-                      {showBannerError.main}
-                      <Typography variant="bodySmall" error>
-                        {showBannerError.sub}
-                      </Typography>
-                    </Stack>
-                  </Alert>
-                </Grid>
-              </Grid>
-            ) : null}
-            <Typography variant="bodyRegular">
-              Add a new banner image
-            </Typography>
-            <Grid container justifyContent="center">
-              <Grid item xs={12} sm={8} md={6}>
-                <StyledFilePond
-                  name="bannerImage"
-                  files={bannerPicture}
-                  allowReorder={false}
-                  allowMultiple={false}
-                  maxFileSize="5MB"
-                  acceptedFileTypes={["image/*"]}
-                  onupdatefiles={setBannerPicture}
-                  onaddfilestart={() => setIsUpdatingBannerImage(true)}
-                  onprocessfiles={() => setIsUpdatingBannerImage(false)}
-                  onerror={handleBannerError}
-                  stylePanelAspectRatio="4:1"
-                  stylePanelLayout="integrated"
-                  server={{
-                    process: (
-                      fieldName,
-                      file,
-                      metadata,
-                      load,
-                      error,
-                      progress,
-                      abort,
-                      transfer,
-                      options
-                    ) => {
-                      // https://github.com/pqina/filepond/issues/279#issuecomment-479961967
-                      FileChecksum.create(file, (checksum_error, checksum) => {
-                        if (checksum_error) {
-                          console.error(checksum_error);
-                          error();
-                        }
-                        axios
-                          .post(
-                            `${process.env.API_URL}/rails/active_storage/direct_uploads`,
-                            {
-                              blob: {
-                                filename: file.name,
-                                content_type: file.type,
-                                byte_size: file.size,
-                                checksum: checksum,
-                              },
-                            }
-                          )
-                          .then((response) => {
-                            if (!response.data) {
-                              return error;
-                            }
-                            const signed_id = response.data.signed_id;
-                            axios
-                              .put(response.data.direct_upload.url, file, {
-                                headers: response.data.direct_upload.headers,
-                                onUploadProgress: (progressEvent) => {
-                                  progress(
-                                    progressEvent.lengthComputable,
-                                    progressEvent.loaded,
-                                    progressEvent.total
-                                  );
-                                },
-                                // need to remove default Authorization header when sending to s3
-                                transformRequest: (data, headers) => {
-                                  if (process.env !== "local") {
-                                    delete headers.common["Authorization"];
-                                  }
-                                  return data;
-                                },
-                              })
-                              .then((response) => {
-                                setBannerImage(signed_id);
-                                load(signed_id);
-                              })
-                              .catch((error) => {
-                                if (!axios.isCancel(error)) {
-                                  console.error(error);
-                                  // error();
-                                }
-                              });
-                          })
-                          .catch((error) => {
-                            console.log(error);
-                          });
-                      });
-                      return {
-                        abort: () => {
-                          // This function is entered if the user has tapped the cancel button
-                          // request.abort(); TODO: is there an active storage abort?
-
-                          // Let FilePond know the request has been cancelled
-                          abort();
-                        },
-                      };
-                    },
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    ondata: (formData) => {
-                      formData.append("blob", value);
-                      return formData;
-                    },
-                    onload: () => {
-                      props.onUploadComplete();
-                    },
-                  }}
-                  credits={false}
-                  labelIdle='Drag & Drop your school banner image or <span class="filepond--label-action">Browse</span>'
-                />
-              </Grid>
+            <Grid item>
+              <Button
+                variant="primary"
+                small
+                type="submit"
+                disabled={!isDirty || isSubmitting}
+              >
+                <Typography variant="bodyRegular" bold>
+                  Invite
+                </Typography>
+              </Button>
             </Grid>
-            <Divider />
-          </Stack>
-        </Stack>
-        <Card
-          noBorder
-          noRadius
-          sx={{
-            position: "sticky",
-            bottom: -24,
-            zIndex: 2,
-            paddingLeft: 0,
-          }}
-        >
-          <Stack direction="row" spacing={3} alignItems="center">
-            <Button
-              small
-              disabled={
-                !isDirty ||
-                isUpdatingBannerImage ||
-                isUpdatingSchoolLogoImage ||
-                isSubmitting
-              }
-              type="submit"
-            >
-              <Typography variant="bodyRegular" bold>
-                Save
-              </Typography>
-            </Button>
-            {(isUpdatingBannerImage || isUpdatingSchoolLogoImage) && (
-              <Typography variant="bodyRegular" lightened>
-                Updating image...
-              </Typography>
-            )}
-          </Stack>
+          </Grid>
         </Card>
-      </form>
-    </Modal>
+      </Box>
+    </form>
+  );
+};
+
+const BoardMemberFields = ({ handleToggle, school }) => {
+  const [isAddingTeacher, setIsAddingTeacher] = useState(false);
+  const [isEditingTeacher, setIsEditingTeacher] = useState(false);
+  const [currentTeacher, setCurrentTeacher] = useState(null);
+
+  const { data: schoolData, isLoading: isLoadingSchoolData } = useSchool(
+    school.id
+  );
+
+  const {
+    query,
+    setQuery,
+    results,
+    noResults,
+    isSearching,
+    setPerPage,
+    setFilters,
+  } = useSearch();
+  useEffect(() => {
+    setQuery("*");
+    setPerPage(100);
+    setFilters({
+      models: "people",
+      "people_filters[roles]": ["Teacher Leader"],
+    });
+  }, []);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, touchedFields, isSubmitting, isDirty },
+  } = useForm({});
+
+  useEffect(() => {
+    if (currentTeacher) {
+      reset({
+        teacher: results?.find((option) => option.id === currentTeacher.id),
+        dateJoined: currentTeacher.schoolRelationshipAttributes.startDate,
+        dateLeft: currentTeacher.schoolRelationshipAttributes.endDate,
+      });
+    }
+  }, [currentTeacher]);
+
+  const handleCancel = () => {
+    setIsAddingTeacher(false);
+    setIsEditingTeacher(false);
+    setCurrentTeacher(null);
+    reset({
+      school: null,
+      dateJoined: "",
+      dateLeft: "",
+    });
+  };
+
+  const handleDeleteSchoolRelationship = async (schoolId) => {
+    try {
+      const response = await schoolRelationshipsApi.destroy(schoolId);
+      mutate(`/v1/schools/${school.id}`);
+      reset();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAddTeacherRelationship = async (data) => {
+    const formattedStartDate = data.dateJoined
+      ? format(new Date(data.dateJoined), "yyyy-MM-dd")
+      : null;
+    const formattedEndDate = data.dateLeft
+      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
+      : null;
+
+    try {
+      const response = await schoolRelationshipsApi.create({
+        school_relationship: {
+          name: school.attributes.name,
+          description: null,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+
+          role_list: ["Board Member"],
+          school_id: school.id,
+          person_id: data.teacher.id,
+        },
+      });
+      mutate(`/v1/schools/${school?.id}`);
+      setIsAddingTeacher(false);
+      setIsEditingTeacher(false);
+      reset({
+        teacher: null,
+        dateJoined: "",
+        dateLeft: "",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpdateTeacherRelationship = async (data) => {
+    const formattedStartDate = data.dateJoined
+      ? format(new Date(data.dateJoined), "yyyy-MM-dd")
+      : null;
+    const formattedEndDate = data.dateLeft
+      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
+      : null;
+
+    try {
+      await schoolRelationshipsApi.update(currentTeacher.schoolRealtionshipId, {
+        school_relationship: {
+          name: school.attributes.name,
+          description: null,
+          start_date: formattedStartDate,
+          end_date: formattedEndDate,
+
+          role_list: ["Board Member"],
+          // school_id: data.school.value,
+          // person_id: currentUser.id,
+        },
+      });
+      mutate(`/v1/schools/${school?.id}`);
+      setIsAddingTeacher(false);
+      setIsEditingTeacher(false);
+      setCurrentTeacher(null);
+      reset({
+        school: null,
+        dateJoined: "",
+        dateLeft: "",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onSubmit = (data) => {
+    console.log({ data });
+    if (isEditingTeacher) {
+      handleUpdateTeacherRelationship(data);
+    } else {
+      handleAddTeacherRelationship(data);
+    }
+  };
+  const boardMemberRelationships = schoolData?.included?.filter(
+    (rel) =>
+      rel.type === "schoolRelationship" &&
+      rel.attributes.roleList.includes("Board Member")
+  );
+
+  const teachers = schoolData?.included
+    ?.filter((i) => i.type === "person")
+    ?.map((teacher) => {
+      const schoolRelationship = boardMemberRelationships.find(
+        (rel) => rel.relationships.person.data.id === teacher.id
+      );
+      return {
+        ...teacher,
+        schoolRelationshipAttributes: schoolRelationship?.attributes,
+        schoolRealtionshipId: schoolRelationship?.id,
+      };
+    })
+    ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are board members
+    ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
+    ?.sort((a, b) => {
+      if (!a.endDate) return -1;
+      if (!b.endDate) return 1;
+      return 0;
+    });
+
+  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+
+  const watchFields = watch();
+
+  // console.log({ results });
+  console.log({ teachers });
+  console.log({ schoolData });
+  // console.log({ currentTeacher });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Grid container spacing={6}>
+        <Grid item xs={12} justifyContent="center">
+          {isAddingTeacher ? (
+            <Grid container>
+              <Grid item xs={12}>
+                <Stack spacing={3}>
+                  <Controller
+                    name="teacher"
+                    control={control}
+                    rules={{ required: "This field is required" }}
+                    defaultValue=""
+                    render={({ field, fieldState: { error, isTouched } }) => (
+                      <Autocomplete
+                        {...field}
+                        // value={field.value || ""}
+                        inputValue={query && query ? query : ""}
+                        onChange={(_, newValue) => {
+                          field.onChange(newValue);
+                          setQuery(newValue);
+                        }}
+                        onInputChange={(_, newInputValue) => {
+                          setQuery(newInputValue);
+                        }}
+                        options={results}
+                        getOptionLabel={(option) =>
+                          option && option.attributes
+                            ? `${option.attributes.firstName} ${option.attributes.lastName}`
+                            : ""
+                        }
+                        renderOption={(props, option) => {
+                          const { key, ...optionProps } = props;
+                          return (
+                            <ListItem key={key} {...optionProps} disablePadding>
+                              <Stack
+                                direction="row"
+                                alignItems="center"
+                                spacing={2}
+                              >
+                                <Avatar
+                                  src={option.attributes.imageUrl}
+                                  size="mini"
+                                />
+                                <Typography variant="bodyRegular">
+                                  {option.attributes.firstName}{" "}
+                                  {option.attributes.lastName}
+                                </Typography>
+                              </Stack>
+                            </ListItem>
+                          );
+                        }}
+                        isOptionEqualToValue={(option, value) =>
+                          option.id === value.id
+                        }
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            label="Search for a Teacher Leader"
+                            error={isTouched && !!error}
+                            placeholder="e.g. Katelyn Shore"
+                            helperText={
+                              isTouched &&
+                              error?.type === "required" &&
+                              "This field is required"
+                            }
+                            InputProps={{
+                              ...params.InputProps,
+                              endAdornment: (
+                                <>
+                                  {isSearching ? (
+                                    <CircularProgress
+                                      color="inherit"
+                                      size={20}
+                                    />
+                                  ) : null}
+                                  {params.InputProps.endAdornment}
+                                </>
+                              ),
+                            }}
+                          />
+                        )}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="dateJoined"
+                    control={control}
+                    defaultValue={null}
+                    render={({ field }) => (
+                      <DatePicker
+                        label="Date joined"
+                        value={field.value}
+                        onChange={(date) => {
+                          field.onChange(date);
+                        }}
+                        maxDate={new Date()}
+                        minDate={new Date("2014-01-01")}
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            error={
+                              touchedFields.dateJoined && !!errors.dateJoined
+                            }
+                            helperText={
+                              touchedFields.dateJoined &&
+                              errors &&
+                              errors.dateJoined &&
+                              errors.dateJoined.type === "required" &&
+                              "This field is required"
+                            }
+                          />
+                        )}
+                      />
+                    )}
+                    rules={{ required: "This field is required" }}
+                  />
+                  <Controller
+                    name="dateLeft"
+                    control={control}
+                    defaultValue={null}
+                    render={({ field }) => (
+                      <DatePicker
+                        label="Date left"
+                        value={field.value}
+                        onChange={(date) => {
+                          field.onChange(date);
+                        }}
+                        maxDate={new Date()}
+                        minDate={new Date("2014-01-01")}
+                        renderInput={(params) => (
+                          <MaterialTextField
+                            {...params}
+                            error={errors.dateLeft}
+                            helperText={
+                              errors &&
+                              errors.dateLeft &&
+                              errors.dateLeft.type === "required" &&
+                              "This field is required"
+                            }
+                          />
+                        )}
+                      />
+                    )}
+                    rules={{ required: false }}
+                  />
+                </Stack>
+              </Grid>
+            </Grid>
+          ) : teachers.length ? (
+            <Grid container spacing={6}>
+              <Grid item>
+                <Card variant="lightened" size="small">
+                  <Grid container spacing={3}>
+                    <Grid item>
+                      <Icon type="flag" variant="primary" />
+                    </Grid>
+                    <Grid item flex={1}>
+                      <Typography variant="bodyRegular" bold>
+                        Note about display
+                      </Typography>
+                      <Typography variant="bodyRegular" lightened>
+                        Your profile will only show Board Members that are
+                        presently at your school.
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Grid>
+              {teachers.map((teacher, i) => (
+                <Grid item xs={12} key={i}>
+                  <Grid
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    spacing={3}
+                  >
+                    <Grid item xs={8}>
+                      <Typography
+                        variant="bodyRegular"
+                        bold
+                        noWrap
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {teacher.attributes.firstName}{" "}
+                        {teacher.attributes.lastName}
+                      </Typography>
+                    </Grid>
+                    <Grid item alignItems="flex-end">
+                      <Stack direction="row" spacing={3}>
+                        <Typography
+                          variant="bodyRegular"
+                          lightened
+                          hoverable
+                          onClick={() => {
+                            setIsEditingTeacher(true);
+                            setCurrentTeacher(teacher);
+                            setIsAddingTeacher(true);
+                          }}
+                        >
+                          Edit
+                        </Typography>
+
+                        <Typography
+                          variant="bodyRegular"
+                          lightened
+                          hoverable
+                          onClick={() =>
+                            handleDeleteSchoolRelationship(
+                              teacher?.schoolRealtionshipId
+                            )
+                          }
+                        >
+                          Remove
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                  <Stack>
+                    {teacher?.schoolRelationshipAttributes?.title ? (
+                      <Typography variant="bodyRegular" lightened>
+                        {teacher.schoolRelationshipAttributes.title}
+                      </Typography>
+                    ) : null}
+
+                    {teacher.schoolRelationshipAttributes.startDate ? (
+                      <Typography variant="bodyRegular" lightened>
+                        {formatHumanDate(
+                          teacher.schoolRelationshipAttributes.startDate
+                        )}{" "}
+                        -{" "}
+                        {teacher.schoolRelationshipAttributes.endDate
+                          ? formatHumanDate(
+                              teacher.schoolRelationshipAttributes.endDate
+                            )
+                          : "Present"}
+                      </Typography>
+                    ) : null}
+                  </Stack>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Card noBorder noRadius size="large">
+              <Stack spacing={6} alignItems="center">
+                <img src="/assets/images/wildflower-logo.png" />
+                <Typography variant="h4">Add your board history</Typography>
+                <Button onClick={() => setIsAddingTeacher(true)}>
+                  <Typography variant="bodyRegular" bold>
+                    Add board member
+                  </Typography>
+                </Button>
+              </Stack>
+            </Card>
+          )}
+        </Grid>
+      </Grid>
+
+      <Box
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingTop: "24px",
+        }}
+      >
+        <Card size="small" elevated>
+          <Grid container justifyContent="space-between" alignItems="center">
+            {isAddingTeacher ? (
+              <>
+                <Grid item>
+                  <Button variant="text" small onClick={handleCancel}>
+                    <Typography variant="bodyRegular" bold>
+                      Cancel
+                    </Typography>
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="primary"
+                    small
+                    type="submit"
+                    disabled={!isDirty || isSubmitting}
+                  >
+                    <Typography variant="bodyRegular" bold>
+                      {isEditingTeacher ? "Save" : "Add"}
+                    </Typography>
+                  </Button>
+                </Grid>
+              </>
+            ) : (
+              <>
+                <Grid item>
+                  <Button variant="text" small onClick={handleToggle}>
+                    <Typography variant="bodyRegular">Cancel</Typography>
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button small onClick={() => setIsAddingTeacher(true)}>
+                    <Typography variant="bodyRegular" bold>
+                      Add
+                    </Typography>
+                  </Button>
+                </Grid>
+              </>
+            )}
+          </Grid>
+        </Card>
+      </Box>
+    </form>
   );
 };
 
@@ -1017,5 +2623,25 @@ const governance = {
     { label: "Independent", value: "Independent" },
     { label: "Charter", value: "Charter" },
     { label: "District", value: "District" },
+  ],
+};
+const charter = {
+  title: "Charter",
+  param: "school_filters[charter]",
+  doNotDisplayFor: "people",
+  options: [
+    {
+      label: "Minnesota Wildflower Montessori School",
+      value: "Minnesota Wildflower Montessori School",
+    },
+    { label: "Colorado Charter", value: "Colorado Charter" },
+    {
+      label: "Wildflower New York Charter School",
+      value: "Wildflower New York Charter School",
+    },
+    {
+      label: "DC Wildflower Public Charter School",
+      value: "DC Wildflower Public Charter School",
+    },
   ],
 };

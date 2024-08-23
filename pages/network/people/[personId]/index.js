@@ -1889,10 +1889,10 @@ const SchoolHistoryFields = ({ handleToggle }) => {
 
       <Box
         sx={{
-          position: "absolute",
-          bottom: "16px",
-          left: "224px",
-          right: "24px",
+          position: "sticky",
+          bottom: 0,
+          left: 0,
+          right: 0,
           paddingTop: "24px",
         }}
       >

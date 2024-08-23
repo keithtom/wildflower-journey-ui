@@ -14,9 +14,11 @@ const SchoolCard = ({ schoolName, subtitle, location, logo, link }) => {
                 {schoolName}
               </Typography>
               {subtitle ? (
-                <Typography variant="bodyRegular">{subtitle}</Typography>
+                <Typography variant="bodySmall" lightened>
+                  {subtitle}
+                </Typography>
               ) : null}
-              <Typography variant="bodyRegular" lightened>
+              <Typography variant="bodySmall" lightened>
                 {location}
               </Typography>
             </Stack>
