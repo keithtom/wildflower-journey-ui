@@ -353,6 +353,7 @@ const OpenSchoolNavigation = ({
     "joyce@wildrosemontessori.org",
     "angelina@astermontessori.org",
     "katelyn.shore@wildflowerschools.org",
+    "maggie.paulin@wildflowerschools.org",
   ];
 
   return (
