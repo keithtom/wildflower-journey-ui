@@ -1941,8 +1941,6 @@ const InviteTeacherFields = ({
     } catch (error) {
       console.log({ error });
     }
-    // POST /v1/schools/[:school_id]/invite_partner
-    // payload:
   }
 
   return (

@@ -56,7 +56,7 @@ async function update(id, params = {}) {
 async function invitePartner(schoolId, data) {
   const config = getAuthHeader();
   try {
-    const response = await schoolsApi.post(
+    const response = await schoolsApi.put(
       `/${schoolId}/invite_partner`,
       data,
       config
