@@ -76,7 +76,7 @@ async function destroy(schoolRelationshipId) {
   const config = getAuthHeader();
 
   try {
-    const response = await workflowsApi.delete(
+    const response = await schoolRelationshipsApi.delete(
       `/${schoolRelationshipId}`,
       config
     );
