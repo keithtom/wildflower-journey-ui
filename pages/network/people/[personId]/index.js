@@ -465,19 +465,6 @@ const EditProfileModal = ({
   toggle,
   open,
 }) => {
-  // modal for editing profile
-  // many fields for editing profile
-  // so fields are grouped
-
-  // the modal should have a fixed menu on the left
-  // showing the individual field groups
-
-  // each group has its own instance of react-hook-form
-  // which should validate the fields for which it is responsible
-  // each group may submit to a different endpoint
-  // the submit button should be within the field group
-  // rather than global for all the field groups in the modal
-
   const [currentFieldGroup, setCurrentFieldGroup] = useState("general");
 
   const handleToggle = () => {
@@ -2301,10 +2288,10 @@ const BoardHistoryFields = ({ handleToggle }) => {
 
       <Box
         sx={{
-          position: "absolute",
-          bottom: "16px",
-          left: "224px",
-          right: "24px",
+          position: "sticky",
+          bottom: 0,
+          left: 0,
+          right: 0,
           paddingTop: "24px",
         }}
       >

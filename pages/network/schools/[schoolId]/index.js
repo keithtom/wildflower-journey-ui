@@ -110,11 +110,6 @@ const School = ({}) => {
     school?.attributes.governanceType ||
     school?.attributes.maxEnrollment;
   const adminId = "10c9-a091";
-  const isMySchool = school?.relationships.people.data.filter(
-    (person) => person.id === currentUser?.id || adminId === currentUser?.id
-  ).length
-    ? true
-    : false;
 
   let schoolLeaders;
   let allSisterSchools;
@@ -189,6 +184,12 @@ const School = ({}) => {
 
   const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
 
+  const isMySchool =
+    schoolLeaders?.some((leader) => leader.id === currentUser?.id) ||
+    adminId === currentUser?.id
+      ? true
+      : false;
+
   // console.log({ currentUser });
   // console.log({ isMySchool });
   // console.log({ included });
@@ -241,7 +242,7 @@ const School = ({}) => {
             <Grid container spacing={8}>
               <Grid item xs={12} md={hasInfo ? 4 : 12}>
                 <Stack spacing={6}>
-                  {schoolLeaders ? (
+                  {schoolLeaders.length ? (
                     <Grid item xs={12}>
                       <Card>
                         <Stack spacing={6}>
