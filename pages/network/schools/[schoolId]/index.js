@@ -1317,9 +1317,13 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
   const [currentTeacher, setCurrentTeacher] = useState(null);
   const [isInvitingTeacher, setIsInvitingTeacher] = useState(false);
 
+  const [disabledResults, setDisabledResults] = useState([]);
+
   const { data: schoolData, isLoading: isLoadingSchoolData } = useSchool(
     school.id
   );
+
+  console.log({ schoolData });
 
   const {
     query,
@@ -1330,6 +1334,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
     setPerPage,
     setFilters,
   } = useSearch();
+
   useEffect(() => {
     setQuery("*");
     setPerPage(100);
@@ -1478,7 +1483,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
         schoolRealtionshipId: schoolRelationship?.id,
       };
     })
-    ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are board members
+    ?.filter((teacher) => teacher.schoolRealtionshipId)
     ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
     ?.sort((a, b) => {
       if (!a.endDate) return -1;
@@ -1531,6 +1536,9 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                               setQuery(newInputValue);
                             }}
                             options={results}
+                            getOptionDisabled={(option) =>
+                              teachers.some((t) => t.id === option.id)
+                            }
                             getOptionLabel={(option) =>
                               option && option.attributes
                                 ? `${option.attributes.firstName} ${option.attributes.lastName}`
@@ -1930,6 +1938,7 @@ const InviteTeacherFields = ({
         title: data.schoolTitle,
         start_date: data.dateJoined,
         end_date: null,
+        role_list: ["Teacher Leader"], // TODO: seems like this does not update the schoolRealtionship, but maybe that is intentional--need a way to identify that they are invited...
       },
     };
     try {
@@ -2305,6 +2314,9 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                           setQuery(newInputValue);
                         }}
                         options={results}
+                        getOptionDisabled={(option) =>
+                          teachers.some((t) => t.id === option.id)
+                        }
                         getOptionLabel={(option) =>
                           option && option.attributes
                             ? `${option.attributes.firstName} ${option.attributes.lastName}`
