@@ -13,7 +13,7 @@ import {
   TextField as MaterialTextField,
   CircularProgress,
 } from "@mui/material";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 import { styled } from "@mui/material/styles";
 import { FilePond, registerPlugin } from "react-filepond";
@@ -116,7 +116,10 @@ const Person = ({}) => {
     return matchingItems;
   };
 
-  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+  const formatHumanDate = (date) => {
+    const parsedDate = parseISO(date);
+    return format(parsedDate, "MMMM d, yyyy");
+  };
 
   let hasInfo;
   let userSchool;
@@ -1640,7 +1643,10 @@ const SchoolHistoryFields = ({ handleToggle }) => {
     )
     ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
 
-  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+  const formatHumanDate = (date) => {
+    const parsedDate = parseISO(date);
+    return format(parsedDate, "MMMM d, yyyy");
+  };
 
   const watchFields = watch();
   // console.log({ watchFields });
@@ -1708,9 +1714,10 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                     render={({ field }) => (
                       <DatePicker
                         label="Date joined"
-                        value={field.value}
+                        value={parseISO(field.value)}
                         onChange={(date) => {
-                          field.onChange(date);
+                          const isoDate = date ? date.toISOString() : "";
+                          field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
                         minDate={new Date("2014-01-01")}
@@ -1740,9 +1747,10 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                     render={({ field }) => (
                       <DatePicker
                         label="Date left"
-                        value={field.value}
+                        value={parseISO(field.value)}
                         onChange={(date) => {
-                          field.onChange(date);
+                          const isoDate = date ? date.toISOString() : "";
+                          field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
                         minDate={new Date("2014-01-01")}
@@ -2074,9 +2082,13 @@ const BoardHistoryFields = ({ handleToggle }) => {
     )
     ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
 
-  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+  const formatHumanDate = (date) => {
+    const parsedDate = parseISO(date);
+    return format(parsedDate, "MMMM d, yyyy");
+  };
 
   const watchFields = watch();
+
   // console.log({ watchFields });
   // console.log({ currentSchool });
   // console.log({ schoolsData });
@@ -2142,9 +2154,10 @@ const BoardHistoryFields = ({ handleToggle }) => {
                     render={({ field }) => (
                       <DatePicker
                         label="Date joined"
-                        value={field.value}
+                        value={parseISO(field.value)}
                         onChange={(date) => {
-                          field.onChange(date);
+                          const isoDate = date ? date.toISOString() : "";
+                          field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
                         minDate={new Date("2014-01-01")}
@@ -2174,9 +2187,10 @@ const BoardHistoryFields = ({ handleToggle }) => {
                     render={({ field }) => (
                       <DatePicker
                         label="Date left"
-                        value={field.value}
+                        value={parseISO(field.value)}
                         onChange={(date) => {
-                          field.onChange(date);
+                          const isoDate = date ? date.toISOString() : "";
+                          field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
                         minDate={new Date("2014-01-01")}
