@@ -11,7 +11,7 @@ import {
   TextField as MaterialTextField,
   CircularProgress,
 } from "@mui/material";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
@@ -182,7 +182,10 @@ const School = ({}) => {
     sisterSchools = allSisterSchools.filter((s) => s.id !== school.id);
   }
 
-  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+  const formatHumanDate = (date) => {
+    const parsedDate = parseISO(date);
+    return format(parsedDate, "MMMM d, yyyy");
+  };
 
   const isMySchool =
     schoolLeaders?.some((leader) => leader.id === currentUser?.id) ||
@@ -197,7 +200,7 @@ const School = ({}) => {
   // console.log({ boardMembers });
   // console.log({ school });
   // console.log({ sisterSchools });
-  // console.log({ schoolData });
+  console.log({ schoolData });
 
   return (
     <>
@@ -644,11 +647,13 @@ const GeneralFields = ({ handleToggle, school, address }) => {
     defaultValues: {
       city: city,
       state: locationState,
-      openDate: openDate,
+      openDate: school.attributes.openedOn,
 
       about: about,
     },
   });
+
+  console.log(school.attributes.openedOn);
 
   const onSubmit = (data) => {
     console.log(data);
@@ -742,8 +747,13 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                 label="Your open date"
                 id="open-date"
                 error={errors.openDate}
-                value={openDate}
-                onChange={handleOpenDate}
+                value={parseISO(field.value)}
+                onChange={(date) => {
+                  const isoDate = date ? date.toISOString() : "";
+                  field.onChange(isoDate);
+                }}
+                // value={parseISO(openDate)}
+                // onChange={handleOpenDate}
                 helperText={
                   errors &&
                   errors.openDate &&
@@ -751,8 +761,6 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                   "This field is required"
                 }
                 {...field}
-                // value={parseISO(dateValue)}
-                // onChange={handleDateValueChange}
               />
             )}
           />
@@ -1492,9 +1500,14 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
       return 0;
     });
 
-  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+  const formatHumanDate = (date) => {
+    const parsedDate = parseISO(date);
+    return format(parsedDate, "MMMM d, yyyy");
+  };
 
   const watchFields = watch();
+
+  console.log(watchFields.dateJoined);
 
   // console.log({ results });
   // console.log({ teachers });
@@ -1610,9 +1623,10 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                         render={({ field }) => (
                           <DatePicker
                             label="Date joined"
-                            value={field.value}
+                            value={parseISO(field.value)}
                             onChange={(date) => {
-                              field.onChange(date);
+                              const isoDate = date ? date.toISOString() : "";
+                              field.onChange(isoDate);
                             }}
                             maxDate={new Date()}
                             minDate={new Date("2014-01-01")}
@@ -1643,9 +1657,10 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                         render={({ field }) => (
                           <DatePicker
                             label="Date left"
-                            value={field.value}
+                            value={parseISO(field.value)}
                             onChange={(date) => {
-                              field.onChange(date);
+                              const isoDate = date ? date.toISOString() : "";
+                              field.onChange(isoDate);
                             }}
                             maxDate={new Date()}
                             minDate={new Date("2014-01-01")}
@@ -2046,9 +2061,10 @@ const InviteTeacherFields = ({
           render={({ field }) => (
             <DatePicker
               label="Date joined"
-              value={field.value}
+              value={parseISO(field.value)}
               onChange={(date) => {
-                field.onChange(date);
+                const isoDate = date ? date.toISOString() : "";
+                field.onChange(isoDate);
               }}
               maxDate={new Date()}
               minDate={new Date("2014-01-01")}
@@ -2280,7 +2296,10 @@ const BoardMemberFields = ({ handleToggle, school }) => {
       return 0;
     });
 
-  const formatHumanDate = (date) => format(new Date(date), "MMMM d, yyyy");
+  const formatHumanDate = (date) => {
+    const parsedDate = parseISO(date);
+    return format(parsedDate, "MMMM d, yyyy");
+  };
 
   const watchFields = watch();
 
@@ -2384,9 +2403,10 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                     render={({ field }) => (
                       <DatePicker
                         label="Date joined"
-                        value={field.value}
+                        value={parseISO(field.value)}
                         onChange={(date) => {
-                          field.onChange(date);
+                          const isoDate = date ? date.toISOString() : "";
+                          field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
                         minDate={new Date("2014-01-01")}
@@ -2416,9 +2436,10 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                     render={({ field }) => (
                       <DatePicker
                         label="Date left"
-                        value={field.value}
+                        value={parseISO(field.value)}
                         onChange={(date) => {
-                          field.onChange(date);
+                          const isoDate = date ? date.toISOString() : "";
+                          field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
                         minDate={new Date("2014-01-01")}
