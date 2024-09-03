@@ -193,8 +193,12 @@ const Navigation = () => {
               variant="primary"
               to="/open-school"
               active={router.asPath === `/open-school/${workflow}`}
-              label="Open School"
-              // label={currentUser?.attributes.schools[0].name}
+              // label="Open School"
+              label={
+                currentUser?.attributes.schools.find(
+                  (school) => school.workflowId === workflow
+                )?.name
+              }
               icon="home"
             />
           ) : null}

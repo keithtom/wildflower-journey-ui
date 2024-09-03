@@ -91,6 +91,7 @@ const Task = ({
     const { data: school, isLoading: schoolIsLoading } =
       useSchool(userSchoolId);
     if (!schoolIsLoading) {
+      console.log({ school });
       assignableUsers = school?.included.filter(
         (item) => item.type === "person"
       );

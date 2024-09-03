@@ -12,7 +12,12 @@ const OpenSchoolWorkflow = ({}) => {
   const router = useRouter();
 
   const { currentUser } = useUserContext();
-  const schoolWorkflowId = currentUser?.attributes?.schools[0]?.workflowId;
+
+  const currentSchool = currentUser?.attributes?.schools.filter(
+    (s) => s.affiliated === true && s.end_date === null
+  );
+
+  const schoolWorkflowId = currentSchool && currentSchool[0]?.workflowId;
 
   useEffect(() => {
     if (schoolWorkflowId) {
