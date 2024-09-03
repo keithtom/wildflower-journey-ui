@@ -127,7 +127,7 @@ const School = ({}) => {
     );
 
     schoolLeaders = schoolData?.included
-      ?.filter((i) => i.type === "person")
+      ?.filter((i) => i.type === "person" && i.attributes.isOnboarded === true)
       ?.map((teacher) => {
         const schoolRelationship = teacherLeaderRelationships.find(
           (rel) => rel.relationships.person.data.id === teacher.id
@@ -642,18 +642,20 @@ const GeneralFields = ({ handleToggle, school, address }) => {
     handleSubmit,
     watch,
     reset,
-    formState: { errors, isSubmitting, isDirty },
+    formState: { errors, touchedFields, isSubmitting, isDirty },
   } = useForm({
     defaultValues: {
       city: city,
       state: locationState,
       openDate: school.attributes.openedOn,
-
       about: about,
     },
   });
 
-  console.log(school.attributes.openedOn);
+  // console.log("school.attributes.openedOn", school.attributes.openedOn);
+
+  const watchFields = watch();
+  // console.log("watchFields.openDate", watchFields.openDate);
 
   const onSubmit = (data) => {
     console.log(data);
@@ -682,15 +684,6 @@ const GeneralFields = ({ handleToggle, school, address }) => {
           setBannerPicture(null);
           setSchoolLogoPicture(null);
           mutate(`/v1/schools/${school.id}`);
-          reset({
-            about: data.about,
-            opened_on: data.openDate,
-            city: data.city,
-            state: data.state,
-            logo_image: schoolLogoImage,
-            banner_image: bannerImage,
-          });
-          // setEditProfileModalOpen(false);
         }
       });
   };
@@ -738,7 +731,6 @@ const GeneralFields = ({ handleToggle, school, address }) => {
           )}
         />
         <Stack spacing={2}>
-          <Typography variant="bodyRegular">Your open date</Typography>
           <Controller
             name="openDate"
             control={control}
@@ -752,15 +744,28 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                   const isoDate = date ? date.toISOString() : "";
                   field.onChange(isoDate);
                 }}
-                // value={parseISO(openDate)}
-                // onChange={handleOpenDate}
-                helperText={
-                  errors &&
-                  errors.openDate &&
-                  errors.openDate.type === "required" &&
-                  "This field is required"
-                }
-                {...field}
+                renderInput={(params) => (
+                  <MaterialTextField
+                    {...params}
+                    error={touchedFields.openDate && !!errors.openDate}
+                    helperText={
+                      touchedFields.openDate &&
+                      errors &&
+                      errors.openDate &&
+                      errors.openDate.type === "required" &&
+                      "This field is required"
+                    }
+                  />
+                )}
+                rules={{ required: "This field is required" }}
+
+                // helperText={
+                //   errors &&
+                //   errors.openDate &&
+                //   errors.openDate.type === "required" &&
+                //   "This field is required"
+                // }
+                // {...field}
               />
             )}
           />
@@ -938,7 +943,7 @@ const GeneralFields = ({ handleToggle, school, address }) => {
           ) : null}
           <Typography variant="bodyRegular">Add a new banner image</Typography>
           <Grid container justifyContent="center">
-            <Grid item xs={12} sm={8} md={6}>
+            <Grid item xs={12}>
               <StyledFilePond
                 name="bannerImage"
                 files={bannerPicture}
@@ -1475,7 +1480,9 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
   };
 
   const teacherLeaderRelationships = schoolData?.included?.filter(
-    (rel) => rel.type === "schoolRelationship"
+    (rel) =>
+      rel.type === "schoolRelationship" &&
+      rel.attributes.roleList.includes("Teacher Leader")
   );
 
   const teachers = schoolData?.included
@@ -1513,10 +1520,10 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
       : 1;
   });
 
-  console.log(watchFields.dateJoined);
+  // console.log(watchFields.dateJoined);
 
   // console.log({ results });
-  console.log({ teachers });
+  // console.log({ teachers });
   // console.log({ currentTeacher });
 
   return (
@@ -1970,8 +1977,8 @@ const InviteTeacherFields = ({
       },
     };
     try {
-      const response = schoolApi.invitePartner(school.id, structuredData);
-      mutate(`/v1/schools/${school.id}`);
+      const response = schoolApi.invitePartner(school?.id, structuredData);
+      mutate(`/v1/schools/${school?.id}`);
       reset();
       setIsInvitingTeacher(false);
       setIsAddingTeacher(false);
@@ -2287,6 +2294,32 @@ const BoardMemberFields = ({ handleToggle, school }) => {
       rel.type === "schoolRelationship" &&
       rel.attributes.roleList.includes("Board Member")
   );
+  const teacherLeaderRelationships = schoolData?.included?.filter(
+    (rel) =>
+      rel.type === "schoolRelationship" &&
+      rel.attributes.roleList.includes("Teacher Leader")
+  );
+
+  // console.log({ teacherLeaderRelationships });
+
+  const currentTeachers = schoolData?.included
+    ?.filter((i) => i.type === "person")
+    ?.map((teacher) => {
+      const schoolRelationship = teacherLeaderRelationships.find(
+        (rel) => rel.relationships.person.data.id === teacher.id
+      );
+      return {
+        ...teacher,
+        schoolRelationshipAttributes: schoolRelationship?.attributes,
+        schoolRealtionshipId: schoolRelationship?.id,
+      };
+    })
+    ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are teacher leaders
+    ?.filter(
+      (teacher) => teacher.schoolRelationshipAttributes.endDate === null
+    ); // Only include teachers who are still at the school
+
+  // console.log({ currentTeachers });
 
   const teachers = schoolData?.included
     ?.filter((i) => i.type === "person")
@@ -2316,8 +2349,8 @@ const BoardMemberFields = ({ handleToggle, school }) => {
   const watchFields = watch();
 
   // console.log({ results });
-  console.log({ teachers });
-  console.log({ schoolData });
+  // console.log({ teachers });
+  // console.log({ schoolData });
   // console.log({ currentTeacher });
 
   return (
@@ -2347,7 +2380,8 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                         }}
                         options={results}
                         getOptionDisabled={(option) =>
-                          teachers.some((t) => t.id === option.id)
+                          teachers.some((t) => t.id === option.id) ||
+                          currentTeachers.some((ct) => ct.id === option.id)
                         }
                         getOptionLabel={(option) =>
                           option && option.attributes
@@ -2371,6 +2405,14 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                                   {option.attributes.firstName}{" "}
                                   {option.attributes.lastName}
                                 </Typography>
+                                {currentTeachers.some(
+                                  (ct) => ct.id === option.id
+                                ) ? (
+                                  <Chip
+                                    label="Current Teacher Leader"
+                                    size="small"
+                                  />
+                                ) : null}
                               </Stack>
                             </ListItem>
                           );
