@@ -1475,9 +1475,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
   };
 
   const teacherLeaderRelationships = schoolData?.included?.filter(
-    (rel) =>
-      rel.type === "schoolRelationship" &&
-      rel.attributes.roleList.includes("Teacher Leader")
+    (rel) => rel.type === "schoolRelationship"
   );
 
   const teachers = schoolData?.included
@@ -1507,10 +1505,18 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
 
   const watchFields = watch();
 
+  const sortedTeachers = teachers.sort((a, b) => {
+    return a.attributes.isOnboarded === b.attributes.isOnboarded
+      ? 0
+      : a.attributes.isOnboarded
+      ? -1
+      : 1;
+  });
+
   console.log(watchFields.dateJoined);
 
   // console.log({ results });
-  // console.log({ teachers });
+  console.log({ teachers });
   // console.log({ currentTeacher });
 
   return (
@@ -1725,7 +1731,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                       </Grid>
                     </Card>
                   </Grid>
-                  {teachers.map((teacher, i) => (
+                  {sortedTeachers.map((teacher, i) => (
                     <Grid item xs={12} key={i}>
                       <Grid
                         container
@@ -1735,19 +1741,25 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                         spacing={3}
                       >
                         <Grid item xs={8}>
-                          <Typography
-                            variant="bodyRegular"
-                            bold
-                            noWrap
-                            style={{
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {teacher.attributes.firstName}{" "}
-                            {teacher.attributes.lastName}
-                          </Typography>
+                          <Stack direction="row" spacing={2}>
+                            <Typography
+                              variant="bodyRegular"
+                              lightened={!teacher.attributes.isOnboarded}
+                              bold
+                              noWrap
+                              style={{
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {teacher.attributes.firstName}{" "}
+                              {teacher.attributes.lastName}
+                            </Typography>
+                            {teacher.attributes.isOnboarded === false ? (
+                              <Chip label="Invited" size="small" />
+                            ) : null}
+                          </Stack>
                         </Grid>
                         <Grid item alignItems="flex-end">
                           <Stack direction="row" spacing={3}>
