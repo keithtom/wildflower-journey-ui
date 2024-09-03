@@ -2405,6 +2405,14 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                                   {option.attributes.firstName}{" "}
                                   {option.attributes.lastName}
                                 </Typography>
+                                {currentTeachers.some(
+                                  (ct) => ct.id === option.id
+                                ) ? (
+                                  <Chip
+                                    label="Current Teacher Leader"
+                                    size="small"
+                                  />
+                                ) : null}
                               </Stack>
                             </ListItem>
                           );
