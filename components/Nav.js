@@ -99,7 +99,13 @@ const Navigation = () => {
   const router = useRouter();
   const { currentUser, isOperationsGuide } = useUserContext();
   const [ogViewingSchool, setOgViewingSchool] = useState();
+  const [mySchoolWorkflowId, setMySchoolWorkflowId] = useState();
   const { workflow } = router.query;
+
+  useEffect(() => {
+    sessionStorage.getItem("mySchoolWorkflowId") &&
+      setMySchoolWorkflowId(sessionStorage.getItem("mySchoolWorkflowId"));
+  }, []);
 
   useEffect(() => {
     if (router.asPath === "/your-schools") {
@@ -192,16 +198,20 @@ const Navigation = () => {
             <NavLink
               variant="primary"
               to="/open-school"
-              active={router.asPath === `/open-school/${workflow}`}
-              label="Open School"
-              // label={currentUser?.attributes.schools[0].name}
+              active={router.asPath === `/open-school/${mySchoolWorkflowId}`}
+              // label="Open School"
+              label={
+                currentUser?.attributes.schools.find(
+                  (school) => school.workflowId === mySchoolWorkflowId
+                )?.name
+              }
               icon="home"
             />
           ) : null}
 
           {router.pathname.includes("/open-school") ? (
             <OpenSchoolNavigation
-              openSchoolWorkflowId={workflow}
+              openSchoolWorkflowId={mySchoolWorkflowId}
               currentUserId={currentUser?.id}
               currentUserEmail={currentUser?.attributes.email}
             />
