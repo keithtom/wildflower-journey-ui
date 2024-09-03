@@ -190,7 +190,6 @@ const Login = ({}) => {
                         defaultValue=""
                         render={({ field }) => (
                           <TextField
-                            className="highlight-ignore"
                             disabled={
                               isSubmitting || isSubmitSuccessful || isLoggingIn
                             }
