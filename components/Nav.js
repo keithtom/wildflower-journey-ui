@@ -99,7 +99,13 @@ const Navigation = () => {
   const router = useRouter();
   const { currentUser, isOperationsGuide } = useUserContext();
   const [ogViewingSchool, setOgViewingSchool] = useState();
+  const [mySchoolWorkflowId, setMySchoolWorkflowId] = useState();
   const { workflow } = router.query;
+
+  useEffect(() => {
+    sessionStorage.getItem("mySchoolWorkflowId") &&
+      setMySchoolWorkflowId(sessionStorage.getItem("mySchoolWorkflowId"));
+  }, []);
 
   useEffect(() => {
     if (router.asPath === "/your-schools") {
@@ -192,16 +198,20 @@ const Navigation = () => {
             <NavLink
               variant="primary"
               to="/open-school"
-              active={router.asPath === `/open-school/${workflow}`}
-              label="Open School"
-              // label={currentUser?.attributes.schools[0].name}
+              active={router.asPath === `/open-school/${mySchoolWorkflowId}`}
+              // label="Open School"
+              label={
+                currentUser?.attributes.schools.find(
+                  (school) => school.workflowId === mySchoolWorkflowId
+                )?.name
+              }
               icon="home"
             />
           ) : null}
 
           {router.pathname.includes("/open-school") ? (
             <OpenSchoolNavigation
-              openSchoolWorkflowId={workflow}
+              openSchoolWorkflowId={mySchoolWorkflowId}
               currentUserId={currentUser?.id}
               currentUserEmail={currentUser?.attributes.email}
             />
@@ -328,11 +338,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
   );
 };
 
-const OpenSchoolNavigation = ({
-  openSchoolWorkflowId,
-  currentUserId,
-  currentUserEmail,
-}) => {
+const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
   const router = useRouter();
   const { workflow } = router.query;
   const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
@@ -346,61 +352,47 @@ const OpenSchoolNavigation = ({
   const thisMonth = new Date().getMonth();
   const thisYear = new Date().getFullYear();
 
-  const approvedEmails = [
-    "judy@alliummontessori.org",
-    "chip@pinyonmontessori.org",
-    "brandi@pinyonmontessori.org",
-    "joyce@wildrosemontessori.org",
-    "angelina@astermontessori.org",
-    "katelyn.shore@wildflowerschools.org",
-    "maggie.paulin@wildflowerschools.org",
-  ];
-
   return (
     <Box>
-      {approvedEmails.includes(currentUserEmail) ? (
-        <>
-          <NavLink
-            variant="secondary"
-            to={`/open-school/${openSchoolWorkflowId}/to-do-list`}
-            active={
-              router.pathname.startsWith("/open-school/") &&
-              router.pathname.includes("/to-do-list")
-            }
-            label="To do list"
-            icon="calendarCheck"
-            secondaryAction={
-              isLoading ? null : !assignedToMe.length ? null : (
-                <Chip
-                  size="small"
-                  label={assignedToMe.length}
-                  variant="lightened"
-                />
-              )
-            }
+      <NavLink
+        variant="secondary"
+        to={`/open-school/${openSchoolWorkflowId}/to-do-list`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/to-do-list")
+        }
+        label="To do list"
+        icon="calendarCheck"
+        secondaryAction={
+          isLoading ? null : !assignedToMe.length ? null : (
+            <Chip
+              size="small"
+              label={assignedToMe.length}
+              variant="lightened"
+            />
+          )
+        }
+      />
+      <NavLink
+        variant="secondary"
+        to={`/open-school/${openSchoolWorkflowId}/checklist/${thisYear}/${thisMonth}`}
+        active={
+          router.pathname.startsWith("/open-school/") &&
+          router.pathname.includes("/checklist")
+        }
+        label="Checklist"
+        icon="layer"
+        secondaryAction={
+          <Chip
+            size="small"
+            label="New"
+            variant="primary"
+            sx={{ pointerEvents: "none" }}
           />
-          <NavLink
-            variant="secondary"
-            to={`/open-school/${openSchoolWorkflowId}/checklist/${thisYear}/${thisMonth}`}
-            active={
-              router.pathname.startsWith("/open-school/") &&
-              router.pathname.includes("/checklist")
-            }
-            label="Checklist"
-            icon="layer"
-            secondaryAction={
-              <Chip
-                size="small"
-                label="New"
-                variant="primary"
-                sx={{ pointerEvents: "none" }}
-              />
-            }
-          />
-        </>
-      ) : null}
-      {approvedEmails.includes(currentUserEmail) ? null : (
-        <>
+        }
+      />
+
+      {/*
           <NavLink
             variant="secondary"
             to={`/open-school/${openSchoolWorkflowId}/enrollment-and-communications`}
@@ -450,9 +442,7 @@ const OpenSchoolNavigation = ({
             }
             label="Support@"
             icon="loader"
-          />
-        </>
-      )}
+          /> */}
     </Box>
   );
 };

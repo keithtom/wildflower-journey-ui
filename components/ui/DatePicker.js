@@ -1,6 +1,4 @@
 import { DatePicker as MaterialDatePicker } from "@mui/x-date-pickers/DatePicker";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import FormHelperText from "@mui/material/FormHelperText";
 import { styled, css } from "@mui/material/styles";
 import { TextField, Stack } from "./index";
@@ -18,23 +16,22 @@ export default function DatePicker({
 }) {
   return (
     <Stack>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <CustomDatePicker
-          id={id}
-          label={label}
-          value={value}
-          onChange={onChange}
-          renderInput={({ inputRef, inputProps, InputProps }) => (
-            <TextField
-              error={error}
-              inputRef={inputRef}
-              endAdornment={InputProps?.endAdornment}
-              {...inputProps}
-            />
-          )}
-          {...props}
-        />
-      </LocalizationProvider>
+      <CustomDatePicker
+        id={id}
+        label={label}
+        value={value}
+        onChange={onChange}
+        renderInput={({ inputRef, inputProps, InputProps }) => (
+          <TextField
+            error={error}
+            inputRef={inputRef}
+            endAdornment={InputProps?.endAdornment}
+            {...inputProps}
+          />
+        )}
+        {...props}
+      />
+
       {helperText && (
         <FormHelperText error={error}>{helperText}</FormHelperText>
       )}
