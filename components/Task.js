@@ -91,17 +91,9 @@ const Task = ({
     const { data: school, isLoading: schoolIsLoading } =
       useSchool(userSchoolId);
     if (!schoolIsLoading) {
-      assignableUsers = school?.included.filter((item) => {
-        if (item.type === "person" && item.attributes.isOnboarded === true) {
-          return school.included.some(
-            (relationship) =>
-              relationship.type === "schoolRelationship" &&
-              relationship.relationships.person.data.id === item.id &&
-              relationship.attributes.endDate === null
-          );
-        }
-        return false;
-      });
+      assignableUsers = school?.included.filter(
+        (item) => item.type === "person"
+      );
     }
   } else if (router.pathname.startsWith("/ssj/")) {
     // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
@@ -119,7 +111,7 @@ const Task = ({
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
   // If you have props that depend on where they are being called from, put them as inputs for Task
 
-  // console.log({ task });
+  console.log({ task });
   // console.log({ assignableUsers });
 
   const taskId = task.id;

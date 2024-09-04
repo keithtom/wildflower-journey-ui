@@ -61,11 +61,11 @@ const AssigneeRoster = ({
 
   const cantAssign = completionType === "one_per_group" && completers.length;
 
-  // console.log({ completers });
+  console.log({ completers });
   // console.log({ assignees });
-  // console.log({ completionType });
-  // console.log({ assignableUsers });
-  // console.log({ cantAssign });
+  console.log({ completionType });
+  console.log({ assignableUsers });
+  console.log({ cantAssign });
 
   return (
     <>

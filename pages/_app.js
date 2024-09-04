@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { theme } from "../styles/theme";
 import { ThemeProvider } from "@mui/material/styles";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import CssBaseline from "@mui/material/CssBaseline";
 import { UserProvider } from "../lib/useUserContext";
 import { useRouter } from "next/router";
@@ -60,15 +58,13 @@ function MyApp({ Component, pageProps }) {
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <UserProvider>
-            <AppBar />
-            <Component {...pageProps} />
-          </UserProvider>
-        </ThemeProvider>
-      </LocalizationProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <UserProvider>
+          <AppBar />
+          <Component {...pageProps} />
+        </UserProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
