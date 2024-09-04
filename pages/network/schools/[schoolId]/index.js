@@ -245,6 +245,49 @@ const School = ({}) => {
             <Grid container spacing={8}>
               <Grid item xs={12} md={hasInfo ? 4 : 12}>
                 <Stack spacing={6}>
+                  {isMySchool ? (
+                    <Button
+                      variant="lightened"
+                      full
+                      onClick={() => setEditProfileModalOpen(true)}
+                    >
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Icon type="pencil" size="small" />
+                        <Typography variant="bodyRegular" bold>
+                          Edit school profile
+                        </Typography>
+                      </Stack>
+                    </Button>
+                  ) : (
+                    <Card
+                      size="small"
+                      variant="lightened"
+                      onClick={() => setClaimSchoolModalOpen(true)}
+                      hoverable
+                    >
+                      <Grid
+                        container
+                        justifyContent="space-between"
+                        alignItems="center"
+                        spacing={3}
+                      >
+                        <Grid item>
+                          <Icon type="flag" variant="primary" />
+                        </Grid>
+                        <Grid item flex={1}>
+                          <Typography variant="bodyRegular" bold>
+                            Is this your school?
+                          </Typography>
+                          <Typography variant="bodySmall" lightened>
+                            You should be able to edit this page.
+                          </Typography>
+                        </Grid>
+                        <Grid item>
+                          <Icon type="chevronRight" variant="lightened" />
+                        </Grid>
+                      </Grid>
+                    </Card>
+                  )}
                   {schoolLeaders.length ? (
                     <Grid item xs={12}>
                       <Card>
@@ -321,50 +364,6 @@ const School = ({}) => {
                       </Grid>
                     </Card>
                   ) : null}
-
-                  {isMySchool ? (
-                    <Button
-                      variant="lightened"
-                      full
-                      onClick={() => setEditProfileModalOpen(true)}
-                    >
-                      <Stack direction="row" spacing={3} alignItems="center">
-                        <Icon type="pencil" size="small" />
-                        <Typography variant="bodyRegular" bold>
-                          Edit school profile
-                        </Typography>
-                      </Stack>
-                    </Button>
-                  ) : (
-                    <Card
-                      size="small"
-                      variant="lightened"
-                      onClick={() => setClaimSchoolModalOpen(true)}
-                      hoverable
-                    >
-                      <Grid
-                        container
-                        justifyContent="space-between"
-                        alignItems="center"
-                        spacing={3}
-                      >
-                        <Grid item>
-                          <Icon type="flag" variant="primary" />
-                        </Grid>
-                        <Grid item flex={1}>
-                          <Typography variant="bodyRegular" bold>
-                            Is this your school?
-                          </Typography>
-                          <Typography variant="bodySmall" lightened>
-                            You should be able to edit this page.
-                          </Typography>
-                        </Grid>
-                        <Grid item>
-                          <Icon type="chevronRight" variant="lightened" />
-                        </Grid>
-                      </Grid>
-                    </Card>
-                  )}
                 </Stack>
               </Grid>
               {hasInfo ? (
