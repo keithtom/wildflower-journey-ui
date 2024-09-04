@@ -12,6 +12,7 @@ const AttributesCard = ({
   agesServed,
   governance,
   maxEnrollment,
+  numClassrooms,
   affinityGroups,
   genderIdentity,
 }) => {
@@ -53,6 +54,18 @@ const AttributesCard = ({
             <Grid container>
               <Grid item>
                 <Chip label={maxEnrollment} size="small" />
+              </Grid>
+            </Grid>
+          </Stack>
+        ) : null}
+        {numClassrooms ? (
+          <Stack spacing={2}>
+            <Typography variant="bodySmall" lightened uppercase bold>
+              Number of Classrooms
+            </Typography>
+            <Grid container>
+              <Grid item>
+                <Chip label={numClassrooms} size="small" />
               </Grid>
             </Grid>
           </Stack>
