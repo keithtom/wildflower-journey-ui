@@ -108,6 +108,7 @@ const useSearch = () => {
     hasMore,
     noResults,
     perPage,
+    setPerPage,
   };
 };
 
