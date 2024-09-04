@@ -267,6 +267,20 @@ const Person = ({}) => {
             <Grid container spacing={8}>
               <Grid item xs={12} md={hasInfo ? 4 : 12}>
                 <Stack spacing={6}>
+                  {isMyProfile ? (
+                    <Button
+                      variant="lightened"
+                      full
+                      onClick={() => setEditProfileModalOpen(true)}
+                    >
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Icon type="pencil" size="small" />
+                        <Typography variant="bodyRegular" bold>
+                          Edit profile
+                        </Typography>
+                      </Stack>
+                    </Button>
+                  ) : null}
                   {hasSchool ? (
                     schoolLink ? (
                       <Card>
@@ -329,20 +343,6 @@ const Person = ({}) => {
                         person?.attributes?.montessoriCertifiedLevelList
                       }
                     />
-                  ) : null}
-                  {isMyProfile ? (
-                    <Button
-                      variant="lightened"
-                      full
-                      onClick={() => setEditProfileModalOpen(true)}
-                    >
-                      <Stack direction="row" spacing={3} alignItems="center">
-                        <Icon type="pencil" size="small" />
-                        <Typography variant="bodyRegular" bold>
-                          Edit profile
-                        </Typography>
-                      </Stack>
-                    </Button>
                   ) : null}
                 </Stack>
               </Grid>
