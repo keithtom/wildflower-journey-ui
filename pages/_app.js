@@ -24,6 +24,10 @@ if (process.env.NODE_ENV === "production") {
       urlBlocklist: [
         // insert full or partial urls that you don't want to record here
       ],
+      networkBodyKeysToRedact: [
+        // insert keys that you want to redact from network bodies here
+        "user",
+      ],
     },
   });
 }
