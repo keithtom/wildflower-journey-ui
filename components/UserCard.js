@@ -10,7 +10,6 @@ const UserCard = ({
   role,
   profileImage,
   link,
-  subtitle,
 }) => {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const handleOpenContactModal = () => {
@@ -33,11 +32,6 @@ const UserCard = ({
               <Typography variant="bodyRegular" bold>
                 {firstName} {lastName}
               </Typography>
-              {subtitle && (
-                <Typography variant="bodySmall" lightened>
-                  {subtitle}
-                </Typography>
-              )}
               <Typography variant="bodySmall" lightened>
                 {role}
               </Typography>

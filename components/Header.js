@@ -29,10 +29,7 @@ const Header = ({ toggleNavOpen }) => {
 
   const logo = "/assets/images/wildflower-logo.png";
 
-  const showNetwork = !(
-    currentUser?.personRoleList?.includes("Emerging Teacher Leader") &&
-    !currentUser?.personRoleList?.includes("Teacher Leader")
-  );
+  const showNetwork = !currentUser?.attributes?.ssj;
 
   // console.log({ currentUser });
   // console.log({ isAdmin });

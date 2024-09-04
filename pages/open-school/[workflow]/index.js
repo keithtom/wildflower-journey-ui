@@ -88,7 +88,7 @@ const OpenSchool = () => {
 
   return (
     <PageContainer>
-      <Grid container spacing={6}>
+      <Grid container spacing={16}>
         <Grid item xs={12}>
           <Card>
             <Grid container justifyContent="space-between">
@@ -97,14 +97,14 @@ const OpenSchool = () => {
                   <Avatar
                     size="lg"
                     src={school.attributes.logoUrl}
-                    sx={{ borderRadius: 4, border: "1px solid #f1f1f1" }}
+                    sx={{ borderRadius: 4 }}
                     imgProps={{ sx: { objectFit: "contain" } }}
                   />
                   <Stack spacing={1}>
                     <Typography variant="bodyRegular">
                       Welcome, {currentUser.attributes.firstName}
                     </Typography>
-                    <Typography variant="h3">
+                    <Typography variant="h4">
                       {school.attributes.name}
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
@@ -129,12 +129,7 @@ const OpenSchool = () => {
           <Link
             href={`/open-school/${workflow}/checklist/${thisYear}/${thisMonth}`}
           >
-            <Card
-              elevated
-              size="large"
-              sx={{ overflow: "hidden" }}
-              variant="primaryOutlined"
-            >
+            <Card elevated size="large" sx={{ overflow: "hidden" }}>
               <Grid container spacing={16}>
                 <Grid item xs={12} sm={6}>
                   <Stack
@@ -147,7 +142,7 @@ const OpenSchool = () => {
                       <Typography variant="bodyLarge">
                         Open School Checklist
                       </Typography>
-                      <Chip label="New" size="small" variant="primary" />
+                      <Chip label="New" size="small" />
                     </Stack>
                     <Stack spacing={3}>
                       <Typography variant="h3" bold>
@@ -194,7 +189,7 @@ const OpenSchool = () => {
           </Link>
         </Grid>
         <Grid item>
-          <Stack spacing={3} pt={12}>
+          <Stack spacing={3}>
             <Grid>
               <Chip
                 icon={<Icon type="loader" size="small" />}

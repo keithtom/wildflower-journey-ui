@@ -180,56 +180,6 @@ const AdminChecklist = () => {
   // Assuming `milestones` is your data object
   const groupedMilestones = isLoading ? null : groupMilestones(milestones);
 
-  const academicQuarters = {
-    1: [
-      { number: 7, name: "July" },
-      { number: 8, name: "August" },
-      { number: 9, name: "September" },
-    ],
-    2: [
-      { number: 10, name: "October" },
-      { number: 11, name: "November" },
-      { number: 12, name: "December" },
-    ],
-    3: [
-      { number: 1, name: "January" },
-      { number: 2, name: "February" },
-      { number: 3, name: "March" },
-    ],
-    4: [
-      { number: 4, name: "April" },
-      { number: 5, name: "May" },
-      { number: 6, name: "June" },
-    ],
-  };
-
-  // Get the current month number and year
-  let currentMonthNumber = new Date(timeframe).getMonth() + 1; // getMonth() returns 0-11, so add 1
-  let currentYear = new Date(timeframe).getFullYear();
-
-  // Increment the month number by 1
-  currentMonthNumber += 1;
-
-  // Adjust the year if the incremented month number exceeds 12
-  if (currentMonthNumber > 12) {
-    currentMonthNumber = 1;
-    currentYear += 1;
-  }
-
-  // Find the academic quarter for the incremented month
-  let currentQuarter = "";
-
-  for (const [quarter, months] of Object.entries(academicQuarters)) {
-    if (months.some((month) => month.number === currentMonthNumber)) {
-      const firstMonth = months[0].name;
-      const lastMonth = months[months.length - 1].name;
-      currentQuarter = `Quarter ${quarter} (${firstMonth}-${lastMonth})`;
-      break;
-    }
-  }
-
-  // console.log({ timeframe });
-  // console.log({ currentQuarter });
   // console.log({ groupedMilestones });
   // console.log({ milestones });
   // console.log({ currentUser });
@@ -341,7 +291,7 @@ const AdminChecklist = () => {
                     )}
                     {groupedMilestones.in_progress.quarterly && (
                       <MilestoneGroup
-                        periodName={currentQuarter}
+                        periodName="This Quarter"
                         milestones={groupedMilestones.in_progress.quarterly}
                       />
                     )}
@@ -398,7 +348,7 @@ const AdminChecklist = () => {
                     )}
                     {groupedMilestones.to_do.quarterly && (
                       <MilestoneGroup
-                        periodName={currentQuarter}
+                        periodName="This Quarter"
                         milestones={groupedMilestones.to_do.quarterly}
                       />
                     )}
@@ -451,7 +401,7 @@ const AdminChecklist = () => {
                     )}
                     {groupedMilestones.done.quarterly && (
                       <MilestoneGroup
-                        periodName={currentQuarter}
+                        periodName="This Quarter"
                         milestones={groupedMilestones.done.quarterly}
                       />
                     )}
