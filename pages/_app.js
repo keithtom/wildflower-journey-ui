@@ -26,7 +26,7 @@ if (process.env.NODE_ENV === "production") {
       ],
       networkBodyKeysToRedact: [
         // insert keys that you want to redact from network bodies here
-        "password",
+        "user",
       ],
     },
   });
