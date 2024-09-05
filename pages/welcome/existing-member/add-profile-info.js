@@ -20,6 +20,7 @@ import axios from "axios";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../../api/people";
 import useAuth from "@lib/utils/useAuth";
+import RedirectUser from "@lib/redirectUser";
 
 const token = getCookie("auth");
 
@@ -104,7 +105,11 @@ const AddProfileInfo = ({}) => {
           const personAttributes = response.data.attributes;
           currentUser.attributes.imageUrl = personAttributes.imageUrl;
           setCurrentUser(currentUser);
-          router.push("/network");
+          RedirectUser({
+            router: router,
+            roleList: currentUser?.personRoleList,
+            isOnboarded: currentUser?.personIsOnboarded,
+          });
         }
       });
   };
@@ -307,13 +312,21 @@ const AddProfileInfo = ({}) => {
                   </Button>
                 </Grid>
                 <Grid item xs={12}>
-                  <Link href="/network">
-                    <Button full variant="text">
-                      <Typography variant="bodyRegular" highlight>
-                        Skip for now
-                      </Typography>
-                    </Button>
-                  </Link>
+                  <Button
+                    full
+                    variant="text"
+                    onClick={() => {
+                      RedirectUser({
+                        router: router,
+                        roleList: currentUser?.personRoleList,
+                        isOnboarded: currentUser?.personIsOnboarded,
+                      });
+                    }}
+                  >
+                    <Typography variant="bodyRegular" highlight>
+                      Skip for now
+                    </Typography>
+                  </Button>
                 </Grid>
               </Grid>
             </Stack>
