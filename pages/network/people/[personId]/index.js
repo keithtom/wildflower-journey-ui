@@ -583,7 +583,7 @@ const GeneralFields = ({ handleToggle }) => {
       lastName: currentUser?.attributes.lastName,
       city: currentUser?.personAddress.city,
       state: currentUser?.personAddress.state,
-      email: currentUser?.attributes.email,
+      email: personData?.data?.attributes.email,
       about: personData?.data?.attributes?.about || "",
       phone: personData?.data?.attributes?.phone || "",
     },
