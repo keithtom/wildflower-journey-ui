@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 
+import { getScreenSize } from "@hooks/react-responsive";
 import peopleApi from "@api/people";
 import { useUserContext, useAssignViewingSchool } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
@@ -27,6 +28,8 @@ const OpenSchool = () => {
   const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow } = router.query;
+
+  const { screenSize } = getScreenSize();
 
   const personId = currentUser?.id;
   // Fetch data
@@ -91,8 +94,8 @@ const OpenSchool = () => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
-            <Grid container justifyContent="space-between">
-              <Grid item>
+            <Grid container justifyContent="space-between" spacing={6}>
+              <Grid item flex={1}>
                 <Stack direction="row" alignItems="center" spacing={6}>
                   <Avatar
                     size="lg"
@@ -113,9 +116,9 @@ const OpenSchool = () => {
                   </Stack>
                 </Stack>
               </Grid>
-              <Grid item>
+              <Grid item flex={screenSize.isSm ? 1 : null}>
                 <Link href={`/network/schools/${school.id}`}>
-                  <Button variant="lightened" small>
+                  <Button variant="lightened" small full={screenSize.isSm}>
                     <Typography variant="bodyRegular" bold>
                       View school profile
                     </Typography>
@@ -131,7 +134,7 @@ const OpenSchool = () => {
           >
             <Card
               elevated
-              size="large"
+              size={screenSize.isSm ? null : "large"}
               sx={{ overflow: "hidden" }}
               variant="primaryOutlined"
             >

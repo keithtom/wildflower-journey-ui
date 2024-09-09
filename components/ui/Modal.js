@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { Grid, Icon, IconButton, Typography } from "./index";
+import { getScreenSize } from "@hooks/react-responsive";
 
 export default function Modal({
   title,
@@ -15,9 +16,9 @@ export default function Modal({
   noPadding,
   fixedDrawer,
   fixedActions,
-
   ...props
 }) {
+  const { screenSize } = getScreenSize();
   const drawerWidth = 200;
   const dialogTitleHeight = 72;
   const fixedActionsHeight = 48;
@@ -27,7 +28,11 @@ export default function Modal({
       maxWidth="sm"
       onClose={toggle}
       {...props}
-      PaperProps={{ style: { height: fixedDrawer ? "600px" : "auto" } }}
+      PaperProps={{
+        style: {
+          height: fixedDrawer ? "600px" : screenSize.isSm ? "100%" : "auto",
+        },
+      }}
     >
       <DialogTitle sx={{ zIndex: 1, height: `${dialogTitleHeight}px` }}>
         <Grid container justifyContent="space-between" alignItems="center">

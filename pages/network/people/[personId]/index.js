@@ -83,8 +83,10 @@ import usePerson from "@hooks/usePerson";
 import useSchool from "@hooks/useSchool";
 import useSchools from "@hooks/useSchools";
 import { DataArea } from "styled-icons/fluentui-system-filled";
+import { getScreenSize } from "@hooks/react-responsive";
 
 const Person = ({}) => {
+  const { screenSize } = getScreenSize();
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const { currentUser } = useUserContext();
 
@@ -462,12 +464,70 @@ const StyledFilePond = styled(FilePond)`
   }
 `;
 
+const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
+  return (
+    <List>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("general")}
+          selected={currentFieldGroup === "general"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">General</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("demographic")}
+          selected={currentFieldGroup === "demographic"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">Demographic</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("certification_and_role")}
+          selected={currentFieldGroup === "certification_and_role"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">Certification & Role</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("school_history")}
+          selected={currentFieldGroup === "school_history"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">School History</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("board_history")}
+          selected={currentFieldGroup === "board_history"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">Board History</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+    </List>
+  );
+};
+
 const EditProfileModal = ({
   mutate,
   setEditProfileModalOpen,
   toggle,
   open,
 }) => {
+  const { screenSize } = getScreenSize();
   const [currentFieldGroup, setCurrentFieldGroup] = useState("general");
 
   const handleToggle = () => {
@@ -497,63 +557,27 @@ const EditProfileModal = ({
       open={open}
       title="Edit your profile"
       fixedDrawer={
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("general")}
-              selected={currentFieldGroup === "general"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">General</Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("demographic")}
-              selected={currentFieldGroup === "demographic"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">Demographic</Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("certification_and_role")}
-              selected={currentFieldGroup === "certification_and_role"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">
-                  Certification & Role
-                </Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("school_history")}
-              selected={currentFieldGroup === "school_history"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">School History</Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("board_history")}
-              selected={currentFieldGroup === "board_history"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">Board History</Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-        </List>
+        screenSize.isSm ? null : (
+          <FieldGroupMenu
+            setCurrentFieldGroup={setCurrentFieldGroup}
+            currentFieldGroup={currentFieldGroup}
+          />
+        )
       }
     >
-      {renderFieldGroup()}
+      {screenSize.isSm ? (
+        <Stack spacing={6}>
+          <Card noPadding elevated size="small">
+            <FieldGroupMenu
+              setCurrentFieldGroup={setCurrentFieldGroup}
+              currentFieldGroup={currentFieldGroup}
+            />
+          </Card>
+          {renderFieldGroup()}
+        </Stack>
+      ) : (
+        renderFieldGroup()
+      )}
     </Modal>
   );
 };

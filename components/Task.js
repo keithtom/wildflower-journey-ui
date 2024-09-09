@@ -538,7 +538,7 @@ const DecisionDrawerActions = ({
                   </Grid>
                 </Card>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Button
                   full
                   variant="text"
@@ -550,7 +550,7 @@ const DecisionDrawerActions = ({
                   </Typography>
                 </Button>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Button
                   full
                   disabled={!selectedDecisionOption}
@@ -618,7 +618,7 @@ const TaskDrawerActions = ({
           canCompleteTask ? (
             // the task is complete, assigned to me, and I can still complete it
             <>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Button
                   full
                   variant="danger"
@@ -629,7 +629,7 @@ const TaskDrawerActions = ({
                   </Typography>
                 </Button>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Button full onClick={handleCompleteTask}>
                   <Typography variant="bodyRegular" light bold>
                     Mark task complete
@@ -663,7 +663,7 @@ const TaskDrawerActions = ({
           // the task is complete, not assigned to me, and I can assign it
           canCompleteTask ? (
             <>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Button
                   variant="lightened"
                   full
@@ -675,7 +675,7 @@ const TaskDrawerActions = ({
                   </Typography>
                 </Button>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Button
                   full
                   disabled={!canAssignTask}
@@ -711,7 +711,7 @@ const TaskDrawerActions = ({
           canUnassignTask ? (
             // the task is not complete, and it is assigned to me, and I can unassign it
             <>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Button
                   full
                   variant="danger"
@@ -722,7 +722,7 @@ const TaskDrawerActions = ({
                   </Typography>
                 </Button>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Button full onClick={handleCompleteTask}>
                   <Typography variant="bodyRegular" light bold>
                     Mark task complete
@@ -737,7 +737,7 @@ const TaskDrawerActions = ({
         ) : (
           // the task is not complete, and it isn't assigned to me
           <>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Button
                 variant="lightened"
                 full
@@ -749,7 +749,7 @@ const TaskDrawerActions = ({
                 </Typography>
               </Button>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Button
                 full
                 disabled={!canAssignTask}
@@ -766,7 +766,7 @@ const TaskDrawerActions = ({
       canAssignTask ? (
         // the task is not complete, and isn't assigned to anyone, and I can assign it
         <>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Button
               variant="lightened"
               full
@@ -777,7 +777,7 @@ const TaskDrawerActions = ({
               </Typography>
             </Button>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Button full onClick={handleCompleteTask}>
               <Typography light bold variant="bodyRegular">
                 Mark task complete
@@ -788,7 +788,7 @@ const TaskDrawerActions = ({
       ) : (
         // the task is not complete, and isn't assigned to anyone, and I can't assign it
         <>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Button
               variant="lightened"
               full
@@ -800,7 +800,7 @@ const TaskDrawerActions = ({
               </Typography>
             </Button>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}>
             <Button full disabled onClick={handleCompleteTask}>
               <Typography light bold variant="bodyRegular">
                 Mark task complete

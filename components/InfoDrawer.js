@@ -21,6 +21,7 @@ import StatusChip from "./StatusChip";
 import Resource from "./Resource";
 import AssigneeRoster from "@components/AssigneeRoster";
 import { useUserContext } from "@lib/useUserContext";
+import { getScreenSize } from "@hooks/react-responsive";
 
 const CustomDrawer = styled(Drawer)`
   .MuiDrawer-paper {
@@ -74,6 +75,7 @@ const InfoDrawer = ({
   assignableUsers,
   completionType,
 }) => {
+  const { screenSize } = getScreenSize();
   const { currentUser, isOperationsGuide } = useUserContext();
 
   const router = useRouter();
@@ -113,7 +115,7 @@ const InfoDrawer = ({
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>
       <StyledInfoCard noBorder noRadius>
-        <Stack spacing={12}>
+        <Stack spacing={screenSize.isSm ? 6 : 12}>
           <Stack spacing={6}>
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
@@ -155,7 +157,9 @@ const InfoDrawer = ({
                   <Typography variant="bodyMini" lightened bold>
                     STATUS
                   </Typography>
-                  <StatusChip status={status} size="small" withIcon />
+                  <div>
+                    <StatusChip status={status} size="small" withIcon />
+                  </div>
                 </Stack>
               )}
               {categories?.length ? (
