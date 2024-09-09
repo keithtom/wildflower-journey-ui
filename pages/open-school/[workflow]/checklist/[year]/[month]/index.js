@@ -34,8 +34,10 @@ import {
   Link,
 } from "@ui";
 import Milestone from "@components/Milestone";
+import { getScreenSize } from "@hooks/react-responsive";
 
 const AdminChecklist = () => {
+  const { screenSize } = getScreenSize();
   const { currentUser } = useUserContext();
   const router = useRouter();
   const workflowId = currentUser?.attributes.schools[0].workflowId;
@@ -239,8 +241,13 @@ const AdminChecklist = () => {
     <PageContainer>
       <Grid container spacing={6}>
         <Grid item xs={12}>
-          <Grid container alignItems="center" justifyContent="space-between">
-            <Grid item>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={6}
+          >
+            <Grid item flex={1}>
               <Typography variant="h3" bold>
                 {isLoading ? (
                   <Skeleton width={120} />
@@ -252,26 +259,33 @@ const AdminChecklist = () => {
                 )}
               </Typography>
             </Grid>
-            <Grid item>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Button
-                  onClick={handleResetDate}
-                  variant="text"
-                  small
-                  disabled={isToday}
-                >
-                  <Typography variant="bodyRegular" bold highlight>
-                    {isToday ? "Current Month" : "Return to Today"}
-                  </Typography>
-                </Button>
-
-                <IconButton onClick={handleDecrementMonth}>
-                  <Icon type="chevronLeft" variant="primary" />
-                </IconButton>
-                <IconButton onClick={handleIncrementMonth}>
-                  <Icon type="chevronRight" variant="primary" />
-                </IconButton>
-              </Stack>
+            <Grid item xs={screenSize.isSm ? 12 : null}>
+              <Grid
+                container
+                justifyContent={screenSize.isSm ? "space-between" : null}
+                alignItems="center"
+              >
+                <Grid item>
+                  <Button
+                    onClick={handleResetDate}
+                    variant="text"
+                    small
+                    disabled={isToday}
+                  >
+                    <Typography variant="bodyRegular" bold highlight>
+                      {isToday ? "Current Month" : "Return to Today"}
+                    </Typography>
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <IconButton onClick={handleDecrementMonth}>
+                    <Icon type="chevronLeft" variant="primary" />
+                  </IconButton>
+                  <IconButton onClick={handleIncrementMonth}>
+                    <Icon type="chevronRight" variant="primary" />
+                  </IconButton>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

@@ -7,7 +7,7 @@ import {
   ListItemButton,
 } from "@mui/material";
 
-import { getScreenSize } from "../hooks/react-responsive";
+import { getScreenSize } from "@hooks/react-responsive";
 import {
   Grid,
   Card,
@@ -44,10 +44,12 @@ const Milestone = ({
   const remainingSteps = stepCount - completedStepsCount;
   const assignedIncomplete = stepsAssignedCount - completedStepsCount;
 
-  const [isMedium, setIsMedium] = useState(false);
+  // const [isMedium, setIsMedium] = useState(false);
   // During hydration `useEffect` is called. `window` is available in `useEffect`. In this case because we know we're in the browser checking for window is not needed. If you need to read something from window that is fine.
   // By calling `setColor` in `useEffect` a render is triggered after hydrating, this causes the "browser specific" value to be available. In this case 'red'.
-  useEffect(() => setIsMedium(screenSize.isMd), []);
+  // useEffect(() => setIsMedium(screenSize.isMd), []);
+
+  console.log(screenSize.isSm);
 
   return (
     <>
@@ -55,20 +57,24 @@ const Milestone = ({
         <ListItem
           secondaryAction={
             <Stack direction="row" spacing={1} alignItems="center">
-              {flag && <Chip label={flag} size="small" />}
-              {phase && (
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <PhaseChip size="small" phase={phase} />
-                </Stack>
-              )}
-              {categories && !hideCategoryChip && (
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Stack direction="row" spacing={2}>
-                    {categories.map((m, i) => (
-                      <CategoryChip category={m} size="small" key={i} />
-                    ))}
-                  </Stack>
-                </Stack>
+              {screenSize.isSm ? null : (
+                <>
+                  {flag && <Chip label={flag} size="small" />}
+                  {phase && (
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <PhaseChip size="small" phase={phase} />
+                    </Stack>
+                  )}
+                  {categories && !hideCategoryChip && (
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Stack direction="row" spacing={2}>
+                        {categories.map((m, i) => (
+                          <CategoryChip category={m} size="small" key={i} />
+                        ))}
+                      </Stack>
+                    </Stack>
+                  )}
+                </>
               )}
               <IconButton
                 size="small"
@@ -113,7 +119,8 @@ const Milestone = ({
                 >
                   {title}
                 </Typography>
-                {isMedium ? null : assignedIncomplete && remainingSteps ? (
+                {screenSize.isSm ? null : assignedIncomplete &&
+                  remainingSteps ? (
                   <Chip
                     sx={{
                       "&:hover": {
