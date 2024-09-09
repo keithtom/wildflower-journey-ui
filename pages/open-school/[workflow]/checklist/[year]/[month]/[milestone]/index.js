@@ -26,8 +26,10 @@ import {
 import Task from "@components/Task";
 import MilestonePageHead from "@components/MilestonePageHead";
 import useMilestone from "@hooks/useMilestone";
+import { getScreenSize } from "@hooks/react-responsive";
 
 const OpenSchoolMilestonePage = ({}) => {
+  const { screenSize } = getScreenSize();
   const router = useRouter();
   const { workflow, milestone: milestoneQuery, year, month } = router.query;
 
@@ -49,7 +51,7 @@ const OpenSchoolMilestonePage = ({}) => {
 
   return (
     <PageContainer>
-      <Stack spacing={12}>
+      <Stack spacing={screenSize.isSm ? 6 : 12}>
         <Grid container>
           <Grid item>
             <Stack direction="row" spacing={2} alignItems="center">

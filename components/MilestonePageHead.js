@@ -33,7 +33,11 @@ const MilestonePageHead = ({
                 {description}
               </Typography>
             ) : null}
-            <Stack direction="row" spacing={6} alignItems="center">
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={4}
+              alignItems={{ xs: "flex-start", sm: "center" }}
+            >
               {status ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
@@ -42,7 +46,7 @@ const MilestonePageHead = ({
                   <StatusChip status={status} size="small" withIcon />
                 </Stack>
               ) : null}
-              {categories.length && false ? (
+              {categories?.length ? (
                 <Stack spacing={2}>
                   <Typography variant="bodyMini" lightened bold>
                     CATEGORY

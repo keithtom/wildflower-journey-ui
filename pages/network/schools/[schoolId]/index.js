@@ -73,6 +73,7 @@ import UserCard from "@components/UserCard";
 import useSchool from "@hooks/useSchool";
 import useSchools from "@hooks/useSchools";
 import useSearch from "@hooks/useSearch";
+import { getScreenSize } from "@hooks/react-responsive";
 
 const School = ({}) => {
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
@@ -497,6 +498,53 @@ const ClaimSchoolModal = ({ toggle, open }) => {
   );
 };
 
+const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
+  return (
+    <List>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("general")}
+          selected={currentFieldGroup === "general"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">General</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("enrollment")}
+          selected={currentFieldGroup === "enrollment"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">Enrollment</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("teacherLeaders")}
+          selected={currentFieldGroup === "teacherLeaders"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">Teacher Leaders</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemButton
+          onClick={() => setCurrentFieldGroup("boardMembers")}
+          selected={currentFieldGroup === "boardMembers"}
+        >
+          <ListItemText sx={{ paddingX: "8px" }}>
+            <Typography variant="bodyRegular">Board Members</Typography>
+          </ListItemText>
+        </ListItemButton>
+      </ListItem>
+    </List>
+  );
+};
+
 const EditProfileModal = ({
   toggle,
   open,
@@ -505,6 +553,7 @@ const EditProfileModal = ({
   mutate,
   setEditProfileModalOpen,
 }) => {
+  const { screenSize } = getScreenSize();
   const [currentFieldGroup, setCurrentFieldGroup] = useState("general");
 
   const handleToggle = () => {
@@ -542,51 +591,27 @@ const EditProfileModal = ({
       open={open}
       title="Edit school profile"
       fixedDrawer={
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("general")}
-              selected={currentFieldGroup === "general"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">General</Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("enrollment")}
-              selected={currentFieldGroup === "enrollment"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">Enrollment</Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("teacherLeaders")}
-              selected={currentFieldGroup === "teacherLeaders"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">Teacher Leaders</Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => setCurrentFieldGroup("boardMembers")}
-              selected={currentFieldGroup === "boardMembers"}
-            >
-              <ListItemText sx={{ paddingX: "8px" }}>
-                <Typography variant="bodyRegular">Board Members</Typography>
-              </ListItemText>
-            </ListItemButton>
-          </ListItem>
-        </List>
+        screenSize.isSm ? null : (
+          <FieldGroupMenu
+            setCurrentFieldGroup={setCurrentFieldGroup}
+            currentFieldGroup={currentFieldGroup}
+          />
+        )
       }
     >
-      {renderFieldGroup()}
+      {screenSize.isSm ? (
+        <Stack spacing={6}>
+          <Card noPadding elevated size="small">
+            <FieldGroupMenu
+              setCurrentFieldGroup={setCurrentFieldGroup}
+              currentFieldGroup={currentFieldGroup}
+            />
+          </Card>
+          {renderFieldGroup()}
+        </Stack>
+      ) : (
+        renderFieldGroup()
+      )}
     </Modal>
   );
 };
