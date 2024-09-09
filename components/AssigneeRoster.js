@@ -123,7 +123,7 @@ const AssigneeRoster = ({
             </ListItemText>
           </ListItem>
           {assignableUsers
-            .sort((a, b) =>
+            ?.sort((a, b) =>
               a.attributes.lastName.localeCompare(b.attributes.lastName)
             )
             .map((user, i) => (
