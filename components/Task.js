@@ -36,6 +36,7 @@ import useTeam from "@hooks/useTeam";
 import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
+import { getScreenSize } from "@hooks/react-responsive";
 
 const StyledTask = styled(Box)`
   width: 100%;
@@ -71,6 +72,7 @@ const Task = ({
   removeStep,
   processName,
 }) => {
+  const { screenSize } = getScreenSize();
   const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow, milestone } = router.query;
@@ -307,7 +309,9 @@ const Task = ({
         disablePadding
         secondaryAction={
           <Stack direction="row" spacing={3} alignItems="center">
-            {processName && <Chip label={processName} size="small" />}
+            {screenSize.isSm
+              ? null
+              : processName && <Chip label={processName} size="small" />}
             {assignableUsers ? (
               <AssigneeRoster
                 handleAssignUser={handleAssignUser}
@@ -379,6 +383,7 @@ const Task = ({
         handleUnassignUser={handleUnassignUser}
         assignableUsers={assignableUsers}
         completionType={completionType}
+        processName={processName}
         actions={
           isDecision ? (
             <DecisionDrawerActions

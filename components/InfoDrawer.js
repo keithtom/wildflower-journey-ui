@@ -74,6 +74,7 @@ const InfoDrawer = ({
   handleUnassignUser,
   assignableUsers,
   completionType,
+  processName,
 }) => {
   const { screenSize } = getScreenSize();
   const { currentUser, isOperationsGuide } = useUserContext();
@@ -119,12 +120,15 @@ const InfoDrawer = ({
           <Stack spacing={6}>
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
-                <Chip
-                  label={
-                    isDecision ? "Decision" : taskId ? "Task" : "Milestone"
-                  }
-                  size="small"
-                />
+                <Stack direction="row" spacing={2}>
+                  {processName && <Chip label={processName} size="small" />}
+                  <Chip
+                    label={
+                      isDecision ? "Decision" : taskId ? "Task" : "Milestone"
+                    }
+                    size="small"
+                  />
+                </Stack>
               </Grid>
               <Grid item>
                 <IconButton onClick={toggle} id="info-drawer-close">
