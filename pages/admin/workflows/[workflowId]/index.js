@@ -824,21 +824,15 @@ const ProcessListItem = ({
                 Reinstate
               </Button>
             ) : (
-              <ConditionalTooltip
-                display={process?.attributes.isPrerequisite}
-                title="Can't remove a process that is a prerequisite"
-              >
-                <span>
-                  <Button
-                    variant="text"
-                    color="error"
-                    disabled={process?.attributes.isPrerequisite}
-                    onClick={() => handleRemoveProcess(process.id)}
-                  >
-                    Remove
-                  </Button>
-                </span>
-              </ConditionalTooltip>
+              <span>
+                <Button
+                  variant="text"
+                  color="error"
+                  onClick={() => handleRemoveProcess(process.id)}
+                >
+                  Remove
+                </Button>
+              </span>
             )}
           </Stack>
         )
