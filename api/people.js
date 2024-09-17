@@ -25,7 +25,7 @@ export const showPerson = {
         return response;
       })
       .catch((error) => {
-        wildflowerApi.handleErrors(error);
+        wildflowerApi.handleErrorsNotPromises(error);
       });
   },
 };
