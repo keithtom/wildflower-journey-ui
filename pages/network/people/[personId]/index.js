@@ -1697,7 +1697,36 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         {...field}
                         onChange={(_, newValue) => field.onChange(newValue)}
                         options={schoolOptions}
+                        getOptionDisabled={(option) =>
+                          schools.some(
+                            (s) =>
+                              s.relationships.school.data.id === option.value
+                          )
+                        }
                         getOptionLabel={(option) => option.label || ""} // Adjust based on your data structure
+                        renderOption={(props, option) => {
+                          const { key, ...optionProps } = props;
+                          return (
+                            <ListItem key={key} {...optionProps} disablePadding>
+                              <Stack
+                                direction="row"
+                                alignItems="center"
+                                spacing={2}
+                              >
+                                <Typography variant="bodyRegular">
+                                  {option.label}
+                                </Typography>
+                                {schools.some(
+                                  (s) =>
+                                    s.relationships.school.data.id ===
+                                    option.value
+                                ) ? (
+                                  <Chip label="Added" size="small" />
+                                ) : null}
+                              </Stack>
+                            </ListItem>
+                          );
+                        }}
                         value={field.value || ""}
                         renderInput={(params) => (
                           <MaterialTextField
@@ -2113,12 +2142,19 @@ const BoardHistoryFields = ({ handleToggle }) => {
 
   const watchFields = watch();
 
+  const schoolsWhereCurrentlyTeacher = personData?.included.filter(
+    (s) =>
+      s.type === "schoolRelationship" &&
+      s.attributes.roleList.includes("Teacher Leader")
+  );
+
   // console.log({ watchFields });
   // console.log({ currentSchool });
   // console.log({ schoolsData });
-  // console.log({ schoolOptions });
-  // console.log({ personData });
-  // console.log("schools", schools);
+  console.log({ schoolOptions });
+  console.log({ personData });
+  console.log({ schoolsWhereCurrentlyTeacher });
+  console.log("schools", schools);
   // console.log("personData", personData);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -2137,7 +2173,47 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         {...field}
                         onChange={(_, newValue) => field.onChange(newValue)}
                         options={schoolOptions}
+                        getOptionDisabled={(option) =>
+                          schools.some(
+                            (s) =>
+                              s.relationships.school.data.id === option.value
+                          ) ||
+                          schoolsWhereCurrentlyTeacher.some(
+                            (s) =>
+                              s.relationships.school.data.id === option.value
+                          )
+                        }
                         getOptionLabel={(option) => option.label || ""} // Adjust based on your data structure
+                        renderOption={(props, option) => {
+                          const { key, ...optionProps } = props;
+                          return (
+                            <ListItem key={key} {...optionProps} disablePadding>
+                              <Stack
+                                direction="row"
+                                alignItems="center"
+                                spacing={2}
+                              >
+                                <Typography variant="bodyRegular">
+                                  {option.label}
+                                </Typography>
+                                {schools.some(
+                                  (s) =>
+                                    s.relationships.school.data.id ===
+                                    option.value
+                                ) ? (
+                                  <Chip label="Added" size="small" />
+                                ) : null}
+                                {schoolsWhereCurrentlyTeacher.some(
+                                  (s) =>
+                                    s.relationships.school.data.id ===
+                                    option.value
+                                ) ? (
+                                  <Chip label="Your School" size="small" />
+                                ) : null}
+                              </Stack>
+                            </ListItem>
+                          );
+                        }}
                         value={field.value || ""}
                         renderInput={(params) => (
                           <MaterialTextField
