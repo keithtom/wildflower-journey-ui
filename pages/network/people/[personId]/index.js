@@ -13,7 +13,7 @@ import {
   TextField as MaterialTextField,
   CircularProgress,
 } from "@mui/material";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
 
 import { styled } from "@mui/material/styles";
 import { FilePond, registerPlugin } from "react-filepond";
@@ -1769,7 +1769,8 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         label="Date joined"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
@@ -1802,7 +1803,8 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         label="Date left"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
@@ -2256,7 +2258,8 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         label="Date joined"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
@@ -2289,7 +2292,8 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         label="Date left"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
