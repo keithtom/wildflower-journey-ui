@@ -11,7 +11,7 @@ import {
   TextField as MaterialTextField,
   CircularProgress,
 } from "@mui/material";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
@@ -765,7 +765,8 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                 error={errors.openDate}
                 value={parseISO(field.value)}
                 onChange={(date) => {
-                  const isoDate = date ? date.toISOString() : "";
+                  const isoDate =
+                    date && isValid(date) ? date.toISOString() : "";
                   field.onChange(isoDate);
                 }}
                 renderInput={(params) => (
@@ -1662,7 +1663,8 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                             label="Date joined"
                             value={parseISO(field.value)}
                             onChange={(date) => {
-                              const isoDate = date ? date.toISOString() : "";
+                              const isoDate =
+                                date && isValid(date) ? date.toISOString() : "";
                               field.onChange(isoDate);
                             }}
                             maxDate={new Date()}
@@ -1696,7 +1698,8 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                             label="Date left"
                             value={parseISO(field.value)}
                             onChange={(date) => {
-                              const isoDate = date ? date.toISOString() : "";
+                              const isoDate =
+                                date && isValid(date) ? date.toISOString() : "";
                               field.onChange(isoDate);
                             }}
                             maxDate={new Date()}
@@ -2106,7 +2109,7 @@ const InviteTeacherFields = ({
               label="Date joined"
               value={parseISO(field.value)}
               onChange={(date) => {
-                const isoDate = date ? date.toISOString() : "";
+                const isoDate = date && isValid(date) ? date.toISOString() : "";
                 field.onChange(isoDate);
               }}
               maxDate={new Date()}
@@ -2483,7 +2486,8 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                         label="Date joined"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
@@ -2516,7 +2520,8 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                         label="Date left"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
