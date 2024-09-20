@@ -666,6 +666,8 @@ const GeneralFields = ({ handleToggle, school, address }) => {
     handleSubmit,
     watch,
     reset,
+    register,
+    setValue,
     formState: { errors, touchedFields, isSubmitting, isDirty },
   } = useForm({
     defaultValues: {
@@ -673,12 +675,17 @@ const GeneralFields = ({ handleToggle, school, address }) => {
       state: locationState,
       openDate: school.attributes.openedOn,
       about: about,
+      schoolLogoPicture: [],
+      bannerPicture: [],
     },
   });
+  register("schoolLogoPicture", { value: schoolLogoPicture });
+  register("bannerPicture", { value: bannerPicture });
 
   // console.log("school.attributes.openedOn", school.attributes.openedOn);
 
   const watchFields = watch();
+  // console.log(watchFields.schoolLogoPicture);
   // console.log("watchFields.openDate", watchFields.openDate);
 
   const onSubmit = (data) => {
@@ -848,7 +855,29 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                 allowMultiple={false}
                 maxFileSize="5MB"
                 acceptedFileTypes={["image/*"]}
-                onupdatefiles={setSchoolLogoPicture}
+                onupdatefiles={(fileItems) => {
+                  setSchoolLogoPicture(
+                    fileItems.map((fileItem) => fileItem.file)
+                  );
+                  setValue(
+                    "schoolLogoPicture",
+                    fileItems.map((fileItem) => fileItem.file),
+                    { shouldDirty: true }
+                  );
+                }}
+                onremovefile={() => {
+                  setSchoolLogoPicture([]);
+                  setValue("schoolLogoPicture", [], {
+                    shouldDirty: true,
+                  });
+                  // Reset the form state if no other fields are dirty
+                  if (
+                    watchFields.schoolLogoPicture &&
+                    watchFields.schoolLogoPicture.length === 0
+                  ) {
+                    reset({ schoolLogoPicture: [] });
+                  }
+                }}
                 onaddfilestart={() => setIsUpdatingSchoolLogoImage(true)}
                 onprocessfiles={() => setIsUpdatingSchoolLogoImage(false)}
                 onerror={handleLogoError}
@@ -976,7 +1005,27 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                 allowMultiple={false}
                 maxFileSize="5MB"
                 acceptedFileTypes={["image/*"]}
-                onupdatefiles={setBannerPicture}
+                onupdatefiles={(fileItems) => {
+                  setBannerPicture(fileItems.map((fileItem) => fileItem.file));
+                  setValue(
+                    "bannerPicture",
+                    fileItems.map((fileItem) => fileItem.file),
+                    { shouldDirty: true }
+                  );
+                }}
+                onremovefile={() => {
+                  setBannerPicture([]);
+                  setValue("bannerPicture", [], {
+                    shouldDirty: true,
+                  });
+                  // Reset the form state if no other fields are dirty
+                  if (
+                    watchFields.bannerPicture &&
+                    watchFields.bannerPicture.length === 0
+                  ) {
+                    reset({ bannerPicture: [] });
+                  }
+                }}
                 onaddfilestart={() => setIsUpdatingBannerImage(true)}
                 onprocessfiles={() => setIsUpdatingBannerImage(false)}
                 onerror={handleBannerError}
@@ -1110,11 +1159,6 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                   Save
                 </Typography>
               </Button>
-              {(isUpdatingBannerImage || isUpdatingSchoolLogoImage) && (
-                <Typography variant="bodyRegular" lightened>
-                  Updating image...
-                </Typography>
-              )}
             </Grid>
           </Grid>
         </Card>
