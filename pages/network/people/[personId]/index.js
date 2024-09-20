@@ -600,6 +600,9 @@ const GeneralFields = ({ handleToggle }) => {
     control,
     handleSubmit,
     reset,
+    register,
+    setValue,
+    watch,
     formState: { errors, isSubmitting, isDirty },
   } = useForm({
     defaultValues: {
@@ -610,8 +613,11 @@ const GeneralFields = ({ handleToggle }) => {
       email: personData?.data?.attributes.email,
       about: personData?.data?.attributes?.about || "",
       phone: personData?.data?.attributes?.phone || "",
+      profilePicture: [],
     },
   });
+  register("profilePicture", { value: profilePicture });
+  const watchFields = watch();
 
   const onSubmit = (data) => {
     peopleApi
@@ -815,7 +821,27 @@ const GeneralFields = ({ handleToggle }) => {
               allowMultiple={false}
               maxFileSize="5MB"
               acceptedFileTypes={["image/*"]}
-              onupdatefiles={setProfilePicture}
+              onupdatefiles={(fileItems) => {
+                setProfilePicture(fileItems.map((fileItem) => fileItem.file));
+                setValue(
+                  "profilePicture",
+                  fileItems.map((fileItem) => fileItem.file),
+                  { shouldDirty: true }
+                );
+              }}
+              onremovefile={() => {
+                setProfilePicture([]);
+                setValue("profilePicture", [], {
+                  shouldDirty: true,
+                });
+                // Reset the form state if no other fields are dirty
+                if (
+                  watchFields.profilePicture &&
+                  watchFields.profilePicture.length === 0
+                ) {
+                  reset({ profilePicture: [] });
+                }
+              }}
               onaddfilestart={() => setIsUpdatingPicture(true)}
               onprocessfiles={() => setIsUpdatingPicture(false)}
               stylePanelAspectRatio="1:1"
@@ -938,7 +964,7 @@ const GeneralFields = ({ handleToggle }) => {
                 variant="primary"
                 small
                 type="submit"
-                disabled={!isDirty || isSubmitting}
+                disabled={!isDirty || isSubmitting || isUpdatingPicture}
               >
                 <Typography variant="bodyRegular" bold>
                   Save
