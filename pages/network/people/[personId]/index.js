@@ -649,7 +649,7 @@ const GeneralFields = ({ handleToggle }) => {
             state: data.state,
             about: data.about,
             phone: data.phone,
-            profileImage: profileImage,
+            profilePicture: [],
           });
         }
       })

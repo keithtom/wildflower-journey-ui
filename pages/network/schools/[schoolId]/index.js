@@ -711,10 +711,13 @@ const GeneralFields = ({ handleToggle, school, address }) => {
           }
           console.error(response.error);
         } else {
-          // console.log("successfully updated", response.data);
           setBannerPicture(null);
           setSchoolLogoPicture(null);
           mutate(`/v1/schools/${school.id}`);
+          reset({
+            schoolLogoPicture: [],
+            bannerPicture: [],
+          });
         }
       });
   };
