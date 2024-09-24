@@ -1685,13 +1685,20 @@ const SchoolHistoryFields = ({ handleToggle }) => {
     }
   };
 
-  const schools = personData?.included
-    ?.filter(
-      (i) =>
-        i.type === "schoolRelationship" &&
-        i.attributes.roleList.includes("Teacher Leader")
-    )
-    ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+  const teacherLeaderRelationships = personData?.included?.filter(
+    (i) =>
+      i.type === "schoolRelationship" &&
+      i.attributes.roleList.includes("Teacher Leader")
+  );
+
+  const schools = teacherLeaderRelationships?.map((relationship) => {
+    const schoolId = relationship.relationships.school.data.id;
+    return personData.included.find(
+      (item) => item.type === "school" && item.id === schoolId
+    );
+  });
+
+  // console.log(schools);
 
   const formatHumanDate = (date) => {
     const parsedDate = parseISO(date);
@@ -1703,6 +1710,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
   // console.log({ currentSchool });
   // console.log({ schoolsData });
   // console.log({ schoolOptions });
+  // console.log({ teacherLeaderRelationships });
   // console.log({ personData });
   // console.log("schools", schools);
   // console.log("personData", personData);
@@ -1909,7 +1917,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                           hoverable
                           onClick={() => {
                             setIsEditingSchool(true);
-                            setCurrentSchool(school);
+                            setCurrentSchool(teacherLeaderRelationships[i]);
                             setIsAddingSchool(true);
                           }}
                         >
@@ -1930,16 +1938,21 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                     </Grid>
                   </Grid>
                   <Stack>
-                    {school.attributes.title ? (
+                    {teacherLeaderRelationships[i].attributes.title ? (
                       <Typography variant="bodyRegular" lightened>
-                        {school.attributes.title}
+                        {teacherLeaderRelationships[i].attributes.title}
                       </Typography>
                     ) : null}
-                    {school.attributes.startDate ? (
+                    {teacherLeaderRelationships[i].attributes.startDate ? (
                       <Typography variant="bodyRegular" lightened>
-                        {formatHumanDate(school.attributes.startDate)} -{" "}
-                        {school.attributes.endDate
-                          ? formatHumanDate(school.attributes.endDate)
+                        {formatHumanDate(
+                          teacherLeaderRelationships[i].attributes.startDate
+                        )}{" "}
+                        -{" "}
+                        {teacherLeaderRelationships[i].attributes.endDate
+                          ? formatHumanDate(
+                              teacherLeaderRelationships[i].attributes.endDate
+                            )
                           : "Present"}
                       </Typography>
                     ) : null}
