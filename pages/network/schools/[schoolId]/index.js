@@ -74,8 +74,10 @@ import useSchool from "@hooks/useSchool";
 import useSchools from "@hooks/useSchools";
 import useSearch from "@hooks/useSearch";
 import { getScreenSize } from "@hooks/react-responsive";
+import useAuth from "@lib/utils/useAuth";
 
 const School = ({}) => {
+  useAuth("/login");
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [claimSchoolModalOpen, setClaimSchoolModalOpen] = useState(false);
   const { currentUser } = useUserContext();
@@ -93,9 +95,11 @@ const School = ({}) => {
   //   console.log({ charterSchools });
   // }, [schoolsData]);
 
-  const { data: schoolData, isLoading } = useSchool(schoolId, {
-    network: true,
-  });
+  const { data: schoolData, isLoading } = currentUser
+    ? useSchool(schoolId, {
+        network: true,
+      })
+    : { data: null, isLoading: true };
 
   const school = schoolData?.data;
   const included = schoolData?.included;
