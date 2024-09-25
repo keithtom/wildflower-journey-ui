@@ -95,7 +95,7 @@ const School = ({}) => {
   //   console.log({ charterSchools });
   // }, [schoolsData]);
 
-  const { data: schoolData, isLoading } = currentUser
+  const { data: schoolData, isLoading } = token
     ? useSchool(schoolId, {
         network: true,
       })
