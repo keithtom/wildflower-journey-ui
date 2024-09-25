@@ -32,6 +32,7 @@ registerPlugin(
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
 import { clearLoggedInState } from "@lib/handleLogout";
+import useAuth from "@lib/utils/useAuth";
 
 import axios from "axios";
 
@@ -86,6 +87,7 @@ import { DataArea } from "styled-icons/fluentui-system-filled";
 import { getScreenSize } from "@hooks/react-responsive";
 
 const Person = ({}) => {
+  useAuth("/login");
   const { screenSize } = getScreenSize();
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const { currentUser } = useUserContext();
@@ -94,9 +96,11 @@ const Person = ({}) => {
   const { personId } = router.query;
 
   // Fetch data
-  const { data: personData, isLoading } = usePerson(personId, {
-    network: true,
-  });
+  const { data: personData, isLoading } = currentUser
+    ? usePerson(personId, {
+        network: true,
+      })
+    : { data: null, isLoading: true };
 
   const person = personData?.data;
   const included = personData?.included;
