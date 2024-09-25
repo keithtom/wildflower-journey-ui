@@ -96,12 +96,11 @@ const Person = ({}) => {
   const { personId } = router.query;
 
   // Fetch data
-  const { data: personData, isLoading } = currentUser
+  const { data: personData, isLoading } = token
     ? usePerson(personId, {
         network: true,
       })
     : { data: null, isLoading: true };
-
   const person = personData?.data;
   const included = personData?.included;
 
