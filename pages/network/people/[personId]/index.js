@@ -1735,10 +1735,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         onChange={(_, newValue) => field.onChange(newValue)}
                         options={schoolOptions}
                         getOptionDisabled={(option) =>
-                          schools.some(
-                            (s) =>
-                              s.relationships.school.data.id === option.value
-                          )
+                          schools.some((s) => s.id === option.value)
                         }
                         getOptionLabel={(option) => option.label || ""} // Adjust based on your data structure
                         renderOption={(props, option) => {
@@ -1753,11 +1750,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                                 <Typography variant="bodyRegular">
                                   {option.label}
                                 </Typography>
-                                {schools.some(
-                                  (s) =>
-                                    s.relationships.school.data.id ===
-                                    option.value
-                                ) ? (
+                                {schools.some((s) => s.id === option.value) ? (
                                   <Chip label="Added" size="small" />
                                 ) : null}
                               </Stack>
@@ -2218,10 +2211,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         onChange={(_, newValue) => field.onChange(newValue)}
                         options={schoolOptions}
                         getOptionDisabled={(option) =>
-                          schools.some(
-                            (s) =>
-                              s.relationships.school.data.id === option.value
-                          ) ||
+                          schools.some((s) => s.id === option.value) ||
                           schoolsWhereCurrentlyTeacher.some(
                             (s) =>
                               s.relationships.school.data.id === option.value
@@ -2240,11 +2230,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
                                 <Typography variant="bodyRegular">
                                   {option.label}
                                 </Typography>
-                                {schools.some(
-                                  (s) =>
-                                    s.relationships.school.data.id ===
-                                    option.value
-                                ) ? (
+                                {schools.some((s) => s.id === option.value) ? (
                                   <Chip label="Added" size="small" />
                                 ) : null}
                                 {schoolsWhereCurrentlyTeacher.some(
