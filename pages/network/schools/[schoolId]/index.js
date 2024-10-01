@@ -11,7 +11,7 @@ import {
   TextField as MaterialTextField,
   CircularProgress,
 } from "@mui/material";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
@@ -74,8 +74,10 @@ import useSchool from "@hooks/useSchool";
 import useSchools from "@hooks/useSchools";
 import useSearch from "@hooks/useSearch";
 import { getScreenSize } from "@hooks/react-responsive";
+import useAuth from "@lib/utils/useAuth";
 
 const School = ({}) => {
+  useAuth("/login");
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [claimSchoolModalOpen, setClaimSchoolModalOpen] = useState(false);
   const { currentUser } = useUserContext();
@@ -93,9 +95,11 @@ const School = ({}) => {
   //   console.log({ charterSchools });
   // }, [schoolsData]);
 
-  const { data: schoolData, isLoading } = useSchool(schoolId, {
-    network: true,
-  });
+  const { data: schoolData, isLoading } = token
+    ? useSchool(schoolId, {
+        network: true,
+      })
+    : { data: null, isLoading: true };
 
   const school = schoolData?.data;
   const included = schoolData?.included;
@@ -666,6 +670,8 @@ const GeneralFields = ({ handleToggle, school, address }) => {
     handleSubmit,
     watch,
     reset,
+    register,
+    setValue,
     formState: { errors, touchedFields, isSubmitting, isDirty },
   } = useForm({
     defaultValues: {
@@ -673,12 +679,17 @@ const GeneralFields = ({ handleToggle, school, address }) => {
       state: locationState,
       openDate: school.attributes.openedOn,
       about: about,
+      schoolLogoPicture: [],
+      bannerPicture: [],
     },
   });
+  register("schoolLogoPicture", { value: schoolLogoPicture });
+  register("bannerPicture", { value: bannerPicture });
 
   // console.log("school.attributes.openedOn", school.attributes.openedOn);
 
   const watchFields = watch();
+  // console.log(watchFields.schoolLogoPicture);
   // console.log("watchFields.openDate", watchFields.openDate);
 
   const onSubmit = (data) => {
@@ -704,10 +715,13 @@ const GeneralFields = ({ handleToggle, school, address }) => {
           }
           console.error(response.error);
         } else {
-          // console.log("successfully updated", response.data);
           setBannerPicture(null);
           setSchoolLogoPicture(null);
           mutate(`/v1/schools/${school.id}`);
+          reset({
+            schoolLogoPicture: [],
+            bannerPicture: [],
+          });
         }
       });
   };
@@ -765,7 +779,8 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                 error={errors.openDate}
                 value={parseISO(field.value)}
                 onChange={(date) => {
-                  const isoDate = date ? date.toISOString() : "";
+                  const isoDate =
+                    date && isValid(date) ? date.toISOString() : "";
                   field.onChange(isoDate);
                 }}
                 renderInput={(params) => (
@@ -847,7 +862,29 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                 allowMultiple={false}
                 maxFileSize="5MB"
                 acceptedFileTypes={["image/*"]}
-                onupdatefiles={setSchoolLogoPicture}
+                onupdatefiles={(fileItems) => {
+                  setSchoolLogoPicture(
+                    fileItems.map((fileItem) => fileItem.file)
+                  );
+                  setValue(
+                    "schoolLogoPicture",
+                    fileItems.map((fileItem) => fileItem.file),
+                    { shouldDirty: true }
+                  );
+                }}
+                onremovefile={() => {
+                  setSchoolLogoPicture([]);
+                  setValue("schoolLogoPicture", [], {
+                    shouldDirty: true,
+                  });
+                  // Reset the form state if no other fields are dirty
+                  if (
+                    watchFields.schoolLogoPicture &&
+                    watchFields.schoolLogoPicture.length === 0
+                  ) {
+                    reset({ schoolLogoPicture: [] });
+                  }
+                }}
                 onaddfilestart={() => setIsUpdatingSchoolLogoImage(true)}
                 onprocessfiles={() => setIsUpdatingSchoolLogoImage(false)}
                 onerror={handleLogoError}
@@ -975,7 +1012,27 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                 allowMultiple={false}
                 maxFileSize="5MB"
                 acceptedFileTypes={["image/*"]}
-                onupdatefiles={setBannerPicture}
+                onupdatefiles={(fileItems) => {
+                  setBannerPicture(fileItems.map((fileItem) => fileItem.file));
+                  setValue(
+                    "bannerPicture",
+                    fileItems.map((fileItem) => fileItem.file),
+                    { shouldDirty: true }
+                  );
+                }}
+                onremovefile={() => {
+                  setBannerPicture([]);
+                  setValue("bannerPicture", [], {
+                    shouldDirty: true,
+                  });
+                  // Reset the form state if no other fields are dirty
+                  if (
+                    watchFields.bannerPicture &&
+                    watchFields.bannerPicture.length === 0
+                  ) {
+                    reset({ bannerPicture: [] });
+                  }
+                }}
                 onaddfilestart={() => setIsUpdatingBannerImage(true)}
                 onprocessfiles={() => setIsUpdatingBannerImage(false)}
                 onerror={handleBannerError}
@@ -1109,11 +1166,6 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                   Save
                 </Typography>
               </Button>
-              {(isUpdatingBannerImage || isUpdatingSchoolLogoImage) && (
-                <Typography variant="bodyRegular" lightened>
-                  Updating image...
-                </Typography>
-              )}
             </Grid>
           </Grid>
         </Card>
@@ -1361,8 +1413,6 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
     school.id
   );
 
-  console.log({ schoolData });
-
   const {
     query,
     setQuery,
@@ -1375,7 +1425,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
 
   useEffect(() => {
     setQuery("*");
-    setPerPage(100);
+    setPerPage(500);
     setFilters({
       models: "people",
       "people_filters[roles]": ["Teacher Leader"],
@@ -1393,7 +1443,6 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
   useEffect(() => {
     if (currentTeacher) {
       reset({
-        teacher: results?.find((option) => option.id === currentTeacher.id),
         dateJoined: currentTeacher.schoolRelationshipAttributes.startDate,
         dateLeft: currentTeacher.schoolRelationshipAttributes.endDate,
         schoolTitle: currentTeacher.schoolRelationshipAttributes.title,
@@ -1544,11 +1593,13 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
       : 1;
   });
 
-  // console.log(watchFields.dateJoined);
-
+  // console.log(watchFields.teacher);
   // console.log({ results });
   // console.log({ teachers });
   // console.log({ currentTeacher });
+  // console.log({ schoolData });
+  // console.log({ isAddingTeacher });
+  // console.log({ isEditingTeacher });
 
   return (
     <>
@@ -1567,92 +1618,100 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                 <Grid container>
                   <Grid item xs={12}>
                     <Stack spacing={3}>
-                      <Controller
-                        name="teacher"
-                        control={control}
-                        rules={{ required: "This field is required" }}
-                        defaultValue=""
-                        render={({
-                          field,
-                          fieldState: { error, isTouched },
-                        }) => (
-                          <Autocomplete
-                            {...field}
-                            inputValue={query && query ? query : ""}
-                            onChange={(_, newValue) => {
-                              field.onChange(newValue);
-                              setQuery(newValue);
-                            }}
-                            onInputChange={(_, newInputValue) => {
-                              setQuery(newInputValue);
-                            }}
-                            options={results}
-                            getOptionDisabled={(option) =>
-                              teachers.some((t) => t.id === option.id)
-                            }
-                            getOptionLabel={(option) =>
-                              option && option.attributes
-                                ? `${option.attributes.firstName} ${option.attributes.lastName}`
-                                : ""
-                            }
-                            renderOption={(props, option) => {
-                              const { key, ...optionProps } = props;
-                              return (
-                                <ListItem
-                                  key={key}
-                                  {...optionProps}
-                                  disablePadding
-                                >
-                                  <Stack
-                                    direction="row"
-                                    alignItems="center"
-                                    spacing={2}
+                      {currentTeacher ? (
+                        <MaterialTextField
+                          disabled
+                          label="Teacher Leader"
+                          value={`${currentTeacher.attributes.firstName} ${currentTeacher.attributes.lastName}`}
+                        />
+                      ) : (
+                        <Controller
+                          name="teacher"
+                          control={control}
+                          rules={{ required: "This field is required" }}
+                          defaultValue=""
+                          render={({
+                            field,
+                            fieldState: { error, isTouched },
+                          }) => (
+                            <Autocomplete
+                              {...field}
+                              inputValue={query && query ? query : ""}
+                              onChange={(_, newValue) => {
+                                field.onChange(newValue);
+                                setQuery(newValue);
+                              }}
+                              onInputChange={(_, newInputValue) => {
+                                setQuery(newInputValue);
+                              }}
+                              options={results}
+                              getOptionDisabled={(option) =>
+                                teachers.some((t) => t.id === option.id)
+                              }
+                              getOptionLabel={(option) =>
+                                option && option.attributes
+                                  ? `${option.attributes.firstName} ${option.attributes.lastName}`
+                                  : ""
+                              }
+                              renderOption={(props, option) => {
+                                const { key, ...optionProps } = props;
+                                return (
+                                  <ListItem
+                                    key={key}
+                                    {...optionProps}
+                                    disablePadding
                                   >
-                                    <Avatar
-                                      src={option.attributes.imageUrl}
-                                      size="mini"
-                                    />
-                                    <Typography variant="bodyRegular">
-                                      {option.attributes.firstName}{" "}
-                                      {option.attributes.lastName}
-                                    </Typography>
-                                  </Stack>
-                                </ListItem>
-                              );
-                            }}
-                            isOptionEqualToValue={(option, value) =>
-                              option.id === value.id
-                            }
-                            renderInput={(params) => (
-                              <MaterialTextField
-                                {...params}
-                                label="Search for a Teacher Leader"
-                                error={isTouched && !!error}
-                                placeholder="e.g. Katelyn Shore"
-                                helperText={
-                                  isTouched &&
-                                  error?.type === "required" &&
-                                  "This field is required"
-                                }
-                                InputProps={{
-                                  ...params.InputProps,
-                                  endAdornment: (
-                                    <>
-                                      {isSearching ? (
-                                        <CircularProgress
-                                          color="inherit"
-                                          size={20}
-                                        />
-                                      ) : null}
-                                      {params.InputProps.endAdornment}
-                                    </>
-                                  ),
-                                }}
-                              />
-                            )}
-                          />
-                        )}
-                      />
+                                    <Stack
+                                      direction="row"
+                                      alignItems="center"
+                                      spacing={2}
+                                    >
+                                      <Avatar
+                                        src={option.attributes.imageUrl}
+                                        size="mini"
+                                      />
+                                      <Typography variant="bodyRegular">
+                                        {option.attributes.firstName}{" "}
+                                        {option.attributes.lastName}
+                                      </Typography>
+                                    </Stack>
+                                  </ListItem>
+                                );
+                              }}
+                              isOptionEqualToValue={(option, value) =>
+                                option.id === value.id
+                              }
+                              renderInput={(params) => (
+                                <MaterialTextField
+                                  {...params}
+                                  label="Search for a Teacher Leader"
+                                  error={isTouched && !!error}
+                                  placeholder="e.g. Katelyn Shore"
+                                  helperText={
+                                    isTouched &&
+                                    error?.type === "required" &&
+                                    "This field is required"
+                                  }
+                                  InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                      <>
+                                        {isSearching ? (
+                                          <CircularProgress
+                                            color="inherit"
+                                            size={20}
+                                          />
+                                        ) : null}
+                                        {params.InputProps.endAdornment}
+                                      </>
+                                    ),
+                                  }}
+                                />
+                              )}
+                            />
+                          )}
+                        />
+                      )}
                       <Controller
                         name="dateJoined"
                         control={control}
@@ -1662,7 +1721,8 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                             label="Date joined"
                             value={parseISO(field.value)}
                             onChange={(date) => {
-                              const isoDate = date ? date.toISOString() : "";
+                              const isoDate =
+                                date && isValid(date) ? date.toISOString() : "";
                               field.onChange(isoDate);
                             }}
                             maxDate={new Date()}
@@ -1696,7 +1756,8 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                             label="Date left"
                             value={parseISO(field.value)}
                             onChange={(date) => {
-                              const isoDate = date ? date.toISOString() : "";
+                              const isoDate =
+                                date && isValid(date) ? date.toISOString() : "";
                               field.onChange(isoDate);
                             }}
                             maxDate={new Date()}
@@ -2106,7 +2167,7 @@ const InviteTeacherFields = ({
               label="Date joined"
               value={parseISO(field.value)}
               onChange={(date) => {
-                const isoDate = date ? date.toISOString() : "";
+                const isoDate = date && isValid(date) ? date.toISOString() : "";
                 field.onChange(isoDate);
               }}
               maxDate={new Date()}
@@ -2190,7 +2251,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
   } = useSearch();
   useEffect(() => {
     setQuery("*");
-    setPerPage(100);
+    setPerPage(500);
     setFilters({
       models: "people",
       "people_filters[roles]": ["Teacher Leader"],
@@ -2208,7 +2269,6 @@ const BoardMemberFields = ({ handleToggle, school }) => {
   useEffect(() => {
     if (currentTeacher) {
       reset({
-        teacher: results?.find((option) => option.id === currentTeacher.id),
         dateJoined: currentTeacher.schoolRelationshipAttributes.startDate,
         dateLeft: currentTeacher.schoolRelationshipAttributes.endDate,
       });
@@ -2385,95 +2445,107 @@ const BoardMemberFields = ({ handleToggle, school }) => {
             <Grid container>
               <Grid item xs={12}>
                 <Stack spacing={3}>
-                  <Controller
-                    name="teacher"
-                    control={control}
-                    rules={{ required: "This field is required" }}
-                    defaultValue=""
-                    render={({ field, fieldState: { error, isTouched } }) => (
-                      <Autocomplete
-                        {...field}
-                        // value={field.value || ""}
-                        inputValue={query && query ? query : ""}
-                        onChange={(_, newValue) => {
-                          field.onChange(newValue);
-                          setQuery(newValue);
-                        }}
-                        onInputChange={(_, newInputValue) => {
-                          setQuery(newInputValue);
-                        }}
-                        options={results}
-                        getOptionDisabled={(option) =>
-                          teachers.some((t) => t.id === option.id) ||
-                          currentTeachers.some((ct) => ct.id === option.id)
-                        }
-                        getOptionLabel={(option) =>
-                          option && option.attributes
-                            ? `${option.attributes.firstName} ${option.attributes.lastName}`
-                            : ""
-                        }
-                        renderOption={(props, option) => {
-                          const { key, ...optionProps } = props;
-                          return (
-                            <ListItem key={key} {...optionProps} disablePadding>
-                              <Stack
-                                direction="row"
-                                alignItems="center"
-                                spacing={2}
+                  {currentTeacher ? (
+                    <MaterialTextField
+                      disabled
+                      label="Teacher Leader"
+                      value={`${currentTeacher.attributes.firstName} ${currentTeacher.attributes.lastName}`}
+                    />
+                  ) : (
+                    <Controller
+                      name="teacher"
+                      control={control}
+                      rules={{ required: "This field is required" }}
+                      defaultValue=""
+                      render={({ field, fieldState: { error, isTouched } }) => (
+                        <Autocomplete
+                          {...field}
+                          // value={field.value || ""}
+                          inputValue={query && query ? query : ""}
+                          onChange={(_, newValue) => {
+                            field.onChange(newValue);
+                            setQuery(newValue);
+                          }}
+                          onInputChange={(_, newInputValue) => {
+                            setQuery(newInputValue);
+                          }}
+                          options={results}
+                          getOptionDisabled={(option) =>
+                            teachers.some((t) => t.id === option.id) ||
+                            currentTeachers.some((ct) => ct.id === option.id)
+                          }
+                          getOptionLabel={(option) =>
+                            option && option.attributes
+                              ? `${option.attributes.firstName} ${option.attributes.lastName}`
+                              : ""
+                          }
+                          renderOption={(props, option) => {
+                            const { key, ...optionProps } = props;
+                            return (
+                              <ListItem
+                                key={key}
+                                {...optionProps}
+                                disablePadding
                               >
-                                <Avatar
-                                  src={option.attributes.imageUrl}
-                                  size="mini"
-                                />
-                                <Typography variant="bodyRegular">
-                                  {option.attributes.firstName}{" "}
-                                  {option.attributes.lastName}
-                                </Typography>
-                                {currentTeachers.some(
-                                  (ct) => ct.id === option.id
-                                ) ? (
-                                  <Chip
-                                    label="Current Teacher Leader"
-                                    size="small"
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={2}
+                                >
+                                  <Avatar
+                                    src={option.attributes.imageUrl}
+                                    size="mini"
                                   />
-                                ) : null}
-                              </Stack>
-                            </ListItem>
-                          );
-                        }}
-                        isOptionEqualToValue={(option, value) =>
-                          option.id === value.id
-                        }
-                        renderInput={(params) => (
-                          <MaterialTextField
-                            {...params}
-                            label="Search for a Teacher Leader"
-                            error={isTouched && !!error}
-                            placeholder="e.g. Katelyn Shore"
-                            helperText={
-                              isTouched &&
-                              error?.type === "required" &&
-                              "This field is required"
-                            }
-                            InputProps={{
-                              ...params.InputProps,
-                              endAdornment: (
-                                <>
-                                  {isSearching ? (
-                                    <CircularProgress
-                                      color="inherit"
-                                      size={20}
+                                  <Typography variant="bodyRegular">
+                                    {option.attributes.firstName}{" "}
+                                    {option.attributes.lastName}
+                                  </Typography>
+                                  {currentTeachers.some(
+                                    (ct) => ct.id === option.id
+                                  ) ? (
+                                    <Chip
+                                      label="Current Teacher Leader"
+                                      size="small"
                                     />
                                   ) : null}
-                                  {params.InputProps.endAdornment}
-                                </>
-                              ),
-                            }}
-                          />
-                        )}
-                      />
-                    )}
-                  />
+                                </Stack>
+                              </ListItem>
+                            );
+                          }}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === value.id
+                          }
+                          renderInput={(params) => (
+                            <MaterialTextField
+                              {...params}
+                              label="Search for a Teacher Leader"
+                              error={isTouched && !!error}
+                              placeholder="e.g. Katelyn Shore"
+                              helperText={
+                                isTouched &&
+                                error?.type === "required" &&
+                                "This field is required"
+                              }
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>
+                                    {isSearching ? (
+                                      <CircularProgress
+                                        color="inherit"
+                                        size={20}
+                                      />
+                                    ) : null}
+                                    {params.InputProps.endAdornment}
+                                  </>
+                                ),
+                              }}
+                            />
+                          )}
+                        />
+                      )}
+                    />
+                  )}
                   <Controller
                     name="dateJoined"
                     control={control}
@@ -2483,7 +2555,8 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                         label="Date joined"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
@@ -2516,7 +2589,8 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                         label="Date left"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}

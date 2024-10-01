@@ -80,6 +80,7 @@ const Header = ({ toggleNavOpen }) => {
         {isLoggedIn ? (
           <Grid item>
             <AvatarMenu
+              disabled={router.pathname.includes("/welcome")}
               showNetwork={showNetwork}
               myProfileLink={
                 showNetwork ? `/network/people/${currentUser.id}` : null
@@ -96,7 +97,13 @@ const Header = ({ toggleNavOpen }) => {
 
 export default Header;
 
-const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
+const AvatarMenu = ({
+  avatarSrc,
+  userName,
+  myProfileLink,
+  showNetwork,
+  disabled,
+}) => {
   const router = useRouter();
 
   const [profileNavOpen, setProfileNavOpen] = useState(false);
@@ -161,6 +168,7 @@ const AvatarMenu = ({ avatarSrc, userName, myProfileLink, showNetwork }) => {
         onClick={handleOpen}
         aria-describedby={id}
         src={avatarSrc}
+        sx={{ pointerEvents: disabled ? "none" : "auto" }}
       />
 
       <StyledUserMenu

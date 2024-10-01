@@ -13,7 +13,7 @@ import {
   TextField as MaterialTextField,
   CircularProgress,
 } from "@mui/material";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
 
 import { styled } from "@mui/material/styles";
 import { FilePond, registerPlugin } from "react-filepond";
@@ -32,6 +32,7 @@ registerPlugin(
 import { getCookie } from "cookies-next";
 import { FileChecksum } from "@lib/rails-filechecksum";
 import { clearLoggedInState } from "@lib/handleLogout";
+import useAuth from "@lib/utils/useAuth";
 
 import axios from "axios";
 
@@ -86,6 +87,7 @@ import { DataArea } from "styled-icons/fluentui-system-filled";
 import { getScreenSize } from "@hooks/react-responsive";
 
 const Person = ({}) => {
+  useAuth("/login");
   const { screenSize } = getScreenSize();
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const { currentUser } = useUserContext();
@@ -94,10 +96,11 @@ const Person = ({}) => {
   const { personId } = router.query;
 
   // Fetch data
-  const { data: personData, isLoading } = usePerson(personId, {
-    network: true,
-  });
-
+  const { data: personData, isLoading } = token
+    ? usePerson(personId, {
+        network: true,
+      })
+    : { data: null, isLoading: true };
   const person = personData?.data;
   const included = personData?.included;
 
@@ -600,6 +603,9 @@ const GeneralFields = ({ handleToggle }) => {
     control,
     handleSubmit,
     reset,
+    register,
+    setValue,
+    watch,
     formState: { errors, isSubmitting, isDirty },
   } = useForm({
     defaultValues: {
@@ -610,8 +616,11 @@ const GeneralFields = ({ handleToggle }) => {
       email: personData?.data?.attributes.email,
       about: personData?.data?.attributes?.about || "",
       phone: personData?.data?.attributes?.phone || "",
+      profilePicture: [],
     },
   });
+  register("profilePicture", { value: profilePicture });
+  const watchFields = watch();
 
   const onSubmit = (data) => {
     peopleApi
@@ -643,7 +652,7 @@ const GeneralFields = ({ handleToggle }) => {
             state: data.state,
             about: data.about,
             phone: data.phone,
-            profileImage: profileImage,
+            profilePicture: [],
           });
         }
       })
@@ -815,7 +824,27 @@ const GeneralFields = ({ handleToggle }) => {
               allowMultiple={false}
               maxFileSize="5MB"
               acceptedFileTypes={["image/*"]}
-              onupdatefiles={setProfilePicture}
+              onupdatefiles={(fileItems) => {
+                setProfilePicture(fileItems.map((fileItem) => fileItem.file));
+                setValue(
+                  "profilePicture",
+                  fileItems.map((fileItem) => fileItem.file),
+                  { shouldDirty: true }
+                );
+              }}
+              onremovefile={() => {
+                setProfilePicture([]);
+                setValue("profilePicture", [], {
+                  shouldDirty: true,
+                });
+                // Reset the form state if no other fields are dirty
+                if (
+                  watchFields.profilePicture &&
+                  watchFields.profilePicture.length === 0
+                ) {
+                  reset({ profilePicture: [] });
+                }
+              }}
               onaddfilestart={() => setIsUpdatingPicture(true)}
               onprocessfiles={() => setIsUpdatingPicture(false)}
               stylePanelAspectRatio="1:1"
@@ -938,7 +967,7 @@ const GeneralFields = ({ handleToggle }) => {
                 variant="primary"
                 small
                 type="submit"
-                disabled={!isDirty || isSubmitting}
+                disabled={!isDirty || isSubmitting || isUpdatingPicture}
               >
                 <Typography variant="bodyRegular" bold>
                   Save
@@ -1659,13 +1688,20 @@ const SchoolHistoryFields = ({ handleToggle }) => {
     }
   };
 
-  const schools = personData?.included
-    ?.filter(
-      (i) =>
-        i.type === "schoolRelationship" &&
-        i.attributes.roleList.includes("Teacher Leader")
-    )
-    ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+  const teacherLeaderRelationships = personData?.included?.filter(
+    (i) =>
+      i.type === "schoolRelationship" &&
+      i.attributes.roleList.includes("Teacher Leader")
+  );
+
+  const schools = teacherLeaderRelationships?.map((relationship) => {
+    const schoolId = relationship.relationships.school.data.id;
+    return personData.included.find(
+      (item) => item.type === "school" && item.id === schoolId
+    );
+  });
+
+  // console.log(schools);
 
   const formatHumanDate = (date) => {
     const parsedDate = parseISO(date);
@@ -1677,6 +1713,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
   // console.log({ currentSchool });
   // console.log({ schoolsData });
   // console.log({ schoolOptions });
+  // console.log({ teacherLeaderRelationships });
   // console.log({ personData });
   // console.log("schools", schools);
   // console.log("personData", personData);
@@ -1697,7 +1734,29 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         {...field}
                         onChange={(_, newValue) => field.onChange(newValue)}
                         options={schoolOptions}
+                        getOptionDisabled={(option) =>
+                          schools.some((s) => s.id === option.value)
+                        }
                         getOptionLabel={(option) => option.label || ""} // Adjust based on your data structure
+                        renderOption={(props, option) => {
+                          const { key, ...optionProps } = props;
+                          return (
+                            <ListItem key={key} {...optionProps} disablePadding>
+                              <Stack
+                                direction="row"
+                                alignItems="center"
+                                spacing={2}
+                              >
+                                <Typography variant="bodyRegular">
+                                  {option.label}
+                                </Typography>
+                                {schools.some((s) => s.id === option.value) ? (
+                                  <Chip label="Added" size="small" />
+                                ) : null}
+                              </Stack>
+                            </ListItem>
+                          );
+                        }}
                         value={field.value || ""}
                         renderInput={(params) => (
                           <MaterialTextField
@@ -1740,7 +1799,8 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         label="Date joined"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
@@ -1773,7 +1833,8 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         label="Date left"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
@@ -1852,7 +1913,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                           hoverable
                           onClick={() => {
                             setIsEditingSchool(true);
-                            setCurrentSchool(school);
+                            setCurrentSchool(teacherLeaderRelationships[i]);
                             setIsAddingSchool(true);
                           }}
                         >
@@ -1873,16 +1934,21 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                     </Grid>
                   </Grid>
                   <Stack>
-                    {school.attributes.title ? (
+                    {teacherLeaderRelationships[i].attributes.title ? (
                       <Typography variant="bodyRegular" lightened>
-                        {school.attributes.title}
+                        {teacherLeaderRelationships[i].attributes.title}
                       </Typography>
                     ) : null}
-                    {school.attributes.startDate ? (
+                    {teacherLeaderRelationships[i].attributes.startDate ? (
                       <Typography variant="bodyRegular" lightened>
-                        {formatHumanDate(school.attributes.startDate)} -{" "}
-                        {school.attributes.endDate
-                          ? formatHumanDate(school.attributes.endDate)
+                        {formatHumanDate(
+                          teacherLeaderRelationships[i].attributes.startDate
+                        )}{" "}
+                        -{" "}
+                        {teacherLeaderRelationships[i].attributes.endDate
+                          ? formatHumanDate(
+                              teacherLeaderRelationships[i].attributes.endDate
+                            )
                           : "Present"}
                       </Typography>
                     ) : null}
@@ -2113,12 +2179,19 @@ const BoardHistoryFields = ({ handleToggle }) => {
 
   const watchFields = watch();
 
+  const schoolsWhereCurrentlyTeacher = personData?.included.filter(
+    (s) =>
+      s.type === "schoolRelationship" &&
+      s.attributes.roleList.includes("Teacher Leader")
+  );
+
   // console.log({ watchFields });
   // console.log({ currentSchool });
   // console.log({ schoolsData });
-  // console.log({ schoolOptions });
-  // console.log({ personData });
-  // console.log("schools", schools);
+  console.log({ schoolOptions });
+  console.log({ personData });
+  console.log({ schoolsWhereCurrentlyTeacher });
+  console.log("schools", schools);
   // console.log("personData", personData);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -2137,7 +2210,40 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         {...field}
                         onChange={(_, newValue) => field.onChange(newValue)}
                         options={schoolOptions}
+                        getOptionDisabled={(option) =>
+                          schools.some((s) => s.id === option.value) ||
+                          schoolsWhereCurrentlyTeacher.some(
+                            (s) =>
+                              s.relationships.school.data.id === option.value
+                          )
+                        }
                         getOptionLabel={(option) => option.label || ""} // Adjust based on your data structure
+                        renderOption={(props, option) => {
+                          const { key, ...optionProps } = props;
+                          return (
+                            <ListItem key={key} {...optionProps} disablePadding>
+                              <Stack
+                                direction="row"
+                                alignItems="center"
+                                spacing={2}
+                              >
+                                <Typography variant="bodyRegular">
+                                  {option.label}
+                                </Typography>
+                                {schools.some((s) => s.id === option.value) ? (
+                                  <Chip label="Added" size="small" />
+                                ) : null}
+                                {schoolsWhereCurrentlyTeacher.some(
+                                  (s) =>
+                                    s.relationships.school.data.id ===
+                                    option.value
+                                ) ? (
+                                  <Chip label="Your School" size="small" />
+                                ) : null}
+                              </Stack>
+                            </ListItem>
+                          );
+                        }}
                         value={field.value || ""}
                         renderInput={(params) => (
                           <MaterialTextField
@@ -2180,7 +2286,8 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         label="Date joined"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
@@ -2213,7 +2320,8 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         label="Date left"
                         value={parseISO(field.value)}
                         onChange={(date) => {
-                          const isoDate = date ? date.toISOString() : "";
+                          const isoDate =
+                            date && isValid(date) ? date.toISOString() : "";
                           field.onChange(isoDate);
                         }}
                         maxDate={new Date()}
