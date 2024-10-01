@@ -121,6 +121,9 @@ const AddProfileInfo = ({}) => {
   const isExistingTL = false;
   const introducerProfilePic = "/assets/images/placeholder-flower.png";
 
+  console.log({ profilePicture });
+  console.log({ isUpdatingPicture });
+
   useAuth("/login");
 
   return (

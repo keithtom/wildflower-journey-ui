@@ -23,6 +23,8 @@ const OpenSchoolWorkflow = ({}) => {
     if (schoolWorkflowId) {
       router.push(`/open-school/${schoolWorkflowId}`);
       sessionStorage.setItem("mySchoolWorkflowId", schoolWorkflowId);
+    } else {
+      router.push("/network");
     }
   }, [currentUser]);
 

@@ -96,7 +96,8 @@ const Task = ({
           return school.included.some(
             (relationship) =>
               relationship.type === "schoolRelationship" &&
-              relationship.relationships.person.data.id === item.id &&
+              (relationship?.relationships?.person?.data?.id ?? null) ===
+                (item?.id ?? null) &&
               relationship.attributes.endDate === null
           );
         }

@@ -172,10 +172,29 @@ async function handleErrors(promise) {
   }
 }
 
+async function handleErrorsNotPromises(error) {
+  if (error.response) {
+    console.log(error.response.data);
+    console.log(error.response.status);
+    console.log(error.response.headers);
+    if (error.response.status === 401) {
+      clearLoggedInState({});
+      // setCurrentUser(null);
+      Router.push("/login");
+    }
+  } else if (error.request) {
+    console.log(error.request);
+  } else {
+    console.log("Error", error.message);
+  }
+  throw error;
+}
+
 export default {
   register,
   loadRelationshipsFromIncluded,
   loadAllRelationshipsFromIncluded,
   lookupIncluded,
   handleErrors,
+  handleErrorsNotPromises,
 };
