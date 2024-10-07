@@ -57,7 +57,7 @@ Cypress.Commands.add("login", (email, password) => {
   });
 });
 
-function resetFixtures() {
+function resetFixtures(isOnboarded) {
   const timestamp = Date.now();
   const email = `cypress_test_${timestamp}@test.com`;
 
@@ -66,6 +66,7 @@ function resetFixtures() {
     url: `${Cypress.env("apiUrl")}/reset_fixtures`,
     body: {
       email: email,
+      is_onboarded: isOnboarded,
     },
   });
   return email;
@@ -100,8 +101,8 @@ function resetPartnerFixtures() {
   return [email1, email2];
 }
 
-Cypress.Commands.add("resetFixtures", () => {
-  cy.wrap(resetFixtures());
+Cypress.Commands.add("resetFixtures", (isOnboarded) => {
+  cy.wrap(resetFixtures(isOnboarded));
 });
 
 // Used with tests that are testing network workflows
@@ -114,7 +115,7 @@ Cypress.Commands.add("resetPartnerFixtures", () => {
 });
 
 Cypress.Commands.add("resetFixturesAndLogin", () => {
-  cy.resetFixtures().then((email) => {
+  cy.resetFixtures(false).then((email) => {
     cy.login(email, "password");
   });
 });
