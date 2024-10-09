@@ -106,7 +106,9 @@ const ProcessId = ({}) => {
       milestone?.relationships.selectedProcesses.data[0].attributes.state ===
         "upgraded" ||
         milestone?.relationships.selectedProcesses.data[0].attributes.state ===
-          "added"
+          "added" ||
+        milestone?.relationships.selectedProcesses.data[0].attributes.state ===
+          "initialized"
     );
   }, [workflow, milestone]);
 
@@ -256,10 +258,10 @@ const ProcessId = ({}) => {
       );
       // console.log({ response });
       router.push(`/admin/workflows/processes/${response.data.data.id}`);
+      setIsEditingProcess(true);
     } catch (error) {
       console.log(error);
     }
-    setIsEditingProcess(true);
   };
 
   const handleRevertAllEdits = async (selectedProcessId) => {
@@ -423,20 +425,21 @@ const ProcessId = ({}) => {
                   </Button>
                 ) : (
                   <Stack direction="row" spacing={3}>
-                    <Button
-                      disabled={
-                        milestone?.relationships.selectedProcesses.data[0]
-                          .attributes.state === "added"
-                      }
-                      variant="contained"
-                      onClick={() =>
-                        handleRevertAllEdits(
-                          milestone.relationships.selectedProcesses.data[0].id
-                        )
-                      }
-                    >
-                      Revert All Edits
-                    </Button>
+                    {milestone?.relationships.selectedProcesses.data[0]
+                      .attributes.state === "initialized" ||
+                    milestone?.relationships.selectedProcesses.data[0]
+                      .attributes.state === "added" ? null : (
+                      <Button
+                        variant="contained"
+                        onClick={() =>
+                          handleRevertAllEdits(
+                            milestone.relationships.selectedProcesses.data[0].id
+                          )
+                        }
+                      >
+                        Revert All Edits
+                      </Button>
+                    )}
                     <Button variant="contained" disabled>
                       Update
                     </Button>
