@@ -22,9 +22,11 @@ describe("tasks part 2", () => {
       cy.contains("a li div p", /^Startup$/).click();
       cy.contains("Milestone D-E-F").click();
       cy.contains("Collaborative Step 1").click();
-      cy.contains("Assign this task").click();
-      cy.get(".assignable-user").first().click();
-      cy.contains("ASSIGNEE");
+      cy.get(
+        `[data-cy="assign-user-button-drawer-${"Collaborative Step 1"}"]`
+      ).click();
+      cy.get('[data-cy="assignable-user"]').first().click();
+      cy.contains("TASK ADDED").should("be.visible");
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({
@@ -44,9 +46,12 @@ describe("tasks part 2", () => {
 
       // assign task to partner 2
       cy.contains("Collaborative Step 1").click();
-      cy.contains("Assign this task").click();
-      cy.get(".assignable-user").eq(1).click();
-      cy.contains("ASSIGNEE");
+      cy.get(
+        `[data-cy="assign-user-button-drawer-${"Collaborative Step 1"}"]`
+      ).click();
+      cy.get('[data-cy="assignable-user"]').eq(1).click();
+      cy.contains("TASK ADDED").should("be.visible");
+
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({
@@ -68,10 +73,17 @@ describe("tasks part 2", () => {
         cy.contains("a li div p", /^Startup$/).click();
         cy.contains("Milestone D-E-F").click();
         cy.contains("Collaborative Step 1").click();
-        cy.contains("Assign this task").click();
-
-        cy.get(".assignable-user").contains(lastName).click();
-
+        cy.get(
+          `[data-cy="assign-user-button-drawer-${"Collaborative Step 1"}"]`
+        ).click();
+        cy.get('[data-cy="assignable-user"]').contains(lastName).click();
+        cy.contains("TASK ADDED").should("be.visible");
+        cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+          .first()
+          .click({
+            force: true,
+          });
+        cy.contains("Collaborative Step 1").click();
         cy.contains("Mark task complete").click();
         cy.get("span.completedTask").should("be.visible");
         cy.logout();
@@ -124,10 +136,17 @@ describe("tasks part 2", () => {
       cy.contains("Milestone D").click();
       cy.contains("h2", /^Milestone D$/);
       cy.contains("Step 1").click();
-      cy.contains("Assign this task").click();
-      cy.get(".assignable-user").first().click();
+      cy.get(`[data-cy="assign-user-button-drawer-${"Step 1"}"]`).click();
+      cy.get('[data-cy="assignable-user"]').first().click();
+      cy.contains("TASK ADDED").should("be.visible");
+      cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
+        .first()
+        .click({
+          force: true,
+        });
+      cy.contains("Step 1").click();
       cy.contains("Mark task complete").click();
-      // cy.contains("Stop assigning").click();
+
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({
@@ -140,8 +159,10 @@ describe("tasks part 2", () => {
       cy.contains("Milestone E").click();
       cy.contains("h2", /^Milestone E$/);
       cy.contains("Step 1").click();
-      cy.contains("Assign this task").click();
-      cy.contains("Stop assigning").click();
+
+      cy.get(`[data-cy="assign-user-button-drawer-${"Step 1"}"]`).click();
+      cy.get('[data-cy="assignable-user"]').first().click();
+      cy.contains("TASK ADDED").should("be.visible");
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({

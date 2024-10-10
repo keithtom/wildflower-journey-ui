@@ -81,6 +81,7 @@ function resetNetworkFixtures() {
     url: `${Cypress.env("apiUrl")}/reset_network_fixtures`,
     body: {
       email: email,
+      is_onboarded: true,
     },
   });
   return email;

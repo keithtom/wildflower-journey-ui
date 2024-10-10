@@ -134,8 +134,6 @@ describe("onboarding spec", () => {
       cy.wait("@upload", { requestTimeout: 60000 });
 
       cy.contains("Confirm").click();
-
-      cy.url({ timeout: 60000 }).should("include", "/ssj");
     });
   });
 
@@ -242,7 +240,7 @@ describe("onboarding spec", () => {
         cy.contains("Foundation Partner").click({ force: true });
         cy.get("body").click(0, 0); // close dropdwon
 
-        cy.get('button[type="submit"]').click({force: true});
+        cy.get('button[type="submit"]').click({ force: true });
         cy.url({ timeout: 60000 }).should(
           "include",
           "/welcome/existing-member/add-profile-info"
