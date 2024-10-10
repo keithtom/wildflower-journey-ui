@@ -442,8 +442,10 @@ describe("network", () => {
           //add
           cy.get('[data-cy="schoolId-boardMembers-add"]').click();
           cy.get('[name="teacher"]').click();
-          cy.get('[name="teacher"]').type("Taylor Zanke");
-          cy.get('li[data-option-index="0"]').contains("Taylor Zanke").click();
+          cy.get('[name="teacher"]').type("Cameron Rutherford");
+          cy.get('li[data-option-index="0"]')
+            .contains("Cameron Rutherford")
+            .click();
           cy.get('[data-cy="schoolId-boardMembers-dateJoined"]')
             .clear()
             .type("01/01/2014");
