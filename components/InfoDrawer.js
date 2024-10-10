@@ -149,6 +149,7 @@ const InfoDrawer = ({
                     assignees={assignees}
                     completers={completers}
                     completionType={completionType}
+                    dataCy={`assign-user-button-drawer-${title}`}
                   />
                 </Stack>
               )}

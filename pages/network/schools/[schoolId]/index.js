@@ -255,6 +255,7 @@ const School = ({}) => {
                       variant="lightened"
                       full
                       onClick={() => setEditProfileModalOpen(true)}
+                      data-cy="schoolId-edit-school-profile"
                     >
                       <Stack direction="row" spacing={3} alignItems="center">
                         <Icon type="pencil" size="small" />
@@ -509,6 +510,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("general")}
           selected={currentFieldGroup === "general"}
+          data-cy="schoolId-general"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">General</Typography>
@@ -519,6 +521,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("enrollment")}
           selected={currentFieldGroup === "enrollment"}
+          data-cy="schoolId-enrollment"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">Enrollment</Typography>
@@ -529,6 +532,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("teacherLeaders")}
           selected={currentFieldGroup === "teacherLeaders"}
+          data-cy="schoolId-teacherLeaders"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">Teacher Leaders</Typography>
@@ -539,6 +543,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("boardMembers")}
           selected={currentFieldGroup === "boardMembers"}
+          data-cy="schoolId-boardMembers"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">Board Members</Typography>
@@ -794,6 +799,7 @@ const GeneralFields = ({ handleToggle, school, address }) => {
                       errors.openDate.type === "required" &&
                       "This field is required"
                     }
+                    data-cy="schoolId-open-date"
                   />
                 )}
                 rules={{ required: "This field is required" }}
@@ -1729,6 +1735,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                             minDate={new Date("2014-01-01")}
                             renderInput={(params) => (
                               <MaterialTextField
+                                data-cy="schoolId-teacherLeaders-dateJoined"
                                 {...params}
                                 error={
                                   touchedFields.dateJoined &&
@@ -1764,6 +1771,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                             minDate={new Date("2014-01-01")}
                             renderInput={(params) => (
                               <MaterialTextField
+                                data-cy="schoolId-teacherLeaders-dateLeft"
                                 {...params}
                                 error={errors.dateLeft}
                                 helperText={
@@ -1864,6 +1872,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                                 setCurrentTeacher(teacher);
                                 setIsAddingTeacher(true);
                               }}
+                              data-cy={`schoolId-teacherLeaders-edit-${i}`}
                             >
                               Edit
                             </Typography>
@@ -1877,6 +1886,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                                   teacher?.schoolRealtionshipId
                                 )
                               }
+                              data-cy={`schoolId-teacherLeaders-remove-${i}`}
                             >
                               Remove
                             </Typography>
@@ -1976,6 +1986,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                           <Button
                             small
                             onClick={() => setIsAddingTeacher(true)}
+                            data-cy="schoolId-teacherLeaders-add"
                           >
                             <Typography variant="bodyRegular" bold>
                               Add
@@ -2004,6 +2015,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                           small
                           variant="secondary"
                           onClick={() => setIsInvitingTeacher(true)}
+                          data-cy="schoolId-teacherLeaders-add-invite"
                         >
                           <Typography variant="bodyRegular" bold>
                             Invite
@@ -2174,6 +2186,7 @@ const InviteTeacherFields = ({
               minDate={new Date("2014-01-01")}
               renderInput={(params) => (
                 <MaterialTextField
+                  data-cy="schoolId-teacherLeaders-add-invite-dateJoined"
                   {...params}
                   error={touchedFields.dateJoined && !!errors.dateJoined}
                   helperText={
@@ -2563,6 +2576,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                         minDate={new Date("2014-01-01")}
                         renderInput={(params) => (
                           <MaterialTextField
+                            data-cy="schoolId-boardMembers-dateJoined"
                             {...params}
                             error={
                               touchedFields.dateJoined && !!errors.dateJoined
@@ -2597,6 +2611,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                         minDate={new Date("2014-01-01")}
                         renderInput={(params) => (
                           <MaterialTextField
+                            data-cy="schoolId-boardMembers-dateLeft"
                             {...params}
                             error={errors.dateLeft}
                             helperText={
@@ -2669,6 +2684,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                             setCurrentTeacher(teacher);
                             setIsAddingTeacher(true);
                           }}
+                          data-cy={`schoolId-boardMembers-edit-${i}`}
                         >
                           Edit
                         </Typography>
@@ -2682,6 +2698,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                               teacher?.schoolRealtionshipId
                             )
                           }
+                          data-cy={`schoolId-boardMembers-remove-${i}`}
                         >
                           Remove
                         </Typography>
@@ -2769,7 +2786,11 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <Button small onClick={() => setIsAddingTeacher(true)}>
+                  <Button
+                    small
+                    onClick={() => setIsAddingTeacher(true)}
+                    data-cy="schoolId-boardMembers-add"
+                  >
                     <Typography variant="bodyRegular" bold>
                       Add
                     </Typography>

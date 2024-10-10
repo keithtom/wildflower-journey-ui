@@ -474,6 +474,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("general")}
           selected={currentFieldGroup === "general"}
+          data-cy="personId-edit-general"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">General</Typography>
@@ -484,6 +485,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("demographic")}
           selected={currentFieldGroup === "demographic"}
+          data-cy="personId-edit-demographic"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">Demographic</Typography>
@@ -494,6 +496,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("certification_and_role")}
           selected={currentFieldGroup === "certification_and_role"}
+          data-cy="personId-edit-certificationAndRole"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">Certification & Role</Typography>
@@ -504,6 +507,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("school_history")}
           selected={currentFieldGroup === "school_history"}
+          data-cy="personId-edit-schoolHistory"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">School History</Typography>
@@ -514,6 +518,7 @@ const FieldGroupMenu = ({ setCurrentFieldGroup, currentFieldGroup }) => {
         <ListItemButton
           onClick={() => setCurrentFieldGroup("board_history")}
           selected={currentFieldGroup === "board_history"}
+          data-cy="personId-edit-boardHistory"
         >
           <ListItemText sx={{ paddingX: "8px" }}>
             <Typography variant="bodyRegular">Board History</Typography>
@@ -1807,6 +1812,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         minDate={new Date("2014-01-01")}
                         renderInput={(params) => (
                           <MaterialTextField
+                            data-cy="personId-edit-schoolHistory-dateJoined"
                             {...params}
                             error={
                               touchedFields.dateJoined && !!errors.dateJoined
@@ -1841,6 +1847,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                         minDate={new Date("2014-01-01")}
                         renderInput={(params) => (
                           <MaterialTextField
+                            data-cy="personId-edit-schoolHistory-dateLeft"
                             {...params}
                             error={errors.dateLeft}
                             helperText={
@@ -1916,6 +1923,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                             setCurrentSchool(teacherLeaderRelationships[i]);
                             setIsAddingSchool(true);
                           }}
+                          data-cy={`personId-edit-schoolHistory-edit-${i}`}
                         >
                           Edit
                         </Typography>
@@ -1925,8 +1933,11 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                           lightened
                           hoverable
                           onClick={() =>
-                            handleDeleteSchoolRelationship(school.id)
+                            handleDeleteSchoolRelationship(
+                              teacherLeaderRelationships[i].id
+                            )
                           }
+                          data-cy={`personId-edit-schoolHistory-remove`}
                         >
                           Remove
                         </Typography>
@@ -1957,7 +1968,12 @@ const SchoolHistoryFields = ({ handleToggle }) => {
               ))}
             </Grid>
           ) : (
-            <Card noBorder noRadius size="large">
+            <Card
+              noBorder
+              noRadius
+              size="large"
+              data-cy="personId-edit-schoolHistory-empty"
+            >
               <Stack spacing={6} alignItems="center">
                 <img src="/assets/images/wildflower-logo.png" />
                 <Typography variant="h4">Add your school history</Typography>
@@ -2013,7 +2029,11 @@ const SchoolHistoryFields = ({ handleToggle }) => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <Button small onClick={() => setIsAddingSchool(true)}>
+                  <Button
+                    small
+                    onClick={() => setIsAddingSchool(true)}
+                    data-cy="personId-edit-schoolHistory-add"
+                  >
                     <Typography variant="bodyRegular" bold>
                       Add
                     </Typography>
@@ -2294,6 +2314,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         minDate={new Date("2014-01-01")}
                         renderInput={(params) => (
                           <MaterialTextField
+                            data-cy="personId-edit-boardHistory-dateJoined"
                             {...params}
                             error={
                               touchedFields.dateJoined && !!errors.dateJoined
@@ -2328,6 +2349,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
                         minDate={new Date("2014-01-01")}
                         renderInput={(params) => (
                           <MaterialTextField
+                            data-cy="personId-edit-boardHistory-dateLeft"
                             {...params}
                             error={errors.dateLeft}
                             helperText={
@@ -2381,6 +2403,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
                             setCurrentSchool(school);
                             setIsAddingSchool(true);
                           }}
+                          data-cy={`personId-edit-boardHistory-edit-${i}`}
                         >
                           Edit
                         </Typography>
@@ -2392,6 +2415,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
                           onClick={() =>
                             handleDeleteSchoolRelationship(school.id)
                           }
+                          data-cy={`personId-edit-boardHistory-remove`}
                         >
                           Remove
                         </Typography>
@@ -2417,7 +2441,12 @@ const BoardHistoryFields = ({ handleToggle }) => {
               ))}
             </Grid>
           ) : (
-            <Card noBorder noRadius size="large">
+            <Card
+              noBorder
+              noRadius
+              size="large"
+              data-cy="personId-edit-boardHistory-empty"
+            >
               <Stack spacing={6} alignItems="center">
                 <img src="/assets/images/wildflower-logo.png" />
                 <Typography variant="h4">Add your board history</Typography>
@@ -2473,7 +2502,11 @@ const BoardHistoryFields = ({ handleToggle }) => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <Button small onClick={() => setIsAddingSchool(true)}>
+                  <Button
+                    small
+                    onClick={() => setIsAddingSchool(true)}
+                    data-cy="personId-edit-boardHistory-add"
+                  >
                     <Typography variant="bodyRegular" bold>
                       Add
                     </Typography>

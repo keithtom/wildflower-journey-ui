@@ -310,6 +310,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
         active={router.pathname.includes("/visioning")}
         label="Visioning"
         icon={true}
+        data-cy="visioning-nav-item"
       />
       <NavLink
         variant="tertiary"
@@ -317,6 +318,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
         active={router.pathname.includes("/planning")}
         label="Planning"
         icon={true}
+        data-cy="planning-nav-item"
       />
       <NavLink
         variant="tertiary"
@@ -324,6 +326,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
         active={router.pathname.includes("/startup")}
         label="Startup"
         icon={true}
+        data-cy="startup-nav-item"
       />
       {opsView ? null : (
         <NavLink

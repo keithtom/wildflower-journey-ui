@@ -317,6 +317,7 @@ const Task = ({
                 assignees={taskAssignees}
                 completers={taskCompleters}
                 completionType={completionType}
+                dataCy={`assign-user-button-inline-${title}`}
               />
             ) : null}
           </Stack>

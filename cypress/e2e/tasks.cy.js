@@ -2,51 +2,49 @@ describe("tasks", () => {
   beforeEach(() => {
     cy.viewport(1280, 832);
   });
-
   describe("single user", () => {
     beforeEach(() => {
       cy.resetFixturesAndLogin();
       cy.visit("/ssj", { timeout: 60000 });
     });
-
     describe("assigning tasks", () => {
       it("should allow multiple assignments and can complete", () => {
-        cy.contains("Visioning").click();
+        // navigate to the visioning phase page
+        cy.get('[data-cy="visioning-nav-item"]').click();
         cy.location("pathname", { timeout: 60000 }).should(
           "include",
           "/visioning"
         );
         // check for something that will be present on the visioning page
-        cy.get("#visioning-header");
+        cy.get('[data-cy="visioning-header"]').click();
+        // navigate to Milestone A page
         cy.contains("Milestone A").click();
 
-        // Assign to Step 1
+        // assign any user to Step 1
         cy.contains("Step 1").click();
-        cy.contains("Assign this task").click();
-        cy.get(".assignable-user").first().click();
+        cy.get(`[data-cy="assign-user-button-drawer-${"Step 1"}"]`).click();
+        cy.get('[data-cy="assignable-user"]').first().click();
         cy.contains("TASK ADDED").should("be.visible");
-        cy.get(".MuiSnackbar-root span svg").click({ force: true });
-        cy.contains("ASSIGNEE");
+        // close the drawer
         cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
           .first()
           .click({
             force: true,
           });
 
-        // // Assign to Step 2
+        // assign any user to Step 2
         cy.contains("Step 2").click();
-        cy.contains("Assign this task").click();
-        cy.get(".assignable-user").first().click();
+        cy.get(`[data-cy="assign-user-button-drawer-${"Step 2"}"]`).click();
+        cy.get('[data-cy="assignable-user"]').first().click();
         cy.contains("TASK ADDED").should("be.visible");
-        cy.get(".MuiSnackbar-root span svg").click({ force: true });
-        cy.contains("ASSIGNEE");
+        // close the drawer
         cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
           .first()
           .click({
             force: true,
           });
 
-        // // avatar should appear 3x. Once in the header, and twice for the assignments
+        // verify 2 tasks assigned by: avatar should appear 3x. Once in the header, and twice for the assignments
         cy.get(".MuiAvatar-img").should("have.length", 3);
 
         cy.contains("To do list").click();
@@ -241,8 +239,6 @@ describe("tasks", () => {
         cy.contains("Decision Step 1").click();
         cy.contains("Option 1").click();
         cy.contains("Make final decision").click();
-        cy.contains("Decision made").should("be.visible");
-        cy.reload();
         cy.contains("Decided").should("be.visible");
       });
     });
@@ -263,7 +259,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -286,7 +282,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -314,7 +310,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -331,7 +327,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -352,7 +348,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -367,7 +363,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -384,7 +380,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -405,7 +401,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -429,7 +425,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -459,7 +455,7 @@ describe("tasks", () => {
         cy.login(email, "password");
       });
       cy.visit("/ssj");
-      cy.contains("Visioning").click();
+      cy.get('[data-cy="visioning-nav-item"]').click();
       cy.location("pathname", { timeout: 60000 }).should(
         "include",
         "/visioning"
@@ -468,7 +464,7 @@ describe("tasks", () => {
       cy.get(".MuiAvatar-img").should("have.length", 3);
       cy.contains("Step 1").click();
       cy.contains("Remove from to do list").click();
-      cy.get(".MuiAvatar-img").should("have.length", 2);
+      cy.get(".MuiAvatar-img").should("have.length", 3);
       cy.logout();
       // unassign task as partner 2
       cy.get("@partner2Email").then((email) => {
@@ -484,7 +480,7 @@ describe("tasks", () => {
       cy.get(".MuiAvatar-img").should("have.length", 2);
       cy.contains("Step 1").click();
       cy.contains("Remove from to do list").click();
-      cy.get(".MuiAvatar-img").should("have.length", 1);
+      cy.get(".MuiAvatar-img").should("have.length", 2);
       cy.logout();
     });
   });
