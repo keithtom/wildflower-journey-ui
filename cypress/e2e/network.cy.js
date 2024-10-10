@@ -124,7 +124,7 @@ describe("network", () => {
         });
       });
     });
-    describe.only("search for self and navigate to profile", () => {
+    describe("search for self and navigate to profile", () => {
       it("should set people cookies, search themselves, and click to profile, and edit", () => {
         let firstName;
         cy.getCookie("firstName")
@@ -463,7 +463,11 @@ describe("network", () => {
             .type("01/01/2024");
           cy.get('button[type="submit"]').should("not.be.disabled").click();
           //remove
-          cy.get('[data-cy="schoolId-boardMembers-remove-0"]').click();
+          cy.get('[data-cy="personId-edit-schoolHistory-remove"]').each(
+            ($el) => {
+              cy.wrap($el).click();
+            }
+          );
         });
       });
     });
