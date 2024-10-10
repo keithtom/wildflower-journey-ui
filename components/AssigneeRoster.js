@@ -29,6 +29,7 @@ const AssigneeRoster = ({
   handleAssignUser,
   handleUnassignUser,
   completionType,
+  dataCy, // for cypress testing
 }) => {
   // popover settings
   const [anchorEl, setAnchorEl] = useState(null);
@@ -69,7 +70,7 @@ const AssigneeRoster = ({
 
   return (
     <>
-      <Box onClick={handleClick} sx={{ cursor: "pointer" }}>
+      <Box onClick={handleClick} sx={{ cursor: "pointer" }} data-cy={dataCy}>
         {assignees?.length ? (
           <Stack direction="row" spacing={1} aria-describedby={id}>
             {assignees
@@ -150,6 +151,7 @@ const AssigneeRoster = ({
                       cantAssign ||
                       completers.some((completer) => completer.id === user.id)
                     }
+                    data-cy="assignable-user"
                   >
                     <Stack direction="row" spacing={3} alignItems="center ">
                       <AvatarWrapper

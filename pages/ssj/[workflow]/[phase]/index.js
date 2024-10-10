@@ -68,7 +68,13 @@ const PhasePage = () => {
                 : undefined
             }
           />
-          <Typography variant="h2" bold capitalize id={`${phase}-header`}>
+          <Typography
+            variant="h2"
+            bold
+            capitalize
+            id={`${phase}-header`}
+            data-cy={`${phase}-header`}
+          >
             {phase}
           </Typography>
 
