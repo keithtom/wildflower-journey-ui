@@ -1033,6 +1033,7 @@ const AddPartnerModal = ({
     },
   });
 
+  const router = useRouter();
   // console.log({ errors });
 
   async function onSubmit(data) {

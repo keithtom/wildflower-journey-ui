@@ -2698,7 +2698,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                               teacher?.schoolRealtionshipId
                             )
                           }
-                          data-cy={`schoolId-boardMembers-remove-${i}`}
+                          data-cy="schoolId-boardMembers-remove"
                         >
                           Remove
                         </Typography>
