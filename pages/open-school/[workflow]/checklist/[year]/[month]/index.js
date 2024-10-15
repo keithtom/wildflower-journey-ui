@@ -248,7 +248,11 @@ const AdminChecklist = () => {
             spacing={6}
           >
             <Grid item flex={1}>
-              <Typography variant="h3" bold>
+              <Typography
+                variant="h3"
+                bold
+                data-cy="open-school-checklist-month"
+              >
                 {isLoading ? (
                   <Skeleton width={120} />
                 ) : (
@@ -267,6 +271,7 @@ const AdminChecklist = () => {
               >
                 <Grid item>
                   <Button
+                    data-cy="open-school-checklist-resetMonth"
                     onClick={handleResetDate}
                     variant="text"
                     small
@@ -278,10 +283,16 @@ const AdminChecklist = () => {
                   </Button>
                 </Grid>
                 <Grid item>
-                  <IconButton onClick={handleDecrementMonth}>
+                  <IconButton
+                    onClick={handleDecrementMonth}
+                    data-cy="open-school-checklist-prevMonth"
+                  >
                     <Icon type="chevronLeft" variant="primary" />
                   </IconButton>
-                  <IconButton onClick={handleIncrementMonth}>
+                  <IconButton
+                    onClick={handleIncrementMonth}
+                    data-cy="open-school-checklist-nextMonth"
+                  >
                     <Icon type="chevronRight" variant="primary" />
                   </IconButton>
                 </Grid>
