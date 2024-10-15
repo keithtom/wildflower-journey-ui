@@ -86,6 +86,20 @@ function resetNetworkFixtures() {
   });
   return email;
 }
+function resetOpenSchoolFixtures() {
+  const timestamp = Date.now();
+  const email = `cypress_test_${timestamp}@test.com`;
+
+  cy.request({
+    method: "PUT",
+    url: `${Cypress.env("apiUrl")}/reset_open_school_fixtures`,
+    body: {
+      email: email,
+      is_onboarded: true,
+    },
+  });
+  return email;
+}
 
 function resetPartnerFixtures() {
   const timestamp = Date.now();
@@ -107,6 +121,10 @@ Cypress.Commands.add("resetFixtures", (isOnboarded) => {
 });
 
 // Used with tests that are testing network workflows
+Cypress.Commands.add("resetOpenSchoolFixtures", () => {
+  cy.wrap(resetOpenSchoolFixtures());
+});
+// Used with tests that are testing network workflows
 Cypress.Commands.add("resetNetworkFixtures", () => {
   cy.wrap(resetNetworkFixtures());
 });
@@ -123,6 +141,11 @@ Cypress.Commands.add("resetFixturesAndLogin", () => {
 
 Cypress.Commands.add("resetNetworkFixturesAndLogin", () => {
   cy.resetNetworkFixtures().then((email) => {
+    cy.login(email, "password");
+  });
+});
+Cypress.Commands.add("resetOpenSchoolFixturesAndLogin", () => {
+  cy.resetOpenSchoolFixtures().then((email) => {
     cy.login(email, "password");
   });
 });
