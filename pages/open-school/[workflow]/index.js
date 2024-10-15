@@ -93,7 +93,7 @@ const OpenSchool = () => {
     <PageContainer>
       <Grid container spacing={6}>
         <Grid item xs={12}>
-          <Card>
+          <Card data-cy="open-school-dashboard-card">
             <Grid container justifyContent="space-between" spacing={6}>
               <Grid item flex={1}>
                 <Stack direction="row" alignItems="center" spacing={6}>
@@ -130,6 +130,7 @@ const OpenSchool = () => {
         </Grid>
         <Grid item xs={12}>
           <Link
+            data-cy="open-school-checklist-cta"
             href={`/open-school/${workflow}/checklist/${thisYear}/${thisMonth}`}
           >
             <Card

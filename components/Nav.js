@@ -358,6 +358,7 @@ const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
   return (
     <Box>
       <NavLink
+        data-cy="open-school-checklist-toDoList"
         variant="secondary"
         to={`/open-school/${openSchoolWorkflowId}/to-do-list`}
         active={
@@ -377,6 +378,7 @@ const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
         }
       />
       <NavLink
+        data-cy="open-school-checklist-navItem"
         variant="secondary"
         to={`/open-school/${openSchoolWorkflowId}/checklist/${thisYear}/${thisMonth}`}
         active={
