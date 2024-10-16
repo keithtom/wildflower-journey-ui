@@ -149,30 +149,7 @@ function lookupIncluded(included, id, type) {
   return included.find((i) => i.id === id && i.type === type);
 }
 
-async function handleErrors(promise) {
-  try {
-    const res = await promise;
-    return res.data;
-  } catch (error) {
-    if (error.response) {
-      console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
-      if (error.response.status === 401) {
-        clearLoggedInState({});
-        setCurrentUser(null);
-        Router.push("/login");
-      }
-    } else if (error.request) {
-      console.log(error.request);
-    } else {
-      console.log("Error", error.message);
-    }
-    throw error;
-  }
-}
-
-async function handleErrorsNotPromises(error) {
+async function handleErrors(error) {
   if (error.response) {
     console.log(error.response.data);
     console.log(error.response.status);
@@ -196,5 +173,4 @@ export default {
   loadAllRelationshipsFromIncluded,
   lookupIncluded,
   handleErrors,
-  handleErrorsNotPromises,
 };
