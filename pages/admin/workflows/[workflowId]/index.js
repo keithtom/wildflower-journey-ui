@@ -436,7 +436,10 @@ const Workflow = ({}) => {
             <Button
               variant="contained"
               size="small"
-              onClick={() => setAddProcessModalOpen(true)}
+              onClick={() => {
+                setAddProcessModalOpen(true);
+                setStagedProcessPosition(0);
+              }}
               disabled={
                 rolloutInProgress ||
                 workflow?.attributes.needsSupport ||
@@ -615,7 +618,7 @@ const AddProcessModal = ({
 }) => {
   const [addType, setAddType] = useState(null);
 
-  // console.log({ stagedProcessPosition });
+  console.log({ stagedProcessPosition });
 
   const handleClose = () => {
     onClose();
