@@ -32,16 +32,20 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogContentText,
   DialogActions,
   Radio,
   RadioGroup,
   FormControlLabel,
   FormHelperText,
   Switch,
+  Drawer,
+  Divider,
+  InputAdornment,
 } from "@mui/material";
 import ssj_categories from "@lib/ssj/categories";
 import CategoryChip from "@components/CategoryChip";
-import { DragHandle, Edit, Warning } from "@mui/icons-material";
+import { DragHandle, Edit, Warning, Check } from "@mui/icons-material";
 import { PageContainer, Grid, Typography } from "@ui";
 import InlineActionTile from "@components/admin/InlineActionTile";
 import DraggableList from "@components/admin/DraggableList";
@@ -51,8 +55,10 @@ import stepsApi from "@api/workflow/definition/steps";
 import processApi from "@api/workflow/definition/processes";
 import workflowApi from "@api/workflow/definition/workflows";
 import useProcessInWorkflow from "@hooks/workflow/definition/useProcessInWorkflow";
-import useMilestones from "@hooks/workflow/definition/useMilestones";
+import useStep from "@hooks/workflow/definition/useStep";
 import useWorkflow from "@hooks/workflow/definition/useWorkflow";
+import { Education } from "styled-icons/zondicons";
+import { set } from "lodash";
 
 const ProcessId = ({}) => {
   const router = useRouter();
@@ -76,6 +82,8 @@ const ProcessId = ({}) => {
   });
   const [updateProcessPositionData, setUpdateProcessPositionData] =
     useState(null);
+
+  const [showEditLanguageModal, setShowEditLanguageModal] = useState(false);
 
   // console.log({ isDraftingNewVersion });
   // console.log({ isEditingProcess });
@@ -455,6 +463,28 @@ const ProcessId = ({}) => {
             </Grid>
           </Grid>
 
+          <Grid container>
+            <Grid item>
+              <Stack spacing={2}>
+                <Typography variant="bodyMini" bold lightened>
+                  LANGUAGE SUPPORT
+                </Typography>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Chip label={"English"} size="small" />
+                  <Chip label={"Spanish"} size="small" />
+                  <Button
+                    size="small"
+                    variant="contained"
+                    endIcon={<Edit fontSize="inherit" />}
+                    onClick={() => setShowEditLanguageModal(true)}
+                  >
+                    Edit
+                  </Button>
+                </Stack>
+              </Stack>
+            </Grid>
+          </Grid>
+
           {/* FORM */}
           <Stack spacing={3}>
             <Controller
@@ -788,6 +818,11 @@ const ProcessId = ({}) => {
           </Card>
         </Stack>
       </form>
+      <EditLanguageModal
+        open={showEditLanguageModal}
+        onClose={() => setShowEditLanguageModal(false)}
+        milestone={milestone}
+      />
       {isRecurring ? null : (
         <ChoosePositionModal
           open={showChoosePositionModal.state}
@@ -1449,5 +1484,204 @@ const ChoosePositionListItem = ({
         ))}
       </ListItemButton>
     </ListItem>
+  );
+};
+
+const EditLanguageModal = ({ open, onClose, milestone }) => {
+  const [currentFieldGroup, setCurrentFieldGroup] = useState([
+    "process",
+    milestone?.id,
+  ]);
+
+  const renderFieldGroup = () => {
+    const [type, id] = currentFieldGroup;
+    switch (type) {
+      case "process":
+        return <TranslateProcessFields processId={id} milestone={milestone} />;
+      case "step":
+        return <TranslateStepFields stepId={id} processId={milestone?.id} />;
+      default:
+        return null;
+    }
+  };
+
+  const handleClose = () => {
+    onClose();
+  };
+  // console.log({ milestone });
+
+  return (
+    <Dialog open={open} onClose={handleClose} fullWidth scroll="paper">
+      <DialogTitle>Add Translations</DialogTitle>
+
+      <DialogContent
+        sx={{ paddingLeft: "224px", minHeight: "480px", maxHeight: "480px" }}
+        dividers
+      >
+        <Drawer
+          variant="permanent"
+          anchor="left"
+          PaperProps={{
+            style: {
+              position: "absolute",
+              top: 64,
+              boxSizing: "border-box",
+              width: "200px",
+              height: "calc(100% - 64px)",
+              borderLeft: "none",
+              borderBottom: "none",
+              padding: 0,
+            },
+          }}
+        >
+          <List>
+            <ListItem
+              disablePadding
+              sx={{
+                background:
+                  milestone.id === currentFieldGroup[1] ? "#fafafa" : null,
+              }}
+            >
+              <ListItemButton
+                onClick={() => setCurrentFieldGroup(["process", milestone.id])}
+              >
+                <ListItemText
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {milestone?.attributes.title}
+                </ListItemText>
+              </ListItemButton>
+            </ListItem>
+            <ListSubheader>Steps</ListSubheader>
+            {milestone?.relationships?.steps?.data.map((step, i) => (
+              <ListItem
+                disablePadding
+                key={i}
+                sx={{
+                  background:
+                    step.id === currentFieldGroup[1] ? "#fafafa" : null,
+                }}
+              >
+                <ListItemButton
+                  onClick={() => setCurrentFieldGroup(["step", step.id])}
+                >
+                  <ListItemText
+                    sx={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {step.attributes.title}
+                  </ListItemText>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+        <DialogContentText>{renderFieldGroup()}</DialogContentText>
+      </DialogContent>
+      <DialogActions sx={{ paddingLeft: "200px" }}>
+        <Grid container justifyContent="space-between">
+          <Grid item>cancel</Grid>
+          <Grid item>save</Grid>
+        </Grid>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+const TranslateProcessFields = ({ processId, milestone }) => {
+  return (
+    <Stack spacing={3}>
+      <TranslateCard
+        fieldName="Title"
+        fieldDefault={milestone.attributes.title}
+        langToTranslate="Spanish"
+      />
+      <TranslateCard
+        fieldName="Description"
+        fieldDefault={milestone.attributes.description}
+        langToTranslate="Spanish"
+      />
+    </Stack>
+  );
+};
+const TranslateStepFields = ({ processId, stepId }) => {
+  const { step, isLoading, isError } = useStep(processId, stepId);
+  // console.log({ step });
+  return isLoading ? (
+    <div>Loading</div>
+  ) : (
+    <Stack spacing={3}>
+      <TranslateCard
+        fieldName="Title"
+        fieldDefault={step.attributes.title}
+        langToTranslate="Spanish"
+      />
+      <TranslateCard
+        fieldName="Description"
+        fieldDefault={step.attributes.description}
+        langToTranslate="Spanish"
+      />
+      {step.relationships.documents.data.length ? (
+        <>
+          <Typography bold>Resources</Typography>
+          {step.relationships.documents.data.map((doc, i) => (
+            <TranslateCard
+              key={i}
+              fieldName="Resource Title"
+              fieldDefault={doc.attributes.title}
+              langToTranslate="Spanish"
+            />
+          ))}
+        </>
+      ) : null}
+      {step.attributes.kind === "decision" ? (
+        <>
+          <Typography bold>Decisions</Typography>
+          <TranslateCard
+            fieldName="Decision Question"
+            fieldDefault={step.attributes.decisionQuestion}
+            langToTranslate="Spanish"
+          />
+          {step.relationships.decisionOptions.data.map((option, i) => (
+            <TranslateCard
+              key={i}
+              fieldName="Decision Option"
+              fieldDefault={option.attributes.description}
+              langToTranslate="Spanish"
+            />
+          ))}
+        </>
+      ) : null}
+    </Stack>
+  );
+};
+
+const TranslateCard = ({ fieldName, fieldDefault, langToTranslate }) => {
+  return (
+    <Card>
+      <Box sx={{ background: "#fafafa", padding: 3 }}>
+        <Stack>
+          <Typography variant="bodyRegular" bold lightened>
+            {fieldName}
+          </Typography>
+          <Typography variant="bodyRegular">{fieldDefault}</Typography>
+        </Stack>
+      </Box>
+      <Box sx={{ padding: 3 }}>
+        <TextField
+          label={langToTranslate}
+          size="small"
+          fullWidth
+          multiline
+        ></TextField>
+      </Box>
+    </Card>
   );
 };
