@@ -56,6 +56,7 @@ const OpenSchoolMilestonePage = ({}) => {
           <Grid item>
             <Stack direction="row" spacing={2} alignItems="center">
               <Link
+                data-cy="milestone-page-back"
                 href={`/open-school/${workflow}/checklist/${year}/${month}`}
               >
                 <IconButton>
@@ -66,7 +67,7 @@ const OpenSchoolMilestonePage = ({}) => {
             </Stack>
           </Grid>
         </Grid>
-        <Grid container>
+        <Grid container data-cy="milestone-page-header">
           <Grid item xs={12}>
             <MilestonePageHead
               isLoading={isLoading}
