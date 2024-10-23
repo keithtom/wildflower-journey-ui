@@ -1493,81 +1493,101 @@ const EditLanguageModal = ({ open, onClose, milestone }) => {
     milestone?.id,
   ]);
 
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm({
+    mode: "onChange",
+  });
+
+  const handleUpdateProcessOrStepTranslation = async (data) => {
+    const [type, id] = currentFieldGroup;
+    if (type === "process") {
+      console.log("processFieldsData", data);
+      // use the id to update the process translation field(s)
+    } else {
+      console.log("stepFieldsData", data);
+      // use the id to update the step translation field(s)
+    }
+  };
+
+  const onSubmit = handleSubmit(handleUpdateProcessOrStepTranslation);
+
   const renderFieldGroup = () => {
     const [type, id] = currentFieldGroup;
     switch (type) {
       case "process":
-        return <TranslateProcessFields processId={id} milestone={milestone} />;
+        return (
+          <TranslateProcessFields
+            processId={id}
+            milestone={milestone}
+            control={control}
+          />
+        );
       case "step":
-        return <TranslateStepFields stepId={id} processId={milestone?.id} />;
+        return (
+          <TranslateStepFields
+            stepId={id}
+            processId={milestone?.id}
+            control={control}
+          />
+        );
       default:
         return null;
     }
   };
 
+  const handleChangeFieldGroup = (type, id) => {
+    setCurrentFieldGroup([type, id]);
+    reset(); // reset the form controls so that we can reuse the fields
+  };
+
   const handleClose = () => {
     onClose();
+    reset(); // reset the form controls so that we can reuse the fields
   };
+
   // console.log({ milestone });
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth scroll="paper">
-      <DialogTitle>Add Translations</DialogTitle>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogTitle>Add Translations</DialogTitle>
 
-      <DialogContent
-        sx={{ paddingLeft: "224px", minHeight: "480px", maxHeight: "480px" }}
-        dividers
-      >
-        <Drawer
-          variant="permanent"
-          anchor="left"
-          PaperProps={{
-            style: {
-              position: "absolute",
-              top: 64,
-              boxSizing: "border-box",
-              width: "200px",
-              height: "calc(100% - 64px)",
-              borderLeft: "none",
-              borderBottom: "none",
-              padding: 0,
-            },
-          }}
+        <DialogContent
+          sx={{ paddingLeft: "224px", minHeight: "480px", maxHeight: "480px" }}
+          dividers
         >
-          <List>
-            <ListItem
-              disablePadding
-              sx={{
-                background:
-                  milestone.id === currentFieldGroup[1] ? "#fafafa" : null,
-              }}
-            >
-              <ListItemButton
-                onClick={() => setCurrentFieldGroup(["process", milestone.id])}
-              >
-                <ListItemText
-                  sx={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {milestone?.attributes.title}
-                </ListItemText>
-              </ListItemButton>
-            </ListItem>
-            <ListSubheader>Steps</ListSubheader>
-            {milestone?.relationships?.steps?.data.map((step, i) => (
+          <Drawer
+            variant="permanent"
+            anchor="left"
+            PaperProps={{
+              style: {
+                position: "absolute",
+                top: 64,
+                boxSizing: "border-box",
+                width: "200px",
+                height: "calc(100% - 64px)",
+                borderLeft: "none",
+                borderBottom: "none",
+                padding: 0,
+              },
+            }}
+          >
+            <List>
               <ListItem
                 disablePadding
-                key={i}
                 sx={{
                   background:
-                    step.id === currentFieldGroup[1] ? "#fafafa" : null,
+                    milestone?.id === currentFieldGroup[1] ? "#fafafa" : null,
                 }}
               >
                 <ListItemButton
-                  onClick={() => setCurrentFieldGroup(["step", step.id])}
+                  onClick={() =>
+                    handleChangeFieldGroup("process", milestone.id)
+                  }
                 >
                   <ListItemText
                     sx={{
@@ -1576,42 +1596,82 @@ const EditLanguageModal = ({ open, onClose, milestone }) => {
                       textOverflow: "ellipsis",
                     }}
                   >
-                    {step.attributes.title}
+                    {milestone?.attributes.title}
                   </ListItemText>
                 </ListItemButton>
               </ListItem>
-            ))}
-          </List>
-        </Drawer>
-        <DialogContentText>{renderFieldGroup()}</DialogContentText>
-      </DialogContent>
-      <DialogActions sx={{ paddingLeft: "200px" }}>
-        <Grid container justifyContent="space-between">
-          <Grid item>cancel</Grid>
-          <Grid item>save</Grid>
-        </Grid>
-      </DialogActions>
+              <ListSubheader>Steps</ListSubheader>
+              {milestone?.relationships?.steps?.data.map((step, i) => (
+                <ListItem
+                  disablePadding
+                  key={i}
+                  sx={{
+                    background:
+                      step.id === currentFieldGroup[1] ? "#fafafa" : null,
+                  }}
+                >
+                  <ListItemButton
+                    onClick={() => handleChangeFieldGroup("step", step.id)}
+                  >
+                    <ListItemText
+                      sx={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {step.attributes.title}
+                    </ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Drawer>
+          <DialogContentText>{renderFieldGroup()}</DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ paddingLeft: "200px" }}>
+          <Stack direction="row" spacing={3}>
+            <Button variant="text" size="small" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              type="submit"
+              disabled={!isDirty}
+            >
+              Save
+            </Button>
+          </Stack>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 };
 
-const TranslateProcessFields = ({ processId, milestone }) => {
+const TranslateProcessFields = ({ processId, milestone, control }) => {
   return (
     <Stack spacing={3}>
       <TranslateCard
-        fieldName="Title"
+        displayName="Title"
         fieldDefault={milestone.attributes.title}
         langToTranslate="Spanish"
+        name="title_es"
+        control={control}
+        // defaultValue={milestone.attributes.title_es}
       />
       <TranslateCard
-        fieldName="Description"
+        displayName="Description"
         fieldDefault={milestone.attributes.description}
         langToTranslate="Spanish"
+        name="description_es"
+        control={control}
+        // defaultValue={milestone.attributes.description_es}
       />
     </Stack>
   );
 };
-const TranslateStepFields = ({ processId, stepId }) => {
+const TranslateStepFields = ({ processId, stepId, control }) => {
   const { step, isLoading, isError } = useStep(processId, stepId);
   // console.log({ step });
   return isLoading ? (
@@ -1619,14 +1679,20 @@ const TranslateStepFields = ({ processId, stepId }) => {
   ) : (
     <Stack spacing={3}>
       <TranslateCard
-        fieldName="Title"
+        displayName="Title"
         fieldDefault={step.attributes.title}
         langToTranslate="Spanish"
+        name="title_es"
+        control={control}
+        // defaultValue={step.attributes.title_es}
       />
       <TranslateCard
-        fieldName="Description"
+        displayName="Description"
         fieldDefault={step.attributes.description}
         langToTranslate="Spanish"
+        name="description_es"
+        control={control}
+        // defaultValue={step.attributes.description_es}
       />
       {step.relationships.documents.data.length ? (
         <>
@@ -1634,9 +1700,12 @@ const TranslateStepFields = ({ processId, stepId }) => {
           {step.relationships.documents.data.map((doc, i) => (
             <TranslateCard
               key={i}
-              fieldName="Resource Title"
+              displayName="Resource Title"
               fieldDefault={doc.attributes.title}
               langToTranslate="Spanish"
+              name="resource_title_es"
+              control={control}
+              // defaultValue={step.attributes.resource_title_es}
             />
           ))}
         </>
@@ -1645,16 +1714,22 @@ const TranslateStepFields = ({ processId, stepId }) => {
         <>
           <Typography bold>Decisions</Typography>
           <TranslateCard
-            fieldName="Decision Question"
+            displayName="Decision Question"
             fieldDefault={step.attributes.decisionQuestion}
             langToTranslate="Spanish"
+            name="decision_question_es"
+            control={control}
+            // defaultValue={step.attributes.decision_question_es}
           />
           {step.relationships.decisionOptions.data.map((option, i) => (
             <TranslateCard
               key={i}
-              fieldName="Decision Option"
+              displayName="Decision Option"
               fieldDefault={option.attributes.description}
               langToTranslate="Spanish"
+              name="decision_option_es"
+              control={control}
+              // defaultValue={step.attributes.decision_option_es}
             />
           ))}
         </>
@@ -1663,24 +1738,39 @@ const TranslateStepFields = ({ processId, stepId }) => {
   );
 };
 
-const TranslateCard = ({ fieldName, fieldDefault, langToTranslate }) => {
+const TranslateCard = ({
+  displayName,
+  fieldDefault,
+  langToTranslate,
+  name,
+  control,
+  defaultValue,
+}) => {
   return (
     <Card>
       <Box sx={{ background: "#fafafa", padding: 3 }}>
         <Stack>
           <Typography variant="bodyRegular" bold lightened>
-            {fieldName}
+            {displayName}
           </Typography>
           <Typography variant="bodyRegular">{fieldDefault}</Typography>
         </Stack>
       </Box>
       <Box sx={{ padding: 3 }}>
-        <TextField
-          label={langToTranslate}
-          size="small"
-          fullWidth
-          multiline
-        ></TextField>
+        <Controller
+          name={name}
+          control={control}
+          defaultValue={defaultValue ? defaultValue : ""}
+          render={({ field }) => (
+            <TextField
+              label={langToTranslate}
+              size="small"
+              fullWidth
+              multiline
+              {...field}
+            />
+          )}
+        />
       </Box>
     </Card>
   );
