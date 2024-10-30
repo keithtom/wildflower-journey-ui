@@ -470,16 +470,28 @@ const ProcessId = ({}) => {
                   LANGUAGE SUPPORT
                 </Typography>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Chip label={"English"} size="small" />
-                  <Chip label={"Spanish"} size="small" />
-                  <Button
-                    size="small"
-                    variant="contained"
-                    endIcon={<Edit fontSize="inherit" />}
-                    onClick={() => setShowEditLanguageModal(true)}
-                  >
-                    Edit
-                  </Button>
+                  {isLoading ? (
+                    <Skeleton width={64} height={28} variant="rounded" />
+                  ) : (
+                    <Chip label={"English"} size="small" />
+                  )}
+                  {isLoading ? (
+                    <Skeleton width={64} height={28} variant="rounded" />
+                  ) : (
+                    <Chip label={"Spanish"} size="small" />
+                  )}
+                  {isLoading ? (
+                    <Skeleton width={64} height={28} variant="rounded" />
+                  ) : (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      endIcon={<Edit fontSize="inherit" />}
+                      onClick={() => setShowEditLanguageModal(true)}
+                    >
+                      Edit
+                    </Button>
+                  )}
                 </Stack>
               </Stack>
             </Grid>
