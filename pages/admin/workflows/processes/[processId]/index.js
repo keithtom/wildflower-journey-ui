@@ -822,6 +822,7 @@ const ProcessId = ({}) => {
         open={showEditLanguageModal}
         onClose={() => setShowEditLanguageModal(false)}
         milestone={milestone}
+        workflowId={workflowId}
       />
       {isRecurring ? null : (
         <ChoosePositionModal
@@ -1487,10 +1488,11 @@ const ChoosePositionListItem = ({
   );
 };
 
-const EditLanguageModal = ({ open, onClose, milestone }) => {
+const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
+  const processId = milestone?.id;
   const [currentFieldGroup, setCurrentFieldGroup] = useState([
     "process",
-    milestone?.id,
+    processId,
   ]);
 
   const {
@@ -1505,11 +1507,23 @@ const EditLanguageModal = ({ open, onClose, milestone }) => {
   const handleUpdateProcessOrStepTranslation = async (data) => {
     const [type, id] = currentFieldGroup;
     if (type === "process") {
-      console.log("processFieldsData", data);
+      console.log("processFieldsData", { data, id });
       // use the id to update the process translation field(s)
+      try {
+        const response = await processApi.editMilestone(id, data);
+        mutate(`definition/workflows/${workflowId}/processes/${id}`);
+      } catch (error) {
+        console.log(error);
+      }
     } else {
-      console.log("stepFieldsData", data);
+      console.log("stepFieldsData", { data, id });
       // use the id to update the step translation field(s)
+      try {
+        const response = await stepsApi.editStep(processId, id, data);
+        mutate(`/definition/processes/${processId}/steps/${id}`);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -1600,31 +1614,35 @@ const EditLanguageModal = ({ open, onClose, milestone }) => {
                   </ListItemText>
                 </ListItemButton>
               </ListItem>
-              <ListSubheader>Steps</ListSubheader>
-              {milestone?.relationships?.steps?.data.map((step, i) => (
-                <ListItem
-                  disablePadding
-                  key={i}
-                  sx={{
-                    background:
-                      step.id === currentFieldGroup[1] ? "#fafafa" : null,
-                  }}
-                >
-                  <ListItemButton
-                    onClick={() => handleChangeFieldGroup("step", step.id)}
-                  >
-                    <ListItemText
+              {milestone?.relationships?.steps?.data.length ? (
+                <>
+                  <ListSubheader>Steps</ListSubheader>
+                  {milestone?.relationships?.steps?.data.map((step, i) => (
+                    <ListItem
+                      disablePadding
+                      key={i}
                       sx={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        background:
+                          step.id === currentFieldGroup[1] ? "#fafafa" : null,
                       }}
                     >
-                      {step.attributes.title}
-                    </ListItemText>
-                  </ListItemButton>
-                </ListItem>
-              ))}
+                      <ListItemButton
+                        onClick={() => handleChangeFieldGroup("step", step.id)}
+                      >
+                        <ListItemText
+                          sx={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {step.attributes.title}
+                        </ListItemText>
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </>
+              ) : null}
             </List>
           </Drawer>
           <DialogContentText>{renderFieldGroup()}</DialogContentText>
