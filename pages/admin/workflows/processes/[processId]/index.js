@@ -1502,20 +1502,29 @@ const ChoosePositionListItem = ({
 
 const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
   const processId = milestone?.id;
-  const [currentFieldGroup, setCurrentFieldGroup] = useState([
-    "process",
-    processId,
-  ]);
+  const [currentFieldGroup, setCurrentFieldGroup] = useState(["process", null]);
+  const [decisionOptionParams, setDecisionOptionParams] = useState([]);
+  const [resourceParams, setResourceParams] = useState([]);
 
   const {
     control,
     reset,
     handleSubmit,
+    watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm({
     mode: "onChange",
   });
 
+  const formValues = watch();
+
+  useEffect(() => {
+    if (milestone?.id) {
+      setCurrentFieldGroup(["process", milestone.id]);
+    }
+  }, [milestone?.id]);
+
+  // submit the data
   const handleUpdateProcessOrStepTranslation = async (data) => {
     const [type, id] = currentFieldGroup;
     if (type === "process") {
@@ -1529,13 +1538,43 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
       }
     } else {
       console.log("stepFieldsData", { data, id });
-      // use the id to update the step translation field(s)
-      try {
-        const response = await stepsApi.editStep(processId, id, data);
-        mutate(`/definition/processes/${processId}/steps/${id}`);
-      } catch (error) {
-        console.log(error);
+      // filter the redundant fields out of the data
+      const filteredData = Object.keys(formValues).reduce((acc, key) => {
+        if (
+          !key.startsWith("decision_option_es_") &&
+          !key.startsWith("decision_option_id_") &&
+          !key.startsWith("resource_title_es_") &&
+          !key.startsWith("resource_id_")
+        ) {
+          acc[key] = formValues[key];
+        }
+        return acc;
+      }, {});
+      // construct the structuredData object that will be submitted
+      const structuredData = {
+        step: {
+          ...filteredData,
+        },
+      };
+      // add the decision options and resources to the structuredData object if available
+      if (resourceParams.length > 0) {
+        structuredData.step.documents_attributes = [...resourceParams];
       }
+      if (decisionOptionParams.length > 0) {
+        structuredData.step.decision_options_attributes = [
+          ...decisionOptionParams,
+        ];
+      }
+
+      // console.log({ structuredData });
+
+      // use the id to update the step translation field(s)
+      // try {
+      //   const response = await stepsApi.editStep(processId, id, structuredData);
+      //   mutate(`/definition/processes/${processId}/steps/${id}`);
+      // } catch (error) {
+      //   console.log(error);
+      // }
     }
   };
 
@@ -1558,6 +1597,9 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
             stepId={id}
             processId={milestone?.id}
             control={control}
+            setResourceParams={setResourceParams}
+            setDecisionOptionParams={setDecisionOptionParams}
+            formValues={formValues}
           />
         );
       default:
@@ -1688,7 +1730,7 @@ const TranslateProcessFields = ({ processId, milestone, control }) => {
         langToTranslate="Spanish"
         name="title_es"
         control={control}
-        // defaultValue={milestone.attributes.title_es}
+        defaultValue={milestone.attributes.titleEs}
       />
       <TranslateCard
         displayName="Description"
@@ -1696,14 +1738,38 @@ const TranslateProcessFields = ({ processId, milestone, control }) => {
         langToTranslate="Spanish"
         name="description_es"
         control={control}
-        // defaultValue={milestone.attributes.description_es}
+        defaultValue={milestone.attributes.descriptionEs}
       />
     </Stack>
   );
 };
-const TranslateStepFields = ({ processId, stepId, control }) => {
+const TranslateStepFields = ({
+  processId,
+  stepId,
+  control,
+  setResourceParams,
+  setDecisionOptionParams,
+  formValues,
+}) => {
   const { step, isLoading, isError } = useStep(processId, stepId);
   // console.log({ step });
+  // consolidate the resource form values into an array for submission
+  useEffect(() => {
+    const data = step?.relationships.documents.data.map((doc, i) => ({
+      resource_id: formValues[`resource_id_${doc.id}`],
+      titleEs: formValues[`resource_title_es_${doc.id}`],
+    }));
+    setResourceParams(data);
+  }, [formValues, step?.relationships.documents.data]);
+  // consolidate the decisionOption form values into an array for submission
+  useEffect(() => {
+    const data = step?.relationships.decisionOptions.data.map((dec, i) => ({
+      id: formValues[`decision_option_id_${dec.id}`],
+      descriptionEs: formValues[`decision_option_es_${dec.id}`],
+    }));
+    setDecisionOptionParams(data);
+  }, [formValues, step?.relationships.decisionOptions.data]);
+
   return isLoading ? (
     <div>Loading</div>
   ) : (
@@ -1714,7 +1780,7 @@ const TranslateStepFields = ({ processId, stepId, control }) => {
         langToTranslate="Spanish"
         name="title_es"
         control={control}
-        // defaultValue={step.attributes.title_es}
+        defaultValue={step.attributes.titleEs}
       />
       <TranslateCard
         displayName="Description"
@@ -1722,21 +1788,29 @@ const TranslateStepFields = ({ processId, stepId, control }) => {
         langToTranslate="Spanish"
         name="description_es"
         control={control}
-        // defaultValue={step.attributes.description_es}
+        defaultValue={step.attributes.descriptionEs}
       />
       {step.relationships.documents.data.length ? (
         <>
           <Typography bold>Resources</Typography>
           {step.relationships.documents.data.map((doc, i) => (
-            <TranslateCard
-              key={i}
-              displayName="Resource Title"
-              fieldDefault={doc.attributes.title}
-              langToTranslate="Spanish"
-              name="resource_title_es"
-              control={control}
-              // defaultValue={step.attributes.resource_title_es}
-            />
+            <>
+              <TranslateCard
+                key={i}
+                displayName="Resource Title"
+                fieldDefault={doc.attributes.title}
+                langToTranslate="Spanish"
+                name={`resource_title_es_${doc.id}`}
+                control={control}
+                // defaultValue={step.attributes.resourceTitleEs}
+              />
+              <Controller
+                name={`resource_id_${doc.id}`}
+                control={control}
+                defaultValue={doc.id}
+                render={({ field }) => <input type="hidden" {...field} />}
+              />
+            </>
           ))}
         </>
       ) : null}
@@ -1749,18 +1823,26 @@ const TranslateStepFields = ({ processId, stepId, control }) => {
             langToTranslate="Spanish"
             name="decision_question_es"
             control={control}
-            // defaultValue={step.attributes.decision_question_es}
+            // defaultValue={step.attributes.decisionQuestionEs}
           />
           {step.relationships.decisionOptions.data.map((option, i) => (
-            <TranslateCard
-              key={i}
-              displayName="Decision Option"
-              fieldDefault={option.attributes.description}
-              langToTranslate="Spanish"
-              name="decision_option_es"
-              control={control}
-              // defaultValue={step.attributes.decision_option_es}
-            />
+            <>
+              <TranslateCard
+                key={i}
+                displayName="Decision Option"
+                fieldDefault={option.attributes.description}
+                langToTranslate="Spanish"
+                name={`decision_option_es_${option.id}`}
+                control={control}
+                // defaultValue={step.attributes.decisionOptionEs}
+              />
+              <Controller
+                name={`decision_option_id_${option.id}`}
+                control={control}
+                defaultValue={option.id}
+                render={({ field }) => <input type="hidden" {...field} />}
+              />
+            </>
           ))}
         </>
       ) : null}
