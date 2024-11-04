@@ -1516,6 +1516,15 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
     mode: "onChange",
   });
 
+  useEffect(() => {
+    if (milestone) {
+      reset({
+        process_title_es: milestone.attributes.titleEs,
+        process_description_es: milestone.attributes.descriptionEs,
+      });
+    }
+  }, [milestone]);
+
   const formValues = watch();
 
   useEffect(() => {
@@ -1527,12 +1536,17 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
   // submit the data
   const handleUpdateProcessOrStepTranslation = async (data) => {
     const [type, id] = currentFieldGroup;
+    const structuredData = {
+      title_es: data.process_title_es,
+      description_es: data.process_description_es,
+    };
     if (type === "process") {
-      console.log("processFieldsData", { data, id });
+      console.log("processFieldsData", { structuredData, id });
       // use the id to update the process translation field(s)
       try {
-        const response = await processApi.editMilestone(id, data);
-        mutate(`definition/workflows/${workflowId}/processes/${id}`);
+        const response = await processApi.editMilestone(id, structuredData);
+        mutate(`definition/workflows/${workflowId}/processes/${processId}`);
+        reset();
       } catch (error) {
         console.log(error);
       }
@@ -1569,12 +1583,13 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
       // console.log({ structuredData });
 
       // use the id to update the step translation field(s)
-      // try {
-      //   const response = await stepsApi.editStep(processId, id, structuredData);
-      //   mutate(`/definition/processes/${processId}/steps/${id}`);
-      // } catch (error) {
-      //   console.log(error);
-      // }
+      try {
+        const response = await stepsApi.editStep(processId, id, structuredData);
+        mutate(`/definition/processes/${processId}/steps/${id}`);
+        reset();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -1582,10 +1597,12 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
 
   const renderFieldGroup = () => {
     const [type, id] = currentFieldGroup;
+    const key = `${type}-${id}`;
     switch (type) {
       case "process":
         return (
           <TranslateProcessFields
+            key={key}
             processId={id}
             milestone={milestone}
             control={control}
@@ -1594,12 +1611,14 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
       case "step":
         return (
           <TranslateStepFields
+            key={key}
             stepId={id}
             processId={milestone?.id}
             control={control}
             setResourceParams={setResourceParams}
             setDecisionOptionParams={setDecisionOptionParams}
             formValues={formValues}
+            reset={reset}
           />
         );
       default:
@@ -1728,7 +1747,7 @@ const TranslateProcessFields = ({ processId, milestone, control }) => {
         displayName="Title"
         fieldDefault={milestone.attributes.title}
         langToTranslate="Spanish"
-        name="title_es"
+        name="process_title_es"
         control={control}
         defaultValue={milestone.attributes.titleEs}
       />
@@ -1736,7 +1755,7 @@ const TranslateProcessFields = ({ processId, milestone, control }) => {
         displayName="Description"
         fieldDefault={milestone.attributes.description}
         langToTranslate="Spanish"
-        name="description_es"
+        name="process_description_es"
         control={control}
         defaultValue={milestone.attributes.descriptionEs}
       />
@@ -1750,25 +1769,48 @@ const TranslateStepFields = ({
   setResourceParams,
   setDecisionOptionParams,
   formValues,
+  reset,
 }) => {
   const { step, isLoading, isError } = useStep(processId, stepId);
   // console.log({ step });
   // consolidate the resource form values into an array for submission
   useEffect(() => {
     const data = step?.relationships.documents.data.map((doc, i) => ({
-      resource_id: formValues[`resource_id_${doc.id}`],
-      titleEs: formValues[`resource_title_es_${doc.id}`],
+      id: formValues[`resource_id_${doc.id}`],
+      title_es: formValues[`resource_title_es_${doc.id}`],
     }));
     setResourceParams(data);
-  }, [formValues, step?.relationships.documents.data]);
+  }, [formValues]);
   // consolidate the decisionOption form values into an array for submission
   useEffect(() => {
     const data = step?.relationships.decisionOptions.data.map((dec, i) => ({
       id: formValues[`decision_option_id_${dec.id}`],
-      descriptionEs: formValues[`decision_option_es_${dec.id}`],
+      description_es: formValues[`decision_option_es_${dec.id}`],
     }));
     setDecisionOptionParams(data);
-  }, [formValues, step?.relationships.decisionOptions.data]);
+  }, [formValues]);
+
+  useEffect(() => {
+    if (step) {
+      const defaultValues = {
+        title_es: step.attributes.titleEs,
+        description_es: step.attributes.descriptionEs,
+        decision_question_es: step.attributes.decisionQuestionEs,
+        ...step.relationships.documents.data.reduce((acc, doc) => {
+          acc[`resource_title_es_${doc.id}`] = doc.attributes.titleEs;
+          acc[`resource_id_${doc.id}`] = doc.id;
+          return acc;
+        }, {}),
+        ...step.relationships.decisionOptions.data.reduce((acc, option) => {
+          acc[`decision_option_es_${option.id}`] =
+            option.attributes.descriptionEs;
+          acc[`decision_option_id_${option.id}`] = option.id;
+          return acc;
+        }, {}),
+      };
+      reset(defaultValues);
+    }
+  }, [step]);
 
   return isLoading ? (
     <div>Loading</div>
@@ -1802,7 +1844,7 @@ const TranslateStepFields = ({
                 langToTranslate="Spanish"
                 name={`resource_title_es_${doc.id}`}
                 control={control}
-                // defaultValue={step.attributes.resourceTitleEs}
+                defaultValue={doc.attributes.titleEs}
               />
               <Controller
                 name={`resource_id_${doc.id}`}
