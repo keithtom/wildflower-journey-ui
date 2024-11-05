@@ -42,6 +42,7 @@ import {
   Drawer,
   Divider,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import ssj_categories from "@lib/ssj/categories";
 import CategoryChip from "@components/CategoryChip";
@@ -1516,17 +1517,9 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
     mode: "onChange",
   });
 
-  useEffect(() => {
-    if (milestone) {
-      reset({
-        process_title_es: milestone.attributes.titleEs,
-        process_description_es: milestone.attributes.descriptionEs,
-      });
-    }
-  }, [milestone]);
-
   const formValues = watch();
 
+  // set the current field group to display when milestone is loaded
   useEffect(() => {
     if (milestone?.id) {
       setCurrentFieldGroup(["process", milestone.id]);
@@ -1536,12 +1529,11 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
   // submit the data
   const handleUpdateProcessOrStepTranslation = async (data) => {
     const [type, id] = currentFieldGroup;
-    const structuredData = {
-      title_es: data.process_title_es,
-      description_es: data.process_description_es,
-    };
     if (type === "process") {
-      console.log("processFieldsData", { structuredData, id });
+      const structuredData = {
+        title_es: data.process_title_es,
+        description_es: data.process_description_es,
+      };
       // use the id to update the process translation field(s)
       try {
         const response = await processApi.editMilestone(id, structuredData);
@@ -1551,7 +1543,6 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
         console.log(error);
       }
     } else {
-      console.log("stepFieldsData", { data, id });
       // filter the redundant fields out of the data
       const filteredData = Object.keys(formValues).reduce((acc, key) => {
         if (
@@ -1579,9 +1570,6 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
           ...decisionOptionParams,
         ];
       }
-
-      // console.log({ structuredData });
-
       // use the id to update the step translation field(s)
       try {
         const response = await stepsApi.editStep(processId, id, structuredData);
@@ -1595,6 +1583,7 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
 
   const onSubmit = handleSubmit(handleUpdateProcessOrStepTranslation);
 
+  // render the correct field group based on the current field group
   const renderFieldGroup = () => {
     const [type, id] = currentFieldGroup;
     const key = `${type}-${id}`;
@@ -1606,6 +1595,7 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
             processId={id}
             milestone={milestone}
             control={control}
+            reset={reset}
           />
         );
       case "step":
@@ -1626,6 +1616,7 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
     }
   };
 
+  // handle the change of the field group
   const handleChangeFieldGroup = (type, id) => {
     setCurrentFieldGroup([type, id]);
     reset(); // reset the form controls so that we can reuse the fields
@@ -1635,8 +1626,6 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
     onClose();
     reset(); // reset the form controls so that we can reuse the fields
   };
-
-  // console.log({ milestone });
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth scroll="paper">
@@ -1740,7 +1729,16 @@ const EditLanguageModal = ({ open, onClose, milestone, workflowId }) => {
   );
 };
 
-const TranslateProcessFields = ({ processId, milestone, control }) => {
+const TranslateProcessFields = ({ milestone, control, reset }) => {
+  // set the default values for process
+  useEffect(() => {
+    if (milestone) {
+      reset({
+        process_title_es: milestone.attributes.titleEs,
+        process_description_es: milestone.attributes.descriptionEs,
+      });
+    }
+  }, [milestone]);
   return (
     <Stack spacing={3}>
       <TranslateCard
@@ -1749,7 +1747,6 @@ const TranslateProcessFields = ({ processId, milestone, control }) => {
         langToTranslate="Spanish"
         name="process_title_es"
         control={control}
-        defaultValue={milestone.attributes.titleEs}
       />
       <TranslateCard
         displayName="Description"
@@ -1757,7 +1754,6 @@ const TranslateProcessFields = ({ processId, milestone, control }) => {
         langToTranslate="Spanish"
         name="process_description_es"
         control={control}
-        defaultValue={milestone.attributes.descriptionEs}
       />
     </Stack>
   );
@@ -1771,8 +1767,8 @@ const TranslateStepFields = ({
   formValues,
   reset,
 }) => {
-  const { step, isLoading, isError } = useStep(processId, stepId);
-  // console.log({ step });
+  const { step, isLoading } = useStep(processId, stepId);
+
   // consolidate the resource form values into an array for submission
   useEffect(() => {
     const data = step?.relationships.documents.data.map((doc, i) => ({
@@ -1790,6 +1786,7 @@ const TranslateStepFields = ({
     setDecisionOptionParams(data);
   }, [formValues]);
 
+  // set the default values for step
   useEffect(() => {
     if (step) {
       const defaultValues = {
@@ -1813,7 +1810,13 @@ const TranslateStepFields = ({
   }, [step]);
 
   return isLoading ? (
-    <div>Loading</div>
+    <Stack
+      sx={{ width: "100%", height: "320px" }}
+      alignItems="center"
+      justifyContent="center"
+    >
+      <CircularProgress />
+    </Stack>
   ) : (
     <Stack spacing={3}>
       <TranslateCard
@@ -1822,7 +1825,6 @@ const TranslateStepFields = ({
         langToTranslate="Spanish"
         name="title_es"
         control={control}
-        defaultValue={step.attributes.titleEs}
       />
       <TranslateCard
         displayName="Description"
@@ -1830,7 +1832,6 @@ const TranslateStepFields = ({
         langToTranslate="Spanish"
         name="description_es"
         control={control}
-        defaultValue={step.attributes.descriptionEs}
       />
       {step.relationships.documents.data.length ? (
         <>
@@ -1844,12 +1845,10 @@ const TranslateStepFields = ({
                 langToTranslate="Spanish"
                 name={`resource_title_es_${doc.id}`}
                 control={control}
-                defaultValue={doc.attributes.titleEs}
               />
               <Controller
                 name={`resource_id_${doc.id}`}
                 control={control}
-                defaultValue={doc.id}
                 render={({ field }) => <input type="hidden" {...field} />}
               />
             </>
@@ -1865,7 +1864,6 @@ const TranslateStepFields = ({
             langToTranslate="Spanish"
             name="decision_question_es"
             control={control}
-            // defaultValue={step.attributes.decisionQuestionEs}
           />
           {step.relationships.decisionOptions.data.map((option, i) => (
             <>
@@ -1876,12 +1874,10 @@ const TranslateStepFields = ({
                 langToTranslate="Spanish"
                 name={`decision_option_es_${option.id}`}
                 control={control}
-                // defaultValue={step.attributes.decisionOptionEs}
               />
               <Controller
                 name={`decision_option_id_${option.id}`}
                 control={control}
-                defaultValue={option.id}
                 render={({ field }) => <input type="hidden" {...field} />}
               />
             </>
