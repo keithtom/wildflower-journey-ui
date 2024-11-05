@@ -205,7 +205,7 @@ const School = ({}) => {
   // console.log({ boardMembers });
   // console.log({ school });
   // console.log({ sisterSchools });
-  console.log({ schoolData });
+  // console.log({ schoolData });
 
   return (
     <>
@@ -1839,6 +1839,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                         justifyContent="space-between"
                         alignItems="center"
                         spacing={3}
+                        data-cy="schoolId-teacherLeaders-list-item"
                       >
                         <Grid item xs={8}>
                           <Stack direction="row" spacing={2}>
@@ -1887,6 +1888,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                                 )
                               }
                               data-cy={`schoolId-teacherLeaders-remove-${i}`}
+                              data-cy-another={`schoolId-teacherLeaders-remove`}
                             >
                               Remove
                             </Typography>

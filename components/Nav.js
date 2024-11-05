@@ -201,7 +201,7 @@ const Navigation = () => {
               active={router.asPath === `/open-school/${mySchoolWorkflowId}`}
               // label="Open School"
               label={
-                currentUser?.attributes.schools.find(
+                currentUser?.attributes?.schools?.find(
                   (school) => school.workflowId === mySchoolWorkflowId
                 )?.name
               }
