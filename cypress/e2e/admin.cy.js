@@ -34,6 +34,10 @@ describe("admin spec", () => {
       cy.contains("Maia Blankenship").click();
       //click to next step
       cy.contains("Next").click();
+      // select workflow
+      cy.contains("Basic Workflow").click();
+      //click to next step
+      cy.contains("Next").click();
       //view summary
       cy.contains("newFirstName newLastName");
       cy.contains("Maya Soriano");
