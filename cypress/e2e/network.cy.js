@@ -394,6 +394,11 @@ describe("network", () => {
 
           // edit teacher leaders
           cy.get('[data-cy="schoolId-teacherLeaders"]').click();
+          // remove - "Taylor Zanke"
+          cy.contains("Taylor Zanke")
+            .parents('[data-cy="schoolId-teacherLeaders-list-item"]')
+            .find('[data-cy-another="schoolId-teacherLeaders-remove"]')
+            .click();
 
           //add - existing
           cy.get('[data-cy="schoolId-teacherLeaders-add"]').click();
