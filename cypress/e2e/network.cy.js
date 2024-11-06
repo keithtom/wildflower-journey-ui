@@ -444,6 +444,11 @@ describe("network", () => {
           cy.get('[data-cy="schoolId-teacherLeaders-edit-0"]').click();
           // edit board members
           cy.get('[data-cy="schoolId-boardMembers"]').click();
+          // remove - "Cameron Rutherford"
+          cy.contains("Cameron Rutherford")
+            .parents('[data-cy="schoolId-boardMembers-list-item"]')
+            .find('[data-cy-another="schoolId-boardMembers-remove"]')
+            .click();
           //add
           cy.get('[data-cy="schoolId-boardMembers-add"]').click();
           cy.get('[name="teacher"]').click();
