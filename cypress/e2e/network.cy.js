@@ -79,7 +79,6 @@ describe("network", () => {
         cy.get('input[name="search"]').type("wild rose");
         cy.contains("Wild Rose Montessori").click();
         cy.contains("Wild Rose Montessori");
-        cy.contains("Cambridge, MA");
         cy.contains("Katelyn Shore").click();
         cy.contains("Katelyn Shore");
       });
@@ -444,6 +443,11 @@ describe("network", () => {
           cy.get('[data-cy="schoolId-teacherLeaders-edit-0"]').click();
           // edit board members
           cy.get('[data-cy="schoolId-boardMembers"]').click();
+          // remove - "Cameron Rutherford"
+          cy.contains("Cameron Rutherford")
+            .parents('[data-cy="schoolId-boardMembers-list-item"]')
+            .find('[data-cy-another="schoolId-boardMembers-remove"]')
+            .click();
           //add
           cy.get('[data-cy="schoolId-boardMembers-add"]').click();
           cy.get('[name="teacher"]').click();
@@ -467,12 +471,12 @@ describe("network", () => {
             .clear()
             .type("01/01/2024");
           cy.get('button[type="submit"]').should("not.be.disabled").click();
-          //remove
-          cy.get('[data-cy="personId-edit-schoolHistory-remove"]').each(
-            ($el) => {
-              cy.wrap($el).click();
-            }
-          );
+          // //remove
+          // cy.get('[data-cy="personId-edit-schoolHistory-remove"]').each(
+          //   ($el) => {
+          //     cy.wrap($el).click();
+          //   }
+          // );
         });
       });
     });

@@ -2659,6 +2659,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                     justifyContent="space-between"
                     alignItems="center"
                     spacing={3}
+                    data-cy="schoolId-boardMembers-list-item"
                   >
                     <Grid item xs={8}>
                       <Typography
@@ -2700,7 +2701,8 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                               teacher?.schoolRealtionshipId
                             )
                           }
-                          data-cy="schoolId-boardMembers-remove"
+                          data-cy={`schoolId-boardMembers-remove-${i}`}
+                          data-cy-another={`schoolId-boardMembers-remove`}
                         >
                           Remove
                         </Typography>
