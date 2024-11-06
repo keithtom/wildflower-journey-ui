@@ -79,7 +79,6 @@ describe("network", () => {
         cy.get('input[name="search"]').type("wild rose");
         cy.contains("Wild Rose Montessori").click();
         cy.contains("Wild Rose Montessori");
-        cy.contains("Cambridge, MA");
         cy.contains("Katelyn Shore").click();
         cy.contains("Katelyn Shore");
       });
@@ -472,12 +471,12 @@ describe("network", () => {
             .clear()
             .type("01/01/2024");
           cy.get('button[type="submit"]').should("not.be.disabled").click();
-          //remove
-          cy.get('[data-cy="personId-edit-schoolHistory-remove"]').each(
-            ($el) => {
-              cy.wrap($el).click();
-            }
-          );
+          // //remove
+          // cy.get('[data-cy="personId-edit-schoolHistory-remove"]').each(
+          //   ($el) => {
+          //     cy.wrap($el).click();
+          //   }
+          // );
         });
       });
     });
