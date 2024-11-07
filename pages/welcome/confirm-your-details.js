@@ -74,7 +74,7 @@ const ConfirmYourDetails = ({}) => {
     if (currentUser) {
       reset({
         firstName: personData?.data?.attributes?.firstName,
-        lastName: personData?.data?.attributes?.firstName,
+        lastName: personData?.data?.attributes?.lastName,
         city: currentUser?.personAddress?.city,
         state: currentUser?.personAddress?.state,
         email: personData?.data?.attributes?.email,

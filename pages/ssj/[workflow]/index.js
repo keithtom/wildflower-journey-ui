@@ -89,7 +89,11 @@ const SSJ = () => {
   const { people, isLoading: currentETLsIsLoading } = usePersons({
     etl: true,
   });
-  const currentETLs = people?.data;
+  const currentETLs = people?.data.filter(
+    (p) => p.attributes.isOnboarded === true
+  );
+
+  console.log({ currentETLs });
 
   const {
     progress,
