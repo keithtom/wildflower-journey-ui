@@ -89,7 +89,11 @@ const SSJ = () => {
   const { people, isLoading: currentETLsIsLoading } = usePersons({
     etl: true,
   });
-  const currentETLs = people?.data;
+  const currentETLs = people?.data.filter(
+    (p) => p.attributes.isOnboarded === true
+  );
+
+  console.log({ currentETLs });
 
   const {
     progress,
@@ -408,6 +412,7 @@ const SSJ = () => {
                           email={p.attributes.email}
                           phone={p.attributes.phone}
                           role="Partner"
+                          profileImage={p.attributes.imageUrl}
                         />
                       </Grid>
                     ))
@@ -866,7 +871,7 @@ const ETLs = ({ etls }) => {
             firstName={f.attributes.firstName}
             lastName={f.attributes.lastName}
             role={f.attributes.roleList[0]}
-            profileImage={f.attributes.profileImage}
+            profileImage={f.attributes.imageUrl}
             email={f.attributes.email}
           />
         </Grid>
@@ -1033,6 +1038,7 @@ const AddPartnerModal = ({
     },
   });
 
+  const router = useRouter();
   // console.log({ errors });
 
   async function onSubmit(data) {
