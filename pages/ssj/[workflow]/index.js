@@ -412,6 +412,7 @@ const SSJ = () => {
                           email={p.attributes.email}
                           phone={p.attributes.phone}
                           role="Partner"
+                          profileImage={p.attributes.imageUrl}
                         />
                       </Grid>
                     ))
@@ -870,7 +871,7 @@ const ETLs = ({ etls }) => {
             firstName={f.attributes.firstName}
             lastName={f.attributes.lastName}
             role={f.attributes.roleList[0]}
-            profileImage={f.attributes.profileImage}
+            profileImage={f.attributes.imageUrl}
             email={f.attributes.email}
           />
         </Grid>
