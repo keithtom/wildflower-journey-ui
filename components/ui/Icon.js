@@ -34,6 +34,7 @@ import {
   CalendarStar,
   Calendar,
   CalendarWeek,
+  Globe,
 } from "@styled-icons/boxicons-regular";
 import {
   BuildingHouse,
@@ -239,6 +240,7 @@ export default function Icon({ ...props }) {
     homeHeart: <HomeHeart />,
     calendarStar: <CalendarStar />,
     userCircle: <UserCircle />,
+    globe: <Globe />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

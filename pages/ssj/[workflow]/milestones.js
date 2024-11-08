@@ -11,6 +11,7 @@ import CategoryChip from "@components/CategoryChip";
 import PhaseChip from "@components/PhaseChip";
 import Milestone from "@components/Milestone";
 import Hero from "@components/Hero";
+import TranslationToggle from "@components/TranslationToggle";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 
@@ -24,6 +25,7 @@ const Milestones = ({}) => {
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
   const [showMilestonesByPhase, setShowMilestonesByPhase] = useState(false);
+  const [preferredLanguage, setPreferredLanguage] = useState("en");
 
   const handleShowMilestonesByCategory = () => {
     setShowMilestonesByCategory(true);
@@ -76,6 +78,9 @@ const Milestones = ({}) => {
           showMilestonesByPhase && <MilestonesByPhase workflow={workflow} />
         )}
       </Stack>
+      {preferredLanguage ? (
+        <TranslationToggle preferredLanguage={preferredLanguage} />
+      ) : null}
     </PageContainer>
   );
 };
