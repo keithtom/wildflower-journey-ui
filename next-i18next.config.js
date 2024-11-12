@@ -2,7 +2,8 @@ module.exports = {
   i18n: {
     defaultLocale: "en",
     locales: ["en", "es"],
-    localePath: "./public/locales",
-    localeStructure: "{{ns}}.{{lng}}",
+    fallbackLng: "en",
   },
+  returnEmptyString: false, // Treat empty strings as missing keys
+  returnNull: false, // Treat null as missing keys
 };

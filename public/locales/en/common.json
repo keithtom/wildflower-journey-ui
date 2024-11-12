@@ -1,0 +1,24 @@
+{
+  "categories": {
+    "albums_advice": "Albums, Advice & Network Membership",
+    "finance": "Finance",
+    "facilities": "Facilities",
+    "governance_compliance": "Governance & Compliance",
+    "human_resources": "Human Resources",
+    "community_family_engagement": "Community & Family Engagement",
+    "classroom_program_practices": "Classroom & Program Practices",
+    "fundraising": "Fundraising",
+    "no_category": "No Category"
+  },
+  "ssj_phases": {
+    "visioning": "Visioning",
+    "planning": "Planning",
+    "startup": "Startup"
+  },
+  "statuses": {
+    "up_next": "Up Next",
+    "to_do": "To Do",
+    "in_progress": "In Progress",
+    "done": "Done"
+  }
+}

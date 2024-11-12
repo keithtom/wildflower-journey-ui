@@ -1,0 +1,24 @@
+{
+  "categories": {
+    "albums_advice": "Album, Consejo & Membresía a la Red",
+    "finance": "Financiamiento",
+    "facilities": "Facilidades",
+    "governance_compliance": "Gobernanza y Cumplimiento",
+    "human_resources": "Recursos Humanos",
+    "community_family_engagement": "Compromiso Familiar y Comunitario",
+    "classroom_program_practices": "Prácticas Educativas y Programáticas",
+    "fundraising": "Recaudación de Fondos",
+    "no_category": "Sin Categoría"
+  },
+  "ssj_phases": {
+    "visioning": "Visión",
+    "planning": "Planificación",
+    "startup": "Inicio"
+  },
+  "statuses": {
+    "up_next": "",
+    "to_do": "",
+    "in_progress": "",
+    "done": ""
+  }
+}

@@ -8,6 +8,7 @@ import ssj_categories from "@lib/ssj/categories";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Skeleton from "@mui/material/Skeleton";
 import { mutate } from "swr";
+import { useTranslation } from "next-i18next";
 
 import { List } from "@mui/material";
 
@@ -35,6 +36,8 @@ const PhasePage = () => {
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
   const [preferredLanguage, setPreferredLanguage] = useState("en");
 
+  const { t } = useTranslation("common");
+
   const router = useRouter();
   const { workflow, phase } = router.query;
 
@@ -50,8 +53,10 @@ const PhasePage = () => {
     phase: phase,
     omit_include: true,
   });
+
   // console.log({ milestonesByCurrentPhase });
   // console.log({ isLoadingMilestonesByCurrentPhase });
+  console.log(milestonesByCurrentPhase);
 
   useAuth("/login");
 
@@ -77,7 +82,7 @@ const PhasePage = () => {
             id={`${phase}-header`}
             data-cy={`${phase}-header`}
           >
-            {phase}
+            {t(`ssj_phases.${phase}`)}
           </Typography>
 
           {isLoadingMilestonesByCurrentPhase || isValidating ? (
@@ -113,7 +118,7 @@ const PhasePage = () => {
                             variant="primary"
                           />
                           <Typography variant="bodyRegular" bold>
-                            In Progress
+                            {t("statuses.in_progress")}
                           </Typography>
                           <Typography variant="bodyRegular" lightened>
                             {milestonesByCurrentPhase?.in_progress?.length}
@@ -155,7 +160,7 @@ const PhasePage = () => {
                             variant="primary"
                           />
                           <Typography variant="bodyRegular" bold>
-                            To Do
+                            {t("statuses.to_do")}
                           </Typography>
                           <Typography variant="bodyRegular" lightened>
                             {milestonesByCurrentPhase?.to_do?.length}
@@ -193,7 +198,7 @@ const PhasePage = () => {
                         >
                           <Icon type="circle" variant="lightened" />
                           <Typography variant="bodyRegular" bold>
-                            Up Next
+                            {t("statuses.up_next")}
                           </Typography>
                           <Typography variant="bodyRegular" lightened>
                             {milestonesByCurrentPhase?.up_next?.length}
@@ -231,7 +236,7 @@ const PhasePage = () => {
                         >
                           <Icon type="checkCircle" variant="success" />
                           <Typography variant="bodyRegular" bold>
-                            Done
+                            {t("statuses.done")}
                           </Typography>
                           <Typography variant="bodyRegular" lightened>
                             {milestonesByCurrentPhase?.done?.length}
@@ -472,3 +477,14 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
     </Modal>
   );
 };
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+      // Add any additional props you need to pass to the page component
+    },
+  };
+}

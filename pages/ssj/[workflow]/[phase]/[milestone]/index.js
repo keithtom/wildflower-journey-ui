@@ -368,36 +368,13 @@ const NewTaskInput = ({}) => {
 //   );
 // };
 
-export async function getServerSideProps() {
-  const FakeMilestoneTasks = [
-    {
-      title: "Complete WF School Name Research Document",
-      completed: false,
-      isSensibleDefault: true,
-    },
-    {
-      title: "Complete advice process on your Name Research Document",
-      completed: false,
-      isSensibleDefault: true,
-    },
-    {
-      title:
-        "Are you going to use the WF Group Exemption or file independently?",
-      isDecision: true,
-      completed: false,
-      isSensibleDefault: true,
-    },
-    {
-      title:
-        "Email your name and research document to support@wildflowerschools.org to confirm name selection",
-      completed: false,
-      isSensibleDefault: false,
-    },
-  ];
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
+export async function getServerSideProps({ locale }) {
   return {
     props: {
-      FakeMilestoneTasks,
+      ...(await serverSideTranslations(locale, ["common"])),
+      // Add any additional props you need to pass to the page component
     },
   };
 }

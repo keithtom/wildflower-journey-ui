@@ -15,12 +15,14 @@ const TranslationToggle = ({ preferredLanguage }) => {
   const { pathname, asPath, query } = router;
 
   // get preferred language from locale and set in state
-  const [language, setLanguage] = useState(router.locale);
+  const [language, setLanguage] = useState(
+    router.locale ? router.locale : "en"
+  );
 
   const handleChangeLang = async (lang) => {
     // set the locale in the router and then in state
     router.push({ pathname, query }, asPath, { locale: lang });
-    setLanguage(router.locale);
+    setLanguage(lang);
     // try {
     //   // send preferred language to server
     // } catch (error) {
