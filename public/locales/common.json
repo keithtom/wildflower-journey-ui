@@ -1,0 +1,54 @@
+{
+  "categories": {
+    "albums_advice": {
+      "en": "Albums, Advice & Network Membership",
+      "es": "Album, Consejo & Membresía a la Red"
+    },
+    "finance": {
+      "en": "Finance",
+      "es": "Financiamiento"
+    },
+    "facilities": {
+      "en": "Facilities",
+      "es": "Facilidades"
+    },
+    "governance_compliance": {
+      "en": "Governance & Compliance",
+      "es": "Gobernanza y Cumplimiento"
+    },
+    "human_resources": {
+      "en": "Human Resources",
+      "es": "Recursos Humanos"
+    },
+    "community_family_engagement": {
+      "en": "Community & Family Engagement",
+      "es": "Compromiso Familiar y Comunitario"
+    },
+    "classroom_program_practices": {
+      "en": "Classroom & Program Practices",
+      "es": "Prácticas Educativas y Programáticas"
+    },
+    "fundraising": {
+      "en": "Fundraising",
+      "es": "Recaudación de Fondos"
+    },
+    "no_category": {
+      "en": "No Category",
+      "es": "Sin Categoría"
+    }
+  },
+  "ssj_phases": {
+    "visioning": {
+      "en": "Visioning",
+      "es": "Visión"
+    },
+    "planning": {
+      "en": "Planning",
+      "es": "Planificación"
+    },
+    "startup": {
+      "en": "Startup",
+      "es": "Inicio"
+    }
+  }
+}

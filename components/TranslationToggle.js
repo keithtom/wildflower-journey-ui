@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 
 import { Stack, Card, Typography, Icon } from "@ui";
@@ -10,12 +11,16 @@ const StyledTranslationToggleCard = styled(Card)`
 `;
 
 const TranslationToggle = ({ preferredLanguage }) => {
-  // get preferred language from props
-  // use preferred language to set lang state
-  const [language, setLanguage] = useState(preferredLanguage);
+  const router = useRouter();
+  const { pathname, asPath, query } = router;
 
-  const handleChangeLangaue = async (lang) => {
-    setLanguage(lang);
+  // get preferred language from locale and set in state
+  const [language, setLanguage] = useState(router.locale);
+
+  const handleChangeLang = async (lang) => {
+    // set the locale in the router and then in state
+    router.push({ pathname, query }, asPath, { locale: lang });
+    setLanguage(router.locale);
     // try {
     //   // send preferred language to server
     // } catch (error) {
@@ -31,7 +36,7 @@ const TranslationToggle = ({ preferredLanguage }) => {
           variant="bodyRegular"
           highlight={language === "en"}
           hoverable
-          onClick={() => handleChangeLangaue("en")}
+          onClick={() => handleChangeLang("en")}
         >
           English
         </Typography>
@@ -39,7 +44,7 @@ const TranslationToggle = ({ preferredLanguage }) => {
           variant="bodyRegular"
           highlight={language === "es"}
           hoverable
-          onClick={() => handleChangeLangaue("es")}
+          onClick={() => handleChangeLang("es")}
         >
           Español
         </Typography>
