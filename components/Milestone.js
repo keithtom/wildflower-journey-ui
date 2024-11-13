@@ -22,6 +22,7 @@ import {
 import CategoryChip from "./CategoryChip";
 import PhaseChip from "./PhaseChip";
 import InfoDrawer from "./InfoDrawer";
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const Milestone = ({
   link,

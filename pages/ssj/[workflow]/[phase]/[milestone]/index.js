@@ -7,6 +7,7 @@ import getAuthHeader from "@lib/getAuthHeader";
 import processesApi from "@api/workflow/processes";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import { List, Skeleton } from "@mui/material";
+import { useTranslation } from "next-i18next";
 
 import useAuth from "@lib/utils/useAuth";
 import {
@@ -28,10 +29,13 @@ import TranslationToggle from "@components/TranslationToggle";
 import MilestonePageHead from "@components/MilestonePageHead";
 import Milestone from "@components/Milestone";
 import useMilestone from "@hooks/useMilestone";
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const MilestonePage = ({ FakeMilestoneTasks }) => {
   const router = useRouter();
   const { workflow, phase, milestone: milestoneQuery } = router.query;
+
+  const { t } = useTranslation("common");
 
   const { milestone, isLoading } = useMilestone(milestoneQuery);
 
@@ -89,8 +93,16 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
                         <Milestone
                           link={`/ssj/${workflow}/${phase}/${m.id}`}
                           key={i}
-                          title={m.attributes.title}
-                          description={m.attributes.description}
+                          title={
+                            m.attributes[
+                              getTranslatedAttr(router.locale, "title")
+                            ] || m.attributes.title
+                          }
+                          description={
+                            m.attributes[
+                              getTranslatedAttr(router.locale, "description")
+                            ] || m.attributes.description
+                          }
                           categories={m.attributes.categories}
                           status={m.attributes.status}
                           stepCount={m.relationships.steps.data.length}
@@ -109,7 +121,7 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
                     <Icon type="chevronLeft" />
                   </IconButton>
                 </Link>
-                <Typography capitalize>{phase}</Typography>
+                <Typography capitalize>{t(`ssj_phases.${phase}`)}</Typography>
               </Stack>
             </Grid>
             {/* <Grid item>
@@ -173,7 +185,7 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
                       >
                         <Icon type="checkDouble" variant="primary" />
                         <Typography variant="bodyRegular" bold>
-                          Tasks
+                          {t("ssj_strings.tasks")}
                         </Typography>
                       </Stack>
                     </Card>

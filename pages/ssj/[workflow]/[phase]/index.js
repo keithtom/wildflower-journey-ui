@@ -28,8 +28,8 @@ import {
 import Milestone from "@components/Milestone";
 import Hero from "@components/Hero";
 import TranslationToggle from "@components/TranslationToggle";
-
 import useMilestones from "@hooks/useMilestones";
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const PhasePage = () => {
   const [phaseCompleteModalOpen, setPhaseCompleteModalOpen] = useState(false);
@@ -131,8 +131,16 @@ const PhasePage = () => {
                       <Milestone
                         link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
+                        title={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || m.attributes.title
+                        }
+                        description={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "description")
+                          ] || m.attributes.description
+                        }
                         categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}

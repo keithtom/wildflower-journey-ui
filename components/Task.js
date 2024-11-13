@@ -37,6 +37,7 @@ import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 import useAllTeams from "@hooks/useAllTeams";
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const StyledTask = styled(Box)`
   width: 100%;
@@ -140,8 +141,12 @@ const Task = ({
   // console.log({ assignableUsers });
 
   const taskId = task.id;
-  const title = task.attributes.title;
-  const description = task.attributes.description;
+  const title =
+    task.attributes[getTranslatedAttr(Router.locale, "title")] ||
+    task.attributes.title;
+  const description =
+    task.attributes[getTranslatedAttr(Router.locale, "description")] ||
+    task.attributes.description;
   const worktime = task.attributes.maxWorktime;
 
   const resources = task.relationships.documents.data;
@@ -181,7 +186,9 @@ const Task = ({
 
   // default to a selected option if selected in assignments.
   const isDecision = task.attributes.isDecision;
-  const decisionQuestion = task.attributes.decisionQuestion;
+  const decisionQuestion =
+    task.attributes[getTranslatedAttr(Router.locale, "decisionQuestion")] ||
+    task.attributes.decisionQuestion;
   const decisionOptions = task.relationships.decisionOptions?.data || [];
   const [isDecided, setIsDecided] = useState(task.attributes.isComplete);
   const [selectedDecisionOption, setDecisionOption] = useState(
@@ -510,7 +517,11 @@ const DecisionDrawerActions = ({
                     key={o.id}
                     value={o.id}
                     control={<Radio disabled={isDecided} />}
-                    label={o.attributes.description}
+                    label={
+                      o.attributes[
+                        getTranslatedAttr(Router.locale, "description")
+                      ] || o.attributes.description
+                    }
                     onChange={handleDecisionOptionChange}
                   />
                 ))}

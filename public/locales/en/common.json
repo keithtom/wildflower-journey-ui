@@ -20,5 +20,8 @@
     "to_do": "To Do",
     "in_progress": "In Progress",
     "done": "Done"
+  },
+  "ssj_strings": {
+    "tasks": "Tasks"
   }
 }
