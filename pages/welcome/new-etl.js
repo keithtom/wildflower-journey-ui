@@ -43,17 +43,13 @@ const StyledShiftedAvatar = styled(Box)`
   position: absolute;
   top: -${({ theme }) => theme.util.buffer * 8}px;
 `;
-const StyledMessage = styled(Card)`
-  margin-top: 130px;
-  &:before {
-  }
-`;
 
 const NewETL = ({}) => {
   const { currentUser } = useUserContext();
   const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
   useAuth("/login");
   // console.log(currentUser);
+  // console.log(opsGuide);
   return (
     <PageContainer isLoading={!currentUser} hideNav>
       <Grid container alignItems="center" justifyContent="center">
@@ -105,14 +101,18 @@ const NewETL = ({}) => {
             ) : null}
             <Card noBorder>
               <Stack spacing={3}>
-                <StyledMessage variant="primaryLightened" size="small">
+                <Card
+                  variant="primaryLightened"
+                  size="small"
+                  sx={{ marginTop: opsGuide ? "130px" : 0 }}
+                >
                   <Typography variant="bodySmall">
                     Hi {currentUser?.attributes.firstName}! We are so excited
                     for you to join our community and start accessing support
                     and resources along the path to opening your own Montessori
                     School! Let's get started by confirming a few details.
                   </Typography>
-                </StyledMessage>
+                </Card>
                 <Link href="/welcome/create-password">
                   <Button full>
                     <Typography variant="bodyRegular" light>

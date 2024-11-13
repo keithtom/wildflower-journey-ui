@@ -91,27 +91,29 @@ const AddProfileInfo = ({}) => {
     setShowError(false);
   };
 
-  const handleSubmit = () => {
-    peopleApi
-      .update(currentUser.id, {
+  const handleSubmit = async () => {
+    try {
+      const response = await peopleApi.update(currentUser.id, {
         person: {
           profile_image: profileImage,
         },
-      })
-      .then((response) => {
-        if (response.error) {
-          console.error(response.error);
-        } else {
-          const personAttributes = response.data.attributes;
-          currentUser.attributes.imageUrl = personAttributes.imageUrl;
-          setCurrentUser(currentUser);
-          RedirectUser({
-            router: router,
-            roleList: currentUser?.personRoleList,
-            isOnboarded: currentUser?.personIsOnboarded,
-          });
-        }
       });
+      const personAttributes = response.data.attributes;
+      currentUser.attributes.imageUrl = personAttributes.imageUrl;
+      setCurrentUser(currentUser);
+      RedirectUser({
+        router: router,
+        roleList: currentUser?.personRoleList,
+        isOnboarded: currentUser?.personIsOnboarded,
+      });
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        clearLoggedInState({});
+        router.push("/login");
+      } else {
+        console.error(error);
+      }
+    }
   };
 
   const handleFileError = (error) => {
@@ -121,8 +123,8 @@ const AddProfileInfo = ({}) => {
   const isExistingTL = false;
   const introducerProfilePic = "/assets/images/placeholder-flower.png";
 
-  console.log({ profilePicture });
-  console.log({ isUpdatingPicture });
+  // console.log({ profilePicture });
+  // console.log({ isUpdatingPicture });
 
   useAuth("/login");
 
