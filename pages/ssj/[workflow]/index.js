@@ -558,7 +558,7 @@ const SSJ = () => {
                   setUnlocked={toggleOnboardingWaysToWork}
                 />
               )}
-              {userOnboardedPeers ? (
+              {/* {userOnboardedPeers ? (
                 <Card variant="lightened" size="large">
                   <Grid
                     container
@@ -580,11 +580,6 @@ const SSJ = () => {
                     </Grid>
                     <Grid item>
                       <Stack direction="row" spacing={6}>
-                        {/* <AvatarGroup>
-                        {FakeETLs.slice(0, 4).map((f, i) => (
-                          <Avatar src={f.attributes.profileImage} key={i} />
-                        ))}
-                      </AvatarGroup> */}
                         <Button onClick={() => setViewEtlsModalOpen(true)}>
                           <Typography variant="h4" bold light>
                             Meet your peers
@@ -604,7 +599,7 @@ const SSJ = () => {
                   img="https://images.unsplash.com/photo-1630609083938-3acb39a06392?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3540&q=80"
                   setUnlocked={toggleOnboardingPeers}
                 />
-              )}
+              )} */}
             </Stack>
           )}
         </PageContainer>
