@@ -93,7 +93,7 @@ const SSJ = () => {
     (p) => p.attributes.isOnboarded === true
   );
 
-  console.log({ currentETLs });
+  // console.log({ currentETLs });
 
   const {
     progress,

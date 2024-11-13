@@ -36,6 +36,7 @@ import useTeam from "@hooks/useTeam";
 import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
+import useAllTeams from "@hooks/useAllTeams";
 
 const StyledTask = styled(Box)`
   width: 100%;
@@ -105,14 +106,29 @@ const Task = ({
       });
     }
   } else if (router.pathname.startsWith("/ssj/")) {
-    // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
-    const teamId = currentUser?.attributes?.ssj?.teamId;
-    const { team, isLoading: teamIsLoading } = useTeam(teamId);
-    // set assignable users as partners
-    if (!teamIsLoading) {
-      assignableUsers = [
-        ...(team?.data?.data?.relationships?.partners?.data || []),
-      ];
+    //if sessionStorage has schoolName, the viewer is an ops guide
+    if (sessionStorage.getItem("schoolName")) {
+      const { teams, isLoading: allTeamsIsLoading } = useAllTeams();
+      // get the team id of the viewed school using the workflow id in the url
+      const viewedSchool = teams?.filter(
+        (t) => t.attributes.workflowId === workflow
+      );
+      // set assignable users from the team
+      if (!allTeamsIsLoading) {
+        assignableUsers = [
+          ...(viewedSchool[0]?.relationships?.partners?.data || []),
+        ];
+      }
+    } else {
+      // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
+      const teamId = currentUser?.attributes?.ssj?.teamId;
+      const { team, isLoading: teamIsLoading } = useTeam(teamId);
+      // set assignable users as partners
+      if (!teamIsLoading) {
+        assignableUsers = [
+          ...(team?.data?.data?.relationships?.partners?.data || []),
+        ];
+      }
     }
   }
 
