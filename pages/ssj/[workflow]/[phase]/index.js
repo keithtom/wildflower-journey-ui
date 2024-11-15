@@ -181,8 +181,16 @@ const PhasePage = () => {
                       <Milestone
                         link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
+                        title={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || m.attributes.title
+                        }
+                        description={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "description")
+                          ] || m.attributes.description
+                        }
                         categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
@@ -219,8 +227,16 @@ const PhasePage = () => {
                       <Milestone
                         link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
+                        title={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || m.attributes.title
+                        }
+                        description={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "description")
+                          ] || m.attributes.description
+                        }
                         categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
@@ -257,8 +273,16 @@ const PhasePage = () => {
                       <Milestone
                         link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
+                        title={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || m.attributes.title
+                        }
+                        description={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "description")
+                          ] || m.attributes.description
+                        }
                         categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
@@ -307,7 +331,7 @@ const PhasePage = () => {
       />
       {phaseCompleteModalOpen ? (
         <Modal
-          title="Great work!"
+          title={t("ssj_ui_content.great_work")}
           open={phaseCompleteModalOpen}
           toggle={() => setPhaseCompleteModalOpen(!phaseCompleteModalOpen)}
         >
@@ -316,14 +340,14 @@ const PhasePage = () => {
               <Stack direction="row" spacing={3} alignItems="center">
                 <Icon type="flag" variant="primary" size="large" />
                 <Typography variant="bodyLarge" bold highlight>
-                  Phase completed!
+                  {t("ssj_ui_content.phase_completed")}
                 </Typography>
               </Stack>
               <Typography variant="h2" bold capitalize>
-                {phase}
+                {t(`ssj_phases.${phase}`)}
               </Typography>
               <Typography variant="bodyLarge" lightened center>
-                You're making great progress!
+                {t("ssj_ui_content.youre_making_great_progress")}
               </Typography>
             </Stack>
           </Card>

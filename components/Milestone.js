@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import {
   List,
   ListItem,
@@ -22,7 +24,6 @@ import {
 import CategoryChip from "./CategoryChip";
 import PhaseChip from "./PhaseChip";
 import InfoDrawer from "./InfoDrawer";
-import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const Milestone = ({
   link,
@@ -38,6 +39,7 @@ const Milestone = ({
   variant,
   flag,
 }) => {
+  const { t } = useTranslation("common");
   const { screenSize } = getScreenSize();
 
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
@@ -50,7 +52,7 @@ const Milestone = ({
   // By calling `setColor` in `useEffect` a render is triggered after hydrating, this causes the "browser specific" value to be available. In this case 'red'.
   // useEffect(() => setIsMedium(screenSize.isMd), []);
 
-  console.log(screenSize.isSm);
+  // console.log(screenSize.isSm);
 
   return (
     <>
@@ -131,8 +133,9 @@ const Milestone = ({
                     size="small"
                     label={
                       <Stack spacing={1} direction="row">
-                        Working on {assignedIncomplete} of {remainingSteps}{" "}
-                        remaining tasks
+                        {t("ssj_ui_content.working_on")} {assignedIncomplete}{" "}
+                        {t("ssj_ui_content.of")} {remainingSteps}{" "}
+                        {t("ssj_ui_content.remaining_tasks")}
                       </Stack>
                     }
                   />
@@ -146,7 +149,8 @@ const Milestone = ({
                     size="small"
                     label={
                       <Stack spacing={1} direction="row">
-                        {completedStepsCount} of {stepCount} tasks completed
+                        {completedStepsCount} {t("ssj_ui_content.of")}{" "}
+                        {stepCount} {t("ssj_ui_content.tasks_completed")}
                       </Stack>
                     }
                   />
@@ -173,13 +177,15 @@ const Milestone = ({
 export default Milestone;
 
 const MilestoneDrawerActions = ({ stepCount, link }) => {
+  const { t } = useTranslation("common");
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Link href={link}>
           <Button full>
             <Typography light bold>
-              View all {stepCount} tasks
+              {t("ssj_ui_content.view_all")} {stepCount}{" "}
+              {t("ssj_ui_content.tasks")}
             </Typography>
           </Button>
         </Link>

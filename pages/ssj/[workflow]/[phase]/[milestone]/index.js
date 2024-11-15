@@ -78,36 +78,37 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
                 <Grid item xs={12}>
                   <Stack spacing={2}>
                     <Typography variant="h4" bold highlight>
-                      Hold up! Try something else first.
+                      {t("ssj_ui_content.hold_up_try_something_else_first")}
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
-                      We don't think you're quite ready to work on this yet. Try
-                      working on these other milestones first.
+                      {t("ssj_ui_content.we_dont_think_youre_ready")}
                     </Typography>
                   </Stack>
                 </Grid>
                 <Grid item xs={12}>
                   <Stack spacing={3}>
-                    {milestonePrerequisites &&
-                      milestonePrerequisites.map((m, i) => (
-                        <Milestone
-                          link={`/ssj/${workflow}/${phase}/${m.id}`}
-                          key={i}
-                          title={
-                            m.attributes[
-                              getTranslatedAttr(router.locale, "title")
-                            ] || m.attributes.title
-                          }
-                          description={
-                            m.attributes[
-                              getTranslatedAttr(router.locale, "description")
-                            ] || m.attributes.description
-                          }
-                          categories={m.attributes.categories}
-                          status={m.attributes.status}
-                          stepCount={m.relationships.steps.data.length}
-                        />
-                      ))}
+                    <Card noPadding>
+                      {milestonePrerequisites &&
+                        milestonePrerequisites.map((m, i) => (
+                          <Milestone
+                            link={`/ssj/${workflow}/${phase}/${m.id}`}
+                            key={i}
+                            title={
+                              m.attributes[
+                                getTranslatedAttr(router.locale, "title")
+                              ] || m.attributes.title
+                            }
+                            description={
+                              m.attributes[
+                                getTranslatedAttr(router.locale, "description")
+                              ] || m.attributes.description
+                            }
+                            categories={m.attributes.categories}
+                            status={m.attributes.status}
+                            stepCount={m.relationships.steps.data.length}
+                          />
+                        ))}
+                    </Card>
                   </Stack>
                 </Grid>
               </Grid>
@@ -150,8 +151,16 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
 
           <MilestonePageHead
             isLoading={isLoading}
-            title={milestone?.attributes.title}
-            description={milestone?.attributes.description}
+            title={
+              milestone?.attributes[
+                getTranslatedAttr(router.locale, "title")
+              ] || milestone?.attributes.title
+            }
+            description={
+              milestone?.attributes[
+                getTranslatedAttr(router.locale, "description")
+              ] || milestone?.attributes.description
+            }
             status={milestone?.attributes.status}
             categories={milestone?.attributes.categories}
           />
@@ -185,7 +194,7 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
                       >
                         <Icon type="checkDouble" variant="primary" />
                         <Typography variant="bodyRegular" bold>
-                          {t("ssj_strings.tasks")}
+                          {t("ssj_ui_content.tasks")}
                         </Typography>
                       </Stack>
                     </Card>
@@ -256,7 +265,7 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
 
       {completeModalOpen ? (
         <Modal
-          title="Great work!"
+          title={t("ssj_ui_content.great_work")}
           open={completeModalOpen}
           toggle={() => setCompleteModalOpen(!completeModalOpen)}
         >
@@ -265,14 +274,16 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
               <Stack direction="row" spacing={3} alignItems="center">
                 <Icon type="flag" variant="primary" size="large" />
                 <Typography variant="bodyLarge" bold highlight>
-                  Milestone completed!
+                  {t("ssj_ui_content.milestone_completed")}
                 </Typography>
               </Stack>
-              <Typography variant="h2" bold>
-                {milestone.attributes.title}
+              <Typography variant="h3" bold center>
+                {milestone?.attributes[
+                  getTranslatedAttr(router.locale, "title")
+                ] || milestone?.attributes.title}
               </Typography>
               <Typography variant="bodyLarge" lightened center>
-                You're making great progress!
+                {t("ssj_ui_content.youre_making_great_progress")}
               </Typography>
             </Stack>
           </Card>

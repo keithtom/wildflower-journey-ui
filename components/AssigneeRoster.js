@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { styled, css } from "@mui/material/styles";
 import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { useTranslation } from "next-i18next";
 
 import {
   Box,
@@ -31,6 +32,8 @@ const AssigneeRoster = ({
   completionType,
   dataCy, // for cypress testing
 }) => {
+  const { t } = useTranslation("common");
+
   // popover settings
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = (event) => {
@@ -119,7 +122,7 @@ const AssigneeRoster = ({
           <ListItem>
             <ListItemText>
               <Typography variant="bodyRegular" lightened>
-                Assign to
+                {t("ssj_ui_content.assign_to")}
               </Typography>
             </ListItemText>
           </ListItem>
@@ -184,7 +187,9 @@ const AssigneeRoster = ({
               <ListItemButton onClick={handleUnassignAll} disabled={isComplete}>
                 <Stack direction="row" spacing={3} alignItems="center ">
                   <Icon type="userCircle" variant="lightened" />
-                  <Typography variant="bodyRegular">No assignee</Typography>
+                  <Typography variant="bodyRegular">
+                    {t("ssj_ui_content.no_assignee")}
+                  </Typography>
                 </Stack>
               </ListItemButton>
             </ListItemText>
