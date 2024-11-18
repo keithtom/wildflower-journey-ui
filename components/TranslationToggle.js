@@ -10,9 +10,11 @@ const StyledTranslationToggleCard = styled(Card)`
   right: 24px;
 `;
 
-const TranslationToggle = ({ preferredLanguage }) => {
+const TranslationToggle = () => {
   const router = useRouter();
   const { pathname, asPath, query } = router;
+
+  const { workflow } = router.query;
 
   // get preferred language from locale and set in state
   const [language, setLanguage] = useState(
@@ -30,7 +32,12 @@ const TranslationToggle = ({ preferredLanguage }) => {
     // }
   };
 
-  return (
+  const approvedWorkflowIds = ["5c8f-d17c"];
+  const isApproved = approvedWorkflowIds.includes(workflow);
+  // console.log({ workflow });
+  // console.log({ isApproved });
+
+  return isApproved ? (
     <StyledTranslationToggleCard size="small" elevated>
       <Stack direction="row" spacing={2} alignItems="center">
         <Icon type="globe" size="small" variant="lightened" />
@@ -52,7 +59,7 @@ const TranslationToggle = ({ preferredLanguage }) => {
         </Typography>
       </Stack>
     </StyledTranslationToggleCard>
-  );
+  ) : null;
 };
 
 export default TranslationToggle;
