@@ -89,7 +89,7 @@ describe("tasks", () => {
           "/to-do-list"
         );
         // check for something that will be present on the to do list page
-        cy.contains("Your to do list", { timeout: 60000 }).should("be.visible");
+        cy.contains("Your To Do List", { timeout: 60000 }).should("be.visible");
         cy.contains("Step 1").should("not.exist");
         cy.contains("Step 2").should("be.visible");
 
@@ -221,7 +221,7 @@ describe("tasks", () => {
           "/to-do-list"
         );
         // check for something that will be present on the to do list page
-        cy.contains("Your to do list", { timeout: 60000 }).should("be.visible");
+        cy.contains("Your To Do List", { timeout: 60000 }).should("be.visible");
         cy.contains("Decision Step 1").click();
         cy.get("#info-drawer-close").first().click({
           force: true,
