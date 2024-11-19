@@ -146,7 +146,13 @@ const InfoDrawer = ({
             <Stack direction={{ xs: "column", sm: "row" }} spacing={4}>
               {taskId && (
                 <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold uppercase>
+                  <Typography
+                    variant="bodyMini"
+                    lightened
+                    bold
+                    uppercase
+                    data-cy="assignee-label"
+                  >
                     {t("ssj_ui_content.assignee")}
                   </Typography>
                   <AssigneeRoster

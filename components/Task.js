@@ -953,7 +953,14 @@ const TaskToast = ({ isAssignToast, open, onClose, title, imageUrl }) => {
           <Stack spacing={1}>
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid item>
-                <Typography variant="bodySmall" lightened capitalize>
+                <Typography
+                  variant="bodySmall"
+                  lightened
+                  capitalize
+                  data-cy={
+                    isAssignToast ? "task-added-toast" : "task-removed-toast"
+                  }
+                >
                   {t("ssj_ui_content.task")}{" "}
                   {isAssignToast
                     ? t("ssj_ui_content.added")

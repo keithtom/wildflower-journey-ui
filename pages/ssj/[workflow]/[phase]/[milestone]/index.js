@@ -73,7 +73,7 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
       <Stack spacing={12}>
         <Stack spacing={8}>
           {isUpNext && (
-            <Card variant="primaryOutlined">
+            <Card variant="primaryOutlined" data-cy="hold-up-milestone-card">
               <Grid container spacing={6}>
                 <Grid item xs={12}>
                   <Stack spacing={2}>

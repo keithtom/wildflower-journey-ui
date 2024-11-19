@@ -24,7 +24,7 @@ describe("tasks", () => {
         cy.contains("Step 1").click();
         cy.get(`[data-cy="assign-user-button-drawer-${"Step 1"}"]`).click();
         cy.get('[data-cy="assignable-user"]').first().click();
-        cy.contains("TASK ADDED").should("be.visible");
+        cy.get('[data-cy="task-added-toast"]').should("be.visible");
         // close the drawer
         cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
           .first()
@@ -36,7 +36,7 @@ describe("tasks", () => {
         cy.contains("Step 2").click();
         cy.get(`[data-cy="assign-user-button-drawer-${"Step 2"}"]`).click();
         cy.get('[data-cy="assignable-user"]').first().click();
-        cy.contains("TASK ADDED").should("be.visible");
+        cy.get('[data-cy="task-added-toast"]').should("be.visible");
         // close the drawer
         cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
           .first()
@@ -53,7 +53,7 @@ describe("tasks", () => {
           "/to-do-list"
         );
         // check for something that will be present on the to do list page
-        cy.contains("Your to do list", { timeout: 60000 }).should("be.visible");
+        cy.contains("Your To Do List", { timeout: 60000 }).should("be.visible");
         cy.contains("Step 1").should("be.visible");
         cy.contains("Step 2").should("be.visible");
 
@@ -267,7 +267,7 @@ describe("tasks", () => {
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
-      cy.contains("ASSIGNEE");
+      cy.get('[data-cy="assignee-label"]').should("exist");
       cy.get(".MuiSnackbar-root span svg").click({ force: true });
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
@@ -293,7 +293,7 @@ describe("tasks", () => {
       // assign task to partner 2
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
-      cy.contains("ASSIGNEE");
+      cy.get('[data-cy="assignee-label"]').should("exist");
       cy.get(".MuiSnackbar-root span svg").click({ force: true });
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
