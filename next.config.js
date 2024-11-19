@@ -1,5 +1,6 @@
 const { withHighlightConfig } = require("@highlight-run/next/config");
 const { i18n } = require("./next-i18next.config");
+const path = require("path");
 
 module.exports = withHighlightConfig({
   reactStrictMode: true,
@@ -11,4 +12,5 @@ module.exports = withHighlightConfig({
       process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID,
   },
   i18n,
+  localePath: path.resolve("./public/locales"),
 });
