@@ -53,7 +53,12 @@ const MilestonePageHead = ({
                   </Typography>
                   <Stack direction="row" spacing={2}>
                     {categories.map((m, i) => (
-                      <CategoryChip category={m} size="small" key={i} />
+                      <CategoryChip
+                        category={m}
+                        size="small"
+                        withIcon
+                        key={i}
+                      />
                     ))}
                   </Stack>
                 </Stack>

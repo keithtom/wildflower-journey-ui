@@ -1,9 +1,0 @@
-module.exports = {
-  i18n: {
-    defaultLocale: "en",
-    locales: ["en", "es"],
-    fallbackLng: "en",
-  },
-  returnEmptyString: false, // Treat empty strings as missing keys
-  returnNull: false, // Treat null as missing keys
-};
