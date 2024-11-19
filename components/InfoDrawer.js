@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
-import { useTranslation } from "next-i18next";
 
 import {
   Card,
@@ -23,7 +22,6 @@ import Resource from "./Resource";
 import AssigneeRoster from "@components/AssigneeRoster";
 import { useUserContext } from "@lib/useUserContext";
 import { getScreenSize } from "@hooks/react-responsive";
-import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const CustomDrawer = styled(Drawer)`
   .MuiDrawer-paper {
@@ -77,7 +75,6 @@ const InfoDrawer = ({
   assignableUsers,
   completionType,
 }) => {
-  const { t } = useTranslation("common");
   const { screenSize } = getScreenSize();
   const { currentUser, isOperationsGuide } = useUserContext();
 
@@ -124,11 +121,7 @@ const InfoDrawer = ({
               <Grid item>
                 <Chip
                   label={
-                    isDecision
-                      ? t("ssj_ui_content.decision")
-                      : taskId
-                      ? t("ssj_ui_content.task")
-                      : t("ssj_ui_content.milestone")
+                    isDecision ? "Decision" : taskId ? "Task" : "Milestone"
                   }
                   size="small"
                 />
@@ -146,14 +139,8 @@ const InfoDrawer = ({
             <Stack direction={{ xs: "column", sm: "row" }} spacing={4}>
               {taskId && (
                 <Stack spacing={2}>
-                  <Typography
-                    variant="bodyMini"
-                    lightened
-                    bold
-                    uppercase
-                    data-cy="assignee-label"
-                  >
-                    {t("ssj_ui_content.assignee")}
+                  <Typography variant="bodyMini" lightened bold>
+                    ASSIGNEE
                   </Typography>
                   <AssigneeRoster
                     handleAssignUser={handleAssignUser}
@@ -168,8 +155,8 @@ const InfoDrawer = ({
               )}
               {status && (
                 <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold uppercase>
-                    {t("ssj_ui_content.status")}
+                  <Typography variant="bodyMini" lightened bold>
+                    STATUS
                   </Typography>
                   <div>
                     <StatusChip status={status} size="small" withIcon />
@@ -178,20 +165,25 @@ const InfoDrawer = ({
               )}
               {categories?.length ? (
                 <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold uppercase>
-                    {t("ssj_ui_content.category")}
+                  <Typography variant="bodyMini" lightened bold>
+                    CATEGORY
                   </Typography>
                   <Stack direction="row" spacing={2}>
                     {categories.map((m, i) => (
-                      <CategoryChip category={m} size="small" key={i} />
+                      <CategoryChip
+                        category={m}
+                        size="small"
+                        withIcon
+                        key={i}
+                      />
                     ))}
                   </Stack>
                 </Stack>
               ) : null}
               {worktime ? (
                 <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold uppercase>
-                    {t("ssj_ui_content.worktime")}
+                  <Typography variant="bodyMini" lightened bold>
+                    WORKTIME
                   </Typography>
                   <Stack direction="row">
                     <WorktimeChip size="small" worktime={worktime} withIcon />
@@ -205,7 +197,7 @@ const InfoDrawer = ({
               <Stack direction="row" spacing={4}>
                 <Icon type="glasses" variant="primary" size="medium" />
                 <Typography variant="bodyRegular" bold>
-                  {t("ssj_ui_content.about")}
+                  About
                 </Typography>
               </Stack>
               <Divider />
@@ -217,11 +209,7 @@ const InfoDrawer = ({
               {resources.map((r, i) => (
                 <Resource
                   link={r.attributes.link}
-                  // title={r.attributes.title}
-                  title={
-                    r.attributes[getTranslatedAttr(router.locale, "title")] ||
-                    r.attributes.title
-                  }
+                  title={r.attributes.title}
                   key={r.id}
                 />
               ))}
