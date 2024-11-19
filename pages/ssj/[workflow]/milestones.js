@@ -4,6 +4,7 @@ import ssj_categories from "@lib/ssj/categories";
 import processesApi from "@api/workflow/processes";
 import { useRouter } from "next/router";
 import { List, ListItem, Skeleton } from "@mui/material";
+import { useTranslation } from "next-i18next";
 
 import useAuth from "@lib/utils/useAuth";
 import { PageContainer, Typography, Card, Stack, Icon, Grid, Chip } from "@ui";
@@ -11,8 +12,10 @@ import CategoryChip from "@components/CategoryChip";
 import PhaseChip from "@components/PhaseChip";
 import Milestone from "@components/Milestone";
 import Hero from "@components/Hero";
+import TranslationToggle from "@components/TranslationToggle";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 import useMilestones from "@hooks/useMilestones";
 
@@ -21,9 +24,12 @@ const Milestones = ({}) => {
   const router = useRouter();
   const { workflow, phase } = router.query;
 
+  const { t } = useTranslation("common");
+
   const [showMilestonesByCategory, setShowMilestonesByCategory] =
     useState(true);
   const [showMilestonesByPhase, setShowMilestonesByPhase] = useState(false);
+  const [preferredLanguage, setPreferredLanguage] = useState("en");
 
   const handleShowMilestonesByCategory = () => {
     setShowMilestonesByCategory(true);
@@ -46,22 +52,22 @@ const Milestones = ({}) => {
               <Stack spacing={6} direction="row" alignItems="center">
                 <Icon type="layer" variant="primary" size="large" />
                 <Typography variant="h3" bold>
-                  Milestones
+                  {t("ssj_ui_content.milestones")}
                 </Typography>
               </Stack>
             </Grid>
             <Grid item>
               <Stack spacing={2} direction="row" alignItems="center">
                 <Typography variant="bodyRegular" lightened>
-                  Group by
+                  {t("ssj_ui_content.group-by")}
                 </Typography>
                 <Chip
-                  label="Category"
+                  label={t("ssj_ui_content.category")}
                   variant={showMilestonesByCategory && "primary"}
                   onClick={handleShowMilestonesByCategory}
                 />
                 <Chip
-                  label="Phase"
+                  label={t("ssj_ui_content.phase")}
                   variant={showMilestonesByPhase && "primary"}
                   onClick={handleShowMilestonesByPhase}
                 />
@@ -76,6 +82,9 @@ const Milestones = ({}) => {
           showMilestonesByPhase && <MilestonesByPhase workflow={workflow} />
         )}
       </Stack>
+      {preferredLanguage ? (
+        <TranslationToggle preferredLanguage={preferredLanguage} />
+      ) : null}
     </PageContainer>
   );
 };
@@ -83,6 +92,8 @@ const Milestones = ({}) => {
 export default Milestones;
 
 const MilestonesByCategory = ({ workflow }) => {
+  const router = useRouter();
+  const { t } = useTranslation("common");
   const { isLoadingMilestonesByCategory, milestonesByCategory } = useMilestones(
     workflow,
     { omit_include: true }
@@ -135,11 +146,18 @@ const MilestonesByCategory = ({ workflow }) => {
                 link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                 key={i}
                 status={m.attributes.status}
-                description={m.attributes.description}
+                title={
+                  m.attributes[getTranslatedAttr(router.locale, "title")] ||
+                  m.attributes.title
+                }
+                description={
+                  m.attributes[
+                    getTranslatedAttr(router.locale, "description")
+                  ] || m.attributes.description
+                }
+                phase={t(`ssj_phases.${m.attributes.phase}`)}
                 categories={m.attributes.categories}
                 hideCategoryChip
-                phase={m.attributes.phase}
-                title={m.attributes.title}
                 stepCount={m.attributes.stepsCount}
               />
             ))}
@@ -150,6 +168,8 @@ const MilestonesByCategory = ({ workflow }) => {
   );
 };
 const MilestonesByPhase = ({ workflow }) => {
+  const router = useRouter();
+  const { t } = useTranslation("common");
   const { isLoadingMilestonesByPhase, milestonesByPhase } =
     useMilestones(workflow);
   // console.log({ milestonesByPhase });
@@ -191,11 +211,17 @@ const MilestonesByPhase = ({ workflow }) => {
             <Milestone
               link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
               key={i}
-              status={m.attributes.status}
-              description={m.attributes.description}
+              title={
+                m.attributes[getTranslatedAttr(router.locale, "title")] ||
+                m.attributes.title
+              }
+              description={
+                m.attributes[getTranslatedAttr(router.locale, "description")] ||
+                m.attributes.description
+              }
               categories={m.attributes.categories}
-              title={m.attributes.title}
               stepCount={m.attributes.stepsCount}
+              status={m.attributes.status}
             />
           ))}
         </List>
@@ -203,3 +229,14 @@ const MilestonesByPhase = ({ workflow }) => {
     ))
   );
 };
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+      // Add any additional props you need to pass to the page component
+    },
+  };
+}
