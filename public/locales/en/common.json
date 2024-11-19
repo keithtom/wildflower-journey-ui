@@ -33,7 +33,7 @@
     "remaining_tasks": "remaining tasks",
     "tasks_completed": "tasks completed",
     "view_all": "View all",
-    "tasks": "tasks",
+    "tasks": "Tasks",
     "decision": "Decision",
     "decided": "Decided",
     "task": "Task",
@@ -58,6 +58,10 @@
     "you": "You",
     "this_task": "This task",
     "assign_to": "Assign to",
-    "no_assignee": "No assignee"
+    "no_assignee": "No assignee",
+    "your-to-do-list": "Your To Do List",
+    "group-by": "Group by",
+    "phase": "Phase",
+    "milestones": "Milestones"
   }
 }

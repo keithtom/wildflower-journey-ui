@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { mutate } from "swr";
 import { getCookie } from "cookies-next";
 import { List, ListItem, Skeleton } from "@mui/material";
+import { useTranslation } from "next-i18next";
 
 import {
   PageContainer,
@@ -23,6 +24,7 @@ import { useUserContext } from "@lib/useUserContext";
 
 import useAssignedSteps from "@hooks/useAssignedSteps";
 import useMilestones from "@hooks/useMilestones";
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const ToDoList = ({}) => {
   const hero = "/assets/images/ssj/SelfManagement_hero.jpg";
@@ -30,6 +32,8 @@ const ToDoList = ({}) => {
   const router = useRouter();
   const { workflow } = router.query;
   const phase = getCookie("phase");
+
+  const { t } = useTranslation("common");
 
   const [teamAssignments, setTeamAssignments] = useState([]);
   const [preferredLanguage, setPreferredLanguage] = useState("en");
@@ -89,7 +93,9 @@ const ToDoList = ({}) => {
                       key={step.id}
                       task={step}
                       processName={
-                        step.relationships.process.data.attributes.title
+                        step.relationships.process.data.attributes[
+                          getTranslatedAttr(router.locale, "title")
+                        ] || step.relationships.process.data.attributes.title
                       }
                       isNext={i === 0}
                       removeStep={removeStep}
@@ -107,7 +113,7 @@ const ToDoList = ({}) => {
                   <Stack direction="row" spacing={5} pl={1} alignItems="center">
                     <Icon type="calendarCheck" variant="primary" />
                     <Typography variant="bodyRegular" bold>
-                      Your to do list
+                      {t("ssj_ui_content.your-to-do-list")}
                     </Typography>
                   </Stack>
                 </Card>
@@ -217,3 +223,14 @@ const ToDoList = ({}) => {
 };
 
 export default ToDoList;
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+      // Add any additional props you need to pass to the page component
+    },
+  };
+}

@@ -58,6 +58,10 @@
     "you": "Tú",
     "this_task": "Esta tarea",
     "assign_to": "Asignar a",
-    "no_assignee": "Sin asignado"
+    "no_assignee": "Sin asignado",
+    "your-to-do-list": "Tu lista de tareas pendientes",
+    "group-by": "Agrupar por",
+    "phase": "Fase",
+    "milestones": "Hitos"
   }
 }
