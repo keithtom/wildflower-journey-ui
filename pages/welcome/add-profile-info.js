@@ -104,8 +104,8 @@ const AddProfileInfo = ({}) => {
       setCurrentUser(currentUser);
       RedirectUser({
         router: router,
-        roleList: currentUser?.personRoleList,
-        isOnboarded: currentUser?.personIsOnboarded,
+        roleList: personAttributes?.roleList,
+        isOnboarded: personAttributes?.isOnboarded,
       });
     } catch (error) {
       if (error?.response?.status === 401) {
