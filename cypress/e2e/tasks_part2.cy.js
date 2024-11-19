@@ -26,7 +26,7 @@ describe("tasks part 2", () => {
         `[data-cy="assign-user-button-drawer-${"Collaborative Step 1"}"]`
       ).click();
       cy.get('[data-cy="assignable-user"]').first().click();
-      cy.contains("TASK ADDED").should("be.visible");
+      cy.get('[data-cy="task-added-toast"]').should("be.visible");
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({
@@ -50,7 +50,7 @@ describe("tasks part 2", () => {
         `[data-cy="assign-user-button-drawer-${"Collaborative Step 1"}"]`
       ).click();
       cy.get('[data-cy="assignable-user"]').eq(1).click();
-      cy.contains("TASK ADDED").should("be.visible");
+      cy.get('[data-cy="task-added-toast"]').should("be.visible");
 
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
@@ -77,7 +77,7 @@ describe("tasks part 2", () => {
           `[data-cy="assign-user-button-drawer-${"Collaborative Step 1"}"]`
         ).click();
         cy.get('[data-cy="assignable-user"]').contains(lastName).click();
-        cy.contains("TASK ADDED").should("be.visible");
+        cy.get('[data-cy="task-added-toast"]').should("be.visible");
         cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
           .first()
           .click({
@@ -130,7 +130,7 @@ describe("tasks part 2", () => {
       cy.visit("/ssj");
       cy.contains("a li div p", /^Startup$/).click();
       cy.contains("Milestone D-E-F").click();
-      cy.contains("Hold up! Try something else first.").should("exist");
+      cy.get('[data-cy="hold-up-milestone-card"]').should("exist");
 
       // complete first prerequisite
       cy.contains("Milestone D").click();
@@ -138,7 +138,7 @@ describe("tasks part 2", () => {
       cy.contains("Step 1").click();
       cy.get(`[data-cy="assign-user-button-drawer-${"Step 1"}"]`).click();
       cy.get('[data-cy="assignable-user"]').first().click();
-      cy.contains("TASK ADDED").should("be.visible");
+      cy.get('[data-cy="task-added-toast"]').should("be.visible");
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({
@@ -162,7 +162,7 @@ describe("tasks part 2", () => {
 
       cy.get(`[data-cy="assign-user-button-drawer-${"Step 1"}"]`).click();
       cy.get('[data-cy="assignable-user"]').first().click();
-      cy.contains("TASK ADDED").should("be.visible");
+      cy.get('[data-cy="task-added-toast"]').should("be.visible");
       cy.get(".MuiPaper-root.MuiDrawer-paperAnchorRight span svg")
         .first()
         .click({
