@@ -8,6 +8,7 @@ import ssj_categories from "@lib/ssj/categories";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Skeleton from "@mui/material/Skeleton";
 import { mutate } from "swr";
+import { useTranslation } from "next-i18next";
 
 import { List } from "@mui/material";
 
@@ -26,12 +27,16 @@ import {
 } from "@ui";
 import Milestone from "@components/Milestone";
 import Hero from "@components/Hero";
-
+import TranslationToggle from "@components/TranslationToggle";
 import useMilestones from "@hooks/useMilestones";
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const PhasePage = () => {
   const [phaseCompleteModalOpen, setPhaseCompleteModalOpen] = useState(false);
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
+  const [preferredLanguage, setPreferredLanguage] = useState("en");
+
+  const { t } = useTranslation("common");
 
   const router = useRouter();
   const { workflow, phase } = router.query;
@@ -48,8 +53,10 @@ const PhasePage = () => {
     phase: phase,
     omit_include: true,
   });
+
   // console.log({ milestonesByCurrentPhase });
   // console.log({ isLoadingMilestonesByCurrentPhase });
+  console.log(milestonesByCurrentPhase);
 
   useAuth("/login");
 
@@ -75,7 +82,7 @@ const PhasePage = () => {
             id={`${phase}-header`}
             data-cy={`${phase}-header`}
           >
-            {phase}
+            {t(`ssj_phases.${phase}`)}
           </Typography>
 
           {isLoadingMilestonesByCurrentPhase || isValidating ? (
@@ -111,7 +118,7 @@ const PhasePage = () => {
                             variant="primary"
                           />
                           <Typography variant="bodyRegular" bold>
-                            In Progress
+                            {t("statuses.in_progress")}
                           </Typography>
                           <Typography variant="bodyRegular" lightened>
                             {milestonesByCurrentPhase?.in_progress?.length}
@@ -124,8 +131,16 @@ const PhasePage = () => {
                       <Milestone
                         link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
+                        title={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || m.attributes.title
+                        }
+                        description={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "description")
+                          ] || m.attributes.description
+                        }
                         categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
@@ -153,7 +168,7 @@ const PhasePage = () => {
                             variant="primary"
                           />
                           <Typography variant="bodyRegular" bold>
-                            To Do
+                            {t("statuses.to_do")}
                           </Typography>
                           <Typography variant="bodyRegular" lightened>
                             {milestonesByCurrentPhase?.to_do?.length}
@@ -166,8 +181,16 @@ const PhasePage = () => {
                       <Milestone
                         link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
+                        title={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || m.attributes.title
+                        }
+                        description={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "description")
+                          ] || m.attributes.description
+                        }
                         categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
@@ -191,7 +214,7 @@ const PhasePage = () => {
                         >
                           <Icon type="circle" variant="lightened" />
                           <Typography variant="bodyRegular" bold>
-                            Up Next
+                            {t("statuses.up_next")}
                           </Typography>
                           <Typography variant="bodyRegular" lightened>
                             {milestonesByCurrentPhase?.up_next?.length}
@@ -204,8 +227,16 @@ const PhasePage = () => {
                       <Milestone
                         link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
+                        title={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || m.attributes.title
+                        }
+                        description={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "description")
+                          ] || m.attributes.description
+                        }
                         categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
@@ -229,7 +260,7 @@ const PhasePage = () => {
                         >
                           <Icon type="checkCircle" variant="success" />
                           <Typography variant="bodyRegular" bold>
-                            Done
+                            {t("statuses.done")}
                           </Typography>
                           <Typography variant="bodyRegular" lightened>
                             {milestonesByCurrentPhase?.done?.length}
@@ -242,8 +273,16 @@ const PhasePage = () => {
                       <Milestone
                         link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
-                        title={m.attributes.title}
-                        description={m.attributes.description}
+                        title={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || m.attributes.title
+                        }
+                        description={
+                          m.attributes[
+                            getTranslatedAttr(router.locale, "description")
+                          ] || m.attributes.description
+                        }
                         categories={m.attributes.categories}
                         status={m.attributes.status}
                         stepCount={m.relationships.steps.data.length}
@@ -292,7 +331,7 @@ const PhasePage = () => {
       />
       {phaseCompleteModalOpen ? (
         <Modal
-          title="Great work!"
+          title={t("ssj_ui_content.great_work")}
           open={phaseCompleteModalOpen}
           toggle={() => setPhaseCompleteModalOpen(!phaseCompleteModalOpen)}
         >
@@ -301,18 +340,21 @@ const PhasePage = () => {
               <Stack direction="row" spacing={3} alignItems="center">
                 <Icon type="flag" variant="primary" size="large" />
                 <Typography variant="bodyLarge" bold highlight>
-                  Phase completed!
+                  {t("ssj_ui_content.phase_completed")}
                 </Typography>
               </Stack>
               <Typography variant="h2" bold capitalize>
-                {phase}
+                {t(`ssj_phases.${phase}`)}
               </Typography>
               <Typography variant="bodyLarge" lightened center>
-                You're making great progress!
+                {t("ssj_ui_content.youre_making_great_progress")}
               </Typography>
             </Stack>
           </Card>
         </Modal>
+      ) : null}
+      {preferredLanguage ? (
+        <TranslationToggle preferredLanguage={preferredLanguage} />
       ) : null}
     </>
   );
@@ -467,3 +509,14 @@ const AddMilestoneModal = ({ toggle, title, open }) => {
     </Modal>
   );
 };
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+      // Add any additional props you need to pass to the page component
+    },
+  };
+}
