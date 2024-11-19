@@ -8,7 +8,6 @@ import { UserProvider } from "../lib/useUserContext";
 import { useRouter } from "next/router";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
-import { appWithTranslation } from "next-i18next";
 
 import { H } from "highlight.run";
 import { ErrorBoundary } from "@highlight-run/react";
@@ -74,4 +73,4 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-export default appWithTranslation(MyApp);
+export default MyApp;

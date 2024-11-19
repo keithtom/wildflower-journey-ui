@@ -1,5 +1,4 @@
 const { withHighlightConfig } = require("@highlight-run/next/config");
-const { i18n } = require("./next-i18next.config");
 
 module.exports = withHighlightConfig({
   reactStrictMode: true,
@@ -10,5 +9,4 @@ module.exports = withHighlightConfig({
     NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID:
       process.env.NEXT_PUBLIC_HIGHLIGHT_PROJECT_ID,
   },
-  i18n,
 });

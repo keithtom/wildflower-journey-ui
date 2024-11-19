@@ -4,7 +4,6 @@ import { styled, css } from "@mui/material/styles";
 import Router from "next/router";
 import { mutate } from "swr";
 import { useRouter } from "next/router";
-import { useTranslation } from "next-i18next";
 
 import {
   List,
@@ -38,7 +37,6 @@ import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 import useAllTeams from "@hooks/useAllTeams";
-import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const StyledTask = styled(Box)`
   width: 100%;
@@ -74,7 +72,6 @@ const Task = ({
   removeStep,
   processName,
 }) => {
-  const { t } = useTranslation("common");
   const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow, milestone } = router.query;
@@ -139,16 +136,12 @@ const Task = ({
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
   // If you have props that depend on where they are being called from, put them as inputs for Task
 
-  console.log({ task });
+  // console.log({ task });
   // console.log({ assignableUsers });
 
   const taskId = task.id;
-  const title =
-    task?.attributes[getTranslatedAttr(Router.locale, "title")] ||
-    task?.attributes.title;
-  const description =
-    task?.attributes[getTranslatedAttr(Router.locale, "description")] ||
-    task?.attributes.description;
+  const title = task.attributes.title;
+  const description = task.attributes.description;
   const worktime = task.attributes.maxWorktime;
 
   const resources = task.relationships.documents.data;
@@ -188,9 +181,7 @@ const Task = ({
 
   // default to a selected option if selected in assignments.
   const isDecision = task.attributes.isDecision;
-  const decisionQuestion =
-    task.attributes[getTranslatedAttr(Router.locale, "decisionQuestion")] ||
-    task.attributes.decisionQuestion;
+  const decisionQuestion = task.attributes.decisionQuestion;
   const decisionOptions = task.relationships.decisionOptions?.data || [];
   const [isDecided, setIsDecided] = useState(task.attributes.isComplete);
   const [selectedDecisionOption, setDecisionOption] = useState(
@@ -379,11 +370,7 @@ const Task = ({
               </Typography>
               {isDecision ? (
                 <Chip
-                  label={
-                    isDecided
-                      ? t("ssj_ui_content.decided")
-                      : t("ssj_ui_content.decision")
-                  }
+                  label={isDecided ? "Decided" : "Decision"}
                   size="small"
                   variant={isDecided && "primary"}
                 />
@@ -488,7 +475,6 @@ const DecisionDrawerActions = ({
     setDecisionOption(e.target.value);
   };
   const { currentUser } = useUserContext();
-  const { t } = useTranslation("common");
 
   // what are the options for the step.  show that.
   // show hte currently selected decision?
@@ -524,11 +510,7 @@ const DecisionDrawerActions = ({
                     key={o.id}
                     value={o.id}
                     control={<Radio disabled={isDecided} />}
-                    label={
-                      o.attributes[
-                        getTranslatedAttr(Router.locale, "description")
-                      ] || o.attributes.description
-                    }
+                    label={o.attributes.description}
                     onChange={handleDecisionOptionChange}
                   />
                 ))}
@@ -547,12 +529,12 @@ const DecisionDrawerActions = ({
                   <Stack direction="row" spacing={3} alignItems="center">
                     <Icon type="check" variant="primary" />
                     <Typography variant="bodyLarge" bold highlight>
-                      {t("ssj_ui_content.decision_made")}
+                      Decision made!
                     </Typography>
                   </Stack>
                   <Typography variant="bodyRegular">
-                    {t("ssj_ui_content.you_cant_easily_change_this")}{" "}
-                    support@wildflowerschools.org
+                    You can't easily change this, but if you must, please reach
+                    out to support@wildflowerschools.org
                   </Typography>
                 </Stack>
               </Card>
@@ -567,7 +549,7 @@ const DecisionDrawerActions = ({
                     </Grid>
                     <Grid item flex={1}>
                       <Typography variant="bodySmall">
-                        {t("ssj_ui_content.if_youd_like_to_change_this")}{" "}
+                        If you'd like to change this decision, please email
                         support@wildflowerschools.org.
                       </Typography>
                     </Grid>
@@ -582,7 +564,7 @@ const DecisionDrawerActions = ({
                   onClick={() => handleUnassignUser(currentUser?.id)}
                 >
                   <Typography bold variant="bodyRegular">
-                    {t("ssj_ui_content.remove_from_to_do_list")}
+                    Remove from to do list
                   </Typography>
                 </Button>
               </Grid>
@@ -593,7 +575,7 @@ const DecisionDrawerActions = ({
                   onClick={handleMakeDecision}
                 >
                   <Typography bold variant="bodyRegular">
-                    {t("ssj_ui_content.make_final_decision")}
+                    Make final decision
                   </Typography>
                 </Button>
               </Grid>
@@ -604,8 +586,7 @@ const DecisionDrawerActions = ({
             {isDecided ? (
               <Button full disabled={true}>
                 <Typography bold>
-                  {t("ssj_ui_content.decided_by")}{" "}
-                  {completedBy?.attributes?.firstName}{" "}
+                  Decided by {completedBy?.attributes?.firstName}{" "}
                   {completedBy?.attributes?.lastName}
                 </Typography>
               </Button>
@@ -616,7 +597,7 @@ const DecisionDrawerActions = ({
                 onClick={() => handleAssignUser(currentUser?.id)}
               >
                 <Typography light bold variant="bodyRegular">
-                  {t("ssj_ui_content.add_to_my_to_do_list")}
+                  Add to my to do list
                 </Typography>
               </Button>
             )}
@@ -642,7 +623,6 @@ const TaskDrawerActions = ({
   handleUncompleteTask,
   completionType,
 }) => {
-  const { t } = useTranslation("common");
   const { currentUser } = useUserContext();
   // const completedBy = taskCompleters[0]; // just take the first since only used when its not me
   // NOTE: canUncompleteTask is not the same as "Completed by me" because sometimes we can't uncomplete a step because the process is completed even though we completed the step.
@@ -663,14 +643,14 @@ const TaskDrawerActions = ({
                   onClick={() => handleUnassignUser(currentUser?.id)}
                 >
                   <Typography variant="bodyRegular" bold>
-                    {t("ssj_ui_content.remove_from_to_do_list")}
+                    Remove from to do list
                   </Typography>
                 </Button>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Button full onClick={handleCompleteTask}>
                   <Typography variant="bodyRegular" light bold>
-                    {t("ssj_ui_content.mark_task_complete")}
+                    Mark task complete
                   </Typography>
                 </Button>
               </Grid>
@@ -679,9 +659,7 @@ const TaskDrawerActions = ({
             // the task is complete, assigned to me, I can't complete it, and I can uncomplete it
             <Grid item xs={12}>
               <Button full variant="danger" onClick={handleUncompleteTask}>
-                <Typography bold>
-                  {t("ssj_ui_content.mark_incomplete")}
-                </Typography>
+                <Typography bold>Mark incomplete</Typography>
               </Button>
             </Grid>
           ) : (
@@ -690,7 +668,7 @@ const TaskDrawerActions = ({
             <Grid item xs={12}>
               <Button full variant="danger" disabled>
                 <Typography bold>
-                  {`${t("ssj_ui_content.completed_by")} ${taskCompleters.map(
+                  {`Completed by ${taskCompleters.map(
                     (completer, i) =>
                       `${completer.attributes.firstName} ${completer.attributes.lastName}`
                   )}`}
@@ -711,7 +689,7 @@ const TaskDrawerActions = ({
                   onClick={() => handleAssignUser(currentUser?.id)}
                 >
                   <Typography bold variant="bodyRegular">
-                    {t("ssj_ui_content.add_to_my_to_do_list")}
+                    Add to my to do list
                   </Typography>
                 </Button>
               </Grid>
@@ -722,7 +700,7 @@ const TaskDrawerActions = ({
                   onClick={handleCompleteTask}
                 >
                   <Typography light bold variant="bodyRegular">
-                    {t("ssj_ui_content.mark_task_complete")}
+                    Mark task complete
                   </Typography>
                 </Button>
               </Grid>
@@ -735,7 +713,7 @@ const TaskDrawerActions = ({
           <Grid item xs={12}>
             <Button full variant="danger" disabled>
               <Typography bold>
-                {`${t("ssj_ui_content.completed_by")} ${taskCompleters.map(
+                {`Completed by ${taskCompleters.map(
                   (completer, i) =>
                     `${completer.attributes.firstName} ${completer.attributes.lastName}`
                 )}`}
@@ -758,14 +736,14 @@ const TaskDrawerActions = ({
                   onClick={() => handleUnassignUser(currentUser?.id)}
                 >
                   <Typography variant="bodyRegular" bold>
-                    {t("ssj_ui_content.remove_from_to_do_list")}
+                    Remove from to do list
                   </Typography>
                 </Button>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Button full onClick={handleCompleteTask}>
                   <Typography variant="bodyRegular" light bold>
-                    {t("ssj_ui_content.mark_task_complete")}
+                    Mark task complete
                   </Typography>
                 </Button>
               </Grid>
@@ -785,7 +763,7 @@ const TaskDrawerActions = ({
                 onClick={() => handleAssignUser(currentUser?.id)}
               >
                 <Typography bold variant="bodyRegular">
-                  {t("ssj_ui_content.add_to_my_to_do_list")}
+                  Add to my to do list
                 </Typography>
               </Button>
             </Grid>
@@ -796,7 +774,7 @@ const TaskDrawerActions = ({
                 onClick={handleCompleteTask}
               >
                 <Typography light bold variant="bodyRegular">
-                  {t("ssj_ui_content.mark_task_complete")}
+                  Mark task complete
                 </Typography>
               </Button>
             </Grid>
@@ -813,14 +791,14 @@ const TaskDrawerActions = ({
               onClick={() => handleAssignUser(currentUser?.id)}
             >
               <Typography bold variant="bodyRegular">
-                {t("ssj_ui_content.add_to_my_to_do_list")}
+                Add to my to do list
               </Typography>
             </Button>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button full onClick={handleCompleteTask}>
               <Typography light bold variant="bodyRegular">
-                {t("ssj_ui_content.mark_task_complete")}
+                Mark task complete
               </Typography>
             </Button>
           </Grid>
@@ -836,14 +814,14 @@ const TaskDrawerActions = ({
               onClick={() => handleAssignUser(currentUser?.id)}
             >
               <Typography bold variant="bodyRegular">
-                {t("ssj_ui_content.add_to_my_to_do_list")}
+                Add to my to do list
               </Typography>
             </Button>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button full disabled onClick={handleCompleteTask}>
               <Typography light bold variant="bodyRegular">
-                {t("ssj_ui_content.mark_task_complete")}
+                Mark task complete
               </Typography>
             </Button>
           </Grid>
@@ -940,7 +918,6 @@ const TaskDrawerActions = ({
 };
 
 const TaskToast = ({ isAssignToast, open, onClose, title, imageUrl }) => {
-  const { t } = useTranslation("common");
   return (
     <Snackbar
       open={open}
@@ -953,18 +930,8 @@ const TaskToast = ({ isAssignToast, open, onClose, title, imageUrl }) => {
           <Stack spacing={1}>
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid item>
-                <Typography
-                  variant="bodySmall"
-                  lightened
-                  capitalize
-                  data-cy={
-                    isAssignToast ? "task-added-toast" : "task-removed-toast"
-                  }
-                >
-                  {t("ssj_ui_content.task")}{" "}
-                  {isAssignToast
-                    ? t("ssj_ui_content.added")
-                    : t("ssj_ui_content.removed")}
+                <Typography variant="bodySmall" lightened>
+                  TASK {isAssignToast ? "ADDED" : "REMOVED"}
                 </Typography>
               </Grid>
               <Grid item>
@@ -978,17 +945,11 @@ const TaskToast = ({ isAssignToast, open, onClose, title, imageUrl }) => {
               {/* // TODO: becomes current user */}
               <Avatar size="mini" src={imageUrl} />
               <Stack direction="row" spacing={1}>
-                <Typography variant="bodySmall" capitalize>
-                  {t("ssj_ui_content.you")}
-                </Typography>
+                <Typography variant="bodySmall">You</Typography>
                 <Typography variant="bodySmall" lightened>
-                  {isAssignToast
-                    ? t("ssj_ui_content.added")
-                    : t("ssj_ui_content.removed")}
+                  {isAssignToast ? "added" : "removed"}
                 </Typography>
-                <Typography variant="bodySmall">
-                  {t("ssj_ui_content.this_task")}
-                </Typography>
+                <Typography variant="bodySmall">this task</Typography>
               </Stack>
             </Stack>
           </Stack>
