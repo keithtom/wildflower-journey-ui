@@ -44,6 +44,7 @@ const useMilestones = (workflowId, params) => {
   }
 
   if (data && data.data.data) {
+    console.log({ data });
     milestonesByPhase = [];
     data.data.data.forEach((milestone) => {
       const phase = milestone.attributes.phase;
