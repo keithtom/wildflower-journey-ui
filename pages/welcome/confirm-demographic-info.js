@@ -156,7 +156,7 @@ const ConfirmDemographicInfo = ({}) => {
   const watchFields = watch();
   const isExistingTL = false;
   const teamId = currentUser?.attributes.ssj.teamId;
-  const { team, isLoading: teamIsLoading } = useTeam(teamId);
+  const { team } = useTeam(teamId);
   const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
   const isCertifiedOrSeeking =
     watchFields.montessoriCertified === "Yes" ||
