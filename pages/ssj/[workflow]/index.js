@@ -3,25 +3,14 @@ import { styled, css } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
-// import getAuthHeader from "@lib/getAuthHeader";
 import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
 import Badge from "@mui/material/Badge";
 
-<<<<<<< Updated upstream
-import ssjApi from "@api/ssj/ssj";
 import teamsApi from "@api/ssj/teams";
-import processesApi from "@api/workflow/processes";
-=======
-// import ssjApi from "@api/ssj/ssj";
-import teamsApi from "@api/ssj/teams";
-// import processesApi from "@api/workflow/processes";
->>>>>>> Stashed changes
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-// import Milestone from "../../../components/Milestone";
-// import Task from "../../../components/Task";
 import Hero from "../../../components/Hero";
 import UserCard from "../../../components/UserCard";
 

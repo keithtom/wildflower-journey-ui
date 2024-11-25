@@ -22,7 +22,7 @@ const token = getCookie("auth");
 function register(path, options) {
   let config = {
     baseURL: `${process.env.API_URL}${path}`,
-    timeout: 750000,
+    timeout: 7500,
     mode: "no-cors",
     headers: {
       "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
