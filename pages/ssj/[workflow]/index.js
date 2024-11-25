@@ -606,6 +606,11 @@ const SSJ = () => {
         open={addPartnerModalOpen}
         team={team}
       />
+      {/* <ViewEtlsModal
+        toggle={() => setViewEtlsModalOpen(!viewEtlsModalOpen)}
+        open={viewEtlsModalOpen}
+        etls={currentETLs}
+      /> */}
       <AddOpenDateModal
         toggle={() => setAddOpenDateModalOpen(!addOpenDateModalOpen)}
         open={addOpenDateModalOpen}
