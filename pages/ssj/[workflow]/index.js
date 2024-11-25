@@ -81,6 +81,12 @@ const SSJ = () => {
 
   const teamId = currentUser?.attributes.ssj.teamId;
   const { team, isLoading: teamIsLoading } = useTeam(teamId);
+  // const { people, isLoading: currentETLsIsLoading } = usePersons({
+  //   etl: true,
+  // });
+  // const currentETLs = people?.data.filter(
+  //   (p) => p.attributes.isOnboarded === true
+  // );
 
   const {
     progress,
@@ -553,10 +559,7 @@ const SSJ = () => {
                     <Grid item>
                       <Stack>
                         <Typography variant="h3" bold>
-<<<<<<< Updated upstream
                           There are {currentETLs.length} other Emerging Teacher
-=======
->>>>>>> Stashed changes
                           Leaders
                         </Typography>
                         <Typography variant="bodyRegular" lightened>
