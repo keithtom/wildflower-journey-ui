@@ -46,7 +46,9 @@ const StyledShiftedAvatar = styled(Box)`
 
 const NewETL = ({}) => {
   const { currentUser } = useUserContext();
-  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  const teamId = currentUser?.attributes.ssj.teamId;
+  const { team } = useTeam(teamId);
+  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
   useAuth("/login");
   // console.log(currentUser);
   // console.log(opsGuide);
@@ -85,11 +87,12 @@ const NewETL = ({}) => {
                     <Avatar
                       sx={{ border: "2px solid white" }}
                       size="lg"
-                      src={opsGuide.imageUrl}
+                      src={opsGuide?.attributes?.imageUrl}
                     />
                     <Stack alignItems="center">
                       <Typography variant="bodyRegular" bold>
-                        {opsGuide.firstName} {opsGuide.lastName}
+                        {opsGuide?.attributes?.firstName}{" "}
+                        {opsGuide?.attributes?.lastName}
                       </Typography>
                       <Typography variant="bodyRegular" lightened>
                         Operations Guide
