@@ -61,7 +61,7 @@ const TranslationToggle = () => {
     }
   };
 
-  const approvedWorkflowIds = ["5c8f-d17c", "6059-b4df"];
+  const approvedWorkflowIds = ["5c8f-d17c"]; // Maggie's workflow ID
   const isApproved = approvedWorkflowIds.includes(workflow);
   // console.log({ workflow });
   // console.log({ isApproved });
