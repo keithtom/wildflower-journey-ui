@@ -230,6 +230,8 @@ const AdminChecklist = () => {
     }
   }
 
+  useAuth("/login");
+
   // console.log({ timeframe });
   // console.log({ currentQuarter });
   // console.log({ groupedMilestones });

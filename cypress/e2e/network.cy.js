@@ -391,20 +391,13 @@ describe("network", () => {
 
           cy.get('button[type="submit"]').should("not.be.disabled").click();
 
-          // edit teacher leaders
+          // navigate to teacher leaders tab
           cy.get('[data-cy="schoolId-teacherLeaders"]').click();
-          cy.contains("Taylor Zanke", { timeout: 5000 }).then(($el) => {
-            if ($el.length > 0) {
-              // Element exists, perform the removal
-              cy.wrap($el)
-                .parents('[data-cy="schoolId-teacherLeaders-list-item"]')
-                .find('[data-cy-another="schoolId-teacherLeaders-remove"]')
-                .click();
-            } else {
-              // Element does not exist, log a message and move on
-              cy.log("Taylor Zanke not found");
-            }
-          });
+          // remove - Taylor Zanke
+          cy.contains("Taylor Zanke")
+            .parents('[data-cy="schoolId-teacherLeaders-list-item"]')
+            .find('[data-cy-another="schoolId-teacherLeaders-remove"]')
+            .click();
 
           //add - existing
           cy.get('[data-cy="schoolId-teacherLeaders-add"]').click();
@@ -478,12 +471,12 @@ describe("network", () => {
             .clear()
             .type("01/01/2024");
           cy.get('button[type="submit"]').should("not.be.disabled").click();
-          // //remove
-          // cy.get('[data-cy="personId-edit-schoolHistory-remove"]').each(
-          //   ($el) => {
-          //     cy.wrap($el).click();
-          //   }
-          // );
+          //remove
+          cy.get('[data-cy="personId-edit-schoolHistory-remove"]').each(
+            ($el) => {
+              cy.wrap($el).click();
+            }
+          );
         });
       });
     });
