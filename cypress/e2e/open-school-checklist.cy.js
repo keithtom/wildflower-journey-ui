@@ -30,7 +30,7 @@ describe("open school checklist", () => {
     });
     describe("using the checklist", () => {
       it("should allow navigating", () => {
-        cy.get('[data-cy="open-school-checklist-cta"]').click();
+        cy.get('[data-cy="open-school-checklist-cta"]').click().wait(5000);
         cy.get('[data-cy="open-school-checklist-month"]').should("exist");
         // navigate to next month
         cy.get('[data-cy="open-school-checklist-nextMonth"]').click();
@@ -43,9 +43,9 @@ describe("open school checklist", () => {
         cy.get('[data-cy="open-school-checklist-resetMonth"]').click();
         cy.get('[data-cy="open-school-checklist-month"]').should("exist");
         // click to milestone
-        cy.contains("Milestone A").click();
+        cy.contains("Milestone A - Recurs Monthly").click();
         cy.get('[data-cy="milestone-page-header"]').should("exist");
-        cy.contains("Milestone A").should("exist");
+        cy.contains("Milestone A - Recurs Monthly").should("exist");
         // back to checklist
         cy.get('[data-cy="milestone-page-back"]').click();
         cy.get('[data-cy="open-school-checklist-month"]').should("exist");

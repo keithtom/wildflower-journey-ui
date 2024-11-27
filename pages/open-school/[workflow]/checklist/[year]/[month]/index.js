@@ -60,57 +60,77 @@ const AdminChecklist = () => {
 
   const handleIncrementMonth = () => {
     if (Number(monthQuery) === 11) {
-      router.push({
-        pathname: router.pathname,
-        query: {
-          workflow: workflowId,
-          month: 0,
-          year: Number(yearQuery) + 1,
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            workflow: workflowId,
+            month: 0,
+            year: Number(yearQuery) + 1,
+          },
         },
-      });
+        `/open-school/${workflowId}/checklist/${Number(yearQuery) + 1}/0`
+      );
     } else {
-      router.push({
-        pathname: router.pathname,
-        query: {
-          workflow: workflowId,
-          month: Number(monthQuery) + 1,
-          year: Number(yearQuery),
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            workflow: workflowId,
+            month: Number(monthQuery) + 1,
+            year: Number(yearQuery),
+          },
         },
-      });
+        `/open-school/${workflowId}/checklist/${Number(yearQuery)}/${
+          Number(monthQuery) + 1
+        }`
+      );
     }
   };
 
   const handleDecrementMonth = () => {
     if (Number(monthQuery) === 0) {
-      router.push({
-        pathname: router.pathname,
-        query: {
-          workflow: workflowId,
-          month: 11,
-          year: Number(yearQuery) - 1,
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            workflow: workflowId,
+            month: 11,
+            year: Number(yearQuery) - 1,
+          },
         },
-      });
+        `/open-school/${workflowId}/checklist/${Number(yearQuery) - 1}/11`
+      );
     } else {
-      router.push({
-        pathname: router.pathname,
-        query: {
-          workflow: workflowId,
-          month: Number(monthQuery) - 1,
-          year: Number(yearQuery),
+      router.push(
+        {
+          pathname: router.pathname,
+          query: {
+            workflow: workflowId,
+            month: Number(monthQuery) - 1,
+            year: Number(yearQuery),
+          },
         },
-      });
+        `/open-school/${workflowId}/checklist/${Number(yearQuery)}/${
+          Number(monthQuery) - 1
+        }`
+      );
     }
   };
 
   const handleResetDate = () => {
-    router.push({
-      pathname: router.pathname,
-      query: {
-        workflow: workflowId,
-        month: new Date().getMonth(),
-        year: new Date().getFullYear(),
+    const now = new Date();
+    router.push(
+      {
+        pathname: router.pathname,
+        query: {
+          workflow: workflowId,
+          month: now.getMonth(),
+          year: now.getFullYear(),
+        },
       },
-    });
+      `/open-school/${workflowId}/checklist/${now.getFullYear()}/${now.getMonth()}`
+    );
   };
 
   // Create a new Date object with the yearQuery and monthQuery
@@ -356,6 +376,7 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.in_progress.past_months}
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.in_progress.monthlyCombined && (
@@ -364,18 +385,21 @@ const AdminChecklist = () => {
                         milestones={
                           groupedMilestones.in_progress.monthlyCombined
                         }
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.in_progress.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.in_progress.quarterly}
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.in_progress.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.in_progress.annually}
+                        workflowId={workflowId}
                       />
                     )}
                   </List>
@@ -415,24 +439,28 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.to_do.past_months}
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.to_do.monthlyCombined && (
                       <MilestoneGroup
                         periodName="This Month"
                         milestones={groupedMilestones.to_do.monthlyCombined}
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.to_do.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.to_do.quarterly}
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.to_do.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.to_do.annually}
+                        workflowId={workflowId}
                       />
                     )}
                   </List>
@@ -468,24 +496,28 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.done.past_months}
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.done.monthlyCombined && (
                       <MilestoneGroup
                         periodName="This Month"
                         milestones={groupedMilestones.done.monthlyCombined}
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.done.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.done.quarterly}
+                        workflowId={workflowId}
                       />
                     )}
                     {groupedMilestones.done.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.done.annually}
+                        workflowId={workflowId}
                       />
                     )}
                   </List>
@@ -569,7 +601,7 @@ const MilestoneGroup = ({ workflowId, milestones, periodName }) => {
           {milestones.map((m, i) => (
             <Milestone
               key={i}
-              link={`/open-school/${workflow}/checklist/${year}/${month}/${m.id}`}
+              link={`/open-school/${workflowId}/checklist/${year}/${month}/${m.id}`}
               title={m.attributes.title}
               description={m.attributes.description}
               categories={m.attributes.categories}
