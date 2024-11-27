@@ -27,6 +27,7 @@ import Task from "@components/Task";
 import MilestonePageHead from "@components/MilestonePageHead";
 import useMilestone from "@hooks/useMilestone";
 import { getScreenSize } from "@hooks/react-responsive";
+import useAuth from "@lib/utils/useAuth";
 
 const OpenSchoolMilestonePage = ({}) => {
   const { screenSize } = getScreenSize();
@@ -48,6 +49,8 @@ const OpenSchoolMilestonePage = ({}) => {
   };
 
   console.log({ milestone });
+
+  useAuth("/login");
 
   return (
     <PageContainer>
