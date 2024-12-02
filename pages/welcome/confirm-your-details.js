@@ -6,6 +6,7 @@ import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
 import { clearLoggedInState } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
+import useTeam from "@hooks/useTeam";
 import { unitedStatesOptions } from "../../lib/utils/demographic-options";
 
 import {

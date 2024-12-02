@@ -22,6 +22,7 @@ import peopleApi from "../../api/people";
 import { clearLoggedInState } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
 import RedirectUser from "@lib/redirectUser";
+import useTeam from "@hooks/useTeam";
 
 const token = getCookie("auth");
 

@@ -81,6 +81,7 @@ const SSJ = () => {
 
   const teamId = currentUser?.attributes.ssj.teamId;
   const { team, isLoading: teamIsLoading } = useTeam(teamId);
+  // TODO: use some sort of pagination so we're not pulling in all the ETL's
   // const { people, isLoading: currentETLsIsLoading } = usePersons({
   //   etl: true,
   // });

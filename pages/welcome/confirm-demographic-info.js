@@ -5,6 +5,7 @@ import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
+import useTeam from "@hooks/useTeam";
 import { clearLoggedInState } from "@lib/handleLogout";
 import {
   lgbtqiaOptions,
