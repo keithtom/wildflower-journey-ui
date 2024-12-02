@@ -934,6 +934,15 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
     </Modal>
   );
 };
+// const ViewEtlsModal = ({ toggle, open, etls }) => {
+//   return (
+//     <Modal title="Meet your peers" toggle={toggle} open={open}>
+//       <Stack spacing={3}>
+//         <ETLs etls={etls} />
+//       </Stack>
+//     </Modal>
+//   );
+// };
 const WaysToWorkModal = ({ toggle, open, title, resources }) => {
   return (
     <Modal title={title} toggle={toggle} open={open}>
