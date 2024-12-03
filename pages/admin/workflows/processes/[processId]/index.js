@@ -489,6 +489,7 @@ const ProcessId = ({}) => {
                       variant="outlined"
                       endIcon={<Edit fontSize="inherit" />}
                       onClick={() => setShowEditLanguageModal(true)}
+                      data-cy="edit-language-button"
                     >
                       Edit
                     </Button>
