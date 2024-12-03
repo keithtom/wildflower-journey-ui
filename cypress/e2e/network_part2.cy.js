@@ -359,11 +359,11 @@ describe("network part 2", () => {
             .type("01/01/2024");
           cy.get('button[type="submit"]').should("not.be.disabled").click();
           // remove all existing board members to start the test fresh next time
-          cy.get('[data-cy-another="schoolId-boardMembers-remove"]').each(
-            ($el) => {
-              cy.wrap($el).click();
-            }
-          );
+          // cy.get('[data-cy-another="schoolId-boardMembers-remove"]').each(
+          //   ($el) => {
+          //     cy.wrap($el).click();
+          //   }
+          // );
         });
       });
     });
