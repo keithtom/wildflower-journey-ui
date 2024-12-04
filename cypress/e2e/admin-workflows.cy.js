@@ -336,7 +336,7 @@ describe("Admin, Rollout Changes", () => {
     cy.wait(1000);
     cy.get("#remove-decision-option-0").click();
   });
-  it.only("submits a new workflow version", () => {
+  it("submits a new workflow version", () => {
     cy.contains("Basic Workflow for Cypress Tests").click();
     cy.wait("@getWorkflow");
     cy.get("button.MuiButtonBase-root").contains("Draft New Version").click();
@@ -345,5 +345,50 @@ describe("Admin, Rollout Changes", () => {
     cy.contains("Review New Version").click();
     cy.wait("@getWorkflow");
     cy.contains("Confirm And Submit").click();
+  });
+});
+
+describe.only("Admin, Translations", () => {
+  beforeEach(() => {
+    cy.resetRolloutWorkflowFixture();
+    cy.login("test@test.com", "password");
+    cy.visit("/admin/workflows");
+    cy.intercept("GET", `v1/workflow/definition/workflows/*`).as("getWorkflow");
+    cy.intercept("GET", `v1/workflow/definition/workflows/*/processes/*`).as(
+      "getProcess"
+    );
+    cy.intercept("GET", `v1/workflow/definition/processes/*/steps/*`).as(
+      "getStep"
+    );
+  });
+  it("navigates to a processId page and edits a PROCESS translation string", () => {
+    cy.contains("Basic Workflow for Cypress Tests").click();
+    cy.contains("Milestone A").click();
+    cy.wait("@getProcess");
+    cy.contains("Milestone A");
+    cy.get('[data-cy="edit-language-button"]').click();
+    cy.get("div.MuiDialog-container").within(() => {
+      //process fields
+      cy.get('[name="process_title_es"]').type("Milestone A (ES)");
+      cy.get('[name="process_description_es"]').type(
+        "Milestone A Description (ES)"
+      );
+      cy.get("button.MuiButtonBase-root").contains("Save").first().click();
+    });
+  });
+  it("navigates to a processId page and edits a STEP translation string", () => {
+    cy.contains("Basic Workflow for Cypress Tests").click();
+    cy.contains("Milestone A").click();
+    cy.wait("@getProcess");
+    cy.contains("Milestone A");
+    cy.get('[data-cy="edit-language-button"]').click();
+    cy.get("div.MuiDialog-container").within(() => {
+      //step fields
+      cy.contains("Step 1").click();
+      cy.get('[name="title_es"]').type("Step 1 (ES)");
+      cy.get('[name="description_es"]').type("Step 1 Description (ES)");
+
+      cy.get("button.MuiButtonBase-root").contains("Save").first().click();
+    });
   });
 });
