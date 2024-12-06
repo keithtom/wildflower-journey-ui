@@ -9,6 +9,7 @@ import registrationsAPI from "../api/registrations";
 import { theme } from "../styles/theme";
 import { useRouter } from "next/router";
 import { getScreenSize } from "../hooks/react-responsive";
+import { useTranslation } from "next-i18next";
 
 import {
   Avatar,
@@ -37,6 +38,8 @@ const Header = ({ toggleNavOpen }) => {
   // console.log({ currentUser });
   // console.log({ isAdmin });
   // console.log(process.env.APP_ENV);
+
+  const { t } = useTranslation("common");
 
   const adminView = isAdmin && router.asPath.includes("/admin") ? true : false;
 
@@ -158,6 +161,8 @@ const AvatarMenu = ({
     }
   }
 
+  const { t } = useTranslation("common");
+
   return (
     <>
       <Avatar
@@ -187,22 +192,22 @@ const AvatarMenu = ({
       >
         <StyledOption>
           <Typography variant="bodyRegular" lightened>
-            Signed in as {userName}
+            {t("header.signed_in_as")} {userName}
           </Typography>
         </StyledOption>
         {myProfileLink ? (
-          <NavLink to={myProfileLink} label="My Profile" />
+          <NavLink to={myProfileLink} label={t("header.my_profile")} />
         ) : null}
 
         {isAdmin ? (
           <>
-            <NavLink to="/network" label="Home" />
-            <NavLink to="/admin" label="Admin" />
+            <NavLink to="/network" label={t("header.home")} />
+            <NavLink to="/admin" label={t("header.admin")} />
           </>
         ) : null}
         {/* {showNetwork ? null : <NavLink to="/settings" label="Settings" />} */}
         <StyledOption onClick={handleLogOut} hoverable>
-          <Typography variant="bodyRegular">Sign out</Typography>
+          <Typography variant="bodyRegular">{t("header.sign_out")}</Typography>
         </StyledOption>
       </StyledUserMenu>
     </>

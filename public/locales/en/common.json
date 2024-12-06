@@ -127,5 +127,17 @@
     "attend_wildflower_community_events_description": "As an Emerging Teacher Leader you can begin attending Wildflower events and offerings. You can use this calendar to identify upcoming opportunities. When in doubt, you can also reach out to your Operations Guide to identify upcoming opportunities.",
     "learn_about_wildflower_school_pods": "Learn about Wildflower school pods",
     "learn_about_wildflower_school_pods_description": "Pods are small groupings of 5 - 7 schools that provide mutual support, accountability and community for one another. Read this first-hand account from a Teacher Leader about her experience of a Pod in a decentralized network. Schools typically join a Pod once they have signed a Membership Agreement with Wildflower, however it is never too early to begin learning about pods or even observe a pod meeting. To get connected, please contact your Operations Guide."
+  },
+  "navigation": {
+    "we_want_to_hear_from_you": "We want to hear from you!",
+    "click_here": "Click here to send us an email with any and all feedback.",
+    "to_do_list": "To do list"
+  },
+  "header": {
+    "signed_in_as": "Signed in as",
+    "sign_out": "Sign out",
+    "home": "Home",
+    "admin": "Admin",
+    "my_profile": "My profile"
   }
 }
