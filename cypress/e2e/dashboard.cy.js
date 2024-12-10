@@ -25,9 +25,9 @@ describe("dashboard spec", () => {
       }).as("teamUpdate");
 
       cy.get('input[placeholder="mm/dd/yyyy"]').clear().type(formattedToday);
-      cy.contains("Set an anticipated open date").click();
+      cy.get('[data-cy="add-open-date-button"]').click();
 
-      cy.contains("OPEN DATE").next().should("contain", yyyy);
+      cy.get('[data-cy="open-date-value"').should("contain", yyyy);
 
       cy.wait("@teamUpdate").then((interception) => {
         assert.equal(interception.response.statusCode, 200);

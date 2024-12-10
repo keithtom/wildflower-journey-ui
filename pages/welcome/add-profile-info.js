@@ -22,6 +22,7 @@ import peopleApi from "../../api/people";
 import { clearLoggedInState } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
 import RedirectUser from "@lib/redirectUser";
+import useTeam from "@hooks/useTeam";
 
 const token = getCookie("auth");
 
@@ -86,6 +87,9 @@ const AddProfileInfo = ({}) => {
   const [showError, setShowError] = useState();
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
+  const teamId = currentUser?.attributes.ssj.teamId;
+  const { team, isLoading: teamIsLoading } = useTeam(teamId);
+  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
 
   const handleFileStart = () => {
     setIsUpdatingPicture(true);
@@ -122,7 +126,6 @@ const AddProfileInfo = ({}) => {
   };
 
   const isExistingTL = false;
-  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
 
   useAuth("/login");
 
@@ -154,10 +157,11 @@ const AddProfileInfo = ({}) => {
                   </StyledChatBubble>
                   {opsGuide ? (
                     <Stack direction="row" spacing={3} alignItems="center">
-                      <Avatar size="sm" src={opsGuide?.imageUrl} />
+                      <Avatar size="sm" src={opsGuide?.attributes?.imageUrl} />
                       <Stack>
                         <Typography variant="bodySmall" bold>
-                          {opsGuide?.firstName} {opsGuide?.lastName}
+                          {opsGuide?.attributes?.firstName}{" "}
+                          {opsGuide?.attributes?.lastName}
                         </Typography>
                         <Typography variant="bodySmall" lightened>
                           Operations Guide

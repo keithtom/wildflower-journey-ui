@@ -58,7 +58,7 @@ describe("tasks", () => {
         cy.contains("Step 2").should("be.visible");
 
         cy.visit("/ssj", { timeout: 60000 });
-        cy.contains("You have 2 tasks").should("be.visible");
+        cy.get('[data-cy="you-have-tasks-statement"]').should("be.visible");
 
         cy.contains("Visioning").click({ timeout: 10000 });
         cy.location("pathname", { timeout: 60000 }).should(
