@@ -316,7 +316,7 @@ const SSJ = () => {
                   <Grid container spacing={3} alignItems="center">
                     <Grid item>
                       <Card size="small">
-                        <Typography variant="bodyMini" bold lightened>
+                        <Typography variant="bodyMini" bold lightened uppercase>
                           {t("ssj_ui_content.phase")}
                         </Typography>
                         <Typography variant="bodySmall">Visioning</Typography>
@@ -326,7 +326,12 @@ const SSJ = () => {
                     currentUser?.personAddress?.state ? (
                       <Grid item>
                         <Card size="small">
-                          <Typography variant="bodyMini" bold lightened>
+                          <Typography
+                            variant="bodyMini"
+                            bold
+                            lightened
+                            uppercase
+                          >
                             {t("ssj_ui_content.location")}
                           </Typography>
                           <Typography variant="bodySmall">
@@ -349,10 +354,18 @@ const SSJ = () => {
                             alignItems="center"
                           >
                             <Stack>
-                              <Typography variant="bodyMini" bold lightened>
+                              <Typography
+                                variant="bodyMini"
+                                bold
+                                lightened
+                                uppercase
+                              >
                                 {t("ssj_ui_content.open_date")}
                               </Typography>
-                              <Typography variant="bodySmall">
+                              <Typography
+                                variant="bodySmall"
+                                data-cy="open-date-value"
+                              >
                                 {moment(openDate).format("MMMM D, YYYY")}
                               </Typography>
                             </Stack>
@@ -390,7 +403,7 @@ const SSJ = () => {
               {assignedSteps > 0 ? (
                 <Card variant="primaryLightened">
                   <Grid container alignItems="center">
-                    <Grid item flex={1}>
+                    <Grid item flex={1} data-cy="you-have-tasks-statement">
                       <Stack direction="row" spacing={2}>
                         <Typography variant="h3" bold>
                           {t("ssj_ui_content.you_have")}{" "}
@@ -1043,7 +1056,11 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
             </Button>
           </Grid>
           <Grid item>
-            <Button disabled={!changedDateValue} onClick={handleSetOpenDate}>
+            <Button
+              disabled={!changedDateValue}
+              onClick={handleSetOpenDate}
+              data-cy="add-open-date-button"
+            >
               <Typography light variant="bodyRegular">
                 {t("ssj_ui_content.add_open_date")}
               </Typography>
