@@ -3,20 +3,15 @@ import { styled, css } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
-import getAuthHeader from "@lib/getAuthHeader";
 import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
 import Badge from "@mui/material/Badge";
 import { useTranslation } from "next-i18next";
 
-import ssjApi from "@api/ssj/ssj";
 import teamsApi from "@api/ssj/teams";
-import processesApi from "@api/workflow/processes";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import Milestone from "../../../components/Milestone";
-import Task from "../../../components/Task";
 import Hero from "../../../components/Hero";
 import UserCard from "../../../components/UserCard";
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
@@ -90,14 +85,13 @@ const SSJ = () => {
 
   const teamId = currentUser?.attributes.ssj.teamId;
   const { team, isLoading: teamIsLoading } = useTeam(teamId);
-  const { people, isLoading: currentETLsIsLoading } = usePersons({
-    etl: true,
-  });
-  const currentETLs = people?.data.filter(
-    (p) => p.attributes.isOnboarded === true
-  );
-
-  // console.log({ currentETLs });
+  // TODO: use some sort of pagination so we're not pulling in all the ETL's
+  // const { people, isLoading: currentETLsIsLoading } = usePersons({
+  //   etl: true,
+  // });
+  // const currentETLs = people?.data.filter(
+  //   (p) => p.attributes.isOnboarded === true
+  // );
 
   const {
     progress,
@@ -122,9 +116,9 @@ const SSJ = () => {
 
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
-  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
   const regionalGrowthLead =
-    currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
+    team?.data?.data?.relationships?.regionalGrowthLead?.data;
 
   useEffect(() => {
     if (team?.data?.data?.attributes?.expectedStartDate) {
@@ -137,10 +131,7 @@ const SSJ = () => {
   useAuth("/login");
 
   const isLoading =
-    teamIsLoading ||
-    ssjProgressIsLoading ||
-    milestonesForPhaseIsLoading ||
-    currentETLsIsLoading;
+    teamIsLoading || ssjProgressIsLoading || milestonesForPhaseIsLoading;
 
   // console.log({ user });
   // console.log({ team });
@@ -729,11 +720,11 @@ const SSJ = () => {
         open={addPartnerModalOpen}
         team={team}
       />
-      <ViewEtlsModal
+      {/* <ViewEtlsModal
         toggle={() => setViewEtlsModalOpen(!viewEtlsModalOpen)}
         open={viewEtlsModalOpen}
         etls={currentETLs}
-      />
+      /> */}
       <AddOpenDateModal
         toggle={() => setAddOpenDateModalOpen(!addOpenDateModalOpen)}
         open={addOpenDateModalOpen}
@@ -1071,15 +1062,15 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
     </Modal>
   );
 };
-const ViewEtlsModal = ({ toggle, open, etls }) => {
-  return (
-    <Modal title="Meet your peers" toggle={toggle} open={open}>
-      <Stack spacing={3}>
-        <ETLs etls={etls} />
-      </Stack>
-    </Modal>
-  );
-};
+// const ViewEtlsModal = ({ toggle, open, etls }) => {
+//   return (
+//     <Modal title="Meet your peers" toggle={toggle} open={open}>
+//       <Stack spacing={3}>
+//         <ETLs etls={etls} />
+//       </Stack>
+//     </Modal>
+//   );
+// };
 const WaysToWorkModal = ({ toggle, open, title, resources }) => {
   return (
     <Modal title={title} toggle={toggle} open={open}>
