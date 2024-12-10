@@ -208,7 +208,11 @@ const AvatarMenu = ({
           </>
         ) : null}
         {/* {showNetwork ? null : <NavLink to="/settings" label="Settings" />} */}
-        <StyledOption onClick={handleLogOut} hoverable>
+        <StyledOption
+          onClick={handleLogOut}
+          hoverable
+          data-cy="sign-out-button"
+        >
           <Typography variant="bodyRegular">{t("header.sign_out")}</Typography>
         </StyledOption>
       </StyledUserMenu>

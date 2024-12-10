@@ -25,7 +25,7 @@ describe("dashboard spec", () => {
       }).as("teamUpdate");
 
       cy.get('input[placeholder="mm/dd/yyyy"]').clear().type(formattedToday);
-      cy.contains("Set an anticipated open date").click();
+      cy.contains("Add your anticipated open date").click();
 
       cy.contains("OPEN DATE").next().should("contain", yyyy);
 

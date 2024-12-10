@@ -8,7 +8,7 @@ describe("logout spec", () => {
     cy.get("div#headerAvatarIcon").click();
     cy.intercept("DELETE", `${Cypress.env("apiUrl")}/logout`).as("logout");
 
-    cy.contains("Sign out").click();
+    cy.get("data-cy=['sign-out-button']").click();
     cy.wait("@logout").its("response.statusCode").should("eq", 200);
   });
 });
