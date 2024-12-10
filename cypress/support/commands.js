@@ -100,16 +100,6 @@ function resetOpenSchoolFixtures() {
   });
   return email;
 }
-function resetTestSchoolFixtures() {
-  const timestamp = Date.now();
-  const email = `cypress_test_${timestamp}@test.com`;
-
-  cy.request({
-    method: "PUT",
-    url: `${Cypress.env("apiUrl")}/reset_test_school`,
-  });
-  return email;
-}
 
 function resetPartnerFixtures() {
   const timestamp = Date.now();
@@ -134,10 +124,6 @@ Cypress.Commands.add("resetFixtures", (isOnboarded) => {
 Cypress.Commands.add("resetOpenSchoolFixtures", () => {
   cy.wrap(resetOpenSchoolFixtures());
 });
-// Used with tests that are testing network profile editing
-Cypress.Commands.add("resetTestSchoolFixtures", () => {
-  cy.wrap(resetTestSchoolFixtures());
-});
 // Used with tests that are testing network workflows
 Cypress.Commands.add("resetNetworkFixtures", () => {
   cy.wrap(resetNetworkFixtures());
@@ -160,11 +146,6 @@ Cypress.Commands.add("resetNetworkFixturesAndLogin", () => {
 });
 Cypress.Commands.add("resetOpenSchoolFixturesAndLogin", () => {
   cy.resetOpenSchoolFixtures().then((email) => {
-    cy.login(email, "password");
-  });
-});
-Cypress.Commands.add("restTestSchoolFixturesAndLogin", () => {
-  cy.resetTestSchoolFixtures().then((email) => {
     cy.login(email, "password");
   });
 });
