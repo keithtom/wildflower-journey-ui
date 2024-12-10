@@ -8,12 +8,6 @@ import { useUserContext } from "@lib/useUserContext";
 import usePerson from "@hooks/usePerson";
 import peopleApi from "@api/people";
 
-const StyledTranslationToggleCard = styled(Card)`
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-`;
-
 const TranslationToggle = () => {
   const router = useRouter();
   const { pathname, asPath, query } = router;
@@ -67,7 +61,7 @@ const TranslationToggle = () => {
   // console.log({ isApproved });
 
   return isApproved ? (
-    <StyledTranslationToggleCard size="small" elevated>
+    <Card size="small">
       <Stack direction="row" spacing={2} alignItems="center">
         <Icon type="globe" size="small" variant="lightened" />
         <Typography
@@ -87,7 +81,7 @@ const TranslationToggle = () => {
           Español
         </Typography>
       </Stack>
-    </StyledTranslationToggleCard>
+    </Card>
   ) : null;
 };
 

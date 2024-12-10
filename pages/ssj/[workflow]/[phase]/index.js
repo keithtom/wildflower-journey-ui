@@ -27,14 +27,13 @@ import {
 } from "@ui";
 import Milestone from "@components/Milestone";
 import Hero from "@components/Hero";
-import TranslationToggle from "@components/TranslationToggle";
+
 import useMilestones from "@hooks/useMilestones";
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const PhasePage = () => {
   const [phaseCompleteModalOpen, setPhaseCompleteModalOpen] = useState(false);
   const [addMilestoneModalOpen, setAddMilestoneModalOpen] = useState(false);
-  const [preferredLanguage, setPreferredLanguage] = useState("en");
 
   const { t } = useTranslation("common");
 
@@ -352,9 +351,6 @@ const PhasePage = () => {
             </Stack>
           </Card>
         </Modal>
-      ) : null}
-      {preferredLanguage ? (
-        <TranslationToggle preferredLanguage={preferredLanguage} />
       ) : null}
     </>
   );

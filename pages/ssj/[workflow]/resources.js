@@ -14,7 +14,7 @@ import Hero from "@components/Hero";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import useSSJResources from "@hooks/useSSJResources";
-import TranslationToggle from "@components/TranslationToggle";
+
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const Resources = () => {
@@ -152,7 +152,6 @@ const Resources = () => {
           )}
         </Stack>
       </PageContainer>
-      <TranslationToggle preferredLanguage={"en"} />
     </>
   );
 };

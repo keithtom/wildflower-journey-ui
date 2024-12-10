@@ -78,7 +78,7 @@ describe("network", () => {
         cy.contains("Schools").click();
         cy.get('input[name="search"]').type("wild rose");
         cy.contains("Wild Rose Montessori").click();
-        cy.contains("Wild Rose Montessori");
+        cy.contains("Wild Rose Montessori").should("be.visible");
         cy.contains("Katelyn Shore").click();
         cy.contains("Katelyn Shore");
       });
@@ -108,14 +108,23 @@ describe("network", () => {
         });
       });
     });
-    describe("paginating results", () => {
+    describe.only("paginating results", () => {
       it("should load more results on scroll", () => {
-        // Scroll to trigger the request
-        cy.scrollTo(0, 2400);
+        cy.contains("Explore the Wildflower Network").should("be.visible");
+
+        // Ensure the element is visible before scrolling
+        cy.get("body").should("be.visible");
+
+        cy.wait(5000);
+
         // Intercept the network request
         cy.intercept("GET", `${Cypress.env("apiUrl")}/v1/search**`).as(
           "getSearchResults"
         );
+
+        // Scroll to trigger the request
+        cy.scrollTo("bottom");
+
         // Wait for the network request to be made
         cy.wait("@getSearchResults").then((interception) => {
           // Assert that the request URL contains page=2
