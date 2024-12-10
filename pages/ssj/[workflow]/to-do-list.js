@@ -18,7 +18,7 @@ import {
 } from "@ui";
 import Task from "@components/Task";
 import Hero from "@components/Hero";
-import TranslationToggle from "@components/TranslationToggle";
+
 import useAuth from "@lib/utils/useAuth";
 import { useUserContext } from "@lib/useUserContext";
 
@@ -215,9 +215,6 @@ const ToDoList = ({}) => {
           </Card>
         )}
       </Stack>
-      {preferredLanguage ? (
-        <TranslationToggle preferredLanguage={preferredLanguage} />
-      ) : null}
     </PageContainer>
   );
 };

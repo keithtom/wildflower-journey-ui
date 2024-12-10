@@ -12,7 +12,7 @@ import CategoryChip from "@components/CategoryChip";
 import PhaseChip from "@components/PhaseChip";
 import Milestone from "@components/Milestone";
 import Hero from "@components/Hero";
-import TranslationToggle from "@components/TranslationToggle";
+
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
@@ -82,9 +82,6 @@ const Milestones = ({}) => {
           showMilestonesByPhase && <MilestonesByPhase workflow={workflow} />
         )}
       </Stack>
-      {preferredLanguage ? (
-        <TranslationToggle preferredLanguage={preferredLanguage} />
-      ) : null}
     </PageContainer>
   );
 };

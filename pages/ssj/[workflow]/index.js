@@ -3,21 +3,18 @@ import { styled, css } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import moment from "moment";
 import { useForm, Controller } from "react-hook-form";
-import getAuthHeader from "@lib/getAuthHeader";
 import { getCookie } from "cookies-next";
 import { parseISO } from "date-fns";
 import Badge from "@mui/material/Badge";
+import { useTranslation } from "next-i18next";
 
-import ssjApi from "@api/ssj/ssj";
 import teamsApi from "@api/ssj/teams";
-import processesApi from "@api/workflow/processes";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import Milestone from "../../../components/Milestone";
-import Task from "../../../components/Task";
 import Hero from "../../../components/Hero";
 import UserCard from "../../../components/UserCard";
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 import {
   Chip,
@@ -54,6 +51,8 @@ const SSJ = () => {
   const isFirstTimeUser = false;
   const ssjIsPaused = false;
 
+  const { t } = useTranslation("common");
+
   const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
   const [addPartnerModalOpen, setAddPartnerModalOpen] = useState(false);
   const [viewEtlsModalOpen, setViewEtlsModalOpen] = useState(false);
@@ -86,14 +85,13 @@ const SSJ = () => {
 
   const teamId = currentUser?.attributes.ssj.teamId;
   const { team, isLoading: teamIsLoading } = useTeam(teamId);
-  const { people, isLoading: currentETLsIsLoading } = usePersons({
-    etl: true,
-  });
-  const currentETLs = people?.data.filter(
-    (p) => p.attributes.isOnboarded === true
-  );
-
-  // console.log({ currentETLs });
+  // TODO: use some sort of pagination so we're not pulling in all the ETL's
+  // const { people, isLoading: currentETLsIsLoading } = usePersons({
+  //   etl: true,
+  // });
+  // const currentETLs = people?.data.filter(
+  //   (p) => p.attributes.isOnboarded === true
+  // );
 
   const {
     progress,
@@ -118,9 +116,9 @@ const SSJ = () => {
 
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
-  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
   const regionalGrowthLead =
-    currentUser?.attributes?.ssj?.regionalGrowthLead?.data?.attributes;
+    team?.data?.data?.relationships?.regionalGrowthLead?.data;
 
   useEffect(() => {
     if (team?.data?.data?.attributes?.expectedStartDate) {
@@ -133,10 +131,7 @@ const SSJ = () => {
   useAuth("/login");
 
   const isLoading =
-    teamIsLoading ||
-    ssjProgressIsLoading ||
-    milestonesForPhaseIsLoading ||
-    currentETLsIsLoading;
+    teamIsLoading || ssjProgressIsLoading || milestonesForPhaseIsLoading;
 
   // console.log({ user });
   // console.log({ team });
@@ -146,6 +141,102 @@ const SSJ = () => {
   // console.log({ currentUser });
   // console.log({ team });
   // console.log({ partners });
+
+  const waysToWorkTogether = [
+    {
+      name: t("ways_to_work_together.with_yourself"),
+      resources: [
+        {
+          title: t(
+            "ways_to_work_together.revisit_your_learning_and_growth_plan"
+          ),
+          url: "https://connected.wildflowerschools.org/posts/4432337-from-teacher-to-transformational-teacher-leader-recorded-etl-gathering?video_markers=learn%2Cgrowth%2Clearning+and+growth%2Clearning.%2Cgrowth%2C",
+          type: "Connected Post",
+          description: t(
+            "ways_to_work_together.revisit_your_learning_and_growth_plan_description"
+          ),
+        },
+        {
+          title: t(
+            "ways_to_work_together.learn_about_wildflower_ways_of_working"
+          ),
+          url: "https://connected.wildflowerschools.org/posts/4840229-self-management-learning-series-virtual-classroom-welcome",
+          type: "Connected Post",
+          description: t(
+            "ways_to_work_together.learn_about_wildflower_ways_of_working_description"
+          ),
+        },
+        {
+          title: t("ways_to_work_together.learn_about_liberatory_leadership"),
+          url: "https://connected.wildflowerschools.org/series/4588030-series-liberatory-leadership-series",
+          type: "Connected Series",
+          description: t(
+            "ways_to_work_together.learn_about_liberatory_leadership_description"
+          ),
+        },
+        {
+          title: t("ways_to_work_together.enroll_in_equity_training"),
+          url: "https://connected.wildflowerschools.org/series/4527958-series-equity-trainings",
+          type: "Connected Series",
+          description: t(
+            "ways_to_work_together.enroll_in_equity_training_description"
+          ),
+        },
+      ],
+    },
+    {
+      name: "With Your Team",
+      resources: [
+        {
+          title: t("ways_to_work_together.identify_a_teacher_leader_partner"),
+          url: "https://docs.google.com/presentation/d/1ymc_PZDNMtAoNdIV0QHPWw5NdekQRQrdjhkT19eyivg/view",
+          type: "Google Slides",
+          description: t(
+            "ways_to_work_together.identify_a_teacher_leader_partner_description"
+          ),
+        },
+        {
+          title: t(
+            "ways_to_work_together.engage_a_growth_and_conciousness_coach"
+          ),
+          url: "https://connected.wildflowerschools.org/series/4406175-series-growth-connectedness-coaches",
+          type: "Connected Series",
+          description: t(
+            "ways_to_work_together.engage_a_growth_and_conciousness_coach_description"
+          ),
+        },
+        {
+          title: t("ways_to_work_together.engage_an_equity_or_abar_coach"),
+          url: "https://connected.wildflowerschools.org/series/4527903-series-equity-consultants",
+          type: "Connected Series",
+          description: t(
+            "ways_to_work_together.engage_an_equity_or_abar_coach_description"
+          ),
+        },
+      ],
+    },
+    {
+      name: "With Your Community",
+      resources: [
+        {
+          title: t("ways_to_work_together.attend_wildflower_community_events"),
+          url: "https://connected.wildflowerschools.org/posts/4634392-wildflower-events-calendar",
+          type: "Connected Post",
+          description: t(
+            "ways_to_work_together.attend_wildflower_community_events_description"
+          ),
+        },
+        {
+          title: t("ways_to_work_together.learn_about_wildflower_school_pods"),
+          url: "https://connected.wildflowerschools.org/posts/4529540-essay-a-decentralized-network-by-erin-mckay",
+          type: "Connected Post",
+          description: t(
+            "ways_to_work_together.learn_about_wildflower_school_pods_description"
+          ),
+        },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -203,10 +294,11 @@ const SSJ = () => {
                     </Badge>
                     <Stack>
                       <Typography variant="h4" bold>
-                        Welcome, {currentUser?.attributes?.firstName}!
+                        {t("ssj_ui_content.welcome")},{" "}
+                        {currentUser?.attributes?.firstName}!
                       </Typography>
                       <Typography variant="bodyLarge" lightened>
-                        School Startup Journey
+                        {t("ssj_ui_content.school_startup_journey")}
                       </Typography>
                     </Stack>
                   </Stack>
@@ -215,8 +307,8 @@ const SSJ = () => {
                   <Grid container spacing={3} alignItems="center">
                     <Grid item>
                       <Card size="small">
-                        <Typography variant="bodyMini" bold lightened>
-                          PHASE
+                        <Typography variant="bodyMini" bold lightened uppercase>
+                          {t("ssj_ui_content.phase")}
                         </Typography>
                         <Typography variant="bodySmall">Visioning</Typography>
                       </Card>
@@ -225,8 +317,13 @@ const SSJ = () => {
                     currentUser?.personAddress?.state ? (
                       <Grid item>
                         <Card size="small">
-                          <Typography variant="bodyMini" bold lightened>
-                            LOCATION
+                          <Typography
+                            variant="bodyMini"
+                            bold
+                            lightened
+                            uppercase
+                          >
+                            {t("ssj_ui_content.location")}
                           </Typography>
                           <Typography variant="bodySmall">
                             {currentUser?.personAddress?.city},{" "}
@@ -248,10 +345,18 @@ const SSJ = () => {
                             alignItems="center"
                           >
                             <Stack>
-                              <Typography variant="bodyMini" bold lightened>
-                                OPEN DATE
+                              <Typography
+                                variant="bodyMini"
+                                bold
+                                lightened
+                                uppercase
+                              >
+                                {t("ssj_ui_content.open_date")}
                               </Typography>
-                              <Typography variant="bodySmall">
+                              <Typography
+                                variant="bodySmall"
+                                data-cy="open-date-value"
+                              >
                                 {moment(openDate).format("MMMM D, YYYY")}
                               </Typography>
                             </Stack>
@@ -276,7 +381,7 @@ const SSJ = () => {
                           >
                             <Icon type="plus" />
                             <Typography variant="bodyRegular">
-                              Add your anticipated open date
+                              {t("ssj_ui_content.add_open_date")}
                             </Typography>
                           </Stack>
                         </Button>
@@ -289,17 +394,17 @@ const SSJ = () => {
               {assignedSteps > 0 ? (
                 <Card variant="primaryLightened">
                   <Grid container alignItems="center">
-                    <Grid item flex={1}>
+                    <Grid item flex={1} data-cy="you-have-tasks-statement">
                       <Stack direction="row" spacing={2}>
                         <Typography variant="h3" bold>
-                          You have{" "}
+                          {t("ssj_ui_content.you_have")}{" "}
                         </Typography>
                         <Typography variant="h3" highlight bold>
-                          {assignedSteps} task
+                          {assignedSteps} {t("ssj_ui_content.task")}
                           {assignedSteps > 1 ? `s` : null}
                         </Typography>{" "}
                         <Typography variant="h3" bold>
-                          on your to do list
+                          {t("ssj_ui_content.on_your_to_do_list")}
                         </Typography>
                       </Stack>
                     </Grid>
@@ -312,7 +417,7 @@ const SSJ = () => {
                             alignItems="center"
                           >
                             <Typography variant="bodyLarge" bold light>
-                              Start working
+                              {t("ssj_ui_content.start_working")}
                             </Typography>
                             <Icon type="rightArrow" variant="light" />
                           </Stack>
@@ -334,13 +439,10 @@ const SSJ = () => {
                         <Stack spacing={6}>
                           <Icon type="calendarCheck" variant="primary" />
                           <Typography variant="h3" bold>
-                            Looks like you don't have any tasks on your to do
-                            list!
+                            {t("ssj_ui_content.looks_like_you_have_no_tasks")}
                           </Typography>
                           <Typography variant="bodyLarge" lightened>
-                            To start, add a task from one of these milestones.
-                            You can take them on at your own pace, according to
-                            your interests, needs, and timeline.
+                            {t("ssj_ui_content.to_start_try_a_milestone")}
                           </Typography>
                         </Stack>
                       </Card>
@@ -365,10 +467,12 @@ const SSJ = () => {
                                   justifyContent="space-between"
                                 >
                                   <Typography variant="bodyRegular" bold>
-                                    {m.attributes.title}
+                                    {m.attributes[
+                                      getTranslatedAttr(router.locale, "title")
+                                    ] || m.attributes.title}
                                   </Typography>
                                   <Button small variant="text">
-                                    Start here
+                                    {t("ssj_ui_content.start_here")}
                                   </Button>
                                 </Stack>
                               </Card>
@@ -389,7 +493,7 @@ const SSJ = () => {
                 >
                   <Grid item>
                     <Typography variant="h3" bold>
-                      Your Startup Family
+                      {t("ssj_ui_content.your_startup_family")}
                     </Typography>
                   </Grid>
                   <Grid item>
@@ -411,7 +515,7 @@ const SSJ = () => {
                           lastName={p.attributes.lastName}
                           email={p.attributes.email}
                           phone={p.attributes.phone}
-                          role="Partner"
+                          role={t("ssj_ui_content.partner")}
                           profileImage={p.attributes.imageUrl}
                         />
                       </Grid>
@@ -436,7 +540,7 @@ const SSJ = () => {
                         email={opsGuide?.email}
                         phone={opsGuide?.phone}
                         profileImage={opsGuide?.imageUrl}
-                        role="Operations Guide"
+                        role={t("ssj_ui_content.operations_guide")}
                       />
                     </Grid>
                   ) : null}
@@ -448,7 +552,7 @@ const SSJ = () => {
                         email={regionalGrowthLead?.email}
                         phone={regionalGrowthLead?.phone}
                         profileImage={regionalGrowthLead?.imageUrl}
-                        role="Regional Growth Lead"
+                        role={t("ssj_ui_content.regional_growth_lead")}
                       />
                     </Grid>
                   ) : null}
@@ -458,7 +562,7 @@ const SSJ = () => {
               {userOnboardedprogress ? (
                 <Stack spacing={6}>
                   <Typography variant="h3" bold>
-                    Your Progress
+                    {t("ssj_ui_content.your_progress")}
                   </Typography>
                   <Stack direction="row" spacing={6}>
                     <Typography
@@ -468,7 +572,7 @@ const SSJ = () => {
                       lightened={!viewPhaseProgress}
                       onClick={() => setViewPhaseProgress(true)}
                     >
-                      Phases
+                      {t("ssj_ui_content.phases")}
                     </Typography>
                     <Typography
                       variant="bodyLarge"
@@ -477,7 +581,7 @@ const SSJ = () => {
                       lightened={viewPhaseProgress}
                       onClick={() => setViewPhaseProgress(false)}
                     >
-                      Categories
+                      {t("ssj_ui_content.categories")}
                     </Typography>
                   </Stack>
 
@@ -536,8 +640,8 @@ const SSJ = () => {
 
               {userOnboardedWaysToWork ? (
                 <Stack spacing={6}>
-                  <Typography variant="h3" bold>
-                    Ways to work together
+                  <Typography variant="h3" bold capitalize>
+                    {t("ssj_ui_content.ways_to_work_together")}
                   </Typography>
                   <Grid container spacing={3}>
                     {waysToWorkTogether?.map((w, i) => (
@@ -616,11 +720,11 @@ const SSJ = () => {
         open={addPartnerModalOpen}
         team={team}
       />
-      <ViewEtlsModal
+      {/* <ViewEtlsModal
         toggle={() => setViewEtlsModalOpen(!viewEtlsModalOpen)}
         open={viewEtlsModalOpen}
         etls={currentETLs}
-      />
+      /> */}
       <AddOpenDateModal
         toggle={() => setAddOpenDateModalOpen(!addOpenDateModalOpen)}
         open={addOpenDateModalOpen}
@@ -749,11 +853,13 @@ const ProgressBar = ({ processes }) => {
   let p = processes;
   let reverseProcesses = [...p].reverse();
 
+  const { t } = useTranslation("common");
+
   return (
     <Stack spacing={3}>
-      <Typography variant="bodyMini" bold lightened>
-        {processes.filter((p) => p === "done").length} OF {processes.length}{" "}
-        MILESTONES COMPLETED
+      <Typography variant="bodyMini" bold lightened uppercase>
+        {processes.filter((p) => p === "done").length} {t("ssj_ui_content.of")}{" "}
+        {processes.length} {t("ssj_ui_content.milestones_completed")}
       </Typography>
       <Stack spacing={1} direction="row">
         {reverseProcesses?.map((p, i) => (
@@ -767,6 +873,8 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
   const visioningImg = "/assets/images/ssj/visioning.jpg";
   const planningImg = "/assets/images/ssj/planning.jpg";
   const startupImg = "/assets/images/ssj/startup.jpg";
+
+  const { t } = useTranslation("common");
   return (
     <Link href={link}>
       <Card
@@ -775,7 +883,7 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
       >
         <Stack spacing={6}>
           <Typography variant="bodyLarge" bold capitalize>
-            {phase}
+            {t(`ssj_phases.${phase.toLowerCase()}`)}
           </Typography>
           <ProgressBar processes={processes} />
           <Stack spacing={2}>
@@ -812,6 +920,7 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
 
 const WaysToWorkCard = ({ waysToWork }) => {
   const [waysToWorkModalOpen, setWaysToWorkModalOpen] = useState(false);
+  const { t } = useTranslation("common");
   return (
     <>
       <Card
@@ -840,8 +949,10 @@ const WaysToWorkCard = ({ waysToWork }) => {
             <Card size="small" noBorder variant="lightened">
               <Typography variant="bodyRegular" lightened>
                 {waysToWork.resources.length > 3
-                  ? `And ${waysToWork.resources.slice(3).length} more`
-                  : `View more`}
+                  ? `${t("ssj_ui_content.and")} ${
+                      waysToWork.resources.slice(3).length
+                    } ${t("ssj_ui_content.more")}`
+                  : t("ssj_ui_content.view_more")}
               </Typography>
             </Card>
           </Stack>
@@ -905,16 +1016,18 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
     toggle();
   };
 
+  const { t } = useTranslation("common");
+
   return (
     <Modal title="Add your anticipated open date" toggle={toggle} open={open}>
       <Stack spacing={3}>
         <Card variant="primaryLightened">
           <Stack alignItems="center" justifyContent="center" spacing={3}>
             <Typography variant="h4" highlight bold>
-              Add the date you'd like to have your school open
+              {t("ssj_ui_content.add_the_date_youd_like_to_open")}
             </Typography>
             <Typography variant="bodyRegular" highlight center>
-              Don't worry, you can always change this later.
+              {t("ssj_ui_content.dont_worry_you_can_change_this_later")}
             </Typography>
           </Stack>
         </Card>
@@ -928,13 +1041,19 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
         <Grid container justifyContent="space-between">
           <Grid item>
             <Button variant="light" onClick={toggle}>
-              <Typography variant="bodyRegular">Cancel</Typography>
+              <Typography variant="bodyRegular">
+                {t("ssj_ui_content.cancel")}
+              </Typography>
             </Button>
           </Grid>
           <Grid item>
-            <Button disabled={!changedDateValue} onClick={handleSetOpenDate}>
+            <Button
+              disabled={!changedDateValue}
+              onClick={handleSetOpenDate}
+              data-cy="add-open-date-button"
+            >
               <Typography light variant="bodyRegular">
-                Set an anticipated open date
+                {t("ssj_ui_content.add_open_date")}
               </Typography>
             </Button>
           </Grid>
@@ -943,15 +1062,15 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
     </Modal>
   );
 };
-const ViewEtlsModal = ({ toggle, open, etls }) => {
-  return (
-    <Modal title="Meet your peers" toggle={toggle} open={open}>
-      <Stack spacing={3}>
-        <ETLs etls={etls} />
-      </Stack>
-    </Modal>
-  );
-};
+// const ViewEtlsModal = ({ toggle, open, etls }) => {
+//   return (
+//     <Modal title="Meet your peers" toggle={toggle} open={open}>
+//       <Stack spacing={3}>
+//         <ETLs etls={etls} />
+//       </Stack>
+//     </Modal>
+//   );
+// };
 const WaysToWorkModal = ({ toggle, open, title, resources }) => {
   return (
     <Modal title={title} toggle={toggle} open={open}>
@@ -1052,6 +1171,8 @@ const AddPartnerModal = ({
     }
   }
 
+  const { t } = useTranslation("common");
+
   return (
     <Modal title="Add a partner" toggle={toggle} open={open}>
       <Stack spacing={3}>
@@ -1059,15 +1180,13 @@ const AddPartnerModal = ({
           <Card variant="lightened" size="large">
             <Stack spacing={6}>
               <Typography variant="h4" bold>
-                Thanks for making a request to add a partner!
+                {t("ssj_ui_content.thanks_for_making_a_request_to_add_partner")}
               </Typography>
               <Typography variant="bodyLarge">
-                Someone from Wildflower Schools will be in touch with you to
-                help set up your partnership shortly!
+                {t("ssj_ui_content.someone_will_be_in_touch_shortly")}
               </Typography>
               <Typography variant="bodyRegular" lightened>
-                In the mean time, if you have any questions or concerns, please
-                reach out to support@wildflowerschools.org
+                {t("ssj_ui_content.in_the_mean_time_reach_out_to_support")}
               </Typography>
             </Stack>
           </Card>
@@ -1076,11 +1195,10 @@ const AddPartnerModal = ({
             <Card variant="primaryLightened">
               <Stack alignItems="center" justifyContent="center" spacing={3}>
                 <Typography variant="h4" highlight bold>
-                  Add your partner via email!
+                  {t("ssj_ui_content.add_your_partner_via_email")}
                 </Typography>
                 <Typography variant="bodyRegular" highlight center>
-                  Make a request to invite your partner to work with you and
-                  join the Wildflower Network.
+                  {t("ssj_ui_content.make_a_request_to_invite_your_partner")}
                 </Typography>
               </Stack>
             </Card>
@@ -1098,7 +1216,7 @@ const AddPartnerModal = ({
                     }}
                     render={({ field }) => (
                       <TextField
-                        label="Your Partner's First Name"
+                        label={t("ssj_ui_content.your_partners_first_name")}
                         placeholder="e.g. Cathy"
                         error={errors.partnerFirstName}
                         helperText={errors?.partnerFirstName?.message || ""}
@@ -1117,7 +1235,7 @@ const AddPartnerModal = ({
                     }}
                     render={({ field }) => (
                       <TextField
-                        label="Your Partner's Last Name"
+                        label={t("ssj_ui_content.your_partners_last_name")}
                         placeholder="e.g. Lee"
                         error={errors.partnerLastName}
                         helperText={errors?.partnerLastName?.message || ""}
@@ -1141,7 +1259,7 @@ const AddPartnerModal = ({
                     }}
                     render={({ field }) => (
                       <TextField
-                        label="Your Partner's Email"
+                        label={t("ssj_ui_content.your_partners_email")}
                         placeholder="e.g. cathylee@gmail.com"
                         error={errors.partnerEmail}
                         helperText={errors?.partnerEmail?.message || ""}
@@ -1153,12 +1271,14 @@ const AddPartnerModal = ({
                 <Grid container justifyContent="space-between">
                   <Grid item>
                     <Button variant="text" onClick={toggle}>
-                      Cancel
+                      {t("ssj_ui_content.cancel")}
                     </Button>
                   </Grid>
                   <Grid item>
                     <Button type="submit" disabled={isSubmitting}>
-                      <Typography light>Invite partner</Typography>
+                      <Typography light>
+                        {t("ssj_ui_content.invite_partner")}
+                      </Typography>
                     </Button>
                   </Grid>
                 </Grid>
@@ -1181,6 +1301,9 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
     align-items: center;
     justify-content: center;
   `;
+
+  const { t } = useTranslation("common");
+
   return (
     <Card
       variant={submittedPartnerRequest ? "lightened" : "primaryOutlined"}
@@ -1198,10 +1321,10 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
           <Grid item flex={1}>
             <Stack>
               <Typography variant="bodyRegular" bold highlight>
-                We're adding your partner
+                {t("ssj_ui_content.were_adding_your_partner")}
               </Typography>
               <Typography variant="bodySmall" lightened>
-                Check back soon to work together!
+                {t("ssj_ui_content.check_back_soon")}
               </Typography>
             </Stack>
           </Grid>
@@ -1216,10 +1339,10 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
           <Grid item>
             <Stack>
               <Typography variant="bodyRegular" highlight bold>
-                Add a partner
+                {t("ssj_ui_content.add_a_partner")}
               </Typography>
               <Typography variant="bodySmall" lightened>
-                Add a partner to collaborate
+                {t("ssj_ui_content.add_a_partner_to_collaborate")}
               </Typography>
             </Stack>
           </Grid>
@@ -1228,87 +1351,6 @@ const AddPartnerCard = ({ onClick, submittedPartnerRequest }) => {
     </Card>
   );
 };
-
-const waysToWorkTogether = [
-  {
-    name: "With Yourself",
-    resources: [
-      {
-        title: "Revisit your learning and growth plan",
-        url: "https://connected.wildflowerschools.org/posts/4432337-from-teacher-to-transformational-teacher-leader-recorded-etl-gathering?video_markers=learn%2Cgrowth%2Clearning+and+growth%2Clearning.%2Cgrowth%2C",
-        type: "Connected Post",
-        description:
-          'From time to time, you may want to revisit the Learning and Growth plan in your Visioning album and use it to guide you towards additional learning opportunities. If you would like to make a new Learning and Growth Plan, you can use this link to access the "Emerging Teacher Leader Self-Awareness Reflective Guide" and accompanying presentation.',
-      },
-      {
-        title: "Learn about Wildflower Ways of Working",
-        url: "https://connected.wildflowerschools.org/posts/4840229-self-management-learning-series-virtual-classroom-welcome",
-        type: "Connected Post",
-        description:
-          "This resource provides six, self-guided learning modules on Wildflower Ways of Working. The six modules include; An Introduction to Self-Management and Domination Culture; The Advice Process; Roles & Responsibilities; Conflict Resolution; Radical Transparency; and Integration. ",
-      },
-      {
-        title: "Learn about Liberatory Leadership",
-        url: "https://connected.wildflowerschools.org/series/4588030-series-liberatory-leadership-series",
-        type: "Connected Series",
-        description:
-          "These sessions explore our collective vision for what ‘Liberatory Montessori’ means at Wildflower and how we support our ongoing development in service of our shared purpose for liberation in our schools and communities. ",
-      },
-      {
-        title: "Enroll in equity training",
-        url: "https://connected.wildflowerschools.org/series/4527958-series-equity-trainings",
-        type: "Connected Series",
-        description:
-          "Wildflower Teacher Leaders and Foundation partners commit to a lifelong journey of personal racial identity development, critical consciousness, and anti-bias anti-racist action (commonly referred to as ABAR). You can use this list of vetted equity trainings to support you along your learning journey.",
-      },
-    ],
-  },
-  {
-    name: "With Your Team",
-    resources: [
-      {
-        title: "Identify a Teacher Leader partner",
-        url: "https://docs.google.com/presentation/d/1ymc_PZDNMtAoNdIV0QHPWw5NdekQRQrdjhkT19eyivg/view",
-        type: "Google Slides",
-        description:
-          "Finding a Teacher Leader partner can be a daunting task, but there are ways to spread the word and activate your network. This resource provides reflection prompts, templates and framing to help you chart a path towards finding a supportive partnership.",
-      },
-      {
-        title: "Engage a Growth & Connectedness coach",
-        url: "https://connected.wildflowerschools.org/series/4406175-series-growth-connectedness-coaches",
-        type: "Connected Series",
-        description:
-          "Once you have identified a partner, Wildflower highly recommends investing in your partnership by engaging a Growth & Connectedness coach. Growth & Connectedness coaches typically focus on leadership, identity, and teamwork development. If you have questions about how to access coaching, please contact your Operations Guide.",
-      },
-      {
-        title: "Engage an Equity or ABAR coach",
-        url: "https://connected.wildflowerschools.org/series/4527903-series-equity-consultants",
-        type: "Connected Series",
-        description:
-          "In addition to attending equity trainings, some Teacher Leaders engage an equity or ABAR coach to support their ongoing racial-identity work. This work is critical to creating an intentionally anti-racist, anti-bias school community.",
-      },
-    ],
-  },
-  {
-    name: "With Your Community",
-    resources: [
-      {
-        title: "Attend Wildflower community events",
-        url: "https://connected.wildflowerschools.org/posts/4634392-wildflower-events-calendar",
-        type: "Connected Post",
-        description:
-          "As an Emerging Teacher Leader you can begin attending Wildflower events and offerings. You can use this calendar to identify upcoming opportunities. When in doubt, you can also reach out to your Operations Guide to identify upcoming opportunities.",
-      },
-      {
-        title: "Learn about Wildflower school pods",
-        url: "https://connected.wildflowerschools.org/posts/4529540-essay-a-decentralized-network-by-erin-mckay",
-        type: "Connected Post",
-        description:
-          "Pods are small groupings of 5 - 7 schools that provide mutual support, accountability and community for one another. Read this first-hand account from a Teacher Leader about her experience of a Pod in a decentralized network. Schools typically join a Pod once they have signed a Membership Agreement with Wildflower, however it is never too early to begin learning about pods or even observe a pod meeting. To get connected, please contact your Operations Guide.",
-      },
-    ],
-  },
-];
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 

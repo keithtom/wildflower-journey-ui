@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
 import { Drawer } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
+import { useTranslation } from "next-i18next";
 
 import { getScreenSize } from "../hooks/react-responsive";
 import { useUserContext } from "../lib/useUserContext";
@@ -24,6 +25,7 @@ import {
 } from "./ui/index";
 import Header from "./Header";
 import useAssignedSteps from "@hooks/useAssignedSteps";
+import TranslationToggle from "./TranslationToggle";
 
 // import AdviceProcessNavigation from "./page-content/advice/AdviceProcessNavigation";
 
@@ -48,6 +50,8 @@ const CustomDrawer = styled(Drawer)`
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const { screenSize } = getScreenSize();
 
+  const { t } = useTranslation("common");
+
   // console.log(screenSize.isSm);
 
   return (
@@ -64,7 +68,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
           sx={{ height: "100%" }}
         >
           <Navigation />
-          <Grid container p={4}>
+          <Grid container p={4} spacing={3}>
             <Grid item xs={12}>
               <Link href="mailto:support@wildflowerschools.org?subject=My Wildflower Feedback">
                 <Card variant="lightened" size="small" hoverable>
@@ -72,7 +76,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                     <Grid container alignItems="center">
                       <Grid item flex={1}>
                         <Typography variant="bodyRegular" bold highlight>
-                          We want to hear from you!
+                          {t("navigation.we_want_to_hear_from_you")}
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -80,11 +84,14 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                       </Grid>
                     </Grid>
                     <Typography variant="bodyRegular" lightened>
-                      Click here to send us an email with any and all feedback.
+                      {t("navigation.click_here")}
                     </Typography>
                   </Stack>
                 </Card>
               </Link>
+            </Grid>
+            <Grid item xs={12}>
+              <TranslationToggle />
             </Grid>
           </Grid>
         </Stack>
@@ -129,6 +136,8 @@ const Navigation = () => {
   // console.log({ isTeacherLeader });
   // console.log({ currentUser });
   // console.log({ workflow });
+
+  const { t } = useTranslation("common");
 
   return currentUser ? (
     <Box>
@@ -223,7 +232,7 @@ const Navigation = () => {
               variant="primary"
               to={`/ssj/${currentUser?.attributes?.ssj?.workflowId}`}
               active={router.asPath === `/ssj/${workflow}`}
-              label="School Startup Journey"
+              label={t("ssj_ui_content.school_startup_journey")}
               icon="home"
             />
           ) : null}
@@ -276,6 +285,8 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
     current_user: true,
   });
 
+  const { t } = useTranslation("common");
+
   return (
     <Box>
       <NavLink
@@ -285,7 +296,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
           router.pathname.startsWith("/ssj/") &&
           router.pathname.includes("/to-do-list")
         }
-        label="To do list"
+        label={t("navigation.to_do_list")}
         icon="calendarCheck"
         secondaryAction={
           isLoading ? null : !assignedSteps.length ? null : (
@@ -301,14 +312,14 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
         variant="secondary"
         to={`/ssj/${SSJworkflowId}/milestones`}
         active={router.pathname.includes("/milestones")}
-        label="Milestones"
+        label={t("ssj_ui_content.milestones")}
         icon="layer"
       />
       <NavLink
         variant="tertiary"
         to={`/ssj/${SSJworkflowId}/visioning`}
         active={router.pathname.includes("/visioning")}
-        label="Visioning"
+        label={t("ssj_phases.visioning")}
         icon={true}
         data-cy="visioning-nav-item"
       />
@@ -316,7 +327,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
         variant="tertiary"
         to={`/ssj/${SSJworkflowId}/planning`}
         active={router.pathname.includes("/planning")}
-        label="Planning"
+        label={t("ssj_phases.planning")}
         icon={true}
         data-cy="planning-nav-item"
       />
@@ -324,7 +335,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
         variant="tertiary"
         to={`/ssj/${SSJworkflowId}/startup`}
         active={router.pathname.includes("/startup")}
-        label="Startup"
+        label={t("ssj_phases.startup")}
         icon={true}
         data-cy="startup-nav-item"
       />
@@ -333,7 +344,7 @@ const SSJNavigation = ({ opsView, SSJworkflowId }) => {
           variant="secondary"
           to={`/ssj/${SSJworkflowId}/resources`}
           active={router.pathname.includes("/resources")}
-          label="Resources"
+          label={t("ssj_ui_content.resources")}
           icon="fileBlank"
         />
       )}

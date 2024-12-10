@@ -5,6 +5,7 @@ import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
+import useTeam from "@hooks/useTeam";
 import { clearLoggedInState } from "@lib/handleLogout";
 import {
   lgbtqiaOptions,
@@ -155,7 +156,9 @@ const ConfirmDemographicInfo = ({}) => {
 
   const watchFields = watch();
   const isExistingTL = false;
-  const opsGuide = currentUser?.attributes?.ssj?.opsGuide?.data?.attributes;
+  const teamId = currentUser?.attributes.ssj.teamId;
+  const { team } = useTeam(teamId);
+  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
   const isCertifiedOrSeeking =
     watchFields.montessoriCertified === "Yes" ||
     watchFields.montessoriCertified === "Currently Seeking Certification";
@@ -203,10 +206,14 @@ const ConfirmDemographicInfo = ({}) => {
                     </StyledChatBubble>
                     {opsGuide ? (
                       <Stack direction="row" spacing={3} alignItems="center">
-                        <Avatar size="sm" src={opsGuide?.imageUrl} />
+                        <Avatar
+                          size="sm"
+                          src={opsGuide?.attributes?.imageUrl}
+                        />
                         <Stack>
                           <Typography variant="bodySmall" bold>
-                            {opsGuide?.firstName} {opsGuide?.lastName}
+                            {opsGuide?.attributes?.firstName}{" "}
+                            {opsGuide?.attributes?.lastName}
                           </Typography>
                           <Typography variant="bodySmall" lightened>
                             Operations Guide
