@@ -155,9 +155,11 @@ const AvatarMenu = ({
         console.error("Error logging out:", err);
       }
     } finally {
-      router.push("/logged-out");
-      clearLoggedInState({});
-      setCurrentUser(null);
+      router.push("/logged-out", "/logged-out", { locale: "en" }).then(() => {
+        // Clear the authentication tokens and user state after redirecting
+        clearLoggedInState({});
+        setCurrentUser(null);
+      });
     }
   }
 
