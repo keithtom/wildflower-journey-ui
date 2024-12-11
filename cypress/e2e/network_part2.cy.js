@@ -10,7 +10,7 @@ describe("network part 2", () => {
   // --------------------- Wildflower Member
   describe("wildflower member", () => {
     beforeEach(() => {
-      cy.resetNetworkFixturesAndLogin();
+      cy.resetOpenSchoolFixturesAndLogin();
 
       cy.getCookie("firstName")
         .should("exist")
@@ -183,21 +183,6 @@ describe("network part 2", () => {
         cy.get('[data-cy="personId-edit-schoolHistory-remove"]').each(($el) => {
           cy.wrap($el).click();
         });
-        cy.get('[data-cy="personId-edit-schoolHistory-empty"]');
-        // add again (so we can navigate to it later)
-        cy.get('[data-cy="personId-edit-schoolHistory-add"]').click();
-        cy.get('[name="school"]').click();
-        cy.get('[name="school"]').type("Wild Rose Montessori");
-        cy.get('li[data-option-index="0"]')
-          .contains("Wild Rose Montessori")
-          .click();
-        cy.get('[data-cy="personId-edit-schoolHistory-dateJoined"]')
-          .clear()
-          .type("01/01/2014");
-        cy.get('[data-cy="personId-edit-schoolHistory-dateLeft"]').clear(); // clear date left so they are eligible to be a current school leader
-        cy.get('[name="schoolTitle"]').click();
-        cy.get('[name="schoolTitle"]').type("CFO");
-        cy.get('button[type="submit"]').should("not.be.disabled").click();
       });
       it("should edit board history fields", () => {
         cy.visit(`/network/people/${id}`, { timeout: 60000 });
@@ -234,160 +219,166 @@ describe("network part 2", () => {
         cy.get('[data-cy="personId-edit-boardHistory-empty"]');
       });
     });
+    describe("navigate to school profile and edit", () => {
+      it("should search for self and navigate to school profile", () => {
+        cy.visit(`/network/people/${id}`, { timeout: 60000 });
+        cy.contains("Cypress Test School").click();
+        cy.contains("Cypress Test School").should("be.visible");
+        cy.get('[data-cy="schoolId-edit-school-profile"]').click();
+      });
+      it("should edit school general fields ", () => {
+        cy.visit(`/network/people/${id}`, { timeout: 60000 });
+        cy.contains("Cypress Test School").click();
+        cy.contains("Cypress Test School").should("be.visible");
+        cy.get('[data-cy="schoolId-edit-school-profile"]').click();
+        // edit general
+        cy.get('input[name="city"]').clear().type("Brooklyn");
+        cy.contains("State").next().click();
+        cy.contains("New York").click({ force: true });
+        cy.get("body").click(0, 0);
+        cy.get('[data-cy="schoolId-open-date"]').click();
+        const today = new Date();
+        const yyyy = today.getFullYear() + 1;
+        let mm = today.getMonth() + 1; // Months start at 0!
+        let dd = today.getDate();
+        if (dd < 10) dd = "0" + dd;
+        if (mm < 10) mm = "0" + mm;
+        const formattedToday = mm + "/" + dd + "/" + yyyy;
+        cy.get('input[placeholder="mm/dd/yyyy"]').clear().type(formattedToday);
+        cy.get('[name="about"]').clear().type("New school about");
+        cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as("uploadLogo");
+        cy.fixture("test_profile_picture.jpg").then((filecontent) => {
+          cy.get('[name="schoolLogo"]').attachFile({
+            fileContent: filecontent.toString(),
+            fileName: "test_profile_picture.jpg",
+            mimeType: "image/jpg",
+          });
+        });
+        cy.wait("@uploadLogo", { requestTimeout: 60000 });
+
+        cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as(
+          "uploadBanner"
+        );
+        cy.fixture("test_profile_picture.jpg").then((filecontent) => {
+          cy.get('[name="bannerImage"]').attachFile({
+            fileContent: filecontent.toString(),
+            fileName: "test_profile_picture.jpg",
+            mimeType: "image/jpg",
+          });
+        });
+        cy.wait("@uploadBanner", { requestTimeout: 60000 });
+        cy.get('button[type="submit"]').should("not.be.disabled").click();
+      });
+      it("should edit school enrollment fields ", () => {
+        cy.visit(`/network/people/${id}`, { timeout: 60000 });
+        cy.contains("Cypress Test School").click();
+        cy.contains("Cypress Test School").should("be.visible");
+        cy.get('[data-cy="schoolId-edit-school-profile"]').click();
+        //  edit enrollment
+        cy.get('[data-cy="schoolId-enrollment"]').click();
+        cy.contains("Ages served").next().click();
+        cy.contains("Infants").click({ force: true });
+        cy.contains("Toddlers").click({ force: true });
+        cy.get("body").click(0, 0);
+        cy.contains("Governance type").next().click();
+        cy.contains("Independent").click({ force: true });
+        cy.get("body").click(0, 0);
+        cy.get('input[name="maxEnrollment"]').clear().type("30");
+        cy.get('input[name="numClassrooms"]').clear().type("4");
+        cy.get('button[type="submit"]').should("not.be.disabled").click();
+      });
+      it("should edit school history fields ", () => {
+        cy.visit(`/network/people/${id}`, { timeout: 60000 });
+        cy.contains("Cypress Test School").click();
+        cy.contains("Cypress Test School").should("be.visible");
+        cy.get('[data-cy="schoolId-edit-school-profile"]').click();
+        // edit teacher leader fields
+        cy.get('[data-cy="schoolId-teacherLeaders"]').click();
+        //add - existing
+        cy.get('[data-cy="schoolId-teacherLeaders-add"]').click();
+        cy.get('[name="teacher"]').click();
+        cy.get('[name="teacher"]').type("Taylor Zanke");
+        cy.get('li[data-option-index="0"]').contains("Taylor Zanke").click();
+        cy.get('[data-cy="schoolId-teacherLeaders-dateJoined"]')
+          .clear()
+          .type("01/01/2014");
+        cy.get('[data-cy="schoolId-teacherLeaders-dateLeft"]')
+          .clear()
+          .type("01/01/2024");
+        cy.get('[name="schoolTitle"]').click();
+        cy.get('[name="schoolTitle"]').type("CFO");
+        cy.get('button[type="submit"]').should("not.be.disabled").click();
+        // edit
+        cy.get('[data-cy="schoolId-teacherLeaders-edit-0"]').click();
+        cy.get('[data-cy="schoolId-teacherLeaders-dateJoined"]')
+          .clear()
+          .type("01/02/2014");
+        cy.get('[data-cy="schoolId-teacherLeaders-dateLeft"]')
+          .clear()
+          .type("01/01/2024");
+        cy.get('[name="schoolTitle"]').click();
+        cy.get('[name="schoolTitle"]').clear().type("CEO");
+        cy.get('button[type="submit"]').should("not.be.disabled").click();
+        //add - invite
+        cy.get('[data-cy="schoolId-teacherLeaders-add"]').click();
+        cy.get('[data-cy="schoolId-teacherLeaders-add-invite"]').click();
+        cy.get('[name="partnerFirstName"]').click();
+        cy.get('[name="partnerFirstName"]').type("First Name");
+        cy.get('[name="partnerLastName"]').click();
+        cy.get('[name="partnerLastName"]').type("Last Name");
+        cy.get('[name="partnerEmail"]').click();
+        cy.get('[name="partnerEmail"]').type("firstNameLastName@test.com");
+        cy.get('[name="schoolTitle"]').click();
+        cy.get('[name="schoolTitle"]').type("CEO");
+        cy.get('[data-cy="schoolId-teacherLeaders-add-invite-dateJoined"]')
+          .clear()
+          .type("01/01/2014");
+        cy.get('button[type="submit"]').should("not.be.disabled").click();
+        //remove
+        cy.get('[data-cy="schoolId-teacherLeaders-remove-0"]').click();
+        // remove - Taylor Zanke
+        cy.contains("Taylor Zanke")
+          .parents('[data-cy="schoolId-teacherLeaders-list-item"]')
+          .find('[data-cy-another="schoolId-teacherLeaders-remove"]')
+          .click();
+      });
+      it("should edit board member fields ", () => {
+        cy.visit(`/network/people/${id}`, { timeout: 60000 });
+        cy.contains("Cypress Test School").click();
+        cy.contains("Cypress Test School").should("be.visible");
+        cy.get('[data-cy="schoolId-edit-school-profile"]').click();
+        // edit board members
+        cy.get('[data-cy="schoolId-boardMembers"]').click();
+        //add
+        cy.get('[data-cy="schoolId-boardMembers-add"]').click();
+        cy.get('[name="teacher"]').click();
+        cy.get('[name="teacher"]').type("Cameron Rutherford");
+        cy.get('li[data-option-index="0"]')
+          .contains("Cameron Rutherford")
+          .click();
+        cy.get('[data-cy="schoolId-boardMembers-dateJoined"]')
+          .clear()
+          .type("01/01/2014");
+        cy.get('[data-cy="schoolId-boardMembers-dateLeft"]')
+          .clear()
+          .type("01/01/2024");
+        cy.get('button[type="submit"]').should("not.be.disabled").click();
+        //edit
+        cy.get('[data-cy="schoolId-boardMembers-edit-0"]').click();
+        cy.get('[data-cy="schoolId-boardMembers-dateJoined"]')
+          .clear()
+          .type("01/02/2014");
+        cy.get('[data-cy="schoolId-boardMembers-dateLeft"]')
+          .clear()
+          .type("01/01/2024");
+        cy.get('button[type="submit"]').should("not.be.disabled").click();
+        // remove
+        cy.get('[data-cy-another="schoolId-boardMembers-remove"]').each(
+          ($el) => {
+            cy.wrap($el).click();
+          }
+        );
+      });
+    });
   });
-  // TODO: Add edit school test here
 });
-// cy.then(() => {
-
-//   // navigate to current school
-//   cy.get("body").click(0, 0);
-//   cy.contains("Wild Rose Montessori").click();
-//   // click edit school profile
-//   cy.get('[data-cy="schoolId-edit-school-profile"]').click();
-//   // edit general
-//   cy.get('input[name="city"]').clear().type("Brooklyn");
-
-//   cy.contains("State").next().click();
-//   cy.contains("New York").click({ force: true });
-//   cy.get("body").click(0, 0);
-
-//   cy.get('[data-cy="schoolId-open-date"]').click();
-//   const today = new Date();
-//   const yyyy = today.getFullYear() + 1;
-//   let mm = today.getMonth() + 1; // Months start at 0!
-//   let dd = today.getDate();
-//   if (dd < 10) dd = "0" + dd;
-//   if (mm < 10) mm = "0" + mm;
-//   const formattedToday = mm + "/" + dd + "/" + yyyy;
-//   cy.get('input[placeholder="mm/dd/yyyy"]')
-//     .clear()
-//     .type(formattedToday);
-//   cy.get('[name="about"]').clear().type("New school about");
-
-//   cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as(
-//     "uploadLogo"
-//   );
-//   cy.fixture("test_profile_picture.jpg").then((filecontent) => {
-//     cy.get('[name="schoolLogo"]').attachFile({
-//       fileContent: filecontent.toString(),
-//       fileName: "test_profile_picture.jpg",
-//       mimeType: "image/jpg",
-//     });
-//   });
-//   cy.wait("@uploadLogo", { requestTimeout: 60000 });
-
-//   cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as(
-//     "uploadBanner"
-//   );
-//   cy.fixture("test_profile_picture.jpg").then((filecontent) => {
-//     cy.get('[name="bannerImage"]').attachFile({
-//       fileContent: filecontent.toString(),
-//       fileName: "test_profile_picture.jpg",
-//       mimeType: "image/jpg",
-//     });
-//   });
-//   cy.wait("@uploadBanner", { requestTimeout: 60000 });
-//   cy.get('button[type="submit"]').should("not.be.disabled").click();
-
-//   // edit enrollment
-//   cy.get('[data-cy="schoolId-enrollment"]').click();
-
-//   cy.contains("Ages served").next().click();
-//   cy.contains("Infants").click({ force: true });
-//   cy.contains("Toddlers").click({ force: true });
-//   cy.get("body").click(0, 0);
-
-//   cy.contains("Governance type").next().click();
-//   cy.contains("Independent").click({ force: true });
-//   cy.get("body").click(0, 0);
-
-//   cy.get('input[name="maxEnrollment"]').clear().type("30");
-//   cy.get('input[name="numClassrooms"]').clear().type("4");
-
-//   cy.get('button[type="submit"]').should("not.be.disabled").click();
-
-//   // navigate to teacher leaders tab
-//   cy.get('[data-cy="schoolId-teacherLeaders"]').click();
-
-//   //add - existing
-
-//   cy.get('[data-cy="schoolId-teacherLeaders-add"]').click();
-//   cy.get('[name="teacher"]').click();
-//   cy.get('[name="teacher"]').type("Taylor Zanke");
-//   cy.get('li[data-option-index="0"]').contains("Taylor Zanke").click();
-//   cy.get('[data-cy="schoolId-teacherLeaders-dateJoined"]')
-//     .clear()
-//     .type("01/01/2014");
-//   cy.get('[data-cy="schoolId-teacherLeaders-dateLeft"]')
-//     .clear()
-//     .type("01/01/2024");
-//   cy.get('[name="schoolTitle"]').click();
-//   cy.get('[name="schoolTitle"]').type("CFO");
-//   cy.get('button[type="submit"]').should("not.be.disabled").click();
-//   // edit
-//   cy.get('[data-cy="schoolId-teacherLeaders-edit-0"]').click();
-//   cy.get('[data-cy="schoolId-teacherLeaders-dateJoined"]')
-//     .clear()
-//     .type("01/02/2014");
-//   cy.get('[data-cy="schoolId-teacherLeaders-dateLeft"]')
-//     .clear()
-//     .type("01/01/2024");
-//   cy.get('[name="schoolTitle"]').click();
-//   cy.get('[name="schoolTitle"]').clear().type("CEO");
-//   cy.get('button[type="submit"]').should("not.be.disabled").click();
-//   //add - invite
-//   cy.get('[data-cy="schoolId-teacherLeaders-add"]').click();
-//   cy.get('[data-cy="schoolId-teacherLeaders-add-invite"]').click();
-//   cy.get('[name="partnerFirstName"]').click();
-//   cy.get('[name="partnerFirstName"]').type("First Name");
-//   cy.get('[name="partnerLastName"]').click();
-//   cy.get('[name="partnerLastName"]').type("Last Name");
-//   cy.get('[name="partnerEmail"]').click();
-//   cy.get('[name="partnerEmail"]').type("firstNameLastName@test.com");
-//   cy.get('[name="schoolTitle"]').click();
-//   cy.get('[name="schoolTitle"]').type("CEO");
-//   cy.get('[data-cy="schoolId-teacherLeaders-add-invite-dateJoined"]')
-//     .clear()
-//     .type("01/01/2014");
-//   cy.get('button[type="submit"]').should("not.be.disabled").click();
-//   //remove
-//   cy.get('[data-cy="schoolId-teacherLeaders-remove-0"]').click();
-//   // remove - Taylor Zanke
-//   cy.contains("Taylor Zanke")
-//     .parents('[data-cy="schoolId-teacherLeaders-list-item"]')
-//     .find('[data-cy-another="schoolId-teacherLeaders-remove"]')
-//     .click();
-
-//   // edit board members
-//   cy.get('[data-cy="schoolId-boardMembers"]').click();
-
-//   //add
-//   cy.get('[data-cy="schoolId-boardMembers-add"]').click();
-//   cy.get('[name="teacher"]').click();
-//   cy.get('[name="teacher"]').type("Cameron Rutherford");
-//   cy.get('li[data-option-index="0"]')
-//     .contains("Cameron Rutherford")
-//     .click();
-//   cy.get('[data-cy="schoolId-boardMembers-dateJoined"]')
-//     .clear()
-//     .type("01/01/2014");
-//   cy.get('[data-cy="schoolId-boardMembers-dateLeft"]')
-//     .clear()
-//     .type("01/01/2024");
-//   cy.get('button[type="submit"]').should("not.be.disabled").click();
-//   //edit
-//   cy.get('[data-cy="schoolId-boardMembers-edit-0"]').click();
-//   cy.get('[data-cy="schoolId-boardMembers-dateJoined"]')
-//     .clear()
-//     .type("01/02/2014");
-//   cy.get('[data-cy="schoolId-boardMembers-dateLeft"]')
-//     .clear()
-//     .type("01/01/2024");
-//   cy.get('button[type="submit"]').should("not.be.disabled").click();
-//   // remove all existing board members to start the test fresh next time
-//   cy.get('[data-cy-another="schoolId-boardMembers-remove"]').each(
-//     ($el) => {
-//       cy.wrap($el).click();
-//     }
-//   );
-// });
