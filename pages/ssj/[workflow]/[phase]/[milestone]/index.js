@@ -25,7 +25,7 @@ import {
   TextField,
 } from "@ui";
 import Task from "@components/Task";
-import TranslationToggle from "@components/TranslationToggle";
+
 import MilestonePageHead from "@components/MilestonePageHead";
 import Milestone from "@components/Milestone";
 import useMilestone from "@hooks/useMilestone";
@@ -288,9 +288,6 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
             </Stack>
           </Card>
         </Modal>
-      ) : null}
-      {preferredLanguage ? (
-        <TranslationToggle preferredLanguage={preferredLanguage} />
       ) : null}
     </PageContainer>
   );

@@ -52,8 +52,7 @@ Cypress.Commands.add("login", (email, password) => {
     window.cookieStore.set("isOg", personAttributes["isOg?"]);
     window.cookieStore.set("firstName", resp.body.data.attributes.firstName);
     window.cookieStore.set("lastName", resp.body.data.attributes.lastName);
-    window.cookieStore.set("id", resp.body.data.id);
-    console.log(resp);
+    window.cookieStore.set("id", personId);
   });
 });
 

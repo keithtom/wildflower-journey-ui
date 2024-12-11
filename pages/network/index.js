@@ -721,11 +721,14 @@ const Filters = [
   },
 ];
 
-export async function getServerSideProps({ params, req, res }) {
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+export async function getServerSideProps({ params, req, res, locale }) {
   const config = getAuthHeader({ req, res });
   if (!config) {
     console.log("no token found, redirecting to login");
     return redirectLoginProps();
   }
-  return { props: { config } };
+  return {
+    props: { config, ...(await serverSideTranslations(locale, ["common"])) },
+  };
 }
