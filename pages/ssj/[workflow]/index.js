@@ -116,9 +116,9 @@ const SSJ = () => {
 
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
-  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
+  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data?.attributes;
   const regionalGrowthLead =
-    team?.data?.data?.relationships?.regionalGrowthLead?.data;
+    team?.data?.data?.relationships?.regionalGrowthLead?.data?.attributes;
 
   useEffect(() => {
     if (team?.data?.data?.attributes?.expectedStartDate) {
