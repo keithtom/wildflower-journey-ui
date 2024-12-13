@@ -196,7 +196,10 @@ const MilestonesByPhase = ({ workflow }) => {
           subheader={
             <Card variant="lightened" size="small" noRadius>
               <Stack direction="row" spacing={5} pl={1} alignItems="center">
-                <PhaseChip phase={m.phase} size="small" />
+                <PhaseChip
+                  phase={t(`ssj_phases.${m.phase.toLowerCase()}`)}
+                  size="small"
+                />
                 <Typography variant="bodyRegular" lightened>
                   {m.milestones.length}
                 </Typography>
