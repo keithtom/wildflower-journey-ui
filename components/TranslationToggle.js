@@ -60,7 +60,7 @@ const TranslationToggle = () => {
   // console.log({ workflow });
   // console.log({ isApproved });
 
-  return isApproved ? (
+  return !isApproved ? (
     <Card size="small">
       <Stack direction="row" spacing={2} alignItems="center">
         <Icon type="globe" size="small" variant="lightened" />

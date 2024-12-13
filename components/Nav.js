@@ -49,7 +49,7 @@ const CustomDrawer = styled(Drawer)`
 
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const { screenSize } = getScreenSize();
-
+  const router = useRouter();
   const { t } = useTranslation("common");
 
   // console.log(screenSize.isSm);
@@ -90,9 +90,11 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                 </Card>
               </Link>
             </Grid>
-            <Grid item xs={12}>
-              <TranslationToggle />
-            </Grid>
+            {router.pathname.includes("/ssj/") ? (
+              <Grid item xs={12}>
+                <TranslationToggle />
+              </Grid>
+            ) : null}
           </Grid>
         </Stack>
       </CustomDrawer>
@@ -126,6 +128,13 @@ const Navigation = () => {
     }
   }, []);
 
+  useEffect(() => {
+    // Check if the current pathname does not include "/ssj/"
+    if (!router.pathname.includes("/ssj/")) {
+      // Set the locale to "en"
+      router.push(router.pathname, router.asPath, { locale: "en" });
+    }
+  }, [router.pathname]);
   const isEmergingTeacherLeader = currentUser?.personRoleList?.includes(
     "Emerging Teacher Leader"
   );

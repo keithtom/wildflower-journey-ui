@@ -52,7 +52,6 @@ const NavLink = ({ to, icon, active, variant, label, ...props }) => {
       <CustomListItem variant={variant} {...props}>
         <Grid
           container
-          // spacing={3}
           alignItems="center"
           ml={variant === "secondary" ? 12 : variant === "tertiary" ? 12 : 3}
         >
