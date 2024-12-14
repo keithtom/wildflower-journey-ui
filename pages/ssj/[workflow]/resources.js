@@ -139,7 +139,11 @@ const Resources = () => {
                     <Stack spacing={3}>
                       {array[0]?.map((r, i) => (
                         <Resource
-                          title={r.data.attributes.title}
+                          title={
+                            r.data.attributes[
+                              getTranslatedAttr(router.locale, "title")
+                            ] || r.data.attributes.title
+                          }
                           link={r.data.attributes.link}
                           key={i}
                         />

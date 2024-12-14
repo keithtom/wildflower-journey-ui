@@ -173,6 +173,7 @@ const ProcessId = ({}) => {
           acc[key] = data[key];
         }
       }
+      console.log({ acc });
       return acc;
     }, {});
 
@@ -568,10 +569,10 @@ const ProcessId = ({}) => {
                         </MenuItem>
                       ))}
                     </Select>
-                    <FormHelperText error={errors.categories}>
+                    <FormHelperText error={errors.category_list}>
                       {errors &&
-                        errors.categories &&
-                        errors.categories.type === "required" &&
+                        errors.category_list &&
+                        errors.category_list.type === "required" &&
                         "This field is required"}
                     </FormHelperText>
                   </>
@@ -936,7 +937,7 @@ const AddStepModal = ({
   }, [open]);
 
   const onSubmit = handleSubmit((data) => {
-    // console.log({ data });
+    console.log({ data });
     handleCreateStep(data);
     reset();
     onClose();
