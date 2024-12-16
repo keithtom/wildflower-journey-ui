@@ -106,7 +106,7 @@ const AddProfileInfo = ({}) => {
       const personAttributes = response.data.attributes;
       currentUser.attributes.imageUrl = personAttributes.imageUrl;
       setCurrentUser(currentUser);
-      RedirectUser({
+      await RedirectUser({
         router: router,
         roleList: personAttributes?.roleList,
         isOnboarded: personAttributes?.isOnboarded,
@@ -128,6 +128,8 @@ const AddProfileInfo = ({}) => {
   const isExistingTL = false;
 
   useAuth("/login");
+
+  console.log({ currentUser });
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>
@@ -324,12 +326,16 @@ const AddProfileInfo = ({}) => {
                   <Button
                     full
                     variant="text"
-                    onClick={() => {
-                      RedirectUser({
-                        router: router,
-                        roleList: currentUser?.personRoleList,
-                        isOnboarded: currentUser?.personIsOnboarded,
-                      });
+                    onClick={async () => {
+                      if (currentUser) {
+                        await RedirectUser({
+                          router: router,
+                          roleList: currentUser.personRoleList,
+                          isOnboarded: currentUser.personIsOnboarded,
+                        });
+                      } else {
+                        console.error("currentUser is not defined");
+                      }
                     }}
                   >
                     <Typography variant="bodyRegular" highlight>
