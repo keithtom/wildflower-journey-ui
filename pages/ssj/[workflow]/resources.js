@@ -36,7 +36,7 @@ const Resources = () => {
   };
 
   const { resources, isLoading } = useSSJResources(workflow);
-  console.log({ resources });
+  // console.log({ resources });
 
   const hero = "/assets/images/ssj/wildflowerSystems.jpg";
 
@@ -52,8 +52,8 @@ const Resources = () => {
               <Grid item>
                 <Stack spacing={6} direction="row" alignItems="center">
                   <Icon type="fileBlank" variant="primary" size="large" />
-                  <Typography variant="h3" bold>
-                    Resources
+                  <Typography variant="h3" bold capitalize>
+                    {t("ssj_ui_content.resources")}
                   </Typography>
                 </Stack>
               </Grid>

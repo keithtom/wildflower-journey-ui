@@ -4,6 +4,8 @@ import { Typography, Stack } from "@ui";
 import CategoryChip from "@components/CategoryChip";
 import StatusChip from "@components/StatusChip";
 
+import { useTranslation } from "next-i18next";
+
 const MilestonePageHead = ({
   isLoading,
   title,
@@ -11,6 +13,7 @@ const MilestonePageHead = ({
   status,
   categories,
 }) => {
+  const { t } = useTranslation("common");
   return (
     <>
       {isLoading ? (
@@ -40,16 +43,16 @@ const MilestonePageHead = ({
             >
               {status ? (
                 <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    STATUS
+                  <Typography variant="bodyMini" lightened bold uppercase>
+                    {t("ssj_ui_content.status")}
                   </Typography>
                   <StatusChip status={status} size="small" withIcon />
                 </Stack>
               ) : null}
               {categories?.length ? (
                 <Stack spacing={2}>
-                  <Typography variant="bodyMini" lightened bold>
-                    CATEGORY
+                  <Typography variant="bodyMini" lightened bold uppercase>
+                    {t("ssj_ui_content.category")}
                   </Typography>
                   <Stack direction="row" spacing={2}>
                     {categories.map((m, i) => (
