@@ -185,7 +185,7 @@ const SSJ = () => {
       ],
     },
     {
-      name: "With Your Team",
+      name: t("ways_to_work_together.with_your_team"),
       resources: [
         {
           title: t("ways_to_work_together.identify_a_teacher_leader_partner"),
@@ -216,7 +216,7 @@ const SSJ = () => {
       ],
     },
     {
-      name: "With Your Community",
+      name: t("ways_to_work_together.with_your_community"),
       resources: [
         {
           title: t("ways_to_work_together.attend_wildflower_community_events"),
@@ -921,6 +921,7 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
 const WaysToWorkCard = ({ waysToWork }) => {
   const [waysToWorkModalOpen, setWaysToWorkModalOpen] = useState(false);
   const { t } = useTranslation("common");
+
   return (
     <>
       <Card
@@ -1019,7 +1020,11 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
   const { t } = useTranslation("common");
 
   return (
-    <Modal title="Add your anticipated open date" toggle={toggle} open={open}>
+    <Modal
+      title={t("ssj_ui_content.add_open_date")}
+      toggle={toggle}
+      open={open}
+    >
       <Stack spacing={3}>
         <Card variant="primaryLightened">
           <Stack alignItems="center" justifyContent="center" spacing={3}>

@@ -154,12 +154,12 @@ const ToDoList = ({}) => {
                     <Typography variant="h3" bold>
                       {isOperationsGuide
                         ? "Looks like this team doesn't have anything on their do to list!"
-                        : "Looks like you don't have any tasks on your to do list!"}
+                        : t("ssj_ui_content.looks_like_you_have_no_tasks")}
                     </Typography>
                     <Typography variant="bodyLarge" lightened>
                       {isOperationsGuide
                         ? "Next time you meet with them help them add a task to their to do list."
-                        : "To start, add a task from one of these milestones. You can take them on at your own pace, according to your interests, needs, and timeline."}
+                        : t("ssj_ui_content.to_start_try_a_milestone")}
                     </Typography>
                   </Stack>
                 </Card>
@@ -197,10 +197,12 @@ const ToDoList = ({}) => {
                                 justifyContent="space-between"
                               >
                                 <Typography variant="bodyRegular" bold>
-                                  {m.attributes.title}
+                                  {m.attributes[
+                                    getTranslatedAttr(router.locale, "title")
+                                  ] || m.attributes.title}
                                 </Typography>
                                 <Button small variant="text">
-                                  Start here
+                                  {t("ssj_ui_content.start_here")}
                                 </Button>
                               </Stack>
                             </Card>
