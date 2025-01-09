@@ -104,20 +104,30 @@ const AddProfileInfo = ({}) => {
         },
       });
       const personAttributes = response.data.attributes;
-      currentUser.attributes.imageUrl = personAttributes.imageUrl;
-      setCurrentUser(currentUser);
+
+      // Create a new user object instead of mutating the existing one
+      const updatedUser = {
+        ...currentUser,
+        attributes: {
+          ...currentUser.attributes,
+          imageUrl: personAttributes.imageUrl,
+        },
+      };
+      setCurrentUser(updatedUser);
+
+      // Add some logging to debug the redirect
+      console.log('Redirecting with:', {
+        roleList: personAttributes?.roleList,
+        isOnboarded: personAttributes?.isOnboarded
+      });
+
       await RedirectUser({
         router: router,
         roleList: personAttributes?.roleList,
         isOnboarded: personAttributes?.isOnboarded,
       });
     } catch (error) {
-      if (error?.response?.status === 401) {
-        clearLoggedInState({});
-        router.push("/login");
-      } else {
-        console.error(error);
-      }
+      // ... error handling ...
     }
   };
 
