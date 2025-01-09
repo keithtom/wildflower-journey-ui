@@ -25,6 +25,12 @@ import {
 } from "@ui";
 
 const OpenSchool = () => {
+  const [mySchoolWorkflowId, setMySchoolWorkflowId] = useState();
+  useEffect(() => {
+    sessionStorage.getItem("mySchoolWorkflowId") &&
+      setMySchoolWorkflowId(sessionStorage.getItem("mySchoolWorkflowId"));
+  }, []);
+  console.log({mySchoolWorkflowId})
   const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow } = router.query;
@@ -41,12 +47,26 @@ const OpenSchool = () => {
 
   const included = personData?.included;
   const schools = personData?.data?.relationships?.schools?.data;
+  const mySchoolName = currentUser?.attributes?.schools?.find(
+    (school) => school.workflowId === mySchoolWorkflowId
+  )?.name
+
+  console.log({mySchoolName})
 
   const userSchool =
     isLoading || !personData
       ? []
       : handleFindMatchingItems(included, schools, "id");
-  const school = userSchool[0];
+
+  const school = mySchoolName
+    ? userSchool.find(school => school.attributes.name === mySchoolName)
+    : userSchool[0];
+
+  // Add a fallback in case no matching school is found
+  if (!school && userSchool.length > 0) {
+    school = userSchool[0];
+  }
+
 
   const thisMonth = new Date().getMonth();
   const thisYear = new Date().getFullYear();
