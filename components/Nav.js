@@ -52,6 +52,10 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const router = useRouter();
   const { t } = useTranslation("common");
 
+  const { workflow } = router.query;
+  const approvedWorkflowIds = ["5c8f-d17c"]; // Maggie's workflow ID
+  const isApproved = approvedWorkflowIds.includes(workflow);
+
   // console.log(screenSize.isSm);
 
   return (
@@ -90,7 +94,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                 </Card>
               </Link>
             </Grid>
-            {router.pathname.includes("/ssj/") ? (
+            {isApproved && router.pathname.includes("/ssj/") ? (
               <Grid item xs={12}>
                 <TranslationToggle />
               </Grid>
