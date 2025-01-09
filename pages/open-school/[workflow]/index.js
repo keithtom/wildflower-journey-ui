@@ -47,6 +47,7 @@ const OpenSchool = () => {
       ? []
       : handleFindMatchingItems(included, schools, "id");
   const school = userSchool[0];
+  console.log({userSchool})
 
   const thisMonth = new Date().getMonth();
   const thisYear = new Date().getFullYear();

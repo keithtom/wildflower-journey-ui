@@ -26,22 +26,28 @@ const YourSchools = () => {
   //fetch data
   const { teams, isLoading } = useAllTeams();
 
+
   //set teams array
   let ssjTeams = teams || [];
 
+  //filter teams to only be for which this user is an ops guide
+  const filteredTeams = ssjTeams?.filter((team) =>
+    team.relationships?.opsGuide?.data?.id === currentUser.id
+  );
+
   //set grouped teams by phase
-  const visioningTeams = ssjTeams.filter(
+  const visioningTeams = filteredTeams.filter(
     (team) => team.attributes.currentPhase === "visioning"
   );
-  const planningTeams = ssjTeams.filter(
+  const planningTeams = filteredTeams.filter(
     (team) => team.attributes.currentPhase === "planning"
   );
-  const startupTeams = ssjTeams.filter(
+  const startupTeams = filteredTeams.filter(
     (team) => team.attributes.currentPhase === "startup"
   );
 
   useAuth("/login");
-  // console.log({ ssjTeams });
+  // console.log({ filteredTeams });
 
   return (
     <PageContainer>

@@ -11,7 +11,6 @@ import peopleApi from "@api/people";
 const TranslationToggle = () => {
   const router = useRouter();
   const { pathname, asPath, query } = router;
-  const { workflow } = router.query;
 
   // get relevant data
   const { currentUser } = useUserContext();
@@ -55,12 +54,7 @@ const TranslationToggle = () => {
     }
   };
 
-  const approvedWorkflowIds = ["5c8f-d17c"]; // Maggie's workflow ID
-  const isApproved = approvedWorkflowIds.includes(workflow);
-  // console.log({ workflow });
-  // console.log({ isApproved });
-
-  return isApproved ? (
+  return (
     <Card size="small">
       <Stack direction="row" spacing={2} alignItems="center">
         <Icon type="globe" size="small" variant="lightened" />
@@ -82,7 +76,7 @@ const TranslationToggle = () => {
         </Typography>
       </Stack>
     </Card>
-  ) : null;
+  )
 };
 
 export default TranslationToggle;
