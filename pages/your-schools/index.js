@@ -32,7 +32,7 @@ const YourSchools = () => {
 
   //filter teams to only be for which this user is an ops guide
   const filteredTeams = ssjTeams?.filter((team) =>
-    team.relationships?.opsGuide?.data?.id === currentUser.id
+    team.relationships?.opsGuide?.data?.id === currentUser?.id
   );
 
   //set grouped teams by phase
