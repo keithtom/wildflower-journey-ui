@@ -15,7 +15,7 @@ const PageWrapper = styled(Box)`
 `;
 const PageContent = styled(Box)`
   flex-grow: 1;
-  margin-top: ${({ theme }) => theme.util.appBarHeight}px;
+  // margin-left: ${({ theme }) => theme.util.drawerWidth}px;
   padding: ${({ theme }) => theme.util.buffer * 6}px;
   overflow-y: hidden;
 `;
@@ -61,10 +61,10 @@ const PageContainer = ({ children, isLoading, hideNav }) => {
           </>
         ) : (
           <>
-            <Header toggleNavOpen={toggleNavOpen} />
-            {hideNav ? null : (
+            {/* <Header toggleNavOpen={toggleNavOpen} /> */}
+            {/* {hideNav ? null : (
               <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
-            )}
+            )} */}
             <PageContent>
               {isLoading ? (
                 <Box
