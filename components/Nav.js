@@ -338,7 +338,10 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
               <Collapse in={schoolExpanded} timeout="auto" unmountOnExit>
                 <NavList sx={{ padding: 0 }}>
                   <NavListItemButton
-                    onClick={() => router.push("/school/1234/to-do-list")}
+                    onClick={() =>
+                      router.push(`/school/${school.id}/to-do-list`)
+                    }
+                    selected={router.pathname.endsWith("/to-do-list")}
                     sx={{ pl: 8 }}
                   >
                     <NavListItemIcon>
