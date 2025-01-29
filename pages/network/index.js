@@ -112,7 +112,11 @@ const Network = () => {
   if (error) return <PageContainer>failed to load</PageContainer>;
 
   return (
-    <PageContainer isLoading={!currentUser} hideNav={!currentUser}>
+    <PageContainer
+      isLoading={!currentUser}
+      hideNav={!currentUser}
+      title="Network"
+    >
       <Grid
         container
         justifyContent="space-between"

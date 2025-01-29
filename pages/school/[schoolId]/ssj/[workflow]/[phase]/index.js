@@ -38,7 +38,7 @@ const PhasePage = () => {
   const { t } = useTranslation("common");
 
   const router = useRouter();
-  const { workflow, phase } = router.query;
+  const { workflow, phase, schoolId } = router.query;
 
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
@@ -128,7 +128,7 @@ const PhasePage = () => {
                   >
                     {milestonesByCurrentPhase?.in_progress?.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                        link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={
                           m.attributes[
@@ -178,7 +178,7 @@ const PhasePage = () => {
                   >
                     {milestonesByCurrentPhase?.to_do?.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                        link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={
                           m.attributes[
@@ -224,7 +224,7 @@ const PhasePage = () => {
                   >
                     {milestonesByCurrentPhase?.up_next?.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                        link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={
                           m.attributes[
@@ -270,7 +270,7 @@ const PhasePage = () => {
                   >
                     {milestonesByCurrentPhase?.done?.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                        link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={
                           m.attributes[

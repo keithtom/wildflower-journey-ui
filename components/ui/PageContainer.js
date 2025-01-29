@@ -15,12 +15,12 @@ const PageWrapper = styled(Box)`
 `;
 const PageContent = styled(Box)`
   flex-grow: 1;
-  // margin-left: ${({ theme }) => theme.util.drawerWidth}px;
   padding: ${({ theme }) => theme.util.buffer * 6}px;
   overflow-y: hidden;
+  margin-top: ${({ theme }) => theme.util.appBarHeight}px;
 `;
 
-const PageContainer = ({ children, isLoading, hideNav }) => {
+const PageContainer = ({ children, isLoading, hideNav, title }) => {
   //TODO: Get this data from the backend
   const SSJAbandonProcessStarted = false;
 
@@ -61,10 +61,8 @@ const PageContainer = ({ children, isLoading, hideNav }) => {
           </>
         ) : (
           <>
-            {/* <Header toggleNavOpen={toggleNavOpen} /> */}
-            {/* {hideNav ? null : (
-              <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
-            )} */}
+            {!hideNav && <Header title={title} />}
+
             <PageContent>
               {isLoading ? (
                 <Box

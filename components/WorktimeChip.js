@@ -20,7 +20,7 @@ const WorktimeChip = ({ worktime, withIcon, ...props }) => {
     return item;
   });
   //log the output
-  console.log({ worktimeItems });
+  // console.log({ worktimeItems });
 
   return (
     <Chip

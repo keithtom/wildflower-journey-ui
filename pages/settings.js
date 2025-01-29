@@ -63,11 +63,8 @@ const SettingsPage = () => {
         />
       </Head>
 
-      <PageContainer>
+      <PageContainer title="Settings">
         <Stack spacing={12}>
-          <Typography variant="h3" bold>
-            Settings
-          </Typography>
           <Grid container>
             <Grid item xs={12}>
               <Stack spacing={6}>

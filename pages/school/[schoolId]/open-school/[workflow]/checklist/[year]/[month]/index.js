@@ -42,7 +42,12 @@ const AdminChecklist = () => {
   const router = useRouter();
   const workflowId = currentUser?.attributes.schools[0].workflowId;
 
-  const { year: yearQuery, month: monthQuery } = router.query;
+  const {
+    year: yearQuery,
+    month: monthQuery,
+    schoolId,
+    workflow,
+  } = router.query;
 
   const [isToday, setIsToday] = useState(false);
 
@@ -64,26 +69,28 @@ const AdminChecklist = () => {
         {
           pathname: router.pathname,
           query: {
-            workflow: workflowId,
+            workflow: workflow,
             month: 0,
             year: Number(yearQuery) + 1,
           },
         },
-        `/open-school/${workflowId}/checklist/${Number(yearQuery) + 1}/0`
+        `/school/${schoolId}/open-school/${workflow}/checklist/${
+          Number(yearQuery) + 1
+        }/0`
       );
     } else {
       router.push(
         {
           pathname: router.pathname,
           query: {
-            workflow: workflowId,
+            workflow: workflow,
             month: Number(monthQuery) + 1,
             year: Number(yearQuery),
           },
         },
-        `/open-school/${workflowId}/checklist/${Number(yearQuery)}/${
-          Number(monthQuery) + 1
-        }`
+        `/school/${schoolId}/open-school/${workflow}/checklist/${Number(
+          yearQuery
+        )}/${Number(monthQuery) + 1}`
       );
     }
   };
@@ -94,26 +101,28 @@ const AdminChecklist = () => {
         {
           pathname: router.pathname,
           query: {
-            workflow: workflowId,
+            workflow: workflow,
             month: 11,
             year: Number(yearQuery) - 1,
           },
         },
-        `/open-school/${workflowId}/checklist/${Number(yearQuery) - 1}/11`
+        `/school/${schoolId}/open-school/${workflow}/checklist/${
+          Number(yearQuery) - 1
+        }/11`
       );
     } else {
       router.push(
         {
           pathname: router.pathname,
           query: {
-            workflow: workflowId,
+            workflow: workflow,
             month: Number(monthQuery) - 1,
             year: Number(yearQuery),
           },
         },
-        `/open-school/${workflowId}/checklist/${Number(yearQuery)}/${
-          Number(monthQuery) - 1
-        }`
+        `/school/${schoolId}/open-school/${workflow}/checklist/${Number(
+          yearQuery
+        )}/${Number(monthQuery) - 1}`
       );
     }
   };
@@ -124,12 +133,12 @@ const AdminChecklist = () => {
       {
         pathname: router.pathname,
         query: {
-          workflow: workflowId,
+          workflow: workflow,
           month: now.getMonth(),
           year: now.getFullYear(),
         },
       },
-      `/open-school/${workflowId}/checklist/${now.getFullYear()}/${now.getMonth()}`
+      `/school/${schoolId}/open-school/${workflow}/checklist/${now.getFullYear()}/${now.getMonth()}`
     );
   };
 
@@ -376,7 +385,7 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.in_progress.past_months}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.in_progress.monthlyCombined && (
@@ -385,21 +394,21 @@ const AdminChecklist = () => {
                         milestones={
                           groupedMilestones.in_progress.monthlyCombined
                         }
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.in_progress.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.in_progress.quarterly}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.in_progress.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.in_progress.annually}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                   </List>
@@ -439,28 +448,28 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.to_do.past_months}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.to_do.monthlyCombined && (
                       <MilestoneGroup
                         periodName="This Month"
                         milestones={groupedMilestones.to_do.monthlyCombined}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.to_do.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.to_do.quarterly}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.to_do.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.to_do.annually}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                   </List>
@@ -496,28 +505,28 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.done.past_months}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.done.monthlyCombined && (
                       <MilestoneGroup
                         periodName="This Month"
                         milestones={groupedMilestones.done.monthlyCombined}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.done.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.done.quarterly}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.done.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.done.annually}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                   </List>
@@ -566,7 +575,7 @@ export default AdminChecklist;
 
 const MilestoneGroup = ({ workflowId, milestones, periodName }) => {
   const router = useRouter();
-  const { workflow, year, month } = router.query;
+  const { workflow, year, month, schoolId } = router.query;
 
   const [open, setOpen] = useState(true);
   return (
@@ -601,7 +610,7 @@ const MilestoneGroup = ({ workflowId, milestones, periodName }) => {
           {milestones.map((m, i) => (
             <Milestone
               key={i}
-              link={`/open-school/${workflowId}/checklist/${year}/${month}/${m.id}`}
+              link={`/school/${schoolId}/open-school/${workflow}/checklist/${year}/${month}/${m.id}`}
               title={m.attributes.title}
               description={m.attributes.description}
               categories={m.attributes.categories}

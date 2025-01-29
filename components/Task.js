@@ -79,66 +79,31 @@ const Task = ({
   const router = useRouter();
   const { workflow, milestone } = router.query;
 
-  let assignableUsers;
-  // Fetch the current user's data
-  const { data: person, isLoading: personIsLoading } = usePerson(
-    currentUser?.id,
-    { network: true }
+  // Get the current school data
+  const { data: school, isLoading: schoolIsLoading } = useSchool(
+    router.query.schoolId
   );
-  // console.log({ person });
-  // console.log({ currentUser });
-  // Extract the school ID from the user's data
-  const userSchoolId =
-    person?.data?.relationships?.schools?.data?.[0]?.id || undefined;
-  if (router.pathname.startsWith("/open-school/")) {
-    // If the current route starts with '/open-school', fetch the school's data and use it to set assignableUsers
-    const { data: school, isLoading: schoolIsLoading } =
-      useSchool(userSchoolId);
-    if (!schoolIsLoading) {
-      assignableUsers = school?.included.filter((item) => {
-        if (item.type === "person" && item.attributes.isOnboarded === true) {
-          return school.included.some(
-            (relationship) =>
-              relationship.type === "schoolRelationship" &&
-              (relationship?.relationships?.person?.data?.id ?? null) ===
-                (item?.id ?? null) &&
-              relationship.attributes.endDate === null
-          );
-        }
-        return false;
-      });
-    }
-  } else if (router.pathname.startsWith("/ssj/")) {
-    //if sessionStorage has schoolName, the viewer is an ops guide
-    if (sessionStorage.getItem("schoolName")) {
-      const { teams, isLoading: allTeamsIsLoading } = useAllTeams();
-      // get the team id of the viewed school using the workflow id in the url
-      const viewedSchool = teams?.filter(
-        (t) => t.attributes.workflowId === workflow
-      );
-      // set assignable users from the team
-      if (!allTeamsIsLoading) {
-        assignableUsers = [
-          ...(viewedSchool[0]?.relationships?.partners?.data || []),
-        ];
-      }
-    } else {
-      // If the current route starts with '/ssj/', fetch the team's data and use it to set assignableUsers
-      const teamId = currentUser?.attributes?.ssj?.teamId;
-      const { team, isLoading: teamIsLoading } = useTeam(teamId);
-      // set assignable users as partners
-      if (!teamIsLoading) {
-        assignableUsers = [
-          ...(team?.data?.data?.relationships?.partners?.data || []),
-        ];
-      }
-    }
+
+  let assignableUsers;
+
+  // Only set assignable users once school data is loaded
+  if (!schoolIsLoading && school?.included) {
+    // Filter included array for persons who are Teacher Leaders or Emerging Teacher Leaders and are onboarded
+    assignableUsers = school.included.filter(
+      (item) =>
+        item.type === "person" &&
+        item.attributes.isOnboarded === true &&
+        item.attributes.roleList?.some((role) =>
+          ["Teacher Leader", "Emerging Teacher Leader"].includes(role)
+        )
+    );
   }
 
-  // Common interface that all invokations of Task should use.
+  // Common interface that all invocations of Task should use.
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
   // If you have props that depend on where they are being called from, put them as inputs for Task
 
+  // console.log({ school });
   console.log({ task });
   // console.log({ assignableUsers });
 
@@ -646,7 +611,7 @@ const TaskDrawerActions = ({
   const { currentUser } = useUserContext();
   // const completedBy = taskCompleters[0]; // just take the first since only used when its not me
   // NOTE: canUncompleteTask is not the same as "Completed by me" because sometimes we can't uncomplete a step because the process is completed even though we completed the step.
-  console.log({ taskCompleters });
+  // console.log({ taskCompleters });
 
   return (
     <Grid container spacing={4}>

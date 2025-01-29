@@ -22,6 +22,7 @@ import { getScreenSize } from "../hooks/react-responsive";
 import { useUserContext } from "../lib/useUserContext";
 import { user } from "../lib/utils/fake-data";
 import { theme } from "../styles/theme";
+import { logout } from "@api/auth";
 import {
   Select,
   Card,
@@ -39,6 +40,7 @@ import {
 import Header from "./Header";
 import useAssignedSteps from "@hooks/useAssignedSteps";
 import TranslationToggle from "./TranslationToggle";
+import useWorkflow from "@hooks/useWorkflow";
 
 // import AdviceProcessNavigation from "./page-content/advice/AdviceProcessNavigation";
 
@@ -69,7 +71,7 @@ const NavList = styled(List)`
 
 const NavListItemButton = styled(ListItemButton)`
   padding: ${({ theme }) => theme.spacing(2, 2)};
-  margin: ${({ theme }) => theme.spacing(0.5, 0)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
   border-radius: ${({ theme }) => theme.radius.md}px;
   &:hover {
     background-color: ${({ theme }) => theme.color.neutral.lightened};
@@ -141,14 +143,207 @@ const NavListItemIcon = styled(ListItemIcon)`
   padding-left: 8px;
 `;
 
+const WorkflowNavItems = ({
+  school,
+  workflowId,
+  openSection,
+  onSectionClick,
+}) => {
+  const router = useRouter();
+  const { workflow, isLoading, isError } = useWorkflow(workflowId);
+  const [expanded, setExpanded] = useState(false);
+
+  console.log({ workflow });
+
+  // Add current date logic
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-based
+
+  useEffect(() => {
+    // Check if any child route is selected
+    const isChecklistSelected = router.asPath.startsWith(
+      `/school/${school.id}/open-school/${workflowId}/checklist`
+    );
+    const isResourcesSelected =
+      router.asPath ===
+      `/school/${school.id}/open-school/${workflowId}/resources`;
+    const isVisioningSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/visioning`;
+    const isPlanningSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/planning`;
+    const isStartupSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/startup`;
+    const isSsjResourcesSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/resources`;
+
+    // Set expanded if any child route is selected
+    setExpanded(
+      isChecklistSelected ||
+        isResourcesSelected ||
+        isVisioningSelected ||
+        isPlanningSelected ||
+        isStartupSelected ||
+        isSsjResourcesSelected
+    );
+  }, [router.asPath, school.id, workflowId]);
+
+  if (isLoading || !workflow) {
+    return null;
+  }
+
+  const isOpenSchoolChecklist = workflow.attributes.recurring === true;
+  const isSchoolStartupJourney = workflow.attributes.recurring === false;
+
+  if (isOpenSchoolChecklist) {
+    return (
+      <>
+        <NavListItemButton
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setExpanded(!expanded);
+          }}
+          sx={{ pl: 8 }}
+        >
+          <NavListItemIcon>
+            <Icon type="calendar" />
+          </NavListItemIcon>
+          <NavListItemText primary="Open School Checklist" />
+          <Icon
+            type={expanded ? "chevronDown" : "chevronRight"}
+            variant="lightened"
+            size="small"
+          />
+        </NavListItemButton>
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <NavList sx={{ padding: 0 }}>
+            <NavListItemButton
+              onClick={() =>
+                router.push(
+                  `/school/${school.id}/open-school/${workflowId}/checklist/${currentYear}/${currentMonth}`
+                )
+              }
+              selected={router.asPath.startsWith(
+                `/school/${school.id}/open-school/${workflowId}/checklist`
+              )}
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Checklist" />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(
+                  `/school/${school.id}/open-school/${workflowId}/resources`
+                )
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/open-school/${workflowId}/resources`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Resources" />
+            </NavListItemButton>
+          </NavList>
+        </Collapse>
+      </>
+    );
+  }
+
+  if (isSchoolStartupJourney) {
+    return (
+      <>
+        <NavListItemButton
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setExpanded(!expanded);
+          }}
+          sx={{ pl: 8 }}
+        >
+          <NavListItemIcon>
+            <Icon type="map" />
+          </NavListItemIcon>
+          <NavListItemText primary="School Startup Journey" />
+          <Icon
+            type={expanded ? "chevronDown" : "chevronRight"}
+            variant="lightened"
+            size="small"
+          />
+        </NavListItemButton>
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <NavList sx={{ padding: 0 }}>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/visioning`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/visioning`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Visioning" />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/planning`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/planning`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Planning" />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/startup`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/startup`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Startup" />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/resources`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/resources`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Resources" />
+            </NavListItemButton>
+          </NavList>
+        </Collapse>
+      </>
+    );
+  }
+
+  return null;
+};
+
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const { screenSize } = getScreenSize();
   const router = useRouter();
   const { t } = useTranslation("common");
   const [anchorEl, setAnchorEl] = useState(null);
-  const [schoolExpanded, setSchoolExpanded] = useState(false);
-  const [checklistExpanded, setChecklistExpanded] = useState(false);
-  const [journeyExpanded, setJourneyExpanded] = useState(false);
+  const [openSchoolId, setOpenSchoolId] = useState(null);
+  const [openSection, setOpenSection] = useState(null);
   const {
     currentUser,
     isLoggedIn,
@@ -157,22 +352,45 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
     isOperationsGuide,
   } = useUserContext();
 
+  // Set initial open school based on route
   useEffect(() => {
-    // Main school section
-    setSchoolExpanded(router.pathname.includes("/school/"));
+    const schoolIdMatch = router.asPath.match(/\/school\/([^/]+)/);
+    if (schoolIdMatch) {
+      setOpenSchoolId(schoolIdMatch[1]);
+    } else {
+      // If we're not on a school route, collapse the school section
+      setOpenSchoolId(null);
+    }
+  }, [router.asPath]);
 
-    // Open School Checklist section
-    setChecklistExpanded(router.pathname.includes("/open-school/"));
-
-    // School Startup Journey section
-    setJourneyExpanded(
-      router.pathname.includes("/ssj/") ||
-        router.pathname.includes("/visioning") ||
-        router.pathname.includes("/planning") ||
-        router.pathname.includes("/startup") ||
-        router.pathname.includes("/resources")
-    );
+  // Determine which section should be open based on current route
+  useEffect(() => {
+    if (router.pathname.includes("/school/")) {
+      if (router.pathname.includes("/open-school/")) {
+        setOpenSection("openSchool");
+      } else if (router.pathname.includes("/ssj/")) {
+        setOpenSection("ssj");
+      } else {
+        setOpenSection("school");
+      }
+    } else {
+      // If we're not on a school route, collapse all sections
+      setOpenSection(null);
+    }
   }, [router.pathname]);
+
+  const handleSectionClick = (section) => {
+    setOpenSection(openSection === section ? null : section);
+  };
+
+  const handleSchoolClick = (schoolId) => {
+    router.push(`/school/${schoolId}`);
+    // Only toggle if it's not already open
+    if (openSchoolId !== schoolId) {
+      setOpenSchoolId(schoolId);
+      handleSectionClick("school");
+    }
+  };
 
   // Don't render nav if user is not logged in
   if (!isLoggedIn) {
@@ -195,7 +413,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
 
   async function handleLogOut() {
     try {
-      const res = await registrationsAPI.logout();
+      const res = await logout();
       console.log(res);
     } catch (err) {
       if (err?.response?.status !== 401) {
@@ -209,9 +427,10 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
       });
     }
   }
+  const logo = "/assets/images/wildflower-logo.png";
 
   // console.log(screenSize.isSm);
-
+  console.log({ currentUser });
   return (
     <StyledNav sx={{ display: "flex" }}>
       <CustomDrawer
@@ -221,233 +440,177 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
         onClose={toggleNavOpen}
         sx={{ p: 2 }}
       >
-        <NavList>
-          <NavListItemButton
-            onClick={handleUserClick}
-            sx={{ cursor: "pointer" }}
-          >
-            <ListItemAvatar>
-              <Avatar
-                sx={{ height: 40, width: 40 }}
-                src={currentUser?.attributes.imageUrl}
-              />
-            </ListItemAvatar>
-            <NavListItemText
-              primary={`${currentUser?.attributes.firstName} ${currentUser?.attributes.lastName}`}
-              secondary={currentUser?.personRoleList.map((m) => {
-                return `${m}, `;
-              })}
-              bold
-            />
-            <Box
-              sx={{
-                ml: 1,
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0,
-              }}
-            >
-              <Icon type="dotsVertical" variant="lightened" />
-            </Box>
-          </NavListItemButton>
-          <NavListItemButton onClick={() => router.push("/network")}>
-            <NavListItemIcon>
-              <Icon type="bookReader" />
-            </NavListItemIcon>
-            <NavListItemText primary="Network" bold />
-          </NavListItemButton>
-          <NavListItemButton onClick={() => router.push("/your-schools")}>
-            <NavListItemIcon>
-              <Icon type="buildingHouse" />
-            </NavListItemIcon>
-            <NavListItemText primary="Your Schools" bold />
-          </NavListItemButton>
-        </NavList>
-        <NavPopover
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "left",
-          }}
+        <Stack
+          justifyContent="space-between"
+          direction="column"
+          sx={{ height: "100%" }}
         >
-          <NavList>
-            <NavListItemButton
-              onClick={() => router.push(`/network/people/${currentUser?.id}`)}
-            >
-              <NavListItemIcon>
-                <Icon type="user" variant="lightened" />
-              </NavListItemIcon>
-              <NavListItemText primary="Your Profile" />
-            </NavListItemButton>
-            <Divider
-              sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
-            />
-            <NavListItemButton onClick={() => router.push("/admin")}>
-              <NavListItemIcon>
-                <Icon type="data" variant="lightened" />
-              </NavListItemIcon>
-              <NavListItemText primary="Switch To Admin" />
-            </NavListItemButton>
-            <NavListItemButton onClick={() => router.push("/settings")}>
-              <NavListItemIcon>
-                <Icon type="cog" variant="lightened" />
-              </NavListItemIcon>
-              <NavListItemText primary="Settings" />
-            </NavListItemButton>
-            <Divider
-              sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
-            />
-            <NavListItemButton onClick={handleLogOut}>
-              <NavListItemIcon>
-                <Icon type="logOut" variant="lightened" />
-              </NavListItemIcon>
-              <NavListItemText primary="Logout" />
-            </NavListItemButton>
-          </NavList>
-        </NavPopover>
-
-        <Divider sx={{ my: 2, borderColor: theme.color.neutral.lightened }} />
-
-        <NavList>
-          {currentUser?.attributes.schools.map((school, i) => (
-            <>
+          <div>
+            <NavList>
               <NavListItemButton
-                key={i}
-                onClick={() => router.push(`/school/${school.id}`)}
-                selected={router.asPath === `/school/${school.id}`}
+                onClick={handleUserClick}
+                sx={{ cursor: "pointer" }}
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    sx={{ height: 40, width: 40 }}
+                    src={currentUser?.attributes.imageUrl}
+                  />
+                </ListItemAvatar>
+                <NavListItemText
+                  primary={`${currentUser?.attributes.firstName} ${currentUser?.attributes.lastName}`}
+                  secondary={currentUser?.personRoleList.map((m) => {
+                    return `${m}, `;
+                  })}
+                  bold
+                />
+                <Box
+                  sx={{
+                    ml: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon type="dotsVertical" variant="lightened" />
+                </Box>
+              </NavListItemButton>
+              <NavListItemButton
+                onClick={() => router.push("/network")}
+                selected={router.pathname.includes("/network")}
               >
                 <NavListItemIcon>
-                  <Box
-                    sx={{
-                      height: 24,
-                      width: 24,
-                      borderRadius: (theme) => theme.radius.md + "px",
-                      backgroundColor: (theme) => theme.color.neutral.main,
-                    }}
-                  />
+                  <Icon type="bookReader" />
                 </NavListItemIcon>
-                <NavListItemText primary={school.name} bold />
-                <Icon variant="lightened" size="small" />
+                <NavListItemText primary="Network" bold />
               </NavListItemButton>
-              <Collapse in={schoolExpanded} timeout="auto" unmountOnExit>
-                <NavList sx={{ padding: 0 }}>
-                  <NavListItemButton
-                    onClick={() =>
-                      router.push(`/school/${school.id}/to-do-list`)
-                    }
-                    selected={router.pathname.endsWith("/to-do-list")}
-                    sx={{ pl: 8 }}
-                  >
-                    <NavListItemIcon>
-                      <Icon type="inbox" />
-                    </NavListItemIcon>
-                    <NavListItemText primary="To Do List" />
-                  </NavListItemButton>
+              {currentUser?.personRoleList.includes("Operations Guide") ? (
+                <NavListItemButton onClick={() => router.push("/your-schools")}>
+                  <NavListItemIcon>
+                    <Icon type="buildingHouse" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Your Schools" bold />
+                </NavListItemButton>
+              ) : null}
+            </NavList>
+            <NavPopover
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <NavList>
+                <NavListItemButton
+                  onClick={() =>
+                    router.push(`/network/people/${currentUser?.id}`)
+                  }
+                >
+                  <NavListItemIcon>
+                    <Icon type="user" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Your Profile" />
+                </NavListItemButton>
+                <Divider
+                  sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+                />
+                <NavListItemButton onClick={() => router.push("/admin")}>
+                  <NavListItemIcon>
+                    <Icon type="data" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Switch To Admin" />
+                </NavListItemButton>
+                <NavListItemButton onClick={() => router.push("/settings")}>
+                  <NavListItemIcon>
+                    <Icon type="cog" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Settings" />
+                </NavListItemButton>
+                <Divider
+                  sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+                />
+                <NavListItemButton onClick={handleLogOut}>
+                  <NavListItemIcon>
+                    <Icon type="logOut" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Logout" />
+                </NavListItemButton>
+              </NavList>
+            </NavPopover>
 
+            <Divider
+              sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+            />
+
+            <NavList>
+              {currentUser?.attributes.schools.map((school, i) => (
+                <div key={i}>
                   <NavListItemButton
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setChecklistExpanded(!checklistExpanded);
-                    }}
-                    sx={{ pl: 8 }}
+                    onClick={() => handleSchoolClick(school.id)}
+                    selected={router.asPath === `/school/${school.id}`}
                   >
                     <NavListItemIcon>
-                      <Icon type="calendar" />
+                      <Box
+                        sx={{
+                          height: 24,
+                          width: 24,
+                          borderRadius: (theme) => theme.radius.md + "px",
+                          backgroundColor: (theme) => theme.color.neutral.main,
+                        }}
+                      />
                     </NavListItemIcon>
-                    <NavListItemText primary="Open School Checklist" />
+                    <NavListItemText primary={school.name} bold />
                     <Icon
-                      type={checklistExpanded ? "chevronDown" : "chevronRight"}
+                      type={
+                        openSchoolId === school.id
+                          ? "chevronDown"
+                          : "chevronRight"
+                      }
                       variant="lightened"
                       size="small"
                     />
                   </NavListItemButton>
-                  <Collapse in={checklistExpanded} timeout="auto" unmountOnExit>
-                    <NavList sx={{ padding: 0 }}>
-                      <NavListItemButton
-                        onClick={() =>
-                          router.push(
-                            "/school/1234/open-school/1234-1234/checklist/2025/1"
-                          )
-                        }
-                        sx={{ pl: 8 }}
-                      >
-                        <NavListItemIcon></NavListItemIcon>
-                        <NavListItemText secondary="Checklist" />
-                      </NavListItemButton>
-                    </NavList>
-                  </Collapse>
-                  <NavListItemButton
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setJourneyExpanded(!journeyExpanded);
-                    }}
-                    sx={{ pl: 8 }}
+                  <Collapse
+                    in={openSchoolId === school.id}
+                    timeout="auto"
+                    unmountOnExit
                   >
-                    <NavListItemIcon>
-                      <Icon type="map" />
-                    </NavListItemIcon>
-                    <NavListItemText primary="School Startup Journey" />
-                    <Icon
-                      type={journeyExpanded ? "chevronDown" : "chevronRight"}
-                      variant="lightened"
-                      size="small"
-                    />
-                  </NavListItemButton>
-                  <Collapse in={journeyExpanded} timeout="auto" unmountOnExit>
                     <NavList sx={{ padding: 0 }}>
                       <NavListItemButton
                         onClick={() =>
-                          router.push("/school/1234/ssj/1234-1234/visioning")
+                          router.push(`/school/${school.id}/to-do-list`)
                         }
-                        selected={router.pathname.endsWith("/visioning")}
+                        selected={router.pathname.endsWith("/to-do-list")}
                         sx={{ pl: 8 }}
                       >
-                        <NavListItemIcon></NavListItemIcon>
-                        <NavListItemText secondary="Visioning" />
+                        <NavListItemIcon>
+                          <Icon type="inbox" />
+                        </NavListItemIcon>
+                        <NavListItemText primary="To Do List" />
                       </NavListItemButton>
-                      <NavListItemButton
-                        onClick={() =>
-                          router.push("/school/1234/ssj/1234-1234/planning")
-                        }
-                        sx={{ pl: 8 }}
-                      >
-                        <NavListItemIcon></NavListItemIcon>
-                        <NavListItemText secondary="Planning" />
-                      </NavListItemButton>
-                      <NavListItemButton
-                        onClick={() =>
-                          router.push("/school/1234/ssj/1234-1234/startup")
-                        }
-                        sx={{ pl: 8 }}
-                      >
-                        <NavListItemIcon></NavListItemIcon>
-                        <NavListItemText secondary="Startup" />
-                      </NavListItemButton>
-                      <NavListItemButton
-                        onClick={() =>
-                          router.push("/school/1234/ssj/1234-1234/resources")
-                        }
-                        sx={{ pl: 8 }}
-                      >
-                        <NavListItemIcon></NavListItemIcon>
-                        <NavListItemText secondary="Resources" />
-                      </NavListItemButton>
+
+                      {school.workflowIds?.map((workflowId) => (
+                        <WorkflowNavItems
+                          key={workflowId}
+                          school={school}
+                          workflowId={workflowId}
+                          openSection={openSection}
+                          onSectionClick={handleSectionClick}
+                        />
+                      ))}
                     </NavList>
                   </Collapse>
-                </NavList>
-              </Collapse>
-            </>
-          ))}
-        </NavList>
-        {/* <Stack
+                </div>
+              ))}
+            </NavList>
+          </div>
+          {/* <Stack
           justifyContent="space-between"
           direction="column"
           sx={{ height: "100%" }}
@@ -504,6 +667,10 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
             ) : null}
           </Grid>
         </Stack> */}
+          <Box sx={{ padding: 4 }}>
+            <img src={logo} style={{ height: "32px" }} />
+          </Box>
+        </Stack>
       </CustomDrawer>
     </StyledNav>
   );
