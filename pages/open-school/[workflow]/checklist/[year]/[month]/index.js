@@ -40,9 +40,11 @@ const AdminChecklist = () => {
   const { screenSize } = getScreenSize();
   const { currentUser } = useUserContext();
   const router = useRouter();
-  const workflowId = currentUser?.attributes.schools[0].workflowId;
-
-  const { year: yearQuery, month: monthQuery } = router.query;
+  const {
+    year: yearQuery,
+    month: monthQuery,
+    workflow: workflowId,
+  } = router.query;
 
   const [isToday, setIsToday] = useState(false);
 
