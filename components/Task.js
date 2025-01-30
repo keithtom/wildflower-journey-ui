@@ -104,7 +104,7 @@ const Task = ({
   // If you have props that depend on where they are being called from, put them as inputs for Task
 
   // console.log({ school });
-  console.log({ task });
+  // console.log({ task });
   // console.log({ assignableUsers });
 
   const taskId = task.id;

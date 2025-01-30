@@ -40,7 +40,6 @@ const AdminChecklist = () => {
   const { screenSize } = getScreenSize();
   const { currentUser } = useUserContext();
   const router = useRouter();
-  const workflowId = currentUser?.attributes.schools[0].workflowId;
 
   const {
     year: yearQuery,
@@ -153,7 +152,7 @@ const AdminChecklist = () => {
   const [year, month] = timeframe.split("-");
   const nonZeroBasedDate = new Date(year, month - 1);
 
-  const { milestones, isLoading } = useMilestones(workflowId, {
+  const { milestones, isLoading } = useMilestones(workflow, {
     // timeframe: monthQuery,
     timeframe,
     omit_include: true,

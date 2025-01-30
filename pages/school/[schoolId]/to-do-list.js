@@ -72,18 +72,49 @@ const ToDoListPage = ({}) => {
   }, [school, hasSetInitialWorkflow]);
 
   // Group steps by assignee
-  const groupedSteps = assignedSteps?.reduce((acc, step) => {
-    step.relationships.assignees.data.forEach((assignee) => {
-      if (!acc[assignee.id]) {
-        acc[assignee.id] = {
-          assignee,
-          steps: [],
-        };
-      }
-      acc[assignee.id].steps.push(step);
-    });
-    return acc;
-  }, {});
+  const groupedSteps =
+    assignedSteps?.reduce((acc, step) => {
+      // Get the completers for this step
+      const completers = step.relationships.completers.data.map((c) => c.id);
+
+      // For each assignee of this step
+      step.relationships.assignees.data.forEach((assignee) => {
+        // Skip if this assignee has already completed the step
+        if (completers.includes(assignee.id)) {
+          return;
+        }
+
+        // Initialize the assignee's steps array if it doesn't exist
+        if (!acc[assignee.id]) {
+          acc[assignee.id] = {
+            assignee,
+            steps: [],
+          };
+        }
+
+        // Only add the step if it's not already in this assignee's list
+        const stepNotYetAdded = !acc[assignee.id].steps.some(
+          (s) => s.id === step.id
+        );
+        if (stepNotYetAdded) {
+          acc[assignee.id].steps.push(step);
+        }
+      });
+      return acc;
+    }, {}) || {};
+
+  // Convert groupedSteps object to array and ensure current user is first
+  const groupedStepsArray = Object.values(groupedSteps);
+  if (groupedStepsArray.length > 0) {
+    const currentUserIndex = groupedStepsArray.findIndex(
+      (group) => group.assignee.id === currentUser.id
+    );
+
+    if (currentUserIndex > -1) {
+      const currentUserGroup = groupedStepsArray.splice(currentUserIndex, 1)[0];
+      groupedStepsArray.unshift(currentUserGroup);
+    }
+  }
 
   const removeStep = (taskId) => {
     // Only proceed if we have assignedSteps
@@ -101,6 +132,7 @@ const ToDoListPage = ({}) => {
 
   console.log({ assignedSteps });
   console.log({ selectedWorkflow });
+  console.log({ groupedSteps });
 
   return (
     <PageContainer title={school?.data.attributes.name}>
@@ -139,7 +171,7 @@ const ToDoListPage = ({}) => {
                 </Stack>
               </Card>
             ) : (
-              Object.values(groupedSteps).map(({ assignee, steps }) => (
+              groupedStepsArray.map(({ assignee, steps }) => (
                 <Card key={assignee.id} noPadding>
                   <List
                     subheader={
