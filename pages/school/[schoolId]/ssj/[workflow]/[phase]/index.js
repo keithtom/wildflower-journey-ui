@@ -9,7 +9,7 @@ import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Skeleton from "@mui/material/Skeleton";
 import { mutate } from "swr";
 import { useTranslation } from "next-i18next";
-
+import { theme } from "../../../../../../styles/theme";
 import { List } from "@mui/material";
 
 import useAuth from "@lib/utils/useAuth";
@@ -63,26 +63,33 @@ const PhasePage = () => {
     <>
       <PageContainer>
         <Stack spacing={12}>
-          <Hero
-            imageUrl={
-              phase === "planning"
-                ? planningHero
-                : phase === "visioning"
-                ? visioningHero
-                : phase === "startup"
-                ? startupHero
-                : undefined
-            }
-          />
-          <Typography
-            variant="h2"
-            bold
-            capitalize
-            id={`${phase}-header`}
-            data-cy={`${phase}-header`}
-          >
-            {t(`ssj_phases.${phase}`)}
-          </Typography>
+          <Grid container>
+            <Grid item xs={12} sm={6}>
+              <Typography
+                variant="h2"
+                bold
+                capitalize
+                id={`${phase}-header`}
+                data-cy={`${phase}-header`}
+              >
+                {t(`ssj_phases.${phase}`)}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <img
+                style={{ width: "100%", borderRadius: theme.radius.md }}
+                src={
+                  phase === "planning"
+                    ? planningHero
+                    : phase === "visioning"
+                    ? visioningHero
+                    : phase === "startup"
+                    ? startupHero
+                    : undefined
+                }
+              />
+            </Grid>
+          </Grid>
 
           {isLoadingMilestonesByCurrentPhase || isValidating ? (
             <Stack spacing={6}>

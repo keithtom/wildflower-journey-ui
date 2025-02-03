@@ -23,6 +23,22 @@ export const showWorkflow = {
   },
 };
 
+export const showResources = {
+  key: (workflowId) => `/workflows/${workflowId}/resources`,
+  fetcher: (workflowId) => {
+    const config = getAuthHeader();
+    return workflowsApi
+      .get(`/workflows/${workflowId}/resources`, config)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        wildflowerApi.handleErrors(error);
+      });
+  },
+};
+
 export default {
   showWorkflow,
+  showResources,
 };

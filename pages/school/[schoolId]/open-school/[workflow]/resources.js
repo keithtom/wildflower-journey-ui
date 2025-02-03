@@ -1,132 +1,156 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-import useSWR from "swr";
+import Skeleton from "@mui/material/Skeleton";
 
-import peopleApi from "@api/people";
-import { useUserContext, useAssignViewingSchool } from "@lib/useUserContext";
-import { clearLoggedInState } from "@lib/handleLogout";
-import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 import useAuth from "@lib/utils/useAuth";
-
-import {
-  PageContainer,
-  Grid,
-  Typography,
-  Avatar,
-  Card,
-  Stack,
-  Button,
-  Icon,
-  Chip,
-  Box,
-  Link,
-} from "@ui";
+import useResources from "@hooks/useResources";
+import { PageContainer, Grid, Typography, Card, Stack, Icon } from "@ui";
+import CategoryChip from "@components/CategoryChip";
+import Resource from "@components/Resource";
+import Hero from "@components/Hero";
 
 const Resources = () => {
-  const { currentUser } = useUserContext();
   const router = useRouter();
+  const { workflow: workflowId } = router.query;
 
   useAuth("/login");
 
+  const {
+    resources,
+    isLoading: resourcesLoading,
+    isError,
+  } = useResources(workflowId);
+
+  // Transform resources data if needed
+  const transformedResources = useMemo(() => {
+    if (!resources) return null;
+
+    // If resources already has the correct structure, return as is
+    if (resources.by_category) {
+      return resources.by_category;
+    }
+
+    // If resources is an array, transform it into the expected structure
+    if (Array.isArray(resources)) {
+      const byCategory = {};
+
+      resources.forEach((resource) => {
+        // Handle categories as an array of strings
+        const categories = resource.attributes?.categories || [];
+
+        // If no categories, add to Uncategorized
+        if (categories.length === 0) {
+          if (!byCategory["Uncategorized"]) {
+            byCategory["Uncategorized"] = [];
+          }
+          byCategory["Uncategorized"].push({ data: resource });
+        } else {
+          // Add resource to each of its categories
+          categories.forEach((category) => {
+            if (!byCategory[category]) {
+              byCategory[category] = [];
+            }
+            byCategory[category].push({ data: resource });
+          });
+        }
+      });
+
+      // Convert to the expected format
+      return Object.entries(byCategory).map(([key, value]) => ({
+        [key]: value,
+      }));
+    }
+
+    return null;
+  }, [resources]);
+
+  const hero = "/assets/images/ssj/wildflowerSystems.jpg";
+
+  // Add a simple initial render to verify data
+  if (resourcesLoading) {
+    return (
+      <PageContainer>
+        <Typography>Loading resources...</Typography>
+      </PageContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <PageContainer>
+        <Typography>Error loading resources</Typography>
+      </PageContainer>
+    );
+  }
+
+  if (!transformedResources) {
+    return (
+      <PageContainer>
+        <Typography>No resources available</Typography>
+      </PageContainer>
+    );
+  }
+
   return (
     <PageContainer>
-      <Grid container spacing={16}>
-        <Grid item xs={12}>
-          <Card
-            elevated
-            variant="primaryOutlined"
-            size="large"
-            sx={{ overflow: "hidden" }}
-          >
-            <Grid container spacing={16}>
-              <Grid item xs={12} sm={6}>
-                <Stack
-                  justifyContent="space-between"
-                  sx={{ height: "100%" }}
-                  spacing={6}
-                >
-                  <Stack direction="row" spacing={3} alignItems="center">
-                    <Icon type="listUl" variant="primary" />
-                    <Typography variant="bodyLarge">Resources</Typography>
-                    <Chip label="Future Feature" size="small" />
-                  </Stack>
-                  <Stack spacing={3}>
-                    <Typography variant="h2" bold>
-                      Find what you need when you need it
-                    </Typography>
-                  </Stack>
-                  <Stack>
-                    <Grid>
-                      <Stack direction="row" spacing={3}>
-                        <Link href="https://forms.gle/KrpzuLvtUkhvQWAN8">
-                          <Button variant="lightened">
-                            <Typography variant="bodyRegular" bold>
-                              Offer feedback
-                            </Typography>
-                          </Button>
-                        </Link>
-                      </Stack>
-                    </Grid>
-                  </Stack>
-                </Stack>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <img
-                  src="/assets/images/open-school/resources.png"
-                  style={{ width: "100%" }}
-                />
-              </Grid>
-            </Grid>
-          </Card>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h3" bold>
-            Features like
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Grid container spacing={6} alignItems="stretch">
-            <Grid item xs={12} sm={4}>
-              <Card variant="lightened" sx={{ height: "100%" }}>
-                <Stack spacing={3}>
-                  <Icon type="check" variant="primary" />
-                  <Stack>
-                    <Typography variant="bodyRegular" bold>
-                      Frequently used templates, tools and resources by
-                      category 
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card variant="lightened" sx={{ height: "100%" }}>
-                <Stack spacing={3}>
-                  <Icon type="check" variant="primary" />
-                  <Stack>
-                    <Typography variant="bodyRegular" bold>
-                      Easily share resources examples between schools 
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card variant="lightened" sx={{ height: "100%" }}>
-                <Stack spacing={3}>
-                  <Icon type="check" variant="primary" />
-                  <Stack>
-                    <Typography variant="bodyRegular" bold>
-                      TL leader forum for asking questions and sharing examples
-                      between schools 
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </Card>
+      <Stack spacing={12}>
+        <Hero imageUrl={hero} />
+        <Stack spacing={2}>
+          <Grid container alignItems="center">
+            <Grid item>
+              <Stack spacing={6} direction="row" alignItems="center">
+                <Icon type="fileBlank" variant="primary" size="large" />
+                <Typography variant="h3" bold capitalize>
+                  Resources
+                </Typography>
+              </Stack>
             </Grid>
           </Grid>
-        </Grid>
-      </Grid>
+        </Stack>
+
+        {resourcesLoading ? (
+          <Stack spacing={6}>
+            {Array.from({ length: 12 }, (_, i) => (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Skeleton width={240} height={48} />
+                  <Stack spacing={3}>
+                    {Array.from({ length: 16 }, (_, j) => (
+                      <Skeleton key={j} height={64} m={0} variant="rounded" />
+                    ))}
+                  </Stack>
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+        ) : (
+          transformedResources?.map((a, i) => {
+            const name = Object.keys(a)[0];
+            const array = Object.values(a);
+            return array[0]?.length ? (
+              <Card key={i}>
+                <Stack spacing={6}>
+                  <Stack direction="row" spacing={6} alignItems="center">
+                    <CategoryChip category={name} size="large" />
+                    <Typography variant="h4" lightened>
+                      {array[0].length}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={3}>
+                    {array[0]?.map((r, i) => (
+                      <Resource
+                        title={r.data.attributes.title}
+                        link={r.data.attributes.link}
+                        key={i}
+                      />
+                    ))}
+                  </Stack>
+                </Stack>
+              </Card>
+            ) : null;
+          })
+        )}
+      </Stack>
     </PageContainer>
   );
 };
