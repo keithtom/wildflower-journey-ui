@@ -698,7 +698,7 @@ const GeneralFields = ({ handleToggle, school, address }) => {
   // console.log("watchFields.openDate", watchFields.openDate);
 
   const onSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
     schoolApi
       .update(school.id, {
         school: {
@@ -1550,7 +1550,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
   };
 
   const onSubmit = (data) => {
-    console.log({ data });
+    // console.log({ data });
     if (isEditingTeacher) {
       handleUpdateTeacherRelationship(data);
     } else {
@@ -2042,7 +2042,7 @@ const InviteTeacherFields = ({
   setIsInvitingTeacher,
   setIsAddingTeacher,
 }) => {
-  console.log("school in invite teacher leader fields", school);
+  // console.log("school in invite teacher leader fields", school);
 
   const {
     control,
@@ -2061,7 +2061,7 @@ const InviteTeacherFields = ({
   });
 
   async function onSubmit(data) {
-    console.log({ data });
+    // console.log({ data });
     const structuredData = {
       person: {
         email: data.partnerEmail,
@@ -2381,7 +2381,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
   };
 
   const onSubmit = (data) => {
-    console.log({ data });
+    // console.log({ data });
     if (isEditingTeacher) {
       handleUpdateTeacherRelationship(data);
     } else {

@@ -173,7 +173,7 @@ const ProcessId = ({}) => {
           acc[key] = data[key];
         }
       }
-      console.log({ acc });
+      // console.log({ acc });
       return acc;
     }, {});
 

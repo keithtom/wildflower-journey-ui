@@ -44,7 +44,7 @@ const StepDrawer = ({
   );
 
   if (open) {
-    console.log({ step });
+    // console.log({ step });
   }
 
   const {
@@ -69,7 +69,7 @@ const StepDrawer = ({
       : { kind: "default" },
   });
   const onSubmit = (data) => {
-    console.log("inside the on submitt");
+    // console.log("inside the on submitt");
     setNewProcess((newProcess) => {
       return {
         ...newProcess,
@@ -91,11 +91,11 @@ const StepDrawer = ({
   //   toggle();
   // };
   const handleRemoveStep = () => {
-    console.log("remove step");
+    // console.log("remove step");
     toggle();
   };
   const handleUpdateStep = () => {
-    console.log("update step");
+    // console.log("update step");
     toggle();
   };
   const handleRemoveDecision = () => {

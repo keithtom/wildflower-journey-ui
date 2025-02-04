@@ -8,7 +8,7 @@ import {
 
 const OpenAdvicePage = ({ openAdvice }) => {
 
-  console.log(openAdvice)
+  // console.log(openAdvice)
 
   return (
     <>

@@ -41,13 +41,13 @@ const StepItem = ({
   const handleAddStep = () => {
     setIsAddingStep(true);
     setStepDrawerOpen(true);
-    console.log("add");
+    // console.log("add");
   };
   const handleEditStep = () => {
     // not adding, so editing
     setIsAddingStep(false);
     setStepDrawerOpen(true);
-    console.log("edit");
+    // console.log("edit");
   };
 
   return (

@@ -4,7 +4,7 @@ import { Icon, Chip, Stack, Typography } from "./ui";
 const StatusChip = ({ status, withIcon, ...props }) => {
   // console.log("Status chip props", status, withIcon, props)
   const { t } = useTranslation("common");
-  console.log({ status });
+  // console.log({ status });
   const translationObject = {
     "up next": "up_next",
     "to do": "to_do",

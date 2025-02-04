@@ -111,10 +111,10 @@ const AddProfileInfo = ({}) => {
       setCurrentUser(updatedUser);
 
       // Add some logging to debug the redirect
-      console.log('Redirecting with:', {
-        roleList: personAttributes?.roleList,
-        isOnboarded: personAttributes?.isOnboarded
-      });
+      // console.log('Redirecting with:', {
+      //   roleList: personAttributes?.roleList,
+      //   isOnboarded: personAttributes?.isOnboarded
+      // });
 
       await RedirectUser({
         router: router,

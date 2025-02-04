@@ -181,7 +181,7 @@ const StepId = ({}) => {
     if (resourcesToDelete.length > 0) {
       try {
         resourcesToDelete.forEach(async (resource) => {
-          console.log("deleting resource", resource);
+          // console.log("deleting resource", resource);
           const response = await stepsApi.deleteDocument(resource);
           setUpdatedStepSnackbarOpen(true);
           mutate(`/v1/documents/${resource}`);
@@ -196,7 +196,7 @@ const StepId = ({}) => {
 
   // Resource handlers
   const handleUpdateResource = (data) => {
-    console.log("Update resource", data);
+    // console.log("Update resource", data);
     const preparedDataForApi = {
       title: data?.resource_title || "",
       link: data?.resource_link || "",
@@ -900,7 +900,7 @@ const DecisionOptionModal = ({
   }, [open]);
 
   const onSubmit = handleSubmit((data) => {
-    console.log({ data });
+    // console.log({ data });
     if (isDraftingNewVersion) {
       if (isAdding) {
         handleAddDecisionOption(data);
@@ -908,7 +908,7 @@ const DecisionOptionModal = ({
         handleUpdateDecisionOption(data);
       }
     } else {
-      console.log({ data });
+      // console.log({ data });
       handleUpdateDecisionOption(data);
     }
     onClose();

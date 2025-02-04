@@ -208,11 +208,11 @@ const Person = ({}) => {
       userSchool;
   }
 
-  console.log({ schoolHistory });
-  console.log({ personData });
-  console.log({ schoolsWhereRoleTeacherLeader });
-  console.log({ schoolsWhereRoleBoardMember });
-  console.log({ boardHistory });
+  // console.log({ schoolHistory });
+  // console.log({ personData });
+  // console.log({ schoolsWhereRoleTeacherLeader });
+  // console.log({ schoolsWhereRoleBoardMember });
+  // console.log({ boardHistory });
   // console.log({ currentUser });
   // console.log({ included });
   // console.log({ userSchool });
@@ -1406,7 +1406,7 @@ const CertificationAndRoleFields = ({ handleToggle }) => {
       });
   };
 
-  console.log({ personData });
+  // console.log({ personData });
   // console.log({ watchFields });
 
   return (
@@ -1685,7 +1685,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
   };
 
   const onSubmit = (data) => {
-    console.log({ data });
+    // console.log({ data });
     if (isEditingSchool) {
       handleUpdateSchoolRelationship(data);
     } else {
@@ -2176,7 +2176,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
   };
 
   const onSubmit = (data) => {
-    console.log({ data });
+    // console.log({ data });
     if (isEditingSchool) {
       handleUpdateSchoolRelationship(data);
     } else {
@@ -2208,10 +2208,10 @@ const BoardHistoryFields = ({ handleToggle }) => {
   // console.log({ watchFields });
   // console.log({ currentSchool });
   // console.log({ schoolsData });
-  console.log({ schoolOptions });
-  console.log({ personData });
-  console.log({ schoolsWhereCurrentlyTeacher });
-  console.log("schools", schools);
+  // console.log({ schoolOptions });
+  // console.log({ personData });
+  // console.log({ schoolsWhereCurrentlyTeacher });
+  // console.log("schools", schools);
   // console.log("personData", personData);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
