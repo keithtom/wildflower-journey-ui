@@ -1,9 +1,9 @@
 import useSWR from "swr";
 import { showSchools } from "@api/schools";
 
-const useSchools = () => {
-  const { data, error } = useSWR(showSchools.key(), () =>
-    showSchools.fetcher()
+const useSchools = (params) => {
+  const { data, error } = useSWR(showSchools.key(params), () =>
+    showSchools.fetcher(params)
   );
 
   return {

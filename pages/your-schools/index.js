@@ -44,7 +44,10 @@ const YourSchools = () => {
   //   (team) => team.attributes.currentPhase === "startup"
   // );
 
-  const { schools, isLoading } = useSchools();
+  const { schools, isLoading } = useSchools({
+    person_id: "7b30-8fae",
+    // role: "Ops Guide",
+  });
 
   console.log({ schools });
 

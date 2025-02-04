@@ -591,6 +591,7 @@ const EditProfileModal = ({
 };
 
 const GeneralFields = ({ handleToggle }) => {
+  const router = useRouter();
   const [profilePicture, setProfilePicture] = useState();
   const [profileImage, setProfileImage] = useState();
   const [showError, setShowError] = useState();
@@ -618,7 +619,6 @@ const GeneralFields = ({ handleToggle }) => {
       lastName: currentUser?.attributes.lastName,
       city: currentUser?.personAddress.city,
       state: currentUser?.personAddress.state,
-      email: personData?.data?.attributes.email,
       about: personData?.data?.attributes?.about || "",
       phone: personData?.data?.attributes?.phone || "",
       profilePicture: [],
@@ -633,7 +633,6 @@ const GeneralFields = ({ handleToggle }) => {
         person: {
           first_name: data.firstName,
           last_name: data.lastName,
-          email: data.email,
           address_attributes: {
             city: data.city,
             state: data.state,
@@ -652,7 +651,6 @@ const GeneralFields = ({ handleToggle }) => {
           reset({
             firstName: data.firstName,
             lastName: data.lastName,
-            email: data.email,
             city: data.city,
             state: data.state,
             about: data.about,
@@ -747,24 +745,7 @@ const GeneralFields = ({ handleToggle }) => {
             />
           )}
         />
-        <Controller
-          name="email"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              label="Email"
-              placeholder="e.g. jane.smith@gmail.com"
-              error={errors.email}
-              helperText={
-                errors &&
-                errors.email &&
-                errors.email.type === "required" &&
-                "This field is required"
-              }
-              {...field}
-            />
-          )}
-        />
+
         <Controller
           name="phone"
           control={control}
@@ -784,6 +765,27 @@ const GeneralFields = ({ handleToggle }) => {
             />
           )}
         />
+        <Card variant="lightened" size="small">
+          <Stack
+            direction="row"
+            spacing={3}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Stack>
+              <Typography variant="bodyRegular" bold>
+                Email update has moved
+              </Typography>
+              <Typography variant="bodySmall" lightened>
+                Update your email on the settings page.
+              </Typography>
+            </Stack>
+            <IconButton onClick={() => router.push("/settings")}>
+              <Icon type="chevronRight" variant="primary" />
+            </IconButton>
+          </Stack>
+        </Card>
+
         <Controller
           name="about"
           control={control}

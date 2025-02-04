@@ -1,48 +1,94 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { styled, css } from "@mui/material/styles";
-import Link from "next/link";
-import Router from "next/router";
+import { styled } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import { FormControlLabel, RadioGroup } from "@mui/material";
-
+import {
+  FormControlLabel,
+  RadioGroup,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+} from "@mui/material";
 import useAuth from "@lib/utils/useAuth";
 import { useUserContext } from "@lib/useUserContext";
 import {
   Alert,
-  Box,
   PageContainer,
   Button,
   Grid,
   Typography,
   Stack,
   Card,
-  Divider,
-  Avatar,
-  AvatarGroup,
-  IconButton,
-  Icon,
   Modal,
-  DatePicker,
   TextField,
   Radio,
+  Icon,
+  Box,
 } from "@ui";
+import TranslationToggle from "@components/TranslationToggle";
+import peopleApi from "@api/people";
+import { mutate } from "swr";
+import { useRouter } from "next/router";
 
 const SettingsPage = () => {
   const [pauseSSJModalOpen, setPauseSSJModalOpen] = useState(false);
   const [SSJPaused, setSSJPaused] = useState(false);
   const { currentUser } = useUserContext();
-
   const [abandonSSJModalOpen, setAbandonSSJModalOpen] = useState(false);
   const [SSJAbandonProcessStarted, setSSJAbandonProcessStarted] =
     useState(false);
+  const [changeEmailModalOpen, setChangeEmailModalOpen] = useState(false);
+  const router = useRouter();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm();
+
+  useEffect(() => {
+    if (currentUser?.attributes?.email) {
+      reset({
+        email: currentUser.attributes.email,
+      });
+    }
+  }, [currentUser, reset]);
 
   useAuth("/login");
+
+  const onSubmit = (data) => {
+    peopleApi
+      .update(currentUser.id, {
+        person: {
+          email: data.email,
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          console.error(response.error);
+        } else {
+          mutate(`/v1/people/${currentUser?.id}`);
+          reset({
+            email: data.email,
+          });
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      });
+  };
 
   return (
     <>
       <Head>
-        <title>Wildflower Schools | Search</title>
+        <title>Wildflower Schools | Settings</title>
         <meta name="title" content="Wildflower Schools" />
         <meta
           property="og:site_name"
@@ -64,132 +110,122 @@ const SettingsPage = () => {
       </Head>
 
       <PageContainer title="Settings">
-        <Stack spacing={12}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Stack spacing={6}>
-                <Typography variant="bodyLarge">
-                  School Startup Journey
-                </Typography>
-                <Card noPadding>
-                  {SSJAbandonProcessStarted ? null : (
-                    <>
-                      <Card noBorder>
-                        <Grid
-                          container
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Grid item>
-                            <Typography
-                              variant="bodyLarge"
-                              bold
-                              highlight={SSJPaused}
-                            >
-                              {SSJPaused
-                                ? "Your SSJ is Paused"
-                                : "Pause your School Startup Journey"}
-                            </Typography>
-                            <Typography variant="bodyRegular" lightened>
-                              {SSJPaused
-                                ? "Ready to resume your journey to opening a Montessori school? Start back up!"
-                                : "Pause your journey to opening a Montessori school and come back to it at another time."}
-                            </Typography>
-                          </Grid>
-                          <Grid item>
-                            {SSJPaused ? (
-                              <Button
-                                variant="secondary"
-                                onClick={() => setSSJPaused(false)}
-                              >
-                                <Stack
-                                  direction="row"
-                                  spacing={3}
-                                  alignItems="center"
-                                >
-                                  <Icon type="play" />
-                                  <Typography
-                                    variant="bodyRegular"
-                                    bold
-                                    highlight
-                                  >
-                                    Un-pause your SSJ
-                                  </Typography>
-                                </Stack>
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="secondary"
-                                onClick={() => setPauseSSJModalOpen(true)}
-                              >
-                                <Stack
-                                  direction="row"
-                                  spacing={2}
-                                  alignItems="center"
-                                >
-                                  <Icon type="pause" />
-                                  <Typography
-                                    variant="bodyRegular"
-                                    bold
-                                    highlight
-                                  >
-                                    Pause your SSJ
-                                  </Typography>
-                                </Stack>
-                              </Button>
-                            )}
-                          </Grid>
-                        </Grid>
-                      </Card>
-                      <Divider />
-                    </>
-                  )}
-                  <Card noBorder>
-                    <Grid
-                      container
-                      justifyContent="space-between"
-                      alignItems="center"
+        <Stack spacing={6}>
+          <Stack spacing={3}>
+            <Typography variant="bodyLarge">School Startup Journey</Typography>
+            <Card noPadding>
+              <List disablePadding>
+                <SettingListItem
+                  show={!SSJAbandonProcessStarted}
+                  title={
+                    SSJPaused
+                      ? "Your SSJ is Paused"
+                      : "Pause your School Startup Journey"
+                  }
+                  subtitle={
+                    SSJPaused
+                      ? "Ready to resume your journey to opening a Montessori school? Start back up!"
+                      : "Pause your journey to opening a Montessori school and come back to it at another time."
+                  }
+                  action={
+                    SSJPaused ? (
+                      <Button
+                        variant="secondary"
+                        onClick={() => setSSJPaused(false)}
+                      >
+                        <Stack direction="row" spacing={3} alignItems="center">
+                          <Icon type="play" />
+                          <Typography variant="bodyRegular" bold highlight>
+                            Un-pause your SSJ
+                          </Typography>
+                        </Stack>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        onClick={() => setPauseSSJModalOpen(true)}
+                      >
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Icon type="pause" />
+                          <Typography variant="bodyRegular" bold highlight>
+                            Pause your SSJ
+                          </Typography>
+                        </Stack>
+                      </Button>
+                    )
+                  }
+                  isLastItem={SSJAbandonProcessStarted}
+                />
+                <SettingListItem
+                  title={
+                    SSJAbandonProcessStarted
+                      ? "You've started the process of leaving the SSJ"
+                      : "Abandon your School Startup Journey"
+                  }
+                  subtitle={
+                    SSJAbandonProcessStarted
+                      ? "You've requested to stop your journey to opening a Montessori school. Please wait for an email from support confirming the end of your SSJ."
+                      : "Completely stop your journey to opening a Montessori school and leave the Wildflower Schools network. We're sorry to see you go!"
+                  }
+                  action={
+                    SSJAbandonProcessStarted ? (
+                      <Alert size="small" severity="error">
+                        Please wait for an email from support to complete the
+                        process
+                      </Alert>
+                    ) : (
+                      <Button
+                        variant="danger"
+                        onClick={() => setAbandonSSJModalOpen(true)}
+                      >
+                        <Typography variant="bodyRegular" bold>
+                          Abandon your SSJ
+                        </Typography>
+                      </Button>
+                    )
+                  }
+                  isLastItem={true}
+                />
+              </List>
+            </Card>
+          </Stack>
+
+          <Stack spacing={3}>
+            <Typography variant="bodyLarge">Preferences</Typography>
+            <Card noPadding>
+              <List disablePadding>
+                <SettingListItem
+                  title="Preferred Language"
+                  subtitle="When available we will use this language. Please note language support is limited to the School Startup Journey at this time."
+                  action={<TranslationToggle />}
+                  isLastItem={true}
+                />
+              </List>
+            </Card>
+          </Stack>
+          <Stack spacing={3}>
+            <Typography variant="bodyLarge">Account</Typography>
+            <Card noPadding>
+              <List disablePadding>
+                <SettingListItem
+                  title="Email"
+                  subtitle={currentUser?.attributes?.email}
+                  action={
+                    <Button
+                      variant="secondary"
+                      small
+                      onClick={() => setChangeEmailModalOpen(true)}
                     >
-                      <Grid item>
-                        <Typography
-                          variant="bodyLarge"
-                          bold
-                          error={SSJAbandonProcessStarted}
-                        >
-                          {SSJAbandonProcessStarted
-                            ? "You've started the process of leaving the SSJ"
-                            : "Abandon your School Startup Journey"}
-                        </Typography>
-                        <Typography variant="bodyRegular" lightened>
-                          {SSJAbandonProcessStarted
-                            ? "You've requested to stop your journey to opening a Montessori school. Please wait for an email from support confirming the end of your SSJ."
-                            : "Completely stop your journey to opening a Montessori school and leave the Wildflower Schools network. We're sorry to see you go!"}
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        {SSJAbandonProcessStarted ? (
-                          <Alert size="small" severity="error">
-                            Please wait for an email from support to complete
-                            the process
-                          </Alert>
-                        ) : (
-                          <Button
-                            variant="danger"
-                            onClick={() => setAbandonSSJModalOpen(true)}
-                          >
-                            <Typography variant="bodyRegular" bold>
-                              Abandon your SSJ
-                            </Typography>
-                          </Button>
-                        )}
-                      </Grid>
-                    </Grid>
-                  </Card>
-                </Card>
-              </Stack>
-            </Grid>
-          </Grid>
+                      Edit
+                    </Button>
+                  }
+                  isLastItem={true}
+                />
+              </List>
+            </Card>
+          </Stack>
         </Stack>
+
         <PauseSSJModal
           toggle={() => setPauseSSJModalOpen(!pauseSSJModalOpen)}
           open={pauseSSJModalOpen}
@@ -199,6 +235,11 @@ const SettingsPage = () => {
           toggle={() => setAbandonSSJModalOpen(!abandonSSJModalOpen)}
           open={abandonSSJModalOpen}
           setSSJAbandonProcessStarted={setSSJAbandonProcessStarted}
+        />
+        <ChangeEmailModal
+          toggle={() => setChangeEmailModalOpen(!changeEmailModalOpen)}
+          open={changeEmailModalOpen}
+          currentUser={currentUser}
         />
       </PageContainer>
     </>
@@ -362,6 +403,150 @@ const AbandonSSJModal = ({ toggle, open, setSSJAbandonProcessStarted }) => {
             <Grid item>
               <Button variant="danger" type="submit" disabled={isSubmitting}>
                 <Typography>Email support</Typography>
+              </Button>
+            </Grid>
+          </Grid>
+        </Stack>
+      </form>
+    </Modal>
+  );
+};
+
+const StyledListItem = styled(ListItem)(({ theme, isLastItem }) => ({
+  padding: theme.spacing(3, 5),
+  borderBottom: !isLastItem
+    ? `1px solid ${theme.color.neutral.lightened}`
+    : "none",
+}));
+
+const StyledListItemText = styled(ListItemText)(({ theme }) => ({
+  maxWidth: "60%",
+  marginRight: theme.spacing(3),
+}));
+
+const SettingListItem = ({
+  title,
+  subtitle,
+  action,
+  show = true,
+  isLastItem = false,
+}) => {
+  if (!show) return null;
+
+  return (
+    <StyledListItem isLastItem={isLastItem}>
+      <StyledListItemText
+        primary={
+          <Typography variant="bodyRegular" bold>
+            {title}
+          </Typography>
+        }
+        secondary={
+          subtitle && (
+            <Typography variant="bodyRegular" lightened>
+              {subtitle}
+            </Typography>
+          )
+        }
+      />
+      <ListItemSecondaryAction>{action}</ListItemSecondaryAction>
+    </StyledListItem>
+  );
+};
+
+const ChangeEmailModal = ({ toggle, open, currentUser }) => {
+  const router = useRouter();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm();
+
+  useEffect(() => {
+    if (currentUser?.attributes?.email) {
+      reset({
+        email: currentUser.attributes.email,
+      });
+    }
+  }, [currentUser, reset]);
+
+  const onSubmit = (data) => {
+    peopleApi
+      .update(currentUser.id, {
+        person: {
+          email: data.email,
+        },
+      })
+      .then((response) => {
+        if (response.error) {
+          console.error(error);
+        } else {
+          mutate(`/v1/people/${currentUser?.id}`);
+          toggle();
+        }
+      })
+      .catch((error) => {
+        if (error?.response?.status === 401) {
+          clearLoggedInState({});
+          router.push("/login");
+        } else {
+          console.error(error);
+        }
+      });
+  };
+
+  return (
+    <Modal toggle={toggle} open={open} title="Change Email">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={6}>
+          <Card variant="primaryLightened">
+            <Stack alignItems="center" justifyContent="center" spacing={3}>
+              <Typography variant="h4" highlight bold>
+                Update your email address
+              </Typography>
+              <Typography variant="bodyRegular" highlight center>
+                This email address is used to log in to the platform and for
+                other Wildflower members to contact you.
+              </Typography>
+            </Stack>
+          </Card>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                label="Email"
+                placeholder="e.g. jane.smith@gmail.com"
+                error={errors.email}
+                helperText={
+                  errors &&
+                  errors.email &&
+                  errors.email.type === "required" &&
+                  "This field is required"
+                }
+                {...field}
+              />
+            )}
+          />
+          <Grid container justifyContent="space-between">
+            <Grid item>
+              <Button variant="text" onClick={toggle}>
+                <Typography variant="bodyRegular" lightened>
+                  Cancel
+                </Typography>
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="primary"
+                type="submit"
+                disabled={!isDirty || isSubmitting}
+              >
+                <Typography variant="bodyRegular" bold>
+                  Save
+                </Typography>
               </Button>
             </Grid>
           </Grid>

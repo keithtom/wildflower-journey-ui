@@ -14,12 +14,15 @@ async function index() {
 }
 
 export const showSchools = {
-  key: () => `/`,
-  fetcher: () => {
+  key: (filter) => `/v1/schools?${Object.keys(filter).join("_")}`,
+  // filters that are usable: status, role, personId
+  fetcher: (filter) => {
+    const config = getAuthHeader();
+    config.params = filter;
     return schoolsApi
-      .get(showSchools.key(), getAuthHeader())
-      .then((data) => {
-        return data;
+      .get(``, config)
+      .then((response) => {
+        return response;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);

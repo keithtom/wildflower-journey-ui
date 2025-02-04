@@ -124,13 +124,13 @@ const TeamMemberItem = ({ member }) => {
         </ListItemAvatar>
         <ListItemText
           primary={
-            <Typography variant="bodyRegular">
-              {member.attributes.name}
+            <Typography variant="bodyRegular" bold>
+              {`${member.attributes.firstName} ${member.attributes.lastName}`}
             </Typography>
           }
           secondary={
             <Typography variant="bodyRegular" lightened>
-              {member.attributes.roleList?.join(", ")}
+              {member.attributes.schoolRoleList?.join(", ")}
             </Typography>
           }
         />
@@ -191,6 +191,7 @@ const SchoolInfoCard = ({
   openedOn,
   schoolId,
   logoImage,
+  expectedStartDate,
 }) => {
   const [openTeamMemberModal, setOpenTeamMemberModal] = useState(false);
 
@@ -262,12 +263,20 @@ const SchoolInfoCard = ({
               ) : null}
             </Stack>
           </StyledSubheader>
-          {!phase ? null : <InfoListItem label="Phase" value={phase} />}
+          {!phase || status === "Open" ? null : (
+            <InfoListItem label="Phase" value={phase} />
+          )}
           {!location ? null : (
             <InfoListItem label="Location" value={location} />
           )}
           {!openDate ? null : (
             <InfoListItem label="Open Date" value={openDate} />
+          )}
+          {!expectedStartDate ? null : (
+            <InfoListItem
+              label="Expected Start Date"
+              value={expectedStartDate}
+            />
           )}
           {!openedOn ? null : (
             <InfoListItem

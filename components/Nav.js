@@ -613,6 +613,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
               ))}
             </NavList>
           </div>
+
           {/* <Stack
           justifyContent="space-between"
           direction="column"
@@ -663,11 +664,6 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                 </Card>
               </Link>
             </Grid>
-            {isApproved && router.pathname.includes("/ssj/") ? (
-              <Grid item xs={12}>
-                <TranslationToggle />
-              </Grid>
-            ) : null}
           </Grid>
         </Stack> */}
           <Box sx={{ padding: 4 }}>

@@ -22,7 +22,7 @@ const SchoolPage = () => {
   const { data: school } = useSchool(schoolId);
 
   // console.log({ currentUser });
-  // console.log({ school });
+  console.log({ school });
   // console.log({ milestones });
   // console.log({ milestonesToDo });
 
@@ -33,16 +33,38 @@ const SchoolPage = () => {
     if (!school?.data?.relationships?.people?.data || !school?.included)
       return [];
 
-    // Get the IDs from team members relationships
-    const teamMemberIds = school.data.relationships.people.data.map(
-      (item) => item.id
+    // First get all active school relationships
+    const schoolRelationships = school.included.filter(
+      (item) => item.type === "schoolRelationship" && !item.attributes.endDate
     );
 
-    // Find matching schoolRelationships in included array
-    return school.included.filter(
-      (item) =>
-        teamMemberIds.includes(item.id) && item.type === "schoolRelationship"
+    // Get the person IDs from the relationships
+    const teamMemberIds = schoolRelationships.map(
+      (item) => item.relationships.person.data.id
     );
+
+    // Get the people and merge with their school relationship data
+    const teamMembers = school.included
+      .filter(
+        (item) => teamMemberIds.includes(item.id) && item.type === "person"
+      )
+      .map((person) => {
+        // Find the matching school relationship for this person
+        const relationship = schoolRelationships.find(
+          (rel) => rel.relationships.person.data.id === person.id
+        );
+
+        // Return person with roleList from their school relationship
+        return {
+          ...person,
+          attributes: {
+            ...person.attributes,
+            schoolRoleList: relationship.attributes.roleList,
+          },
+        };
+      });
+
+    return teamMembers;
   }, [school]);
 
   useEffect(() => {
@@ -160,9 +182,10 @@ const SchoolPage = () => {
                 ? school?.data?.attributes?.logoImageUrl
                 : null
             }
-            phase={school?.data?.attributes?.phase}
+            phase={school?.data?.attributes?.currentPhase}
             location={school?.data?.attributes?.location}
             openDate={school?.data?.attributes?.openDate}
+            expectedStartDate={school?.data?.attributes?.expectedStartDate}
             teamMembers={teamMembers}
             status={school?.data?.attributes?.status}
             // status={null}
