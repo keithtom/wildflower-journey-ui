@@ -22,13 +22,11 @@ import {
 } from "./ui/index";
 import AppBar from "./AppBar";
 
-const Header = ({ toggleNavOpen }) => {
+const Header = ({ title, toggleNavOpen }) => {
   const router = useRouter();
   const { screenSize } = getScreenSize();
 
   const { currentUser, isLoggedIn, isAdmin } = useUserContext();
-
-  const logo = "/assets/images/wildflower-logo.png";
 
   const showNetwork = !(
     currentUser?.personRoleList?.includes("Emerging Teacher Leader") &&
@@ -44,178 +42,23 @@ const Header = ({ toggleNavOpen }) => {
   const adminView = isAdmin && router.asPath.includes("/admin") ? true : false;
 
   return (
-    <AppBar env={process.env.APP_ENV} isAdmin={adminView}>
-      <Grid
-        container
-        justifyContent={isLoggedIn ? "space-between" : "center"}
-        alignItems="center"
-      >
-        <Grid item>
-          {screenSize.isSm && isLoggedIn ? (
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
-                onClick={toggleNavOpen}
-              >
-                <Icon type="menu" />
-              </IconButton>
-              <img src={logo} style={{ height: "24px" }} />
-              <Typography variant="bodyRegular" bold noWrap light={adminView}>
-                My Wildflower
-              </Typography>
-            </Stack>
-          ) : (
-            <Stack direction="row" alignItems="center" spacing={3}>
-              <img src={logo} style={{ height: "32px" }} />
-              <Typography variant="bodyLarge" bold noWrap lightened={adminView}>
-                My Wildflower
-              </Typography>
-              {adminView ? (
-                <Typography variant="bodyLarge" light>
-                  Admin
-                </Typography>
-              ) : null}
-            </Stack>
-          )}
-        </Grid>
-        {isLoggedIn ? (
-          <Grid item>
-            <AvatarMenu
-              disabled={router.pathname.includes("/welcome")}
-              showNetwork={showNetwork}
-              myProfileLink={
-                showNetwork ? `/network/people/${currentUser.id}` : null
-              }
-              avatarSrc={currentUser?.attributes?.imageUrl}
-              userName={`${currentUser.attributes.firstName} ${currentUser.attributes.lastName}`}
-            />
-          </Grid>
-        ) : null}
-      </Grid>
+    <AppBar
+      env={process.env.APP_ENV}
+      isAdmin={adminView}
+      sx={{ width: `calc(100% - ${theme.util.drawerWidth}px)`, padding: 6 }}
+    >
+      <Stack direction="row" alignItems="center" spacing={3}>
+        <Typography variant="bodyLarge" bold noWrap lightened={adminView}>
+          {title}
+        </Typography>
+        {/* {adminView ? (
+          <Typography variant="bodyLarge" light>
+            Admin
+          </Typography>
+        ) : null} */}
+      </Stack>
     </AppBar>
   );
 };
 
 export default Header;
-
-const AvatarMenu = ({
-  avatarSrc,
-  userName,
-  myProfileLink,
-  showNetwork,
-  disabled,
-}) => {
-  const router = useRouter();
-
-  const [profileNavOpen, setProfileNavOpen] = useState(false);
-  const handleOpen = (event) => {
-    setProfileNavOpen(event.currentTarget);
-  };
-  const handleClose = () => {
-    setProfileNavOpen(null);
-  };
-
-  const open = Boolean(profileNavOpen);
-  const id = open ? "profile-nav" : null;
-  const { setCurrentUser, isAdmin } = useUserContext();
-
-  const StyledOption = styled(ListItem, {
-    shouldForwardProp: (prop) => prop !== "hoverable",
-  })`
-    border-bottom: 1px solid ${({ theme }) => theme.color.neutral.lightened};
-    &:last-child {
-      border-bottom: none;
-    }
-    /* Hoverable */
-    ${(props) =>
-      props.hoverable &&
-      css`
-        &:hover {
-          cursor: pointer;
-          background: ${props.theme.color.neutral.lightened};
-        }
-      `}
-  `;
-
-  const StyledUserMenu = styled(Popover)`
-    margin-top: ${({ theme }) => theme.util.buffer * 2}px;
-    .MuiPopover-paper {
-      width: 240px;
-    }
-  `;
-
-  async function handleLogOut() {
-    try {
-      const res = await registrationsAPI.logout();
-      console.log(res);
-    } catch (err) {
-      if (err?.response?.status !== 401) {
-        console.error("Error logging out:", err);
-      }
-    } finally {
-      router.push("/logged-out", "/logged-out", { locale: "en" }).then(() => {
-        // Clear the authentication tokens and user state after redirecting
-        clearLoggedInState({});
-        setCurrentUser(null);
-      });
-    }
-  }
-
-  const { t } = useTranslation("common");
-
-  return (
-    <>
-      <Avatar
-        alt={userName}
-        id="headerAvatarIcon"
-        hoverable
-        size="sm"
-        onClick={handleOpen}
-        aria-describedby={id}
-        src={avatarSrc}
-        sx={{ pointerEvents: disabled ? "none" : "auto" }}
-      />
-
-      <StyledUserMenu
-        id={id}
-        open={open}
-        anchorEl={profileNavOpen}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <StyledOption>
-          <Typography variant="bodyRegular" lightened>
-            {t("header.signed_in_as")} {userName}
-          </Typography>
-        </StyledOption>
-        {myProfileLink ? (
-          <NavLink to={myProfileLink} label={t("header.my_profile")} />
-        ) : null}
-
-        {isAdmin ? (
-          <>
-            <NavLink to="/network" label={t("header.home")} />
-            <NavLink to="/admin" label={t("header.admin")} />
-          </>
-        ) : null}
-        {/* {showNetwork ? null : <NavLink to="/settings" label="Settings" />} */}
-        <StyledOption
-          onClick={handleLogOut}
-          hoverable
-          data-cy="sign-out-button"
-        >
-          <Typography variant="bodyRegular">{t("header.sign_out")}</Typography>
-        </StyledOption>
-      </StyledUserMenu>
-    </>
-  );
-};

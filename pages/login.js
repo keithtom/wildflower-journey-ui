@@ -35,11 +35,12 @@ const Login = ({}) => {
         router: router,
         roleList: currentUser?.personRoleList,
         isOnboarded: currentUser?.personIsOnboarded,
+        schoolId: currentUser?.attributes?.schools[0]?.schoolId,
       });
     }
   }, [isLoggedIn, currentUser]);
 
-  // console.log({ currentUser });
+  console.log({ currentUser });
 
   const {
     control,
@@ -62,19 +63,13 @@ const Login = ({}) => {
       )?.attributes;
       const personRoleList = personData?.roleList;
       const personIsOnboarded = personData?.isOnboarded;
-
-      setCurrentUser({
-        id: personId,
-        type: response.data.data.type,
-        attributes: userAttributes,
-        personRoleList: personRoleList,
-        personIsOnboarded: personIsOnboarded,
-      });
+      const personSchool = response?.data?.data?.attributes?.schools[0]?.id;
 
       RedirectUser({
         router: router,
         roleList: personRoleList,
         isOnboarded: personIsOnboarded,
+        schoolId: personSchool,
       });
     } catch (error) {
       console.log(error);

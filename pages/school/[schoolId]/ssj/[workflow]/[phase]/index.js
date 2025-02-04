@@ -9,7 +9,7 @@ import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import Skeleton from "@mui/material/Skeleton";
 import { mutate } from "swr";
 import { useTranslation } from "next-i18next";
-
+import { theme } from "../../../../../../styles/theme";
 import { List } from "@mui/material";
 
 import useAuth from "@lib/utils/useAuth";
@@ -38,7 +38,7 @@ const PhasePage = () => {
   const { t } = useTranslation("common");
 
   const router = useRouter();
-  const { workflow, phase } = router.query;
+  const { workflow, phase, schoolId } = router.query;
 
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
@@ -63,26 +63,33 @@ const PhasePage = () => {
     <>
       <PageContainer>
         <Stack spacing={12}>
-          <Hero
-            imageUrl={
-              phase === "planning"
-                ? planningHero
-                : phase === "visioning"
-                ? visioningHero
-                : phase === "startup"
-                ? startupHero
-                : undefined
-            }
-          />
-          <Typography
-            variant="h2"
-            bold
-            capitalize
-            id={`${phase}-header`}
-            data-cy={`${phase}-header`}
-          >
-            {t(`ssj_phases.${phase}`)}
-          </Typography>
+          <Grid container>
+            <Grid item xs={12} sm={6}>
+              <Typography
+                variant="h2"
+                bold
+                capitalize
+                id={`${phase}-header`}
+                data-cy={`${phase}-header`}
+              >
+                {t(`ssj_phases.${phase}`)}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <img
+                style={{ width: "100%", borderRadius: theme.radius.md }}
+                src={
+                  phase === "planning"
+                    ? planningHero
+                    : phase === "visioning"
+                    ? visioningHero
+                    : phase === "startup"
+                    ? startupHero
+                    : undefined
+                }
+              />
+            </Grid>
+          </Grid>
 
           {isLoadingMilestonesByCurrentPhase || isValidating ? (
             <Stack spacing={6}>
@@ -128,7 +135,7 @@ const PhasePage = () => {
                   >
                     {milestonesByCurrentPhase?.in_progress?.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                        link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={
                           m.attributes[
@@ -178,7 +185,7 @@ const PhasePage = () => {
                   >
                     {milestonesByCurrentPhase?.to_do?.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                        link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={
                           m.attributes[
@@ -224,7 +231,7 @@ const PhasePage = () => {
                   >
                     {milestonesByCurrentPhase?.up_next?.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                        link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={
                           m.attributes[
@@ -270,7 +277,7 @@ const PhasePage = () => {
                   >
                     {milestonesByCurrentPhase?.done?.map((m, i) => (
                       <Milestone
-                        link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                        link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                         key={i}
                         title={
                           m.attributes[

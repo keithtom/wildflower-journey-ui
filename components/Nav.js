@@ -1,14 +1,28 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { styled } from "@mui/material/styles";
-import { Drawer } from "@mui/material";
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemSecondaryAction,
+  Divider,
+  Popover,
+  Collapse,
+} from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
 import { useTranslation } from "next-i18next";
 
+import { clearLoggedInState } from "../lib/handleLogout";
 import { getScreenSize } from "../hooks/react-responsive";
 import { useUserContext } from "../lib/useUserContext";
 import { user } from "../lib/utils/fake-data";
 import { theme } from "../styles/theme";
+import { logout } from "@api/auth";
 import {
   Select,
   Card,
@@ -21,16 +35,20 @@ import {
   Icon,
   Snackbar,
   Chip,
-  Divider,
+  Avatar,
 } from "./ui/index";
 import Header from "./Header";
 import useAssignedSteps from "@hooks/useAssignedSteps";
 import TranslationToggle from "./TranslationToggle";
+import useWorkflow from "@hooks/useWorkflow";
 
 // import AdviceProcessNavigation from "./page-content/advice/AdviceProcessNavigation";
 
 const StyledNav = styled(Box)`
   display: flex;
+  position: fixed;
+  height: 100%;
+  z-index: ${({ theme }) => theme.zIndex.drawer};
 `;
 
 const CustomDrawer = styled(Drawer)`
@@ -43,21 +61,376 @@ const CustomDrawer = styled(Drawer)`
     outline: 1px solid ${({ theme }) => theme.color.neutral.main};
     border: none;
     margin-top: 0;
-    padding-top: ${({ theme }) => theme.util.appBarHeight}px;
+    padding: ${({ theme }) => theme.spacing(2, 2)};
   }
 `;
+
+const NavList = styled(List)`
+  padding: ${({ theme }) => theme.spacing(2, 2)};
+`;
+
+const NavListItemButton = styled(ListItemButton)`
+  padding: ${({ theme }) => theme.spacing(2, 2)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
+  border-radius: ${({ theme }) => theme.radius.md}px;
+  &:hover {
+    background-color: ${({ theme }) => theme.color.neutral.lightened};
+  }
+  &.Mui-selected {
+    background-color: ${({ theme }) => theme.color.neutral.lightened};
+    .MuiTypography-root {
+      color: ${({ theme }) => theme.color.primary.main};
+    }
+    .MuiListItemIcon-root svg {
+      color: ${({ theme }) => theme.color.primary.main};
+    }
+    &:hover {
+      background-color: ${({ theme }) => theme.color.neutral.lightened};
+    }
+  }
+`;
+
+const NavListItemText = ({ primary, secondary, bold, ...props }) => (
+  <ListItemText
+    primary={
+      <Typography
+        variant="bodyRegular"
+        bold={bold}
+        sx={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {primary}
+      </Typography>
+    }
+    secondary={
+      secondary && (
+        <Typography
+          variant="bodyRegular"
+          lightened
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {secondary}
+        </Typography>
+      )
+    }
+    {...props}
+  />
+);
+
+const NavPopover = styled(Popover)`
+  .MuiPaper-root {
+    width: ${({ theme }) => theme.util.drawerWidth - theme.util.buffer * 8}px;
+    margin-top: ${({ theme }) => theme.spacing(1)};
+    box-shadow: ${({ theme }) => theme.shadow.small.lightened};
+    border-radius: ${({ theme }) => theme.radius.lg}px;
+    border: ${({ theme }) => theme.util.borderWidth} solid
+      ${({ theme }) => theme.color.neutral.main};
+    background: ${({ theme }) => theme.color.neutral.light};
+  }
+`;
+
+const NavListItemIcon = styled(ListItemIcon)`
+  min-width: 56px;
+  display: flex;
+  justify-content: left;
+  padding-left: 8px;
+`;
+
+const WorkflowNavItems = ({
+  school,
+  workflowId,
+  openSection,
+  onSectionClick,
+}) => {
+  const router = useRouter();
+  const { workflow, isLoading, isError } = useWorkflow(workflowId);
+  const [expanded, setExpanded] = useState(false);
+
+  console.log({ workflow });
+
+  // Add current date logic
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-based
+
+  useEffect(() => {
+    // Check if any child route is selected
+    const isChecklistSelected = router.asPath.startsWith(
+      `/school/${school.id}/open-school/${workflowId}/checklist`
+    );
+    const isResourcesSelected =
+      router.asPath ===
+      `/school/${school.id}/open-school/${workflowId}/resources`;
+    const isVisioningSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/visioning`;
+    const isPlanningSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/planning`;
+    const isStartupSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/startup`;
+    const isSsjResourcesSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/resources`;
+
+    // Set expanded if any child route is selected
+    setExpanded(
+      isChecklistSelected ||
+        isResourcesSelected ||
+        isVisioningSelected ||
+        isPlanningSelected ||
+        isStartupSelected ||
+        isSsjResourcesSelected
+    );
+  }, [router.asPath, school.id, workflowId]);
+
+  if (isLoading || !workflow) {
+    return null;
+  }
+
+  const isOpenSchoolChecklist = workflow.attributes.recurring === true;
+  const isSchoolStartupJourney = workflow.attributes.recurring === false;
+
+  if (isOpenSchoolChecklist) {
+    return (
+      <>
+        <NavListItemButton
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setExpanded(!expanded);
+          }}
+          sx={{ pl: 8 }}
+        >
+          <NavListItemIcon>
+            <Icon type="calendar" />
+          </NavListItemIcon>
+          <NavListItemText primary="Open School Checklist" />
+          <Icon
+            type={expanded ? "chevronDown" : "chevronRight"}
+            variant="lightened"
+            size="small"
+          />
+        </NavListItemButton>
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <NavList sx={{ padding: 0 }}>
+            <NavListItemButton
+              onClick={() =>
+                router.push(
+                  `/school/${school.id}/open-school/${workflowId}/checklist/${currentYear}/${currentMonth}`
+                )
+              }
+              selected={router.asPath.startsWith(
+                `/school/${school.id}/open-school/${workflowId}/checklist`
+              )}
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Checklist" />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(
+                  `/school/${school.id}/open-school/${workflowId}/resources`
+                )
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/open-school/${workflowId}/resources`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Resources" />
+            </NavListItemButton>
+          </NavList>
+        </Collapse>
+      </>
+    );
+  }
+
+  if (isSchoolStartupJourney) {
+    return (
+      <>
+        <NavListItemButton
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setExpanded(!expanded);
+          }}
+          sx={{ pl: 8 }}
+        >
+          <NavListItemIcon>
+            <Icon type="map" />
+          </NavListItemIcon>
+          <NavListItemText primary="School Startup Journey" />
+          <Icon
+            type={expanded ? "chevronDown" : "chevronRight"}
+            variant="lightened"
+            size="small"
+          />
+        </NavListItemButton>
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <NavList sx={{ padding: 0 }}>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/visioning`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/visioning`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Visioning" />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/planning`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/planning`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Planning" />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/startup`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/startup`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Startup" />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/resources`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/resources`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary="Resources" />
+            </NavListItemButton>
+          </NavList>
+        </Collapse>
+      </>
+    );
+  }
+
+  return null;
+};
 
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const { screenSize } = getScreenSize();
   const router = useRouter();
   const { t } = useTranslation("common");
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [openSchoolId, setOpenSchoolId] = useState(null);
+  const [openSection, setOpenSection] = useState(null);
+  const {
+    currentUser,
+    isLoggedIn,
+    setCurrentUser,
+    isAdmin,
+    isOperationsGuide,
+  } = useUserContext();
+
+  // Set initial open school based on route
+  useEffect(() => {
+    const schoolIdMatch = router.asPath.match(/\/school\/([^/]+)/);
+    if (schoolIdMatch) {
+      setOpenSchoolId(schoolIdMatch[1]);
+    } else {
+      // If we're not on a school route, collapse the school section
+      setOpenSchoolId(null);
+    }
+  }, [router.asPath]);
+
+  // Determine which section should be open based on current route
+  useEffect(() => {
+    if (router.pathname.includes("/school/")) {
+      if (router.pathname.includes("/open-school/")) {
+        setOpenSection("openSchool");
+      } else if (router.pathname.includes("/ssj/")) {
+        setOpenSection("ssj");
+      } else {
+        setOpenSection("school");
+      }
+    } else {
+      // If we're not on a school route, collapse all sections
+      setOpenSection(null);
+    }
+  }, [router.pathname]);
+
+  const handleSectionClick = (section) => {
+    setOpenSection(openSection === section ? null : section);
+  };
+
+  const handleSchoolClick = (schoolId) => {
+    router.push(`/school/${schoolId}`);
+    // Only toggle if it's not already open
+    if (openSchoolId !== schoolId) {
+      setOpenSchoolId(schoolId);
+      handleSectionClick("school");
+    }
+  };
+
+  // Don't render nav if user is not logged in
+  if (!isLoggedIn) {
+    return null;
+  }
+
+  const handleUserClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
 
   const { workflow } = router.query;
   const approvedWorkflowIds = ["5c8f-d17c"]; // Maggie's workflow ID
   const isApproved = approvedWorkflowIds.includes(workflow);
 
-  // console.log(screenSize.isSm);
+  async function handleLogOut() {
+    try {
+      const res = await logout();
+      console.log(res);
+    } catch (err) {
+      if (err?.response?.status !== 401) {
+        console.error("Error logging out:", err);
+      }
+    } finally {
+      router.push("/logged-out", "/logged-out", { locale: "en" }).then(() => {
+        // Clear the authentication tokens and user state after redirecting
+        clearLoggedInState({});
+        setCurrentUser(null);
+      });
+    }
+  }
+  const logo = "/assets/images/wildflower-logo.png";
 
+  // console.log(screenSize.isSm);
+  console.log({ currentUser });
   return (
     <StyledNav sx={{ display: "flex" }}>
       <CustomDrawer
@@ -65,13 +438,209 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
         anchor="left"
         open={navOpen}
         onClose={toggleNavOpen}
+        sx={{ p: 2 }}
       >
         <Stack
           justifyContent="space-between"
           direction="column"
           sx={{ height: "100%" }}
         >
-          <Navigation />
+          <div>
+            <NavList>
+              <NavListItemButton
+                onClick={handleUserClick}
+                sx={{ cursor: "pointer" }}
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    sx={{ height: 40, width: 40 }}
+                    src={currentUser?.attributes.imageUrl}
+                  />
+                </ListItemAvatar>
+                <NavListItemText
+                  primary={`${currentUser?.attributes.firstName} ${currentUser?.attributes.lastName}`}
+                  secondary={currentUser?.personRoleList.map((m) => {
+                    return `${m}, `;
+                  })}
+                  bold
+                />
+                <Box
+                  sx={{
+                    ml: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon type="dotsVertical" variant="lightened" />
+                </Box>
+              </NavListItemButton>
+              <NavListItemButton
+                onClick={() => router.push("/network")}
+                selected={router.pathname.includes("/network")}
+              >
+                <NavListItemIcon>
+                  <Icon type="bookReader" />
+                </NavListItemIcon>
+                <NavListItemText primary="Network" bold />
+              </NavListItemButton>
+              {currentUser?.personRoleList.includes("Ops Guide") ? (
+                <NavListItemButton
+                  onClick={() => router.push("/your-schools")}
+                  selected={router.pathname.includes("/your-schools")}
+                >
+                  <NavListItemIcon>
+                    <Icon type="buildingHouse" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Your Schools" bold />
+                </NavListItemButton>
+              ) : null}
+            </NavList>
+            <NavPopover
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <NavList>
+                <NavListItemButton
+                  onClick={() =>
+                    router.push(`/network/people/${currentUser?.id}`)
+                  }
+                >
+                  <NavListItemIcon>
+                    <Icon type="user" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Your Profile" />
+                </NavListItemButton>
+                <Divider
+                  sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+                />
+                <NavListItemButton onClick={() => router.push("/admin")}>
+                  <NavListItemIcon>
+                    <Icon type="data" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Switch To Admin" />
+                </NavListItemButton>
+                <NavListItemButton onClick={() => router.push("/settings")}>
+                  <NavListItemIcon>
+                    <Icon type="cog" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Settings" />
+                </NavListItemButton>
+                <Divider
+                  sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+                />
+                <NavListItemButton onClick={handleLogOut}>
+                  <NavListItemIcon>
+                    <Icon type="logOut" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Logout" />
+                </NavListItemButton>
+              </NavList>
+            </NavPopover>
+
+            <Divider
+              sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+            />
+
+            <NavList>
+              {currentUser?.attributes.schools.map((school, i) => (
+                <div key={i}>
+                  <NavListItemButton
+                    onClick={() => handleSchoolClick(school.id)}
+                    selected={router.asPath === `/school/${school.id}`}
+                  >
+                    <NavListItemIcon>
+                      <Box
+                        sx={{
+                          height: 24,
+                          width: 24,
+                          borderRadius: (theme) => theme.radius.md + "px",
+                          backgroundColor: (theme) => theme.color.neutral.main,
+                        }}
+                      />
+                    </NavListItemIcon>
+                    <NavListItemText primary={school.name} bold />
+                    <Icon
+                      type={
+                        openSchoolId === school.id
+                          ? "chevronDown"
+                          : "chevronRight"
+                      }
+                      variant="lightened"
+                      size="small"
+                    />
+                  </NavListItemButton>
+                  <Collapse
+                    in={openSchoolId === school.id}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <NavList sx={{ padding: 0 }}>
+                      <NavListItemButton
+                        onClick={() =>
+                          router.push(`/school/${school.id}/to-do-list`)
+                        }
+                        selected={router.pathname.endsWith("/to-do-list")}
+                        sx={{ pl: 8 }}
+                      >
+                        <NavListItemIcon>
+                          <Icon type="inbox" />
+                        </NavListItemIcon>
+                        <NavListItemText primary="To Do List" />
+                      </NavListItemButton>
+
+                      {school.workflowIds?.map((workflowId) => (
+                        <WorkflowNavItems
+                          key={workflowId}
+                          school={school}
+                          workflowId={workflowId}
+                          openSection={openSection}
+                          onSectionClick={handleSectionClick}
+                        />
+                      ))}
+                    </NavList>
+                  </Collapse>
+                </div>
+              ))}
+            </NavList>
+          </div>
+          {/* <Stack
+          justifyContent="space-between"
+          direction="column"
+          sx={{ height: "100%" }}
+        >
+          <div>
+            <Grid container spacing={3} alignItems="center">
+              <Grid item>
+                <Avatar />
+              </Grid>
+              <Grid item>
+                <Typography variant="bodyRegular" bold>
+                  Maggie Paulin
+                </Typography>
+                <Typography variant="bodyRegular" lightened>
+                  Emerging Teacher Leader
+                </Typography>
+              </Grid>
+            </Grid>
+            <NavLink
+              variant="primary"
+              to="/network"
+              active={router.pathname.includes("/network")}
+              label="Network"
+              icon="bookReader"
+            />
+            <Navigation />
+          </div>
           <Grid container p={4} spacing={3}>
             <Grid item xs={12}>
               <Link href="mailto:support@wildflowerschools.org?subject=My Wildflower Feedback">
@@ -100,6 +669,10 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
               </Grid>
             ) : null}
           </Grid>
+        </Stack> */}
+          <Box sx={{ padding: 4 }}>
+            <img src={logo} style={{ height: "32px" }} />
+          </Box>
         </Stack>
       </CustomDrawer>
     </StyledNav>
@@ -107,371 +680,3 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
 };
 
 export default Nav;
-
-const Navigation = () => {
-  const router = useRouter();
-  const { currentUser, isOperationsGuide } = useUserContext();
-  const [ogViewingSchool, setOgViewingSchool] = useState();
-  const [mySchoolWorkflowId, setMySchoolWorkflowId] = useState();
-  const { workflow } = router.query;
-
-  useEffect(() => {
-    sessionStorage.getItem("mySchoolWorkflowId") &&
-      setMySchoolWorkflowId(sessionStorage.getItem("mySchoolWorkflowId"));
-  }, []);
-
-  useEffect(() => {
-    if (router.asPath === "/your-schools") {
-      sessionStorage.removeItem("schoolName");
-    }
-    if (
-      router.pathname.includes("/ssj/") &&
-      sessionStorage.getItem("schoolName")
-    ) {
-      setOgViewingSchool(sessionStorage.getItem("schoolName"));
-    }
-  }, []);
-
-  useEffect(() => {
-    // Check if the current pathname does not include "/ssj/"
-    if (!router.pathname.includes("/ssj/")) {
-      // Set the locale to "en"
-      router.push(router.pathname, router.asPath, { locale: "en" });
-    }
-  }, [router.pathname]);
-  const isEmergingTeacherLeader = currentUser?.personRoleList?.includes(
-    "Emerging Teacher Leader"
-  );
-  const isTeacherLeader =
-    currentUser?.personRoleList?.includes("Teacher Leader");
-
-  // console.log({ ogViewingSchool });
-  // console.log({ isTeacherLeader });
-  // console.log({ currentUser });
-  // console.log({ workflow });
-
-  const { t } = useTranslation("common");
-
-  return currentUser ? (
-    <Box>
-      {isOperationsGuide && router.pathname.includes("/ssj/") ? (
-        <Snackbar
-          open={ogViewingSchool}
-          autoHideDuration={null}
-          anchorOrigin={{ vertical: "middle", horizontal: "center" }}
-        >
-          <div>
-            <Card size="small" variant="primaryLightened">
-              <Stack direction="row" spacing={3} alignItems="center">
-                <Typography variant="bodySmall" bold highlight>
-                  VIEWING
-                </Typography>
-                <Typography variant="bodyRegular">{ogViewingSchool}</Typography>
-              </Stack>
-            </Card>
-          </div>
-        </Snackbar>
-      ) : null}
-
-      {router.pathname.includes("/admin/") || router.asPath === "/admin" ? (
-        <>
-          <NavLink
-            variant="primary"
-            to="/admin"
-            active={router.asPath === "/admin"}
-            label="Dashboard"
-            icon="home"
-          />
-          <NavLink
-            variant="primary"
-            to="/admin/workflows"
-            active={router.asPath === "/admin/workflows"}
-            label="Workflows"
-            onClick={() => localStorage.removeItem("workflowId")}
-            icon="layer"
-          />
-          {/* <NavLink
-            variant="primary"
-            to="/admin/workflows/processes"
-            active={router.asPath === "/admin/workflows/processes"}
-            label="Processes"
-            onClick={() => localStorage.removeItem("workflowId")}
-            icon={true}
-          /> */}
-          <NavLink
-            variant="primary"
-            to="/admin/schools"
-            active={router.asPath === "/admin/schools"}
-            label="Schools"
-            icon="buildingHouse"
-          />
-        </>
-      ) : (
-        <>
-          <NavLink
-            variant="primary"
-            to="/network"
-            active={router.pathname.includes("/network")}
-            label="Network"
-            icon="bookReader"
-          />
-
-          {isTeacherLeader ? (
-            <NavLink
-              variant="primary"
-              to="/open-school"
-              active={router.asPath === `/open-school/${mySchoolWorkflowId}`}
-              // label="Open School"
-              label={
-                currentUser?.attributes?.schools?.find(
-                  (school) => school.workflowId === mySchoolWorkflowId
-                )?.name
-              }
-              icon="home"
-            />
-          ) : null}
-
-          {router.pathname.includes("/open-school") ? (
-            <OpenSchoolNavigation
-              openSchoolWorkflowId={mySchoolWorkflowId}
-              currentUserId={currentUser?.id}
-              currentUserEmail={currentUser?.attributes.email}
-            />
-          ) : null}
-
-          {!isOperationsGuide && isEmergingTeacherLeader ? (
-            <NavLink
-              deEmphasized={isTeacherLeader}
-              variant="primary"
-              to={`/ssj/${currentUser?.attributes?.ssj?.workflowId}`}
-              active={router.asPath === `/ssj/${workflow}`}
-              label={t("ssj_ui_content.school_startup_journey")}
-              icon="home"
-            />
-          ) : null}
-
-          {isOperationsGuide ? (
-            <Stack spacing={3}>
-              <NavLink
-                variant="primary"
-                to="/your-schools"
-                active={router.asPath === "/your-schools"}
-                label="Your Schools"
-                icon="buildingHouse"
-              />
-
-              {ogViewingSchool && router.pathname.includes("/ssj/") ? (
-                <Box pl={3} pr={3} pb={3}>
-                  <Card size="small" variant="primaryLightened">
-                    <Stack direction="row" spacing={3} alignItems="center">
-                      <Typography variant="bodySmall" bold highlight>
-                        VIEWING
-                      </Typography>
-                      <Typography variant="bodyRegular">
-                        {ogViewingSchool}
-                      </Typography>
-                    </Stack>
-                  </Card>
-                </Box>
-              ) : null}
-            </Stack>
-          ) : null}
-
-          {router.pathname.includes("/ssj") ? (
-            <SSJNavigation
-              SSJworkflowId={workflow}
-              opsView={isOperationsGuide}
-            />
-          ) : null}
-        </>
-      )}
-    </Box>
-  ) : (
-    <Box />
-  );
-};
-
-const SSJNavigation = ({ opsView, SSJworkflowId }) => {
-  const router = useRouter();
-  const { workflow } = router.query;
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
-    current_user: true,
-  });
-
-  const { t } = useTranslation("common");
-
-  return (
-    <Box>
-      <NavLink
-        variant="secondary"
-        to={`/ssj/${SSJworkflowId}/to-do-list`}
-        active={
-          router.pathname.startsWith("/ssj/") &&
-          router.pathname.includes("/to-do-list")
-        }
-        label={t("navigation.to_do_list")}
-        icon="calendarCheck"
-        secondaryAction={
-          isLoading ? null : !assignedSteps.length ? null : (
-            <Chip
-              size="small"
-              label={assignedSteps.length}
-              variant="lightened"
-            />
-          )
-        }
-      />
-      <NavLink
-        variant="secondary"
-        to={`/ssj/${SSJworkflowId}/milestones`}
-        active={router.pathname.includes("/milestones")}
-        label={t("ssj_ui_content.milestones")}
-        icon="layer"
-      />
-      <NavLink
-        variant="tertiary"
-        to={`/ssj/${SSJworkflowId}/visioning`}
-        active={router.pathname.includes("/visioning")}
-        label={t("ssj_phases.visioning")}
-        icon={true}
-        data-cy="visioning-nav-item"
-      />
-      <NavLink
-        variant="tertiary"
-        to={`/ssj/${SSJworkflowId}/planning`}
-        active={router.pathname.includes("/planning")}
-        label={t("ssj_phases.planning")}
-        icon={true}
-        data-cy="planning-nav-item"
-      />
-      <NavLink
-        variant="tertiary"
-        to={`/ssj/${SSJworkflowId}/startup`}
-        active={router.pathname.includes("/startup")}
-        label={t("ssj_phases.startup")}
-        icon={true}
-        data-cy="startup-nav-item"
-      />
-      {opsView ? null : (
-        <NavLink
-          variant="secondary"
-          to={`/ssj/${SSJworkflowId}/resources`}
-          active={router.pathname.includes("/resources")}
-          label={t("ssj_ui_content.resources")}
-          icon="fileBlank"
-        />
-      )}
-    </Box>
-  );
-};
-
-const OpenSchoolNavigation = ({ openSchoolWorkflowId, currentUserId }) => {
-  const router = useRouter();
-  const { workflow } = router.query;
-  const { assignedSteps, isLoading, isError } = useAssignedSteps(workflow, {
-    current_user: true,
-  });
-
-  const assignedToMe = assignedSteps?.filter(
-    (step) => step.relationships.assignees.data[0].id === currentUserId
-  );
-
-  const thisMonth = new Date().getMonth();
-  const thisYear = new Date().getFullYear();
-
-  return (
-    <Box>
-      <NavLink
-        data-cy="open-school-checklist-toDoList"
-        variant="secondary"
-        to={`/open-school/${openSchoolWorkflowId}/to-do-list`}
-        active={
-          router.pathname.startsWith("/open-school/") &&
-          router.pathname.includes("/to-do-list")
-        }
-        label="To do list"
-        icon="calendarCheck"
-        secondaryAction={
-          isLoading ? null : !assignedToMe.length ? null : (
-            <Chip
-              size="small"
-              label={assignedToMe.length}
-              variant="lightened"
-            />
-          )
-        }
-      />
-      <NavLink
-        data-cy="open-school-checklist-navItem"
-        variant="secondary"
-        to={`/open-school/${openSchoolWorkflowId}/checklist/${thisYear}/${thisMonth}`}
-        active={
-          router.pathname.startsWith("/open-school/") &&
-          router.pathname.includes("/checklist")
-        }
-        label="Checklist"
-        icon="layer"
-        secondaryAction={
-          <Chip
-            size="small"
-            label="New"
-            variant="primary"
-            sx={{ pointerEvents: "none" }}
-          />
-        }
-      />
-
-      {/*
-          <NavLink
-            variant="secondary"
-            to={`/open-school/${openSchoolWorkflowId}/enrollment-and-communications`}
-            active={
-              router.pathname.startsWith("/open-school/") &&
-              router.pathname.includes("/enrollment-and-communications")
-            }
-            label="Enrollment & Family Comms"
-            icon="loader"
-          />
-          <NavLink
-            variant="secondary"
-            to={`/open-school/${openSchoolWorkflowId}/finance-and-operations`}
-            active={
-              router.pathname.startsWith("/open-school/") &&
-              router.pathname.includes("/finance-and-operations")
-            }
-            label="Finance & Operations"
-            icon="loader"
-          />
-          <NavLink
-            variant="secondary"
-            to={`/open-school/${openSchoolWorkflowId}/my-board`}
-            active={
-              router.pathname.startsWith("/open-school/") &&
-              router.pathname.includes("/my-board")
-            }
-            label="My Board"
-            icon="loader"
-          />
-          <NavLink
-            variant="secondary"
-            to={`/open-school/${openSchoolWorkflowId}/resources`}
-            active={
-              router.pathname.startsWith("/open-school/") &&
-              router.pathname.includes("/resources")
-            }
-            label="Resources"
-            icon="loader"
-          />
-          <NavLink
-            variant="secondary"
-            to={`/open-school/${openSchoolWorkflowId}/support`}
-            active={
-              router.pathname.startsWith("/open-school/") &&
-              router.pathname.includes("/support")
-            }
-            label="Support@"
-            icon="loader"
-          /> */}
-    </Box>
-  );
-};

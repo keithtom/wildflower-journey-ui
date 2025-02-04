@@ -35,8 +35,13 @@ import {
   Calendar,
   CalendarWeek,
   Globe,
+  Cog,
+  LogOut,
+  User,
+  Data,
 } from "@styled-icons/boxicons-regular";
 import {
+  Inbox,
   BuildingHouse,
   Bus,
   BookReader,
@@ -57,7 +62,7 @@ import {
   Home,
   Wrench,
   Lock,
-  Map,
+  MapAlt,
   CalendarAlt,
   Group,
   UserCircle,
@@ -184,6 +189,7 @@ export default function Icon({ ...props }) {
     dotsVertical: <DotsVerticalRounded />,
     chevronRight: <ChevronRight />,
     chevronLeft: <ChevronLeft />,
+    chevronDown: <ChevronDown />,
     rightArrow: <RightArrowAlt />,
     close: <X />,
     expandMore: <ChevronDown />,
@@ -229,7 +235,7 @@ export default function Icon({ ...props }) {
     lock: <Lock />,
     filter: <Filter />,
     minus: <Minus />,
-    map: <Map />,
+    map: <MapAlt />,
     calendar: <Calendar />,
     calendarAlt: <CalendarAlt />,
     calendarWeek: <CalendarWeek />,
@@ -241,6 +247,11 @@ export default function Icon({ ...props }) {
     calendarStar: <CalendarStar />,
     userCircle: <UserCircle />,
     globe: <Globe />,
+    inbox: <Inbox />,
+    cog: <Cog />,
+    logOut: <LogOut />,
+    user: <User />,
+    data: <Data />,
   };
 
   return <StyledIcon {...props}>{icons[props.type]}</StyledIcon>;

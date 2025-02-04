@@ -33,7 +33,7 @@ import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const MilestonePage = ({ FakeMilestoneTasks }) => {
   const router = useRouter();
-  const { workflow, phase, milestone: milestoneQuery } = router.query;
+  const { workflow, phase, milestone: milestoneQuery, schoolId } = router.query;
 
   const { t } = useTranslation("common");
 
@@ -91,7 +91,7 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
                       {milestonePrerequisites &&
                         milestonePrerequisites.map((m, i) => (
                           <Milestone
-                            link={`/ssj/${workflow}/${phase}/${m.id}`}
+                            link={`/school/${schoolId}/ssj/${workflow}/${phase}/${m.id}`}
                             key={i}
                             title={
                               m.attributes[
@@ -117,7 +117,7 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Link href={`/ssj/${workflow}/${phase}`}>
+                <Link href={`/school/${schoolId}/ssj/${workflow}/${phase}`}>
                   <IconButton>
                     <Icon type="chevronLeft" />
                   </IconButton>

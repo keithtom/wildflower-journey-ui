@@ -12,8 +12,8 @@ import teamsApi from "@api/ssj/teams";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import Hero from "../../../components/Hero";
-import UserCard from "../../../components/UserCard";
+import Hero from "@components/Hero";
+import UserCard from "@components/UserCard";
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 import {

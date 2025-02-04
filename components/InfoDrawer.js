@@ -90,30 +90,30 @@ const InfoDrawer = ({
 
   const isETL = currentUser?.attributes.ssj ? true : false;
 
-  let showActions = false;
+  let showActions = true;
 
-  if (isOperationsGuide) {
-    if (
-      // is a teacher leader, who is looking at their own checklist
-      isTL &&
-      router.pathname.startsWith("/open-school/") &&
-      currentUser.attributes.schools[0].workflowId === workflow
-    ) {
-      showActions = true;
-    } else if (
-      // is an emerging teacher leader, who is looking at their SSJ
-      isETL &&
-      router.pathname.startsWith("/ssj/") &&
-      currentUser.attributes.ssj.workflowId === workflow
-    ) {
-      showActions = true;
-    } else {
-      // is simply an ops guide looking at a school
-      showActions = false;
-    }
-  } else {
-    showActions = true;
-  }
+  // if (isOperationsGuide) {
+  //   if (
+  //     // is a teacher leader, who is looking at their own checklist
+  //     isTL &&
+  //     router.pathname.startsWith("/open-school/") &&
+  //     currentUser.attributes.schools[0].workflowId === workflow
+  //   ) {
+  //     showActions = true;
+  //   } else if (
+  //     // is an emerging teacher leader, who is looking at their SSJ
+  //     isETL &&
+  //     router.pathname.startsWith("/ssj/") &&
+  //     currentUser.attributes.ssj.workflowId === workflow
+  //   ) {
+  //     showActions = true;
+  //   } else {
+  //     // is simply an ops guide looking at a school
+  //     showActions = false;
+  //   }
+  // } else {
+  //   showActions = true;
+  // }
 
   return (
     <CustomDrawer anchor="right" open={open} onClose={toggle}>

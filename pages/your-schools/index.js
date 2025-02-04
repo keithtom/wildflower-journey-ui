@@ -5,7 +5,7 @@ import Skeleton from "@mui/material/Skeleton";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
 import useAllTeams from "@hooks/useAllTeams";
-
+import useSchools from "@hooks/useSchools";
 import PhaseChip from "../../components/PhaseChip";
 import {
   PageContainer,
@@ -21,37 +21,39 @@ import {
 
 const YourSchools = () => {
   const { currentUser } = useUserContext();
-  const router = useRouter();
 
-  //fetch data
-  const { teams, isLoading } = useAllTeams();
+  // //fetch data
+  // const { teams, isLoading } = useAllTeams();
 
+  // //set teams array
+  // let ssjTeams = teams || [];
 
-  //set teams array
-  let ssjTeams = teams || [];
+  // //filter teams to only be for which this user is an ops guide
+  // const filteredTeams = ssjTeams?.filter(
+  //   (team) => team.relationships?.opsGuide?.data?.id === currentUser?.id
+  // );
 
-  //filter teams to only be for which this user is an ops guide
-  const filteredTeams = ssjTeams?.filter((team) =>
-    team.relationships?.opsGuide?.data?.id === currentUser?.id
-  );
+  // //set grouped teams by phase
+  // const visioningTeams = filteredTeams.filter(
+  //   (team) => team.attributes.currentPhase === "visioning"
+  // );
+  // const planningTeams = filteredTeams.filter(
+  //   (team) => team.attributes.currentPhase === "planning"
+  // );
+  // const startupTeams = filteredTeams.filter(
+  //   (team) => team.attributes.currentPhase === "startup"
+  // );
 
-  //set grouped teams by phase
-  const visioningTeams = filteredTeams.filter(
-    (team) => team.attributes.currentPhase === "visioning"
-  );
-  const planningTeams = filteredTeams.filter(
-    (team) => team.attributes.currentPhase === "planning"
-  );
-  const startupTeams = filteredTeams.filter(
-    (team) => team.attributes.currentPhase === "startup"
-  );
+  const { schools, isLoading } = useSchools();
+
+  console.log({ schools });
 
   useAuth("/login");
   // console.log({ filteredTeams });
 
   return (
-    <PageContainer>
-      <Grid container spacing={16}>
+    <PageContainer title="Your Schools">
+      {/* <Grid container spacing={16}>
         <Grid item xs={12}>
           <Stack spacing={3} direction="row" alignItems="center">
             <Avatar src={currentUser?.attributes.imageUrl} />
@@ -69,10 +71,6 @@ const YourSchools = () => {
           <Grid container>
             <Grid item xs={12}>
               <Stack spacing={6}>
-                <Typography variant="bodyLarge" bold>
-                  Your Schools
-                </Typography>
-
                 {isLoading ? (
                   <Stack spacing={6}>
                     <Skeleton width={120} height={48} />
@@ -125,6 +123,7 @@ const YourSchools = () => {
                           openDate={p.attributes.expectedStartDate}
                           team={p.relationships.partners.data}
                           workflowId={p.attributes.workflowId}
+                          schoolId={p.attributes.schoolId}
                         />
                       ))}
                     </Stack>
@@ -162,18 +161,25 @@ const YourSchools = () => {
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      </Grid> */}
     </PageContainer>
   );
 };
 
 export default YourSchools;
 
-const SchoolCard = ({ name, location, team, openDate, workflowId }) => {
+const SchoolCard = ({
+  name,
+  location,
+  team,
+  openDate,
+  workflowId,
+  schoolId,
+}) => {
   const router = useRouter();
   const handleSetActiveTeam = (workflowId) => {
     sessionStorage.setItem("schoolName", name);
-    router.push(`/ssj/${workflowId}/to-do-list`);
+    router.push(`/school/${schoolId}/`);
   };
   return (
     <Card size="small">

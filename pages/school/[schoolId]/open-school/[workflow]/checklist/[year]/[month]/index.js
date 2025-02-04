@@ -19,6 +19,7 @@ import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 import useAuth from "@lib/utils/useAuth";
 import useMilestones from "@hooks/useMilestones";
+import useSchool from "@hooks/useSchool";
 import {
   PageContainer,
   Grid,
@@ -40,96 +41,49 @@ const AdminChecklist = () => {
   const { screenSize } = getScreenSize();
   const { currentUser } = useUserContext();
   const router = useRouter();
-  const workflowId = currentUser?.attributes.schools[0].workflowId;
 
-  const { year: yearQuery, month: monthQuery } = router.query;
+  // All date-related calculations
+  const today = new Date();
+  const currentMonth = today.getMonth(); // 0-11
+  const currentYear = today.getFullYear();
+
+  // Academic year calculations
+  const academicYearStart = currentMonth >= 8 ? currentYear : currentYear - 1;
+  const academicYearEnd = academicYearStart + 1;
+
+  const {
+    year: yearQuery,
+    month: monthQuery,
+    schoolId,
+    workflow,
+  } = router.query;
+
+  const { data: school } = useSchool(schoolId);
 
   const [isToday, setIsToday] = useState(false);
 
   useEffect(() => {
-    const now = new Date();
     if (
-      Number(monthQuery) === now.getMonth() &&
-      Number(yearQuery) === now.getFullYear()
+      Number(monthQuery) === currentMonth &&
+      Number(yearQuery) === currentYear
     ) {
       setIsToday(true);
     } else {
       setIsToday(false);
     }
-  }, [monthQuery, yearQuery]);
-
-  const handleIncrementMonth = () => {
-    if (Number(monthQuery) === 11) {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            workflow: workflowId,
-            month: 0,
-            year: Number(yearQuery) + 1,
-          },
-        },
-        `/open-school/${workflowId}/checklist/${Number(yearQuery) + 1}/0`
-      );
-    } else {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            workflow: workflowId,
-            month: Number(monthQuery) + 1,
-            year: Number(yearQuery),
-          },
-        },
-        `/open-school/${workflowId}/checklist/${Number(yearQuery)}/${
-          Number(monthQuery) + 1
-        }`
-      );
-    }
-  };
-
-  const handleDecrementMonth = () => {
-    if (Number(monthQuery) === 0) {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            workflow: workflowId,
-            month: 11,
-            year: Number(yearQuery) - 1,
-          },
-        },
-        `/open-school/${workflowId}/checklist/${Number(yearQuery) - 1}/11`
-      );
-    } else {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            workflow: workflowId,
-            month: Number(monthQuery) - 1,
-            year: Number(yearQuery),
-          },
-        },
-        `/open-school/${workflowId}/checklist/${Number(yearQuery)}/${
-          Number(monthQuery) - 1
-        }`
-      );
-    }
-  };
+  }, [monthQuery, yearQuery, currentMonth, currentYear]);
 
   const handleResetDate = () => {
-    const now = new Date();
     router.push(
       {
         pathname: router.pathname,
         query: {
-          workflow: workflowId,
-          month: now.getMonth(),
-          year: now.getFullYear(),
+          workflow: workflow,
+          month: currentMonth,
+          year: currentYear,
         },
       },
-      `/open-school/${workflowId}/checklist/${now.getFullYear()}/${now.getMonth()}`
+      `/school/${schoolId}/open-school/${workflow}/checklist/${currentYear}/${currentMonth}`
     );
   };
 
@@ -144,7 +98,7 @@ const AdminChecklist = () => {
   const [year, month] = timeframe.split("-");
   const nonZeroBasedDate = new Date(year, month - 1);
 
-  const { milestones, isLoading } = useMilestones(workflowId, {
+  const { milestones, isLoading } = useMilestones(workflow, {
     // timeframe: monthQuery,
     timeframe,
     omit_include: true,
@@ -227,18 +181,6 @@ const AdminChecklist = () => {
 
   // Get the current month number and year
   let currentMonthNumber = new Date(timeframe).getMonth() + 1; // getMonth() returns 0-11, so add 1
-  let currentYear = new Date(timeframe).getFullYear();
-
-  // Increment the month number by 1
-  currentMonthNumber += 1;
-
-  // Adjust the year if the incremented month number exceeds 12
-  if (currentMonthNumber > 12) {
-    currentMonthNumber = 1;
-    currentYear += 1;
-  }
-
-  // Find the academic quarter for the incremented month
   let currentQuarter = "";
 
   for (const [quarter, months] of Object.entries(academicQuarters)) {
@@ -260,7 +202,7 @@ const AdminChecklist = () => {
   // useAuth("/login");
 
   return (
-    <PageContainer>
+    <PageContainer title={school?.data?.attributes?.name}>
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Grid
@@ -269,21 +211,78 @@ const AdminChecklist = () => {
             justifyContent="space-between"
             spacing={6}
           >
-            <Grid item flex={1}>
-              <Typography
-                variant="h3"
-                bold
-                data-cy="open-school-checklist-month"
+            <Grid item>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{ overflowX: "auto", pb: 1 }}
               >
-                {isLoading ? (
-                  <Skeleton width={120} />
-                ) : (
-                  new Date(nonZeroBasedDate).toLocaleString("default", {
-                    month: "long",
-                    year: "numeric",
-                  })
-                )}
-              </Typography>
+                {/* First semester */}
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="bodySmall" lightened>
+                    {academicYearStart}
+                  </Typography>
+                  {["Sep", "Oct", "Nov", "Dec"].map((monthName, index) => {
+                    const monthIndex = index + 8; // September starts at index 8
+                    return (
+                      <Chip
+                        key={monthIndex}
+                        label={monthName}
+                        size="small"
+                        variant={
+                          Number(monthQuery) === monthIndex
+                            ? "primary"
+                            : "default"
+                        }
+                        onClick={() => {
+                          router.push(
+                            {
+                              pathname: router.pathname,
+                              query: {
+                                ...router.query,
+                                month: monthIndex,
+                                year: academicYearStart,
+                              },
+                            },
+                            `/school/${schoolId}/open-school/${workflow}/checklist/${academicYearStart}/${monthIndex}`
+                          );
+                        }}
+                      />
+                    );
+                  })}
+                </Stack>
+                {/* Second semester */}
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="bodySmall" lightened>
+                    {academicYearEnd}
+                  </Typography>
+                  {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"].map(
+                    (monthName, index) => (
+                      <Chip
+                        key={index}
+                        label={monthName}
+                        size="small"
+                        variant={
+                          Number(monthQuery) === index ? "primary" : "default"
+                        }
+                        onClick={() => {
+                          router.push(
+                            {
+                              pathname: router.pathname,
+                              query: {
+                                ...router.query,
+                                month: index,
+                                year: academicYearEnd,
+                              },
+                            },
+                            `/school/${schoolId}/open-school/${workflow}/checklist/${academicYearEnd}/${index}`
+                          );
+                        }}
+                      />
+                    )
+                  )}
+                </Stack>
+              </Stack>
             </Grid>
             <Grid item xs={screenSize.isSm ? 12 : null}>
               <Grid
@@ -304,24 +303,11 @@ const AdminChecklist = () => {
                     </Typography>
                   </Button>
                 </Grid>
-                <Grid item>
-                  <IconButton
-                    onClick={handleDecrementMonth}
-                    data-cy="open-school-checklist-prevMonth"
-                  >
-                    <Icon type="chevronLeft" variant="primary" />
-                  </IconButton>
-                  <IconButton
-                    onClick={handleIncrementMonth}
-                    data-cy="open-school-checklist-nextMonth"
-                  >
-                    <Icon type="chevronRight" variant="primary" />
-                  </IconButton>
-                </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
+
         {isLoading ? (
           <Grid item xs={12}>
             <Card noPadding>
@@ -376,7 +362,7 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.in_progress.past_months}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.in_progress.monthlyCombined && (
@@ -385,21 +371,21 @@ const AdminChecklist = () => {
                         milestones={
                           groupedMilestones.in_progress.monthlyCombined
                         }
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.in_progress.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.in_progress.quarterly}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.in_progress.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.in_progress.annually}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                   </List>
@@ -439,28 +425,28 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.to_do.past_months}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.to_do.monthlyCombined && (
                       <MilestoneGroup
                         periodName="This Month"
                         milestones={groupedMilestones.to_do.monthlyCombined}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.to_do.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.to_do.quarterly}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.to_do.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.to_do.annually}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                   </List>
@@ -496,28 +482,28 @@ const AdminChecklist = () => {
                       <MilestoneGroup
                         periodName="Past Months"
                         milestones={groupedMilestones.done.past_months}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.done.monthlyCombined && (
                       <MilestoneGroup
                         periodName="This Month"
                         milestones={groupedMilestones.done.monthlyCombined}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.done.quarterly && (
                       <MilestoneGroup
                         periodName={currentQuarter}
                         milestones={groupedMilestones.done.quarterly}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                     {groupedMilestones.done.annually && (
                       <MilestoneGroup
                         periodName="This Year"
                         milestones={groupedMilestones.done.annually}
-                        workflowId={workflowId}
+                        workflowId={workflow}
                       />
                     )}
                   </List>
@@ -566,7 +552,7 @@ export default AdminChecklist;
 
 const MilestoneGroup = ({ workflowId, milestones, periodName }) => {
   const router = useRouter();
-  const { workflow, year, month } = router.query;
+  const { workflow, year, month, schoolId } = router.query;
 
   const [open, setOpen] = useState(true);
   return (
@@ -601,7 +587,7 @@ const MilestoneGroup = ({ workflowId, milestones, periodName }) => {
           {milestones.map((m, i) => (
             <Milestone
               key={i}
-              link={`/open-school/${workflowId}/checklist/${year}/${month}/${m.id}`}
+              link={`/school/${schoolId}/open-school/${workflow}/checklist/${year}/${month}/${m.id}`}
               title={m.attributes.title}
               description={m.attributes.description}
               categories={m.attributes.categories}

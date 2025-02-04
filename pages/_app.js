@@ -9,11 +9,9 @@ import { useRouter } from "next/router";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { appWithTranslation } from "next-i18next";
-
+import Layout from "../components/Layout";
 import { H } from "highlight.run";
 import { ErrorBoundary } from "@highlight-run/react";
-
-import AppBar from "../components/AppBar";
 
 if (process.env.NODE_ENV === "production") {
   console.log("enabling highlight.io", process.env);
@@ -43,11 +41,9 @@ function MyApp({ Component, pageProps }) {
     NProgress.configure({ showSpinner: false, color: "#00A69C" });
 
     Router.events.on("routeChangeStart", (url) => {
-      // setIsLoading(true);
       NProgress.start();
     });
     Router.events.on("routeChangeComplete", (url) => {
-      // setIsLoading(false);
       NProgress.done(false);
     });
 
@@ -55,6 +51,7 @@ function MyApp({ Component, pageProps }) {
       setIsLoading(false);
     });
   }, [Router]);
+
   return (
     <ErrorBoundary>
       <meta
@@ -65,8 +62,9 @@ function MyApp({ Component, pageProps }) {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <UserProvider>
-            <AppBar />
-            <Component {...pageProps} />
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
           </UserProvider>
         </ThemeProvider>
       </LocalizationProvider>

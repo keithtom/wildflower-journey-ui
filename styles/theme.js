@@ -12,7 +12,7 @@ export const theme = createTheme({
   util: {
     buffer,
     borderWidth: borderWidth,
-    drawerWidth: 280,
+    drawerWidth: 320,
     appBarHeight: 64,
     infoDrawerWidth: 520,
   },
