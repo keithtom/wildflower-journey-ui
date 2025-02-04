@@ -48,8 +48,13 @@ const AssignedStepsCard = ({
 
     const milestonesData = milestones.data.data;
 
+    // Filter out "done" milestones first
+    const incompleteMilestones = milestonesData.filter(
+      (milestone) => milestone?.attributes?.status !== "done"
+    );
+
     if (isOpen) {
-      return milestonesData.filter((milestone) => {
+      return incompleteMilestones.filter((milestone) => {
         const dueDate = milestone?.attributes?.dueDate
           ? new Date(milestone?.attributes?.dueDate)
           : null;
@@ -59,7 +64,7 @@ const AssignedStepsCard = ({
       });
     }
 
-    return milestonesData.filter(
+    return incompleteMilestones.filter(
       (milestone) => milestone?.attributes?.phase === currentPhase
     );
   }, [milestones, isOpen, currentPhase, monthRange]);

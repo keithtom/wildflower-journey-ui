@@ -484,8 +484,11 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                 </NavListItemIcon>
                 <NavListItemText primary="Network" bold />
               </NavListItemButton>
-              {currentUser?.personRoleList.includes("Operations Guide") ? (
-                <NavListItemButton onClick={() => router.push("/your-schools")}>
+              {currentUser?.personRoleList.includes("Ops Guide") ? (
+                <NavListItemButton
+                  onClick={() => router.push("/your-schools")}
+                  selected={router.pathname.includes("/your-schools")}
+                >
                   <NavListItemIcon>
                     <Icon type="buildingHouse" />
                   </NavListItemIcon>

@@ -1,3 +1,5 @@
+import { useForm, Controller } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import {
   List,
   ListItem,
@@ -6,11 +8,11 @@ import {
   ListSubheader,
   ListItemAvatar,
   Divider,
-  Button,
   Popover,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
+  Button,
   Card,
   Typography,
   Stack,
@@ -20,6 +22,9 @@ import {
   Box,
   Link,
   Chip,
+  IconButton,
+  Modal,
+  TextField,
 } from "../ui";
 import { theme } from "../../styles/theme";
 import { useState } from "react";
@@ -119,7 +124,9 @@ const TeamMemberItem = ({ member }) => {
         </ListItemAvatar>
         <ListItemText
           primary={
-            <Typography variant="bodyRegular">{`${member.attributes.firstName} ${member.attributes.lastName}`}</Typography>
+            <Typography variant="bodyRegular">
+              {member.attributes.name}
+            </Typography>
           }
           secondary={
             <Typography variant="bodyRegular" lightened>
@@ -185,6 +192,12 @@ const SchoolInfoCard = ({
   schoolId,
   logoImage,
 }) => {
+  const [openTeamMemberModal, setOpenTeamMemberModal] = useState(false);
+
+  const handleOpenTeamMemberModal = () => {
+    setOpenTeamMemberModal(true);
+  };
+
   return (
     <Card sx={{ p: 3 }}>
       <Stack spacing={3}>
@@ -242,7 +255,7 @@ const SchoolInfoCard = ({
                   <Chip
                     label="Update profile"
                     size="small"
-                    variant="primary"
+                    variant="lightened"
                     sx={{ cursor: "pointer" }}
                   />
                 </Link>
@@ -272,17 +285,166 @@ const SchoolInfoCard = ({
 
         <List>
           <StyledSubheader>
-            <Typography variant="bodyLarge" bold>
-              {status === "Open" ? "Open School Team" : "Startup Team"}
-            </Typography>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Typography variant="bodyLarge" bold>
+                {status === "Open" ? "Open School Team" : "Startup Team"}
+              </Typography>
+              <IconButton onClick={handleOpenTeamMemberModal}>
+                <Icon type="plus" variant="primary" />
+              </IconButton>
+            </Stack>
           </StyledSubheader>
           {teamMembers?.map((member, index) => (
             <TeamMemberItem key={index} member={member} />
           ))}
         </List>
       </Stack>
+      {openTeamMemberModal ? (
+        <TeamMemberModal
+          toggle={() => setOpenTeamMemberModal(!openTeamMemberModal)}
+          open={openTeamMemberModal}
+        />
+      ) : null}
     </Card>
   );
 };
 
 export default SchoolInfoCard;
+
+const TeamMemberModal = ({ toggle, open }) => {
+  const { t } = useTranslation("common");
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      partnerFirstName: "",
+      partnerLastName: "",
+      partnerEmail: "",
+    },
+  });
+
+  const router = useRouter();
+  // console.log({ errors });
+
+  async function onSubmit(data) {
+    try {
+      const response = await teamsApi.invitePartner(team?.data?.data?.id, data);
+      if (response.status === 200) {
+        setSubmittedPartnerRequest(true);
+      }
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        clearLoggedInState({});
+        router.push("/login");
+      } else {
+        console.error(err);
+      }
+    }
+  }
+  return (
+    <Modal toggle={toggle} title="Add Team Member" open={open}>
+      <Stack spacing={3}>
+        <Card variant="primaryLightened">
+          <Stack alignItems="center" justifyContent="center" spacing={3}>
+            <Typography variant="h4" highlight bold>
+              {t("ssj_ui_content.add_your_partner_via_email")}
+            </Typography>
+            <Typography variant="bodyRegular" highlight center>
+              {t("ssj_ui_content.make_a_request_to_invite_your_partner")}
+            </Typography>
+          </Stack>
+        </Card>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={6}>
+            <Stack spacing={3}>
+              <Controller
+                name="partnerFirstName"
+                control={control}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "This field is required",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    label={t("ssj_ui_content.your_partners_first_name")}
+                    placeholder="e.g. Cathy"
+                    error={errors.partnerFirstName}
+                    helperText={errors?.partnerFirstName?.message || ""}
+                    {...field}
+                  />
+                )}
+              />
+              <Controller
+                name="partnerLastName"
+                control={control}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "This field is required",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    label={t("ssj_ui_content.your_partners_last_name")}
+                    placeholder="e.g. Lee"
+                    error={errors.partnerLastName}
+                    helperText={errors?.partnerLastName?.message || ""}
+                    {...field}
+                  />
+                )}
+              />
+              <Controller
+                name="partnerEmail"
+                control={control}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "This field is required",
+                  },
+                  pattern: {
+                    value:
+                      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                    message: "Invalid email format",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    label={t("ssj_ui_content.your_partners_email")}
+                    placeholder="e.g. cathylee@gmail.com"
+                    error={errors.partnerEmail}
+                    helperText={errors?.partnerEmail?.message || ""}
+                    {...field}
+                  />
+                )}
+              />
+            </Stack>
+            <Grid container justifyContent="space-between">
+              <Grid item>
+                <Button variant="text" onClick={toggle}>
+                  <Typography variant="bodyRegular">
+                    {t("ssj_ui_content.cancel")}
+                  </Typography>
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button type="submit" disabled={isSubmitting}>
+                  <Typography light variant="bodyRegular">
+                    {t("ssj_ui_content.invite_partner")}
+                  </Typography>
+                </Button>
+              </Grid>
+            </Grid>
+          </Stack>
+        </form>
+      </Stack>
+    </Modal>
+  );
+};

@@ -111,15 +111,16 @@ const AddProfileInfo = ({}) => {
       setCurrentUser(updatedUser);
 
       // Add some logging to debug the redirect
-      console.log('Redirecting with:', {
+      console.log("Redirecting with:", {
         roleList: personAttributes?.roleList,
-        isOnboarded: personAttributes?.isOnboarded
+        isOnboarded: personAttributes?.isOnboarded,
       });
 
       await RedirectUser({
         router: router,
         roleList: personAttributes?.roleList,
         isOnboarded: personAttributes?.isOnboarded,
+        schoolId: currentUser?.attributes?.schools[0]?.schoolId,
       });
     } catch (error) {
       // ... error handling ...
@@ -336,6 +337,8 @@ const AddProfileInfo = ({}) => {
                           router: router,
                           roleList: currentUser.personRoleList,
                           isOnboarded: currentUser.personIsOnboarded,
+                          schoolId:
+                            currentUser?.attributes?.schools[0]?.schoolId,
                         });
                       } else {
                         console.error("currentUser is not defined");

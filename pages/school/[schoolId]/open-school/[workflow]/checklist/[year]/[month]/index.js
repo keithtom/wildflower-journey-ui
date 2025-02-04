@@ -19,6 +19,7 @@ import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 import useAuth from "@lib/utils/useAuth";
 import useMilestones from "@hooks/useMilestones";
+import useSchool from "@hooks/useSchool";
 import {
   PageContainer,
   Grid,
@@ -41,6 +42,15 @@ const AdminChecklist = () => {
   const { currentUser } = useUserContext();
   const router = useRouter();
 
+  // All date-related calculations
+  const today = new Date();
+  const currentMonth = today.getMonth(); // 0-11
+  const currentYear = today.getFullYear();
+
+  // Academic year calculations
+  const academicYearStart = currentMonth >= 8 ? currentYear : currentYear - 1;
+  const academicYearEnd = academicYearStart + 1;
+
   const {
     year: yearQuery,
     month: monthQuery,
@@ -48,96 +58,32 @@ const AdminChecklist = () => {
     workflow,
   } = router.query;
 
+  const { data: school } = useSchool(schoolId);
+
   const [isToday, setIsToday] = useState(false);
 
   useEffect(() => {
-    const now = new Date();
     if (
-      Number(monthQuery) === now.getMonth() &&
-      Number(yearQuery) === now.getFullYear()
+      Number(monthQuery) === currentMonth &&
+      Number(yearQuery) === currentYear
     ) {
       setIsToday(true);
     } else {
       setIsToday(false);
     }
-  }, [monthQuery, yearQuery]);
-
-  const handleIncrementMonth = () => {
-    if (Number(monthQuery) === 11) {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            workflow: workflow,
-            month: 0,
-            year: Number(yearQuery) + 1,
-          },
-        },
-        `/school/${schoolId}/open-school/${workflow}/checklist/${
-          Number(yearQuery) + 1
-        }/0`
-      );
-    } else {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            workflow: workflow,
-            month: Number(monthQuery) + 1,
-            year: Number(yearQuery),
-          },
-        },
-        `/school/${schoolId}/open-school/${workflow}/checklist/${Number(
-          yearQuery
-        )}/${Number(monthQuery) + 1}`
-      );
-    }
-  };
-
-  const handleDecrementMonth = () => {
-    if (Number(monthQuery) === 0) {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            workflow: workflow,
-            month: 11,
-            year: Number(yearQuery) - 1,
-          },
-        },
-        `/school/${schoolId}/open-school/${workflow}/checklist/${
-          Number(yearQuery) - 1
-        }/11`
-      );
-    } else {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: {
-            workflow: workflow,
-            month: Number(monthQuery) - 1,
-            year: Number(yearQuery),
-          },
-        },
-        `/school/${schoolId}/open-school/${workflow}/checklist/${Number(
-          yearQuery
-        )}/${Number(monthQuery) - 1}`
-      );
-    }
-  };
+  }, [monthQuery, yearQuery, currentMonth, currentYear]);
 
   const handleResetDate = () => {
-    const now = new Date();
     router.push(
       {
         pathname: router.pathname,
         query: {
           workflow: workflow,
-          month: now.getMonth(),
-          year: now.getFullYear(),
+          month: currentMonth,
+          year: currentYear,
         },
       },
-      `/school/${schoolId}/open-school/${workflow}/checklist/${now.getFullYear()}/${now.getMonth()}`
+      `/school/${schoolId}/open-school/${workflow}/checklist/${currentYear}/${currentMonth}`
     );
   };
 
@@ -235,18 +181,6 @@ const AdminChecklist = () => {
 
   // Get the current month number and year
   let currentMonthNumber = new Date(timeframe).getMonth() + 1; // getMonth() returns 0-11, so add 1
-  let currentYear = new Date(timeframe).getFullYear();
-
-  // Increment the month number by 1
-  currentMonthNumber += 1;
-
-  // Adjust the year if the incremented month number exceeds 12
-  if (currentMonthNumber > 12) {
-    currentMonthNumber = 1;
-    currentYear += 1;
-  }
-
-  // Find the academic quarter for the incremented month
   let currentQuarter = "";
 
   for (const [quarter, months] of Object.entries(academicQuarters)) {
@@ -268,7 +202,7 @@ const AdminChecklist = () => {
   // useAuth("/login");
 
   return (
-    <PageContainer>
+    <PageContainer title={school?.data?.attributes?.name}>
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Grid
@@ -277,21 +211,78 @@ const AdminChecklist = () => {
             justifyContent="space-between"
             spacing={6}
           >
-            <Grid item flex={1}>
-              <Typography
-                variant="h3"
-                bold
-                data-cy="open-school-checklist-month"
+            <Grid item>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{ overflowX: "auto", pb: 1 }}
               >
-                {isLoading ? (
-                  <Skeleton width={120} />
-                ) : (
-                  new Date(nonZeroBasedDate).toLocaleString("default", {
-                    month: "long",
-                    year: "numeric",
-                  })
-                )}
-              </Typography>
+                {/* First semester */}
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="bodySmall" lightened>
+                    {academicYearStart}
+                  </Typography>
+                  {["Sep", "Oct", "Nov", "Dec"].map((monthName, index) => {
+                    const monthIndex = index + 8; // September starts at index 8
+                    return (
+                      <Chip
+                        key={monthIndex}
+                        label={monthName}
+                        size="small"
+                        variant={
+                          Number(monthQuery) === monthIndex
+                            ? "primary"
+                            : "default"
+                        }
+                        onClick={() => {
+                          router.push(
+                            {
+                              pathname: router.pathname,
+                              query: {
+                                ...router.query,
+                                month: monthIndex,
+                                year: academicYearStart,
+                              },
+                            },
+                            `/school/${schoolId}/open-school/${workflow}/checklist/${academicYearStart}/${monthIndex}`
+                          );
+                        }}
+                      />
+                    );
+                  })}
+                </Stack>
+                {/* Second semester */}
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="bodySmall" lightened>
+                    {academicYearEnd}
+                  </Typography>
+                  {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"].map(
+                    (monthName, index) => (
+                      <Chip
+                        key={index}
+                        label={monthName}
+                        size="small"
+                        variant={
+                          Number(monthQuery) === index ? "primary" : "default"
+                        }
+                        onClick={() => {
+                          router.push(
+                            {
+                              pathname: router.pathname,
+                              query: {
+                                ...router.query,
+                                month: index,
+                                year: academicYearEnd,
+                              },
+                            },
+                            `/school/${schoolId}/open-school/${workflow}/checklist/${academicYearEnd}/${index}`
+                          );
+                        }}
+                      />
+                    )
+                  )}
+                </Stack>
+              </Stack>
             </Grid>
             <Grid item xs={screenSize.isSm ? 12 : null}>
               <Grid
@@ -312,24 +303,11 @@ const AdminChecklist = () => {
                     </Typography>
                   </Button>
                 </Grid>
-                <Grid item>
-                  <IconButton
-                    onClick={handleDecrementMonth}
-                    data-cy="open-school-checklist-prevMonth"
-                  >
-                    <Icon type="chevronLeft" variant="primary" />
-                  </IconButton>
-                  <IconButton
-                    onClick={handleIncrementMonth}
-                    data-cy="open-school-checklist-nextMonth"
-                  >
-                    <Icon type="chevronRight" variant="primary" />
-                  </IconButton>
-                </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
+
         {isLoading ? (
           <Grid item xs={12}>
             <Card noPadding>

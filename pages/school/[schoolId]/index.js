@@ -15,75 +15,34 @@ import { useMemo, useEffect } from "react";
 
 const SchoolPage = () => {
   const router = useRouter();
-  const { schoolId, workflow } = router.query;
-  // const workflow = "5c8f-d17c"; //static for now
+  const { schoolId } = router.query;
   const { currentUser } = useUserContext();
   const { t } = useTranslation("common");
 
   const { data: school } = useSchool(schoolId);
-  console.log({ school });
-
-  const { milestones, isLoading } = useMilestones(
-    school?.data?.attributes?.workflowIds[0]
-  );
-  console.log({ milestones });
-
-  // Filter milestones based on school status and conditions
-  const milestonesToDo = useMemo(() => {
-    if (isLoading) return [];
-    if (!milestones?.data?.data || !school?.data?.attributes) return [];
-
-    const isOpen = school?.data?.attributes?.status === "Open";
-    const currentPhase = school?.data?.attributes?.currentPhase;
-    const currentDate = new Date();
-
-    // Get start and end of current month
-    const startOfMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      1
-    );
-    const endOfMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      0
-    );
-
-    // For open schools: get milestones with due dates in current month
-    const openSchoolMilestones = isOpen
-      ? milestones.data.data.filter((milestone) => {
-          const dueDate = milestone?.attributes?.dueDate
-            ? new Date(milestone?.attributes?.dueDate)
-            : null;
-          return dueDate && dueDate >= startOfMonth && dueDate <= endOfMonth;
-        })
-      : [];
-
-    // For schools in progress: get milestones matching current phase
-    const phaseBasedMilestones = !isOpen
-      ? milestones.data.data.filter(
-          (milestone) => milestone?.attributes?.phase === currentPhase
-        )
-      : [];
-
-    // Prefer open school milestones if they exist
-    return openSchoolMilestones.length > 0
-      ? openSchoolMilestones
-      : phaseBasedMilestones;
-  }, [milestones, school, isLoading]);
 
   // console.log({ currentUser });
-  console.log({ school });
-  console.log({ milestones });
-  console.log({ milestonesToDo });
+  // console.log({ school });
+  // console.log({ milestones });
+  // console.log({ milestonesToDo });
 
   const hero = "/assets/images/ssj/SSJ_hero.jpg";
 
-  // Build teamMembers array from school.included
+  // Build teamMembers array from relationships and included data
   const teamMembers = useMemo(() => {
-    if (!school?.included) return [];
+    if (!school?.data?.relationships?.people?.data || !school?.included)
+      return [];
 
-    return school.included.filter((item) => item.type === "person");
+    // Get the IDs from team members relationships
+    const teamMemberIds = school.data.relationships.people.data.map(
+      (item) => item.id
+    );
+
+    // Find matching schoolRelationships in included array
+    return school.included.filter(
+      (item) =>
+        teamMemberIds.includes(item.id) && item.type === "schoolRelationship"
+    );
   }, [school]);
 
   useEffect(() => {
@@ -205,7 +164,8 @@ const SchoolPage = () => {
             location={school?.data?.attributes?.location}
             openDate={school?.data?.attributes?.openDate}
             teamMembers={teamMembers}
-            status={school?.data?.attributes?.status}
+            // status={school?.data?.attributes?.status}
+            status={null}
             schoolName={school?.data?.attributes?.name}
             openedOn={school?.data?.attributes?.openedOn}
             schoolId={schoolId}
@@ -219,7 +179,6 @@ const SchoolPage = () => {
 
             <AssignedStepsCard
               workflows={school?.data?.attributes?.workflowIds}
-              milestonesToDo={milestonesToDo}
               schoolId={schoolId}
               schoolStatus={school?.data?.attributes?.status}
               currentPhase={school?.data?.attributes?.currentPhase}
