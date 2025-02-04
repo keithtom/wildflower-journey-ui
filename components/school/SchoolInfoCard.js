@@ -293,9 +293,11 @@ const SchoolInfoCard = ({
               <Typography variant="bodyLarge" bold>
                 {status === "Open" ? "Open School Team" : "Startup Team"}
               </Typography>
-              <IconButton onClick={handleOpenTeamMemberModal}>
-                <Icon type="plus" variant="primary" />
-              </IconButton>
+              {status === "Open" ? null : (
+                <IconButton onClick={handleOpenTeamMemberModal}>
+                  <Icon type="plus" variant="primary" />
+                </IconButton>
+              )}
             </Stack>
           </StyledSubheader>
           {teamMembers?.map((member, index) => (

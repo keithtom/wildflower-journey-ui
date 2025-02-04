@@ -164,8 +164,8 @@ const SchoolPage = () => {
             location={school?.data?.attributes?.location}
             openDate={school?.data?.attributes?.openDate}
             teamMembers={teamMembers}
-            // status={school?.data?.attributes?.status}
-            status={null}
+            status={school?.data?.attributes?.status}
+            // status={null}
             schoolName={school?.data?.attributes?.name}
             openedOn={school?.data?.attributes?.openedOn}
             schoolId={schoolId}

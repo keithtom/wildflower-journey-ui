@@ -64,7 +64,7 @@ const AdminChecklist = () => {
 
   useEffect(() => {
     if (
-      Number(monthQuery) === currentMonth &&
+      Number(monthQuery) === currentMonth + 1 &&
       Number(yearQuery) === currentYear
     ) {
       setIsToday(true);
@@ -74,21 +74,23 @@ const AdminChecklist = () => {
   }, [monthQuery, yearQuery, currentMonth, currentYear]);
 
   const handleResetDate = () => {
+    const urlMonth = currentMonth + 1;
+
     router.push(
       {
         pathname: router.pathname,
         query: {
           workflow: workflow,
-          month: currentMonth,
+          month: urlMonth,
           year: currentYear,
         },
       },
-      `/school/${schoolId}/open-school/${workflow}/checklist/${currentYear}/${currentMonth}`
+      `/school/${schoolId}/open-school/${workflow}/checklist/${currentYear}/${urlMonth}`
     );
   };
 
   // Create a new Date object with the yearQuery and monthQuery
-  const timeframeDate = new Date(yearQuery, monthQuery);
+  const timeframeDate = new Date(yearQuery, Number(monthQuery) - 1);
 
   // Format the Date object as "YYYY-MM-DD"
   const timeframe = `${timeframeDate.getFullYear()}-${String(
@@ -96,10 +98,8 @@ const AdminChecklist = () => {
   ).padStart(2, "0")}-01`;
 
   const [year, month] = timeframe.split("-");
-  const nonZeroBasedDate = new Date(year, month - 1);
 
   const { milestones, isLoading } = useMilestones(workflow, {
-    // timeframe: monthQuery,
     timeframe,
     omit_include: true,
   });
@@ -194,12 +194,36 @@ const AdminChecklist = () => {
 
   useAuth("/login");
 
-  // console.log({ timeframe });
-  // console.log({ currentQuarter });
-  // console.log({ groupedMilestones });
-  // console.log({ milestones });
-  // console.log({ currentUser });
-  // useAuth("/login");
+  // Update the month chips to handle 1-based URL months
+  const renderMonthChip = (monthName, index, isFirstSemester) => {
+    const monthIndex = isFirstSemester ? index + 9 : index + 1;
+    const selectedMonth = Number(monthQuery);
+
+    return (
+      <Chip
+        key={monthIndex}
+        label={monthName}
+        size="small"
+        variant={selectedMonth === monthIndex ? "primary" : "default"}
+        onClick={() => {
+          const targetYear = isFirstSemester
+            ? academicYearStart
+            : academicYearEnd;
+          router.push(
+            {
+              pathname: router.pathname,
+              query: {
+                ...router.query,
+                month: monthIndex,
+                year: targetYear,
+              },
+            },
+            `/school/${schoolId}/open-school/${workflow}/checklist/${targetYear}/${monthIndex}`
+          );
+        }}
+      />
+    );
+  };
 
   return (
     <PageContainer title={school?.data?.attributes?.name}>
@@ -224,31 +248,7 @@ const AdminChecklist = () => {
                   </Typography>
                   {["Sep", "Oct", "Nov", "Dec"].map((monthName, index) => {
                     const monthIndex = index + 8; // September starts at index 8
-                    return (
-                      <Chip
-                        key={monthIndex}
-                        label={monthName}
-                        size="small"
-                        variant={
-                          Number(monthQuery) === monthIndex
-                            ? "primary"
-                            : "default"
-                        }
-                        onClick={() => {
-                          router.push(
-                            {
-                              pathname: router.pathname,
-                              query: {
-                                ...router.query,
-                                month: monthIndex,
-                                year: academicYearStart,
-                              },
-                            },
-                            `/school/${schoolId}/open-school/${workflow}/checklist/${academicYearStart}/${monthIndex}`
-                          );
-                        }}
-                      />
-                    );
+                    return renderMonthChip(monthName, index, true);
                   })}
                 </Stack>
                 {/* Second semester */}
@@ -257,29 +257,9 @@ const AdminChecklist = () => {
                     {academicYearEnd}
                   </Typography>
                   {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"].map(
-                    (monthName, index) => (
-                      <Chip
-                        key={index}
-                        label={monthName}
-                        size="small"
-                        variant={
-                          Number(monthQuery) === index ? "primary" : "default"
-                        }
-                        onClick={() => {
-                          router.push(
-                            {
-                              pathname: router.pathname,
-                              query: {
-                                ...router.query,
-                                month: index,
-                                year: academicYearEnd,
-                              },
-                            },
-                            `/school/${schoolId}/open-school/${workflow}/checklist/${academicYearEnd}/${index}`
-                          );
-                        }}
-                      />
-                    )
+                    (monthName, index) => {
+                      return renderMonthChip(monthName, index, false);
+                    }
                   )}
                 </Stack>
               </Stack>
