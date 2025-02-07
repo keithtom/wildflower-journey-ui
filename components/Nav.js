@@ -109,12 +109,12 @@ const NavListItemText = ({ primary, secondary, bold, ...props }) => (
       secondary && (
         <Typography
           variant="bodyRegular"
-          lightened
           sx={{
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
           }}
+          lightened
         >
           {secondary}
         </Typography>
@@ -153,7 +153,7 @@ const WorkflowNavItems = ({
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
   const [expanded, setExpanded] = useState(false);
 
-  console.log({ workflow });
+  // console.log({ workflow });
 
   // Add current date logic
   const currentDate = new Date();
@@ -337,6 +337,63 @@ const WorkflowNavItems = ({
   return null;
 };
 
+const SchoolNavItem = ({
+  school,
+  openSchoolId,
+  handleSchoolClick,
+  router,
+  openSection,
+  onSectionClick,
+}) => (
+  <div>
+    <NavListItemButton
+      onClick={() => handleSchoolClick(school.id)}
+      selected={router.asPath === `/school/${school.id}`}
+    >
+      <NavListItemIcon>
+        <Box
+          sx={{
+            height: 24,
+            width: 24,
+            borderRadius: (theme) => theme.radius.md + "px",
+            backgroundColor: (theme) => theme.color.neutral.main,
+          }}
+        />
+      </NavListItemIcon>
+      <NavListItemText primary={school.name} bold />
+      <Icon
+        type={openSchoolId === school.id ? "chevronDown" : "chevronRight"}
+        variant="lightened"
+        size="small"
+      />
+    </NavListItemButton>
+    <Collapse in={openSchoolId === school.id} timeout="auto" unmountOnExit>
+      <NavList sx={{ padding: 0 }}>
+        <NavListItemButton
+          onClick={() => router.push(`/school/${school.id}/to-do-list`)}
+          selected={router.pathname.endsWith("/to-do-list")}
+          sx={{ pl: 8 }}
+        >
+          <NavListItemIcon>
+            <Icon type="inbox" />
+          </NavListItemIcon>
+          <NavListItemText primary="To Do List" />
+        </NavListItemButton>
+
+        {school.workflowIds?.map((workflowId) => (
+          <WorkflowNavItems
+            key={workflowId}
+            school={school}
+            workflowId={workflowId}
+            openSection={openSection}
+            onSectionClick={onSectionClick}
+          />
+        ))}
+      </NavList>
+    </Collapse>
+  </div>
+);
+
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const { screenSize } = getScreenSize();
   const router = useRouter();
@@ -431,6 +488,21 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
 
   // console.log(screenSize.isSm);
   console.log({ currentUser });
+
+  const isTeacherLeaderSchool = (school) =>
+    school.role_list?.some(
+      (role) => role === "Teacher Leader" || role === "Emerging Teacher Leader"
+    );
+
+  const teacherLeaderSchools =
+    currentUser?.attributes.schools.filter(isTeacherLeaderSchool) || [];
+  const otherSchools =
+    currentUser?.attributes.schools.filter(
+      (school) => !isTeacherLeaderSchool(school)
+    ) || [];
+  const shouldShowDivider =
+    teacherLeaderSchools.length > 0 && otherSchools.length > 0;
+
   return (
     <StyledNav sx={{ display: "flex" }}>
       <CustomDrawer
@@ -523,12 +595,14 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                 <Divider
                   sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
                 />
-                <NavListItemButton onClick={() => router.push("/admin")}>
-                  <NavListItemIcon>
-                    <Icon type="data" variant="lightened" />
-                  </NavListItemIcon>
-                  <NavListItemText primary="Switch To Admin" />
-                </NavListItemButton>
+                {isAdmin ? (
+                  <NavListItemButton onClick={() => router.push("/admin")}>
+                    <NavListItemIcon>
+                      <Icon type="data" variant="lightened" />
+                    </NavListItemIcon>
+                    <NavListItemText primary="Switch To Admin" />
+                  </NavListItemButton>
+                ) : null}
                 <NavListItemButton onClick={() => router.push("/settings")}>
                   <NavListItemIcon>
                     <Icon type="cog" variant="lightened" />
@@ -552,64 +626,34 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
             />
 
             <NavList>
-              {currentUser?.attributes.schools.map((school, i) => (
-                <div key={i}>
-                  <NavListItemButton
-                    onClick={() => handleSchoolClick(school.id)}
-                    selected={router.asPath === `/school/${school.id}`}
-                  >
-                    <NavListItemIcon>
-                      <Box
-                        sx={{
-                          height: 24,
-                          width: 24,
-                          borderRadius: (theme) => theme.radius.md + "px",
-                          backgroundColor: (theme) => theme.color.neutral.main,
-                        }}
-                      />
-                    </NavListItemIcon>
-                    <NavListItemText primary={school.name} bold />
-                    <Icon
-                      type={
-                        openSchoolId === school.id
-                          ? "chevronDown"
-                          : "chevronRight"
-                      }
-                      variant="lightened"
-                      size="small"
-                    />
-                  </NavListItemButton>
-                  <Collapse
-                    in={openSchoolId === school.id}
-                    timeout="auto"
-                    unmountOnExit
-                  >
-                    <NavList sx={{ padding: 0 }}>
-                      <NavListItemButton
-                        onClick={() =>
-                          router.push(`/school/${school.id}/to-do-list`)
-                        }
-                        selected={router.pathname.endsWith("/to-do-list")}
-                        sx={{ pl: 8 }}
-                      >
-                        <NavListItemIcon>
-                          <Icon type="inbox" />
-                        </NavListItemIcon>
-                        <NavListItemText primary="To Do List" />
-                      </NavListItemButton>
+              {teacherLeaderSchools.map((school, i) => (
+                <SchoolNavItem
+                  key={`teacher-leader-${i}`}
+                  school={school}
+                  openSchoolId={openSchoolId}
+                  handleSchoolClick={handleSchoolClick}
+                  router={router}
+                  openSection={openSection}
+                  onSectionClick={handleSectionClick}
+                />
+              ))}
 
-                      {school.workflowIds?.map((workflowId) => (
-                        <WorkflowNavItems
-                          key={workflowId}
-                          school={school}
-                          workflowId={workflowId}
-                          openSection={openSection}
-                          onSectionClick={handleSectionClick}
-                        />
-                      ))}
-                    </NavList>
-                  </Collapse>
-                </div>
+              {shouldShowDivider && (
+                <Divider
+                  sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+                />
+              )}
+
+              {otherSchools.map((school, i) => (
+                <SchoolNavItem
+                  key={`other-${i}`}
+                  school={school}
+                  openSchoolId={openSchoolId}
+                  handleSchoolClick={handleSchoolClick}
+                  router={router}
+                  openSection={openSection}
+                  onSectionClick={handleSectionClick}
+                />
               ))}
             </NavList>
           </div>

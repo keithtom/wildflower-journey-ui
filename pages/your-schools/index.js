@@ -44,12 +44,14 @@ const YourSchools = () => {
   //   (team) => team.attributes.currentPhase === "startup"
   // );
 
-  const { schools, isLoading } = useSchools({
-    person_id: "7b30-8fae",
-    // role: "Ops Guide",
+  const { data: schools, isLoading } = useSchools({
+    person_id: currentUser?.id,
+    role: "Ops Guide",
   });
 
-  console.log({ schools });
+  useEffect(() => {
+    console.log({ schools });
+  }, [schools, isLoading]);
 
   useAuth("/login");
   // console.log({ filteredTeams });
@@ -271,6 +273,7 @@ const SchoolCard = ({
 };
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useEffect } from "react";
 
 export async function getServerSideProps({ locale }) {
   return {

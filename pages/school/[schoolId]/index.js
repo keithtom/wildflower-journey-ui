@@ -62,6 +62,11 @@ const SchoolPage = () => {
             schoolRoleList: relationship.attributes.roleList,
           },
         };
+      })
+      .sort((a, b) => {
+        // Sort by active status - active members first
+        if (a.attributes.active === b.attributes.active) return 0;
+        return a.attributes.active ? -1 : 1;
       });
 
     return teamMembers;
@@ -173,13 +178,13 @@ const SchoolPage = () => {
         <Grid item xs={12} sm={4}>
           <SchoolInfoCard
             heroImage={
-              school?.data?.attributes?.heroImageUrl
+              school?.data?.attributes?.status === "Open"
                 ? school?.data?.attributes?.heroImageUrl
                 : hero
             }
             logoImage={
-              school?.data?.attributes?.logoImageUrl
-                ? school?.data?.attributes?.logoImageUrl
+              school?.data?.attributes?.logoUrl
+                ? school?.data?.attributes?.logoUrl
                 : null
             }
             phase={school?.data?.attributes?.currentPhase}
@@ -188,7 +193,6 @@ const SchoolPage = () => {
             expectedStartDate={school?.data?.attributes?.expectedStartDate}
             teamMembers={teamMembers}
             status={school?.data?.attributes?.status}
-            // status={null}
             schoolName={school?.data?.attributes?.name}
             openedOn={school?.data?.attributes?.openedOn}
             schoolId={schoolId}
@@ -197,7 +201,8 @@ const SchoolPage = () => {
         <Grid item xs={12} sm={8}>
           <Stack spacing={12}>
             <Typography variant="h2">
-              Welcome, {currentUser?.attributes?.firstName}!
+              {t("ssj_ui_content.welcome")},{" "}
+              {currentUser?.attributes?.firstName}!
             </Typography>
 
             <AssignedStepsCard

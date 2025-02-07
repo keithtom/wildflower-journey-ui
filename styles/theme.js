@@ -26,7 +26,7 @@ export const theme = createTheme({
   color: {
     text: {
       light: "#FFFFFF",
-      lightened: "#B2B2B2",
+      lightened: "#999999",
       main: "#1A1A1A",
     },
     primary: {

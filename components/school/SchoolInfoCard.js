@@ -1,5 +1,8 @@
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslation } from "next-i18next";
+import { parseISO } from "date-fns";
+import moment from "moment";
 import {
   List,
   ListItem,
@@ -25,10 +28,12 @@ import {
   IconButton,
   Modal,
   TextField,
+  DatePicker,
 } from "../ui";
 import { theme } from "../../styles/theme";
-import { useState } from "react";
 import { useRouter } from "next/router";
+import schoolsApi from "../../api/schools";
+import { mutate } from "swr";
 
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: theme.radius.md,
@@ -54,25 +59,43 @@ const ContactPopover = styled(Popover)`
   }
 `;
 
-const InfoListItem = ({ label, value }) => (
-  <ListItem disablePadding>
-    <ListItemText
-      sx={{ padding: theme.spacing(1.5, 2) }}
-      primary={
-        <Grid container>
-          <Grid item xs={6}>
-            <Typography variant="bodyRegular" lightened>
-              {label}
-            </Typography>
+const InfoListItem = ({ label, value, action }) =>
+  action ? (
+    <StyledListItemButton onClick={action}>
+      <ListItemText
+        primary={
+          <Grid container>
+            <Grid item xs={6}>
+              <Typography variant="bodyRegular" lightened>
+                {label}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="bodyRegular">{value}</Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="bodyRegular">{value}</Typography>
+        }
+      />
+    </StyledListItemButton>
+  ) : (
+    <ListItem disablePadding>
+      <ListItemText
+        sx={{ padding: theme.spacing(1.5, 2) }}
+        primary={
+          <Grid container>
+            <Grid item xs={6}>
+              <Typography variant="bodyRegular" lightened>
+                {label}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="bodyRegular">{value}</Typography>
+            </Grid>
           </Grid>
-        </Grid>
-      }
-    />
-  </ListItem>
-);
+        }
+      />
+    </ListItem>
+  );
 
 const TeamMemberItem = ({ member }) => {
   const router = useRouter();
@@ -115,22 +138,42 @@ const TeamMemberItem = ({ member }) => {
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
         onMouseMove={handleMouseMove}
+        disabled={!member.attributes.active}
       >
         <ListItemAvatar>
-          <Avatar
-            sx={{ height: 40, width: 40 }}
-            src={member.attributes.imageUrl}
-          />
+          {member.attributes.active ? (
+            <Avatar
+              sx={{ height: 40, width: 40 }}
+              src={member.attributes.imageUrl}
+            />
+          ) : (
+            <Box
+              sx={{
+                height: 40,
+                width: 40,
+                backgroundColor: theme.color.primary.lightest,
+                borderRadius: theme.radius.full,
+                border: `1px dashed ${theme.color.primary.main}`,
+              }}
+            />
+          )}
         </ListItemAvatar>
         <ListItemText
           primary={
-            <Typography variant="bodyRegular" bold>
-              {`${member.attributes.firstName} ${member.attributes.lastName}`}
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={3}>
+              <Typography variant="bodyRegular" bold>
+                {`${member.attributes.firstName} ${member.attributes.lastName}`}
+              </Typography>
+              {!member.attributes.active ? (
+                <Chip label="Invited" size="small" />
+              ) : null}
+            </Stack>
           }
           secondary={
             <Typography variant="bodyRegular" lightened>
-              {member.attributes.schoolRoleList?.join(", ")}
+              {!member.attributes.active
+                ? member.attributes.roleList?.join(", ")
+                : member.attributes.schoolRoleList?.join(", ")}
             </Typography>
           }
         />
@@ -194,10 +237,13 @@ const SchoolInfoCard = ({
   expectedStartDate,
 }) => {
   const [openTeamMemberModal, setOpenTeamMemberModal] = useState(false);
-
+  const [openAddOpenDateModal, setOpenAddOpenDateModal] = useState(false);
+  const [openAddLocationModal, setOpenAddLocationModal] = useState(false);
   const handleOpenTeamMemberModal = () => {
     setOpenTeamMemberModal(true);
   };
+
+  const { t } = useTranslation("common");
 
   return (
     <Card sx={{ p: 3 }}>
@@ -230,11 +276,12 @@ const SchoolInfoCard = ({
                 zIndex: 10,
                 borderRadius: theme.radius.sm,
                 overflow: "hidden",
+                backgroundColor: "white",
               }}
             >
               <img
                 src={logoImage}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
             </Box>
           ) : null}
@@ -249,7 +296,9 @@ const SchoolInfoCard = ({
               spacing={1}
             >
               <Typography variant="bodyLarge" bold>
-                {status === "Open" ? schoolName : "School Startup Journey"}
+                {status === "Open"
+                  ? schoolName
+                  : t("ssj_ui_content.school_startup_journey")}
               </Typography>
               {status === "Open" ? (
                 <Link href={`/network/schools/${schoolId}`}>
@@ -264,23 +313,41 @@ const SchoolInfoCard = ({
             </Stack>
           </StyledSubheader>
           {!phase || status === "Open" ? null : (
-            <InfoListItem label="Phase" value={phase} />
+            <InfoListItem
+              label={t("ssj_ui_content.phase")}
+              value={t(`ssj_phases.${phase.toLowerCase()}`)}
+            />
           )}
           {!location ? null : (
-            <InfoListItem label="Location" value={location} />
+            <InfoListItem
+              label={t("ssj_ui_content.location")}
+              value={location}
+            />
           )}
           {!openDate ? null : (
-            <InfoListItem label="Open Date" value={openDate} />
+            <InfoListItem
+              label={t("ssj_ui_content.open_date")}
+              value={new Date(openDate).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            />
           )}
           {!expectedStartDate ? null : (
             <InfoListItem
-              label="Expected Start Date"
-              value={expectedStartDate}
+              action={() => setOpenAddOpenDateModal(true)}
+              label={t("ssj_ui_content.open_date")}
+              value={new Date(expectedStartDate).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             />
           )}
           {!openedOn ? null : (
             <InfoListItem
-              label="Opened On"
+              label={t("ssj_ui_content.open_date")}
               value={new Date(openedOn).toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
@@ -300,7 +367,9 @@ const SchoolInfoCard = ({
               justifyContent="space-between"
             >
               <Typography variant="bodyLarge" bold>
-                {status === "Open" ? "Open School Team" : "Startup Team"}
+                {status === "Open"
+                  ? "Open School Team"
+                  : t("ssj_ui_content.startup_team")}
               </Typography>
               {status === "Open" ? null : (
                 <IconButton onClick={handleOpenTeamMemberModal}>
@@ -312,21 +381,59 @@ const SchoolInfoCard = ({
           {teamMembers?.map((member, index) => (
             <TeamMemberItem key={index} member={member} />
           ))}
+          {status === "Open" ? null : (
+            <ListItem disablePadding>
+              <StyledListItemButton onClick={handleOpenTeamMemberModal}>
+                <ListItemAvatar>
+                  <Box
+                    sx={{
+                      height: 40,
+                      width: 40,
+                      backgroundColor: theme.color.primary.lightest,
+                      borderRadius: theme.radius.full,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Icon type="plus" variant="primary" />
+                  </Box>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Typography variant="bodyRegular" bold highlight>
+                      Add a partner
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography variant="bodyRegular" lightened>
+                      Add a partner to collaborate
+                    </Typography>
+                  }
+                />
+              </StyledListItemButton>
+            </ListItem>
+          )}
         </List>
       </Stack>
       {openTeamMemberModal ? (
         <TeamMemberModal
           toggle={() => setOpenTeamMemberModal(!openTeamMemberModal)}
           open={openTeamMemberModal}
+          schoolId={schoolId}
         />
       ) : null}
+      <AddOpenDateModal
+        toggle={() => setOpenAddOpenDateModal(!openAddOpenDateModal)}
+        open={openAddOpenDateModal}
+      />
     </Card>
   );
 };
 
 export default SchoolInfoCard;
 
-const TeamMemberModal = ({ toggle, open }) => {
+const TeamMemberModal = ({ toggle, open, schoolId }) => {
   const { t } = useTranslation("common");
   const {
     control,
@@ -344,10 +451,20 @@ const TeamMemberModal = ({ toggle, open }) => {
   // console.log({ errors });
 
   async function onSubmit(data) {
+    const structuredData = {
+      person: {
+        email: data.partnerEmail,
+        first_name: data.partnerFirstName,
+        last_name: data.partnerLastName,
+      },
+    };
     try {
-      const response = await teamsApi.invitePartner(team?.data?.data?.id, data);
+      const response = await schoolsApi.invitePartner(schoolId, structuredData);
       if (response.status === 200) {
-        setSubmittedPartnerRequest(true);
+        toggle();
+
+        mutate(`/v1/schools/${schoolId}`);
+        console.log("success");
       }
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -455,6 +572,88 @@ const TeamMemberModal = ({ toggle, open }) => {
             </Grid>
           </Stack>
         </form>
+      </Stack>
+    </Modal>
+  );
+};
+
+const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
+  const [dateValue, setDateValue] = useState();
+  const [changedDateValue, setChangedDateValue] = useState(false);
+  useEffect(() => {
+    if (!changedDateValue) {
+      setDateValue(openDate);
+    }
+  });
+  const handleDateValueChange = (newValue) => {
+    setDateValue(moment(newValue).format("YYYY-MM-DD"));
+    setChangedDateValue(true);
+  };
+  const handleSetOpenDate = () => {
+    try {
+      teamsApi.setStartDate({
+        id: team?.data?.data?.id,
+        date: moment(dateValue).format("YYYY-MM-DD"),
+      }); //send to api
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        clearLoggedInState({});
+        router.push("/login");
+      } else {
+        console.error(err);
+      }
+    }
+    setOpenDate(moment(dateValue).format("YYYY-MM-DD"));
+    setChangedDateValue(false);
+    toggle();
+  };
+
+  const { t } = useTranslation("common");
+
+  return (
+    <Modal
+      title={t("ssj_ui_content.add_open_date")}
+      toggle={toggle}
+      open={open}
+    >
+      <Stack spacing={3}>
+        <Card variant="primaryLightened">
+          <Stack alignItems="center" justifyContent="center" spacing={3}>
+            <Typography variant="h4" highlight bold>
+              {t("ssj_ui_content.add_the_date_youd_like_to_open")}
+            </Typography>
+            <Typography variant="bodyRegular" highlight center>
+              {t("ssj_ui_content.dont_worry_you_can_change_this_later")}
+            </Typography>
+          </Stack>
+        </Card>
+        <DatePicker
+          label="Your anticipated open date"
+          id="open-date"
+          disablePast
+          value={parseISO(dateValue)}
+          onChange={handleDateValueChange}
+        />
+        <Grid container justifyContent="space-between">
+          <Grid item>
+            <Button variant="light" onClick={toggle}>
+              <Typography variant="bodyRegular">
+                {t("ssj_ui_content.cancel")}
+              </Typography>
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              disabled={!changedDateValue}
+              onClick={handleSetOpenDate}
+              data-cy="add-open-date-button"
+            >
+              <Typography light variant="bodyRegular">
+                {t("ssj_ui_content.add_open_date")}
+              </Typography>
+            </Button>
+          </Grid>
+        </Grid>
       </Stack>
     </Modal>
   );
