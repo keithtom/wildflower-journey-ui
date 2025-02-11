@@ -11,6 +11,7 @@ import SchoolProgress from "@components/school/SchoolProgress";
 import useAssignedSteps from "@hooks/useAssignedSteps";
 import useMilestones from "@hooks/useMilestones";
 import useSchool from "@hooks/useSchool";
+import { useDashboardProgress } from "@hooks/useDashboard";
 import { useMemo, useEffect } from "react";
 
 const SchoolPage = () => {
@@ -20,9 +21,13 @@ const SchoolPage = () => {
   const { t } = useTranslation("common");
 
   const { data: school } = useSchool(schoolId);
+  const workflowId = school?.data?.attributes?.workflowIds?.[0];
+  const { data: progress, isLoading: isLoadingProgress } =
+    useDashboardProgress(workflowId);
 
   // console.log({ currentUser });
   console.log({ school });
+  console.log({ progress });
   // console.log({ milestones });
   // console.log({ milestonesToDo });
 
@@ -210,9 +215,17 @@ const SchoolPage = () => {
               schoolId={schoolId}
               schoolStatus={school?.data?.attributes?.status}
               currentPhase={school?.data?.attributes?.currentPhase}
+              currentUser={currentUser}
             />
 
-            {/* <SchoolProgress progress={progress} workflow={workflow} /> */}
+            {!isLoadingProgress && progress && (
+              <SchoolProgress
+                progress={progress}
+                workflow={workflowId}
+                isOpen={school?.data?.attributes?.status === "Open"}
+                schoolId={schoolId}
+              />
+            )}
 
             <WaysToWork waysToWorkData={waysToWorkTogether} />
           </Stack>

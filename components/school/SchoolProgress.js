@@ -105,53 +105,93 @@ const PhaseProgressCard = ({ phase, processes, link, isCurrentPhase }) => {
   );
 };
 
-const SchoolProgress = ({ progress, workflow }) => {
+const SchoolProgress = ({ progress, workflow, isOpen, schoolId }) => {
   const { t } = useTranslation("common");
-  const [viewPhaseProgress, setViewPhaseProgress] = useState(true);
+  const [viewSummaryProgress, setViewSummaryProgress] = useState(true);
+
+  const currentMonthProgress = progress?.by_due_month?.find((month) => {
+    // Parse the month name (e.g. "January 2024") into a Date object
+    const monthDate = new Date(month.name);
+    const currentDate = new Date();
+
+    // Check if the month and year match current month and year
+    return (
+      monthDate.getMonth() === currentDate.getMonth() &&
+      monthDate.getFullYear() === currentDate.getFullYear()
+    );
+  });
+
+  const currentMonth = new Date().toLocaleString("en-US", { month: "long" });
+
+  console.log({ currentMonthProgress });
 
   return (
     <Stack spacing={6}>
       <Typography variant="h3" bold>
-        {t("ssj_ui_content.your_progress")}
+        {isOpen ? `It's ${currentMonth}!` : t("ssj_ui_content.your_progress")}
       </Typography>
+
       <Stack direction="row" spacing={6}>
         <Typography
           variant="bodyLarge"
           bold
           hoverable
-          lightened={!viewPhaseProgress}
-          onClick={() => setViewPhaseProgress(true)}
+          lightened={!viewSummaryProgress}
+          onClick={() => setViewSummaryProgress(true)}
         >
-          {t("ssj_ui_content.phases")}
+          Summary
         </Typography>
         <Typography
           variant="bodyLarge"
           bold
           hoverable
-          lightened={viewPhaseProgress}
-          onClick={() => setViewPhaseProgress(false)}
+          lightened={viewSummaryProgress}
+          onClick={() => setViewSummaryProgress(false)}
         >
           {t("ssj_ui_content.categories")}
         </Typography>
       </Stack>
 
-      {viewPhaseProgress ? (
-        <Grid container spacing={3}>
-          {progress?.by_phase?.map((phase, index) => (
-            <Grid item xs={12} sm={4} key={index}>
-              <PhaseProgressCard
-                phase={phase.name}
-                link={`/ssj/${workflow}/${phase.name}`}
-                processes={phase.statuses}
-              />
+      {viewSummaryProgress ? (
+        isOpen ? (
+          <Grid container>
+            <Grid item xs={12}>
+              <Card variant="lightened">
+                <Stack spacing={6} direction="row" alignItems="center">
+                  <img
+                    src="/assets/images/school-calendar.jpg"
+                    style={{
+                      width: "64px",
+                      borderRadius: "12px",
+                      aspectRatio: "1/1",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <Box sx={{ width: "100%" }}>
+                    <ProgressBar processes={currentMonthProgress.statuses} />
+                  </Box>
+                </Stack>
+              </Card>
             </Grid>
-          ))}
-        </Grid>
+          </Grid>
+        ) : (
+          <Grid container spacing={3}>
+            {progress?.by_phase?.map((phase, index) => (
+              <Grid item xs={12} sm={4} key={index}>
+                <PhaseProgressCard
+                  phase={phase.name}
+                  link={`/school/${schoolId}/ssj/${workflow}/${phase.name}`}
+                  processes={phase.statuses}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )
       ) : (
         <Grid container spacing={3} alignItems="stretch">
           {progress?.by_category?.map((category, index) => (
             <Grid item xs={12} sm={4} key={index}>
-              <Link href={`/ssj/${workflow}/milestones`}>
+              <Link href={`/school/${schoolId}/ssj/${workflow}/milestones`}>
                 <Card hoverable variant="lightened" sx={{ height: "100%" }}>
                   <Stack spacing={6}>
                     <Grid container>

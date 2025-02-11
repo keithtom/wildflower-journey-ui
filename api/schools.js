@@ -70,4 +70,18 @@ async function invitePartner(schoolId, data) {
   }
 }
 
-export default { index, show, update, invitePartner };
+async function reinvitePartner(schoolId, data) {
+  const config = getAuthHeader();
+  try {
+    const response = await schoolsApi.put(
+      `/${schoolId}/reinvite_partner`,
+      data,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
+export default { index, show, update, invitePartner, reinvitePartner };

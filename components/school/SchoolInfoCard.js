@@ -97,13 +97,14 @@ const InfoListItem = ({ label, value, action }) =>
     </ListItem>
   );
 
-const TeamMemberItem = ({ member }) => {
+const TeamMemberItem = ({ member, schoolId }) => {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState(null);
   const [mousePosition, setMousePosition] = useState({
     mouseX: 0,
     mouseY: 0,
   });
+  const [openInvitedMemberModal, setOpenInvitedMemberModal] = useState(false);
   const open = Boolean(anchorEl);
 
   const handlePopoverOpen = (event) => {
@@ -131,14 +132,19 @@ const TeamMemberItem = ({ member }) => {
     router.push(`/network/people/${member.id}`);
   };
 
+  const handleViewInvitedMember = () => {
+    setOpenInvitedMemberModal(true);
+  };
+
   return (
     <ListItem disablePadding>
       <StyledListItemButton
-        onClick={handleClick}
+        onClick={
+          !member.attributes.active ? handleViewInvitedMember : handleClick
+        }
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
         onMouseMove={handleMouseMove}
-        disabled={!member.attributes.active}
       >
         <ListItemAvatar>
           {member.attributes.active ? (
@@ -217,8 +223,34 @@ const TeamMemberItem = ({ member }) => {
               </ListItemText>
             </ListItem>
           )}
+          {member.attributes.active ? (
+            <ListItem>
+              <ListItemText>
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Grid item>
+                    <Typography variant="bodySmall" highlight>
+                      View in directory
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Icon type="chevronRight" variant="primary" size="small" />
+                  </Grid>
+                </Grid>
+              </ListItemText>
+            </ListItem>
+          ) : null}
         </List>
       </ContactPopover>
+      <InvitedMemberModal
+        toggle={() => setOpenInvitedMemberModal(!openInvitedMemberModal)}
+        open={openInvitedMemberModal}
+        schoolId={schoolId}
+        member={member}
+      />
     </ListItem>
   );
 };
@@ -238,7 +270,7 @@ const SchoolInfoCard = ({
 }) => {
   const [openTeamMemberModal, setOpenTeamMemberModal] = useState(false);
   const [openAddOpenDateModal, setOpenAddOpenDateModal] = useState(false);
-  const [openAddLocationModal, setOpenAddLocationModal] = useState(false);
+
   const handleOpenTeamMemberModal = () => {
     setOpenTeamMemberModal(true);
   };
@@ -379,7 +411,7 @@ const SchoolInfoCard = ({
             </Stack>
           </StyledSubheader>
           {teamMembers?.map((member, index) => (
-            <TeamMemberItem key={index} member={member} />
+            <TeamMemberItem key={index} member={member} schoolId={schoolId} />
           ))}
           {status === "Open" ? null : (
             <ListItem disablePadding>
@@ -416,13 +448,13 @@ const SchoolInfoCard = ({
           )}
         </List>
       </Stack>
-      {openTeamMemberModal ? (
-        <TeamMemberModal
-          toggle={() => setOpenTeamMemberModal(!openTeamMemberModal)}
-          open={openTeamMemberModal}
-          schoolId={schoolId}
-        />
-      ) : null}
+
+      <TeamMemberModal
+        toggle={() => setOpenTeamMemberModal(!openTeamMemberModal)}
+        open={openTeamMemberModal}
+        schoolId={schoolId}
+      />
+
       <AddOpenDateModal
         toggle={() => setOpenAddOpenDateModal(!openAddOpenDateModal)}
         open={openAddOpenDateModal}
@@ -432,6 +464,91 @@ const SchoolInfoCard = ({
 };
 
 export default SchoolInfoCard;
+
+const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
+  const [isInviteSent, setIsInviteSent] = useState(false);
+  const handleSendInviteAgain = async () => {
+    try {
+      const response = await schoolsApi.reinvitePartner(schoolId, {
+        person: { id: member.id },
+      });
+      if (response.status === 200) {
+        setIsInviteSent(true);
+        mutate(`/v1/schools/${schoolId}`);
+        // console.log("success");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <Modal
+      toggle={toggle}
+      title={`${member.attributes.firstName} ${member.attributes.lastName}`}
+      open={open}
+      fixedActions={
+        <Button
+          variant="text"
+          onClick={handleSendInviteAgain}
+          small
+          disabled={isInviteSent}
+        >
+          <Typography variant="bodyRegular">
+            {isInviteSent ? "Invite sent" : "Send invite again"}
+          </Typography>
+        </Button>
+      }
+    >
+      <List>
+        <ListItem disablePadding>
+          <ListItemAvatar>
+            {member.attributes.active ? (
+              <Avatar
+                sx={{ height: 40, width: 40 }}
+                src={member.attributes.imageUrl}
+              />
+            ) : (
+              <Box
+                sx={{
+                  height: 40,
+                  width: 40,
+                  backgroundColor: theme.color.primary.lightest,
+                  borderRadius: theme.radius.full,
+                  border: `1px dashed ${theme.color.primary.main}`,
+                }}
+              />
+            )}
+          </ListItemAvatar>
+          <ListItemText
+            primary={
+              <Stack direction="row" alignItems="center" spacing={3}>
+                <Typography variant="bodyRegular" bold>
+                  {`${member.attributes.firstName} ${member.attributes.lastName}`}
+                </Typography>
+                {!member.attributes.active ? (
+                  <Chip label="Invited" size="small" />
+                ) : null}
+              </Stack>
+            }
+            secondary={
+              <Stack direction="row" spacing={6}>
+                <Typography variant="bodyRegular" lightened>
+                  {!member.attributes.active
+                    ? member.attributes.roleList?.join(", ")
+                    : member.attributes.schoolRoleList?.join(", ")}
+                </Typography>
+                <Typography variant="bodyRegular">
+                  {member.attributes.email}
+                </Typography>
+              </Stack>
+            }
+          />
+        </ListItem>
+      </List>
+    </Modal>
+  );
+};
 
 const TeamMemberModal = ({ toggle, open, schoolId }) => {
   const { t } = useTranslation("common");
