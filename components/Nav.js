@@ -503,6 +503,8 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const shouldShowDivider =
     teacherLeaderSchools.length > 0 && otherSchools.length > 0;
 
+  // console.log({ teacherLeaderSchools, otherSchools, shouldShowDivider });
+
   return (
     <StyledNav sx={{ display: "flex" }}>
       <CustomDrawer

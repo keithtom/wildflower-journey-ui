@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import moment from "moment";
 import Skeleton from "@mui/material/Skeleton";
@@ -22,56 +23,31 @@ import {
 const YourSchools = () => {
   const { currentUser } = useUserContext();
 
-  // //fetch data
-  // const { teams, isLoading } = useAllTeams();
-
-  // //set teams array
-  // let ssjTeams = teams || [];
-
-  // //filter teams to only be for which this user is an ops guide
-  // const filteredTeams = ssjTeams?.filter(
-  //   (team) => team.relationships?.opsGuide?.data?.id === currentUser?.id
-  // );
-
-  // //set grouped teams by phase
-  // const visioningTeams = filteredTeams.filter(
-  //   (team) => team.attributes.currentPhase === "visioning"
-  // );
-  // const planningTeams = filteredTeams.filter(
-  //   (team) => team.attributes.currentPhase === "planning"
-  // );
-  // const startupTeams = filteredTeams.filter(
-  //   (team) => team.attributes.currentPhase === "startup"
-  // );
-
   const { data: schools, isLoading } = useSchools({
     person_id: currentUser?.id,
     role: "Ops Guide",
   });
 
-  useEffect(() => {
-    console.log({ schools });
-  }, [schools, isLoading]);
+  // useEffect(() => {
+  //   console.log({ schools });
+  // }, [schools, isLoading]);
+
+  //set grouped teams by phase
+  const visioningTeams = schools?.data.filter(
+    (school) => school.attributes.currentPhase === "visioning"
+  );
+  const planningTeams = schools?.data.filter(
+    (school) => school.attributes.currentPhase === "planning"
+  );
+  const startupTeams = schools?.data.filter(
+    (school) => school.attributes.currentPhase === "startup"
+  );
 
   useAuth("/login");
-  // console.log({ filteredTeams });
 
   return (
     <PageContainer title="Your Schools">
-      {/* <Grid container spacing={16}>
-        <Grid item xs={12}>
-          <Stack spacing={3} direction="row" alignItems="center">
-            <Avatar src={currentUser?.attributes.imageUrl} />
-            <Stack>
-              <Typography variant="h4" bold>
-                Welcome, {currentUser?.attributes?.firstName}!
-              </Typography>
-              <Typography variant="bodyLarge" lightened>
-                Operations Dashboard
-              </Typography>
-            </Stack>
-          </Stack>
-        </Grid>
+      <Grid container spacing={16}>
         <Grid item xs={12}>
           <Grid container>
             <Grid item xs={12}>
@@ -94,11 +70,11 @@ const YourSchools = () => {
                       {visioningTeams?.map((v, i) => (
                         <SchoolCard
                           key={i}
-                          name={v.attributes.tempName}
+                          name={v.attributes.name}
                           location={v.attributes.tempLocation}
                           openDate={v.attributes.expectedStartDate}
-                          team={v.relationships.partners.data}
-                          workflowId={v.attributes.workflowId}
+                          team={v.attributes.activePartners}
+                          schoolId={v.id}
                         />
                       ))}
                     </Stack>
@@ -123,12 +99,11 @@ const YourSchools = () => {
                       {planningTeams?.map((p, i) => (
                         <SchoolCard
                           key={i}
-                          name={p.attributes.tempName}
+                          name={p.attributes.name}
                           location={p.attributes.tempLocation}
                           openDate={p.attributes.expectedStartDate}
-                          team={p.relationships.partners.data}
-                          workflowId={p.attributes.workflowId}
-                          schoolId={p.attributes.schoolId}
+                          team={p.attributes.activePartners}
+                          schoolId={p.id}
                         />
                       ))}
                     </Stack>
@@ -152,11 +127,11 @@ const YourSchools = () => {
                       {startupTeams?.map((s, i) => (
                         <SchoolCard
                           key={i}
-                          name={s.attributes.tempName}
+                          name={s.attributes.name}
                           location={s.attributes.tempLocation}
                           openDate={s.attributes.expectedStartDate}
-                          team={s.relationships.partners.data}
-                          workflowId={s.attributes.workflowId}
+                          team={s.attributes.activePartners}
+                          schoolId={p.id}
                         />
                       ))}
                     </Stack>
@@ -166,26 +141,19 @@ const YourSchools = () => {
             </Grid>
           </Grid>
         </Grid>
-      </Grid> */}
+      </Grid>
     </PageContainer>
   );
 };
 
 export default YourSchools;
 
-const SchoolCard = ({
-  name,
-  location,
-  team,
-  openDate,
-  workflowId,
-  schoolId,
-}) => {
+const SchoolCard = ({ name, location, team, openDate, schoolId }) => {
   const router = useRouter();
-  const handleSetActiveTeam = (workflowId) => {
-    sessionStorage.setItem("schoolName", name);
+  const handleSetActiveTeam = (schoolId) => {
     router.push(`/school/${schoolId}/`);
   };
+
   return (
     <Card size="small">
       <Grid container alignItems="center" spacing={6}>
@@ -196,7 +164,6 @@ const SchoolCard = ({
             alignItems="center"
             sx={{ width: "85%" }}
           >
-            <Avatar size="sm" />
             <Stack sx={{ width: "100%" }}>
               <Typography
                 variant="bodyLarge"
@@ -233,7 +200,11 @@ const SchoolCard = ({
                 <AvatarGroup>
                   {team &&
                     team?.map((t, i) => (
-                      <Avatar size="sm" src={t.attributes?.imageUrl} key={i} />
+                      <Avatar
+                        size="sm"
+                        src={t.data.attributes?.imageUrl}
+                        key={i}
+                      />
                     ))}
                 </AvatarGroup>
                 <Stack>
@@ -242,7 +213,8 @@ const SchoolCard = ({
                       {team &&
                         team?.map((t, i) => (
                           <span key={i}>
-                            {t.attributes.firstName} {t.attributes.lastName}{" "}
+                            {t.data.attributes.firstName}{" "}
+                            {t.data.attributes.lastName}{" "}
                             {i !== team.length - 1 ? "and " : null}
                           </span>
                         ))}
@@ -258,7 +230,7 @@ const SchoolCard = ({
               <Button
                 variant="text"
                 small
-                onClick={() => handleSetActiveTeam(workflowId)}
+                onClick={() => handleSetActiveTeam(schoolId)}
               >
                 <Typography variant="bodyRegular" bold>
                   View
@@ -273,7 +245,6 @@ const SchoolCard = ({
 };
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useEffect } from "react";
 
 export async function getServerSideProps({ locale }) {
   return {
