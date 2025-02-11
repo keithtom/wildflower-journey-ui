@@ -205,6 +205,33 @@ const TeamMemberItem = ({ member, schoolId }) => {
         marginThreshold={16}
       >
         <List>
+          {member.attributes.active ? (
+            <>
+              <ListItem>
+                <ListItemText>
+                  <Grid
+                    container
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Grid item>
+                      <Typography variant="bodySmall" highlight>
+                        View in directory
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      <Icon
+                        type="chevronRight"
+                        variant="primary"
+                        size="small"
+                      />
+                    </Grid>
+                  </Grid>
+                </ListItemText>
+              </ListItem>
+              <Divider sx={{ borderColor: theme.color.neutral.lightened }} />
+            </>
+          ) : null}
           {member.attributes.email && (
             <ListItem>
               <ListItemText>
@@ -223,26 +250,6 @@ const TeamMemberItem = ({ member, schoolId }) => {
               </ListItemText>
             </ListItem>
           )}
-          {member.attributes.active ? (
-            <ListItem>
-              <ListItemText>
-                <Grid
-                  container
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Grid item>
-                    <Typography variant="bodySmall" highlight>
-                      View in directory
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Icon type="chevronRight" variant="primary" size="small" />
-                  </Grid>
-                </Grid>
-              </ListItemText>
-            </ListItem>
-          ) : null}
         </List>
       </ContactPopover>
       <InvitedMemberModal
@@ -359,32 +366,20 @@ const SchoolInfoCard = ({
           {!openDate ? null : (
             <InfoListItem
               label={t("ssj_ui_content.open_date")}
-              value={new Date(openDate).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
+              value={moment(openDate).format("MMMM D, YYYY")}
             />
           )}
           {!expectedStartDate ? null : (
             <InfoListItem
               action={() => setOpenAddOpenDateModal(true)}
-              label={t("ssj_ui_content.open_date")}
-              value={new Date(expectedStartDate).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
+              label="Anticipated open date"
+              value={moment(expectedStartDate).format("MMMM D, YYYY")}
             />
           )}
           {!openedOn ? null : (
             <InfoListItem
               label={t("ssj_ui_content.open_date")}
-              value={new Date(openedOn).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
+              value={moment(openedOn).format("MMMM D, YYYY")}
             />
           )}
         </List>
@@ -458,6 +453,8 @@ const SchoolInfoCard = ({
       <AddOpenDateModal
         toggle={() => setOpenAddOpenDateModal(!openAddOpenDateModal)}
         open={openAddOpenDateModal}
+        openDate={expectedStartDate}
+        schoolId={schoolId}
       />
     </Card>
   );
@@ -694,38 +691,51 @@ const TeamMemberModal = ({ toggle, open, schoolId }) => {
   );
 };
 
-const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
-  const [dateValue, setDateValue] = useState();
-  const [changedDateValue, setChangedDateValue] = useState(false);
+const AddOpenDateModal = ({ toggle, open, openDate, schoolId }) => {
+  const [dateValue, setDateValue] = useState(
+    openDate ? moment(openDate).toDate() : null
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const { t } = useTranslation("common");
+
+  // Update dateValue when openDate prop changes
   useEffect(() => {
-    if (!changedDateValue) {
-      setDateValue(openDate);
+    if (openDate) {
+      setDateValue(moment(openDate).toDate());
     }
-  });
+  }, [openDate]);
+
   const handleDateValueChange = (newValue) => {
-    setDateValue(moment(newValue).format("YYYY-MM-DD"));
-    setChangedDateValue(true);
+    setDateValue(newValue);
   };
-  const handleSetOpenDate = () => {
+
+  const handleSetOpenDate = async () => {
+    if (!dateValue) return;
+
     try {
-      teamsApi.setStartDate({
-        id: team?.data?.data?.id,
-        date: moment(dateValue).format("YYYY-MM-DD"),
-      }); //send to api
+      setIsSubmitting(true);
+      const response = await schoolsApi.update(schoolId, {
+        school: {
+          expected_start_date: moment(dateValue).format("YYYY-MM-DD"),
+        },
+      });
+
+      if (response.status === 200) {
+        await mutate(`/v1/schools/${schoolId}`);
+        toggle();
+      }
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
         router.push("/login");
       } else {
-        console.error(err);
+        console.error("Error updating open date:", err);
       }
+    } finally {
+      setIsSubmitting(false);
     }
-    setOpenDate(moment(dateValue).format("YYYY-MM-DD"));
-    setChangedDateValue(false);
-    toggle();
   };
-
-  const { t } = useTranslation("common");
 
   return (
     <Modal
@@ -748,7 +758,7 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
           label="Your anticipated open date"
           id="open-date"
           disablePast
-          value={parseISO(dateValue)}
+          value={dateValue}
           onChange={handleDateValueChange}
         />
         <Grid container justifyContent="space-between">
@@ -761,7 +771,11 @@ const AddOpenDateModal = ({ toggle, open, openDate, setOpenDate, team }) => {
           </Grid>
           <Grid item>
             <Button
-              disabled={!changedDateValue}
+              disabled={
+                isSubmitting ||
+                (openDate &&
+                  moment(dateValue).format("YYYY-MM-DD") === openDate)
+              }
               onClick={handleSetOpenDate}
               data-cy="add-open-date-button"
             >
