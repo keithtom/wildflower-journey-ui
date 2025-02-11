@@ -621,6 +621,7 @@ const GeneralFields = ({ handleToggle }) => {
       state: currentUser?.personAddress.state,
       about: personData?.data?.attributes?.about || "",
       phone: personData?.data?.attributes?.phone || "",
+      email: personData?.data?.attributes?.email || "",
       profilePicture: [],
     },
   });
@@ -639,6 +640,7 @@ const GeneralFields = ({ handleToggle }) => {
           },
           about: data.about,
           phone: data.phone,
+          email: data.email,
           profile_image: profileImage,
         },
       })
@@ -655,6 +657,7 @@ const GeneralFields = ({ handleToggle }) => {
             state: data.state,
             about: data.about,
             phone: data.phone,
+            email: data.email,
             profilePicture: [],
           });
         }
@@ -765,7 +768,26 @@ const GeneralFields = ({ handleToggle }) => {
             />
           )}
         />
-        <Card variant="lightened" size="small">
+        <Controller
+          name="email"
+          control={control}
+          rules={{ required: false }}
+          render={({ field }) => (
+            <TextField
+              label="Email"
+              placeholder="e.g. jane@wildflowerschools.org"
+              error={errors.email}
+              helperText={
+                errors &&
+                errors.phone &&
+                errors.phone.type === "required" &&
+                "This field is required"
+              }
+              {...field}
+            />
+          )}
+        />
+        {/* <Card variant="lightened" size="small">
           <Stack
             direction="row"
             spacing={3}
@@ -784,7 +806,7 @@ const GeneralFields = ({ handleToggle }) => {
               <Icon type="chevronRight" variant="primary" />
             </IconButton>
           </Stack>
-        </Card>
+        </Card> */}
 
         <Controller
           name="about"
