@@ -123,12 +123,10 @@ const SchoolProgress = ({ progress, workflow, isOpen, schoolId }) => {
 
   const currentMonth = new Date().toLocaleString("en-US", { month: "long" });
 
-  console.log({ currentMonthProgress });
-
   return (
     <Stack spacing={6}>
       <Typography variant="h3" bold>
-        {isOpen ? `It's ${currentMonth}!` : t("ssj_ui_content.your_progress")}
+        {isOpen ? `It's ${currentMonth}!` : t("ssj_ui_content.progress")}
       </Typography>
 
       <Stack direction="row" spacing={6}>

@@ -45,7 +45,13 @@ const Header = ({ title, toggleNavOpen }) => {
     <AppBar
       env={process.env.APP_ENV}
       isAdmin={adminView}
-      sx={{ width: `calc(100% - ${theme.util.drawerWidth}px)`, padding: 6 }}
+      sx={{
+        marginTop: screenSize.isSm ? `${theme.util.appBarHeight}px` : 0,
+        width: screenSize.isSm
+          ? "100%"
+          : `calc(100% - ${theme.util.drawerWidth}px)`,
+        padding: 6,
+      }}
     >
       <Stack direction="row" alignItems="center" spacing={3}>
         <Typography variant="bodyLarge" bold noWrap lightened={adminView}>

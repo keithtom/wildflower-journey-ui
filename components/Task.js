@@ -77,14 +77,14 @@ const Task = ({
   const { t } = useTranslation("common");
   const { currentUser } = useUserContext();
   const router = useRouter();
-  const { workflow, milestone } = router.query;
+  const { workflow, milestone, schoolId } = router.query;
 
   // Get the current school data
-  const { data: school, isLoading: schoolIsLoading } = useSchool(
-    router.query.schoolId
-  );
+  const { data: school, isLoading: schoolIsLoading } = useSchool(schoolId);
 
   let assignableUsers;
+
+  // console.log({ school });
 
   // Only set assignable users once school data is loaded
   if (!schoolIsLoading && school?.included) {

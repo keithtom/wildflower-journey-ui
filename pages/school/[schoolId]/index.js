@@ -26,8 +26,8 @@ const SchoolPage = () => {
     useDashboardProgress(workflowId);
 
   // console.log({ currentUser });
-  console.log({ school });
-  console.log({ progress });
+  // console.log({ school });
+  // console.log({ progress });
   // console.log({ milestones });
   // console.log({ milestonesToDo });
 
@@ -77,9 +77,19 @@ const SchoolPage = () => {
     return teamMembers;
   }, [school]);
 
-  useEffect(() => {
-    console.log("Team Members:", teamMembers);
-  }, [teamMembers]);
+  // useEffect(() => {
+  //   console.log("Team Members:", teamMembers);
+  // }, [teamMembers]);
+
+  const currentUserViewOnly = teamMembers.find(
+    (member) =>
+      member.id === currentUser?.id &&
+      (member.attributes.schoolRoleList.includes("Ops Guide") ||
+        member.attributes.schoolRoleList.includes("Foundation Partner") ||
+        member.attributes.schoolRoleList.includes("School Support")) &&
+      !member.attributes.schoolRoleList.includes("Teacher Leader") &&
+      !member.attributes.schoolRoleList.includes("Emerging Teacher Leader")
+  );
 
   const waysToWorkTogether = [
     {
@@ -201,6 +211,7 @@ const SchoolPage = () => {
             schoolName={school?.data?.attributes?.name}
             openedOn={school?.data?.attributes?.openedOn}
             schoolId={schoolId}
+            currentUserViewOnly={currentUserViewOnly}
           />
         </Grid>
         <Grid item xs={12} sm={8}>
@@ -210,13 +221,15 @@ const SchoolPage = () => {
               {currentUser?.attributes?.firstName}!
             </Typography>
 
-            <AssignedStepsCard
-              workflows={school?.data?.attributes?.workflowIds}
-              schoolId={schoolId}
-              schoolStatus={school?.data?.attributes?.status}
-              currentPhase={school?.data?.attributes?.currentPhase}
-              currentUser={currentUser}
-            />
+            {currentUserViewOnly ? null : (
+              <AssignedStepsCard
+                workflows={school?.data?.attributes?.workflowIds}
+                schoolId={schoolId}
+                schoolStatus={school?.data?.attributes?.status}
+                currentPhase={school?.data?.attributes?.currentPhase}
+                currentUser={currentUser}
+              />
+            )}
 
             {!isLoadingProgress && progress && (
               <SchoolProgress

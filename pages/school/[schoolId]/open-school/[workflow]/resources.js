@@ -4,6 +4,7 @@ import Skeleton from "@mui/material/Skeleton";
 
 import useAuth from "@lib/utils/useAuth";
 import useResources from "@hooks/useResources";
+import useSchool from "@hooks/useSchool";
 import { PageContainer, Grid, Typography, Card, Stack, Icon } from "@ui";
 import CategoryChip from "@components/CategoryChip";
 import Resource from "@components/Resource";
@@ -11,7 +12,9 @@ import Hero from "@components/Hero";
 
 const Resources = () => {
   const router = useRouter();
-  const { workflow: workflowId } = router.query;
+  const { workflow: workflowId, schoolId } = router.query;
+
+  const { data: school } = useSchool(schoolId);
 
   useAuth("/login");
 
@@ -92,7 +95,7 @@ const Resources = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer title={school?.data.attributes.name}>
       <Stack spacing={12}>
         <Hero imageUrl={hero} />
         <Stack spacing={2}>

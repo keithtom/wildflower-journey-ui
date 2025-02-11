@@ -1,5 +1,14 @@
 import { useMemo } from "react";
-import { Card, Typography, Stack, Grid, Button, Icon, Link } from "../ui";
+import {
+  Card,
+  Typography,
+  Stack,
+  Grid,
+  Button,
+  Icon,
+  Link,
+  Spinner,
+} from "../ui";
 import { useTranslation } from "next-i18next";
 import useAssignedStepsCount from "@hooks/useAssignedStepsCount";
 import useMilestones from "@hooks/useMilestones";
@@ -74,8 +83,12 @@ const AssignedStepsCard = ({
 
   if (isLoading) {
     return (
-      <Card>
-        <Typography>Loading tasks...</Typography>
+      <Card variant="primaryLightened">
+        <Grid container alignItems="center" justifyContent="center">
+          <Grid item>
+            <Spinner />
+          </Grid>
+        </Grid>
       </Card>
     );
   }

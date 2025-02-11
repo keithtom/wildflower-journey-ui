@@ -170,7 +170,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
               <Typography variant="bodyRegular" bold>
                 {`${member.attributes.firstName} ${member.attributes.lastName}`}
               </Typography>
-              {!member.attributes.active ? (
+              {!member.attributes.active || !member.attributes.isOnboarded ? (
                 <Chip label="Invited" size="small" />
               ) : null}
             </Stack>
@@ -274,6 +274,7 @@ const SchoolInfoCard = ({
   schoolId,
   logoImage,
   expectedStartDate,
+  currentUserViewOnly,
 }) => {
   const [openTeamMemberModal, setOpenTeamMemberModal] = useState(false);
   const [openAddOpenDateModal, setOpenAddOpenDateModal] = useState(false);
@@ -371,7 +372,9 @@ const SchoolInfoCard = ({
           )}
           {!expectedStartDate ? null : (
             <InfoListItem
-              action={() => setOpenAddOpenDateModal(true)}
+              action={
+                currentUserViewOnly ? null : () => setOpenAddOpenDateModal(true)
+              }
               label={t("ssj_ui_content.anticipated_open_date")}
               value={moment(expectedStartDate).format("MMMM D, YYYY")}
             />
@@ -398,7 +401,7 @@ const SchoolInfoCard = ({
                   ? "Open School Team"
                   : t("ssj_ui_content.startup_team")}
               </Typography>
-              {status === "Open" ? null : (
+              {status === "Open" || currentUserViewOnly ? null : (
                 <IconButton onClick={handleOpenTeamMemberModal}>
                   <Icon type="plus" variant="primary" />
                 </IconButton>
@@ -408,7 +411,7 @@ const SchoolInfoCard = ({
           {teamMembers?.map((member, index) => (
             <TeamMemberItem key={index} member={member} schoolId={schoolId} />
           ))}
-          {status === "Open" ? null : (
+          {status === "Open" || currentUserViewOnly ? null : (
             <ListItem disablePadding>
               <StyledListItemButton onClick={handleOpenTeamMemberModal}>
                 <ListItemAvatar>
@@ -525,6 +528,9 @@ const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
                 </Typography>
                 {!member.attributes.active ? (
                   <Chip label="Invited" size="small" />
+                ) : null}
+                {!member.attributes.isOnboarded ? (
+                  <Chip label="Pending" size="small" />
                 ) : null}
               </Stack>
             }

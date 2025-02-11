@@ -398,8 +398,8 @@ const SchoolNavItem = ({
 );
 
 const Nav = ({ toggleNavOpen, navOpen }) => {
-  const { screenSize } = getScreenSize();
   const router = useRouter();
+  const { screenSize } = getScreenSize();
   const { t } = useTranslation("common");
   const [anchorEl, setAnchorEl] = useState(null);
   const [openSchoolId, setOpenSchoolId] = useState(null);
@@ -433,6 +433,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
       } else {
         setOpenSection("school");
       }
+      toggleNavOpen();
     } else {
       // If we're not on a school route, collapse all sections
       setOpenSection(null);
@@ -490,7 +491,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const logo = "/assets/images/wildflower-logo.png";
 
   // console.log(screenSize.isSm);
-  console.log({ currentUser });
+  // console.log({ currentUser });
 
   const isTeacherLeaderSchool = (school) =>
     school.role_list?.some(
@@ -509,13 +510,20 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   // console.log({ teacherLeaderSchools, otherSchools, shouldShowDivider });
 
   return (
-    <StyledNav sx={{ display: "flex" }}>
+    <StyledNav
+      sx={{
+        display: "flex",
+      }}
+    >
       <CustomDrawer
         variant={screenSize.isSm ? "temporary" : "permanent"}
         anchor="left"
         open={navOpen}
         onClose={toggleNavOpen}
-        sx={{ p: 2 }}
+        sx={{
+          p: 2,
+          zIndex: 10,
+        }}
       >
         <Stack
           justifyContent="space-between"
@@ -663,35 +671,10 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
             </NavList>
           </div>
 
-          {/* <Stack
-          justifyContent="space-between"
-          direction="column"
-          sx={{ height: "100%" }}
-        >
-          <div>
-            <Grid container spacing={3} alignItems="center">
-              <Grid item>
-                <Avatar />
-              </Grid>
-              <Grid item>
-                <Typography variant="bodyRegular" bold>
-                  Maggie Paulin
-                </Typography>
-                <Typography variant="bodyRegular" lightened>
-                  Emerging Teacher Leader
-                </Typography>
-              </Grid>
+          <Grid container spacing={3} p={4}>
+            <Grid item xs={12}>
+              <img src={logo} style={{ height: "32px" }} />
             </Grid>
-            <NavLink
-              variant="primary"
-              to="/network"
-              active={router.pathname.includes("/network")}
-              label="Network"
-              icon="bookReader"
-            />
-            <Navigation />
-          </div>
-          <Grid container p={4} spacing={3}>
             <Grid item xs={12}>
               <Link href="mailto:support@wildflowerschools.org?subject=My Wildflower Feedback">
                 <Card variant="lightened" size="small" hoverable>
@@ -714,10 +697,6 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
               </Link>
             </Grid>
           </Grid>
-        </Stack> */}
-          <Box sx={{ padding: 4 }}>
-            <img src={logo} style={{ height: "32px" }} />
-          </Box>
         </Stack>
       </CustomDrawer>
     </StyledNav>

@@ -29,6 +29,7 @@ import Milestone from "@components/Milestone";
 import Hero from "@components/Hero";
 
 import useMilestones from "@hooks/useMilestones";
+import useSchool from "@hooks/useSchool";
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const PhasePage = () => {
@@ -39,6 +40,8 @@ const PhasePage = () => {
 
   const router = useRouter();
   const { workflow, phase, schoolId } = router.query;
+
+  const { data: school } = useSchool(schoolId);
 
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
@@ -61,7 +64,7 @@ const PhasePage = () => {
 
   return (
     <>
-      <PageContainer>
+      <PageContainer title={school?.data.attributes.name}>
         <Stack spacing={12}>
           <Grid container spacing={12}>
             <Grid item xs={12} sm={6}>
@@ -82,7 +85,7 @@ const PhasePage = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <img
-                style={{ width: "100%", borderRadius: theme.radius.md }}
+                style={{ width: "100%", borderRadius: theme.radius.lg }}
                 src={
                   phase === "planning"
                     ? planningHero
