@@ -104,7 +104,12 @@
     "add_a_partner_to_collaborate": "Invitar a un socio para colaborar",
     "and": "y",
     "more": "Más",
-    "view_more": "Ver más"
+    "view_more": "Ver más",
+    "anticipated_open_date": "Fecha de apertura anticipada",
+
+    "visioning_description": "La fase de visión es un período de reflexión en el que los maestros exploran su propósito, visión escolar y alineación con los principios de Wildflower. Los maestros documentan su visión en un álbum de visión de Wildflower, que se comparte con un grupo de miembros de la red y de la comunidad para recibir comentarios. Si bien cada equipo avanza a su propio ritmo, esta fase normalmente tarda entre uno y dos meses, lo que da tiempo para una reflexión profunda. Muchos maestros comparten que esta fase proporciona un marco útil para aclarar su propósito, visión escolar y cronograma, todos los cuales son fundamentales para un plan escolar exitoso.",
+    "planning_description": "En la fase de planificación, su equipo refinará la visión, el presupuesto y el cronograma de la escuela y comenzará a formar elementos clave del negocio. Estos planes se registran en un álbum de planificación de Wildflower y se comparten con el mismo equipo de asesores para recibir comentarios. La fase de planificación culmina con la decisión de firmar el acuerdo de membresía con Wildflower. Si bien los cronogramas varían mucho, muchos equipos pasan de cuatro a seis meses en la fase de planificación e idealmente completan la fase siete a nueve meses antes de que tengan la intención de abrir la escuela.",
+    "startup_description": "La fase de inicio está activa e implica la puesta en funcionamiento de sus planes escolares. Durante esta fase, la mayoría de las escuelas se constituirán como una organización sin fines de lucro, alquilarán y renovarán una instalación, involucrarán a su comunidad, recaudarán fondos e inscribirán a las familias. Si bien esta fase suele tardar de 6 a 9 meses, es probable que los plazos se vean afectados por la disponibilidad de instalaciones, el acceso al capital, los procesos de renovación y la concesión de licencias. Debido a esto, Wildflower recomienda programar reuniones regulares para reflexionar sobre el cronograma y permanecer flexible y adaptable a medida que cambian sus planes."
   },
   "ways_to_work_together": {
     "with_yourself": "Contigo mismo",

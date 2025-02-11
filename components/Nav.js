@@ -153,6 +153,7 @@ const WorkflowNavItems = ({
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
   const [expanded, setExpanded] = useState(false);
 
+  const { t } = useTranslation("common");
   // console.log({ workflow });
 
   // Add current date logic
@@ -267,7 +268,9 @@ const WorkflowNavItems = ({
           <NavListItemIcon>
             <Icon type="map" />
           </NavListItemIcon>
-          <NavListItemText primary="School Startup Journey" />
+          <NavListItemText
+            primary={t("ssj_ui_content.school_startup_journey")}
+          />
           <Icon
             type={expanded ? "chevronDown" : "chevronRight"}
             variant="lightened"
@@ -287,7 +290,7 @@ const WorkflowNavItems = ({
               sx={{ pl: 8 }}
             >
               <NavListItemIcon></NavListItemIcon>
-              <NavListItemText secondary="Visioning" />
+              <NavListItemText secondary={t("ssj_phases.visioning")} />
             </NavListItemButton>
             <NavListItemButton
               onClick={() =>
@@ -300,7 +303,7 @@ const WorkflowNavItems = ({
               sx={{ pl: 8 }}
             >
               <NavListItemIcon></NavListItemIcon>
-              <NavListItemText secondary="Planning" />
+              <NavListItemText secondary={t("ssj_phases.planning")} />
             </NavListItemButton>
             <NavListItemButton
               onClick={() =>
@@ -313,7 +316,7 @@ const WorkflowNavItems = ({
               sx={{ pl: 8 }}
             >
               <NavListItemIcon></NavListItemIcon>
-              <NavListItemText secondary="Startup" />
+              <NavListItemText secondary={t("ssj_phases.startup")} />
             </NavListItemButton>
             <NavListItemButton
               onClick={() =>
@@ -326,7 +329,7 @@ const WorkflowNavItems = ({
               sx={{ pl: 8 }}
             >
               <NavListItemIcon></NavListItemIcon>
-              <NavListItemText secondary="Resources" />
+              <NavListItemText secondary={t("ssj_ui_content.resources")} />
             </NavListItemButton>
           </NavList>
         </Collapse>

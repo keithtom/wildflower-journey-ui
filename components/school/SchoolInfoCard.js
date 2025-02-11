@@ -372,7 +372,7 @@ const SchoolInfoCard = ({
           {!expectedStartDate ? null : (
             <InfoListItem
               action={() => setOpenAddOpenDateModal(true)}
-              label="Anticipated open date"
+              label={t("ssj_ui_content.anticipated_open_date")}
               value={moment(expectedStartDate).format("MMMM D, YYYY")}
             />
           )}

@@ -111,7 +111,7 @@ const SettingsPage = () => {
 
       <PageContainer title="Settings">
         <Stack spacing={6}>
-          <Stack spacing={3}>
+          {/* <Stack spacing={3}>
             <Typography variant="bodyLarge">School Startup Journey</Typography>
             <Card noPadding>
               <List disablePadding>
@@ -188,7 +188,7 @@ const SettingsPage = () => {
                 />
               </List>
             </Card>
-          </Stack>
+          </Stack> */}
 
           <Stack spacing={3}>
             <Typography variant="bodyLarge">Preferences</Typography>
@@ -203,7 +203,7 @@ const SettingsPage = () => {
               </List>
             </Card>
           </Stack>
-          <Stack spacing={3}>
+          {/* <Stack spacing={3}>
             <Typography variant="bodyLarge">Account</Typography>
             <Card noPadding>
               <List disablePadding>
@@ -223,7 +223,7 @@ const SettingsPage = () => {
                 />
               </List>
             </Card>
-          </Stack>
+          </Stack> */}
         </Stack>
 
         <PauseSSJModal
@@ -555,3 +555,14 @@ const ChangeEmailModal = ({ toggle, open, currentUser }) => {
     </Modal>
   );
 };
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+      // Add any additional props you need to pass to the page component
+    },
+  };
+}

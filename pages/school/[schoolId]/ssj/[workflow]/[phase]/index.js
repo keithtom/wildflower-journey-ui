@@ -63,17 +63,22 @@ const PhasePage = () => {
     <>
       <PageContainer>
         <Stack spacing={12}>
-          <Grid container>
+          <Grid container spacing={12}>
             <Grid item xs={12} sm={6}>
-              <Typography
-                variant="h2"
-                bold
-                capitalize
-                id={`${phase}-header`}
-                data-cy={`${phase}-header`}
-              >
-                {t(`ssj_phases.${phase}`)}
-              </Typography>
+              <Stack spacing={6}>
+                <Typography
+                  variant="h2"
+                  bold
+                  capitalize
+                  id={`${phase}-header`}
+                  data-cy={`${phase}-header`}
+                >
+                  {t(`ssj_phases.${phase}`)}
+                </Typography>
+                <Typography variant="bodyLarge" lightened>
+                  {t(`ssj_ui_content.${phase}_description`)}
+                </Typography>
+              </Stack>
             </Grid>
             <Grid item xs={12} sm={6}>
               <img
