@@ -58,7 +58,7 @@ const PhasePage = () => {
 
   // console.log({ milestonesByCurrentPhase });
   // console.log({ isLoadingMilestonesByCurrentPhase });
-  console.log(milestonesByCurrentPhase);
+  // console.log(milestonesByCurrentPhase);
 
   useAuth("/login");
 

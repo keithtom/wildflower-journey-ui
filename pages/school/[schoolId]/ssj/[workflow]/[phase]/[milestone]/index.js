@@ -30,10 +30,12 @@ import MilestonePageHead from "@components/MilestonePageHead";
 import Milestone from "@components/Milestone";
 import useMilestone from "@hooks/useMilestone";
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
-
+import useSchool from "@hooks/useSchool";
 const MilestonePage = ({ FakeMilestoneTasks }) => {
   const router = useRouter();
   const { workflow, phase, milestone: milestoneQuery, schoolId } = router.query;
+
+  const { data: school } = useSchool(schoolId);
 
   const { t } = useTranslation("common");
 
@@ -45,7 +47,6 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
 
   const [completeModalOpen, setCompleteModalOpen] = useState(false);
   const [userIsEditing, setUserIsEditing] = useState(false);
-  const [preferredLanguage, setPreferredLanguage] = useState("en");
 
   const handleCompleteMilestone = () => {
     setCompleteModalOpen(true);
@@ -57,8 +58,12 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
     setUserIsEditing(false);
   };
 
-  var milestonePrerequisites =
-    milestone?.relationships?.prerequisiteProcesses?.data;
+  const milestonePrerequisites =
+    milestone?.relationships?.prerequisiteProcesses?.data?.filter(
+      (prerequisite) => prerequisite.attributes.status !== "done"
+    );
+
+  const hasPrerequisites = milestonePrerequisites?.length > 0;
 
   const milestoneRelationships = milestone?.relationships?.steps?.data;
 
@@ -69,10 +74,10 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
   useAuth("/login");
 
   return (
-    <PageContainer>
+    <PageContainer title={school?.data.attributes.name}>
       <Stack spacing={12}>
         <Stack spacing={8}>
-          {isUpNext && (
+          {hasPrerequisites && isUpNext && (
             <Card variant="primaryOutlined" data-cy="hold-up-milestone-card">
               <Grid container spacing={6}>
                 <Grid item xs={12}>

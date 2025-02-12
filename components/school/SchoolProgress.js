@@ -189,18 +189,18 @@ const SchoolProgress = ({ progress, workflow, isOpen, schoolId }) => {
         <Grid container spacing={3} alignItems="stretch">
           {progress?.by_category?.map((category, index) => (
             <Grid item xs={12} sm={4} key={index}>
-              <Link href={`/school/${schoolId}/ssj/${workflow}/milestones`}>
-                <Card hoverable variant="lightened" sx={{ height: "100%" }}>
-                  <Stack spacing={6}>
-                    <Grid container>
-                      <Grid item>
-                        <CategoryChip category={category.name} size="small" />
-                      </Grid>
+              {/* <Link href={`/school/${schoolId}/ssj/${workflow}/milestones`}> */}
+              <Card hoverable variant="lightened" sx={{ height: "100%" }}>
+                <Stack spacing={6}>
+                  <Grid container>
+                    <Grid item>
+                      <CategoryChip category={category.name} size="small" />
                     </Grid>
-                    <ProgressBar processes={category.statuses} />
-                  </Stack>
-                </Card>
-              </Link>
+                  </Grid>
+                  <ProgressBar processes={category.statuses} />
+                </Stack>
+              </Card>
+              {/* </Link> */}
             </Grid>
           ))}
         </Grid>
