@@ -7,7 +7,7 @@ import { getScreenSize } from "../hooks/react-responsive";
 import Nav from "./Nav";
 import AppBar from "./AppBar";
 import { Icon, Stack } from "@components/ui";
-
+import { useRouter } from "next/router";
 const MainContent = styled(Box, {
   shouldForwardProp: (prop) => prop !== "hasNav",
 })(({ theme, hasNav }) => ({
@@ -16,21 +16,27 @@ const MainContent = styled(Box, {
   minHeight: "100vh",
 }));
 
-const Layout = ({ children, showNav = true }) => {
+const Layout = ({ children }) => {
+  const router = useRouter();
   const { isLoggedIn } = useUserContext();
   const { screenSize } = getScreenSize();
 
+  const routesWithNoNav = ["/welcome", "/login", "/logged-out"];
+  const showNav = !routesWithNoNav.some((route) =>
+    router.pathname.startsWith(route)
+  );
+
   const [navOpen, setNavOpen] = useState(false);
   // Only hide nav if there's definitely no token
-  const shouldShowNav = isLoggedIn && showNav;
 
   const logo = "/assets/images/wildflower-logo.png";
 
-  console.log({ navOpen });
+  // console.log({ showNav });
+  // console.log({ navOpen });
 
   return (
     <Box sx={{ display: "flex" }}>
-      {shouldShowNav && screenSize.isSm ? (
+      {isLoggedIn && screenSize.isSm ? (
         <AppBar>
           <Stack direction="row" alignItems="center" spacing={4}>
             <Icon type="menu" onClick={() => setNavOpen(!navOpen)} />
@@ -39,10 +45,10 @@ const Layout = ({ children, showNav = true }) => {
         </AppBar>
       ) : null}
 
-      {shouldShowNav && (
+      {isLoggedIn && showNav && (
         <Nav toggleNavOpen={() => setNavOpen(!navOpen)} navOpen={navOpen} />
       )}
-      <MainContent hasNav={shouldShowNav && !screenSize.isSm}>
+      <MainContent hasNav={isLoggedIn && !screenSize.isSm && showNav}>
         {children}
       </MainContent>
     </Box>

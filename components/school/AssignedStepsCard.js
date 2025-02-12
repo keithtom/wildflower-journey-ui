@@ -78,6 +78,8 @@ const AssignedStepsCard = ({
     );
   }, [milestones, isOpen, currentPhase, monthRange]);
 
+  // console.log(milestonesToDo);
+
   // Combined loading state
   const isLoading = isLoadingCount || isLoadingMilestones || isLoadingWorkflows;
 
@@ -116,8 +118,14 @@ const AssignedStepsCard = ({
                 <Link
                   href={
                     isOpen
-                      ? `school/${schoolId}/open-school/${milestone.relationships.workflow.data.id}/${milestone.attributes.phase}/${milestone.id}`
-                      : `school/${schoolId}/ssj/${milestone.relationships.workflow.data.id}/${milestone.attributes.phase}/${milestone.id}`
+                      ? `/school/${schoolId}/open-school/${
+                          milestone.relationships.workflow.data.id
+                        }/checklist/${new Date(
+                          milestone.attributes.dueDate
+                        ).getFullYear()}/${
+                          new Date(milestone.attributes.dueDate).getMonth() + 1
+                        }/${milestone.id}`
+                      : `/school/${schoolId}/ssj/${milestone.relationships.workflow.data.id}/${milestone.attributes.phase}/${milestone.id}`
                   }
                   key={index}
                 >

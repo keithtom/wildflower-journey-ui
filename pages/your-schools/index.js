@@ -131,7 +131,7 @@ const YourSchools = () => {
                           location={s.attributes.tempLocation}
                           openDate={s.attributes.expectedStartDate}
                           team={s.attributes.activePartners}
-                          schoolId={p.id}
+                          schoolId={s.id}
                         />
                       ))}
                     </Stack>

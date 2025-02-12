@@ -177,9 +177,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
           }
           secondary={
             <Typography variant="bodyRegular" lightened>
-              {!member.attributes.active
-                ? member.attributes.roleList?.join(", ")
-                : member.attributes.schoolRoleList?.join(", ")}
+              {member.attributes.schoolRoleList?.join(", ")}
             </Typography>
           }
         />
@@ -364,19 +362,17 @@ const SchoolInfoCard = ({
               value={location}
             />
           )}
-          {!openDate ? null : (
-            <InfoListItem
-              label={t("ssj_ui_content.open_date")}
-              value={moment(openDate).format("MMMM D, YYYY")}
-            />
-          )}
-          {!expectedStartDate ? null : (
+          {status === "Open" ? null : (
             <InfoListItem
               action={
                 currentUserViewOnly ? null : () => setOpenAddOpenDateModal(true)
               }
               label={t("ssj_ui_content.anticipated_open_date")}
-              value={moment(expectedStartDate).format("MMMM D, YYYY")}
+              value={
+                !expectedStartDate
+                  ? "Set an anticipated open date"
+                  : moment(expectedStartDate).format("MMMM D, YYYY")
+              }
             />
           )}
           {!openedOn ? null : (
@@ -529,17 +525,12 @@ const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
                 {!member.attributes.active ? (
                   <Chip label="Invited" size="small" />
                 ) : null}
-                {!member.attributes.isOnboarded ? (
-                  <Chip label="Pending" size="small" />
-                ) : null}
               </Stack>
             }
             secondary={
               <Stack direction="row" spacing={6}>
                 <Typography variant="bodyRegular" lightened>
-                  {!member.attributes.active
-                    ? member.attributes.roleList?.join(", ")
-                    : member.attributes.schoolRoleList?.join(", ")}
+                  {member.attributes.schoolRoleList?.join(", ")}
                 </Typography>
                 <Typography variant="bodyRegular">
                   {member.attributes.email}

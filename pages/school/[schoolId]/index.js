@@ -21,7 +21,9 @@ const SchoolPage = () => {
   const { t } = useTranslation("common");
 
   const { data: school } = useSchool(schoolId);
-  const workflowId = school?.data?.attributes?.workflowIds?.[0];
+  //to do: get the workflowId for the school based on whether it is OSC or SSJ
+  // if the school is open, get the workflowId for recurring = true, and if the school is ssj, get the workflowId for recurring = false
+  const workflowId = school?.data?.attributes?.workflowIds?.[1];
   const { data: progress, isLoading: isLoadingProgress } =
     useDashboardProgress(workflowId);
 
@@ -204,7 +206,6 @@ const SchoolPage = () => {
             }
             phase={school?.data?.attributes?.currentPhase}
             location={school?.data?.attributes?.location}
-            openDate={school?.data?.attributes?.openDate}
             expectedStartDate={school?.data?.attributes?.expectedStartDate}
             teamMembers={teamMembers}
             status={school?.data?.attributes?.status}
@@ -217,7 +218,9 @@ const SchoolPage = () => {
         <Grid item xs={12} sm={8}>
           <Stack spacing={12}>
             <Typography variant="h2">
-              {t("ssj_ui_content.welcome")},{" "}
+              <span style={{ opacity: 0.5 }}>
+                {t("ssj_ui_content.welcome")},
+              </span>{" "}
               {currentUser?.attributes?.firstName}!
             </Typography>
 

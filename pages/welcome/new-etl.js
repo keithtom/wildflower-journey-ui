@@ -17,6 +17,7 @@ import {
   PageContainer,
 } from "@ui";
 import Header from "@components/Header";
+import useSchool from "@hooks/useSchool";
 
 const PageContent = styled(Box)`
   flex-grow: 1;
@@ -47,12 +48,17 @@ const StyledShiftedAvatar = styled(Box)`
 
 const NewETL = ({}) => {
   const { currentUser } = useUserContext();
-  const teamId = currentUser?.attributes.ssj.teamId;
-  const { team } = useTeam(teamId);
-  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
+  const selectedSchoolId =
+    currentUser?.attributes.schools[currentUser?.attributes.schools.length - 1]
+      ?.id;
+
+  const { data: school } = useSchool(selectedSchoolId);
+  const opsGuide = school?.data.attributes?.opsGuides[0].data;
   useAuth("/login");
-  // console.log(currentUser);
-  // console.log(opsGuide);
+  // console.log({ selectedSchoolId });
+  // console.log({ school });
+  // console.log({ currentUser });
+  // console.log({ opsGuide });
   return (
     <PageContainer isLoading={!currentUser} hideNav>
       <Grid container alignItems="center" justifyContent="center">
