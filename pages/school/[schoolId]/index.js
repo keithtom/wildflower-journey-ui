@@ -33,7 +33,7 @@ const SchoolPage = () => {
 
   // console.log({ selectedWorkflow });
   // console.log({ currentUser });
-  // console.log({ school });
+  console.log({ school });
   // console.log({ progress });
   // console.log({ milestones });
   // console.log({ milestonesToDo });
@@ -76,9 +76,9 @@ const SchoolPage = () => {
         };
       })
       .sort((a, b) => {
-        // Sort by active status - active members first
-        if (a.attributes.active === b.attributes.active) return 0;
-        return a.attributes.active ? -1 : 1;
+        // Sort by isOnboarded status - onboarded members first
+        if (a.attributes.isOnboarded === b.attributes.isOnboarded) return 0;
+        return a.attributes.isOnboarded ? -1 : 1;
       });
 
     return teamMembers;

@@ -140,14 +140,19 @@ const TeamMemberItem = ({ member, schoolId }) => {
     <ListItem disablePadding>
       <StyledListItemButton
         onClick={
-          !member.attributes.active ? handleViewInvitedMember : handleClick
+          !member.attributes.isOnboarded
+            ? handleViewInvitedMember
+            : member.attributes.active
+            ? handleClick
+            : null
         }
+        sx={{ cursor: member.attributes.active ? "pointer" : "default" }}
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
         onMouseMove={handleMouseMove}
       >
         <ListItemAvatar>
-          {member.attributes.active ? (
+          {member.attributes.isOnboarded ? (
             <Avatar
               sx={{ height: 40, width: 40 }}
               src={member.attributes.imageUrl}
@@ -170,7 +175,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
               <Typography variant="bodyRegular" bold>
                 {`${member.attributes.firstName} ${member.attributes.lastName}`}
               </Typography>
-              {!member.attributes.active || !member.attributes.isOnboarded ? (
+              {!member.attributes.isOnboarded ? (
                 <Chip label="Invited" size="small" />
               ) : null}
             </Stack>
@@ -203,7 +208,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
         marginThreshold={16}
       >
         <List>
-          {member.attributes.active ? (
+          {member.attributes.active && member.attributes.isOnboarded ? (
             <>
               <ListItem>
                 <ListItemText>
@@ -499,7 +504,7 @@ const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
       <List>
         <ListItem disablePadding>
           <ListItemAvatar>
-            {member.attributes.active ? (
+            {member.attributes.isOnboarded ? (
               <Avatar
                 sx={{ height: 40, width: 40 }}
                 src={member.attributes.imageUrl}
@@ -522,7 +527,7 @@ const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
                 <Typography variant="bodyRegular" bold>
                   {`${member.attributes.firstName} ${member.attributes.lastName}`}
                 </Typography>
-                {!member.attributes.active ? (
+                {!member.attributes.isOnboarded ? (
                   <Chip label="Invited" size="small" />
                 ) : null}
               </Stack>

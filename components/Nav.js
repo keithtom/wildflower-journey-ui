@@ -364,11 +364,6 @@ const SchoolNavItem = ({
         />
       </NavListItemIcon>
       <NavListItemText primary={school.name} bold />
-      <Icon
-        type={openSchoolId === school.id ? "chevronDown" : "chevronRight"}
-        variant="lightened"
-        size="small"
-      />
     </NavListItemButton>
     <Collapse in={openSchoolId === school.id} timeout="auto" unmountOnExit>
       <NavList sx={{ padding: 0 }}>

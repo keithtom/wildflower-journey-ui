@@ -84,19 +84,43 @@ const Task = ({
 
   let assignableUsers;
 
-  // console.log({ school });
+  console.log({ school });
 
   // Only set assignable users once school data is loaded
   if (!schoolIsLoading && school?.included) {
-    // Filter included array for persons who are Teacher Leaders or Emerging Teacher Leaders and are onboarded
-    assignableUsers = school.included.filter(
-      (item) =>
-        item.type === "person" &&
-        item.attributes.isOnboarded === true &&
-        item.attributes.roleList?.some((role) =>
-          ["Teacher Leader", "Emerging Teacher Leader"].includes(role)
-        )
+    // First get all active school relationships
+    const schoolRelationships = school.included.filter(
+      (item) => item.type === "schoolRelationship" && !item.attributes.endDate
     );
+
+    // Get the person IDs from the active relationships and map their roles
+    const activePersonRoles = schoolRelationships.reduce(
+      (acc, relationship) => {
+        acc[relationship.relationships.person.data.id] =
+          relationship.attributes.roleList;
+        return acc;
+      },
+      {}
+    );
+
+    // Filter included array for persons who are onboarded and have an active school relationship
+    // with Teacher Leader or Emerging Teacher Leader role
+    assignableUsers = school.included
+      .filter(
+        (item) =>
+          item.type === "person" &&
+          item.attributes.isOnboarded === true &&
+          activePersonRoles[item.id]?.some((role) =>
+            ["Teacher Leader", "Emerging Teacher Leader"].includes(role)
+          )
+      )
+      .map((person) => ({
+        ...person,
+        attributes: {
+          ...person.attributes,
+          schoolRoleList: activePersonRoles[person.id],
+        },
+      }));
   }
 
   // Common interface that all invocations of Task should use.
