@@ -370,7 +370,7 @@ const SchoolInfoCard = ({
               label={t("ssj_ui_content.anticipated_open_date")}
               value={
                 !expectedStartDate
-                  ? "Set an anticipated open date"
+                  ? "No date"
                   : moment(expectedStartDate).format("MMMM D, YYYY")
               }
             />

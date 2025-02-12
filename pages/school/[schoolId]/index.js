@@ -12,6 +12,7 @@ import useAssignedSteps from "@hooks/useAssignedSteps";
 import useMilestones from "@hooks/useMilestones";
 import useSchool from "@hooks/useSchool";
 import { useDashboardProgress } from "@hooks/useDashboard";
+import useSelectedWorkflow from "@hooks/useSelectedWorkflow";
 import { useMemo, useEffect } from "react";
 
 const SchoolPage = () => {
@@ -21,12 +22,16 @@ const SchoolPage = () => {
   const { t } = useTranslation("common");
 
   const { data: school } = useSchool(schoolId);
-  //to do: get the workflowId for the school based on whether it is OSC or SSJ
-  // if the school is open, get the workflowId for recurring = true, and if the school is ssj, get the workflowId for recurring = false
-  const workflowId = school?.data?.attributes?.workflowIds?.[1];
-  const { data: progress, isLoading: isLoadingProgress } =
-    useDashboardProgress(workflowId);
+  const isOpen = school?.data?.attributes?.status === "Open";
 
+  const { selectedWorkflow, isLoading: isLoadingWorkflow } =
+    useSelectedWorkflow(school?.data?.attributes?.workflowIds, isOpen);
+
+  const { data: progress, isLoading: isLoadingProgress } = useDashboardProgress(
+    selectedWorkflow?.id
+  );
+
+  // console.log({ selectedWorkflow });
   // console.log({ currentUser });
   // console.log({ school });
   // console.log({ progress });
@@ -237,8 +242,8 @@ const SchoolPage = () => {
             {!isLoadingProgress && progress && (
               <SchoolProgress
                 progress={progress}
-                workflow={workflowId}
-                isOpen={school?.data?.attributes?.status === "Open"}
+                workflow={selectedWorkflow?.id}
+                isOpen={isOpen}
                 schoolId={schoolId}
               />
             )}

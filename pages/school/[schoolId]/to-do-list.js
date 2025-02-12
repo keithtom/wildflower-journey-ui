@@ -23,6 +23,7 @@ import {
 import useSchool from "@hooks/useSchool";
 import useAssignedSteps from "@hooks/useAssignedSteps";
 import useWorkflow from "@hooks/useWorkflow";
+import useSelectedWorkflow from "@hooks/useSelectedWorkflow";
 import { useUserContext } from "../../../lib/useUserContext";
 import Task from "@components/Task";
 import { theme } from "../../../styles/theme";
@@ -51,25 +52,24 @@ const ToDoListPage = ({}) => {
   const { schoolId } = router.query;
   const { data: school } = useSchool(schoolId);
   const { currentUser } = useUserContext();
-  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
-  const [hasSetInitialWorkflow, setHasSetInitialWorkflow] = useState(false);
+  const isOpen = school?.data?.attributes?.status === "Open";
 
-  // Only fetch assigned steps when we have a selectedWorkflow
+  const { selectedWorkflow, isLoading: isLoadingWorkflow } =
+    useSelectedWorkflow(school?.data?.attributes?.workflowIds, isOpen);
+
+  const [activeWorkflow, setActiveWorkflow] = useState(null);
+
+  // Only fetch assigned steps when we have an activeWorkflow
   const { assignedSteps, isLoading } = useAssignedSteps(
-    selectedWorkflow ? selectedWorkflow : null
-    // { current_user: true }
+    activeWorkflow ? activeWorkflow : null
   );
 
-  // Update selectedWorkflow only once when school data becomes available
+  // Update activeWorkflow when selectedWorkflow changes
   useEffect(() => {
-    if (
-      !hasSetInitialWorkflow &&
-      school?.data?.attributes?.workflowIds?.length > 0
-    ) {
-      setSelectedWorkflow(school.data.attributes.workflowIds[0]);
-      setHasSetInitialWorkflow(true);
+    if (selectedWorkflow?.id) {
+      setActiveWorkflow(selectedWorkflow.id);
     }
-  }, [school, hasSetInitialWorkflow]);
+  }, [selectedWorkflow]);
 
   // Group steps by assignee
   const groupedSteps =
@@ -122,7 +122,7 @@ const ToDoListPage = ({}) => {
 
     // Update the SWR cache with the filtered steps
     mutate(
-      `/workflows/${selectedWorkflow}/assigned_steps`,
+      `/workflows/${activeWorkflow}/assigned_steps`,
       {
         data: assignedSteps.filter((step) => step.id !== taskId),
       },
@@ -131,7 +131,7 @@ const ToDoListPage = ({}) => {
   };
 
   console.log({ assignedSteps });
-  console.log({ selectedWorkflow });
+  console.log({ activeWorkflow });
   console.log({ groupedSteps });
 
   return (
@@ -147,14 +147,14 @@ const ToDoListPage = ({}) => {
             <Grid item key={i}>
               <WorkflowOption
                 workflowId={w}
-                setSelectedWorkflow={setSelectedWorkflow}
-                selectedWorkflow={selectedWorkflow}
+                setSelectedWorkflow={setActiveWorkflow}
+                selectedWorkflow={activeWorkflow}
               />
             </Grid>
           ))}
         </Grid>
 
-        {selectedWorkflow && !isLoading && groupedSteps && (
+        {activeWorkflow && !isLoading && groupedSteps && (
           <Stack spacing={4}>
             {Object.keys(groupedSteps).length === 0 ? (
               <Card>
@@ -220,7 +220,7 @@ const ToDoListPage = ({}) => {
                         }
                         isNext={index === 0}
                         removeStep={removeStep}
-                        workflow={selectedWorkflow}
+                        workflow={activeWorkflow}
                       />
                     ))}
                   </List>
