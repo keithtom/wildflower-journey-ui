@@ -59,12 +59,12 @@ const AdminSSJ = ({}) => {
 
   return (
     <>
-      <PageContainer isAdmin>
+      <PageContainer isAdmin title="Schools">
         <Stack spacing={6}>
           <Grid container justifyContent="space-between">
             <Grid item>
-              <Typography variant="bodyLarge" bold>
-                Schools
+              <Typography variant="bodyLarge">
+                {ssjTeams.length} schools
               </Typography>
             </Grid>
             <Grid item>

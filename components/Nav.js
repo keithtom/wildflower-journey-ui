@@ -555,26 +555,69 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                   <Icon type="dotsVertical" variant="lightened" />
                 </Box>
               </NavListItemButton>
-              <NavListItemButton
-                onClick={() => router.push("/network")}
-                selected={router.pathname.includes("/network")}
-              >
-                <NavListItemIcon>
-                  <Icon type="bookReader" />
-                </NavListItemIcon>
-                <NavListItemText primary="Network" bold />
-              </NavListItemButton>
-              {currentUser?.personRoleList.includes("Ops Guide") ? (
-                <NavListItemButton
-                  onClick={() => router.push("/your-schools")}
-                  selected={router.pathname.includes("/your-schools")}
-                >
-                  <NavListItemIcon>
-                    <Icon type="buildingHouse" />
-                  </NavListItemIcon>
-                  <NavListItemText primary="Your Schools" bold />
-                </NavListItemButton>
-              ) : null}
+              {!router.asPath.includes("/admin") && (
+                <>
+                  <NavListItemButton
+                    onClick={() => router.push("/network")}
+                    selected={router.pathname.includes("/network")}
+                  >
+                    <NavListItemIcon>
+                      <Icon type="bookReader" />
+                    </NavListItemIcon>
+                    <NavListItemText primary="Network" bold />
+                  </NavListItemButton>
+                  {currentUser?.personRoleList.includes("Ops Guide") ? (
+                    <NavListItemButton
+                      onClick={() => router.push("/your-schools")}
+                      selected={router.pathname.includes("/your-schools")}
+                    >
+                      <NavListItemIcon>
+                        <Icon type="buildingHouse" />
+                      </NavListItemIcon>
+                      <NavListItemText primary="Your Schools" bold />
+                    </NavListItemButton>
+                  ) : null}
+                </>
+              )}
+
+              {/* Admin Navigation */}
+              {isAdmin && router.asPath.includes("/admin") && (
+                <>
+                  <Divider
+                    sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+                  />
+                  <NavListItemButton
+                    onClick={() => router.push("/admin")}
+                    selected={router.asPath === "/admin"}
+                  >
+                    <NavListItemIcon>
+                      <Icon type="home" />
+                    </NavListItemIcon>
+                    <NavListItemText primary="Dashboard" bold />
+                  </NavListItemButton>
+                  <NavListItemButton
+                    onClick={() => {
+                      localStorage.removeItem("workflowId");
+                      router.push("/admin/workflows");
+                    }}
+                    selected={router.asPath === "/admin/workflows"}
+                  >
+                    <NavListItemIcon>
+                      <Icon type="layer" />
+                    </NavListItemIcon>
+                    <NavListItemText primary="Workflows" bold />
+                  </NavListItemButton>
+                  <NavListItemButton
+                    onClick={() => router.push("/admin/schools")}
+                    selected={router.asPath === "/admin/schools"}
+                  >
+                    <NavListItemIcon>
+                      <Icon type="buildingHouse" />
+                    </NavListItemIcon>
+                    <NavListItemText primary="Schools" bold />
+                  </NavListItemButton>
+                </>
+              )}
             </NavList>
             <NavPopover
               open={open}
@@ -604,11 +647,33 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                   sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
                 />
                 {isAdmin ? (
-                  <NavListItemButton onClick={() => router.push("/admin")}>
+                  <NavListItemButton
+                    onClick={() => {
+                      if (router.asPath.includes("/admin")) {
+                        // Check if we're on a school-specific admin page
+                        const schoolMatch = router.asPath.match(
+                          /\/admin\/schools\/([^/]+)/
+                        );
+                        if (schoolMatch) {
+                          router.push(`/school/${schoolMatch[1]}`);
+                        } else {
+                          router.push("/network");
+                        }
+                      } else {
+                        router.push("/admin");
+                      }
+                    }}
+                  >
                     <NavListItemIcon>
                       <Icon type="data" variant="lightened" />
                     </NavListItemIcon>
-                    <NavListItemText primary="Switch To Admin" />
+                    <NavListItemText
+                      primary={
+                        router.asPath.includes("/admin")
+                          ? "Switch to Platform"
+                          : "Switch to Admin"
+                      }
+                    />
                   </NavListItemButton>
                 ) : null}
                 <NavListItemButton onClick={() => router.push("/settings")}>
@@ -634,35 +699,39 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
             />
 
             <NavList>
-              {teacherLeaderSchools.map((school, i) => (
-                <SchoolNavItem
-                  key={`teacher-leader-${i}`}
-                  school={school}
-                  openSchoolId={openSchoolId}
-                  handleSchoolClick={handleSchoolClick}
-                  router={router}
-                  openSection={openSection}
-                  onSectionClick={handleSectionClick}
-                />
-              ))}
+              {!router.asPath.includes("/admin") && (
+                <>
+                  {teacherLeaderSchools.map((school, i) => (
+                    <SchoolNavItem
+                      key={`teacher-leader-${i}`}
+                      school={school}
+                      openSchoolId={openSchoolId}
+                      handleSchoolClick={handleSchoolClick}
+                      router={router}
+                      openSection={openSection}
+                      onSectionClick={handleSectionClick}
+                    />
+                  ))}
 
-              {shouldShowDivider && (
-                <Divider
-                  sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
-                />
+                  {shouldShowDivider && (
+                    <Divider
+                      sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+                    />
+                  )}
+
+                  {otherSchools.map((school, i) => (
+                    <SchoolNavItem
+                      key={`other-${i}`}
+                      school={school}
+                      openSchoolId={openSchoolId}
+                      handleSchoolClick={handleSchoolClick}
+                      router={router}
+                      openSection={openSection}
+                      onSectionClick={handleSectionClick}
+                    />
+                  ))}
+                </>
               )}
-
-              {otherSchools.map((school, i) => (
-                <SchoolNavItem
-                  key={`other-${i}`}
-                  school={school}
-                  openSchoolId={openSchoolId}
-                  handleSchoolClick={handleSchoolClick}
-                  router={router}
-                  openSection={openSection}
-                  onSectionClick={handleSectionClick}
-                />
-              ))}
             </NavList>
           </div>
 
