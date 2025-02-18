@@ -665,7 +665,14 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                     }}
                   >
                     <NavListItemIcon>
-                      <Icon type="data" variant="lightened" />
+                      <Icon
+                        type={
+                          router.asPath.includes("/admin")
+                            ? "buildingHouse"
+                            : "data"
+                        }
+                        variant="lightened"
+                      />
                     </NavListItemIcon>
                     <NavListItemText
                       primary={
@@ -739,27 +746,29 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
             <Grid item xs={12}>
               <img src={logo} style={{ height: "32px" }} />
             </Grid>
-            <Grid item xs={12}>
-              <Link href="mailto:support@wildflowerschools.org?subject=My Wildflower Feedback">
-                <Card variant="lightened" size="small" hoverable>
-                  <Stack spacing={1}>
-                    <Grid container alignItems="center">
-                      <Grid item flex={1}>
-                        <Typography variant="bodyRegular" bold highlight>
-                          {t("navigation.we_want_to_hear_from_you")}
-                        </Typography>
+            {router.asPath.includes("/admin") ? null : (
+              <Grid item xs={12}>
+                <Link href="mailto:support@wildflowerschools.org?subject=My Wildflower Feedback">
+                  <Card variant="lightened" size="small" hoverable>
+                    <Stack spacing={1}>
+                      <Grid container alignItems="center">
+                        <Grid item flex={1}>
+                          <Typography variant="bodyRegular" bold highlight>
+                            {t("navigation.we_want_to_hear_from_you")}
+                          </Typography>
+                        </Grid>
+                        <Grid item>
+                          <Icon type="chevronRight" variant="primary" />
+                        </Grid>
                       </Grid>
-                      <Grid item>
-                        <Icon type="chevronRight" variant="primary" />
-                      </Grid>
-                    </Grid>
-                    <Typography variant="bodyRegular" lightened>
-                      {t("navigation.click_here")}
-                    </Typography>
-                  </Stack>
-                </Card>
-              </Link>
-            </Grid>
+                      <Typography variant="bodyRegular" lightened>
+                        {t("navigation.click_here")}
+                      </Typography>
+                    </Stack>
+                  </Card>
+                </Link>
+              </Grid>
+            )}
           </Grid>
         </Stack>
       </CustomDrawer>
