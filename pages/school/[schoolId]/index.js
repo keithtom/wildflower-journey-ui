@@ -66,12 +66,21 @@ const SchoolPage = () => {
           (rel) => rel.relationships.person.data.id === person.id
         );
 
-        // Return person with roleList from their school relationship
+        // Return person with roleList from their school relationship and the relationship ID
         return {
           ...person,
           attributes: {
             ...person.attributes,
             schoolRoleList: relationship.attributes.roleList,
+          },
+          relationships: {
+            ...person.relationships,
+            schoolRelationship: {
+              data: {
+                id: relationship.id,
+                type: "schoolRelationship",
+              },
+            },
           },
         };
       })

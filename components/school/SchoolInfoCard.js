@@ -33,6 +33,7 @@ import {
 import { theme } from "../../styles/theme";
 import { useRouter } from "next/router";
 import schoolsApi from "../../api/schools";
+import schoolRelationshipsApi from "../../api/school_relationships";
 import { mutate } from "swr";
 
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
@@ -105,6 +106,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
     mouseY: 0,
   });
   const [openInvitedMemberModal, setOpenInvitedMemberModal] = useState(false);
+  const [openRemovePartnerModal, setOpenRemovePartnerModal] = useState(false);
   const open = Boolean(anchorEl);
 
   const handlePopoverOpen = (event) => {
@@ -136,8 +138,25 @@ const TeamMemberItem = ({ member, schoolId }) => {
     setOpenInvitedMemberModal(true);
   };
 
+  console.log({ member });
+
   return (
-    <ListItem disablePadding>
+    <ListItem
+      disablePadding
+      secondaryAction={
+        member.attributes.isOnboarded ? (
+          <IconButton
+            aria-label="menu"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenRemovePartnerModal(true);
+            }}
+          >
+            <Icon type="dotsVertical" variant="lightened" />
+          </IconButton>
+        ) : null
+      }
+    >
       <StyledListItemButton
         onClick={
           !member.attributes.isOnboarded
@@ -187,6 +206,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
           }
         />
       </StyledListItemButton>
+
       <ContactPopover
         sx={{
           pointerEvents: "none",
@@ -260,6 +280,13 @@ const TeamMemberItem = ({ member, schoolId }) => {
         open={openInvitedMemberModal}
         schoolId={schoolId}
         member={member}
+      />
+      <RemovePartnerModal
+        toggle={() => setOpenRemovePartnerModal(!openRemovePartnerModal)}
+        open={openRemovePartnerModal}
+        schoolId={schoolId}
+        member={member}
+        relationshipId={member.relationships?.schoolRelationship?.data?.id}
       />
     </ListItem>
   );
@@ -396,6 +423,7 @@ const SchoolInfoCard = ({
               direction="row"
               alignItems="center"
               justifyContent="space-between"
+              sx={{ paddingRight: "8px" }}
             >
               <Typography variant="bodyLarge" bold>
                 {status === "Open"
@@ -433,12 +461,12 @@ const SchoolInfoCard = ({
                 <ListItemText
                   primary={
                     <Typography variant="bodyRegular" bold highlight>
-                      Add a partner
+                      {t("ssj_ui_content.add_a_partner")}
                     </Typography>
                   }
                   secondary={
                     <Typography variant="bodyRegular" lightened>
-                      Add a partner to collaborate
+                      {t("ssj_ui_content.add_a_partner_to_collaborate")}
                     </Typography>
                   }
                 />
@@ -783,6 +811,99 @@ const AddOpenDateModal = ({ toggle, open, openDate, schoolId }) => {
             >
               <Typography light variant="bodyRegular">
                 {t("ssj_ui_content.add_open_date")}
+              </Typography>
+            </Button>
+          </Grid>
+        </Grid>
+      </Stack>
+    </Modal>
+  );
+};
+
+const RemovePartnerModal = ({
+  toggle,
+  open,
+  schoolId,
+  member,
+  relationshipId,
+}) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmationText, setConfirmationText] = useState("");
+  const router = useRouter();
+  const { t } = useTranslation("common");
+
+  const fullName = `${member.attributes.firstName} ${member.attributes.lastName}`;
+  const isConfirmed = confirmationText === fullName;
+
+  // Reset confirmation text when modal closes
+  useEffect(() => {
+    if (!open) {
+      setConfirmationText("");
+    }
+  }, [open]);
+
+  const handleRemovePartner = async () => {
+    if (!isConfirmed) return;
+
+    try {
+      setIsSubmitting(true);
+      const response = await schoolRelationshipsApi.update(relationshipId, {
+        end_date: moment().format("YYYY-MM-DD"),
+      });
+
+      if (response.status === 200) {
+        await mutate(`/v1/schools/${schoolId}`);
+        toggle();
+      }
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        clearLoggedInState({});
+        router.push("/login");
+      } else {
+        console.error("Error removing partner:", err);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Modal toggle={toggle} title="Remove Team Member" open={open}>
+      <Stack spacing={3}>
+        <Card variant="primaryLightened">
+          <Stack alignItems="center" justifyContent="center" spacing={3}>
+            <Typography variant="h4" highlight bold>
+              Remove {fullName}
+            </Typography>
+          </Stack>
+        </Card>
+        <Stack spacing={1}>
+          <Typography variant="bodyRegular" lightened>
+            Please type "{fullName}" to confirm removal
+          </Typography>
+          <TextField
+            value={confirmationText}
+            onChange={(e) => setConfirmationText(e.target.value)}
+            placeholder={fullName}
+            fullWidth
+          />
+        </Stack>
+        <Grid container justifyContent="space-between">
+          <Grid item>
+            <Button variant="text" onClick={toggle}>
+              <Typography variant="bodyRegular">
+                {t("ssj_ui_content.cancel")}
+              </Typography>
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              onClick={handleRemovePartner}
+              disabled={isSubmitting || !isConfirmed}
+              variant="danger"
+            >
+              <Typography light variant="bodyRegular">
+                Remove Member
               </Typography>
             </Button>
           </Grid>

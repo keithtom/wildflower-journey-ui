@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { mutate } from "swr";
 
+import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 import {
   PageContainer,
   Grid,
@@ -216,7 +217,9 @@ const ToDoListPage = ({}) => {
                         key={step.id}
                         task={step}
                         processName={
-                          step.relationships.process.data.attributes.title
+                          step.relationships.process.data.attributes[
+                            getTranslatedAttr(router.locale, "title")
+                          ] || step.relationships.process.data.attributes.title
                         }
                         isNext={index === 0}
                         removeStep={removeStep}
