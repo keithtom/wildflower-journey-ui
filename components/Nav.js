@@ -491,13 +491,13 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const isTeacherLeaderSchool = (school) =>
     school.role_list?.some(
       (role) => role === "Teacher Leader" || role === "Emerging Teacher Leader"
-    );
+    ) && !school.end_date;
 
   const teacherLeaderSchools =
     currentUser?.attributes.schools.filter(isTeacherLeaderSchool) || [];
   const otherSchools =
     currentUser?.attributes.schools.filter(
-      (school) => !isTeacherLeaderSchool(school)
+      (school) => !isTeacherLeaderSchool(school) && !school.end_date
     ) || [];
   const shouldShowDivider =
     teacherLeaderSchools.length > 0 && otherSchools.length > 0;
