@@ -114,7 +114,6 @@ const NavListItemText = ({ primary, secondary, bold, ...props }) => (
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
           }}
-          lightened
         >
           {secondary}
         </Typography>
@@ -317,6 +316,19 @@ const WorkflowNavItems = ({
             >
               <NavListItemIcon></NavListItemIcon>
               <NavListItemText secondary={t("ssj_phases.startup")} />
+            </NavListItemButton>
+            <NavListItemButton
+              onClick={() =>
+                router.push(`/school/${school.id}/ssj/${workflowId}/milestones`)
+              }
+              selected={
+                router.asPath ===
+                `/school/${school.id}/ssj/${workflowId}/milestones`
+              }
+              sx={{ pl: 8 }}
+            >
+              <NavListItemIcon></NavListItemIcon>
+              <NavListItemText secondary={t("ssj_ui_content.milestones")} />
             </NavListItemButton>
             <NavListItemButton
               onClick={() =>

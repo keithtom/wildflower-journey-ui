@@ -31,16 +31,27 @@ const Login = ({}) => {
   useEffect(() => {
     if (isLoggedIn) {
       setIsLoggingIn(true);
+      const personSchool = currentUser?.attributes?.schools
+        .filter(
+          (school) =>
+            // Filter out schools with end_date
+            !school.end_date &&
+            // Keep only schools where user is a Teacher Leader or ETL
+            school.role_list?.some(
+              (role) =>
+                role === "Teacher Leader" || role === "Emerging Teacher Leader"
+            )
+        )
+        // Sort by start_date descending (most recent first)
+        .sort((a, b) => new Date(b.start_date) - new Date(a.start_date))[0]?.id; // Get the ID of the first (most recent) school)
       RedirectUser({
         router: router,
         roleList: currentUser?.personRoleList,
         isOnboarded: currentUser?.personIsOnboarded,
-        schoolId: currentUser?.attributes?.schools[0]?.schoolId,
+        schoolId: personSchool,
       });
     }
   }, [isLoggedIn, currentUser]);
-
-  console.log({ currentUser });
 
   const {
     control,
@@ -63,7 +74,20 @@ const Login = ({}) => {
       )?.attributes;
       const personRoleList = personData?.roleList;
       const personIsOnboarded = personData?.isOnboarded;
-      const personSchool = response?.data?.data?.attributes?.schools[0]?.id;
+
+      const personSchool = response?.data?.data?.attributes?.schools
+        .filter(
+          (school) =>
+            // Filter out schools with end_date
+            !school.end_date &&
+            // Keep only schools where user is a Teacher Leader or ETL
+            school.role_list?.some(
+              (role) =>
+                role === "Teacher Leader" || role === "Emerging Teacher Leader"
+            )
+        )
+        // Sort by start_date descending (most recent first)
+        .sort((a, b) => new Date(b.start_date) - new Date(a.start_date))[0]?.id; // Get the ID of the first (most recent) school
 
       RedirectUser({
         router: router,

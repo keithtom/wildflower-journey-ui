@@ -38,6 +38,8 @@ const Resources = () => {
     setShowResourcesByCategory(false);
   };
 
+  // const { resources, isLoading } = useSSJResources(workflow);
+  // console.log({ resources });
   const { resources, isLoading } = useSSJResources(workflow);
   // console.log({ resources });
 

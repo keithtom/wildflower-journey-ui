@@ -187,22 +187,26 @@ const SchoolProgress = ({ progress, workflow, isOpen, schoolId }) => {
         )
       ) : (
         <Grid container spacing={3} alignItems="stretch">
-          {progress?.by_category?.map((category, index) => (
-            <Grid item xs={12} sm={4} key={index}>
-              {/* <Link href={`/school/${schoolId}/ssj/${workflow}/milestones`}> */}
-              <Card hoverable variant="lightened" sx={{ height: "100%" }}>
-                <Stack spacing={6}>
-                  <Grid container>
-                    <Grid item>
-                      <CategoryChip category={category.name} size="small" />
+          {progress?.by_category
+            ?.filter(
+              (category) => category.statuses && category.statuses.length > 0
+            )
+            ?.map((category, index) => (
+              <Grid item xs={12} sm={4} key={index}>
+                {/* <Link href={`/school/${schoolId}/ssj/${workflow}/milestones`}> */}
+                <Card variant="lightened" sx={{ height: "100%" }}>
+                  <Stack spacing={6}>
+                    <Grid container>
+                      <Grid item>
+                        <CategoryChip category={category.name} size="small" />
+                      </Grid>
                     </Grid>
-                  </Grid>
-                  <ProgressBar processes={category.statuses} />
-                </Stack>
-              </Card>
-              {/* </Link> */}
-            </Grid>
-          ))}
+                    <ProgressBar processes={category.statuses} />
+                  </Stack>
+                </Card>
+                {/* </Link> */}
+              </Grid>
+            ))}
         </Grid>
       )}
     </Stack>

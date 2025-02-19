@@ -62,22 +62,27 @@ const ContactPopover = styled(Popover)`
 
 const InfoListItem = ({ label, value, action }) =>
   action ? (
-    <StyledListItemButton onClick={action}>
-      <ListItemText
-        primary={
-          <Grid container>
-            <Grid item xs={6}>
-              <Typography variant="bodyRegular" lightened>
-                {label}
-              </Typography>
+    <ListItem disablePadding>
+      <StyledListItemButton onClick={action}>
+        <ListItemText
+          primary={
+            <Grid container>
+              <Grid item xs={6}>
+                <Typography variant="bodyRegular" lightened>
+                  {label}
+                </Typography>
+              </Grid>
+              <Grid item xs={5}>
+                <Typography variant="bodyRegular">{value}</Typography>
+              </Grid>
+              <Grid>
+                <Icon type="pencil" size="small" variant="primary" />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <Typography variant="bodyRegular">{value}</Typography>
-            </Grid>
-          </Grid>
-        }
-      />
-    </StyledListItemButton>
+          }
+        />
+      </StyledListItemButton>
+    </ListItem>
   ) : (
     <ListItem disablePadding>
       <ListItemText
@@ -138,13 +143,18 @@ const TeamMemberItem = ({ member, schoolId }) => {
     setOpenInvitedMemberModal(true);
   };
 
-  console.log({ member });
+  // console.log({ member });
+  const { t } = useTranslation("common");
+
+  const isTeacher =
+    member.attributes.schoolRoleList?.includes("Teacher Leader") ||
+    member.attributes.schoolRoleList?.includes("Emerging Teacher Leader");
 
   return (
     <ListItem
       disablePadding
       secondaryAction={
-        member.attributes.isOnboarded ? (
+        member.attributes.isOnboarded && isTeacher ? (
           <IconButton
             aria-label="menu"
             onClick={(e) => {
@@ -239,15 +249,8 @@ const TeamMemberItem = ({ member, schoolId }) => {
                   >
                     <Grid item>
                       <Typography variant="bodySmall" highlight>
-                        View in directory
+                        {t("ssj_ui_content.view_in_directory")}
                       </Typography>
-                    </Grid>
-                    <Grid item>
-                      <Icon
-                        type="chevronRight"
-                        variant="primary"
-                        size="small"
-                      />
                     </Grid>
                   </Grid>
                 </ListItemText>
@@ -582,7 +585,8 @@ const TeamMemberModal = ({ toggle, open, schoolId }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitSuccessful, isSubmitting },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       partnerFirstName: "",
@@ -592,7 +596,6 @@ const TeamMemberModal = ({ toggle, open, schoolId }) => {
   });
 
   const router = useRouter();
-  // console.log({ errors });
 
   async function onSubmit(data) {
     const structuredData = {
@@ -605,10 +608,13 @@ const TeamMemberModal = ({ toggle, open, schoolId }) => {
     try {
       const response = await schoolsApi.invitePartner(schoolId, structuredData);
       if (response.status === 200) {
-        toggle();
-
+        reset({
+          partnerFirstName: "",
+          partnerLastName: "",
+          partnerEmail: "",
+        });
         mutate(`/v1/schools/${schoolId}`);
-        console.log("success");
+        toggle();
       }
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -619,8 +625,18 @@ const TeamMemberModal = ({ toggle, open, schoolId }) => {
       }
     }
   }
+
+  const handleClose = () => {
+    reset({
+      partnerFirstName: "",
+      partnerLastName: "",
+      partnerEmail: "",
+    });
+    toggle();
+  };
+
   return (
-    <Modal toggle={toggle} title="Add Team Member" open={open}>
+    <Modal toggle={handleClose} title="Add Team Member" open={open}>
       <Stack spacing={3}>
         <Card variant="primaryLightened">
           <Stack alignItems="center" justifyContent="center" spacing={3}>
@@ -700,7 +716,7 @@ const TeamMemberModal = ({ toggle, open, schoolId }) => {
             </Stack>
             <Grid container justifyContent="space-between">
               <Grid item>
-                <Button variant="text" onClick={toggle}>
+                <Button variant="text" onClick={handleClose}>
                   <Typography variant="bodyRegular">
                     {t("ssj_ui_content.cancel")}
                   </Typography>

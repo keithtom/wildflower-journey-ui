@@ -8,6 +8,8 @@ import Nav from "./Nav";
 import AppBar from "./AppBar";
 import { Icon, Stack } from "@components/ui";
 import { useRouter } from "next/router";
+import { theme } from "../styles/theme";
+
 const MainContent = styled(Box, {
   shouldForwardProp: (prop) => prop !== "hasNav",
 })(({ theme, hasNav }) => ({

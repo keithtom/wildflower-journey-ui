@@ -106,6 +106,7 @@
     "more": "Más",
     "view_more": "Ver más",
     "anticipated_open_date": "Fecha de apertura anticipada",
+    "view_in_directory": "View in directory",
 
     "visioning_description": "La fase de visión es un período de reflexión en el que los maestros exploran su propósito, visión escolar y alineación con los principios de Wildflower. Los maestros documentan su visión en un álbum de visión de Wildflower, que se comparte con un grupo de miembros de la red y de la comunidad para recibir comentarios. Si bien cada equipo avanza a su propio ritmo, esta fase normalmente tarda entre uno y dos meses, lo que da tiempo para una reflexión profunda. Muchos maestros comparten que esta fase proporciona un marco útil para aclarar su propósito, visión escolar y cronograma, todos los cuales son fundamentales para un plan escolar exitoso.",
     "planning_description": "En la fase de planificación, su equipo refinará la visión, el presupuesto y el cronograma de la escuela y comenzará a formar elementos clave del negocio. Estos planes se registran en un álbum de planificación de Wildflower y se comparten con el mismo equipo de asesores para recibir comentarios. La fase de planificación culmina con la decisión de firmar el acuerdo de membresía con Wildflower. Si bien los cronogramas varían mucho, muchos equipos pasan de cuatro a seis meses en la fase de planificación e idealmente completan la fase siete a nueve meses antes de que tengan la intención de abrir la escuela.",
@@ -124,8 +125,8 @@
     "with_your_team": "Con tu equipo",
     "identify_a_teacher_leader_partner": "Identifica a una maestra líder",
     "identify_a_teacher_leader_partner_description": "Encontrar un socio maestra líder puede ser una tarea desalentadora, pero hay estrategias para activar tu red. Este recurso ofrece sugerencias de reflexión y plantillas para ayudarle.",
-    "engage_a_growth_and_conciousness_coach": "Contrate a un entrenedor de crecimiento y conectividad",
-    "engage_a_growth_and_conciousness_coach_description": "Una vez que hayas identificado un socio, Wildflower recomienda que contrate una guía de crecimiento y conectividad. Los coaches de crecimiento y conectividad suelen centrarse en el desarrollo del liderazgo, la identidad y el trabajo en equipo. Si tienes preguntas sobre cómo acceder al coaching, comuníquese con tu guía de operaciones.",
+    "engage_a_growth_and_connectedness_coach": "Contrate a un entrenedor de crecimiento y conectividad",
+    "engage_a_growth_and_connectedness_coach_description": "Una vez que hayas identificado un socio, Wildflower recomienda que contrate una guía de crecimiento y conectividad. Los coaches de crecimiento y conectividad suelen centrarse en el desarrollo del liderazgo, la identidad y el trabajo en equipo. Si tienes preguntas sobre cómo acceder al coaching, comuníquese con tu guía de operaciones.",
     "engage_an_equity_or_abar_coach": "Contrate a un entrenedor de la equidad o ABAR",
     "engage_an_equity_or_abar_coach_description": "Además de asistir a capacitaciones sobre la equidad, algunos maestras líderes contratan a un guía de equidad o ABAR para apoyar su trabajo continuo sobre identidad racial. Este trabajo es fundamental para crear una comunidad escolar intencionalmente antirracista y antisesgos.",
     "with_your_community": "Con tu comunidad",

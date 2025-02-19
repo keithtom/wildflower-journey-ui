@@ -169,12 +169,12 @@ const SchoolPage = () => {
           },
           {
             title: t(
-              "ways_to_work_together.engage_a_growth_and_conciousness_coach"
+              "ways_to_work_together.engage_a_growth_and_connectedness_coach"
             ),
             url: "https://connected.wildflowerschools.org/series/4406175-series-growth-connectedness-coaches",
             type: "Connected Series",
             description: t(
-              "ways_to_work_together.engage_a_growth_and_conciousness_coach_description"
+              "ways_to_work_together.engage_a_growth_and_connectedness_coach_description"
             ),
           },
           {
