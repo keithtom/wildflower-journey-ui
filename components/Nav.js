@@ -551,9 +551,13 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                 </ListItemAvatar>
                 <NavListItemText
                   primary={`${currentUser?.attributes.firstName} ${currentUser?.attributes.lastName}`}
-                  secondary={currentUser?.personRoleList.map((m) => {
-                    return `${m}, `;
-                  })}
+                  secondary={
+                    currentUser?.personRoleList
+                      ?.map((role, index, array) =>
+                        index === array.length - 1 ? role : `${role}, `
+                      )
+                      .join("") || ""
+                  }
                   bold
                 />
                 <Box
