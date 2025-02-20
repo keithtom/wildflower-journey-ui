@@ -30,15 +30,8 @@ const Workflows = ({}) => {
   );
 
   return (
-    <PageContainer isAdmin>
+    <PageContainer isAdmin title="Workflows">
       <Stack spacing={6}>
-        <Grid container>
-          <Grid item>
-            <Typography variant="h4" bold>
-              Workflows
-            </Typography>
-          </Grid>
-        </Grid>
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card sx={{ padding: 0 }}>

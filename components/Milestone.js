@@ -45,7 +45,10 @@ const Milestone = ({
   const [infoDrawerOpen, setInfoDrawerOpen] = useState(false);
 
   const remainingSteps = stepCount - completedStepsCount;
-  const assignedIncomplete = stepsAssignedCount - completedStepsCount;
+  const assignedIncomplete = Math.max(
+    0,
+    stepsAssignedCount - completedStepsCount
+  );
 
   // const [isMedium, setIsMedium] = useState(false);
   // During hydration `useEffect` is called. `window` is available in `useEffect`. In this case because we know we're in the browser checking for window is not needed. If you need to read something from window that is fine.

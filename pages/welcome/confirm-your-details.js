@@ -6,7 +6,7 @@ import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
 import { clearLoggedInState } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
-import useTeam from "@hooks/useTeam";
+import useSchool from "@hooks/useSchool";
 import { unitedStatesOptions } from "../../lib/utils/demographic-options";
 
 import {
@@ -120,9 +120,13 @@ const ConfirmYourDetails = ({}) => {
   };
 
   const isExistingTL = false;
-  const teamId = currentUser?.attributes.ssj.teamId;
-  const { team } = useTeam(teamId);
-  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
+  const selectedSchoolId =
+    currentUser?.attributes.schools[currentUser?.attributes.schools.length - 1]
+      ?.id;
+
+  const { data: school } = useSchool(selectedSchoolId);
+  const opsGuide = school?.data.attributes?.opsGuides[0].data;
+  useAuth("/login");
 
   useAuth("/login");
 

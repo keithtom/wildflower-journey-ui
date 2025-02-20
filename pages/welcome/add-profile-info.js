@@ -22,7 +22,7 @@ import peopleApi from "../../api/people";
 import { clearLoggedInState } from "@lib/handleLogout";
 import useAuth from "@lib/utils/useAuth";
 import RedirectUser from "@lib/redirectUser";
-import useTeam from "@hooks/useTeam";
+import useSchool from "@hooks/useSchool";
 
 const token = getCookie("auth");
 
@@ -87,9 +87,13 @@ const AddProfileInfo = ({}) => {
   const [showError, setShowError] = useState();
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
-  const teamId = currentUser?.attributes.ssj.teamId;
-  const { team, isLoading: teamIsLoading } = useTeam(teamId);
-  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
+  const selectedSchoolId =
+    currentUser?.attributes.schools[currentUser?.attributes.schools.length - 1]
+      ?.id;
+
+  const { data: school } = useSchool(selectedSchoolId);
+  const opsGuide = school?.data.attributes?.opsGuides[0].data;
+  useAuth("/login");
 
   const handleFileStart = () => {
     setIsUpdatingPicture(true);
@@ -114,17 +118,17 @@ const AddProfileInfo = ({}) => {
         },
       };
       setCurrentUser(updatedUser);
-
       // Add some logging to debug the redirect
-      // console.log('Redirecting with:', {
-      //   roleList: personAttributes?.roleList,
-      //   isOnboarded: personAttributes?.isOnboarded
-      // });
+      console.log("Redirecting with:", {
+        roleList: personAttributes?.roleList,
+        isOnboarded: personAttributes?.isOnboarded,
+      });
 
       await RedirectUser({
         router: router,
         roleList: personAttributes?.roleList,
         isOnboarded: personAttributes?.isOnboarded,
+        schoolId: currentUser?.attributes?.schools[0]?.schoolId,
       });
     } catch (error) {
       // ... error handling ...
@@ -342,6 +346,8 @@ const AddProfileInfo = ({}) => {
                           router: router,
                           roleList: currentUser.personRoleList,
                           isOnboarded: currentUser.personIsOnboarded,
+                          schoolId:
+                            currentUser?.attributes?.schools[0]?.schoolId,
                         });
                       } else {
                         console.error("currentUser is not defined");

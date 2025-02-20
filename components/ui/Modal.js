@@ -24,7 +24,7 @@ export default function Modal({
   const fixedActionsHeight = 48;
   return (
     <Dialog
-      fullWidth="sm"
+      fullWidth={true}
       maxWidth="sm"
       onClose={toggle}
       {...props}

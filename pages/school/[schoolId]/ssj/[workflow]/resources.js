@@ -14,12 +14,15 @@ import Hero from "@components/Hero";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
 import useSSJResources from "@hooks/useSSJResources";
+import useSchool from "@hooks/useSchool";
 
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
 
 const Resources = () => {
   const router = useRouter();
-  const { workflow } = router.query;
+  const { workflow, schoolId } = router.query;
+
+  const { data: school } = useSchool(schoolId);
 
   const { t } = useTranslation("common");
 
@@ -35,6 +38,8 @@ const Resources = () => {
     setShowResourcesByCategory(false);
   };
 
+  // const { resources, isLoading } = useSSJResources(workflow);
+  // console.log({ resources });
   const { resources, isLoading } = useSSJResources(workflow);
   // console.log({ resources });
 
@@ -44,7 +49,7 @@ const Resources = () => {
 
   return (
     <>
-      <PageContainer>
+      <PageContainer title={school?.data.attributes.name}>
         <Stack spacing={12}>
           <Hero imageUrl={hero} />
           <Stack spacing={2}>

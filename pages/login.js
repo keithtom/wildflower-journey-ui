@@ -6,6 +6,7 @@ import { useUserContext } from "../lib/useUserContext";
 import authApi from "@api/auth";
 import { clearLoggedInState } from "@lib/handleLogout";
 import RedirectUser from "@lib/redirectUser";
+import usePerson from "@hooks/usePerson";
 
 import { getScreenSize } from "../hooks/react-responsive";
 import {
@@ -28,18 +29,37 @@ const Login = ({}) => {
   const hasSSJ = currentUser?.attributes?.ssj ? true : false;
   const router = useRouter();
 
+  // Only fetch person data if we have a currentUser
+  const { data: personData } = usePerson(
+    currentUser?.id ? currentUser.id : null
+  );
+
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && currentUser) {
       setIsLoggingIn(true);
+      const personSchool = currentUser?.attributes?.schools
+        .filter(
+          (school) =>
+            // Filter out schools with end_date
+            !school.end_date &&
+            // Keep only schools where user is a Teacher Leader or ETL
+            school.role_list?.some(
+              (role) =>
+                role === "Teacher Leader" || role === "Emerging Teacher Leader"
+            )
+        )
+        // Sort by start_date descending (most recent first)
+        .sort((a, b) => new Date(b.start_date) - new Date(a.start_date))[0]?.id;
+
       RedirectUser({
         router: router,
         roleList: currentUser?.personRoleList,
         isOnboarded: currentUser?.personIsOnboarded,
+        schoolId: personSchool,
+        preferredLanguage: personData?.data?.attributes?.preferredLanguage,
       });
     }
-  }, [isLoggedIn, currentUser]);
-
-  // console.log({ currentUser });
+  }, [isLoggedIn, personData]);
 
   const {
     control,
@@ -62,19 +82,27 @@ const Login = ({}) => {
       )?.attributes;
       const personRoleList = personData?.roleList;
       const personIsOnboarded = personData?.isOnboarded;
-
-      setCurrentUser({
-        id: personId,
-        type: response.data.data.type,
-        attributes: userAttributes,
-        personRoleList: personRoleList,
-        personIsOnboarded: personIsOnboarded,
-      });
+      const personPreferredLanguage = personData?.preferredLanguage;
+      const personSchool = response?.data?.data?.attributes?.schools
+        .filter(
+          (school) =>
+            // Filter out schools with end_date
+            !school.end_date &&
+            // Keep only schools where user is a Teacher Leader or ETL
+            school.role_list?.some(
+              (role) =>
+                role === "Teacher Leader" || role === "Emerging Teacher Leader"
+            )
+        )
+        // Sort by start_date descending (most recent first)
+        .sort((a, b) => new Date(b.start_date) - new Date(a.start_date))[0]?.id; // Get the ID of the first (most recent) school
 
       RedirectUser({
         router: router,
         roleList: personRoleList,
         isOnboarded: personIsOnboarded,
+        schoolId: personSchool,
+        preferredLanguage: personPreferredLanguage,
       });
     } catch (error) {
       console.log(error);
