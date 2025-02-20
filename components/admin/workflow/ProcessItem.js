@@ -20,13 +20,13 @@ const ProcessItem = ({ listLength, process, number }) => {
   const handleAddProcess = () => {
     setIsAddingProcess(true);
     setProcessDrawerOpen(true);
-    console.log("add");
+    // console.log("add");
   };
   const handleEditProcess = () => {
     // not adding, so editing
     setIsAddingProcess(false);
     setProcessDrawerOpen(true);
-    console.log("edit");
+    // console.log("edit");
   };
 
   return (

@@ -42,7 +42,7 @@ const ProcessDrawer = ({ process, open, toggle, isAdding, isEditing }) => {
   // maybe pass just processId into the ProcessDrawer component
 
   if (open) {
-    console.log("process----------------------", process);
+    // console.log("process----------------------", process);
   }
 
   // TAYLOR: Since the data received from the API is not in the same shape that
@@ -60,7 +60,7 @@ const ProcessDrawer = ({ process, open, toggle, isAdding, isEditing }) => {
     workable_dependencies_attributes: [],
   });
 
-  console.log("temporaryProcess-----------------", temporaryProcess);
+  // console.log("temporaryProcess-----------------", temporaryProcess);
 
   const {
     handleSubmit,

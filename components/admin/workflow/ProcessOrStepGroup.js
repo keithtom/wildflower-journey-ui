@@ -8,12 +8,12 @@ const ProcessOrStepGroup = ({ handleAddStep, notEditable, children }) => {
   const handleAddAtStart = () => {
     // make this the dynamic start
     handleAddStep(0);
-    console.log("add at start");
+    // console.log("add at start");
   };
   const handleAddAtEnd = () => {
     // make this the dynamic end
     handleAddStep(1000);
-    console.log("add at end");
+    // console.log("add at end");
   };
   return (
     <Box sx={{ position: "relative" }}>

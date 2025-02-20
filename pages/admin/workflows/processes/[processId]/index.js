@@ -173,7 +173,7 @@ const ProcessId = ({}) => {
           acc[key] = data[key];
         }
       }
-      console.log({ acc });
+      // console.log({ acc });
       return acc;
     }, {});
 
@@ -1961,3 +1961,13 @@ const TranslateCard = ({
     </Card>
   );
 };
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+      // Add any additional props you need to pass to the page component
+    },
+  };
+}

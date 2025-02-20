@@ -25,7 +25,7 @@ const ActionsContainer = styled(Box)`
 
 const DecisionDrawer = ({ open, toggle, isAdding }) => {
   const handleAddOption = () => {
-    console.log("adding option");
+    // console.log("adding option");
     toggle();
   };
   return (

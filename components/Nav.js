@@ -476,7 +476,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const open = Boolean(anchorEl);
 
   const { workflow } = router.query;
-  const approvedWorkflowIds = ["5c8f-d17c"]; // Maggie's workflow ID
+  const approvedWorkflowIds = ["5c8f-d17c", "ef9a-9d8b", "4c60-119d"]; // Maggie, Karla-Soammy-school, Mónica-school
   const isApproved = approvedWorkflowIds.includes(workflow);
 
   async function handleLogOut() {

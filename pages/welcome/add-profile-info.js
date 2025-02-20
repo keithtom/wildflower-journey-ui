@@ -143,7 +143,7 @@ const AddProfileInfo = ({}) => {
 
   useAuth("/login");
 
-  console.log({ currentUser });
+  // console.log({ currentUser });
 
   return (
     <PageContainer isLoading={!currentUser} hideNav>

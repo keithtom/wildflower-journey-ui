@@ -43,7 +43,7 @@ const SubmitVersionPage = () => {
 
   // Fetch data
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  console.log({ workflow });
+  // console.log({ workflow });
 
   //  group processes by phase
   function groupByPhase(data) {
@@ -82,7 +82,7 @@ const SubmitVersionPage = () => {
       groupByPhase(isLoading ? [] : workflow?.relationships.processes.data)
     );
   }, [workflow]);
-  console.log({ groupedProcesses });
+  // console.log({ groupedProcesses });
 
   const handleSubmitNewVersion = async () => {
     try {

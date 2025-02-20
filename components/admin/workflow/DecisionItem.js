@@ -7,13 +7,13 @@ const DecisionItem = ({ decision, number, totalOptions }) => {
   const handleAddDecision = () => {
     setIsAddingOption(true);
     setDecisionDrawerOpen(true);
-    console.log("add");
+    // console.log("add");
   };
   const handleEditDecision = () => {
     // not adding, so editing
     setIsAddingOption(false);
     setDecisionDrawerOpen(true);
-    console.log("edit");
+    // console.log("edit");
   };
 
   return (
