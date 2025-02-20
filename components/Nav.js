@@ -506,9 +506,9 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
     ) && !school.end_date;
 
   const teacherLeaderSchools =
-    currentUser?.attributes.schools.filter(isTeacherLeaderSchool) || [];
+    currentUser?.attributes?.schools?.filter(isTeacherLeaderSchool) || [];
   const otherSchools =
-    currentUser?.attributes.schools.filter(
+    currentUser?.attributes?.schools?.filter(
       (school) => !isTeacherLeaderSchool(school) && !school.end_date
     ) || [];
   const shouldShowDivider =
@@ -724,17 +724,18 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
             <NavList>
               {!router.asPath.includes("/admin") && (
                 <>
-                  {teacherLeaderSchools.map((school, i) => (
-                    <SchoolNavItem
-                      key={`teacher-leader-${i}`}
-                      school={school}
-                      openSchoolId={openSchoolId}
-                      handleSchoolClick={handleSchoolClick}
-                      router={router}
-                      openSection={openSection}
-                      onSectionClick={handleSectionClick}
-                    />
-                  ))}
+                  {teacherLeaderSchools.length > 0 &&
+                    teacherLeaderSchools.map((school, i) => (
+                      <SchoolNavItem
+                        key={`teacher-leader-${i}`}
+                        school={school}
+                        openSchoolId={openSchoolId}
+                        handleSchoolClick={handleSchoolClick}
+                        router={router}
+                        openSection={openSection}
+                        onSectionClick={handleSectionClick}
+                      />
+                    ))}
 
                   {shouldShowDivider && (
                     <Divider
@@ -742,17 +743,18 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                     />
                   )}
 
-                  {otherSchools.map((school, i) => (
-                    <SchoolNavItem
-                      key={`other-${i}`}
-                      school={school}
-                      openSchoolId={openSchoolId}
-                      handleSchoolClick={handleSchoolClick}
-                      router={router}
-                      openSection={openSection}
-                      onSectionClick={handleSectionClick}
-                    />
-                  ))}
+                  {otherSchools.length > 0 &&
+                    otherSchools.map((school, i) => (
+                      <SchoolNavItem
+                        key={`other-${i}`}
+                        school={school}
+                        openSchoolId={openSchoolId}
+                        handleSchoolClick={handleSchoolClick}
+                        router={router}
+                        openSection={openSection}
+                        onSectionClick={handleSectionClick}
+                      />
+                    ))}
                 </>
               )}
             </NavList>
