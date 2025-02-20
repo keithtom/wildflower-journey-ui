@@ -120,7 +120,10 @@ const AddProfileInfo = ({}) => {
         router: router,
         roleList: personAttributes?.roleList,
         isOnboarded: personAttributes?.isOnboarded,
-        schoolId: currentUser?.attributes?.schools[0]?.schoolId,
+        schoolId:
+          currentUser?.attributes?.schools?.length > 0
+            ? currentUser.attributes.schools[0]?.schoolId
+            : null,
       });
     } catch (error) {
       // ... error handling ...
@@ -338,7 +341,9 @@ const AddProfileInfo = ({}) => {
                           roleList: currentUser.personRoleList,
                           isOnboarded: currentUser.personIsOnboarded,
                           schoolId:
-                            currentUser?.attributes?.schools[0]?.schoolId,
+                            currentUser?.attributes?.schools?.length > 0
+                              ? currentUser.attributes.schools[0]?.schoolId
+                              : null,
                         });
                       } else {
                         console.error("currentUser is not defined");

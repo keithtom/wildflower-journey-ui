@@ -128,7 +128,10 @@ const AddProfileInfo = ({}) => {
         router: router,
         roleList: personAttributes?.roleList,
         isOnboarded: personAttributes?.isOnboarded,
-        schoolId: currentUser?.attributes?.schools[0]?.schoolId,
+        schoolId:
+          currentUser?.attributes?.schools?.length > 0
+            ? currentUser.attributes.schools[0]?.schoolId
+            : null,
       });
     } catch (error) {
       // ... error handling ...
