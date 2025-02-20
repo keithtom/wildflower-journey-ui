@@ -48,7 +48,7 @@ const OpenSchoolMilestonePage = ({}) => {
     // ??? implement?
   };
 
-  console.log({ milestone });
+  // console.log({ milestone });
 
   useAuth("/login");
 

@@ -139,7 +139,7 @@ const Task = ({
   // Always call out the constants here and never directly pull from task.attributes in the UI; except unless you are setting default state in a useState hook.
   // If you have props that depend on where they are being called from, put them as inputs for Task
 
-  console.log({ task });
+  // console.log({ task });
   // console.log({ assignableUsers });
 
   const taskId = task.id;
@@ -646,7 +646,7 @@ const TaskDrawerActions = ({
   const { currentUser } = useUserContext();
   // const completedBy = taskCompleters[0]; // just take the first since only used when its not me
   // NOTE: canUncompleteTask is not the same as "Completed by me" because sometimes we can't uncomplete a step because the process is completed even though we completed the step.
-  console.log({ taskCompleters });
+  // console.log({ taskCompleters });
 
   return (
     <Grid container spacing={4}>

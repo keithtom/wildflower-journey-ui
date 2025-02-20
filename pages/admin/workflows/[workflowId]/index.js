@@ -72,7 +72,7 @@ const Workflow = ({}) => {
   // console.log({ workflowId });
 
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-  console.log({ workflow });
+  // console.log({ workflow });
 
   const isRecurring = workflow?.attributes.recurring;
 
@@ -163,7 +163,7 @@ const Workflow = ({}) => {
   const handleStartNewVersion = async () => {
     try {
       const response = await workflowApi.newVersionWorkflow(workflowId);
-      console.log("response in handle new version ---", response);
+      // console.log("response in handle new version ---", response);
       router.push(`/admin/workflows/${response.data.data.id}`);
     } catch (error) {
       console.log(error);
@@ -172,7 +172,7 @@ const Workflow = ({}) => {
   const handleCancelDraft = async () => {
     try {
       const response = await workflowApi.deleteWorkflow(workflowId);
-      console.log("response in cancel draft!! -----", response);
+      // console.log("response in cancel draft!! -----", response);
       // TODO: Push to the workflow that the deleted workflow was a duplicate of
       router.push(`/admin/workflows/${workflow.attributes.previousVersionId}`);
     } catch (error) {
@@ -241,7 +241,7 @@ const Workflow = ({}) => {
     } catch (error) {
       console.log(error);
     }
-    console.log({ data });
+    // console.log({ data });
   };
   const handleRemoveProcess = async (processId) => {
     try {
@@ -249,7 +249,7 @@ const Workflow = ({}) => {
         workflowId,
         processId
       );
-      console.log({ response });
+      // console.log({ response });
       mutate(`/definition/workflows/${workflowId}`);
     } catch (error) {
       console.log(error);
@@ -644,7 +644,7 @@ const AddProcessModal = ({
   // console.log(groupAddedInto);
 
   const onSubmit = handleSubmit((data) => {
-    console.log({ data });
+    // console.log({ data });
     handleCreateProcess(data);
     setAddType(null);
     reset();

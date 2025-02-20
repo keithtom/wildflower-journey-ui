@@ -30,7 +30,7 @@ const OpenSchool = () => {
     sessionStorage.getItem("mySchoolWorkflowId") &&
       setMySchoolWorkflowId(sessionStorage.getItem("mySchoolWorkflowId"));
   }, []);
-  console.log({mySchoolWorkflowId})
+  // console.log({mySchoolWorkflowId})
   const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow } = router.query;
@@ -49,9 +49,9 @@ const OpenSchool = () => {
   const schools = personData?.data?.relationships?.schools?.data;
   const mySchoolName = currentUser?.attributes?.schools?.find(
     (school) => school.workflowId === mySchoolWorkflowId
-  )?.name
+  )?.name;
 
-  console.log({mySchoolName})
+  // console.log({mySchoolName})
 
   const userSchool =
     isLoading || !personData
@@ -59,14 +59,13 @@ const OpenSchool = () => {
       : handleFindMatchingItems(included, schools, "id");
 
   const school = mySchoolName
-    ? userSchool.find(school => school.attributes.name === mySchoolName)
+    ? userSchool.find((school) => school.attributes.name === mySchoolName)
     : userSchool[0];
 
   // Add a fallback in case no matching school is found
   if (!school && userSchool.length > 0) {
     school = userSchool[0];
   }
-
 
   const thisMonth = new Date().getMonth();
   const thisYear = new Date().getFullYear();
