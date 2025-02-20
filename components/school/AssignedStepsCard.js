@@ -40,20 +40,20 @@ const AssignedStepsCard = ({
   const { workflows: workflowsArray, isLoading: isLoadingWorkflows } =
     useWorkflows(workflows);
   const selectedWorkflow = useMemo(() => {
-    if (!workflowsArray?.length) return null;
+    if (!workflowsArray?.length || assignedSteps > 0) return null;
     return workflowsArray.find(
       (workflow) => workflow?.data?.data?.attributes?.recurring === isOpen
     );
-  }, [workflowsArray, isOpen]);
+  }, [workflowsArray, isOpen, assignedSteps]);
 
-  // Fetch milestones for the selected workflow
+  // Fetch milestones for the selected workflow only when assignedSteps is 0
   const { milestones, isLoading: isLoadingMilestones } = useMilestones(
-    selectedWorkflow?.data?.data?.id
+    assignedSteps === 0 ? selectedWorkflow?.data?.data?.id : null
   );
 
   // Filter milestones based on school status and conditions
   const milestonesToDo = useMemo(() => {
-    if (!milestones?.data?.data) return [];
+    if (!milestones?.data?.data || assignedSteps > 0) return [];
 
     const milestonesData = milestones.data.data;
 
@@ -76,12 +76,15 @@ const AssignedStepsCard = ({
     return incompleteMilestones.filter(
       (milestone) => milestone?.attributes?.phase === currentPhase
     );
-  }, [milestones, isOpen, currentPhase, monthRange]);
+  }, [milestones, isOpen, currentPhase, monthRange, assignedSteps]);
 
   // console.log(milestonesToDo);
 
-  // Combined loading state
-  const isLoading = isLoadingCount || isLoadingMilestones || isLoadingWorkflows;
+  // Combined loading state - only include milestone loading when we need it
+  const isLoading =
+    isLoadingCount ||
+    isLoadingWorkflows ||
+    (assignedSteps === 0 && isLoadingMilestones);
 
   if (isLoading) {
     return (
