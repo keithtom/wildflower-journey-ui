@@ -5,7 +5,7 @@ import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { useRouter } from "next/router";
 import { useUserContext } from "@lib/useUserContext";
 import peopleApi from "../../api/people";
-import useTeam from "@hooks/useTeam";
+import useSchool from "@hooks/useSchool";
 import { clearLoggedInState } from "@lib/handleLogout";
 import {
   lgbtqiaOptions,
@@ -156,9 +156,13 @@ const ConfirmDemographicInfo = ({}) => {
 
   const watchFields = watch();
   const isExistingTL = false;
-  const teamId = currentUser?.attributes.ssj.teamId;
-  const { team } = useTeam(teamId);
-  const opsGuide = team?.data?.data?.relationships?.opsGuide?.data;
+  const selectedSchoolId =
+    currentUser?.attributes.schools[currentUser?.attributes.schools.length - 1]
+      ?.id;
+
+  const { data: school } = useSchool(selectedSchoolId);
+  const opsGuide = school?.data.attributes?.opsGuides[0].data;
+  useAuth("/login");
   const isCertifiedOrSeeking =
     watchFields.montessoriCertified === "Yes" ||
     watchFields.montessoriCertified === "Currently Seeking Certification";

@@ -42,15 +42,8 @@ const AdminDashboard = () => {
   const schoolsImage = "/assets/images/ssj/SSJ_hero.jpg";
 
   return (
-    <PageContainer isAdmin>
+    <PageContainer isAdmin title="Admin Dashboard">
       <Stack spacing={6}>
-        <Grid container>
-          <Grid item>
-            <Typography variant="bodyLarge" bold>
-              Admin Dashboard
-            </Typography>
-          </Grid>
-        </Grid>
         <Grid container spacing={6}>
           <Grid item sm={6} md={4}>
             <Card>

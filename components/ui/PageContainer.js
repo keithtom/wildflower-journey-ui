@@ -3,6 +3,7 @@ import { styled, css } from "@mui/material/styles";
 
 import { user } from "../../lib/utils/fake-data";
 import { theme } from "../../styles/theme";
+import { getScreenSize } from "../../hooks/react-responsive";
 
 import { Box, Grid, Card, Stack, Icon, Typography, Spinner } from "./index";
 import Nav from "../Nav";
@@ -15,17 +16,14 @@ const PageWrapper = styled(Box)`
 `;
 const PageContent = styled(Box)`
   flex-grow: 1;
-  margin-top: ${({ theme }) => theme.util.appBarHeight}px;
   padding: ${({ theme }) => theme.util.buffer * 6}px;
   overflow-y: hidden;
 `;
 
-const PageContainer = ({ children, isLoading, hideNav }) => {
+const PageContainer = ({ children, isLoading, hideNav, title }) => {
+  const { screenSize } = getScreenSize();
   //TODO: Get this data from the backend
   const SSJAbandonProcessStarted = false;
-
-  const [navOpen, setNavOpen] = useState(false);
-  const toggleNavOpen = () => setNavOpen(!navOpen);
 
   return (
     <>
@@ -33,7 +31,13 @@ const PageContainer = ({ children, isLoading, hideNav }) => {
         {SSJAbandonProcessStarted ? (
           <>
             <Header />
-            <PageContent>
+            <PageContent
+              sx={{
+                marginTop: screenSize.isSm
+                  ? `${theme.util.appBarHeight * 2}px`
+                  : `${theme.util.appBarHeight}px`,
+              }}
+            >
               <Grid container alignItems="center" justifyContent="center">
                 <Grid item xs={12} sm={6} md={5} lg={4}>
                   <Card>
@@ -61,11 +65,15 @@ const PageContainer = ({ children, isLoading, hideNav }) => {
           </>
         ) : (
           <>
-            <Header toggleNavOpen={toggleNavOpen} />
-            {hideNav ? null : (
-              <Nav toggleNavOpen={toggleNavOpen} navOpen={navOpen} />
-            )}
-            <PageContent>
+            {!hideNav && <Header title={title} />}
+
+            <PageContent
+              sx={{
+                marginTop: screenSize.isSm
+                  ? `${theme.util.appBarHeight * 2}px`
+                  : `${theme.util.appBarHeight}px`,
+              }}
+            >
               {isLoading ? (
                 <Box
                   sx={{

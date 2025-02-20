@@ -32,7 +32,13 @@ import useAuth from "@lib/utils/useAuth";
 const OpenSchoolMilestonePage = ({}) => {
   const { screenSize } = getScreenSize();
   const router = useRouter();
-  const { workflow, milestone: milestoneQuery, year, month } = router.query;
+  const {
+    workflow,
+    milestone: milestoneQuery,
+    year,
+    month,
+    schoolId,
+  } = router.query;
 
   const { milestone, isLoading } = useMilestone(milestoneQuery);
 
@@ -60,7 +66,7 @@ const OpenSchoolMilestonePage = ({}) => {
             <Stack direction="row" spacing={2} alignItems="center">
               <Link
                 data-cy="milestone-page-back"
-                href={`/open-school/${workflow}/checklist/${year}/${month}`}
+                href={`/school/${schoolId}/open-school/${workflow}/checklist/${year}/${month}`}
               >
                 <IconButton>
                   <Icon type="chevronLeft" />

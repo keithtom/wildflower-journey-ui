@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { styled } from "@mui/material/styles";
 import { mutate } from "swr";
 
-import { Stack, Card, Typography, Icon } from "@ui";
+import { Select } from "@ui";
 import { useUserContext } from "@lib/useUserContext";
 import usePerson from "@hooks/usePerson";
 import peopleApi from "@api/people";
+
+const languageOptions = [
+  { label: "English", value: "en" },
+  { label: "Español", value: "es" },
+];
 
 const TranslationToggle = () => {
   const router = useRouter();
@@ -35,16 +39,16 @@ const TranslationToggle = () => {
     }
   }, [person]);
 
-  const handleChangeLang = async (lang) => {
+  const handleChangeLang = async (value) => {
     // when changing language set it in the locale
-    router.push({ pathname, query }, asPath, { locale: lang });
+    router.push({ pathname, query }, asPath, { locale: value });
     // set the language state to the changed language
-    setLanguage(lang);
+    setLanguage(value);
     try {
       // send preferred language to be the changed language server
       const response = await peopleApi.update(currentUser.id, {
         person: {
-          preferred_language: lang,
+          preferred_language: value,
         },
       });
       // mutate the endpoint to reload the person data and trigger the useEffect
@@ -55,28 +59,13 @@ const TranslationToggle = () => {
   };
 
   return (
-    <Card size="small">
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Icon type="globe" size="small" variant="lightened" />
-        <Typography
-          variant="bodyRegular"
-          highlight={language === "en"}
-          hoverable
-          onClick={() => handleChangeLang("en")}
-        >
-          English
-        </Typography>
-        <Typography
-          variant="bodyRegular"
-          highlight={language === "es"}
-          hoverable
-          onClick={() => handleChangeLang("es")}
-        >
-          Español
-        </Typography>
-      </Stack>
-    </Card>
-  )
+    <Select
+      value={language}
+      onChange={(e) => handleChangeLang(e.target.value)}
+      options={languageOptions}
+      size="small"
+    />
+  );
 };
 
 export default TranslationToggle;
