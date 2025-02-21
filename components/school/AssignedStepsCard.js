@@ -13,6 +13,7 @@ import { useTranslation } from "next-i18next";
 import useAssignedStepsCount from "@hooks/useAssignedStepsCount";
 import useMilestones from "@hooks/useMilestones";
 import useWorkflows from "@hooks/useWorkflows";
+import { theme } from "../../styles/theme";
 
 const AssignedStepsCard = ({
   workflows = [],
@@ -160,12 +161,10 @@ const AssignedStepsCard = ({
           <Stack direction="row" spacing={2}>
             <Typography variant="h3" bold>
               {t("ssj_ui_content.you_have")}{" "}
-            </Typography>
-            <Typography variant="h3" highlight bold>
-              {assignedSteps} {t("ssj_ui_content.task")}
-              {assignedSteps > 1 ? `s` : null}
-            </Typography>{" "}
-            <Typography variant="h3" bold>
+              <span style={{ color: theme.color.primary.main }}>
+                {assignedSteps} {t("ssj_ui_content.task")}
+                {assignedSteps > 1 ? `s` : null}{" "}
+              </span>{" "}
               {t("ssj_ui_content.on_your_to_do_list")}
             </Typography>
           </Stack>
