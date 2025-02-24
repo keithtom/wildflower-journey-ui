@@ -550,13 +550,15 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                   />
                 </ListItemAvatar>
                 <NavListItemText
-                  primary={`${currentUser?.attributes.firstName} ${currentUser?.attributes.lastName}`}
+                  primary={`${currentUser?.attributes?.firstName} ${currentUser?.attributes?.lastName}`}
                   secondary={
-                    currentUser?.personRoleList
-                      ?.map((role, index, array) =>
-                        index === array.length - 1 ? role : `${role}, `
-                      )
-                      .join("") || ""
+                    currentUser?.personRoleList?.length > 0
+                      ? currentUser.personRoleList
+                          .map((role, index, array) =>
+                            index === array.length - 1 ? role : `${role}, `
+                          )
+                          .join("")
+                      : ""
                   }
                   bold
                 />
@@ -582,7 +584,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                     </NavListItemIcon>
                     <NavListItemText primary="Network" bold />
                   </NavListItemButton>
-                  {currentUser?.personRoleList.includes("Ops Guide") ? (
+                  {currentUser?.personRoleList?.includes("Ops Guide") ? (
                     <NavListItemButton
                       onClick={() => router.push("/your-schools")}
                       selected={router.pathname.includes("/your-schools")}
