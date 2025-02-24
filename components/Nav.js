@@ -174,6 +174,8 @@ const WorkflowNavItems = ({
       router.asPath === `/school/${school.id}/ssj/${workflowId}/planning`;
     const isStartupSelected =
       router.asPath === `/school/${school.id}/ssj/${workflowId}/startup`;
+    const isSsjMilestonesSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/milestones`;
     const isSsjResourcesSelected =
       router.asPath === `/school/${school.id}/ssj/${workflowId}/resources`;
 
@@ -184,6 +186,7 @@ const WorkflowNavItems = ({
         isVisioningSelected ||
         isPlanningSelected ||
         isStartupSelected ||
+        isSsjMilestonesSelected ||
         isSsjResourcesSelected
     );
   }, [router.asPath, school.id, workflowId]);
@@ -430,7 +433,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
     }
 
     // Close the navigation drawer when route changes (on mobile)
-    if (screenSize.isSm) {
+    if (screenSize.isSm && navOpen) {
       toggleNavOpen(false);
     }
   }, [router.asPath]);
@@ -480,8 +483,6 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const open = Boolean(anchorEl);
 
   const { workflow } = router.query;
-  const approvedWorkflowIds = ["5c8f-d17c", "ef9a-9d8b", "4c60-119d"]; // Maggie, Karla-Soammy-school, Mónica-school
-  const isApproved = approvedWorkflowIds.includes(workflow);
 
   async function handleLogOut() {
     try {
