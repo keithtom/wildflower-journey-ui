@@ -76,6 +76,7 @@ const InfoDrawer = ({
   handleUnassignUser,
   assignableUsers,
   completionType,
+  processName,
 }) => {
   const { t } = useTranslation("common");
   const { screenSize } = getScreenSize();
@@ -198,6 +199,16 @@ const InfoDrawer = ({
                   </Stack>
                 </Stack>
               ) : null}
+              {processName && screenSize.isSm && (
+                <Stack spacing={2}>
+                  <Typography variant="bodyMini" lightened bold uppercase>
+                    {t("ssj_ui_content.milestone")}
+                  </Typography>
+                  <Stack direction="row">
+                    <Chip label={processName} size="small" />
+                  </Stack>
+                </Stack>
+              )}
             </Stack>
           </Stack>
           {about && (
