@@ -428,6 +428,11 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
       // If we're not on a school route, collapse the school section
       setOpenSchoolId(null);
     }
+
+    // Close the navigation drawer when route changes (on mobile)
+    if (screenSize.isSm) {
+      toggleNavOpen(false);
+    }
   }, [router.asPath]);
 
   // Determine which section should be open based on current route
@@ -440,7 +445,6 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
       } else {
         setOpenSection("school");
       }
-      toggleNavOpen();
     } else {
       // If we're not on a school route, collapse all sections
       setOpenSection(null);
