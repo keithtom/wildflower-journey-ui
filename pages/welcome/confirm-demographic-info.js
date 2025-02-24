@@ -64,7 +64,7 @@ const StyledChatBubble = styled(Box)`
 
 const ConfirmDemographicInfo = ({}) => {
   const router = useRouter();
-  const { currentUser } = useUserContext();
+  const { currentUser, setCurrentUser } = useUserContext();
 
   const { data: personData, isLoading } = usePerson(currentUser?.id);
 
@@ -123,7 +123,7 @@ const ConfirmDemographicInfo = ({}) => {
         person: {
           primary_language: data.primaryLanguage,
           primary_language_other: data.primaryLanguageOther,
-          race_ethnicity_list: data.raceEthnicity, // FIX: multi select with other, it uses tags, how is this sent when multiple options?
+          race_ethnicity_list: data.raceEthnicity,
           race_ethnicity_other: data.raceEthnicityOther,
           lgbtqia: data.lgbtqia,
           gender: data.gender,
@@ -141,6 +141,16 @@ const ConfirmDemographicInfo = ({}) => {
         if (response.error) {
           console.error(error);
         } else {
+          const person = response.data.attributes;
+          // Create a new user object with updated attributes
+          const updatedUser = {
+            ...currentUser,
+            attributes: {
+              ...currentUser.attributes,
+            },
+            personIsOnboarded: person.isOnboarded,
+          };
+          setCurrentUser(updatedUser);
           router.push("/welcome/add-profile-info");
         }
       })
