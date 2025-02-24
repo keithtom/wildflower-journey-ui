@@ -16,6 +16,7 @@ const MainContent = styled(Box, {
   flexGrow: 1,
   marginLeft: hasNav ? `${theme.util.drawerWidth}px` : 0,
   minHeight: "100vh",
+  width: "100%",
 }));
 
 const Layout = ({ children }) => {
