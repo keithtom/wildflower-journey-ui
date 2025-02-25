@@ -198,10 +198,6 @@ const WorkflowNavItems = ({
   const isOpenSchoolChecklist = workflow.attributes.recurring === true;
   const isSchoolStartupJourney = workflow.attributes.recurring === false;
 
-  const isAffiliated = currentUser?.schools?.some(
-    (school) => school.affiliated === true
-  );
-
   if (isOpenSchoolChecklist) {
     return (
       <>
@@ -660,23 +656,19 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
               }}
             >
               <NavList>
-                {isAffiliated ? (
-                  <NavListItemButton
-                    onClick={() =>
-                      router.push(`/network/people/${currentUser?.id}`)
-                    }
-                  >
-                    <NavListItemIcon>
-                      <Icon type="user" variant="lightened" />
-                    </NavListItemIcon>
-                    <NavListItemText primary="Your Profile" />
-                  </NavListItemButton>
-                ) : null}
-                {isAffiliated ? (
-                  <Divider
-                    sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
-                  />
-                ) : null}
+                <NavListItemButton
+                  onClick={() =>
+                    router.push(`/network/people/${currentUser?.id}`)
+                  }
+                >
+                  <NavListItemIcon>
+                    <Icon type="user" variant="lightened" />
+                  </NavListItemIcon>
+                  <NavListItemText primary="Your Profile" />
+                </NavListItemButton>
+                <Divider
+                  sx={{ my: 2, borderColor: theme.color.neutral.lightened }}
+                />
                 {isAdmin ? (
                   <NavListItemButton
                     onClick={() => {
