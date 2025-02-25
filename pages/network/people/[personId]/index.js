@@ -134,13 +134,15 @@ const Person = ({}) => {
   let boardHistory;
 
   if (!isLoading) {
-    const includedSchools = included.filter((item) => item.type === "school");
+    const includedSchools =
+      included?.filter((item) => item.type === "school") || [];
 
-    schoolsWhereRoleTeacherLeader = included.filter(
-      (item) =>
-        item.type === "schoolRelationship" &&
-        item.attributes.roleList.includes("Teacher Leader")
-    );
+    schoolsWhereRoleTeacherLeader =
+      included?.filter(
+        (item) =>
+          item.type === "schoolRelationship" &&
+          item.attributes.roleList.includes("Teacher Leader")
+      ) || [];
 
     schoolHistory = includedSchools
       .map((school) => {
@@ -156,10 +158,8 @@ const Person = ({}) => {
             endDate: relationship.attributes.endDate,
           };
         }
-
-        return null; // Return null if no matching relationship is found
       })
-      .filter((school) => school !== null) // Filter out null values
+      .filter(Boolean)
       .sort((a, b) => {
         if (!a.endDate) return -1;
         if (!b.endDate) return 1;
@@ -1743,7 +1743,6 @@ const SchoolHistoryFields = ({ handleToggle }) => {
   // console.log({ schoolsData });
   // console.log({ schoolOptions });
   // console.log({ teacherLeaderRelationships });
-  // console.log({ personData });
   // console.log("schools", schools);
   // console.log("personData", personData);
   return (

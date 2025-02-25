@@ -39,6 +39,7 @@ import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
 import useAllTeams from "@hooks/useAllTeams";
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
+import { getScreenSize } from "@hooks/react-responsive";
 
 const StyledTask = styled(Box)`
   width: 100%;
@@ -74,6 +75,7 @@ const Task = ({
   removeStep,
   processName,
 }) => {
+  const { screenSize } = getScreenSize();
   const { t } = useTranslation("common");
   const { currentUser } = useUserContext();
   const router = useRouter();
@@ -84,7 +86,7 @@ const Task = ({
 
   let assignableUsers;
 
-  console.log({ school });
+  // console.log({ school });
 
   // Only set assignable users once school data is loaded
   if (!schoolIsLoading && school?.included) {
@@ -322,7 +324,9 @@ const Task = ({
         disablePadding
         secondaryAction={
           <Stack direction="row" spacing={3} alignItems="center">
-            {processName && <Chip label={processName} size="small" />}
+            {processName && !screenSize.isSm && (
+              <Chip label={processName} size="small" />
+            )}
             {assignableUsers ? (
               <AssigneeRoster
                 handleAssignUser={handleAssignUser}
@@ -399,6 +403,7 @@ const Task = ({
         handleUnassignUser={handleUnassignUser}
         assignableUsers={assignableUsers}
         completionType={completionType}
+        processName={processName}
         actions={
           isDecision ? (
             <DecisionDrawerActions

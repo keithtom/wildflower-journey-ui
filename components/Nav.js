@@ -174,6 +174,8 @@ const WorkflowNavItems = ({
       router.asPath === `/school/${school.id}/ssj/${workflowId}/planning`;
     const isStartupSelected =
       router.asPath === `/school/${school.id}/ssj/${workflowId}/startup`;
+    const isSsjMilestonesSelected =
+      router.asPath === `/school/${school.id}/ssj/${workflowId}/milestones`;
     const isSsjResourcesSelected =
       router.asPath === `/school/${school.id}/ssj/${workflowId}/resources`;
 
@@ -184,6 +186,7 @@ const WorkflowNavItems = ({
         isVisioningSelected ||
         isPlanningSelected ||
         isStartupSelected ||
+        isSsjMilestonesSelected ||
         isSsjResourcesSelected
     );
   }, [router.asPath, school.id, workflowId]);
@@ -428,6 +431,11 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
       // If we're not on a school route, collapse the school section
       setOpenSchoolId(null);
     }
+
+    // Close the navigation drawer when route changes (on mobile)
+    if (screenSize.isSm && navOpen) {
+      toggleNavOpen(false);
+    }
   }, [router.asPath]);
 
   // Determine which section should be open based on current route
@@ -440,7 +448,6 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
       } else {
         setOpenSection("school");
       }
-      toggleNavOpen();
     } else {
       // If we're not on a school route, collapse all sections
       setOpenSection(null);
@@ -476,8 +483,6 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const open = Boolean(anchorEl);
 
   const { workflow } = router.query;
-  const approvedWorkflowIds = ["5c8f-d17c", "ef9a-9d8b", "4c60-119d"]; // Maggie, Karla-Soammy-school, Mónica-school
-  const isApproved = approvedWorkflowIds.includes(workflow);
 
   async function handleLogOut() {
     try {
@@ -498,7 +503,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const logo = "/assets/images/wildflower-logo.png";
 
   // console.log(screenSize.isSm);
-  // console.log({ currentUser });
+  console.log({ currentUser });
 
   const isTeacherLeaderSchool = (school) =>
     school.role_list?.some(
@@ -506,9 +511,9 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
     ) && !school.end_date;
 
   const teacherLeaderSchools =
-    currentUser?.attributes.schools.filter(isTeacherLeaderSchool) || [];
+    currentUser?.attributes?.schools?.filter(isTeacherLeaderSchool) || [];
   const otherSchools =
-    currentUser?.attributes.schools.filter(
+    currentUser?.attributes?.schools?.filter(
       (school) => !isTeacherLeaderSchool(school) && !school.end_date
     ) || [];
   const shouldShowDivider =
@@ -550,10 +555,16 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                   />
                 </ListItemAvatar>
                 <NavListItemText
-                  primary={`${currentUser?.attributes.firstName} ${currentUser?.attributes.lastName}`}
-                  secondary={currentUser?.personRoleList.map((m) => {
-                    return `${m}, `;
-                  })}
+                  primary={`${currentUser?.attributes?.firstName} ${currentUser?.attributes?.lastName}`}
+                  secondary={
+                    currentUser?.personRoleList?.length > 0
+                      ? currentUser.personRoleList
+                          .map((role, index, array) =>
+                            index === array.length - 1 ? role : `${role}, `
+                          )
+                          .join("")
+                      : ""
+                  }
                   bold
                 />
                 <Box
@@ -578,7 +589,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                     </NavListItemIcon>
                     <NavListItemText primary="Network" bold />
                   </NavListItemButton>
-                  {currentUser?.personRoleList.includes("Ops Guide") ? (
+                  {currentUser?.personRoleList?.includes("Ops Guide") ? (
                     <NavListItemButton
                       onClick={() => router.push("/your-schools")}
                       selected={router.pathname.includes("/your-schools")}
@@ -720,17 +731,18 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
             <NavList>
               {!router.asPath.includes("/admin") && (
                 <>
-                  {teacherLeaderSchools.map((school, i) => (
-                    <SchoolNavItem
-                      key={`teacher-leader-${i}`}
-                      school={school}
-                      openSchoolId={openSchoolId}
-                      handleSchoolClick={handleSchoolClick}
-                      router={router}
-                      openSection={openSection}
-                      onSectionClick={handleSectionClick}
-                    />
-                  ))}
+                  {teacherLeaderSchools.length > 0 &&
+                    teacherLeaderSchools.map((school, i) => (
+                      <SchoolNavItem
+                        key={`teacher-leader-${i}`}
+                        school={school}
+                        openSchoolId={openSchoolId}
+                        handleSchoolClick={handleSchoolClick}
+                        router={router}
+                        openSection={openSection}
+                        onSectionClick={handleSectionClick}
+                      />
+                    ))}
 
                   {shouldShowDivider && (
                     <Divider
@@ -738,17 +750,18 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                     />
                   )}
 
-                  {otherSchools.map((school, i) => (
-                    <SchoolNavItem
-                      key={`other-${i}`}
-                      school={school}
-                      openSchoolId={openSchoolId}
-                      handleSchoolClick={handleSchoolClick}
-                      router={router}
-                      openSection={openSection}
-                      onSectionClick={handleSectionClick}
-                    />
-                  ))}
+                  {otherSchools.length > 0 &&
+                    otherSchools.map((school, i) => (
+                      <SchoolNavItem
+                        key={`other-${i}`}
+                        school={school}
+                        openSchoolId={openSchoolId}
+                        handleSchoolClick={handleSchoolClick}
+                        router={router}
+                        openSection={openSection}
+                        onSectionClick={handleSectionClick}
+                      />
+                    ))}
                 </>
               )}
             </NavList>
