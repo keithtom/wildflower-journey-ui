@@ -76,8 +76,13 @@ import useSearch from "@hooks/useSearch";
 import { getScreenSize } from "@hooks/react-responsive";
 import useAuth from "@lib/utils/useAuth";
 
+// Remove the local constants and import from shared location
+import { NETWORK_SCHOOL_FIELDS } from "@lib/constants/schoolFields";
+
 const School = ({}) => {
   useAuth("/login");
+  // Use the imported constants where needed:
+  const { agesServed, governance, charter } = NETWORK_SCHOOL_FIELDS;
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [claimSchoolModalOpen, setClaimSchoolModalOpen] = useState(false);
   const { currentUser } = useUserContext();
@@ -1273,7 +1278,7 @@ const EnrollmentFields = ({ handleToggle, school }) => {
               withCheckbox
               label="Ages served"
               placeholder="Select the ages your school serves..."
-              options={agesServed.options}
+              options={NETWORK_SCHOOL_FIELDS.agesServed.options}
               error={errors.agesServed}
               defaultValue={[]}
               value={agesServedList}
@@ -1295,7 +1300,7 @@ const EnrollmentFields = ({ handleToggle, school }) => {
             <Select
               label="Governance type"
               placeholder="Select your school's governance..."
-              options={governance.options}
+              options={NETWORK_SCHOOL_FIELDS.governance.options}
               value={governanceType}
               onChange={handleGovernanceType}
               error={errors.governance}
@@ -1317,7 +1322,7 @@ const EnrollmentFields = ({ handleToggle, school }) => {
               <Select
                 label="Charter Group"
                 placeholder="e.g. Colorado Charter"
-                options={charter.options}
+                options={NETWORK_SCHOOL_FIELDS.charter.options}
                 value={charterString}
                 onChange={handleCharterString}
                 error={errors.charterString}
@@ -2807,52 +2812,6 @@ const BoardMemberFields = ({ handleToggle, school }) => {
       </Box>
     </form>
   );
-};
-
-const agesServed = {
-  title: "Age level",
-  param: "school_filters[age_levels]",
-  doNotDisplayFor: "people",
-  options: [
-    { value: "Infants", label: "Infants" },
-    { value: "Toddlers", label: "Toddlers" },
-    { value: "Primary", label: "Primary" },
-    { value: "Lower Elementary", label: "Lower Elementary" },
-    { value: "Upper Elementary", label: "Upper Elementary" },
-    { value: "Adolescent", label: "Adolescent" },
-    { value: "High School", label: "High School" },
-  ],
-};
-
-const governance = {
-  title: "Governance",
-  param: "school_filters[governance]",
-  doNotDisplayFor: "people",
-  options: [
-    { label: "Independent", value: "Independent" },
-    { label: "Charter", value: "Charter" },
-    { label: "District", value: "District" },
-  ],
-};
-const charter = {
-  title: "Charter",
-  param: "school_filters[charter]",
-  doNotDisplayFor: "people",
-  options: [
-    {
-      label: "Minnesota Wildflower Montessori School",
-      value: "Minnesota Wildflower Montessori School",
-    },
-    { label: "Colorado Charter", value: "Colorado Charter" },
-    {
-      label: "Wildflower New York Charter School",
-      value: "Wildflower New York Charter School",
-    },
-    {
-      label: "DC Wildflower Public Charter School",
-      value: "DC Wildflower Public Charter School",
-    },
-  ],
 };
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
