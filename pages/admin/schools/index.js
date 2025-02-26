@@ -9,7 +9,18 @@ import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
 import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/router";
-import { Chip, Skeleton } from "@mui/material";
+import {
+  Chip,
+  Skeleton,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  ListItemSecondaryAction,
+  ListItemIcon,
+  ListSubheader,
+} from "@mui/material";
+import { School } from "@mui/icons-material";
 
 import { clearLoggedInState } from "@lib/handleLogout";
 import { useUserContext } from "@lib/useUserContext";
@@ -37,25 +48,12 @@ const AdminSSJ = ({}) => {
   const router = useRouter();
 
   const { teams, isLoading } = useAllTeams();
-  // console.log({ teams });
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
-  // const { data, error, isLoading, isValidating, mutate } = useSWR(
-  //   "api/teams",
-  //   () => teamsApi.index().then((res) => res.data),
-  //   {
-  //     onErrorRetry: (error) => {
-  //       if (error?.response?.status === 401) {
-  //         clearLoggedInState({});
-  //         router.push("/login");
-  //       } else {
-  //         console.error(error);
-  //       }
-  //     },
-  //   }
-  // );
-  let ssjTeams = teams || [];
+  const handleSchoolClick = (schoolId) => {
+    router.push(`/admin/schools/${schoolId}`);
+  };
 
   return (
     <>
@@ -64,7 +62,7 @@ const AdminSSJ = ({}) => {
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="bodyLarge">
-                {ssjTeams.length} schools
+                {teams?.length || 0} schools
               </Typography>
             </Grid>
             <Grid item>
@@ -77,25 +75,70 @@ const AdminSSJ = ({}) => {
           </Grid>
           <Grid container>
             <Grid item xs={12}>
-              <Card noPadding noRadius noBorder>
-                <Stack spacing={1}>
+              <Card sx={{ padding: 0 }}>
+                <List>
                   {isLoading ? (
-                    <Stack spacing={2}>
-                      {Array.from({ length: 24 }, (_, j) => (
-                        <Skeleton key={j} height={48} m={0} variant="rounded" />
-                      ))}
-                    </Stack>
+                    Array.from({ length: 8 }).map((_, index) => (
+                      <ListItem key={index} divider>
+                        <ListItemIcon>
+                          <Skeleton variant="circular" width={24} height={24} />
+                        </ListItemIcon>
+                        <ListItemText>
+                          <Skeleton variant="text" width={240} />
+                        </ListItemText>
+                      </ListItem>
+                    ))
+                  ) : teams?.length === 0 ? (
+                    <ListItem>
+                      <ListItemText>
+                        <Typography
+                          variant="bodyRegular"
+                          lightened
+                          align="center"
+                        >
+                          No schools yet
+                        </Typography>
+                      </ListItemText>
+                    </ListItem>
                   ) : (
-                    ssjTeams?.map((s, i) => (
-                      <Card size="small" key={i}>
-                        <Stack direction="row" alignItems="center" spacing={3}>
-                          <Avatar size="sm" />
-                          <Typography>{s?.attributes?.tempName}</Typography>
-                        </Stack>
-                      </Card>
+                    teams?.map((team, i) => (
+                      <ListItem
+                        key={team.id}
+                        disablePadding
+                        divider={i !== teams.length - 1}
+                      >
+                        <ListItemButton
+                          onClick={() => handleSchoolClick(team.id)}
+                        >
+                          <ListItemIcon>
+                            <School fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={team.attributes.tempName}
+                            primaryTypographyProps={{
+                              variant: "bodyRegular",
+                            }}
+                          />
+                          <ListItemSecondaryAction>
+                            <Stack direction="row" spacing={2}>
+                              {team.attributes.status && (
+                                <Chip
+                                  label={team.attributes.status}
+                                  size="small"
+                                  color={
+                                    team.attributes.status === "Open"
+                                      ? "primary"
+                                      : "default"
+                                  }
+                                />
+                              )}
+                            </Stack>
+                          </ListItemSecondaryAction>
+                        </ListItemButton>
+                      </ListItem>
                     ))
                   )}
-                </Stack>
+                </List>
               </Card>
             </Grid>
           </Grid>
