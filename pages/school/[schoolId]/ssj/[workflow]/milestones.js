@@ -90,6 +90,7 @@ export default Milestones;
 
 const MilestonesByCategory = ({ workflow }) => {
   const router = useRouter();
+  const { schoolId } = router.query;
   const { t } = useTranslation("common");
   const { isLoadingMilestonesByCategory, milestonesByCategory } = useMilestones(
     workflow,
@@ -140,7 +141,7 @@ const MilestonesByCategory = ({ workflow }) => {
           >
             {a.milestones?.map((m, i) => (
               <Milestone
-                link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+                link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
                 key={i}
                 status={m.attributes.status}
                 title={
