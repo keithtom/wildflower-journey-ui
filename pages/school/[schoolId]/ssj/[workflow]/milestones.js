@@ -167,6 +167,7 @@ const MilestonesByCategory = ({ workflow }) => {
 };
 const MilestonesByPhase = ({ workflow }) => {
   const router = useRouter();
+  const { schoolId } = router.query;
   const { t } = useTranslation("common");
   const { isLoadingMilestonesByPhase, milestonesByPhase } =
     useMilestones(workflow);
@@ -210,7 +211,7 @@ const MilestonesByPhase = ({ workflow }) => {
         >
           {m.milestones?.map((m, i) => (
             <Milestone
-              link={`/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
+              link={`/school/${schoolId}/ssj/${workflow}/${m.attributes.phase}/${m.id}`}
               key={i}
               title={
                 m.attributes[getTranslatedAttr(router.locale, "title")] ||
