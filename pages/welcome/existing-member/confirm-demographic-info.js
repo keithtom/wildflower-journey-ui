@@ -34,6 +34,7 @@ import {
   MultiSelect,
   Radio,
   PageContainer,
+  Alert,
 } from "@ui";
 import usePerson from "@hooks/usePerson";
 
@@ -64,7 +65,9 @@ const ConfirmDemographicInfo = ({}) => {
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
 
-  const { data: personData, isLoading } = usePerson(currentUser?.id);
+  const { data: personData, isLoading: isLoadingPerson } = usePerson(
+    currentUser?.id
+  );
 
   const {
     control,
@@ -92,7 +95,7 @@ const ConfirmDemographicInfo = ({}) => {
   });
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && personData?.data?.attributes) {
       reset({
         primaryLanguage: personData?.data?.attributes?.primaryLanguage || "",
         primaryLanguageOther:
@@ -112,19 +115,17 @@ const ConfirmDemographicInfo = ({}) => {
           personData?.data?.attributes?.montessoriCertifiedLevelList || [],
         classroomAge: personData?.data?.attributes?.classroomAgeList || [],
         role: personData?.data?.attributes?.roleList || [],
-        is_onboarded: true,
       });
     }
-  }, [currentUser, isLoading]);
+  }, [currentUser, personData]);
 
-  const onSubmit = (data) => {
-    // console.log("classroomAge: ", data.classroomAge);
-    peopleApi
-      .update(currentUser.id, {
+  const onSubmit = async (data) => {
+    try {
+      const response = await peopleApi.update(currentUser.id, {
         person: {
           primary_language: data.primaryLanguage,
           primary_language_other: data.primaryLanguageOther,
-          race_ethnicity_list: data.raceEthnicity, // FIX: multi select with other, it uses tags, how is this sent when multiple options?
+          race_ethnicity_list: data.raceEthnicity,
           race_ethnicity_other: data.raceEthnicityOther,
           lgbtqia: data.lgbtqia,
           gender: data.gender,
@@ -138,24 +139,31 @@ const ConfirmDemographicInfo = ({}) => {
           role_list: data.role,
           is_onboarded: true,
         },
-      })
-      .then((response) => {
-        if (response.error) {
-          console.error(error);
-        } else {
-          const person = response.data.attributes;
-          // Create a new user object with updated attributes
-          const updatedUser = {
-            ...currentUser,
-            attributes: {
-              ...currentUser.attributes,
-            },
-            personIsOnboarded: person.isOnboarded,
-          };
-          setCurrentUser(updatedUser);
-          router.push("/welcome/existing-member/add-profile-info");
-        }
       });
+
+      if (response.error) {
+        console.error(response.error);
+        return;
+      }
+
+      const person = response.data.attributes;
+      const updatedUser = {
+        ...currentUser,
+        attributes: {
+          ...currentUser.attributes,
+        },
+        personIsOnboarded: person.isOnboarded,
+      };
+      setCurrentUser(updatedUser);
+      router.push("/welcome/existing-member/add-profile-info");
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        clearLoggedInState({});
+        router.push("/login");
+      } else {
+        console.error(error);
+      }
+    }
   };
 
   const watchFields = watch();
@@ -174,10 +182,9 @@ const ConfirmDemographicInfo = ({}) => {
     watchFields.pronouns === "Not-listed or more specific pronouns";
 
   useAuth("/login");
-  // console.log({ watchFields });
 
   return (
-    <PageContainer isLoading={!currentUser} hideNav>
+    <PageContainer isLoading={!currentUser || isLoadingPerson} hideNav>
       <Grid container alignItems="center" justifyContent="center">
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <Card>

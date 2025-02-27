@@ -166,11 +166,12 @@ const Person = ({}) => {
         return 0;
       });
 
-    schoolsWhereRoleBoardMember = included.filter(
-      (item) =>
-        item.type === "schoolRelationship" &&
-        item.attributes.roleList.includes("Board Member")
-    );
+    schoolsWhereRoleBoardMember =
+      included?.filter(
+        (item) =>
+          item.type === "schoolRelationship" &&
+          item.attributes.roleList.includes("Board Member")
+      ) || [];
 
     boardHistory = includedSchools
       .map((school) => {

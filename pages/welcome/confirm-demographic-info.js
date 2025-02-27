@@ -66,7 +66,16 @@ const ConfirmDemographicInfo = ({}) => {
   const router = useRouter();
   const { currentUser, setCurrentUser } = useUserContext();
 
-  const { data: personData, isLoading } = usePerson(currentUser?.id);
+  const { data: personData, isLoading: isLoadingPerson } = usePerson(
+    currentUser?.id
+  );
+
+  const selectedSchoolId =
+    currentUser?.attributes?.schools?.[
+      currentUser?.attributes?.schools?.length - 1
+    ]?.id;
+  const { data: school, isLoading: isLoadingSchool } =
+    useSchool(selectedSchoolId);
 
   const {
     control,
@@ -93,7 +102,7 @@ const ConfirmDemographicInfo = ({}) => {
   });
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && personData?.data?.attributes) {
       reset({
         primaryLanguage: personData?.data?.attributes?.primaryLanguage || "",
         primaryLanguageOther:
@@ -114,12 +123,11 @@ const ConfirmDemographicInfo = ({}) => {
         classroomAge: personData?.data?.attributes?.classroomAgeList || [],
       });
     }
-  }, [currentUser, isLoading]);
+  }, [currentUser, personData]);
 
-  const onSubmit = (data) => {
-    // console.log("classroomAge: ", data.classroomAge);
-    peopleApi
-      .update(currentUser.id, {
+  const onSubmit = async (data) => {
+    try {
+      const response = await peopleApi.update(currentUser.id, {
         person: {
           primary_language: data.primaryLanguage,
           primary_language_other: data.primaryLanguageOther,
@@ -136,41 +144,35 @@ const ConfirmDemographicInfo = ({}) => {
           classroom_age_list: data.classroomAge,
           is_onboarded: true,
         },
-      })
-      .then((response) => {
-        if (response.error) {
-          console.error(error);
-        } else {
-          const person = response.data.attributes;
-          // Create a new user object with updated attributes
-          const updatedUser = {
-            ...currentUser,
-            attributes: {
-              ...currentUser.attributes,
-            },
-            personIsOnboarded: person.isOnboarded,
-          };
-          setCurrentUser(updatedUser);
-          router.push("/welcome/add-profile-info");
-        }
-      })
-      .catch((error) => {
-        if (error?.response?.status === 401) {
-          clearLoggedInState({});
-          router.push("/login");
-        } else {
-          console.error(error);
-        }
       });
+
+      if (response.error) {
+        console.error(response.error);
+        return;
+      }
+
+      const person = response.data.attributes;
+      const updatedUser = {
+        ...currentUser,
+        attributes: {
+          ...currentUser.attributes,
+        },
+        personIsOnboarded: person.isOnboarded,
+      };
+      setCurrentUser(updatedUser);
+      router.push("/welcome/add-profile-info");
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        clearLoggedInState({});
+        router.push("/login");
+      } else {
+        console.error(error);
+      }
+    }
   };
 
   const watchFields = watch();
   const isExistingTL = false;
-  const selectedSchoolId =
-    currentUser?.attributes.schools[currentUser?.attributes.schools.length - 1]
-      ?.id;
-
-  const { data: school } = useSchool(selectedSchoolId);
   const opsGuide = school?.data.attributes?.opsGuides[0].data;
   useAuth("/login");
   const isCertifiedOrSeeking =
