@@ -84,4 +84,24 @@ async function reinvitePartner(schoolId, data) {
   }
 }
 
-export default { index, show, update, invitePartner, reinvitePartner };
+async function removePartner(schoolId, partnerId) {
+  const config = getAuthHeader();
+  try {
+    const response = await schoolsApi.put(
+      `/${schoolId}/remove_partner`,
+      { person: { id: partnerId } },
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+export default {
+  index,
+  show,
+  update,
+  invitePartner,
+  reinvitePartner,
+  removePartner,
+};

@@ -127,8 +127,8 @@ const School = ({}) => {
       (rel) =>
         rel.type === "schoolRelationship" &&
         rel.attributes.roleList.includes("Teacher Leader") &&
-        rel.attributes.startDate &&
-        !rel.attributes.endDate
+        rel.attributes.startDate && // was onboarded
+        !rel.attributes.endDate // Only include current teacher leaders
     );
 
     schoolLeaders = schoolData?.included
@@ -1468,9 +1468,9 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
     });
   };
 
-  const handleDeleteSchoolRelationship = async (schoolId) => {
+  const handleRemovePartner = async (schoolId, partnerId) => {
     try {
-      const response = await schoolRelationshipsApi.destroy(schoolId);
+      const response = await schoolApi.removePartner(schoolId, partnerId);
       mutate(`/v1/schools/${school.id}`);
       reset();
     } catch (error) {
@@ -1561,7 +1561,8 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
   const teacherLeaderRelationships = schoolData?.included?.filter(
     (rel) =>
       rel.type === "schoolRelationship" &&
-      rel.attributes.roleList.includes("Teacher Leader")
+      rel.attributes.roleList.includes("Teacher Leader") &&
+      !rel.attributes.endDate // Only include invited and active teacher leaders
   );
 
   const teachers = schoolData?.included
@@ -1883,9 +1884,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                               lightened
                               hoverable
                               onClick={() =>
-                                handleDeleteSchoolRelationship(
-                                  teacher?.schoolRealtionshipId
-                                )
+                                handleRemovePartner(school?.id, teacher?.id)
                               }
                               data-cy={`schoolId-teacherLeaders-remove-${i}`}
                               data-cy-another={`schoolId-teacherLeaders-remove`}
@@ -2396,10 +2395,9 @@ const BoardMemberFields = ({ handleToggle, school }) => {
   const teacherLeaderRelationships = schoolData?.included?.filter(
     (rel) =>
       rel.type === "schoolRelationship" &&
-      rel.attributes.roleList.includes("Teacher Leader")
+      rel.attributes.roleList.includes("Teacher Leader") &&
+      !rel.attributes.endDate // Only include current teacher leaders
   );
-
-  // console.log({ teacherLeaderRelationships });
 
   const currentTeachers = schoolData?.included
     ?.filter((i) => i.type === "person")
@@ -2697,9 +2695,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                           lightened
                           hoverable
                           onClick={() =>
-                            handleDeleteSchoolRelationship(
-                              teacher?.schoolRealtionshipId
-                            )
+                            handleRemovePartner(school?.id, teacher?.id)
                           }
                           data-cy={`schoolId-boardMembers-remove-${i}`}
                           data-cy-another={`schoolId-boardMembers-remove`}
