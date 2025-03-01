@@ -115,6 +115,9 @@ const Person = ({}) => {
     person?.attributes.montessoriCertifiedLevelList.length;
 
   const findMatchingItems = (array1, array2, property) => {
+    if (!Array.isArray(array1) || !Array.isArray(array2)) {
+      return [];
+    }
     const matchingItems = array1.filter((item1) =>
       array2.some((item2) => item1[property] === item2[property])
     );
@@ -198,8 +201,8 @@ const Person = ({}) => {
       });
 
     userSchool = findMatchingItems(
-      included,
-      person?.relationships.schools.data,
+      included || [],
+      person?.relationships?.schools?.data || [],
       "id"
     );
     hasInfo =
@@ -1743,7 +1746,6 @@ const SchoolHistoryFields = ({ handleToggle }) => {
   // console.log({ currentSchool });
   // console.log({ schoolsData });
   // console.log({ schoolOptions });
-  // console.log({ teacherLeaderRelationships });
   // console.log("schools", schools);
   // console.log("personData", personData);
   return (
@@ -2027,9 +2029,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
               <>
                 <Grid item>
                   <Button variant="text" small onClick={handleCancel}>
-                    <Typography variant="bodyRegular" bold>
-                      Cancel
-                    </Typography>
+                    <Typography variant="bodyRegular">Cancel</Typography>
                   </Button>
                 </Grid>
                 <Grid item>
