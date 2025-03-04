@@ -36,6 +36,7 @@ function augmentStep(step, included) {
     .filter((e) => e.attributes.completedAt)
     .map((e) => {
       // load assignee from included
+
       let relationshipAssignee = e.relationships.assignee.data;
       let assignee = wildflowerApi.lookupIncluded(
         included,
