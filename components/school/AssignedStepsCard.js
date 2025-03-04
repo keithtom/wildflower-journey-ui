@@ -34,9 +34,12 @@ const AssignedStepsCard = ({
   }, []);
 
   // Get total assigned steps count
-  const { assignedSteps, isLoading: isLoadingCount } =
-    useAssignedStepsCount(workflows);
-
+  // console.log({ workflows });
+  const { assignedSteps, isLoading: isLoadingCount } = useAssignedStepsCount(
+    workflows,
+    { current_user: true }
+  );
+  // debugger;
   // Get all workflows and select the appropriate one
   const { workflows: workflowsArray, isLoading: isLoadingWorkflows } =
     useWorkflows(workflows);
