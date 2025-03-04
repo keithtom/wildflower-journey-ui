@@ -109,6 +109,5 @@ export default {
   update,
   invitePartner,
   reinvitePartner,
-  inviteSchool,
   removePartner,
 };
