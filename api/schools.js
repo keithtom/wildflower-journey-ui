@@ -22,7 +22,7 @@ export const showSchools = {
     return schoolsApi
       .get(``, config)
       .then((response) => {
-        return response;
+        return response.data;
       })
       .catch((error) => {
         wildflowerApi.handleErrors(error);
@@ -84,4 +84,22 @@ async function reinvitePartner(schoolId, data) {
   }
 }
 
-export default { index, show, update, invitePartner, reinvitePartner };
+async function inviteSchool(data) {
+  let response;
+  try {
+    response = await schoolsApi.post(`/`, data, getAuthHeader());
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  response = await response.data;
+  return response;
+}
+
+export default {
+  index,
+  show,
+  update,
+  invitePartner,
+  reinvitePartner,
+  inviteSchool,
+};
