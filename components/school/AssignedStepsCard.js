@@ -49,7 +49,10 @@ const AssignedStepsCard = ({
 
   // Fetch milestones for the selected workflow only when assignedSteps is 0
   const { milestones, isLoading: isLoadingMilestones } = useMilestones(
-    assignedSteps === 0 ? selectedWorkflow?.data?.data?.id : null
+    assignedSteps === 0 ? selectedWorkflow?.data?.data?.id : null,
+    {
+      phase: currentPhase,
+    }
   );
 
   // Filter milestones based on school status and conditions
