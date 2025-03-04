@@ -639,6 +639,15 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                     </NavListItemIcon>
                     <NavListItemText primary="Schools" bold />
                   </NavListItemButton>
+                  <NavListItemButton
+                    onClick={() => router.push("/admin/people")}
+                    selected={router.asPath === "/admin/people"}
+                  >
+                    <NavListItemIcon>
+                      <Icon type="userCircle" />
+                    </NavListItemIcon>
+                    <NavListItemText primary="People" bold />
+                  </NavListItemButton>
                 </>
               )}
             </NavList>
