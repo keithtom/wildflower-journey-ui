@@ -5,8 +5,8 @@ import StepLabel from "@mui/material/StepLabel";
 import { useForm, Controller } from "react-hook-form";
 import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
 import { styled, css } from "@mui/material/styles";
-import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
+import schoolsApi from "@api/schools";
 import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/router";
 import { Chip, Skeleton } from "@mui/material";
@@ -14,7 +14,7 @@ import { Chip, Skeleton } from "@mui/material";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
-import useAllTeams from "@hooks/useAllTeams";
+import useSchools from "@hooks/useSchools";
 import useWorkflows from "@hooks/workflow/definition/useWorkflows";
 import {
   Box,
@@ -36,26 +36,11 @@ const AdminSSJ = ({}) => {
   const { currentUser } = useUserContext();
   const router = useRouter();
 
-  const { teams, isLoading } = useAllTeams();
-  // console.log({ teams });
+  const { data: schools, isLoading } = useSchools({ status: "Emerging" });
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
-  // const { data, error, isLoading, isValidating, mutate } = useSWR(
-  //   "api/teams",
-  //   () => teamsApi.index().then((res) => res.data),
-  //   {
-  //     onErrorRetry: (error) => {
-  //       if (error?.response?.status === 401) {
-  //         clearLoggedInState({});
-  //         router.push("/login");
-  //       } else {
-  //         console.error(error);
-  //       }
-  //     },
-  //   }
-  // );
-  let ssjTeams = teams || [];
+  let ssjSchools = schools || [];
 
   return (
     <>
@@ -64,7 +49,7 @@ const AdminSSJ = ({}) => {
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="bodyLarge">
-                {ssjTeams.length} schools
+                {ssjSchools.length} schools
               </Typography>
             </Grid>
             <Grid item>
@@ -86,11 +71,11 @@ const AdminSSJ = ({}) => {
                       ))}
                     </Stack>
                   ) : (
-                    ssjTeams?.map((s, i) => (
+                    ssjSchools?.map((s, i) => (
                       <Card size="small" key={i}>
                         <Stack direction="row" alignItems="center" spacing={3}>
                           <Avatar size="sm" />
-                          <Typography>{s?.attributes?.tempName}</Typography>
+                          <Typography>{s?.attributes?.name}</Typography>
                         </Stack>
                       </Card>
                     ))
@@ -132,7 +117,7 @@ const StyledPersonOption = styled(Card)`
 `;
 
 const AddSchoolModal = ({ open, toggle }) => {
-  const [team, setTeam] = useState({});
+  const [school, setSchool] = useState({});
   const [tempDisplayData, setTempDisplayData] = useState({});
   const [activeStep, setActiveStep] = useState(0);
   const { mutate } = useSWRConfig();
@@ -145,11 +130,11 @@ const AddSchoolModal = ({ open, toggle }) => {
   };
 
   const handleInviteComplete = () => {
-    setTeam({});
+    setSchool({});
     setTempDisplayData({});
     setActiveStep(0);
     toggle();
-    mutate("api/ssj/teams");
+    mutate("api/schools");
   };
 
   return (
@@ -157,8 +142,8 @@ const AddSchoolModal = ({ open, toggle }) => {
       {activeStep === 0 ? (
         <AddEmergingTeacherLeaders
           handleNext={handleNext}
-          setTeam={setTeam}
-          team={team}
+          setSchool={setSchool}
+          school={school}
           activeStep={activeStep}
           open={open}
           toggle={toggle}
@@ -167,8 +152,8 @@ const AddSchoolModal = ({ open, toggle }) => {
         <AddOperationsGuide
           handlePrev={handlePrev}
           handleNext={handleNext}
-          setTeam={setTeam}
-          team={team}
+          setSchool={setSchool}
+          school={school}
           setTempDisplayData={setTempDisplayData}
           tempDisplayData={tempDisplayData}
           activeStep={activeStep}
@@ -179,8 +164,8 @@ const AddSchoolModal = ({ open, toggle }) => {
         <AddRegionalGrowthLead
           handlePrev={handlePrev}
           handleNext={handleNext}
-          setTeam={setTeam}
-          team={team}
+          setSchool={setSchool}
+          school={school}
           setTempDisplayData={setTempDisplayData}
           tempDisplayData={tempDisplayData}
           activeStep={activeStep}
@@ -191,8 +176,8 @@ const AddSchoolModal = ({ open, toggle }) => {
         <AddWorkflow
           handlePrev={handlePrev}
           handleNext={handleNext}
-          setTeam={setTeam}
-          team={team}
+          setSchool={setSchool}
+          school={school}
           setTempDisplayData={setTempDisplayData}
           tempDisplayData={tempDisplayData}
           activeStep={activeStep}
@@ -204,7 +189,7 @@ const AddSchoolModal = ({ open, toggle }) => {
           <InviteSchool
             handlePrev={handlePrev}
             handleInviteComplete={handleInviteComplete}
-            team={team}
+            school={school}
             setTempDisplayData={setTempDisplayData}
             tempDisplayData={tempDisplayData}
             activeStep={activeStep}
@@ -415,19 +400,19 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
 
 const AddEmergingTeacherLeaders = ({
   handleNext,
-  team,
-  setTeam,
+  school,
+  setSchool,
   activeStep,
   open,
   toggle,
 }) => {
   const [multiplePeople, setMultiplePeople] = useState(
-    team.etl_people_params ? team.etl_people_params : []
+    school.etl_people_params ? school.etl_people_params : []
   );
   const { handleSubmit } = useForm();
   const onSubmit = (data) => {
-    setTeam({
-      ...team,
+    setSchool({
+      ...school,
       etl_people_params: multiplePeople,
     });
     handleNext();
@@ -467,7 +452,7 @@ const AddEmergingTeacherLeaders = ({
       <Stack spacing={6}>
         <FormStepper activeStep={activeStep} />
         <AddMultiplePeopleForm
-          team={team}
+          school={school}
           setMultiplePeople={setMultiplePeople}
           multiplePeople={multiplePeople}
         />
@@ -478,8 +463,8 @@ const AddEmergingTeacherLeaders = ({
 const AddOperationsGuide = ({
   handlePrev,
   handleNext,
-  team,
-  setTeam,
+  school,
+  setSchool,
   setTempDisplayData,
   tempDisplayData,
   activeStep,
@@ -493,12 +478,15 @@ const AddOperationsGuide = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      operationsGuide: team.ops_guide_id ? team.ops_guide_id : null,
+      operationsGuide:
+        school?.attributes?.ops_guides.length > 0
+          ? school?.attributes?.ops_guides[0]?.data?.id
+          : null,
     },
   });
   const onSubmit = (data) => {
-    setTeam({
-      ...team,
+    setSchool({
+      ...school,
       ops_guide_id: data.operationsGuide,
     });
     const selectedOpsGuide = opsGuides.filter(
@@ -651,8 +639,8 @@ const AddOperationsGuide = ({
 const AddRegionalGrowthLead = ({
   handlePrev,
   handleNext,
-  team,
-  setTeam,
+  school,
+  setSchool,
   setTempDisplayData,
   tempDisplayData,
   activeStep,
@@ -666,7 +654,10 @@ const AddRegionalGrowthLead = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      regionalGrowthLead: team.rgl_id ? team.rgl_id : null,
+      regionalGrowthLead:
+        school?.attributes?.rgls.length > 0
+          ? school?.attributes?.rgls[0]?.data?.id
+          : null,
     },
   });
   useEffect(() => {
@@ -694,8 +685,8 @@ const AddRegionalGrowthLead = ({
   );
   let rgl = rglData || [];
   const onSubmit = (data) => {
-    setTeam({
-      ...team,
+    setSchool({
+      ...school,
       rgl_id: data.regionalGrowthLead,
     });
     const selectedRgl = rgl.filter((o) => o.id === data.regionalGrowthLead);
@@ -820,8 +811,8 @@ const AddRegionalGrowthLead = ({
 const AddWorkflow = ({
   handlePrev,
   handleNext,
-  team,
-  setTeam,
+  school,
+  setSchool,
   setTempDisplayData,
   tempDisplayData,
   activeStep,
@@ -835,7 +826,10 @@ const AddWorkflow = ({
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      workflow: team.workflow_id ? team.workflow_id : null,
+      workflow:
+        school?.attributes?.workflow_ids.length > 0
+          ? school?.attributes?.workflow_ids[0]
+          : null,
     },
   });
 
@@ -845,8 +839,8 @@ const AddWorkflow = ({
     (w) => w.attributes.recurring === false
   );
   const onSubmit = (data) => {
-    setTeam({
-      ...team,
+    setSchool({
+      ...school,
       workflow_id: data.workflow,
     });
     const selectedWorkflow = workflows.filter((o) => o.id === data.workflow);
@@ -1006,7 +1000,7 @@ const AddWorkflow = ({
 };
 const InviteSchool = ({
   handlePrev,
-  team,
+  school,
   tempDisplayData,
   handleInviteComplete,
   activeStep,
@@ -1022,9 +1016,8 @@ const InviteSchool = ({
   } = useForm();
 
   const onSubmit = async () => {
-    // console.log({ team });
     try {
-      await teamsApi.inviteTeam({ team: team });
+      await schoolsApi.inviteSchool({ school: school });
     } catch (error) {
       if (error?.response?.status === 422) {
         setDuplicateEmailError(error.response.data.message);
@@ -1034,7 +1027,6 @@ const InviteSchool = ({
     }
     handleInviteComplete();
   };
-  // console.log({ team });
   // console.log({ duplicateEmailError });
   // console.log({ tempDisplayData });
   return (
@@ -1075,7 +1067,7 @@ const InviteSchool = ({
               <Typography variant="bodyRegular" bold>
                 Emerging Teacher Leader
               </Typography>
-              {team.etl_people_params?.map((etl, i) => (
+              {school.etl_people_params?.map((etl, i) => (
                 <Card
                   variant={duplicateEmailError ? "error" : "lightened"}
                   size="small"
