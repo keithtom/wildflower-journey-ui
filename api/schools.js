@@ -84,24 +84,13 @@ async function reinvitePartner(schoolId, data) {
   }
 }
 
-async function inviteSchool(data) {
-  let response;
-  try {
-    response = await schoolsApi.post(`/`, data, getAuthHeader());
-  } catch (error) {
-    return Promise.reject(error);
-  }
-  response = await response.data;
-  return response;
-}
-
 async function removePartner(schoolId, partnerId, endDate) {
   const config = getAuthHeader();
   try {
     const response = await schoolsApi.put(
       `/${schoolId}/remove_partner`,
       {
-        person: { 
+        person: {
           id: partnerId,
           end_date: endDate,
         },
