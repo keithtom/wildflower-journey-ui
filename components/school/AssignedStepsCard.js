@@ -34,9 +34,12 @@ const AssignedStepsCard = ({
   }, []);
 
   // Get total assigned steps count
-  const { assignedSteps, isLoading: isLoadingCount } =
-    useAssignedStepsCount(workflows);
-
+  // console.log({ workflows });
+  const { assignedSteps, isLoading: isLoadingCount } = useAssignedStepsCount(
+    workflows,
+    { current_user: true }
+  );
+  // debugger;
   // Get all workflows and select the appropriate one
   const { workflows: workflowsArray, isLoading: isLoadingWorkflows } =
     useWorkflows(workflows);
@@ -49,7 +52,10 @@ const AssignedStepsCard = ({
 
   // Fetch milestones for the selected workflow only when assignedSteps is 0
   const { milestones, isLoading: isLoadingMilestones } = useMilestones(
-    assignedSteps === 0 ? selectedWorkflow?.data?.data?.id : null
+    assignedSteps === 0 ? selectedWorkflow?.data?.data?.id : null,
+    {
+      phase: currentPhase,
+    }
   );
 
   // Filter milestones based on school status and conditions

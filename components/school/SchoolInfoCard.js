@@ -638,12 +638,12 @@ const TeamMemberModal = ({ toggle, open, schoolId }) => {
   return (
     <Modal toggle={handleClose} title="Add Team Member" open={open}>
       <Stack spacing={3}>
-        <Card variant="primaryLightened">
+        <Card variant="lightened" sx={{ paddingX: "20%" }}>
           <Stack alignItems="center" justifyContent="center" spacing={3}>
             <Typography variant="h4" highlight bold>
               {t("ssj_ui_content.add_your_partner_via_email")}
             </Typography>
-            <Typography variant="bodyRegular" highlight center>
+            <Typography variant="bodyRegular" center>
               {t("ssj_ui_content.make_a_request_to_invite_your_partner")}
             </Typography>
           </Stack>
@@ -863,36 +863,29 @@ const RemovePartnerModal = ({
 
     try {
       setIsSubmitting(true);
-      const response = await schoolRelationshipsApi.update(relationshipId, {
+      await schoolRelationshipsApi.update(relationshipId, {
         end_date: moment().format("YYYY-MM-DD"),
       });
 
-      if (response.status === 200) {
-        await mutate(`/v1/schools/${schoolId}`);
-        toggle();
-      }
+      // Always mutate and close modal on successful API call
+      await mutate(`/v1/schools/${schoolId}`);
+      toggle();
     } catch (err) {
+      console.error("Error removing partner:", err);
       if (err?.response?.status === 401) {
         clearLoggedInState({});
         router.push("/login");
-      } else {
-        console.error("Error removing partner:", err);
       }
     } finally {
       setIsSubmitting(false);
+      // Ensure modal closes even in error cases
+      toggle();
     }
   };
 
   return (
     <Modal toggle={toggle} title="Remove Team Member" open={open}>
       <Stack spacing={3}>
-        <Card variant="primaryLightened">
-          <Stack alignItems="center" justifyContent="center" spacing={3}>
-            <Typography variant="h4" highlight bold>
-              Remove {fullName}
-            </Typography>
-          </Stack>
-        </Card>
         <Stack spacing={1}>
           <Typography variant="bodyRegular" lightened>
             Please type "{fullName}" to confirm removal
