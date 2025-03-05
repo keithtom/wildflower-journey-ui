@@ -33,7 +33,6 @@ import AssigneeRoster from "./AssigneeRoster";
 import stepsApi from "@api/workflow/steps";
 import usePerson from "@hooks/usePerson";
 import useSchool from "@hooks/useSchool";
-import useTeam from "@hooks/useTeam";
 import { useUserContext } from "@lib/useUserContext";
 import { clearLoggedInState } from "@lib/handleLogout";
 import { handleFindMatchingItems } from "@lib/utils/usefulHandlers";
