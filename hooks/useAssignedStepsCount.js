@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import { showAssigned } from "@api/workflow/steps";
 
-const useAssignedStepsCount = (workflowIds) => {
+const useAssignedStepsCount = (workflowIds, params) => {
   const workflowArray = Array.isArray(workflowIds) ? workflowIds : [];
 
   // Use a single SWR hook with all workflowIds as the key
@@ -10,7 +10,9 @@ const useAssignedStepsCount = (workflowIds) => {
     async () => {
       // Fetch data for all workflows in parallel
       const results = await Promise.all(
-        workflowArray.map((workflowId) => showAssigned.fetcher(workflowId))
+        workflowArray.map((workflowId) =>
+          showAssigned.fetcher(workflowId, params)
+        )
       );
 
       // Count total steps across all workflows
