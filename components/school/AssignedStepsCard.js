@@ -14,6 +14,7 @@ import useAssignedStepsCount from "@hooks/useAssignedStepsCount";
 import useMilestones from "@hooks/useMilestones";
 import useWorkflows from "@hooks/useWorkflows";
 import { theme } from "../../styles/theme";
+import { format } from "date-fns";
 
 const AssignedStepsCard = ({
   workflows = [],
@@ -53,9 +54,9 @@ const AssignedStepsCard = ({
   // Fetch milestones for the selected workflow only when assignedSteps is 0
   const { milestones, isLoading: isLoadingMilestones } = useMilestones(
     assignedSteps === 0 ? selectedWorkflow?.data?.data?.id : null,
-    {
-      phase: currentPhase,
-    }
+    selectedWorkflow?.data?.data?.attributes?.recurring
+      ? { timeframe: format(Date.now(), "yyyy-MM-dd"), omit_include: true }
+      : { phase: currentPhase, omit_include: true }
   );
 
   // Filter milestones based on school status and conditions
