@@ -1,21 +1,37 @@
 import { useEffect, useState } from "react";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
+import {
+  Stepper,
+  Step,
+  StepLabel,
+  FormControlLabel,
+  RadioGroup,
+  FormHelperText,
+  CircularProgress,
+  TextField,
+  Chip,
+  Skeleton,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  ListItemSecondaryAction,
+  ListItemIcon,
+  Autocomplete,
+} from "@mui/material";
+import { School } from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
-import { styled, css } from "@mui/material/styles";
 import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
 import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/router";
-import { Chip, Skeleton } from "@mui/material";
 
 import { clearLoggedInState } from "@lib/handleLogout";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
 import useAllTeams from "@hooks/useAllTeams";
 import useWorkflows from "@hooks/workflow/definition/useWorkflows";
+import useSearch from "@hooks/useSearch";
 import {
   Box,
   PageContainer,
@@ -26,7 +42,6 @@ import {
   Card,
   Avatar,
   Modal,
-  TextField,
   Radio,
   Spinner,
 } from "@ui";
@@ -37,25 +52,12 @@ const AdminSSJ = ({}) => {
   const router = useRouter();
 
   const { teams, isLoading } = useAllTeams();
-  // console.log({ teams });
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
-  // const { data, error, isLoading, isValidating, mutate } = useSWR(
-  //   "api/teams",
-  //   () => teamsApi.index().then((res) => res.data),
-  //   {
-  //     onErrorRetry: (error) => {
-  //       if (error?.response?.status === 401) {
-  //         clearLoggedInState({});
-  //         router.push("/login");
-  //       } else {
-  //         console.error(error);
-  //       }
-  //     },
-  //   }
-  // );
-  let ssjTeams = teams || [];
+  const handleSchoolClick = (schoolId) => {
+    router.push(`/admin/schools/${schoolId}`);
+  };
 
   return (
     <>
@@ -64,7 +66,7 @@ const AdminSSJ = ({}) => {
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="bodyLarge">
-                {ssjTeams.length} schools
+                {teams?.length || 0} schools
               </Typography>
             </Grid>
             <Grid item>
@@ -77,25 +79,70 @@ const AdminSSJ = ({}) => {
           </Grid>
           <Grid container>
             <Grid item xs={12}>
-              <Card noPadding noRadius noBorder>
-                <Stack spacing={1}>
+              <Card sx={{ padding: 0 }}>
+                <List>
                   {isLoading ? (
-                    <Stack spacing={2}>
-                      {Array.from({ length: 24 }, (_, j) => (
-                        <Skeleton key={j} height={48} m={0} variant="rounded" />
-                      ))}
-                    </Stack>
+                    Array.from({ length: 8 }).map((_, index) => (
+                      <ListItem key={index} divider>
+                        <ListItemIcon>
+                          <Skeleton variant="circular" width={24} height={24} />
+                        </ListItemIcon>
+                        <ListItemText>
+                          <Skeleton variant="text" width={240} />
+                        </ListItemText>
+                      </ListItem>
+                    ))
+                  ) : teams?.length === 0 ? (
+                    <ListItem>
+                      <ListItemText>
+                        <Typography
+                          variant="bodyRegular"
+                          lightened
+                          align="center"
+                        >
+                          No schools yet
+                        </Typography>
+                      </ListItemText>
+                    </ListItem>
                   ) : (
-                    ssjTeams?.map((s, i) => (
-                      <Card size="small" key={i}>
-                        <Stack direction="row" alignItems="center" spacing={3}>
-                          <Avatar size="sm" />
-                          <Typography>{s?.attributes?.tempName}</Typography>
-                        </Stack>
-                      </Card>
+                    teams?.map((team, i) => (
+                      <ListItem
+                        key={team.id}
+                        disablePadding
+                        divider={i !== teams.length - 1}
+                      >
+                        <ListItemButton
+                          onClick={() => handleSchoolClick(team.id)}
+                        >
+                          <ListItemIcon>
+                            <School fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={team.attributes.tempName}
+                            primaryTypographyProps={{
+                              variant: "bodyRegular",
+                            }}
+                          />
+                          <ListItemSecondaryAction>
+                            <Stack direction="row" spacing={2}>
+                              {team.attributes.status && (
+                                <Chip
+                                  label={team.attributes.status}
+                                  size="small"
+                                  color={
+                                    team.attributes.status === "Open"
+                                      ? "primary"
+                                      : "default"
+                                  }
+                                />
+                              )}
+                            </Stack>
+                          </ListItemSecondaryAction>
+                        </ListItemButton>
+                      </ListItem>
                     ))
                   )}
-                </Stack>
+                </List>
               </Card>
             </Grid>
           </Grid>
@@ -245,18 +292,62 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      teacher: null,
+      first_name: "",
+      last_name: "",
+      email: "",
+    },
+  });
+
   const onSubmit = (data) => {
-    setMultiplePeople((multiplePeople) => {
-      return [...multiplePeople, data];
-    });
-    reset({ first_name: "", last_name: "", email: "" });
+    const newPerson = data.teacher
+      ? {
+          id: data.teacher.id,
+          first_name: data.teacher.attributes.firstName,
+          last_name: data.teacher.attributes.lastName,
+          email: data.teacher.attributes.email,
+          imageUrl: data.teacher.attributes.imageUrl,
+          isExisting: true,
+        }
+      : {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+          isExisting: false,
+        };
+
+    setMultiplePeople((prev) => [...prev, newPerson]);
+    reset({ teacher: null, first_name: "", last_name: "", email: "" });
   };
+
   const handleRemovePerson = (email) => {
     const removedPeople = multiplePeople.filter((p) => p.email !== email);
     setMultiplePeople(removedPeople);
   };
+
+  const {
+    query,
+    setQuery,
+    results,
+    noResults,
+    isSearching,
+    setPerPage,
+    setFilters,
+  } = useSearch();
+
+  useEffect(() => {
+    setQuery("*");
+    setPerPage(500);
+    setFilters({
+      models: "people",
+      "people_filters[roles]": ["Teacher Leader"],
+    });
+  }, []);
+
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -273,7 +364,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                 spacing={2}
               >
                 {multiplePeople.length ? (
-                  multiplePeople?.map((etl, i) => (
+                  multiplePeople?.map((person, i) => (
                     <Grid item xs={12} key={i}>
                       <Card full noBorder size="small">
                         <Grid
@@ -287,13 +378,15 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                               spacing={3}
                               alignItems="center"
                             >
-                              <Avatar size="sm" />
+                              <Avatar src={person.imageUrl} size="sm" />
                               <Stack>
                                 <Typography variant="bodyRegular" bold>
-                                  {etl.first_name} {etl.last_name}
+                                  {person.first_name} {person.last_name}
                                 </Typography>
                                 <Typography variant="bodyRegular" lightened>
-                                  Emerging Teacher Leader
+                                  {person.isExisting
+                                    ? "Existing Teacher Leader"
+                                    : "New Teacher Leader"}
                                 </Typography>
                               </Stack>
                             </Stack>
@@ -302,7 +395,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                             <Button
                               variant="danger"
                               small
-                              onClick={() => handleRemovePerson(etl.email)}
+                              onClick={() => handleRemovePerson(person.email)}
                             >
                               <Typography variant="bodyRegular" bold>
                                 Remove
@@ -315,7 +408,9 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                   ))
                 ) : (
                   <Grid item>
-                    <Typography lightened>No ETLs</Typography>
+                    <Typography lightened>
+                      No Teacher Leaders added yet
+                    </Typography>
                   </Grid>
                 )}
               </Grid>
@@ -325,6 +420,109 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
             <Card>
               <Stack spacing={3}>
                 <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Controller
+                      name="teacher"
+                      control={control}
+                      render={({ field, fieldState: { error, isTouched } }) => (
+                        <Autocomplete
+                          {...field}
+                          inputValue={query || ""}
+                          onChange={(_, newValue) => {
+                            field.onChange(newValue);
+                            if (newValue) {
+                              setValue(
+                                "first_name",
+                                newValue.attributes.firstName
+                              );
+                              setValue(
+                                "last_name",
+                                newValue.attributes.lastName
+                              );
+                              setValue("email", newValue.attributes.email);
+                            }
+                            setQuery(
+                              newValue
+                                ? `${newValue.attributes.firstName} ${newValue.attributes.lastName}`
+                                : ""
+                            );
+                          }}
+                          onInputChange={(_, newInputValue) => {
+                            setQuery(newInputValue);
+                          }}
+                          options={results}
+                          getOptionDisabled={(option) =>
+                            multiplePeople.some((p) => p.id === option.id)
+                          }
+                          getOptionLabel={(option) =>
+                            option && option.attributes
+                              ? `${option.attributes.firstName} ${option.attributes.lastName}`
+                              : ""
+                          }
+                          renderOption={(props, option) => {
+                            const { key, ...optionProps } = props;
+                            return (
+                              <ListItem
+                                key={option.id}
+                                {...optionProps}
+                                disablePadding
+                              >
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={2}
+                                >
+                                  <Avatar
+                                    src={option.attributes.imageUrl}
+                                    size="mini"
+                                  />
+                                  <Typography variant="bodyRegular">
+                                    {option.attributes.firstName}{" "}
+                                    {option.attributes.lastName}
+                                  </Typography>
+                                </Stack>
+                              </ListItem>
+                            );
+                          }}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === value?.id
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Search for an existing Teacher Leader"
+                              error={isTouched && !!error}
+                              placeholder="e.g. Katelyn Shore"
+                              helperText={
+                                isTouched &&
+                                error?.type === "required" &&
+                                "This field is required"
+                              }
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>
+                                    {isSearching ? (
+                                      <CircularProgress
+                                        color="inherit"
+                                        size={20}
+                                      />
+                                    ) : null}
+                                    {params.InputProps.endAdornment}
+                                  </>
+                                ),
+                              }}
+                            />
+                          )}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="bodyRegular" lightened>
+                      Or add a new Teacher Leader:
+                    </Typography>
+                  </Grid>
                   <Grid item xs={12} sm={6}>
                     <Controller
                       name="first_name"
@@ -337,15 +535,12 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                       }}
                       render={({ field }) => (
                         <TextField
+                          {...field}
                           label="First name"
                           placeholder="e.g. Jane"
-                          error={errors.firstName}
-                          helperText={
-                            errors &&
-                            errors.firstName &&
-                            errors.firstName.message
-                          }
-                          {...field}
+                          error={!!errors.first_name}
+                          helperText={errors.first_name?.message}
+                          fullWidth
                         />
                       )}
                     />
@@ -362,13 +557,12 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                       }}
                       render={({ field }) => (
                         <TextField
+                          {...field}
                           label="Last name"
                           placeholder="e.g. Smith"
-                          error={errors.lastName}
-                          helperText={
-                            errors && errors.lastName && errors.lastName.message
-                          }
-                          {...field}
+                          error={!!errors.last_name}
+                          helperText={errors.last_name?.message}
+                          fullWidth
                         />
                       )}
                     />
@@ -389,19 +583,18 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                   }}
                   render={({ field }) => (
                     <TextField
+                      {...field}
                       label="Email"
                       placeholder="e.g. jane.smith@gmail.com"
-                      error={errors.email}
-                      helperText={
-                        errors && errors.email && errors.email.message
-                      }
-                      {...field}
+                      error={!!errors.email}
+                      helperText={errors.email?.message}
+                      fullWidth
                     />
                   )}
                 />
                 <Button variant="lightened" type="submit">
                   <Typography variant="bodyRegular" bold highlight>
-                    Add ETL
+                    Add Teacher Leader
                   </Typography>
                 </Button>
               </Stack>
