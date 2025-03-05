@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { styled, css } from "@mui/material/styles";
 
 import useAuth from "@lib/utils/useAuth";
-import useTeam from "@hooks/useTeam";
 import { useUserContext } from "@lib/useUserContext";
 import {
   Button,
