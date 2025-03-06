@@ -14,7 +14,17 @@ async function index() {
 }
 
 export const showSchools = {
-  key: (filter) => `/v1/schools?${Object.keys(filter).join("_")}`,
+  key: (filter) => {
+    const params = new URLSearchParams();
+    Object.entries(filter).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => params.append(key + "[]", v));
+      } else {
+        params.append(key, value);
+      }
+    });
+    return `/v1/schools?${params.toString()}`;
+  },
   // filters that are usable: status, role, personId
   fetcher: (filter) => {
     const config = getAuthHeader();
