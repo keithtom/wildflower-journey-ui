@@ -229,7 +229,7 @@ const PersonIdPage = () => {
 
   if (isLoading) {
     return (
-      <PageContainer>
+      <PageContainer isAdmin>
         <Grid container spacing={6}>
           <Grid item xs={12} md={6}>
             <Card>
@@ -308,7 +308,10 @@ const PersonIdPage = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer
+      isAdmin
+      title={`${person?.data?.attributes?.firstName} ${person?.data?.attributes?.lastName}`}
+    >
       <Grid container spacing={6}>
         {/* Left Column */}
         <Grid item xs={12} md={6}>

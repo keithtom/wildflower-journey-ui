@@ -237,7 +237,7 @@ const SchoolIdPage = () => {
 
   if (isLoading) {
     return (
-      <PageContainer>
+      <PageContainer isAdmin>
         <Grid container spacing={6}>
           <Grid item xs={12} md={6}>
             <Card>
@@ -254,7 +254,7 @@ const SchoolIdPage = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer isAdmin title={school?.data?.attributes?.name}>
       <Grid container spacing={6}>
         {/* Left Column */}
         <Grid item xs={12} md={6}>
@@ -324,6 +324,15 @@ const SchoolIdPage = () => {
                           color: person.roleList.length
                             ? "text.primary"
                             : "text.secondary",
+                          sx: {
+                            whiteSpace: "normal",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            pr: 24, // Add padding to prevent text from hitting actions
+                          },
                         }}
                       />
                       <ListItemSecondaryAction>

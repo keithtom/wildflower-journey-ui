@@ -114,6 +114,7 @@ const AdminPeople = () => {
                                 width: 32,
                                 height: 32,
                               }}
+                              src={person.attributes.imageUrl}
                             >
                               <Typography variant="bodySmall">
                                 {person.attributes.firstName?.[0] || ""}
