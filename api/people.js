@@ -8,6 +8,18 @@ function getAuthHeader() {
   return { headers: { Authorization: token } };
 }
 
+async function create(personParams) {
+  let response;
+  try {
+    const config = getAuthHeader();
+    response = await peopleApi.post(`/`, personParams, config);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  const data = await response.data;
+  return data;
+}
+
 function show(personId, params = {}) {
   const config = getAuthHeader();
   config.params = params;
@@ -84,4 +96,4 @@ export const showPersons = {
   },
 };
 
-export default { show, update, index };
+export default { show, update, index, create };

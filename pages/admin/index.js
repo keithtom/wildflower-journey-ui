@@ -97,7 +97,7 @@ const AdminDashboard = () => {
                         {isLoadingSchools ? (
                           <Skeleton width={200} />
                         ) : (
-                          `${schools.length} Schools`
+                          `${schools?.data?.length} Schools`
                         )}
                       </Typography>
                       <Typography variant="bodyLarge" bold highlight>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import { Person } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
@@ -33,9 +33,12 @@ import {
   FormHelperText,
   Chip,
   Skeleton,
+  CircularProgress,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import usePersons from "@hooks/usePersons";
+import peopleApi from "@api/people";
+import { mutate } from "swr";
 
 const AdminPeople = () => {
   const [addPersonModalOpen, setAddPersonModalOpen] = useState(false);
@@ -51,6 +54,100 @@ const AdminPeople = () => {
   const handlePersonClick = (personId) => {
     router.push(`/admin/people/${personId}`);
   };
+
+  // Group people by visibility
+  const groupedPeople = useMemo(() => {
+    if (!people?.data) return { visible: [], notVisible: [] };
+
+    return people.data.reduce(
+      (acc, person) => {
+        if (person.attributes.showNetwork) {
+          acc.visible.push(person);
+        } else {
+          acc.notVisible.push(person);
+        }
+        return acc;
+      },
+      { visible: [], notVisible: [] }
+    );
+  }, [people]);
+
+  const PeopleList = ({ people, emptyMessage }) => (
+    <List>
+      {people.length === 0 ? (
+        <ListItem>
+          <ListItemText>
+            <Typography variant="bodyRegular" lightened align="center">
+              {emptyMessage}
+            </Typography>
+          </ListItemText>
+        </ListItem>
+      ) : (
+        people.map((person, i) => (
+          <ListItem
+            key={person.id}
+            disablePadding
+            divider={i !== people.length - 1}
+          >
+            <ListItemButton onClick={() => handlePersonClick(person.id)}>
+              <ListItemIcon>
+                <Avatar
+                  sx={{
+                    bgcolor: "primary.main",
+                    width: 32,
+                    height: 32,
+                  }}
+                  src={person.attributes.imageUrl}
+                >
+                  <Typography variant="bodySmall">
+                    {person.attributes.firstName?.[0] || ""}
+                    {person.attributes.lastName?.[0] || ""}
+                  </Typography>
+                </Avatar>
+              </ListItemIcon>
+              <ListItemText
+                primary={`${person.attributes.firstName} ${person.attributes.lastName}`}
+                secondary={person.attributes.email}
+                primaryTypographyProps={{
+                  variant: "bodyRegular",
+                }}
+                secondaryTypographyProps={{
+                  variant: "bodySmall",
+                }}
+              />
+              <ListItemSecondaryAction>
+                <Stack direction="row" spacing={2}>
+                  {person.attributes.roleList?.map((role, index) => (
+                    <Chip
+                      key={`${role}-${index}`}
+                      label={role}
+                      size="small"
+                      color="default"
+                    />
+                  ))}
+                </Stack>
+              </ListItemSecondaryAction>
+            </ListItemButton>
+          </ListItem>
+        ))
+      )}
+    </List>
+  );
+
+  const LoadingList = () => (
+    <List>
+      {Array.from({ length: 4 }).map((_, index) => (
+        <ListItem key={index} divider>
+          <ListItemIcon>
+            <Skeleton variant="circular" width={24} height={24} />
+          </ListItemIcon>
+          <ListItemText>
+            <Skeleton variant="text" width={240} />
+          </ListItemText>
+        </ListItem>
+      ))}
+    </List>
+  );
 
   return (
     <>
@@ -70,99 +167,85 @@ const AdminPeople = () => {
               </Button>
             </Grid>
           </Grid>
-          <Grid container>
-            <Grid item xs={12}>
-              <Card sx={{ borderRadius: 4 }}>
-                <List>
-                  {isLoading ? (
-                    Array.from({ length: 8 }).map((_, index) => (
-                      <ListItem key={index} divider>
-                        <ListItemIcon>
-                          <Skeleton variant="circular" width={24} height={24} />
-                        </ListItemIcon>
-                        <ListItemText>
-                          <Skeleton variant="text" width={240} />
-                        </ListItemText>
-                      </ListItem>
-                    ))
-                  ) : people?.data?.length === 0 ? (
-                    <ListItem>
-                      <ListItemText>
-                        <Typography
-                          variant="bodyRegular"
-                          lightened
-                          align="center"
-                        >
-                          No people yet
-                        </Typography>
-                      </ListItemText>
-                    </ListItem>
-                  ) : (
-                    people?.data?.map((person, i) => (
-                      <ListItem
-                        key={person.id}
-                        disablePadding
-                        divider={i !== people.length - 1}
-                      >
-                        <ListItemButton
-                          onClick={() => handlePersonClick(person.id)}
-                        >
-                          <ListItemIcon>
-                            <Avatar
-                              sx={{
-                                bgcolor: "primary.main",
-                                width: 32,
-                                height: 32,
-                              }}
-                              src={person.attributes.imageUrl}
-                            >
-                              <Typography variant="bodySmall">
-                                {person.attributes.firstName?.[0] || ""}
-                                {person.attributes.lastName?.[0] || ""}
-                              </Typography>
-                            </Avatar>
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={`${person.attributes.firstName} ${person.attributes.lastName}`}
-                            secondary={person.attributes.email}
-                            primaryTypographyProps={{
-                              variant: "bodyRegular",
-                            }}
-                            secondaryTypographyProps={{
-                              variant: "bodySmall",
-                            }}
-                          />
-                          <ListItemSecondaryAction>
-                            <Stack direction="row" spacing={2}>
-                              {person.attributes.roleList?.map(
-                                (role, index) => (
-                                  <Chip
-                                    key={`${role}-${index}`}
-                                    label={role}
-                                    size="small"
-                                    color="default"
-                                  />
-                                )
-                              )}
-                              <Chip
-                                label={
-                                  person.attributes.showNetwork
-                                    ? "Visible"
-                                    : "Not Visible"
-                                }
-                                size="small"
-                                variant="outlined"
-                              />
-                            </Stack>
-                          </ListItemSecondaryAction>
-                        </ListItemButton>
-                      </ListItem>
-                    ))
-                  )}
-                </List>
-              </Card>
-            </Grid>
-          </Grid>
+          <Stack spacing={6}>
+            {/* Visible People */}
+            <Card sx={{ borderRadius: 4 }}>
+              <List
+                subheader={
+                  <ListSubheader
+                    component="div"
+                    sx={{
+                      background: "#f1f1f1",
+                      paddingX: 4,
+                      paddingY: 3,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Typography variant="bodyLarge">
+                        Visible in Directory
+                      </Typography>
+                      <Chip
+                        label={groupedPeople.visible.length}
+                        size="small"
+                        color="primary"
+                      />
+                    </Stack>
+                  </ListSubheader>
+                }
+              >
+                {isLoading ? (
+                  <LoadingList />
+                ) : (
+                  <PeopleList
+                    people={groupedPeople.visible}
+                    emptyMessage="No visible people"
+                  />
+                )}
+              </List>
+            </Card>
+
+            {/* Not Visible People */}
+            <Card sx={{ borderRadius: 4 }}>
+              <List
+                subheader={
+                  <ListSubheader
+                    component="div"
+                    sx={{
+                      background: "#f1f1f1",
+                      paddingX: 4,
+                      paddingY: 3,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Typography variant="bodyLarge">
+                        Not Visible in Directory
+                      </Typography>
+                      <Chip
+                        label={groupedPeople.notVisible.length}
+                        size="small"
+                        color="default"
+                      />
+                    </Stack>
+                  </ListSubheader>
+                }
+              >
+                {isLoading ? (
+                  <LoadingList />
+                ) : (
+                  <PeopleList
+                    people={groupedPeople.notVisible}
+                    emptyMessage="No hidden people"
+                  />
+                )}
+              </List>
+            </Card>
+          </Stack>
         </Stack>
       </PageContainer>
       <AddPersonModal
@@ -176,11 +259,13 @@ const AdminPeople = () => {
 export default AdminPeople;
 
 const AddPersonModal = ({ open, onClose }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
     defaultValues: {
       firstName: "",
@@ -191,23 +276,65 @@ const AddPersonModal = ({ open, onClose }) => {
     },
   });
 
+  useEffect(() => {
+    if (open) {
+      reset();
+      setError(null);
+    }
+  }, [open, reset]);
+
   const handleClose = () => {
     reset();
+    setError(null);
     onClose();
   };
 
-  const onSubmit = handleSubmit((data) => {
-    console.log("Add person form data:", data);
-    // Handle person creation here
-    handleClose();
-  });
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await peopleApi.create({
+        person: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          role_list: data.role ? [data.role] : [],
+          show_network: data.visibleInDirectory,
+        },
+      });
+      // Refresh the people list
+      await mutate("/v1/people");
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      setError(
+        err?.response?.data?.error ||
+          "An error occurred while creating the person."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: { borderRadius: 4 },
+      }}
+    >
       <DialogTitle>Add New Person</DialogTitle>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 2 }}>
+            {error && (
+              <Typography color="error" variant="bodySmall">
+                {error}
+              </Typography>
+            )}
             <Controller
               name="firstName"
               control={control}
@@ -219,6 +346,7 @@ const AddPersonModal = ({ open, onClose }) => {
                   error={!!errors.firstName}
                   helperText={errors.firstName?.message}
                   fullWidth
+                  placeholder="e.g. Jane"
                 />
               )}
             />
@@ -233,6 +361,7 @@ const AddPersonModal = ({ open, onClose }) => {
                   error={!!errors.lastName}
                   helperText={errors.lastName?.message}
                   fullWidth
+                  placeholder="e.g. Smith"
                 />
               )}
             />
@@ -254,6 +383,7 @@ const AddPersonModal = ({ open, onClose }) => {
                   error={!!errors.email}
                   helperText={errors.email?.message}
                   fullWidth
+                  placeholder="e.g. jane.smith@example.com"
                 />
               )}
             />
@@ -299,12 +429,21 @@ const AddPersonModal = ({ open, onClose }) => {
             />
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 3 }}>
           <Button onClick={handleClose} color="inherit">
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
-            Add Person
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            sx={{ minWidth: 100 }}
+          >
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Add Person"
+            )}
           </Button>
         </DialogActions>
       </form>

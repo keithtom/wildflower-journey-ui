@@ -551,8 +551,6 @@ const EditDetailsModal = ({ open, onClose, person }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  console.log({ person });
-
   const {
     control,
     handleSubmit,
