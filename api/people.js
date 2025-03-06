@@ -59,7 +59,17 @@ async function index(filter) {
 
 // filter example: {{ops_guide: true, rgl: true}} or {{etl: true}} Note that a person cannot be an etl
 export const showPersons = {
-  key: (filter) => `/v1/people?${Object.keys(filter).join("_")}`,
+  key: (filter) => {
+    const params = new URLSearchParams();
+    Object.entries(filter).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => params.append(key + "[]", v));
+      } else {
+        params.append(key, value);
+      }
+    });
+    return `/v1/people?${params.toString()}`;
+  },
   fetcher: (filter) => {
     const config = getAuthHeader();
     config.params = filter;
