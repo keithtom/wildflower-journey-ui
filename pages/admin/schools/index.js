@@ -18,7 +18,6 @@ import {
   ListItemIcon,
   Autocomplete,
   ListSubheader,
-  Card,
 } from "@mui/material";
 import { School } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
@@ -35,6 +34,7 @@ import useSchools from "@hooks/useSchools";
 import useWorkflows from "@hooks/workflow/definition/useWorkflows";
 import useSearch from "@hooks/useSearch";
 import {
+  Card,
   Box,
   PageContainer,
   Button,
@@ -81,7 +81,7 @@ const AdminSSJ = ({}) => {
   }, [schools]);
 
   const SchoolList = ({ schools, status }) => (
-    <Card sx={{ borderRadius: 4 }}>
+    <Card noPadding>
       <List
         subheader={
           <ListSubheader

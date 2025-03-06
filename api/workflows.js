@@ -38,7 +38,21 @@ export const showResources = {
   },
 };
 
+async function remove(workflowId) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.delete(
+      `/workflows/${workflowId}`,
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+
 export default {
   showWorkflow,
   showResources,
+  remove,
 };

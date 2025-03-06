@@ -31,6 +31,7 @@ import {
   Autocomplete,
   Chip,
   Skeleton,
+  CircularProgress,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import {
@@ -64,6 +65,8 @@ import { useForm } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import usePerson from "@hooks/usePerson";
 import useSchool from "@hooks/useSchool";
+import { mutate } from "swr";
+import peopleApi from "@api/people";
 
 const SchoolItem = ({ schoolId, personRelationships }) => {
   const { data: schoolData, isLoading } = useSchool(schoolId);
@@ -543,6 +546,13 @@ const PersonIdPage = () => {
 export default PersonIdPage;
 
 const EditDetailsModal = ({ open, onClose, person }) => {
+  const router = useRouter();
+  const { personId } = router.query;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  console.log({ person });
+
   const {
     control,
     handleSubmit,
@@ -576,21 +586,64 @@ const EditDetailsModal = ({ open, onClose, person }) => {
 
   const handleClose = () => {
     reset();
+    setError(null);
     onClose();
   };
 
-  const onSubmit = handleSubmit((data) => {
-    console.log("Edit details form data:", data);
-    // Handle person update here
-    handleClose();
-  });
+  const onSubmit = async (data) => {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await peopleApi.update(personId, {
+        person: {
+          // Wrap data in person object
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          city: data.city,
+          state: data.state,
+          about: data.about,
+          location: data.location,
+          montessori_certified: data.montessoriCertified,
+          montessori_certified_level_list: data.montessoriCertifiedLevels,
+          montessori_certified_year: data.montessoriCertifiedYear,
+          primary_language: data.primaryLanguage,
+          primary_language_other: data.primaryLanguageOther,
+          race_ethnicity_list: data.raceEthnicity,
+          race_ethnicity_other: data.raceEthnicityOther,
+          gender: data.gender,
+          gender_other: data.genderOther,
+          pronouns: data.pronouns,
+          pronouns_other: data.pronounsOther,
+          household_income: data.householdIncome,
+          role_list: data.roles,
+        },
+      });
+      await mutate(`/v1/people/${personId}`);
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      setError(
+        err?.response?.data?.error ||
+          "An error occurred while updating the person."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>Edit Person Details</DialogTitle>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent sx={{ maxHeight: 640, overflowY: "auto" }}>
           <Stack spacing={3} sx={{ mt: 2 }}>
+            {error && (
+              <Typography color="error" variant="bodySmall">
+                {error}
+              </Typography>
+            )}
             {/* General Fields */}
             <Typography variant="h6">General Information</Typography>
             <Controller
@@ -881,8 +934,12 @@ const EditDetailsModal = ({ open, onClose, person }) => {
           <Button onClick={handleClose} color="inherit">
             Cancel
           </Button>
-          <Button type="submit" variant="contained">
-            Save Changes
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </DialogActions>
       </form>
