@@ -54,6 +54,7 @@ const AdminSSJ = ({}) => {
 
   const { data: schools, isLoading } = useSchools({
     status: ["Emerging", "Open"],
+    serialization_fields: ["name", "status", "currentPhase"],
   });
 
   useEffect(() => {

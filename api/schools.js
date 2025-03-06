@@ -17,7 +17,9 @@ export const showSchools = {
   key: (filter) => {
     const params = new URLSearchParams();
     Object.entries(filter).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
+      if (key === "serialization_fields" && Array.isArray(value)) {
+        params.append(key, value.join(","));
+      } else if (Array.isArray(value)) {
         value.forEach((v) => params.append(key + "[]", v));
       } else {
         params.append(key, value);
@@ -28,7 +30,19 @@ export const showSchools = {
   // filters that are usable: status, role, personId
   fetcher: (filter) => {
     const config = getAuthHeader();
-    config.params = filter;
+    // Convert the parameters in the same way as the key function
+    const params = {};
+    Object.entries(filter).forEach(([key, value]) => {
+      if (key === "serialization_fields" && Array.isArray(value)) {
+        params[key] = value.join(",");
+      } else if (Array.isArray(value)) {
+        // For arrays, use the array directly - axios will format with [] suffix
+        params[key] = value;
+      } else {
+        params[key] = value;
+      }
+    });
+    config.params = params;
     return schoolsApi
       .get(``, config)
       .then((response) => {

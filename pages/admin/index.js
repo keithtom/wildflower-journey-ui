@@ -36,7 +36,9 @@ import useSchools from "@hooks/useSchools";
 
 const AdminDashboard = () => {
   const { workflows, isLoading } = useWorkflows();
-  const { schools, isLoading: isLoadingSchools } = useSchools();
+  const { data: schools, isLoading: isLoadingSchools } = useSchools({
+    serialization_fields: ["name"],
+  });
 
   const workflowImage = "/assets/images/ssj/wildflowerSystems.jpg";
   const schoolsImage = "/assets/images/ssj/SSJ_hero.jpg";
