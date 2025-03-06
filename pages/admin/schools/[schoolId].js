@@ -24,6 +24,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Skeleton,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import {
@@ -38,8 +39,10 @@ import {
   Visibility,
   Groups,
 } from "@mui/icons-material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/router";
 import { useForm, Controller } from "react-hook-form";
+import useSchool from "@hooks/useSchool";
 import {
   AGES_SERVED_OPTIONS,
   GOVERNANCE_OPTIONS,
@@ -47,6 +50,14 @@ import {
 } from "@lib/constants/schoolFields";
 
 const SchoolIdPage = () => {
+  const router = useRouter();
+  const { schoolId } = router.query;
+  const { data: school, isLoading } = useSchool(schoolId);
+
+  useEffect(() => {
+    console.log("Raw school data:", school);
+  }, [school]);
+
   const [addPersonModalOpen, setAddPersonModalOpen] = useState(false);
   const [editDetailsModalOpen, setEditDetailsModalOpen] = useState(false);
   const [addWorkflowModalOpen, setAddWorkflowModalOpen] = useState(false);
@@ -57,33 +68,90 @@ const SchoolIdPage = () => {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
 
-  // Mock data - replace with actual data fetching
-  const schoolData = [
-    { key: "name", value: "Example School", icon: <School /> },
-    { key: "city", value: "New York", icon: <LocationOn /> },
-    { key: "state", value: "NY", icon: <LocationOn /> },
-    { key: "openDate", value: "2010-09-01", icon: <Event /> },
-    {
-      key: "about",
-      value:
-        "A wonderful Montessori school focused on child-centered education.",
-      icon: <School />,
-    },
-    {
-      key: "agesServed",
-      value: ["Primary", "Lower Elementary"],
-      icon: <Category />,
-    },
-    { key: "governanceType", value: "Charter", icon: <Category /> },
-    { key: "maxEnrollment", value: "120", icon: <Groups /> },
-    { key: "numClassrooms", value: "6", icon: <Category /> },
-  ];
+  // Transform school data into the format we need
+  const schoolData = useMemo(() => {
+    if (!school?.data?.attributes) return [];
 
-  const associatedPeople = [
-    { id: 1, name: "John Doe", role: "Principal" },
-    { id: 2, name: "Jane Smith", role: "Teacher" },
-    { id: 3, name: "Bob Wilson", role: "Administrator" },
-  ];
+    const transformedData = [
+      {
+        key: "name",
+        value: school.data.attributes.name || "Unnamed School",
+        icon: <School />,
+      },
+      {
+        key: "city",
+        value: school.data.attributes.city || "Not provided",
+        icon: <LocationOn />,
+      },
+      {
+        key: "state",
+        value: school.data.attributes.state || "Not provided",
+        icon: <LocationOn />,
+      },
+      {
+        key: "openDate",
+        value: school.data.attributes.openDate || "Not provided",
+        icon: <Event />,
+      },
+      {
+        key: "about",
+        value: school.data.attributes.about || "Not provided",
+        icon: <School />,
+      },
+      {
+        key: "agesServed",
+        value: school.data.attributes.agesServedList || [],
+        icon: <Category />,
+        isArray: true,
+        emptyMessage: "Not provided",
+      },
+      {
+        key: "governanceType",
+        value: school.data.attributes.governanceType || "Not provided",
+        icon: <Category />,
+      },
+      {
+        key: "maxEnrollment",
+        value:
+          school.data.attributes.maxEnrollment?.toString() || "Not provided",
+        icon: <Groups />,
+      },
+      {
+        key: "numClassrooms",
+        value:
+          school.data.attributes.numClassrooms?.toString() || "Not provided",
+        icon: <Category />,
+      },
+    ];
+
+    console.log("Transformed school data:", transformedData);
+    return transformedData;
+  }, [school]);
+
+  // Transform associated people data
+  const associatedPeople = useMemo(() => {
+    if (!school?.data?.relationships?.people?.data || !school?.included)
+      return [];
+
+    return school.data.relationships.people.data
+      .map((personRelation) => {
+        // Find the person in the included array
+        const personData = school.included.find(
+          (item) => item.type === "person" && item.id === personRelation.id
+        );
+
+        if (!personData) return null;
+
+        return {
+          id: personData.id,
+          firstName: personData.attributes.firstName,
+          lastName: personData.attributes.lastName,
+          roleList: personData.attributes.roleList || [],
+          imageUrl: personData.attributes.imageUrl,
+        };
+      })
+      .filter(Boolean); // Remove any null entries
+  }, [school]);
 
   const currentWorkflows = [{ id: 1, name: "School Startup Journey" }];
 
@@ -92,7 +160,9 @@ const SchoolIdPage = () => {
       id: 3,
       type: "button",
       label: "Set Status",
-      description: "Current status: Open",
+      description: `Current status: ${
+        school?.data?.attributes?.status || "Unknown"
+      }`,
       icon: <FiberManualRecord color="primary" />,
       action: () => setSetStatusModalOpen(true),
       color: "primary",
@@ -103,7 +173,7 @@ const SchoolIdPage = () => {
       label: "Member",
       description: "School membership status",
       icon: <Groups />,
-      value: true,
+      value: school?.data?.attributes?.isMember || false,
       action: (checked) => console.log("Member status changed:", checked),
     },
     {
@@ -112,7 +182,7 @@ const SchoolIdPage = () => {
       label: "Visible in Directory",
       description: "Control school visibility",
       icon: <Visibility />,
-      value: false,
+      value: school?.data?.attributes?.isVisible || false,
       action: (checked) => console.log("Visibility changed:", checked),
     },
     {
@@ -165,6 +235,24 @@ const SchoolIdPage = () => {
     setRemoveWorkflowModalOpen(true);
   };
 
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <Grid container spacing={6}>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <Stack spacing={2} p={3}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} height={60} />
+                ))}
+              </Stack>
+            </Card>
+          </Grid>
+        </Grid>
+      </PageContainer>
+    );
+  }
+
   return (
     <PageContainer>
       <Grid container spacing={6}>
@@ -172,7 +260,7 @@ const SchoolIdPage = () => {
         <Grid item xs={12} md={6}>
           <Stack spacing={6}>
             {/* Associated People Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -200,37 +288,72 @@ const SchoolIdPage = () => {
                   </ListSubheader>
                 }
               >
-                {associatedPeople.map((person) => (
-                  <ListItem key={person.id} divider>
-                    <ListItemIcon>
-                      <Avatar sx={{ bgcolor: "primary.main" }}>
-                        <Typography variant="bodySmall">
-                          {person.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </Typography>
-                      </Avatar>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={person.name}
-                      secondary={person.role}
-                    />
-                    <ListItemSecondaryAction>
-                      <Button
-                        size="small"
-                        onClick={() => handleEditPerson(person)}
+                {associatedPeople.length === 0 ? (
+                  <ListItem>
+                    <ListItemText>
+                      <Typography
+                        variant="bodyRegular"
+                        lightened
+                        align="center"
                       >
-                        Edit
-                      </Button>
-                    </ListItemSecondaryAction>
+                        No associated people
+                      </Typography>
+                    </ListItemText>
                   </ListItem>
-                ))}
+                ) : (
+                  associatedPeople.map((person) => (
+                    <ListItem key={person.id} divider>
+                      <ListItemIcon>
+                        <Avatar sx={{ bgcolor: "primary.main" }}>
+                          <Typography variant="bodySmall">
+                            {person.firstName?.[0] || ""}
+                            {person.lastName?.[0] || ""}
+                          </Typography>
+                        </Avatar>
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`${person.firstName} ${person.lastName}`}
+                        secondary={
+                          person.roleList.join(", ") || "No roles assigned"
+                        }
+                        primaryTypographyProps={{
+                          variant: "bodyRegular",
+                        }}
+                        secondaryTypographyProps={{
+                          variant: "bodyRegular",
+                          color: person.roleList.length
+                            ? "text.primary"
+                            : "text.secondary",
+                        }}
+                      />
+                      <ListItemSecondaryAction>
+                        <Stack direction="row" spacing={1}>
+                          <Button
+                            size="small"
+                            variant="text"
+                            onClick={() =>
+                              router.push(`/admin/people/${person.id}`)
+                            }
+                          >
+                            View
+                          </Button>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => handleEditPerson(person)}
+                          >
+                            Edit
+                          </Button>
+                        </Stack>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))
+                )}
               </List>
             </Card>
 
             {/* School Details Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -256,33 +379,46 @@ const SchoolIdPage = () => {
                   </ListSubheader>
                 }
               >
-                {schoolData.map(({ key, value, icon }) => (
-                  <ListItem
-                    key={key}
-                    divider
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      px: 4,
-                      pr: 12,
-                    }}
-                  >
-                    <ListItemIcon>{icon}</ListItemIcon>
-                    <ListItemText
-                      primary={key.charAt(0).toUpperCase() + key.slice(1)}
-                      primaryTypographyProps={{
-                        color: "text.secondary",
-                        variant: "bodyRegular",
+                {schoolData.map(
+                  ({ key, value, icon, isArray, emptyMessage }) => (
+                    <ListItem
+                      key={key}
+                      divider
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        px: 4,
                       }}
-                    />
-                    <ListItemSecondaryAction>
-                      <Typography variant="bodyRegular">
-                        {Array.isArray(value) ? value.join(", ") : value}
-                      </Typography>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
+                    >
+                      <ListItemIcon>{icon}</ListItemIcon>
+                      <ListItemText
+                        primary={
+                          key.charAt(0).toUpperCase() +
+                          key.slice(1).replace(/([A-Z])/g, " $1")
+                        }
+                        secondary={
+                          isArray
+                            ? value?.length > 0
+                              ? value.join(", ")
+                              : emptyMessage
+                            : value
+                        }
+                        primaryTypographyProps={{
+                          variant: "bodyRegular",
+                          color: "text.primary",
+                        }}
+                        secondaryTypographyProps={{
+                          variant: "bodyRegular",
+                          color:
+                            value === "Not provided"
+                              ? "text.secondary"
+                              : "text.primary",
+                        }}
+                      />
+                    </ListItem>
+                  )
+                )}
               </List>
             </Card>
           </Stack>
@@ -292,7 +428,7 @@ const SchoolIdPage = () => {
         <Grid item xs={12} md={6}>
           <Stack spacing={6}>
             {/* Workflows Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -343,7 +479,7 @@ const SchoolIdPage = () => {
             </Card>
 
             {/* Admin Actions Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader

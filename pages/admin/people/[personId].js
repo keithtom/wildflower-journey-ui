@@ -30,6 +30,7 @@ import {
   FormLabel,
   Autocomplete,
   Chip,
+  Skeleton,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import {
@@ -47,7 +48,7 @@ import {
   Badge,
   Key,
 } from "@mui/icons-material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import {
   languageOptions,
@@ -61,6 +62,55 @@ import {
 } from "@lib/utils/demographic-options";
 import { useForm } from "react-hook-form";
 import { Controller } from "react-hook-form";
+import usePerson from "@hooks/usePerson";
+import useSchool from "@hooks/useSchool";
+
+const SchoolItem = ({ schoolId, personRelationships }) => {
+  const { data: schoolData, isLoading } = useSchool(schoolId);
+  const router = useRouter();
+
+  if (isLoading) {
+    return (
+      <ListItem divider>
+        <ListItemText>
+          <Skeleton height={40} />
+        </ListItemText>
+      </ListItem>
+    );
+  }
+
+  if (!schoolData?.data) return null;
+
+  // Find the person in the included data that matches the school's people relationship
+  const schoolPerson = schoolData?.included?.find(
+    (item) =>
+      item.type === "person" &&
+      schoolData.data.relationships.people.data.some((p) => p.id === item.id)
+  );
+
+  // Get the role list from the matched person's attributes
+  const schoolRoleList = schoolPerson?.attributes?.roleList || [];
+
+  return (
+    <ListItem divider>
+      <ListItemIcon>
+        <School />
+      </ListItemIcon>
+      <ListItemText
+        primary={schoolData.data.attributes.name}
+        secondary={schoolRoleList.join(", ") || "No roles assigned"}
+      />
+      <ListItemSecondaryAction>
+        <Button
+          size="small"
+          onClick={() => router.push(`/admin/schools/${schoolData.data.id}`)}
+        >
+          View
+        </Button>
+      </ListItemSecondaryAction>
+    </ListItem>
+  );
+};
 
 const PersonIdPage = () => {
   const [editDetailsModalOpen, setEditDetailsModalOpen] = useState(false);
@@ -68,56 +118,132 @@ const PersonIdPage = () => {
   const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
   const router = useRouter();
   const { personId } = router.query;
+  const { data: person, isLoading } = usePerson(personId);
 
-  // Mock data - replace with actual data fetching
-  const personData = [
-    // General Fields
-    { key: "firstName", value: "John", icon: <Person /> },
-    { key: "lastName", value: "Doe", icon: <Person /> },
-    { key: "email", value: "john.doe@example.com", icon: <Email /> },
-    { key: "phone", value: "+1 (555) 123-4567", icon: <Phone /> },
-    { key: "city", value: "New York", icon: <LocationOn /> },
-    { key: "state", value: "NY", icon: <LocationOn /> },
-    {
-      key: "about",
-      value:
-        "A passionate Montessori educator with over 10 years of experience.",
-      icon: <Person />,
-    },
+  // Get school IDs from relationships
+  const schoolIds = useMemo(
+    () => person?.data?.relationships?.schools?.data?.map((s) => s.id) || [],
+    [person]
+  );
 
-    // Demographic Fields
-    { key: "primaryLanguage", value: "English", icon: <Language /> },
-    {
-      key: "raceEthnicity",
-      value: ["Asian, or Asian American", "White"],
-      icon: <Person />,
-    },
-    { key: "gender", value: "Male/Man", icon: <Wc /> },
-    { key: "pronouns", value: "he/him/his", icon: <Wc /> },
+  useEffect(() => {
+    console.log({ person });
+  }, [person]);
 
-    // Certification & Role Fields
-    { key: "montessoriCertified", value: "Yes", icon: <Badge /> },
-    {
-      key: "montessoriCertifiedLevels",
-      value: ["Primary/Early Childhood", "6-9 Elementary"],
-      icon: <School />,
-    },
-    {
-      key: "montessoriCertifiedYear",
-      value: "Primary/Early Childhood - 2015\n6-9 Elementary - 2018",
-      icon: <School />,
-    },
-  ];
+  const schoolRelationships =
+    person?.data?.relationships?.schoolRelationships?.data || [];
 
-  const associatedSchools = [
-    { id: 1, name: "Montessori School A", role: "Lead Teacher" },
-    { id: 2, name: "Montessori School B", role: "Assistant Teacher" },
-  ];
+  const personData = useMemo(() => {
+    if (!person?.data?.attributes) return [];
 
-  const currentRoles = [
-    { id: 1, role: "Teacher Leader", since: "2020" },
-    { id: 2, role: "Foundation Partner", since: "2022" },
-  ];
+    return [
+      // General Information
+      {
+        key: "firstName",
+        value: person.data.attributes.firstName,
+        icon: <Person />,
+      },
+      {
+        key: "lastName",
+        value: person.data.attributes.lastName,
+        icon: <Person />,
+      },
+      {
+        key: "email",
+        value: person.data.attributes.email,
+        icon: <Email />,
+      },
+      {
+        key: "phone",
+        value: person.data.attributes.phone || "Not provided",
+        icon: <Phone />,
+      },
+      {
+        key: "about",
+        value: person.data.attributes.about || "Not provided",
+        icon: <Person />,
+      },
+
+      // Location
+      {
+        key: "location",
+        value: person.data.attributes.location || "Not provided",
+        icon: <LocationOn />,
+      },
+
+      // Demographics
+      {
+        key: "primaryLanguage",
+        value: person.data.attributes.primaryLanguage || "Not provided",
+        icon: <Language />,
+      },
+      {
+        key: "raceEthnicity",
+        value: person.data.attributes.raceEthnicityList || [],
+        icon: <Person />,
+        isArray: true,
+        emptyMessage: "Not provided",
+      },
+      {
+        key: "gender",
+        value: person.data.attributes.gender || "Not provided",
+        icon: <Wc />,
+      },
+      {
+        key: "pronouns",
+        value: person.data.attributes.pronouns || "Not provided",
+        icon: <Wc />,
+      },
+
+      // Certification
+      {
+        key: "montessoriCertified",
+        value:
+          person.data.attributes.montessoriCertified === "1" ? "Yes" : "No",
+        icon: <Badge />,
+      },
+      {
+        key: "montessoriCertifiedLevels",
+        value: person.data.attributes.montessoriCertifiedLevelList || [],
+        icon: <School />,
+        isArray: true,
+        emptyMessage: "No certifications",
+      },
+      {
+        key: "montessoriCertifiedYear",
+        value: person.data.attributes.montessoriCertifiedYear || "Not provided",
+        icon: <School />,
+      },
+    ];
+  }, [person]);
+
+  const currentRoles = useMemo(() => {
+    if (!person?.data?.attributes?.roleList) return [];
+
+    return person.data.attributes.roleList.map((role) => ({
+      id: role,
+      role: role,
+      since: person.data.attributes.startDate || "N/A",
+    }));
+  }, [person]);
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <Grid container spacing={6}>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <Stack spacing={2} p={3}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} height={60} />
+                ))}
+              </Stack>
+            </Card>
+          </Grid>
+        </Grid>
+      </PageContainer>
+    );
+  }
 
   const adminActions = [
     {
@@ -188,7 +314,7 @@ const PersonIdPage = () => {
         <Grid item xs={12} md={6}>
           <Stack spacing={6}>
             {/* Person Details Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -223,7 +349,6 @@ const PersonIdPage = () => {
                       alignItems: "center",
                       gap: 2,
                       px: 4,
-                      pr: 12,
                     }}
                   >
                     <ListItemIcon>{item.icon}</ListItemIcon>
@@ -232,25 +357,32 @@ const PersonIdPage = () => {
                         item.key.charAt(0).toUpperCase() +
                         item.key.slice(1).replace(/([A-Z])/g, " $1")
                       }
+                      secondary={
+                        item.isArray
+                          ? item.value?.length > 0
+                            ? item.value.join(", ")
+                            : item.emptyMessage
+                          : item.value
+                      }
                       primaryTypographyProps={{
-                        color: "text.secondary",
                         variant: "bodyRegular",
+                        color: "text.primary",
+                      }}
+                      secondaryTypographyProps={{
+                        variant: "bodyRegular",
+                        color:
+                          item.value === "Not provided"
+                            ? "text.secondary"
+                            : "text.primary",
                       }}
                     />
-                    <ListItemSecondaryAction>
-                      <Typography variant="bodyRegular">
-                        {Array.isArray(item.value)
-                          ? item.value.join(", ")
-                          : item.value}
-                      </Typography>
-                    </ListItemSecondaryAction>
                   </ListItem>
                 ))}
               </List>
             </Card>
 
             {/* Associated Schools Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -271,27 +403,27 @@ const PersonIdPage = () => {
                   </ListSubheader>
                 }
               >
-                {associatedSchools.map((school) => (
-                  <ListItem key={school.id} divider>
-                    <ListItemIcon>
-                      <School />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={school.name}
-                      secondary={school.role}
-                    />
-                    <ListItemSecondaryAction>
-                      <Button
-                        size="small"
-                        onClick={() =>
-                          router.push(`/admin/schools/${school.id}`)
-                        }
+                {schoolIds.length === 0 ? (
+                  <ListItem>
+                    <ListItemText>
+                      <Typography
+                        variant="bodyRegular"
+                        lightened
+                        align="center"
                       >
-                        View
-                      </Button>
-                    </ListItemSecondaryAction>
+                        No associated schools
+                      </Typography>
+                    </ListItemText>
                   </ListItem>
-                ))}
+                ) : (
+                  schoolIds.map((schoolId) => (
+                    <SchoolItem
+                      key={schoolId}
+                      schoolId={schoolId}
+                      personRelationships={schoolRelationships}
+                    />
+                  ))
+                )}
               </List>
             </Card>
           </Stack>
@@ -301,7 +433,7 @@ const PersonIdPage = () => {
         <Grid item xs={12} md={6}>
           <Stack spacing={6}>
             {/* Roles Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -317,22 +449,38 @@ const PersonIdPage = () => {
                   </ListSubheader>
                 }
               >
-                {currentRoles.map((role) => (
-                  <ListItem key={role.id} divider>
-                    <ListItemIcon>
-                      <Work />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={role.role}
-                      secondary={`Since ${role.since}`}
-                    />
+                {currentRoles.length === 0 ? (
+                  <ListItem>
+                    <ListItemText>
+                      <Typography
+                        variant="bodyRegular"
+                        lightened
+                        align="center"
+                      >
+                        No roles assigned
+                      </Typography>
+                    </ListItemText>
                   </ListItem>
-                ))}
+                ) : (
+                  currentRoles.map((role) => (
+                    <ListItem key={role.id} divider>
+                      <ListItemIcon>
+                        <Work />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={role.role}
+                        secondary={
+                          role.since !== "N/A" ? `Since ${role.since}` : null
+                        }
+                      />
+                    </ListItem>
+                  ))
+                )}
               </List>
             </Card>
 
             {/* Admin Actions Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader

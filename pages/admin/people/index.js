@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Person } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
@@ -35,46 +35,16 @@ import {
   Skeleton,
 } from "@mui/material";
 import { PageContainer } from "@ui";
+import usePersons from "@hooks/usePersons";
+
 const AdminPeople = () => {
   const [addPersonModalOpen, setAddPersonModalOpen] = useState(false);
   const { currentUser } = useUserContext();
   const router = useRouter();
 
-  // Mock data - replace with actual API integration later
-  const people = [
-    {
-      id: "1",
-      attributes: {
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@example.com",
-        role: "Teacher",
-        status: "Active",
-      },
-    },
-    {
-      id: "2",
-      attributes: {
-        firstName: "Jane",
-        lastName: "Smith",
-        email: "jane.smith@example.com",
-        role: "Administrator",
-        status: "Active",
-      },
-    },
-    {
-      id: "3",
-      attributes: {
-        firstName: "Bob",
-        lastName: "Wilson",
-        email: "bob.wilson@example.com",
-        role: "Principal",
-        status: "Inactive",
-      },
-    },
-  ];
-
-  const isLoading = false; // Replace with actual loading state
+  const { people, isLoading } = usePersons({
+    lightweight: true,
+  });
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
@@ -89,7 +59,7 @@ const AdminPeople = () => {
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="bodyLarge">
-                {people?.length || 0} people
+                {people?.data?.length || 0} people
               </Typography>
             </Grid>
             <Grid item>
@@ -115,7 +85,7 @@ const AdminPeople = () => {
                         </ListItemText>
                       </ListItem>
                     ))
-                  ) : people?.length === 0 ? (
+                  ) : people?.data?.length === 0 ? (
                     <ListItem>
                       <ListItemText>
                         <Typography
@@ -128,7 +98,7 @@ const AdminPeople = () => {
                       </ListItemText>
                     </ListItem>
                   ) : (
-                    people?.map((person, i) => (
+                    people?.data?.map((person, i) => (
                       <ListItem
                         key={person.id}
                         disablePadding
@@ -146,8 +116,8 @@ const AdminPeople = () => {
                               }}
                             >
                               <Typography variant="bodySmall">
-                                {person.attributes.firstName[0]}
-                                {person.attributes.lastName[0]}
+                                {person.attributes.firstName?.[0] || ""}
+                                {person.attributes.lastName?.[0] || ""}
                               </Typography>
                             </Avatar>
                           </ListItemIcon>
@@ -163,19 +133,24 @@ const AdminPeople = () => {
                           />
                           <ListItemSecondaryAction>
                             <Stack direction="row" spacing={2}>
+                              {person.attributes.roleList?.map(
+                                (role, index) => (
+                                  <Chip
+                                    key={`${role}-${index}`}
+                                    label={role}
+                                    size="small"
+                                    color="default"
+                                  />
+                                )
+                              )}
                               <Chip
-                                label={person.attributes.role}
-                                size="small"
-                                color="default"
-                              />
-                              <Chip
-                                label={person.attributes.status}
-                                size="small"
-                                color={
-                                  person.attributes.status === "Active"
-                                    ? "primary"
-                                    : "default"
+                                label={
+                                  person.attributes.showNetwork
+                                    ? "Visible"
+                                    : "Not Visible"
                                 }
+                                size="small"
+                                variant="outlined"
                               />
                             </Stack>
                           </ListItemSecondaryAction>
