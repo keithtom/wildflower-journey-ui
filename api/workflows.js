@@ -38,11 +38,34 @@ export const showResources = {
   },
 };
 
-async function remove(workflowId) {
+async function update(workflowId, visible) {
   const config = getAuthHeader();
   try {
-    const response = await workflowsApi.delete(
+    const response = await workflowsApi.put(
       `/workflows/${workflowId}`,
+      {
+        workflow: {
+          visible: visible,
+        },
+      },
+      config
+    );
+    return response;
+  } catch (error) {
+    wildflowerApi.handleErrors(error);
+  }
+}
+async function create(schoolId, definitionId) {
+  const config = getAuthHeader();
+  try {
+    const response = await workflowsApi.post(
+      `/workflows`,
+      {
+        workflow: {
+          school_id: schoolId,
+          definition_id: definitionId,
+        },
+      },
       config
     );
     return response;
@@ -54,5 +77,6 @@ async function remove(workflowId) {
 export default {
   showWorkflow,
   showResources,
-  remove,
+  update,
+  create,
 };

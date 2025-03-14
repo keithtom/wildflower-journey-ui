@@ -96,4 +96,16 @@ export const showPersons = {
   },
 };
 
-export default { show, update, index, create };
+async function remove(personId) {
+  let response;
+  try {
+    const config = getAuthHeader();
+    response = await peopleApi.delete(`/${personId}`, config);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+  const data = await response.data;
+  return data;
+}
+
+export default { show, update, index, create, remove };

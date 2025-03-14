@@ -24,6 +24,7 @@ import { styled } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
+import schoolsApi from "@api/schools";
 import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/router";
 
@@ -353,18 +354,14 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
   const onSubmit = (data) => {
     const newPerson = data.teacher
       ? {
-          id: data.teacher.id,
           first_name: data.teacher.attributes.firstName,
           last_name: data.teacher.attributes.lastName,
           email: data.teacher.attributes.email,
-          imageUrl: data.teacher.attributes.imageUrl,
-          isExisting: true,
         }
       : {
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
-          isExisting: false,
         };
 
     setMultiplePeople((prev) => [...prev, newPerson]);
@@ -391,7 +388,6 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
     setPerPage(500);
     setFilters({
       models: "people",
-      "people_filters[roles]": ["Teacher Leader"],
     });
   }, []);
 
@@ -431,9 +427,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                                   {person.first_name} {person.last_name}
                                 </Typography>
                                 <Typography variant="bodyRegular" lightened>
-                                  {person.isExisting
-                                    ? "Existing Teacher Leader"
-                                    : "New Teacher Leader"}
+                                  Emerging Teacher Leader
                                 </Typography>
                               </Stack>
                             </Stack>
@@ -537,7 +531,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label="Search for an existing Teacher Leader"
+                              label="Search for an existing person"
                               error={isTouched && !!error}
                               placeholder="e.g. Katelyn Shore"
                               helperText={
@@ -567,7 +561,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="bodyRegular" lightened>
-                      Or add a new Teacher Leader:
+                      Or add a new person
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -1262,21 +1256,17 @@ const InviteSchool = ({
   } = useForm();
 
   const onSubmit = async () => {
-    // console.log({ team });
     try {
-      await teamsApi.inviteTeam({ team: team });
+      await schoolsApi.create({ school: team });
+      handleInviteComplete();
     } catch (error) {
       if (error?.response?.status === 422) {
         setDuplicateEmailError(error.response.data.message);
       }
-      // console.log({ error });
       console.error(error);
     }
-    handleInviteComplete();
   };
-  // console.log({ team });
-  // console.log({ duplicateEmailError });
-  // console.log({ tempDisplayData });
+
   return (
     <Modal
       open={open}

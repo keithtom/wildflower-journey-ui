@@ -49,6 +49,8 @@ const AdminPeople = () => {
     lightweight: true,
   });
 
+  console.log({ people });
+
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
   const handlePersonClick = (personId) => {
@@ -61,7 +63,7 @@ const AdminPeople = () => {
 
     return people.data.reduce(
       (acc, person) => {
-        if (person.attributes.showNetwork) {
+        if (person.attributes.active) {
           acc.visible.push(person);
         } else {
           acc.notVisible.push(person);
@@ -71,6 +73,8 @@ const AdminPeople = () => {
       { visible: [], notVisible: [] }
     );
   }, [people]);
+
+  console.log({ groupedPeople });
 
   const PeopleList = ({ people, emptyMessage }) => (
     <List>

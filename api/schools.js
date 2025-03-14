@@ -8,6 +8,11 @@ function getAuthHeader() {
   return { headers: { Authorization: token } };
 }
 
+async function create(params) {
+  const config = getAuthHeader();
+  return schoolsApi.post("", params, config);
+}
+
 // TODO update to SWR hook
 async function index() {
   return schoolsApi.get();
@@ -127,6 +132,11 @@ async function removePartner(schoolId, partnerId, endDate) {
   }
 }
 
+async function remove(id) {
+  const config = getAuthHeader();
+  return schoolsApi.delete(`/${id}`, config);
+}
+
 export default {
   index,
   show,
@@ -134,4 +144,6 @@ export default {
   invitePartner,
   reinvitePartner,
   removePartner,
+  remove,
+  create,
 };

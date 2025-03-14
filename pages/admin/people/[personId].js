@@ -264,14 +264,25 @@ const PersonIdPage = () => {
       label: "Visible in Directory",
       description: "Control person visibility",
       icon: <Visibility />,
-      value: true,
-      action: (checked) => console.log("Visibility changed:", checked),
+      value: person?.data?.attributes?.active || false,
+      action: async (checked) => {
+        try {
+          await peopleApi.update(personId, {
+            person: {
+              active: checked,
+            },
+          });
+          await mutate(`/v1/people/${personId}`);
+        } catch (error) {
+          console.error("Error updating visibility:", error);
+        }
+      },
     },
     {
       id: 3,
       type: "button",
       label: "Remove Person",
-      description: "Permanently delete this person",
+      description: "Remove school relationships and login",
       icon: <Delete />,
       action: () => setRemovePersonModalOpen(true),
       color: "error",
@@ -551,6 +562,12 @@ const EditDetailsModal = ({ open, onClose, person }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
+  // Helper function to get clean value from person data
+  const getDefaultValue = (key) => {
+    const value = person.find((item) => item.key === key)?.value;
+    return value === "Not provided" ? "" : value || "";
+  };
+
   const {
     control,
     handleSubmit,
@@ -558,27 +575,23 @@ const EditDetailsModal = ({ open, onClose, person }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      firstName: person.find((item) => item.key === "firstName")?.value || "",
-      lastName: person.find((item) => item.key === "lastName")?.value || "",
-      email: person.find((item) => item.key === "email")?.value || "",
-      phone: person.find((item) => item.key === "phone")?.value || "",
-      city: person.find((item) => item.key === "city")?.value || "",
-      state: person.find((item) => item.key === "state")?.value || "",
-      about: person.find((item) => item.key === "about")?.value || "",
-      primaryLanguage:
-        person.find((item) => item.key === "primaryLanguage")?.value || "",
-      gender: person.find((item) => item.key === "gender")?.value || "",
-      pronouns: person.find((item) => item.key === "pronouns")?.value || "",
+      firstName: getDefaultValue("firstName"),
+      lastName: getDefaultValue("lastName"),
+      email: getDefaultValue("email"),
+      phone: getDefaultValue("phone"),
+      city: getDefaultValue("city"),
+      state: getDefaultValue("state"),
+      about: getDefaultValue("about"),
+      primaryLanguage: getDefaultValue("primaryLanguage"),
+      gender: getDefaultValue("gender"),
+      pronouns: getDefaultValue("pronouns"),
       raceEthnicity:
         person.find((item) => item.key === "raceEthnicity")?.value || [],
-      montessoriCertified:
-        person.find((item) => item.key === "montessoriCertified")?.value || "",
+      montessoriCertified: getDefaultValue("montessoriCertified"),
       montessoriCertifiedLevels:
         person.find((item) => item.key === "montessoriCertifiedLevels")
           ?.value || [],
-      montessoriCertifiedYear:
-        person.find((item) => item.key === "montessoriCertifiedYear")?.value ||
-        "",
+      montessoriCertifiedYear: getDefaultValue("montessoriCertifiedYear"),
     },
   });
 
@@ -591,33 +604,48 @@ const EditDetailsModal = ({ open, onClose, person }) => {
   const onSubmit = async (data) => {
     setError(null);
     setIsSubmitting(true);
+
+    // Create the person update object
+    const personUpdate = {
+      person: {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+      },
+    };
+
+    // Add optional fields only if they have values
+    if (data.phone) personUpdate.person.phone = data.phone;
+    if (data.about) personUpdate.person.about = data.about;
+    if (data.primaryLanguage)
+      personUpdate.person.primary_language = data.primaryLanguage;
+    if (data.gender) personUpdate.person.gender = data.gender;
+    if (data.pronouns) personUpdate.person.pronouns = data.pronouns;
+
+    // Always include Montessori certification fields
+    personUpdate.person.montessori_certified = data.montessoriCertified;
+    personUpdate.person.montessori_certified_level_list =
+      data.montessoriCertifiedLevels || [];
+    if (data.montessoriCertifiedYear) {
+      personUpdate.person.montessori_certified_year =
+        data.montessoriCertifiedYear;
+    }
+
+    // Handle arrays - only include if they have values
+    if (data.raceEthnicity?.length > 0) {
+      personUpdate.person.race_ethnicity_list = data.raceEthnicity;
+    }
+
+    // Only include address_attributes if either city or state has a value
+    if (data.city || data.state) {
+      personUpdate.person.address_attributes = {
+        ...(data.city && { city: data.city }),
+        ...(data.state && { state: data.state }),
+      };
+    }
+
     try {
-      await peopleApi.update(personId, {
-        person: {
-          // Wrap data in person object
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          city: data.city,
-          state: data.state,
-          about: data.about,
-          location: data.location,
-          montessori_certified: data.montessoriCertified,
-          montessori_certified_level_list: data.montessoriCertifiedLevels,
-          montessori_certified_year: data.montessoriCertifiedYear,
-          primary_language: data.primaryLanguage,
-          primary_language_other: data.primaryLanguageOther,
-          race_ethnicity_list: data.raceEthnicity,
-          race_ethnicity_other: data.raceEthnicityOther,
-          gender: data.gender,
-          gender_other: data.genderOther,
-          pronouns: data.pronouns,
-          pronouns_other: data.pronounsOther,
-          household_income: data.householdIncome,
-          role_list: data.roles,
-        },
-      });
+      await peopleApi.update(personId, personUpdate);
       await mutate(`/v1/people/${personId}`);
       handleClose();
     } catch (err) {
@@ -991,6 +1019,8 @@ const ResetPasswordModal = ({ open, onClose, personName }) => {
 };
 
 const RemovePersonModal = ({ open, onClose, personName }) => {
+  const router = useRouter();
+  const { personId } = router.query;
   const {
     control,
     handleSubmit,
@@ -1005,21 +1035,33 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
 
   const confirmName = watch("confirmName");
   const isNameConfirmed = confirmName === personName;
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (open) {
       reset({ confirmName: "" });
+      setError(null);
     }
   }, [open, reset]);
 
   const handleClose = () => {
     reset();
+    setError(null);
     onClose();
   };
 
-  const onSubmit = handleSubmit(() => {
-    // Handle person deletion here
-    handleClose();
+  const onSubmit = handleSubmit(async () => {
+    try {
+      await peopleApi.remove(personId);
+      // Redirect to people list after successful removal
+      router.push("/admin/people");
+    } catch (err) {
+      console.error(err);
+      setError(
+        err?.response?.data?.error ||
+          "An error occurred while removing this person."
+      );
+    }
   });
 
   return (
@@ -1029,12 +1071,17 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
         <DialogContent>
           <Stack spacing={3}>
             <Typography color="error">
-              This action cannot be undone. This will permanently delete this
-              person's account and remove all associated data.
+              This will remove all school relationships, remove their login, and
+              remove them from the directory.
             </Typography>
             <Typography>
               To remove "{personName}", please type their full name below:
             </Typography>
+            {error && (
+              <Typography color="error" variant="bodySmall">
+                {error}
+              </Typography>
+            )}
             <Controller
               name="confirmName"
               control={control}
@@ -1066,7 +1113,11 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
             color="error"
             disabled={!isNameConfirmed || isSubmitting}
           >
-            Remove Person
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Remove Person"
+            )}
           </Button>
         </DialogActions>
       </form>

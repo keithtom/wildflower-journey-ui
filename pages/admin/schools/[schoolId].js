@@ -28,6 +28,7 @@ import {
   CircularProgress,
   Chip,
   FormHelperText,
+  FormControlLabel,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import {
@@ -76,6 +77,7 @@ const SchoolIdPage = () => {
   const [removeWorkflowModalOpen, setRemoveWorkflowModalOpen] = useState(false);
   const [setStatusModalOpen, setSetStatusModalOpen] = useState(false);
   const [removeSchoolModalOpen, setRemoveSchoolModalOpen] = useState(false);
+  const [editMemberModalOpen, setEditMemberModalOpen] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
 
@@ -144,48 +146,56 @@ const SchoolIdPage = () => {
   }, [school]);
 
   // Transform associated people data
-  const associatedPeople = useMemo(() => {
+  const { activePeople, formerPeople } = useMemo(() => {
     if (!school?.data?.relationships?.people?.data || !school?.included)
-      return [];
+      return { activePeople: [], formerPeople: [] };
 
-    return school.data.relationships.people.data
+    const transformPerson = (personRelation, schoolRelationship) => {
+      // Find the person in the included array
+      const personData = school.included.find(
+        (item) => item.type === "person" && item.id === personRelation.id
+      );
+
+      if (!personData || !schoolRelationship) return null;
+
+      // Get the roleList from the school relationship
+      const roleList = schoolRelationship.attributes.roleList || [];
+
+      // If the role is "Wildflower Support", replace it with the title and append (WS)
+      const transformedRoleList = roleList.map((role) =>
+        role === "Wildflower Support" && schoolRelationship.attributes.title
+          ? `${schoolRelationship.attributes.title} (WS)`
+          : role
+      );
+
+      return {
+        id: personData.id,
+        firstName: personData.attributes.firstName,
+        lastName: personData.attributes.lastName,
+        roleList: transformedRoleList,
+        imageUrl: personData.attributes.imageUrl,
+        endDate: schoolRelationship.attributes.endDate,
+      };
+    };
+
+    const people = school.data.relationships.people.data
       .map((personRelation) => {
-        // Find the person in the included array
-        const personData = school.included.find(
-          (item) => item.type === "person" && item.id === personRelation.id
-        );
-
-        if (!personData) return null;
-
         // Find the school relationship for this person
         const schoolRelationship = school.included.find(
           (item) =>
             item.type === "schoolRelationship" &&
-            item.relationships?.person?.data?.id === personData.id &&
+            item.relationships?.person?.data?.id === personRelation.id &&
             item.relationships?.school?.data?.id === school.data.id
         );
 
-        if (!schoolRelationship) return null;
-
-        // Get the roleList from the school relationship
-        const roleList = schoolRelationship.attributes.roleList || [];
-
-        // If the role is "Wildflower Support", replace it with the title and append (WS)
-        const transformedRoleList = roleList.map((role) =>
-          role === "Wildflower Support" && schoolRelationship.attributes.title
-            ? `${schoolRelationship.attributes.title} (WS)`
-            : role
-        );
-
-        return {
-          id: personData.id,
-          firstName: personData.attributes.firstName,
-          lastName: personData.attributes.lastName,
-          roleList: transformedRoleList,
-          imageUrl: personData.attributes.imageUrl,
-        };
+        return transformPerson(personRelation, schoolRelationship);
       })
       .filter(Boolean); // Remove any null entries
+
+    return {
+      activePeople: people.filter((person) => !person.endDate),
+      formerPeople: people.filter((person) => person.endDate),
+    };
   }, [school]);
 
   const currentWorkflows = [{ id: 1, name: "School Startup Journey" }];
@@ -198,31 +208,36 @@ const SchoolIdPage = () => {
       description: `Current status: ${
         school?.data?.attributes?.status || "Unknown"
       }`,
-      icon: <FiberManualRecord color="primary" />,
+      icon: (
+        <FiberManualRecord
+          color={
+            school?.data?.attributes?.status === "Open"
+              ? "primary"
+              : school?.data?.attributes?.status === "Abandoned"
+              ? "error"
+              : "secondary"
+          }
+        />
+      ),
       action: () => setSetStatusModalOpen(true),
       color: "primary",
     },
     {
       id: 4,
-      type: "switch",
-      label: "Member",
-      description: "School membership status",
+      type: "button",
+      label: "Set Membership",
+      description: `Current status: ${
+        school?.data?.attributes?.affiliated ? "Affiliated" : "Not Affiliated"
+      } ${
+        school?.data?.attributes?.affiliationDate &&
+        school?.data?.attributes?.affiliated
+          ? `on ${school?.data?.attributes?.affiliationDate}`
+          : ""
+      }`,
       icon: <Groups />,
       value: school?.data?.attributes?.affiliated || false,
-      action: async (checked) => {
-        try {
-          await schoolsApi.update(schoolId, {
-            school: {
-              affiliated: checked,
-            },
-          });
-          // Refresh the school data
-          mutate(`/v1/schools/${schoolId}`);
-        } catch (err) {
-          console.error("Failed to update member status:", err);
-          // You might want to add a toast or other error notification here
-        }
-      },
+      action: () => setEditMemberModalOpen(true),
+      color: "primary",
     },
     {
       id: 5,
@@ -350,9 +365,7 @@ const SchoolIdPage = () => {
                       alignItems: "center",
                     }}
                   >
-                    <Typography variant="bodyLarge">
-                      Associated People
-                    </Typography>
+                    <Typography variant="bodyLarge">Current People</Typography>
                     <Button
                       size="small"
                       variant="contained"
@@ -363,7 +376,7 @@ const SchoolIdPage = () => {
                   </ListSubheader>
                 }
               >
-                {associatedPeople.length === 0 ? (
+                {activePeople.length === 0 ? (
                   <ListItem>
                     <ListItemText>
                       <Typography
@@ -371,12 +384,12 @@ const SchoolIdPage = () => {
                         lightened
                         align="center"
                       >
-                        No associated people
+                        No current people
                       </Typography>
                     </ListItemText>
                   </ListItem>
                 ) : (
-                  associatedPeople.map((person) => (
+                  activePeople.map((person) => (
                     <ListItem key={person.id} divider>
                       <ListItemIcon>
                         <Avatar sx={{ bgcolor: "primary.main" }}>
@@ -388,52 +401,66 @@ const SchoolIdPage = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={`${person.firstName} ${person.lastName}`}
-                        secondary={
-                          person.roleList.join(", ") || "No roles assigned"
-                        }
+                        secondary={person.roleList.join(", ")}
                         primaryTypographyProps={{
                           variant: "bodyRegular",
                         }}
                         secondaryTypographyProps={{
-                          variant: "bodyRegular",
-                          color: person.roleList.length
-                            ? "text.primary"
-                            : "text.secondary",
-                          sx: {
-                            whiteSpace: "normal",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                            pr: 24, // Add padding to prevent text from hitting actions
-                          },
+                          variant: "bodySmall",
                         }}
                       />
                       <ListItemSecondaryAction>
-                        <Stack direction="row" spacing={1}>
-                          <Button
-                            size="small"
-                            variant="text"
-                            onClick={() =>
-                              router.push(`/admin/people/${person.id}`)
-                            }
-                          >
-                            View
-                          </Button>
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            onClick={() => handleEditPerson(person)}
-                          >
-                            Edit
-                          </Button>
-                        </Stack>
+                        <Button
+                          size="small"
+                          onClick={() => handleEditPerson(person)}
+                        >
+                          Edit
+                        </Button>
                       </ListItemSecondaryAction>
                     </ListItem>
                   ))
                 )}
               </List>
+              {formerPeople.length > 0 && (
+                <>
+                  <ListSubheader
+                    component="div"
+                    sx={{
+                      background: "#f1f1f1",
+                      paddingX: 4,
+                      paddingY: 3,
+                      borderTop: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Typography variant="bodyLarge">Former People</Typography>
+                  </ListSubheader>
+                  <List>
+                    {formerPeople.map((person) => (
+                      <ListItem key={person.id} divider disabled>
+                        <ListItemIcon>
+                          <Avatar sx={{ bgcolor: "primary.main" }}>
+                            <Typography variant="bodySmall">
+                              {person.firstName?.[0] || ""}
+                              {person.lastName?.[0] || ""}
+                            </Typography>
+                          </Avatar>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={`${person.firstName} ${person.lastName}`}
+                          secondary={person.roleList.join(", ")}
+                          primaryTypographyProps={{
+                            variant: "bodyRegular",
+                          }}
+                          secondaryTypographyProps={{
+                            variant: "bodySmall",
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </>
+              )}
             </Card>
 
             {/* School Details Section */}
@@ -639,6 +666,11 @@ const SchoolIdPage = () => {
         open={removeSchoolModalOpen}
         onClose={() => setRemoveSchoolModalOpen(false)}
         schoolName={schoolData.find((item) => item.key === "name")?.value || ""}
+      />
+      <EditMemberModal
+        open={editMemberModalOpen}
+        onClose={() => setEditMemberModalOpen(false)}
+        school={school}
       />
     </PageContainer>
   );
@@ -899,6 +931,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
     try {
       await schoolsApi.update(schoolId, {
         school: {
+          name: data.name,
           about: data.about,
           opened_on: data.openedOn,
           expected_start_date: data.expectedStartDate,
@@ -941,6 +974,21 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                 {error}
               </Typography>
             )}
+
+            <Controller
+              name="name"
+              control={control}
+              rules={{ required: "School name is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="School Name"
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                  fullWidth
+                />
+              )}
+            />
 
             <Controller
               name="about"
@@ -1200,7 +1248,7 @@ const AddWorkflowModal = ({ open, onClose }) => {
       { recurring: [], nonRecurring: [] }
     );
   }, [workflows]);
-  console.log({ groupedWorkflows });
+
   const handleClose = () => {
     reset();
     setError(null);
@@ -1212,13 +1260,9 @@ const AddWorkflowModal = ({ open, onClose }) => {
     setError(null);
 
     try {
-      await workflowsApi.create({
-        workflow: {
-          definition_id: data.workflow,
-          school_id: schoolId,
-        },
-      });
+      await workflowsApi.create(schoolId, data.workflow);
 
+      // console.log({ data });
       // Refresh the school data
       mutate(`/v1/schools/${schoolId}`);
       handleClose();
@@ -1616,7 +1660,7 @@ const RemoveWorkflowModal = ({ open, onClose, workflow }) => {
     setError(null);
 
     try {
-      await workflowsApi.remove(workflow.id);
+      await workflowsApi.update(workflow.id, false);
       // Refresh the school data
       mutate(`/v1/schools/${schoolId}`);
       handleClose();
@@ -1643,6 +1687,10 @@ const RemoveWorkflowModal = ({ open, onClose, workflow }) => {
             <Typography>
               To remove the workflow "{workflow.attributes.name}", please type
               its name below:
+            </Typography>
+            <Typography color="error">
+              Please be extremely sure that you want to remove this workflow as
+              it is costly to reinstate!
             </Typography>
             <Controller
               name="confirmName"
@@ -1681,6 +1729,7 @@ const RemoveWorkflowModal = ({ open, onClose, workflow }) => {
 };
 
 const STATUS_OPTIONS = [
+  { value: "Abandoned", label: "Abandoned" },
   { value: "Emerging", label: "Emerging" },
   { value: "Open", label: "Open" },
 ];
@@ -1787,6 +1836,11 @@ const SetStatusModal = ({ open, onClose, currentStatus }) => {
 };
 
 const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
+  const router = useRouter();
+  const { schoolId } = router.query;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
   const {
     control,
     handleSubmit,
@@ -1805,17 +1859,28 @@ const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
   useEffect(() => {
     if (open) {
       reset({ confirmName: "" });
+      setError(null);
     }
   }, [open, reset]);
 
   const handleClose = () => {
     reset();
+    setError(null);
     onClose();
   };
 
-  const onSubmit = handleSubmit((data) => {
-    console.log("Remove school:", schoolName);
-    handleClose();
+  const onSubmit = handleSubmit(async () => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      await schoolsApi.remove(schoolId);
+      // Redirect to schools list after successful removal
+      router.push("/admin/schools");
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to remove school");
+      setIsSubmitting(false);
+    }
   });
 
   return (
@@ -1830,6 +1895,11 @@ const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
             <Typography>
               To remove "{schoolName}", please type the school name below:
             </Typography>
+            {error && (
+              <Typography color="error" variant="bodySmall">
+                {error}
+              </Typography>
+            )}
             <Controller
               name="confirmName"
               control={control}
@@ -1852,9 +1922,13 @@ const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
             type="submit"
             variant="contained"
             color="error"
-            disabled={!isNameConfirmed}
+            disabled={!isNameConfirmed || isSubmitting}
           >
-            Remove School
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Remove School"
+            )}
           </Button>
         </DialogActions>
       </form>
@@ -1908,6 +1982,142 @@ const WorkflowItem = ({ workflowId, onRemove }) => {
         </Button>
       </ListItemSecondaryAction>
     </ListItem>
+  );
+};
+
+const EditMemberModal = ({ open, onClose, school }) => {
+  const router = useRouter();
+  const { schoolId } = router.query;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      affiliated: school?.data?.attributes?.affiliated || false,
+      affiliationDate: school?.data?.attributes?.affiliationDate || "",
+    },
+  });
+
+  useEffect(() => {
+    if (school) {
+      reset({
+        affiliated: school.data.attributes.affiliated || false,
+        affiliationDate: school.data.attributes.affiliationDate || "",
+      });
+    }
+  }, [school, reset]);
+
+  const handleClose = () => {
+    reset();
+    setError(null);
+    onClose();
+  };
+
+  const onSubmit = handleSubmit(async (data) => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      // Only include affiliation_date in the update if:
+      // 1. The school is being set to affiliated (true)
+      // 2. The school was previously affiliated and has an existing date
+      const updateData = {
+        affiliated: data.affiliated,
+        ...(data.affiliated || school.data.attributes.affiliationDate
+          ? { affiliation_date: data.affiliationDate }
+          : {}),
+      };
+
+      await schoolsApi.update(schoolId, {
+        school: updateData,
+      });
+
+      // Refresh the school data
+      mutate(`/v1/schools/${schoolId}`);
+      handleClose();
+    } catch (err) {
+      setError(
+        err?.response?.data?.message || "Failed to update school member status"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  });
+
+  const affiliated = watch("affiliated");
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Edit School Member Status</DialogTitle>
+      <form onSubmit={onSubmit}>
+        <DialogContent>
+          <Stack spacing={3}>
+            {error && (
+              <Typography color="error" variant="bodySmall">
+                {error}
+              </Typography>
+            )}
+            <Controller
+              name="affiliated"
+              control={control}
+              render={({ field: { value, onChange, ...field } }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={value}
+                      onChange={(e) => onChange(e.target.checked)}
+                      {...field}
+                    />
+                  }
+                  label="Member"
+                />
+              )}
+            />
+            {affiliated ? (
+              <Controller
+                name="affiliationDate"
+                control={control}
+                rules={{
+                  required: affiliated
+                    ? "Affiliation date is required for members"
+                    : false,
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Affiliation Date"
+                    type="date"
+                    fullWidth
+                    disabled={
+                      !affiliated && !school.data.attributes.affiliationDate
+                    }
+                    error={!!errors.affiliationDate}
+                    helperText={errors.affiliationDate?.message}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                )}
+              />
+            ) : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 };
 
