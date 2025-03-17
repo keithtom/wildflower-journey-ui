@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Stepper,
   Step,
@@ -17,29 +17,31 @@ import {
   ListItemSecondaryAction,
   ListItemIcon,
   Autocomplete,
+  ListSubheader,
 } from "@mui/material";
 import { School } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
 import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
+import schoolsApi from "@api/schools";
 import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/router";
 
 import { clearLoggedInState } from "@lib/handleLogout";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
-import useAllTeams from "@hooks/useAllTeams";
+import useSchools from "@hooks/useSchools";
 import useWorkflows from "@hooks/workflow/definition/useWorkflows";
 import useSearch from "@hooks/useSearch";
 import {
+  Card,
   Box,
   PageContainer,
   Button,
   Grid,
   Typography,
   Stack,
-  Card,
   Avatar,
   Modal,
   Radio,
@@ -51,13 +53,100 @@ const AdminSSJ = ({}) => {
   const { currentUser } = useUserContext();
   const router = useRouter();
 
-  const { teams, isLoading } = useAllTeams();
+  const { data: schools, isLoading } = useSchools({
+    status: ["Emerging", "Open"],
+    serialization_fields: ["name", "status", "currentPhase"],
+  });
+
+  useEffect(() => {
+    console.log({ schools });
+  }, [schools]);
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
   const handleSchoolClick = (schoolId) => {
     router.push(`/admin/schools/${schoolId}`);
   };
+
+  // Get all unique status values and group schools
+  const schoolsByStatus = useMemo(() => {
+    if (!schools?.data) return {};
+
+    return schools.data.reduce((acc, school) => {
+      const status = school.attributes.status || "Unknown";
+      if (!acc[status]) {
+        acc[status] = [];
+      }
+      acc[status].push(school);
+      return acc;
+    }, {});
+  }, [schools]);
+
+  const SchoolList = ({ schools, status }) => (
+    <Card noPadding>
+      <List
+        subheader={
+          <ListSubheader
+            component="div"
+            sx={{
+              background: "#f1f1f1",
+              paddingX: 4,
+              paddingY: 3,
+            }}
+          >
+            <Typography variant="bodyLarge" bold lightened>
+              {status} Schools
+            </Typography>
+          </ListSubheader>
+        }
+      >
+        {schools.length === 0 ? (
+          <ListItem disablePadding>
+            <ListItemText>
+              <Typography variant="bodyRegular" lightened align="center">
+                No {status.toLowerCase()} schools
+              </Typography>
+            </ListItemText>
+          </ListItem>
+        ) : (
+          schools.map((school, i) => (
+            <ListItem
+              key={school.id}
+              disablePadding
+              divider={i !== schools.length - 1}
+            >
+              <ListItemButton onClick={() => handleSchoolClick(school.id)}>
+                <ListItemIcon>
+                  <School fontSize="small" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={school.attributes.name}
+                  primaryTypographyProps={{
+                    variant: "bodyRegular",
+                  }}
+                />
+                <ListItemSecondaryAction>
+                  <Stack direction="row" spacing={2}>
+                    {school.attributes.status === "Emerging" &&
+                      school.attributes.currentPhase && (
+                        <Chip
+                          label={school.attributes.currentPhase}
+                          size="small"
+                          variant="outlined"
+                        />
+                      )}
+                  </Stack>
+                </ListItemSecondaryAction>
+              </ListItemButton>
+            </ListItem>
+          ))
+        )}
+      </List>
+    </Card>
+  );
+
+  // Define the preferred order of status types
+  const statusOrder = ["Open", "Emerging", "Unknown"];
 
   return (
     <>
@@ -66,7 +155,7 @@ const AdminSSJ = ({}) => {
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="bodyLarge">
-                {teams?.length || 0} schools
+                {schools?.data?.length || 0} schools
               </Typography>
             </Grid>
             <Grid item>
@@ -77,75 +166,34 @@ const AdminSSJ = ({}) => {
               </Button>
             </Grid>
           </Grid>
-          <Grid container>
-            <Grid item xs={12}>
-              <Card sx={{ padding: 0 }}>
-                <List>
-                  {isLoading ? (
-                    Array.from({ length: 8 }).map((_, index) => (
-                      <ListItem key={index} divider>
-                        <ListItemIcon>
-                          <Skeleton variant="circular" width={24} height={24} />
-                        </ListItemIcon>
-                        <ListItemText>
-                          <Skeleton variant="text" width={240} />
-                        </ListItemText>
-                      </ListItem>
-                    ))
-                  ) : teams?.length === 0 ? (
-                    <ListItem>
-                      <ListItemText>
-                        <Typography
-                          variant="bodyRegular"
-                          lightened
-                          align="center"
-                        >
-                          No schools yet
-                        </Typography>
-                      </ListItemText>
-                    </ListItem>
-                  ) : (
-                    teams?.map((team, i) => (
-                      <ListItem
-                        key={team.id}
-                        disablePadding
-                        divider={i !== teams.length - 1}
-                      >
-                        <ListItemButton
-                          onClick={() => handleSchoolClick(team.id)}
-                        >
-                          <ListItemIcon>
-                            <School fontSize="small" />
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={team.attributes.tempName}
-                            primaryTypographyProps={{
-                              variant: "bodyRegular",
-                            }}
-                          />
-                          <ListItemSecondaryAction>
-                            <Stack direction="row" spacing={2}>
-                              {team.attributes.status && (
-                                <Chip
-                                  label={team.attributes.status}
-                                  size="small"
-                                  color={
-                                    team.attributes.status === "Open"
-                                      ? "primary"
-                                      : "default"
-                                  }
-                                />
-                              )}
-                            </Stack>
-                          </ListItemSecondaryAction>
-                        </ListItemButton>
-                      </ListItem>
-                    ))
-                  )}
-                </List>
-              </Card>
-            </Grid>
-          </Grid>
+          {isLoading ? (
+            <Card sx={{ borderRadius: 4 }}>
+              <Stack spacing={2} p={3}>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Skeleton key={i} height={60} />
+                ))}
+              </Stack>
+            </Card>
+          ) : (
+            <Stack spacing={6}>
+              {Object.entries(schoolsByStatus)
+                .sort(([statusA], [statusB]) => {
+                  const indexA = statusOrder.indexOf(statusA);
+                  const indexB = statusOrder.indexOf(statusB);
+                  // If status not in statusOrder, put it at the end
+                  if (indexA === -1) return 1;
+                  if (indexB === -1) return -1;
+                  return indexA - indexB;
+                })
+                .map(([status, schoolsList]) => (
+                  <SchoolList
+                    key={status}
+                    schools={schoolsList}
+                    status={status}
+                  />
+                ))}
+            </Stack>
+          )}
         </Stack>
       </PageContainer>
       <AddSchoolModal
@@ -306,18 +354,14 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
   const onSubmit = (data) => {
     const newPerson = data.teacher
       ? {
-          id: data.teacher.id,
           first_name: data.teacher.attributes.firstName,
           last_name: data.teacher.attributes.lastName,
           email: data.teacher.attributes.email,
-          imageUrl: data.teacher.attributes.imageUrl,
-          isExisting: true,
         }
       : {
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
-          isExisting: false,
         };
 
     setMultiplePeople((prev) => [...prev, newPerson]);
@@ -344,7 +388,6 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
     setPerPage(500);
     setFilters({
       models: "people",
-      "people_filters[roles]": ["Teacher Leader"],
     });
   }, []);
 
@@ -384,9 +427,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                                   {person.first_name} {person.last_name}
                                 </Typography>
                                 <Typography variant="bodyRegular" lightened>
-                                  {person.isExisting
-                                    ? "Existing Teacher Leader"
-                                    : "New Teacher Leader"}
+                                  Emerging Teacher Leader
                                 </Typography>
                               </Stack>
                             </Stack>
@@ -490,7 +531,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label="Search for an existing Teacher Leader"
+                              label="Search for an existing person"
                               error={isTouched && !!error}
                               placeholder="e.g. Katelyn Shore"
                               helperText={
@@ -520,7 +561,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="bodyRegular" lightened>
-                      Or add a new Teacher Leader:
+                      Or add a new person
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -1215,21 +1256,17 @@ const InviteSchool = ({
   } = useForm();
 
   const onSubmit = async () => {
-    // console.log({ team });
     try {
-      await teamsApi.inviteTeam({ team: team });
+      await schoolsApi.create({ school: team });
+      handleInviteComplete();
     } catch (error) {
       if (error?.response?.status === 422) {
         setDuplicateEmailError(error.response.data.message);
       }
-      // console.log({ error });
       console.error(error);
     }
-    handleInviteComplete();
   };
-  // console.log({ team });
-  // console.log({ duplicateEmailError });
-  // console.log({ tempDisplayData });
+
   return (
     <Modal
       open={open}

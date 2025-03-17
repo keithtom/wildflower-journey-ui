@@ -30,6 +30,8 @@ import {
   FormLabel,
   Autocomplete,
   Chip,
+  Skeleton,
+  CircularProgress,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import {
@@ -47,7 +49,7 @@ import {
   Badge,
   Key,
 } from "@mui/icons-material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import {
   languageOptions,
@@ -61,6 +63,57 @@ import {
 } from "@lib/utils/demographic-options";
 import { useForm } from "react-hook-form";
 import { Controller } from "react-hook-form";
+import usePerson from "@hooks/usePerson";
+import useSchool from "@hooks/useSchool";
+import { mutate } from "swr";
+import peopleApi from "@api/people";
+
+const SchoolItem = ({ schoolId, personRelationships }) => {
+  const { data: schoolData, isLoading } = useSchool(schoolId);
+  const router = useRouter();
+
+  if (isLoading) {
+    return (
+      <ListItem divider>
+        <ListItemText>
+          <Skeleton height={40} />
+        </ListItemText>
+      </ListItem>
+    );
+  }
+
+  if (!schoolData?.data) return null;
+
+  // Find the person in the included data that matches the school's people relationship
+  const schoolPerson = schoolData?.included?.find(
+    (item) =>
+      item.type === "person" &&
+      schoolData.data.relationships.people.data.some((p) => p.id === item.id)
+  );
+
+  // Get the role list from the matched person's attributes
+  const schoolRoleList = schoolPerson?.attributes?.roleList || [];
+
+  return (
+    <ListItem divider>
+      <ListItemIcon>
+        <School />
+      </ListItemIcon>
+      <ListItemText
+        primary={schoolData.data.attributes.name}
+        secondary={schoolRoleList.join(", ") || "No roles assigned"}
+      />
+      <ListItemSecondaryAction>
+        <Button
+          size="small"
+          onClick={() => router.push(`/admin/schools/${schoolData.data.id}`)}
+        >
+          View
+        </Button>
+      </ListItemSecondaryAction>
+    </ListItem>
+  );
+};
 
 const PersonIdPage = () => {
   const [editDetailsModalOpen, setEditDetailsModalOpen] = useState(false);
@@ -68,56 +121,132 @@ const PersonIdPage = () => {
   const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
   const router = useRouter();
   const { personId } = router.query;
+  const { data: person, isLoading } = usePerson(personId);
 
-  // Mock data - replace with actual data fetching
-  const personData = [
-    // General Fields
-    { key: "firstName", value: "John", icon: <Person /> },
-    { key: "lastName", value: "Doe", icon: <Person /> },
-    { key: "email", value: "john.doe@example.com", icon: <Email /> },
-    { key: "phone", value: "+1 (555) 123-4567", icon: <Phone /> },
-    { key: "city", value: "New York", icon: <LocationOn /> },
-    { key: "state", value: "NY", icon: <LocationOn /> },
-    {
-      key: "about",
-      value:
-        "A passionate Montessori educator with over 10 years of experience.",
-      icon: <Person />,
-    },
+  // Get school IDs from relationships
+  const schoolIds = useMemo(
+    () => person?.data?.relationships?.schools?.data?.map((s) => s.id) || [],
+    [person]
+  );
 
-    // Demographic Fields
-    { key: "primaryLanguage", value: "English", icon: <Language /> },
-    {
-      key: "raceEthnicity",
-      value: ["Asian, or Asian American", "White"],
-      icon: <Person />,
-    },
-    { key: "gender", value: "Male/Man", icon: <Wc /> },
-    { key: "pronouns", value: "he/him/his", icon: <Wc /> },
+  useEffect(() => {
+    console.log({ person });
+  }, [person]);
 
-    // Certification & Role Fields
-    { key: "montessoriCertified", value: "Yes", icon: <Badge /> },
-    {
-      key: "montessoriCertifiedLevels",
-      value: ["Primary/Early Childhood", "6-9 Elementary"],
-      icon: <School />,
-    },
-    {
-      key: "montessoriCertifiedYear",
-      value: "Primary/Early Childhood - 2015\n6-9 Elementary - 2018",
-      icon: <School />,
-    },
-  ];
+  const schoolRelationships =
+    person?.data?.relationships?.schoolRelationships?.data || [];
 
-  const associatedSchools = [
-    { id: 1, name: "Montessori School A", role: "Lead Teacher" },
-    { id: 2, name: "Montessori School B", role: "Assistant Teacher" },
-  ];
+  const personData = useMemo(() => {
+    if (!person?.data?.attributes) return [];
 
-  const currentRoles = [
-    { id: 1, role: "Teacher Leader", since: "2020" },
-    { id: 2, role: "Foundation Partner", since: "2022" },
-  ];
+    return [
+      // General Information
+      {
+        key: "firstName",
+        value: person.data.attributes.firstName,
+        icon: <Person />,
+      },
+      {
+        key: "lastName",
+        value: person.data.attributes.lastName,
+        icon: <Person />,
+      },
+      {
+        key: "email",
+        value: person.data.attributes.email,
+        icon: <Email />,
+      },
+      {
+        key: "phone",
+        value: person.data.attributes.phone || "Not provided",
+        icon: <Phone />,
+      },
+      {
+        key: "about",
+        value: person.data.attributes.about || "Not provided",
+        icon: <Person />,
+      },
+
+      // Location
+      {
+        key: "location",
+        value: person.data.attributes.location || "Not provided",
+        icon: <LocationOn />,
+      },
+
+      // Demographics
+      {
+        key: "primaryLanguage",
+        value: person.data.attributes.primaryLanguage || "Not provided",
+        icon: <Language />,
+      },
+      {
+        key: "raceEthnicity",
+        value: person.data.attributes.raceEthnicityList || [],
+        icon: <Person />,
+        isArray: true,
+        emptyMessage: "Not provided",
+      },
+      {
+        key: "gender",
+        value: person.data.attributes.gender || "Not provided",
+        icon: <Wc />,
+      },
+      {
+        key: "pronouns",
+        value: person.data.attributes.pronouns || "Not provided",
+        icon: <Wc />,
+      },
+
+      // Certification
+      {
+        key: "montessoriCertified",
+        value:
+          person.data.attributes.montessoriCertified === "1" ? "Yes" : "No",
+        icon: <Badge />,
+      },
+      {
+        key: "montessoriCertifiedLevels",
+        value: person.data.attributes.montessoriCertifiedLevelList || [],
+        icon: <School />,
+        isArray: true,
+        emptyMessage: "No certifications",
+      },
+      {
+        key: "montessoriCertifiedYear",
+        value: person.data.attributes.montessoriCertifiedYear || "Not provided",
+        icon: <School />,
+      },
+    ];
+  }, [person]);
+
+  const currentRoles = useMemo(() => {
+    if (!person?.data?.attributes?.roleList) return [];
+
+    return person.data.attributes.roleList.map((role) => ({
+      id: role,
+      role: role,
+      since: person.data.attributes.startDate || "N/A",
+    }));
+  }, [person]);
+
+  if (isLoading) {
+    return (
+      <PageContainer isAdmin>
+        <Grid container spacing={6}>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <Stack spacing={2} p={3}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} height={60} />
+                ))}
+              </Stack>
+            </Card>
+          </Grid>
+        </Grid>
+      </PageContainer>
+    );
+  }
 
   const adminActions = [
     {
@@ -135,14 +264,25 @@ const PersonIdPage = () => {
       label: "Visible in Directory",
       description: "Control person visibility",
       icon: <Visibility />,
-      value: true,
-      action: (checked) => console.log("Visibility changed:", checked),
+      value: person?.data?.attributes?.active || false,
+      action: async (checked) => {
+        try {
+          await peopleApi.update(personId, {
+            person: {
+              active: checked,
+            },
+          });
+          await mutate(`/v1/people/${personId}`);
+        } catch (error) {
+          console.error("Error updating visibility:", error);
+        }
+      },
     },
     {
       id: 3,
       type: "button",
       label: "Remove Person",
-      description: "Permanently delete this person",
+      description: "Remove school relationships and login",
       icon: <Delete />,
       action: () => setRemovePersonModalOpen(true),
       color: "error",
@@ -182,13 +322,16 @@ const PersonIdPage = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer
+      isAdmin
+      title={`${person?.data?.attributes?.firstName} ${person?.data?.attributes?.lastName}`}
+    >
       <Grid container spacing={6}>
         {/* Left Column */}
         <Grid item xs={12} md={6}>
           <Stack spacing={6}>
             {/* Person Details Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -223,7 +366,6 @@ const PersonIdPage = () => {
                       alignItems: "center",
                       gap: 2,
                       px: 4,
-                      pr: 12,
                     }}
                   >
                     <ListItemIcon>{item.icon}</ListItemIcon>
@@ -232,25 +374,32 @@ const PersonIdPage = () => {
                         item.key.charAt(0).toUpperCase() +
                         item.key.slice(1).replace(/([A-Z])/g, " $1")
                       }
+                      secondary={
+                        item.isArray
+                          ? item.value?.length > 0
+                            ? item.value.join(", ")
+                            : item.emptyMessage
+                          : item.value
+                      }
                       primaryTypographyProps={{
-                        color: "text.secondary",
                         variant: "bodyRegular",
+                        color: "text.primary",
+                      }}
+                      secondaryTypographyProps={{
+                        variant: "bodyRegular",
+                        color:
+                          item.value === "Not provided"
+                            ? "text.secondary"
+                            : "text.primary",
                       }}
                     />
-                    <ListItemSecondaryAction>
-                      <Typography variant="bodyRegular">
-                        {Array.isArray(item.value)
-                          ? item.value.join(", ")
-                          : item.value}
-                      </Typography>
-                    </ListItemSecondaryAction>
                   </ListItem>
                 ))}
               </List>
             </Card>
 
             {/* Associated Schools Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -271,27 +420,27 @@ const PersonIdPage = () => {
                   </ListSubheader>
                 }
               >
-                {associatedSchools.map((school) => (
-                  <ListItem key={school.id} divider>
-                    <ListItemIcon>
-                      <School />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={school.name}
-                      secondary={school.role}
-                    />
-                    <ListItemSecondaryAction>
-                      <Button
-                        size="small"
-                        onClick={() =>
-                          router.push(`/admin/schools/${school.id}`)
-                        }
+                {schoolIds.length === 0 ? (
+                  <ListItem>
+                    <ListItemText>
+                      <Typography
+                        variant="bodyRegular"
+                        lightened
+                        align="center"
                       >
-                        View
-                      </Button>
-                    </ListItemSecondaryAction>
+                        No associated schools
+                      </Typography>
+                    </ListItemText>
                   </ListItem>
-                ))}
+                ) : (
+                  schoolIds.map((schoolId) => (
+                    <SchoolItem
+                      key={schoolId}
+                      schoolId={schoolId}
+                      personRelationships={schoolRelationships}
+                    />
+                  ))
+                )}
               </List>
             </Card>
           </Stack>
@@ -301,7 +450,7 @@ const PersonIdPage = () => {
         <Grid item xs={12} md={6}>
           <Stack spacing={6}>
             {/* Roles Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -317,22 +466,38 @@ const PersonIdPage = () => {
                   </ListSubheader>
                 }
               >
-                {currentRoles.map((role) => (
-                  <ListItem key={role.id} divider>
-                    <ListItemIcon>
-                      <Work />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={role.role}
-                      secondary={`Since ${role.since}`}
-                    />
+                {currentRoles.length === 0 ? (
+                  <ListItem>
+                    <ListItemText>
+                      <Typography
+                        variant="bodyRegular"
+                        lightened
+                        align="center"
+                      >
+                        No roles assigned
+                      </Typography>
+                    </ListItemText>
                   </ListItem>
-                ))}
+                ) : (
+                  currentRoles.map((role) => (
+                    <ListItem key={role.id} divider>
+                      <ListItemIcon>
+                        <Work />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={role.role}
+                        secondary={
+                          role.since !== "N/A" ? `Since ${role.since}` : null
+                        }
+                      />
+                    </ListItem>
+                  ))
+                )}
               </List>
             </Card>
 
             {/* Admin Actions Section */}
-            <Card>
+            <Card sx={{ borderRadius: 4 }}>
               <List
                 subheader={
                   <ListSubheader
@@ -392,6 +557,17 @@ const PersonIdPage = () => {
 export default PersonIdPage;
 
 const EditDetailsModal = ({ open, onClose, person }) => {
+  const router = useRouter();
+  const { personId } = router.query;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Helper function to get clean value from person data
+  const getDefaultValue = (key) => {
+    const value = person.find((item) => item.key === key)?.value;
+    return value === "Not provided" ? "" : value || "";
+  };
+
   const {
     control,
     handleSubmit,
@@ -399,47 +575,101 @@ const EditDetailsModal = ({ open, onClose, person }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      firstName: person.find((item) => item.key === "firstName")?.value || "",
-      lastName: person.find((item) => item.key === "lastName")?.value || "",
-      email: person.find((item) => item.key === "email")?.value || "",
-      phone: person.find((item) => item.key === "phone")?.value || "",
-      city: person.find((item) => item.key === "city")?.value || "",
-      state: person.find((item) => item.key === "state")?.value || "",
-      about: person.find((item) => item.key === "about")?.value || "",
-      primaryLanguage:
-        person.find((item) => item.key === "primaryLanguage")?.value || "",
-      gender: person.find((item) => item.key === "gender")?.value || "",
-      pronouns: person.find((item) => item.key === "pronouns")?.value || "",
+      firstName: getDefaultValue("firstName"),
+      lastName: getDefaultValue("lastName"),
+      email: getDefaultValue("email"),
+      phone: getDefaultValue("phone"),
+      city: getDefaultValue("city"),
+      state: getDefaultValue("state"),
+      about: getDefaultValue("about"),
+      primaryLanguage: getDefaultValue("primaryLanguage"),
+      gender: getDefaultValue("gender"),
+      pronouns: getDefaultValue("pronouns"),
       raceEthnicity:
         person.find((item) => item.key === "raceEthnicity")?.value || [],
-      montessoriCertified:
-        person.find((item) => item.key === "montessoriCertified")?.value || "",
+      montessoriCertified: getDefaultValue("montessoriCertified"),
       montessoriCertifiedLevels:
         person.find((item) => item.key === "montessoriCertifiedLevels")
           ?.value || [],
-      montessoriCertifiedYear:
-        person.find((item) => item.key === "montessoriCertifiedYear")?.value ||
-        "",
+      montessoriCertifiedYear: getDefaultValue("montessoriCertifiedYear"),
     },
   });
 
   const handleClose = () => {
     reset();
+    setError(null);
     onClose();
   };
 
-  const onSubmit = handleSubmit((data) => {
-    console.log("Edit details form data:", data);
-    // Handle person update here
-    handleClose();
-  });
+  const onSubmit = async (data) => {
+    setError(null);
+    setIsSubmitting(true);
+
+    // Create the person update object
+    const personUpdate = {
+      person: {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+      },
+    };
+
+    // Add optional fields only if they have values
+    if (data.phone) personUpdate.person.phone = data.phone;
+    if (data.about) personUpdate.person.about = data.about;
+    if (data.primaryLanguage)
+      personUpdate.person.primary_language = data.primaryLanguage;
+    if (data.gender) personUpdate.person.gender = data.gender;
+    if (data.pronouns) personUpdate.person.pronouns = data.pronouns;
+
+    // Always include Montessori certification fields
+    personUpdate.person.montessori_certified = data.montessoriCertified;
+    personUpdate.person.montessori_certified_level_list =
+      data.montessoriCertifiedLevels || [];
+    if (data.montessoriCertifiedYear) {
+      personUpdate.person.montessori_certified_year =
+        data.montessoriCertifiedYear;
+    }
+
+    // Handle arrays - only include if they have values
+    if (data.raceEthnicity?.length > 0) {
+      personUpdate.person.race_ethnicity_list = data.raceEthnicity;
+    }
+
+    // Only include address_attributes if either city or state has a value
+    if (data.city || data.state) {
+      personUpdate.person.address_attributes = {
+        ...(data.city && { city: data.city }),
+        ...(data.state && { state: data.state }),
+      };
+    }
+
+    try {
+      await peopleApi.update(personId, personUpdate);
+      await mutate(`/v1/people/${personId}`);
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      setError(
+        err?.response?.data?.error ||
+          "An error occurred while updating the person."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>Edit Person Details</DialogTitle>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent sx={{ maxHeight: 640, overflowY: "auto" }}>
           <Stack spacing={3} sx={{ mt: 2 }}>
+            {error && (
+              <Typography color="error" variant="bodySmall">
+                {error}
+              </Typography>
+            )}
             {/* General Fields */}
             <Typography variant="h6">General Information</Typography>
             <Controller
@@ -730,8 +960,12 @@ const EditDetailsModal = ({ open, onClose, person }) => {
           <Button onClick={handleClose} color="inherit">
             Cancel
           </Button>
-          <Button type="submit" variant="contained">
-            Save Changes
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </DialogActions>
       </form>
@@ -785,6 +1019,8 @@ const ResetPasswordModal = ({ open, onClose, personName }) => {
 };
 
 const RemovePersonModal = ({ open, onClose, personName }) => {
+  const router = useRouter();
+  const { personId } = router.query;
   const {
     control,
     handleSubmit,
@@ -799,21 +1035,33 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
 
   const confirmName = watch("confirmName");
   const isNameConfirmed = confirmName === personName;
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (open) {
       reset({ confirmName: "" });
+      setError(null);
     }
   }, [open, reset]);
 
   const handleClose = () => {
     reset();
+    setError(null);
     onClose();
   };
 
-  const onSubmit = handleSubmit(() => {
-    // Handle person deletion here
-    handleClose();
+  const onSubmit = handleSubmit(async () => {
+    try {
+      await peopleApi.remove(personId);
+      // Redirect to people list after successful removal
+      router.push("/admin/people");
+    } catch (err) {
+      console.error(err);
+      setError(
+        err?.response?.data?.error ||
+          "An error occurred while removing this person."
+      );
+    }
   });
 
   return (
@@ -823,12 +1071,17 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
         <DialogContent>
           <Stack spacing={3}>
             <Typography color="error">
-              This action cannot be undone. This will permanently delete this
-              person's account and remove all associated data.
+              This will remove all school relationships, remove their login, and
+              remove them from the directory.
             </Typography>
             <Typography>
               To remove "{personName}", please type their full name below:
             </Typography>
+            {error && (
+              <Typography color="error" variant="bodySmall">
+                {error}
+              </Typography>
+            )}
             <Controller
               name="confirmName"
               control={control}
@@ -860,7 +1113,11 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
             color="error"
             disabled={!isNameConfirmed || isSubmitting}
           >
-            Remove Person
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Remove Person"
+            )}
           </Button>
         </DialogActions>
       </form>

@@ -32,11 +32,13 @@ import {
 
 import { PageContainer, Grid, Typography, Link } from "@ui";
 import useWorkflows from "@hooks/workflow/definition/useWorkflows";
-import useAllTeams from "@hooks/useAllTeams";
+import useSchools from "@hooks/useSchools";
 
 const AdminDashboard = () => {
   const { workflows, isLoading } = useWorkflows();
-  const { teams, isLoading: isLoadingTeams } = useAllTeams();
+  const { data: schools, isLoading: isLoadingSchools } = useSchools({
+    serialization_fields: ["name"],
+  });
 
   const workflowImage = "/assets/images/ssj/wildflowerSystems.jpg";
   const schoolsImage = "/assets/images/ssj/SSJ_hero.jpg";
@@ -94,10 +96,10 @@ const AdminDashboard = () => {
                         Edit
                       </Typography>
                       <Typography variant="h2" bold>
-                        {isLoadingTeams ? (
+                        {isLoadingSchools ? (
                           <Skeleton width={200} />
                         ) : (
-                          `${teams.length} Schools`
+                          `${schools?.data?.length} Schools`
                         )}
                       </Typography>
                       <Typography variant="bodyLarge" bold highlight>
