@@ -29,6 +29,9 @@ import {
   Chip,
   FormHelperText,
   FormControlLabel,
+  FormGroup,
+  FormLabel,
+  Checkbox,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import {
@@ -312,13 +315,14 @@ const SchoolIdPage = () => {
 
     setSelectedPerson({
       ...person,
-      role: schoolRelationship?.attributes?.roleList?.[0] || "", // Assuming single role for now
+      role: schoolRelationship?.attributes?.roleList || [],
       title: schoolRelationship?.attributes?.title || "",
       name: `${person.firstName} ${person.lastName}`,
       schoolRelationshipId: schoolRelationship?.id,
     });
     setEditPersonModalOpen(true);
   };
+  console.log(selectedPerson);
 
   const handleRemoveWorkflow = (workflow) => {
     setSelectedWorkflow(workflow);
@@ -1412,21 +1416,22 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      role: "",
+      roles: [],
       title: "",
       confirmName: "",
-      endDate: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
+      endDate: new Date().toISOString().split("T")[0],
     },
   });
 
-  const selectedRole = watch("role");
+  const selectedRoles = watch("roles") || [];
   const confirmName = watch("confirmName");
   const isNameConfirmed = person && confirmName === person.name;
+  const hasWildflowerSupport = selectedRoles.includes("Wildflower Support");
 
   useEffect(() => {
     if (person) {
       reset({
-        role: person.role || "",
+        roles: person.role || [],
         title: person.title || "",
         confirmName: "",
         endDate: new Date().toISOString().split("T")[0],
@@ -1448,7 +1453,6 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
 
       try {
         await schoolsApi.removePartner(schoolId, person.id, data.endDate);
-        // Refresh the school data
         mutate(`/v1/schools/${schoolId}`);
         handleClose();
       } catch (err) {
@@ -1467,12 +1471,11 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
     try {
       await schoolRelationshipsApi.update(person.schoolRelationshipId, {
         school_relationship: {
-          role_list: [data.role],
-          title: data.role === "Wildflower Support" ? data.title : undefined,
+          role_list: data.roles,
+          title: hasWildflowerSupport ? data.title : undefined,
         },
       });
 
-      // Refresh the school data
       mutate(`/v1/schools/${schoolId}`);
       handleClose();
     } catch (err) {
@@ -1537,37 +1540,44 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
               </>
             ) : (
               <>
-                <Controller
-                  name="role"
-                  control={control}
-                  rules={{ required: "Please select a role" }}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.role}>
-                      <InputLabel>Role at school</InputLabel>
-                      <Select {...field} label="Role at school">
+                <FormControl error={!!errors.roles} component="fieldset">
+                  <FormLabel component="legend">Roles at school</FormLabel>
+                  <Controller
+                    name="roles"
+                    control={control}
+                    rules={{ required: "Please select at least one role" }}
+                    render={({ field }) => (
+                      <FormGroup>
                         {ROLE_OPTIONS.map((role) => (
-                          <MenuItem
+                          <FormControlLabel
                             key={role}
-                            value={role}
-                            disabled={
-                              role === "Emerging Teacher Leader" &&
-                              schoolStatus === "Open"
+                            control={
+                              <Checkbox
+                                checked={field.value.includes(role)}
+                                onChange={(e) => {
+                                  const newRoles = e.target.checked
+                                    ? [...field.value, role]
+                                    : field.value.filter((r) => r !== role);
+                                  field.onChange(newRoles);
+                                }}
+                                disabled={
+                                  role === "Emerging Teacher Leader" &&
+                                  schoolStatus === "Open"
+                                }
+                              />
                             }
-                          >
-                            {role}
-                          </MenuItem>
+                            label={role}
+                          />
                         ))}
-                      </Select>
-                      {errors.role && (
-                        <Typography color="error" variant="caption">
-                          {errors.role.message}
-                        </Typography>
-                      )}
-                    </FormControl>
+                      </FormGroup>
+                    )}
+                  />
+                  {errors.roles && (
+                    <FormHelperText>{errors.roles.message}</FormHelperText>
                   )}
-                />
+                </FormControl>
 
-                {selectedRole === "Wildflower Support" && (
+                {hasWildflowerSupport && (
                   <Controller
                     name="title"
                     control={control}
