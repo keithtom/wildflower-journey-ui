@@ -18,6 +18,7 @@ import {
   ListItemIcon,
   Autocomplete,
   ListSubheader,
+  Pagination,
 } from "@mui/material";
 import { School } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
@@ -48,19 +49,16 @@ import {
   Spinner,
 } from "@ui";
 
-const AdminSSJ = ({}) => {
+const AdminSchools = () => {
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const { currentUser } = useUserContext();
   const router = useRouter();
 
   const { data: schools, isLoading } = useSchools({
-    status: ["Emerging", "Open"],
-    serialization_fields: ["name", "status", "currentPhase"],
+    page,
+    per_page: 25,
   });
-
-  useEffect(() => {
-    console.log({ schools });
-  }, [schools]);
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
@@ -68,21 +66,11 @@ const AdminSSJ = ({}) => {
     router.push(`/admin/schools/${schoolId}`);
   };
 
-  // Get all unique status values and group schools
-  const schoolsByStatus = useMemo(() => {
-    if (!schools?.data) return {};
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
 
-    return schools.data.reduce((acc, school) => {
-      const status = school.attributes.status || "Unknown";
-      if (!acc[status]) {
-        acc[status] = [];
-      }
-      acc[status].push(school);
-      return acc;
-    }, {});
-  }, [schools]);
-
-  const SchoolList = ({ schools, status }) => (
+  const SchoolList = ({ schools }) => (
     <Card noPadding>
       <List
         subheader={
@@ -95,16 +83,16 @@ const AdminSSJ = ({}) => {
             }}
           >
             <Typography variant="bodyLarge" bold lightened>
-              {status} Schools
+              Schools
             </Typography>
           </ListSubheader>
         }
       >
-        {schools.length === 0 ? (
+        {!schools?.length ? (
           <ListItem disablePadding>
             <ListItemText>
               <Typography variant="bodyRegular" lightened align="center">
-                No {status.toLowerCase()} schools
+                No schools found
               </Typography>
             </ListItemText>
           </ListItem>
@@ -127,14 +115,22 @@ const AdminSSJ = ({}) => {
                 />
                 <ListItemSecondaryAction>
                   <Stack direction="row" spacing={2}>
-                    {school.attributes.status === "Emerging" &&
-                      school.attributes.currentPhase && (
-                        <Chip
-                          label={school.attributes.currentPhase}
-                          size="small"
-                          variant="outlined"
-                        />
-                      )}
+                    <Chip
+                      label={school.attributes.status}
+                      size="small"
+                      color={
+                        school.attributes.status === "Open"
+                          ? "primary"
+                          : "default"
+                      }
+                    />
+                    {school.attributes.currentPhase && (
+                      <Chip
+                        label={school.attributes.currentPhase}
+                        size="small"
+                        variant="outlined"
+                      />
+                    )}
                   </Stack>
                 </ListItemSecondaryAction>
               </ListItemButton>
@@ -145,9 +141,6 @@ const AdminSSJ = ({}) => {
     </Card>
   );
 
-  // Define the preferred order of status types
-  const statusOrder = ["Open", "Emerging", "Unknown"];
-
   return (
     <>
       <PageContainer isAdmin title="Schools">
@@ -155,7 +148,7 @@ const AdminSSJ = ({}) => {
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="bodyLarge">
-                {schools?.data?.length || 0} schools
+                {schools?.meta?.total_entries || 0} schools
               </Typography>
             </Grid>
             <Grid item>
@@ -166,6 +159,7 @@ const AdminSSJ = ({}) => {
               </Button>
             </Grid>
           </Grid>
+
           {isLoading ? (
             <Card sx={{ borderRadius: 4 }}>
               <Stack spacing={2} p={3}>
@@ -175,25 +169,17 @@ const AdminSSJ = ({}) => {
               </Stack>
             </Card>
           ) : (
-            <Stack spacing={6}>
-              {Object.entries(schoolsByStatus)
-                .sort(([statusA], [statusB]) => {
-                  const indexA = statusOrder.indexOf(statusA);
-                  const indexB = statusOrder.indexOf(statusB);
-                  // If status not in statusOrder, put it at the end
-                  if (indexA === -1) return 1;
-                  if (indexB === -1) return -1;
-                  return indexA - indexB;
-                })
-                .map(([status, schoolsList]) => (
-                  <SchoolList
-                    key={status}
-                    schools={schoolsList}
-                    status={status}
-                  />
-                ))}
-            </Stack>
+            <SchoolList schools={schools?.data} />
           )}
+
+          <Grid container justifyContent="center">
+            <Pagination
+              count={schools?.meta?.total_pages || 1}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+            />
+          </Grid>
         </Stack>
       </PageContainer>
       <AddSchoolModal
@@ -204,7 +190,7 @@ const AdminSSJ = ({}) => {
   );
 };
 
-export default AdminSSJ;
+export default AdminSchools;
 
 const StyledPersonOption = styled(Card)`
   border-bottom: 1px solid ${({ theme }) => theme.color.neutral.main};

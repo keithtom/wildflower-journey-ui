@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Person } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
@@ -34,6 +34,7 @@ import {
   Chip,
   Skeleton,
   CircularProgress,
+  Pagination,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import usePersons from "@hooks/usePersons";
@@ -42,11 +43,14 @@ import { mutate } from "swr";
 
 const AdminPeople = () => {
   const [addPersonModalOpen, setAddPersonModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const { currentUser } = useUserContext();
   const router = useRouter();
 
   const { people, isLoading } = usePersons({
     lightweight: true,
+    page,
+    per_page: 25,
   });
 
   console.log({ people });
@@ -57,32 +61,17 @@ const AdminPeople = () => {
     router.push(`/admin/people/${personId}`);
   };
 
-  // Group people by visibility
-  const groupedPeople = useMemo(() => {
-    if (!people?.data) return { visible: [], notVisible: [] };
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
 
-    return people.data.reduce(
-      (acc, person) => {
-        if (person.attributes.active) {
-          acc.visible.push(person);
-        } else {
-          acc.notVisible.push(person);
-        }
-        return acc;
-      },
-      { visible: [], notVisible: [] }
-    );
-  }, [people]);
-
-  console.log({ groupedPeople });
-
-  const PeopleList = ({ people, emptyMessage }) => (
+  const PeopleList = ({ people }) => (
     <List>
-      {people.length === 0 ? (
+      {!people?.length ? (
         <ListItem>
           <ListItemText>
             <Typography variant="bodyRegular" lightened align="center">
-              {emptyMessage}
+              No people found
             </Typography>
           </ListItemText>
         </ListItem>
@@ -120,7 +109,12 @@ const AdminPeople = () => {
                 }}
               />
               <ListItemSecondaryAction>
-                <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Chip
+                    label={person.attributes.active ? "Visible" : "Not Visible"}
+                    size="small"
+                    color={person.attributes.active ? "primary" : "default"}
+                  />
                   {person.attributes.roleList?.map((role, index) => (
                     <Chip
                       key={`${role}-${index}`}
@@ -160,7 +154,7 @@ const AdminPeople = () => {
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="bodyLarge">
-                {people?.data?.length || 0} people
+                {people?.meta?.total_entries || 0} people
               </Typography>
             </Grid>
             <Grid item>
@@ -171,85 +165,19 @@ const AdminPeople = () => {
               </Button>
             </Grid>
           </Grid>
-          <Stack spacing={6}>
-            {/* Visible People */}
-            <Card sx={{ borderRadius: 4 }}>
-              <List
-                subheader={
-                  <ListSubheader
-                    component="div"
-                    sx={{
-                      background: "#f1f1f1",
-                      paddingX: 4,
-                      paddingY: 3,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Typography variant="bodyLarge">
-                        Visible in Directory
-                      </Typography>
-                      <Chip
-                        label={groupedPeople.visible.length}
-                        size="small"
-                        color="primary"
-                      />
-                    </Stack>
-                  </ListSubheader>
-                }
-              >
-                {isLoading ? (
-                  <LoadingList />
-                ) : (
-                  <PeopleList
-                    people={groupedPeople.visible}
-                    emptyMessage="No visible people"
-                  />
-                )}
-              </List>
-            </Card>
 
-            {/* Not Visible People */}
-            <Card sx={{ borderRadius: 4 }}>
-              <List
-                subheader={
-                  <ListSubheader
-                    component="div"
-                    sx={{
-                      background: "#f1f1f1",
-                      paddingX: 4,
-                      paddingY: 3,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Typography variant="bodyLarge">
-                        Not Visible in Directory
-                      </Typography>
-                      <Chip
-                        label={groupedPeople.notVisible.length}
-                        size="small"
-                        color="default"
-                      />
-                    </Stack>
-                  </ListSubheader>
-                }
-              >
-                {isLoading ? (
-                  <LoadingList />
-                ) : (
-                  <PeopleList
-                    people={groupedPeople.notVisible}
-                    emptyMessage="No hidden people"
-                  />
-                )}
-              </List>
-            </Card>
-          </Stack>
+          <Card sx={{ borderRadius: 4 }}>
+            {isLoading ? <LoadingList /> : <PeopleList people={people?.data} />}
+          </Card>
+
+          <Grid container justifyContent="center">
+            <Pagination
+              count={people?.meta?.total_pages || 1}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+            />
+          </Grid>
         </Stack>
       </PageContainer>
       <AddPersonModal
