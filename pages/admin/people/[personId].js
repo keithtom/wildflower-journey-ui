@@ -129,10 +129,6 @@ const PersonIdPage = () => {
     [person]
   );
 
-  useEffect(() => {
-    console.log({ person });
-  }, [person]);
-
   const schoolRelationships =
     person?.data?.relationships?.schoolRelationships?.data || [];
 
