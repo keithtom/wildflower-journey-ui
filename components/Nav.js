@@ -503,7 +503,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const logo = "/assets/images/wildflower-logo.png";
 
   // console.log(screenSize.isSm);
-  console.log({ currentUser });
+  // console.log({ currentUser });
 
   const isTeacherLeaderSchool = (school) =>
     school.role_list?.some(
