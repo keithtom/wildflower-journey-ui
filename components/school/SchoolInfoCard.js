@@ -499,6 +499,18 @@ export default SchoolInfoCard;
 
 const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
   const [isInviteSent, setIsInviteSent] = useState(false);
+
+  const handleCancelInvite = async () => {
+    try {
+      const response = await schoolsApi.removePartner(schoolId, member.id);
+      if (response.status === 200) {
+        mutate(`/v1/schools/${schoolId}`);
+        toggle();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const handleSendInviteAgain = async () => {
     try {
       const response = await schoolsApi.reinvitePartner(schoolId, {
@@ -520,16 +532,25 @@ const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
       title={`${member.attributes.firstName} ${member.attributes.lastName}`}
       open={open}
       fixedActions={
-        <Button
-          variant="text"
-          onClick={handleSendInviteAgain}
-          small
-          disabled={isInviteSent}
-        >
-          <Typography variant="bodyRegular">
-            {isInviteSent ? "Invite sent" : "Send invite again"}
-          </Typography>
-        </Button>
+        <Grid container justifyContent="space-between" spacing={3}>
+          <Grid item>
+            <Button onClick={handleCancelInvite} small variant="danger">
+              <Typography variant="bodyRegular">Cancel invite</Typography>
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="text"
+              onClick={handleSendInviteAgain}
+              small
+              disabled={isInviteSent}
+            >
+              <Typography variant="bodyRegular">
+                {isInviteSent ? "Invite sent" : "Send invite again"}
+              </Typography>
+            </Button>
+          </Grid>
+        </Grid>
       }
     >
       <List>
