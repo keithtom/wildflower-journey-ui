@@ -125,15 +125,16 @@ const Login = ({}) => {
     }
   };
 
-  async function handleRequestEmailLink() {
+  async function handleRequestPasswordResetEmail() {
     const emailValid = await trigger("email");
     if (emailValid) {
       try {
         const email = getValues("email");
-        await authApi.loginEmailLink(email);
+        await authApi.resetPasswordEmail(email);
         setSentEmailLoginRequest(true);
       } catch (error) {
         console.error(error);
+        setError("Failed to send login link. Please try again.");
       }
     }
   }
@@ -162,8 +163,8 @@ const Login = ({}) => {
                           We emailed you a link
                         </Typography>
                         <Typography variant="bodyRegular">
-                          Check your email for a secure link to log in. You
-                          should receive it within a few minutes.
+                          Check your email for a secure link to reset your
+                          password. You should receive it within a few minutes.
                         </Typography>
                       </Stack>
                     </Grid>
@@ -278,7 +279,7 @@ const Login = ({}) => {
                                   Forgot your password?
                                 </Typography>
                                 <Typography variant="bodyRegular">
-                                  Request an email link to login.
+                                  Reset your password
                                 </Typography>
                               </Stack>
                             </Grid>
@@ -286,7 +287,7 @@ const Login = ({}) => {
                         </Grid>
                         <Grid item xs={12} ml={6}>
                           <Button
-                            onClick={handleRequestEmailLink}
+                            onClick={handleRequestPasswordResetEmail}
                             disabled={
                               isSubmitting || isSubmitSuccessful || isLoggingIn
                             }

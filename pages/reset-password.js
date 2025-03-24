@@ -11,16 +11,18 @@ import {
   TextField,
   PageContainer,
 } from "@ui";
+import registrationsApi from "../api/registrations";
 
 const ResetPassword = () => {
   const router = useRouter();
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     control,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting: formIsSubmitting },
   } = useForm({
     defaultValues: {
       password: "",
@@ -32,19 +34,15 @@ const ResetPassword = () => {
   const password = watch("password");
 
   const onSubmit = async (data) => {
+    setIsSubmitting(true);
     try {
-      // For now, just log the data
-      console.log("Reset password data:", data);
-
-      // TODO: Implement actual password reset when endpoint is available
-      // await authApi.resetPassword(data.password);
-      // router.push("/login");
-    } catch (err) {
-      console.error(err);
-      setError(
-        err?.response?.data?.error ||
-          "An error occurred while resetting your password."
-      );
+      await registrationsApi.setPassword(data.password, data.confirmPassword);
+      router.push("/login");
+    } catch (error) {
+      console.error(error);
+      setError("Failed to reset password. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -84,7 +82,7 @@ const ResetPassword = () => {
                           placeholder="Enter your new password"
                           error={!!errors.password}
                           helperText={errors.password?.message}
-                          disabled={isSubmitting}
+                          disabled={formIsSubmitting}
                           fullWidth
                         />
                       )}
@@ -105,16 +103,16 @@ const ResetPassword = () => {
                           placeholder="Confirm your new password"
                           error={!!errors.confirmPassword}
                           helperText={errors.confirmPassword?.message}
-                          disabled={isSubmitting}
+                          disabled={formIsSubmitting}
                           fullWidth
                         />
                       )}
                     />
                   </Stack>
 
-                  <Button type="submit" disabled={isSubmitting} fullWidth>
+                  <Button type="submit" disabled={formIsSubmitting} fullWidth>
                     <Typography variant="bodyRegular" bold light>
-                      {isSubmitting ? "Resetting..." : "Reset Password"}
+                      {formIsSubmitting ? "Resetting..." : "Reset Password"}
                     </Typography>
                   </Button>
                 </Stack>

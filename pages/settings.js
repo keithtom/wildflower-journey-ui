@@ -203,11 +203,11 @@ const SettingsPage = () => {
               </List>
             </Card>
           </Stack>
-          {/* <Stack spacing={3}>
+          <Stack spacing={3}>
             <Typography variant="bodyLarge">Account</Typography>
             <Card noPadding>
               <List disablePadding>
-                <SettingListItem
+                {/* <SettingListItem
                   title="Email"
                   subtitle={currentUser?.attributes?.email}
                   action={
@@ -220,10 +220,24 @@ const SettingsPage = () => {
                     </Button>
                   }
                   isLastItem={true}
+                /> */}
+                <SettingListItem
+                  title="Reset Password"
+                  subtitle="Reset your password"
+                  action={
+                    <Button
+                      variant="secondary"
+                      small
+                      onClick={() => router.push("/reset-password")}
+                    >
+                      Reset your password
+                    </Button>
+                  }
+                  isLastItem={true}
                 />
               </List>
             </Card>
-          </Stack> */}
+          </Stack>
         </Stack>
 
         <PauseSSJModal
