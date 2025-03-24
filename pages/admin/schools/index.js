@@ -326,7 +326,6 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
     control,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -338,25 +337,21 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
   });
 
   const onSubmit = (data) => {
-    const newPerson = data.teacher
-      ? {
-          first_name: data.teacher.attributes.firstName,
-          last_name: data.teacher.attributes.lastName,
-          email: data.teacher.attributes.email,
-        }
-      : {
+    if (data.first_name && data.last_name && data.email) {
+      setMultiplePeople((prev) => [
+        ...prev,
+        {
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
-        };
-
-    setMultiplePeople((prev) => [...prev, newPerson]);
-    reset({ teacher: null, first_name: "", last_name: "", email: "" });
+        },
+      ]);
+      reset({ first_name: "", last_name: "", email: "" });
+    }
   };
 
   const handleRemovePerson = (email) => {
-    const removedPeople = multiplePeople.filter((p) => p.email !== email);
-    setMultiplePeople(removedPeople);
+    setMultiplePeople((prev) => prev.filter((p) => p.email !== email));
   };
 
   const {
@@ -376,6 +371,20 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
       models: "people",
     });
   }, []);
+
+  const handleTeacherSelect = (selectedTeacher) => {
+    if (selectedTeacher) {
+      setMultiplePeople((prev) => [
+        ...prev,
+        {
+          first_name: selectedTeacher.attributes.firstName,
+          last_name: selectedTeacher.attributes.lastName,
+          email: selectedTeacher.attributes.email,
+        },
+      ]);
+      setQuery("");
+    }
+  };
 
   return (
     <div>
@@ -456,30 +465,16 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                           {...field}
                           inputValue={query || ""}
                           onChange={(_, newValue) => {
-                            field.onChange(newValue);
-                            if (newValue) {
-                              setValue(
-                                "first_name",
-                                newValue.attributes.firstName
-                              );
-                              setValue(
-                                "last_name",
-                                newValue.attributes.lastName
-                              );
-                              setValue("email", newValue.attributes.email);
-                            }
-                            setQuery(
-                              newValue
-                                ? `${newValue.attributes.firstName} ${newValue.attributes.lastName}`
-                                : ""
-                            );
+                            handleTeacherSelect(newValue);
                           }}
                           onInputChange={(_, newInputValue) => {
                             setQuery(newInputValue);
                           }}
                           options={results}
                           getOptionDisabled={(option) =>
-                            multiplePeople.some((p) => p.id === option.id)
+                            multiplePeople.some(
+                              (p) => p.email === option.attributes.email
+                            )
                           }
                           getOptionLabel={(option) =>
                             option && option.attributes

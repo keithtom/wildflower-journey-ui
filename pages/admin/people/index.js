@@ -231,7 +231,7 @@ const AddPersonModal = ({ open, onClose }) => {
           last_name: data.lastName,
           email: data.email,
           role_list: data.role ? [data.role] : [],
-          show_network: data.visibleInDirectory,
+          active: data.visibleInDirectory,
         },
       });
       // Refresh the people list
