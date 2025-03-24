@@ -59,6 +59,10 @@ const AdminSchools = () => {
     per_page: 25,
   });
 
+  const filteredSchools = schools?.data?.filter(
+    (s) => s.attributes.status !== "Abandoned"
+  );
+
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
   const handleSchoolClick = (schoolId) => {
@@ -87,7 +91,7 @@ const AdminSchools = () => {
           </ListSubheader>
         }
       >
-        {!schools?.length ? (
+        {!filteredSchools?.length ? (
           <ListItem disablePadding>
             <ListItemText>
               <Typography variant="bodyRegular" lightened align="center">
@@ -96,7 +100,7 @@ const AdminSchools = () => {
             </ListItemText>
           </ListItem>
         ) : (
-          schools.map((school, i) => (
+          filteredSchools.map((school, i) => (
             <ListItem
               key={school.id}
               disablePadding
