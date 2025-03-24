@@ -115,6 +115,15 @@ const ResetPassword = () => {
                       {formIsSubmitting ? "Resetting..." : "Reset Password"}
                     </Typography>
                   </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => router.push("/login")}
+                    fullWidth
+                  >
+                    <Typography variant="bodyRegular" bold light>
+                      Cancel
+                    </Typography>
+                  </Button>
                 </Stack>
               </form>
             </Stack>
