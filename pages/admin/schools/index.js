@@ -23,7 +23,6 @@ import {
 import { School } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
 import schoolsApi from "@api/schools";
 import useSWR, { useSWRConfig } from "swr";
@@ -60,6 +59,10 @@ const AdminSchools = () => {
     per_page: 25,
   });
 
+  const filteredSchools = schools?.data?.filter(
+    (s) => s.attributes.status !== "Abandoned"
+  );
+
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
   const handleSchoolClick = (schoolId) => {
@@ -88,7 +91,7 @@ const AdminSchools = () => {
           </ListSubheader>
         }
       >
-        {!schools?.length ? (
+        {!filteredSchools?.length ? (
           <ListItem disablePadding>
             <ListItemText>
               <Typography variant="bodyRegular" lightened align="center">
@@ -97,7 +100,7 @@ const AdminSchools = () => {
             </ListItemText>
           </ListItem>
         ) : (
-          schools.map((school, i) => (
+          filteredSchools.map((school, i) => (
             <ListItem
               key={school.id}
               disablePadding
@@ -326,7 +329,6 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
     control,
     handleSubmit,
     reset,
-    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -338,25 +340,21 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
   });
 
   const onSubmit = (data) => {
-    const newPerson = data.teacher
-      ? {
-          first_name: data.teacher.attributes.firstName,
-          last_name: data.teacher.attributes.lastName,
-          email: data.teacher.attributes.email,
-        }
-      : {
+    if (data.first_name && data.last_name && data.email) {
+      setMultiplePeople((prev) => [
+        ...prev,
+        {
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
-        };
-
-    setMultiplePeople((prev) => [...prev, newPerson]);
-    reset({ teacher: null, first_name: "", last_name: "", email: "" });
+        },
+      ]);
+      reset({ first_name: "", last_name: "", email: "" });
+    }
   };
 
   const handleRemovePerson = (email) => {
-    const removedPeople = multiplePeople.filter((p) => p.email !== email);
-    setMultiplePeople(removedPeople);
+    setMultiplePeople((prev) => prev.filter((p) => p.email !== email));
   };
 
   const {
@@ -376,6 +374,20 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
       models: "people",
     });
   }, []);
+
+  const handleTeacherSelect = (selectedTeacher) => {
+    if (selectedTeacher) {
+      setMultiplePeople((prev) => [
+        ...prev,
+        {
+          first_name: selectedTeacher.attributes.firstName,
+          last_name: selectedTeacher.attributes.lastName,
+          email: selectedTeacher.attributes.email,
+        },
+      ]);
+      setQuery("");
+    }
+  };
 
   return (
     <div>
@@ -456,30 +468,16 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                           {...field}
                           inputValue={query || ""}
                           onChange={(_, newValue) => {
-                            field.onChange(newValue);
-                            if (newValue) {
-                              setValue(
-                                "first_name",
-                                newValue.attributes.firstName
-                              );
-                              setValue(
-                                "last_name",
-                                newValue.attributes.lastName
-                              );
-                              setValue("email", newValue.attributes.email);
-                            }
-                            setQuery(
-                              newValue
-                                ? `${newValue.attributes.firstName} ${newValue.attributes.lastName}`
-                                : ""
-                            );
+                            handleTeacherSelect(newValue);
                           }}
                           onInputChange={(_, newInputValue) => {
                             setQuery(newInputValue);
                           }}
                           options={results}
                           getOptionDisabled={(option) =>
-                            multiplePeople.some((p) => p.id === option.id)
+                            multiplePeople.some(
+                              (p) => p.email === option.attributes.email
+                            )
                           }
                           getOptionLabel={(option) =>
                             option && option.attributes
