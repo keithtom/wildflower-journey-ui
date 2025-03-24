@@ -23,7 +23,6 @@ import {
 import { School } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
 import schoolsApi from "@api/schools";
 import useSWR, { useSWRConfig } from "swr";
