@@ -665,7 +665,7 @@ const AddEmergingTeacherLeaders = ({
             {activeStep === 0 ? null : (
               <Grid item>
                 <Button type="submit" variant="text" small>
-                  <Typography variant="bodyRegular" bold light>
+                  <Typography variant="bodyRegular" bold>
                     Prev
                   </Typography>
                 </Button>
@@ -769,7 +769,7 @@ const AddOperationsGuide = ({
           <Grid container justifyContent="space-between">
             <Grid item>
               <Button variant="text" onClick={handlePrev} small>
-                <Typography variant="bodyRegular" bold light>
+                <Typography variant="bodyRegular" bold>
                   Prev
                 </Typography>
               </Button>
@@ -938,7 +938,7 @@ const AddRegionalGrowthLead = ({
           <Grid container justifyContent="space-between">
             <Grid item>
               <Button variant="text" onClick={handlePrev} small>
-                <Typography variant="bodyRegular" bold light>
+                <Typography variant="bodyRegular" bold>
                   Prev
                 </Typography>
               </Button>
@@ -1089,7 +1089,7 @@ const AddWorkflow = ({
           <Grid container justifyContent="space-between">
             <Grid item>
               <Button variant="text" onClick={handlePrev} small>
-                <Typography variant="bodyRegular" bold light>
+                <Typography variant="bodyRegular" bold>
                   Prev
                 </Typography>
               </Button>
@@ -1261,7 +1261,7 @@ const InviteSchool = ({
           <Grid container justifyContent="space-between">
             <Grid item>
               <Button variant="text" onClick={handlePrev} small>
-                <Typography variant="bodyRegular" bold light>
+                <Typography variant="bodyRegular" bold>
                   Prev
                 </Typography>
               </Button>
