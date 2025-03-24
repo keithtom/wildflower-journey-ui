@@ -53,7 +53,9 @@ const AdminPeople = () => {
     per_page: 25,
   });
 
-  console.log({ people });
+  const filteredPeople = people?.data?.filter(
+    (p) => p.attributes.endDate === null
+  );
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
@@ -67,7 +69,7 @@ const AdminPeople = () => {
 
   const PeopleList = ({ people }) => (
     <List>
-      {!people?.length ? (
+      {!filteredPeople?.length ? (
         <ListItem>
           <ListItemText>
             <Typography variant="bodyRegular" lightened align="center">
@@ -76,7 +78,7 @@ const AdminPeople = () => {
           </ListItemText>
         </ListItem>
       ) : (
-        people.map((person, i) => (
+        filteredPeople.map((person, i) => (
           <ListItem
             key={person.id}
             disablePadding
