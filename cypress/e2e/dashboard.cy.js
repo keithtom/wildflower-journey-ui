@@ -21,15 +21,15 @@ describe("dashboard spec", () => {
 
       cy.intercept({
         method: "PUT",
-        url: "/v1/ssj/teams/*",
-      }).as("teamUpdate");
+        url: "/v1/schools/*",
+      }).as("schoolUpdate");
 
       cy.get('input[placeholder="mm/dd/yyyy"]').clear().type(formattedToday);
       cy.get('[data-cy="add-open-date-button"]').click();
 
       cy.get('[data-cy="open-date-value"').should("contain", yyyy);
 
-      cy.wait("@teamUpdate").then((interception) => {
+      cy.wait("@schoolUpdate").then((interception) => {
         assert.equal(interception.response.statusCode, 200);
       });
     });
@@ -39,7 +39,7 @@ describe("dashboard spec", () => {
     it("should send invite to partner", () => {
       cy.intercept({
         method: "PUT",
-        url: "/v1/ssj/teams/*/invite_partner",
+        url: "/v1/schools/*/invite_partner",
       }).as("invitePartner");
 
       const today = new Date();
