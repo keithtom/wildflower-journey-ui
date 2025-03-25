@@ -5,7 +5,6 @@ import Skeleton from "@mui/material/Skeleton";
 
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
-import useAllTeams from "@hooks/useAllTeams";
 import useSchools from "@hooks/useSchools";
 import PhaseChip from "../../components/PhaseChip";
 import {
