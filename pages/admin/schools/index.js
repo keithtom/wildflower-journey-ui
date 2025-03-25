@@ -233,7 +233,7 @@ const AddSchoolModal = ({ open, toggle }) => {
     setTempDisplayData({});
     setActiveStep(0);
     toggle();
-    mutate("api/ssj/teams");
+    mutate("v1/schools");
   };
 
   return (

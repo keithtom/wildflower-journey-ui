@@ -66,7 +66,7 @@ async function loginEmailLink(email) {
 async function resetPasswordEmail(email) {
   const config = getAuthHeader();
   const response = await api.post(
-    `/password-reset`,
+    `/users/password_reset`,
     {
       email: email,
     },
