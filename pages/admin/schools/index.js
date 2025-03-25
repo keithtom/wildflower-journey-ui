@@ -473,7 +473,11 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                           onInputChange={(_, newInputValue) => {
                             setQuery(newInputValue);
                           }}
-                          options={results}
+                          options={
+                            results?.filter(
+                              (person) => !person.attributes.endDate
+                            ) || []
+                          }
                           getOptionDisabled={(option) =>
                             multiplePeople.some(
                               (p) => p.email === option.attributes.email
@@ -745,7 +749,10 @@ const AddOperationsGuide = ({
     mutate,
   } = useSWR(
     "api/school?ops_guides",
-    () => peopleApi.index({ ops_guide: true }).then((res) => res.data),
+    () =>
+      peopleApi
+        .index({ ops_guide: true })
+        .then((res) => res.data.filter((person) => !person.attributes.endDate)),
     {
       onErrorRetry: (error) => {
         if (error?.response?.status === 401) {
@@ -757,6 +764,7 @@ const AddOperationsGuide = ({
       },
     }
   );
+
   let opsGuides = opsGuideData || [];
 
   return (
@@ -898,7 +906,10 @@ const AddRegionalGrowthLead = ({
     mutate,
   } = useSWR(
     "api/school?ops_guides",
-    () => peopleApi.index({ rgl: true }).then((res) => res.data),
+    () =>
+      peopleApi
+        .index({ rgl: true })
+        .then((res) => res.data.filter((person) => !person.attributes.endDate)),
     {
       onErrorRetry: (error) => {
         if (error?.response?.status === 401) {

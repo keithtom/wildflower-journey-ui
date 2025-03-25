@@ -33,15 +33,21 @@ import {
 import { PageContainer, Grid, Typography, Link } from "@ui";
 import useWorkflows from "@hooks/workflow/definition/useWorkflows";
 import useSchools from "@hooks/useSchools";
-
+import usePersons from "@hooks/usePersons";
 const AdminDashboard = () => {
   const { workflows, isLoading } = useWorkflows();
   const { data: schools, isLoading: isLoadingSchools } = useSchools({
     serialization_fields: ["name"],
   });
+  const { people, isLoading: isLoadingPeople } = usePersons({
+    lightweight: true,
+    page: 1,
+    per_page: 1000000,
+  });
 
   const workflowImage = "/assets/images/ssj/wildflowerSystems.jpg";
   const schoolsImage = "/assets/images/ssj/SSJ_hero.jpg";
+  const peopleImage = "/assets/images/direct-human-support.jpg";
 
   return (
     <PageContainer isAdmin title="Admin Dashboard">
@@ -104,6 +110,36 @@ const AdminDashboard = () => {
                       </Typography>
                       <Typography variant="bodyLarge" bold highlight>
                         {isLoading ? <Skeleton width={120} /> : "View schools"}
+                      </Typography>
+                    </Stack>
+                  </CardContent>
+                </CardActionArea>
+              </Link>
+            </Card>
+          </Grid>
+          <Grid item xs={6} sm={4}>
+            <Card>
+              <Link href="/admin/people">
+                <CardActionArea>
+                  <CardMedia
+                    sx={{ height: 140 }}
+                    image={peopleImage}
+                    title="people"
+                  />
+                  <CardContent>
+                    <Stack spacing={3}>
+                      <Typography variant="bodyLarge" bold lightened>
+                        Edit
+                      </Typography>
+                      <Typography variant="h2" bold>
+                        {isLoadingPeople ? (
+                          <Skeleton width={200} />
+                        ) : (
+                          `${people?.data?.length} People`
+                        )}
+                      </Typography>
+                      <Typography variant="bodyLarge" bold highlight>
+                        {isLoading ? <Skeleton width={120} /> : "View people"}
                       </Typography>
                     </Stack>
                   </CardContent>
