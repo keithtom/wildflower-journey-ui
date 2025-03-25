@@ -48,6 +48,7 @@ import {
   Wc,
   Badge,
   Key,
+  CheckCircle,
 } from "@mui/icons-material";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
@@ -67,6 +68,7 @@ import usePerson from "@hooks/usePerson";
 import useSchool from "@hooks/useSchool";
 import { mutate } from "swr";
 import peopleApi from "@api/people";
+import authApi from "@api/auth";
 
 const SchoolItem = ({ schoolId, personRelationships }) => {
   const { data: schoolData, isLoading } = useSchool(schoolId);
@@ -538,6 +540,7 @@ const PersonIdPage = () => {
         personName={`${
           personData.find((item) => item.key === "firstName")?.value
         } ${personData.find((item) => item.key === "lastName")?.value}`}
+        email={personData.find((item) => item.key === "email")?.value}
       />
       <RemovePersonModal
         open={removePersonModalOpen}
@@ -969,11 +972,11 @@ const EditDetailsModal = ({ open, onClose, person }) => {
   );
 };
 
-const ResetPasswordModal = ({ open, onClose, personName }) => {
+const ResetPasswordModal = ({ open, onClose, personName, email }) => {
   const {
     handleSubmit,
     reset,
-    formState: { isSubmitting },
+    formState: { isSubmitting, isSubmitSuccessful },
   } = useForm();
 
   const handleClose = () => {
@@ -981,35 +984,57 @@ const ResetPasswordModal = ({ open, onClose, personName }) => {
     onClose();
   };
 
-  const onSubmit = handleSubmit(() => {
-    // Handle password reset here
-    handleClose();
+  const onSubmit = handleSubmit(async () => {
+    try {
+      await authApi.resetPasswordEmail(email);
+    } catch (error) {
+      console.error(error);
+    }
+    setTimeout(() => {
+      handleClose();
+    }, 1000);
   });
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
       <DialogTitle>Reset Password</DialogTitle>
-      <form onSubmit={onSubmit}>
+      {isSubmitSuccessful ? (
         <DialogContent>
-          <Typography>
-            Are you sure you want to send a password reset email to {personName}
-            ?
-          </Typography>
+          <Card variant="lightened" sx={{ p: 4 }}>
+            <Stack spacing={2} alignItems="center">
+              <CheckCircle sx={{ color: "success.main" }} />
+              <Typography>
+                Password reset email sent to{" "}
+                <Chip label={personName} size="small" /> at{" "}
+                <Chip label={email} size="small" />.
+              </Typography>
+            </Stack>
+          </Card>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="inherit">
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSubmitting}
-          >
-            Send Reset Email
-          </Button>
-        </DialogActions>
-      </form>
+      ) : (
+        <form onSubmit={onSubmit}>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to send a password reset email to{" "}
+              <Chip label={personName} size="small" /> at{" "}
+              <Chip label={email} size="small" />?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="inherit">
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={isSubmitting}
+            >
+              Send Reset Email
+            </Button>
+          </DialogActions>
+        </form>
+      )}
     </Dialog>
   );
 };
