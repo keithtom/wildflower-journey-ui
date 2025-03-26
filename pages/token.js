@@ -26,13 +26,19 @@ const Token = ({ query }) => {
             attributes: userAttributes,
           });
 
-          //construct the relevant data to redirect based on
-          const personRoleList = response.data?.included?.find((a) => {
-            return a.id === personId;
-          })?.attributes?.roleList;
-          const personIsOnboarded = response.data?.included?.find((a) => {
-            return a.id === personId;
-          })?.attributes?.isOnboarded;
+          // If there's a redirect URL in the query params, use that
+          if (redirect) {
+            router.push(redirect);
+            return;
+          }
+
+          // Otherwise use the RedirectUser function with the person's role and onboarding status
+          const personRoleList = response.data?.included?.find(
+            (a) => a.id === personId
+          )?.attributes?.roleList;
+          const personIsOnboarded = response.data?.included?.find(
+            (a) => a.id === personId
+          )?.attributes?.isOnboarded;
 
           RedirectUser({
             router: router,
@@ -43,7 +49,7 @@ const Token = ({ query }) => {
         .catch((error) => {
           // if tokenAuth fails then
           router.push("/login");
-          alert(error.message);
+          console.error("Token authentication failed:", error);
         });
     }
   }, []);

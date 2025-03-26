@@ -10,6 +10,7 @@ import {
   Autocomplete,
   TextField as MaterialTextField,
   CircularProgress,
+  Popover,
 } from "@mui/material";
 import { format, parseISO, isValid } from "date-fns";
 import { styled } from "@mui/material/styles";
@@ -73,11 +74,17 @@ import UserCard from "@components/UserCard";
 import useSchool from "@hooks/useSchool";
 import useSchools from "@hooks/useSchools";
 import useSearch from "@hooks/useSearch";
+import usePerson from "@hooks/usePerson";
 import { getScreenSize } from "@hooks/react-responsive";
 import useAuth from "@lib/utils/useAuth";
 
+// Remove the local constants and import from shared location
+import { NETWORK_SCHOOL_FIELDS } from "@lib/constants/schoolFields";
+
 const School = ({}) => {
   useAuth("/login");
+  // Use the imported constants where needed:
+  const { agesServed, governance, charter } = NETWORK_SCHOOL_FIELDS;
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [claimSchoolModalOpen, setClaimSchoolModalOpen] = useState(false);
   const { currentUser } = useUserContext();
@@ -1273,7 +1280,7 @@ const EnrollmentFields = ({ handleToggle, school }) => {
               withCheckbox
               label="Ages served"
               placeholder="Select the ages your school serves..."
-              options={agesServed.options}
+              options={NETWORK_SCHOOL_FIELDS.agesServed.options}
               error={errors.agesServed}
               defaultValue={[]}
               value={agesServedList}
@@ -1295,7 +1302,7 @@ const EnrollmentFields = ({ handleToggle, school }) => {
             <Select
               label="Governance type"
               placeholder="Select your school's governance..."
-              options={governance.options}
+              options={NETWORK_SCHOOL_FIELDS.governance.options}
               value={governanceType}
               onChange={handleGovernanceType}
               error={errors.governance}
@@ -1317,7 +1324,7 @@ const EnrollmentFields = ({ handleToggle, school }) => {
               <Select
                 label="Charter Group"
                 placeholder="e.g. Colorado Charter"
-                options={charter.options}
+                options={NETWORK_SCHOOL_FIELDS.charter.options}
                 value={charterString}
                 onChange={handleCharterString}
                 error={errors.charterString}
@@ -1407,12 +1414,140 @@ const EnrollmentFields = ({ handleToggle, school }) => {
     </form>
   );
 };
+
+const RemovePersonPopover = ({
+  open,
+  onClose,
+  anchorEl,
+  personId,
+  school,
+  isOnboarded,
+}) => {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm({
+    defaultValues: {
+      endDate: null,
+    },
+  });
+
+  useEffect(() => {
+    if (!open) {
+      reset({ endDate: null });
+    }
+  }, [open, reset]);
+
+  const onSubmit = async (data) => {
+    try {
+      await schoolApi.removePartner(
+        school.id,
+        personId,
+        isOnboarded ? format(new Date(data.endDate), "yyyy-MM-dd") : null
+      );
+      mutate(`/v1/schools/${school.id}`);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <Popover
+      open={open}
+      onClose={onClose}
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "center",
+      }}
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "center",
+      }}
+    >
+      <Card size="small" noBorder noRadius sx={{ maxWidth: "320px" }}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={3}>
+            {isOnboarded ? (
+              <Typography variant="bodyRegular" lightened>
+                To remove this person please provide the date they left or will
+                leave the school.
+              </Typography>
+            ) : (
+              <Typography variant="bodyRegular" lightened>
+                Please confirm that you wish to uninvite this person to the
+                school.
+              </Typography>
+            )}
+            {isOnboarded && (
+              <Controller
+                name="endDate"
+                control={control}
+                rules={{ required: "End date is required" }}
+                render={({ field }) => (
+                  <DatePicker
+                    label="Date Left"
+                    value={field.value}
+                    onChange={(date) => field.onChange(date)}
+                    minDate={new Date("2014-01-01")}
+                    renderInput={(params) => (
+                      <MaterialTextField
+                        {...params}
+                        error={!!errors.endDate}
+                        helperText={errors.endDate?.message}
+                      />
+                    )}
+                  />
+                )}
+              />
+            )}
+            <Grid container justifyContent="space-between" spacing={2}>
+              <Grid item>
+                <Button variant="text" small onClick={onClose}>
+                  <Typography variant="bodyRegular">Cancel</Typography>
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  type="submit"
+                  small
+                  variant="danger"
+                  disabled={isSubmitting || (!isDirty && isOnboarded)}
+                >
+                  {isOnboarded ? (
+                    <Typography variant="bodyRegular" bold light>
+                      {isSubmitting ? "Removing..." : "Remove"}
+                    </Typography>
+                  ) : (
+                    <Typography variant="bodyRegular" bold light>
+                      {isSubmitting ? "Uninviting..." : "Uninvite"}
+                    </Typography>
+                  )}
+                </Button>
+              </Grid>
+            </Grid>
+          </Stack>
+        </form>
+      </Card>
+    </Popover>
+  );
+};
 const TeacherLeaderFields = ({ handleToggle, school }) => {
   const [isAddingTeacher, setIsAddingTeacher] = useState(false);
   const [isEditingTeacher, setIsEditingTeacher] = useState(false);
   const [currentTeacher, setCurrentTeacher] = useState(null);
   const [isInvitingTeacher, setIsInvitingTeacher] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [personIdToRemove, setPersonIdToRemove] = useState(null);
+  const [removingPersonIsOnboarded, setRemovingPersonIsOnboarded] =
+    useState(false);
 
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const [disabledResults, setDisabledResults] = useState([]);
 
   const { data: schoolData, isLoading: isLoadingSchoolData } = useSchool(
@@ -1468,14 +1603,10 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
     });
   };
 
-  const handleDeleteSchoolRelationship = async (schoolId) => {
-    try {
-      const response = await schoolRelationshipsApi.destroy(schoolId);
-      mutate(`/v1/schools/${school.id}`);
-      reset();
-    } catch (error) {
-      console.log(error);
-    }
+  const handleRemovePerson = (event, personId, isOnboarded) => {
+    setAnchorEl(event.currentTarget);
+    setPersonIdToRemove(personId);
+    setRemovingPersonIsOnboarded(isOnboarded);
   };
 
   const handleAddTeacherRelationship = async (data) => {
@@ -1492,7 +1623,6 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
           name: school.attributes.name,
           description: null,
           start_date: formattedStartDate,
-          end_date: formattedEndDate,
           title: data.schoolTitle, // the title the teacher had while at the school
           role_list: ["Teacher Leader"],
           school_id: school.id,
@@ -1527,7 +1657,6 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
           name: school.attributes.name,
           description: null,
           start_date: formattedStartDate,
-          end_date: formattedEndDate,
           title: data.schoolTitle,
           role_list: ["Teacher Leader"],
           // school_id: data.school.value,
@@ -1577,12 +1706,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
       };
     })
     ?.filter((teacher) => teacher.schoolRealtionshipId)
-    ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
-    ?.sort((a, b) => {
-      if (!a.endDate) return -1;
-      if (!b.endDate) return 1;
-      return 0;
-    });
+    ?.filter((teacher) => !teacher.schoolRelationshipAttributes?.endDate);
 
   const formatHumanDate = (date) => {
     const parsedDate = parseISO(date);
@@ -1754,38 +1878,6 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                         )}
                         rules={{ required: "This field is required" }}
                       />
-                      <Controller
-                        name="dateLeft"
-                        control={control}
-                        defaultValue={null}
-                        render={({ field }) => (
-                          <DatePicker
-                            label="Date left"
-                            value={parseISO(field.value)}
-                            onChange={(date) => {
-                              const isoDate =
-                                date && isValid(date) ? date.toISOString() : "";
-                              field.onChange(isoDate);
-                            }}
-                            maxDate={new Date()}
-                            minDate={new Date("2014-01-01")}
-                            renderInput={(params) => (
-                              <MaterialTextField
-                                data-cy="schoolId-teacherLeaders-dateLeft"
-                                {...params}
-                                error={errors.dateLeft}
-                                helperText={
-                                  errors &&
-                                  errors.dateLeft &&
-                                  errors.dateLeft.type === "required" &&
-                                  "This field is required"
-                                }
-                              />
-                            )}
-                          />
-                        )}
-                        rules={{ required: false }}
-                      />
 
                       <Controller
                         name="schoolTitle"
@@ -1878,13 +1970,16 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                               Edit
                             </Typography>
 
+                            {/* Remove teacher leader button */}
                             <Typography
                               variant="bodyRegular"
                               lightened
                               hoverable
-                              onClick={() =>
-                                handleDeleteSchoolRelationship(
-                                  teacher?.schoolRealtionshipId
+                              onClick={(event) =>
+                                handleRemovePerson(
+                                  event,
+                                  teacher.id,
+                                  teacher.attributes.isOnboarded
                                 )
                               }
                               data-cy={`schoolId-teacherLeaders-remove-${i}`}
@@ -2032,6 +2127,14 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
           )}
         </form>
       )}
+      <RemovePersonPopover
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        school={school}
+        personId={personIdToRemove}
+        isOnboarded={removingPersonIsOnboarded}
+      />
     </>
   );
 };
@@ -2250,6 +2353,17 @@ const BoardMemberFields = ({ handleToggle, school }) => {
   const [isAddingTeacher, setIsAddingTeacher] = useState(false);
   const [isEditingTeacher, setIsEditingTeacher] = useState(false);
   const [currentTeacher, setCurrentTeacher] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [personIdToRemove, setPersonIdToRemove] = useState(null);
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleRemovePerson = (event, personId) => {
+    setAnchorEl(event.currentTarget);
+    setPersonIdToRemove(personId);
+  };
 
   const { data: schoolData, isLoading: isLoadingSchoolData } = useSchool(
     school.id
@@ -2315,9 +2429,6 @@ const BoardMemberFields = ({ handleToggle, school }) => {
     const formattedStartDate = data.dateJoined
       ? format(new Date(data.dateJoined), "yyyy-MM-dd")
       : null;
-    const formattedEndDate = data.dateLeft
-      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
-      : null;
 
     try {
       const response = await schoolRelationshipsApi.create({
@@ -2325,7 +2436,6 @@ const BoardMemberFields = ({ handleToggle, school }) => {
           name: school.attributes.name,
           description: null,
           start_date: formattedStartDate,
-          end_date: formattedEndDate,
 
           role_list: ["Board Member"],
           school_id: school.id,
@@ -2338,7 +2448,6 @@ const BoardMemberFields = ({ handleToggle, school }) => {
       reset({
         teacher: null,
         dateJoined: "",
-        dateLeft: "",
       });
     } catch (error) {
       console.log(error);
@@ -2349,9 +2458,6 @@ const BoardMemberFields = ({ handleToggle, school }) => {
     const formattedStartDate = data.dateJoined
       ? format(new Date(data.dateJoined), "yyyy-MM-dd")
       : null;
-    const formattedEndDate = data.dateLeft
-      ? format(new Date(data.dateLeft), "yyyy-MM-dd")
-      : null;
 
     try {
       await schoolRelationshipsApi.update(currentTeacher.schoolRealtionshipId, {
@@ -2359,7 +2465,6 @@ const BoardMemberFields = ({ handleToggle, school }) => {
           name: school.attributes.name,
           description: null,
           start_date: formattedStartDate,
-          end_date: formattedEndDate,
 
           role_list: ["Board Member"],
           // school_id: data.school.value,
@@ -2433,12 +2538,7 @@ const BoardMemberFields = ({ handleToggle, school }) => {
       };
     })
     ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are board members
-    ?.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))
-    ?.sort((a, b) => {
-      if (!a.endDate) return -1;
-      if (!b.endDate) return 1;
-      return 0;
-    });
+    ?.filter((teacher) => !teacher.schoolRelationshipAttributes?.endDate); // Only include teachers who are still at the school
 
   const formatHumanDate = (date) => {
     const parsedDate = parseISO(date);
@@ -2596,38 +2696,6 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                     )}
                     rules={{ required: "This field is required" }}
                   />
-                  <Controller
-                    name="dateLeft"
-                    control={control}
-                    defaultValue={null}
-                    render={({ field }) => (
-                      <DatePicker
-                        label="Date left"
-                        value={parseISO(field.value)}
-                        onChange={(date) => {
-                          const isoDate =
-                            date && isValid(date) ? date.toISOString() : "";
-                          field.onChange(isoDate);
-                        }}
-                        maxDate={new Date()}
-                        minDate={new Date("2014-01-01")}
-                        renderInput={(params) => (
-                          <MaterialTextField
-                            data-cy="schoolId-boardMembers-dateLeft"
-                            {...params}
-                            error={errors.dateLeft}
-                            helperText={
-                              errors &&
-                              errors.dateLeft &&
-                              errors.dateLeft.type === "required" &&
-                              "This field is required"
-                            }
-                          />
-                        )}
-                      />
-                    )}
-                    rules={{ required: false }}
-                  />
                 </Stack>
               </Grid>
             </Grid>
@@ -2696,10 +2764,8 @@ const BoardMemberFields = ({ handleToggle, school }) => {
                           variant="bodyRegular"
                           lightened
                           hoverable
-                          onClick={() =>
-                            handleDeleteSchoolRelationship(
-                              teacher?.schoolRealtionshipId
-                            )
+                          onClick={(event) =>
+                            handleRemovePerson(event, teacher.id)
                           }
                           data-cy={`schoolId-boardMembers-remove-${i}`}
                           data-cy-another={`schoolId-boardMembers-remove`}
@@ -2805,54 +2871,16 @@ const BoardMemberFields = ({ handleToggle, school }) => {
           </Grid>
         </Card>
       </Box>
+      <RemovePersonPopover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        school={school}
+        personId={personIdToRemove}
+        isOnboarded={true}
+      />
     </form>
   );
-};
-
-const agesServed = {
-  title: "Age level",
-  param: "school_filters[age_levels]",
-  doNotDisplayFor: "people",
-  options: [
-    { value: "Infants", label: "Infants" },
-    { value: "Toddlers", label: "Toddlers" },
-    { value: "Primary", label: "Primary" },
-    { value: "Lower Elementary", label: "Lower Elementary" },
-    { value: "Upper Elementary", label: "Upper Elementary" },
-    { value: "Adolescent", label: "Adolescent" },
-    { value: "High School", label: "High School" },
-  ],
-};
-
-const governance = {
-  title: "Governance",
-  param: "school_filters[governance]",
-  doNotDisplayFor: "people",
-  options: [
-    { label: "Independent", value: "Independent" },
-    { label: "Charter", value: "Charter" },
-    { label: "District", value: "District" },
-  ],
-};
-const charter = {
-  title: "Charter",
-  param: "school_filters[charter]",
-  doNotDisplayFor: "people",
-  options: [
-    {
-      label: "Minnesota Wildflower Montessori School",
-      value: "Minnesota Wildflower Montessori School",
-    },
-    { label: "Colorado Charter", value: "Colorado Charter" },
-    {
-      label: "Wildflower New York Charter School",
-      value: "Wildflower New York Charter School",
-    },
-    {
-      label: "DC Wildflower Public Charter School",
-      value: "DC Wildflower Public Charter School",
-    },
-  ],
 };
 
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

@@ -24,7 +24,12 @@ const Layout = ({ children }) => {
   const { isLoggedIn } = useUserContext();
   const { screenSize } = getScreenSize();
 
-  const routesWithNoNav = ["/welcome", "/login", "/logged-out"];
+  const routesWithNoNav = [
+    "/welcome",
+    "/login",
+    "/logged-out",
+    "/reset-password",
+  ];
   const showNav = !routesWithNoNav.some((route) =>
     router.pathname.startsWith(route)
   );

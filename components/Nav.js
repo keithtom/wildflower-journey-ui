@@ -503,7 +503,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   const logo = "/assets/images/wildflower-logo.png";
 
   // console.log(screenSize.isSm);
-  console.log({ currentUser });
+  // console.log({ currentUser });
 
   const isTeacherLeaderSchool = (school) =>
     school.role_list?.some(
@@ -638,6 +638,15 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                       <Icon type="buildingHouse" />
                     </NavListItemIcon>
                     <NavListItemText primary="Schools" bold />
+                  </NavListItemButton>
+                  <NavListItemButton
+                    onClick={() => router.push("/admin/people")}
+                    selected={router.asPath === "/admin/people"}
+                  >
+                    <NavListItemIcon>
+                      <Icon type="userCircle" />
+                    </NavListItemIcon>
+                    <NavListItemText primary="People" bold />
                   </NavListItemButton>
                 </>
               )}

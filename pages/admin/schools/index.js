@@ -1,61 +1,148 @@
-import { useEffect, useState } from "react";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
+import { useEffect, useState, useMemo } from "react";
+import {
+  Stepper,
+  Step,
+  StepLabel,
+  FormControlLabel,
+  RadioGroup,
+  FormHelperText,
+  CircularProgress,
+  TextField,
+  Chip,
+  Skeleton,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  ListItemSecondaryAction,
+  ListItemIcon,
+  Autocomplete,
+  ListSubheader,
+  Pagination,
+} from "@mui/material";
+import { School } from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
 import { useForm, Controller } from "react-hook-form";
-import { FormControlLabel, RadioGroup, FormHelperText } from "@mui/material";
-import { styled, css } from "@mui/material/styles";
-import teamsApi from "@api/ssj/teams";
 import peopleApi from "@api/people";
+import schoolsApi from "@api/schools";
 import useSWR, { useSWRConfig } from "swr";
 import { useRouter } from "next/router";
-import { Chip, Skeleton } from "@mui/material";
 
 import { clearLoggedInState } from "@lib/handleLogout";
 import { useUserContext } from "@lib/useUserContext";
 import useAuth from "@lib/utils/useAuth";
-import useAllTeams from "@hooks/useAllTeams";
+import useSchools from "@hooks/useSchools";
 import useWorkflows from "@hooks/workflow/definition/useWorkflows";
+import useSearch from "@hooks/useSearch";
 import {
+  Card,
   Box,
   PageContainer,
   Button,
   Grid,
   Typography,
   Stack,
-  Card,
   Avatar,
   Modal,
-  TextField,
   Radio,
   Spinner,
 } from "@ui";
 
-const AdminSSJ = ({}) => {
+const AdminSchools = () => {
   const [addSchoolModalOpen, setAddSchoolModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const { currentUser } = useUserContext();
   const router = useRouter();
 
-  const { teams, isLoading } = useAllTeams();
-  // console.log({ teams });
+  const { data: schools, isLoading } = useSchools({
+    page,
+    per_page: 25,
+  });
+
+  const filteredSchools = schools?.data?.filter(
+    (s) => s.attributes.status !== "Abandoned"
+  );
 
   useAuth(!currentUser?.attributes?.isAdmin && "/network");
 
-  // const { data, error, isLoading, isValidating, mutate } = useSWR(
-  //   "api/teams",
-  //   () => teamsApi.index().then((res) => res.data),
-  //   {
-  //     onErrorRetry: (error) => {
-  //       if (error?.response?.status === 401) {
-  //         clearLoggedInState({});
-  //         router.push("/login");
-  //       } else {
-  //         console.error(error);
-  //       }
-  //     },
-  //   }
-  // );
-  let ssjTeams = teams || [];
+  const handleSchoolClick = (schoolId) => {
+    router.push(`/admin/schools/${schoolId}`);
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const SchoolList = ({ schools }) => (
+    <Card noPadding>
+      <List
+        subheader={
+          <ListSubheader
+            component="div"
+            sx={{
+              background: "#f1f1f1",
+              paddingX: 4,
+              paddingY: 3,
+            }}
+          >
+            <Typography variant="bodyLarge" bold lightened>
+              Schools
+            </Typography>
+          </ListSubheader>
+        }
+      >
+        {!filteredSchools?.length ? (
+          <ListItem disablePadding>
+            <ListItemText>
+              <Typography variant="bodyRegular" lightened align="center">
+                No schools found
+              </Typography>
+            </ListItemText>
+          </ListItem>
+        ) : (
+          filteredSchools.map((school, i) => (
+            <ListItem
+              key={school.id}
+              disablePadding
+              divider={i !== schools.length - 1}
+            >
+              <ListItemButton onClick={() => handleSchoolClick(school.id)}>
+                <ListItemIcon>
+                  <School fontSize="small" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={school.attributes.name}
+                  primaryTypographyProps={{
+                    variant: "bodyRegular",
+                  }}
+                />
+                <ListItemSecondaryAction>
+                  <Stack direction="row" spacing={2}>
+                    <Chip
+                      label={school.attributes.status}
+                      size="small"
+                      color={
+                        school.attributes.status === "Open"
+                          ? "primary"
+                          : "default"
+                      }
+                    />
+                    {school.attributes.currentPhase && (
+                      <Chip
+                        label={school.attributes.currentPhase}
+                        size="small"
+                        variant="outlined"
+                      />
+                    )}
+                  </Stack>
+                </ListItemSecondaryAction>
+              </ListItemButton>
+            </ListItem>
+          ))
+        )}
+      </List>
+    </Card>
+  );
 
   return (
     <>
@@ -64,7 +151,7 @@ const AdminSSJ = ({}) => {
           <Grid container justifyContent="space-between">
             <Grid item>
               <Typography variant="bodyLarge">
-                {ssjTeams.length} schools
+                {schools?.meta?.total_entries || 0} schools
               </Typography>
             </Grid>
             <Grid item>
@@ -75,29 +162,26 @@ const AdminSSJ = ({}) => {
               </Button>
             </Grid>
           </Grid>
-          <Grid container>
-            <Grid item xs={12}>
-              <Card noPadding noRadius noBorder>
-                <Stack spacing={1}>
-                  {isLoading ? (
-                    <Stack spacing={2}>
-                      {Array.from({ length: 24 }, (_, j) => (
-                        <Skeleton key={j} height={48} m={0} variant="rounded" />
-                      ))}
-                    </Stack>
-                  ) : (
-                    ssjTeams?.map((s, i) => (
-                      <Card size="small" key={i}>
-                        <Stack direction="row" alignItems="center" spacing={3}>
-                          <Avatar size="sm" />
-                          <Typography>{s?.attributes?.tempName}</Typography>
-                        </Stack>
-                      </Card>
-                    ))
-                  )}
-                </Stack>
-              </Card>
-            </Grid>
+
+          {isLoading ? (
+            <Card sx={{ borderRadius: 4 }}>
+              <Stack spacing={2} p={3}>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <Skeleton key={i} height={60} />
+                ))}
+              </Stack>
+            </Card>
+          ) : (
+            <SchoolList schools={schools?.data} />
+          )}
+
+          <Grid container justifyContent="center">
+            <Pagination
+              count={schools?.meta?.total_pages || 1}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+            />
           </Grid>
         </Stack>
       </PageContainer>
@@ -109,7 +193,7 @@ const AdminSSJ = ({}) => {
   );
 };
 
-export default AdminSSJ;
+export default AdminSchools;
 
 const StyledPersonOption = styled(Card)`
   border-bottom: 1px solid ${({ theme }) => theme.color.neutral.main};
@@ -149,7 +233,7 @@ const AddSchoolModal = ({ open, toggle }) => {
     setTempDisplayData({});
     setActiveStep(0);
     toggle();
-    mutate("api/ssj/teams");
+    mutate("v1/schools");
   };
 
   return (
@@ -246,17 +330,65 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      teacher: null,
+      first_name: "",
+      last_name: "",
+      email: "",
+    },
+  });
+
   const onSubmit = (data) => {
-    setMultiplePeople((multiplePeople) => {
-      return [...multiplePeople, data];
-    });
-    reset({ first_name: "", last_name: "", email: "" });
+    if (data.first_name && data.last_name && data.email) {
+      setMultiplePeople((prev) => [
+        ...prev,
+        {
+          first_name: data.first_name,
+          last_name: data.last_name,
+          email: data.email,
+        },
+      ]);
+      reset({ first_name: "", last_name: "", email: "" });
+    }
   };
+
   const handleRemovePerson = (email) => {
-    const removedPeople = multiplePeople.filter((p) => p.email !== email);
-    setMultiplePeople(removedPeople);
+    setMultiplePeople((prev) => prev.filter((p) => p.email !== email));
   };
+
+  const {
+    query,
+    setQuery,
+    results,
+    noResults,
+    isSearching,
+    setPerPage,
+    setFilters,
+  } = useSearch();
+
+  useEffect(() => {
+    setQuery("*");
+    setPerPage(500);
+    setFilters({
+      models: "people",
+    });
+  }, []);
+
+  const handleTeacherSelect = (selectedTeacher) => {
+    if (selectedTeacher) {
+      setMultiplePeople((prev) => [
+        ...prev,
+        {
+          first_name: selectedTeacher.attributes.firstName,
+          last_name: selectedTeacher.attributes.lastName,
+          email: selectedTeacher.attributes.email,
+        },
+      ]);
+      setQuery("");
+    }
+  };
+
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -273,7 +405,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                 spacing={2}
               >
                 {multiplePeople.length ? (
-                  multiplePeople?.map((etl, i) => (
+                  multiplePeople?.map((person, i) => (
                     <Grid item xs={12} key={i}>
                       <Card full noBorder size="small">
                         <Grid
@@ -287,10 +419,10 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                               spacing={3}
                               alignItems="center"
                             >
-                              <Avatar size="sm" />
+                              <Avatar src={person.imageUrl} size="sm" />
                               <Stack>
                                 <Typography variant="bodyRegular" bold>
-                                  {etl.first_name} {etl.last_name}
+                                  {person.first_name} {person.last_name}
                                 </Typography>
                                 <Typography variant="bodyRegular" lightened>
                                   Emerging Teacher Leader
@@ -302,7 +434,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                             <Button
                               variant="danger"
                               small
-                              onClick={() => handleRemovePerson(etl.email)}
+                              onClick={() => handleRemovePerson(person.email)}
                             >
                               <Typography variant="bodyRegular" bold>
                                 Remove
@@ -315,7 +447,9 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                   ))
                 ) : (
                   <Grid item>
-                    <Typography lightened>No ETLs</Typography>
+                    <Typography lightened>
+                      No Teacher Leaders added yet
+                    </Typography>
                   </Grid>
                 )}
               </Grid>
@@ -325,6 +459,99 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
             <Card>
               <Stack spacing={3}>
                 <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Controller
+                      name="teacher"
+                      control={control}
+                      render={({ field, fieldState: { error, isTouched } }) => (
+                        <Autocomplete
+                          {...field}
+                          inputValue={query || ""}
+                          onChange={(_, newValue) => {
+                            handleTeacherSelect(newValue);
+                          }}
+                          onInputChange={(_, newInputValue) => {
+                            setQuery(newInputValue);
+                          }}
+                          options={
+                            results?.filter(
+                              (person) => !person.attributes.endDate
+                            ) || []
+                          }
+                          getOptionDisabled={(option) =>
+                            multiplePeople.some(
+                              (p) => p.email === option.attributes.email
+                            )
+                          }
+                          getOptionLabel={(option) =>
+                            option && option.attributes
+                              ? `${option.attributes.firstName} ${option.attributes.lastName}`
+                              : ""
+                          }
+                          renderOption={(props, option) => {
+                            const { key, ...optionProps } = props;
+                            return (
+                              <ListItem
+                                key={option.id}
+                                {...optionProps}
+                                disablePadding
+                              >
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={2}
+                                >
+                                  <Avatar
+                                    src={option.attributes.imageUrl}
+                                    size="mini"
+                                  />
+                                  <Typography variant="bodyRegular">
+                                    {option.attributes.firstName}{" "}
+                                    {option.attributes.lastName}
+                                  </Typography>
+                                </Stack>
+                              </ListItem>
+                            );
+                          }}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === value?.id
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Search for an existing person"
+                              error={isTouched && !!error}
+                              placeholder="e.g. Katelyn Shore"
+                              helperText={
+                                isTouched &&
+                                error?.type === "required" &&
+                                "This field is required"
+                              }
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>
+                                    {isSearching ? (
+                                      <CircularProgress
+                                        color="inherit"
+                                        size={20}
+                                      />
+                                    ) : null}
+                                    {params.InputProps.endAdornment}
+                                  </>
+                                ),
+                              }}
+                            />
+                          )}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="bodyRegular" lightened>
+                      Or add a new person
+                    </Typography>
+                  </Grid>
                   <Grid item xs={12} sm={6}>
                     <Controller
                       name="first_name"
@@ -337,15 +564,12 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                       }}
                       render={({ field }) => (
                         <TextField
+                          {...field}
                           label="First name"
                           placeholder="e.g. Jane"
-                          error={errors.firstName}
-                          helperText={
-                            errors &&
-                            errors.firstName &&
-                            errors.firstName.message
-                          }
-                          {...field}
+                          error={!!errors.first_name}
+                          helperText={errors.first_name?.message}
+                          fullWidth
                         />
                       )}
                     />
@@ -362,13 +586,12 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                       }}
                       render={({ field }) => (
                         <TextField
+                          {...field}
                           label="Last name"
                           placeholder="e.g. Smith"
-                          error={errors.lastName}
-                          helperText={
-                            errors && errors.lastName && errors.lastName.message
-                          }
-                          {...field}
+                          error={!!errors.last_name}
+                          helperText={errors.last_name?.message}
+                          fullWidth
                         />
                       )}
                     />
@@ -389,19 +612,18 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                   }}
                   render={({ field }) => (
                     <TextField
+                      {...field}
                       label="Email"
                       placeholder="e.g. jane.smith@gmail.com"
-                      error={errors.email}
-                      helperText={
-                        errors && errors.email && errors.email.message
-                      }
-                      {...field}
+                      error={!!errors.email}
+                      helperText={errors.email?.message}
+                      fullWidth
                     />
                   )}
                 />
                 <Button variant="lightened" type="submit">
                   <Typography variant="bodyRegular" bold highlight>
-                    Add ETL
+                    Add Teacher Leader
                   </Typography>
                 </Button>
               </Stack>
@@ -447,7 +669,7 @@ const AddEmergingTeacherLeaders = ({
             {activeStep === 0 ? null : (
               <Grid item>
                 <Button type="submit" variant="text" small>
-                  <Typography variant="bodyRegular" bold light>
+                  <Typography variant="bodyRegular" bold>
                     Prev
                   </Typography>
                 </Button>
@@ -527,7 +749,10 @@ const AddOperationsGuide = ({
     mutate,
   } = useSWR(
     "api/school?ops_guides",
-    () => peopleApi.index({ ops_guide: true }).then((res) => res.data),
+    () =>
+      peopleApi
+        .index({ ops_guide: true })
+        .then((res) => res.data.filter((person) => !person.attributes.endDate)),
     {
       onErrorRetry: (error) => {
         if (error?.response?.status === 401) {
@@ -539,6 +764,7 @@ const AddOperationsGuide = ({
       },
     }
   );
+
   let opsGuides = opsGuideData || [];
 
   return (
@@ -551,7 +777,7 @@ const AddOperationsGuide = ({
           <Grid container justifyContent="space-between">
             <Grid item>
               <Button variant="text" onClick={handlePrev} small>
-                <Typography variant="bodyRegular" bold light>
+                <Typography variant="bodyRegular" bold>
                   Prev
                 </Typography>
               </Button>
@@ -680,7 +906,10 @@ const AddRegionalGrowthLead = ({
     mutate,
   } = useSWR(
     "api/school?ops_guides",
-    () => peopleApi.index({ rgl: true }).then((res) => res.data),
+    () =>
+      peopleApi
+        .index({ rgl: true })
+        .then((res) => res.data.filter((person) => !person.attributes.endDate)),
     {
       onErrorRetry: (error) => {
         if (error?.response?.status === 401) {
@@ -720,7 +949,7 @@ const AddRegionalGrowthLead = ({
           <Grid container justifyContent="space-between">
             <Grid item>
               <Button variant="text" onClick={handlePrev} small>
-                <Typography variant="bodyRegular" bold light>
+                <Typography variant="bodyRegular" bold>
                   Prev
                 </Typography>
               </Button>
@@ -871,7 +1100,7 @@ const AddWorkflow = ({
           <Grid container justifyContent="space-between">
             <Grid item>
               <Button variant="text" onClick={handlePrev} small>
-                <Typography variant="bodyRegular" bold light>
+                <Typography variant="bodyRegular" bold>
                   Prev
                 </Typography>
               </Button>
@@ -1022,21 +1251,17 @@ const InviteSchool = ({
   } = useForm();
 
   const onSubmit = async () => {
-    // console.log({ team });
     try {
-      await teamsApi.inviteTeam({ team: team });
+      await schoolsApi.create({ school: team });
+      handleInviteComplete();
     } catch (error) {
       if (error?.response?.status === 422) {
         setDuplicateEmailError(error.response.data.message);
       }
-      // console.log({ error });
       console.error(error);
     }
-    handleInviteComplete();
   };
-  // console.log({ team });
-  // console.log({ duplicateEmailError });
-  // console.log({ tempDisplayData });
+
   return (
     <Modal
       open={open}
@@ -1047,7 +1272,7 @@ const InviteSchool = ({
           <Grid container justifyContent="space-between">
             <Grid item>
               <Button variant="text" onClick={handlePrev} small>
-                <Typography variant="bodyRegular" bold light>
+                <Typography variant="bodyRegular" bold>
                   Prev
                 </Typography>
               </Button>
