@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { getCookie } from "cookies-next";
-import ssjApi from "@api/ssj/ssj";
 import { useRouter } from "next/router";
 import Skeleton from "@mui/material/Skeleton";
 import { useTranslation } from "next-i18next";

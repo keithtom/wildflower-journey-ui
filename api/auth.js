@@ -63,6 +63,18 @@ async function loginEmailLink(email) {
   const result = await response.json;
   return result;
 }
+async function resetPasswordEmail(email) {
+  const config = getAuthHeader();
+  const response = await api.post(
+    `/users/password_reset`,
+    {
+      email: email,
+    },
+    config
+  );
+  const result = await response.json;
+  return result;
+}
 
 function setCookies(response) {
   setCookie("auth", response.headers["authorization"], {
@@ -88,4 +100,9 @@ function setCookies(response) {
   }
 }
 
-export default { tokenAuth, loginEmailLink, login };
+export default {
+  tokenAuth,
+  loginEmailLink,
+  login,
+  resetPasswordEmail,
+};
