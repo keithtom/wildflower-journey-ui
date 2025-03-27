@@ -1560,10 +1560,6 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
                                     : field.value.filter((r) => r !== role);
                                   field.onChange(newRoles);
                                 }}
-                                disabled={
-                                  role === "Emerging Teacher Leader" &&
-                                  schoolStatus === "Open"
-                                }
                               />
                             }
                             label={role}
