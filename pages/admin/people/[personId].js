@@ -218,6 +218,8 @@ const PersonIdPage = () => {
     ];
   }, [person]);
 
+  console.log({ personData });
+
   const currentRoles = useMemo(() => {
     if (!person?.data?.attributes?.roleList) return [];
 
@@ -624,7 +626,8 @@ const EditDetailsModal = ({ open, onClose, person }) => {
     // Always include Montessori certification fields
     personUpdate.person.montessori_certified = data.montessoriCertified;
     personUpdate.person.montessori_certified_level_list =
-      data.montessoriCertifiedLevels || [];
+      data.montessoriCertifiedLevels?.map((level) => level.value || level) ||
+      [];
     if (data.montessoriCertifiedYear) {
       personUpdate.person.montessori_certified_year =
         data.montessoriCertifiedYear;
@@ -866,9 +869,9 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                     renderTags={(value, getTagProps) =>
                       value.map((option, index) => (
                         <Chip
-                          label={option}
+                          label={option.label || option}
                           {...getTagProps({ index })}
-                          key={option}
+                          key={option.value || option}
                         />
                       ))
                     }
@@ -927,9 +930,9 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                     renderTags={(value, getTagProps) =>
                       value.map((option, index) => (
                         <Chip
-                          label={option}
+                          label={option.label || option}
                           {...getTagProps({ index })}
-                          key={option}
+                          key={option.value || option}
                         />
                       ))
                     }

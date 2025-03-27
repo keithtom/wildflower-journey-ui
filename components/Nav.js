@@ -682,15 +682,13 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                   <NavListItemButton
                     onClick={() => {
                       if (router.asPath.includes("/admin")) {
-                        // Check if we're on a school-specific admin page
-                        const schoolMatch = router.asPath.match(
-                          /\/admin\/schools\/([^/]+)/
-                        );
-                        if (schoolMatch) {
-                          router.push(`/school/${schoolMatch[1]}`);
-                        } else {
-                          router.push("/network");
-                        }
+                        teacherLeaderSchools
+                          ? router.push(
+                              `/school/${teacherLeaderSchools[0]?.id}`
+                            )
+                          : currentUser?.personRoleList?.includes("Ops Guide")
+                          ? router.push("/your-schools")
+                          : router.push("/network");
                       } else {
                         router.push("/admin");
                       }
