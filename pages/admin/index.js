@@ -38,11 +38,13 @@ const AdminDashboard = () => {
   const { workflows, isLoading } = useWorkflows();
   const { data: schools, isLoading: isLoadingSchools } = useSchools({
     serialization_fields: ["name"],
+    page: 1,
+    per_page: 1,
   });
   const { people, isLoading: isLoadingPeople } = usePersons({
     lightweight: true,
     page: 1,
-    per_page: 1000000,
+    per_page: 1,
   });
 
   const workflowImage = "/assets/images/ssj/wildflowerSystems.jpg";
@@ -105,7 +107,7 @@ const AdminDashboard = () => {
                         {isLoadingSchools ? (
                           <Skeleton width={200} />
                         ) : (
-                          `${schools?.data?.length} Schools`
+                          `${schools?.meta?.total_entries} Schools`
                         )}
                       </Typography>
                       <Typography variant="bodyLarge" bold highlight>
@@ -135,7 +137,7 @@ const AdminDashboard = () => {
                         {isLoadingPeople ? (
                           <Skeleton width={200} />
                         ) : (
-                          `${people?.data?.length} People`
+                          `${people?.meta?.total_entries} People`
                         )}
                       </Typography>
                       <Typography variant="bodyLarge" bold highlight>
