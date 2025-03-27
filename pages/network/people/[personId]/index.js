@@ -90,7 +90,7 @@ const Person = ({}) => {
   useAuth("/login");
   const { screenSize } = getScreenSize();
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
-  const { currentUser } = useUserContext();
+  const { currentUser, isAdmin } = useUserContext();
 
   const router = useRouter();
   const { personId } = router.query;
@@ -104,7 +104,7 @@ const Person = ({}) => {
   const person = personData?.data;
   const included = personData?.included;
 
-  const isMyProfile = currentUser?.id === personId;
+  const isMyProfile = currentUser?.id === personId || isAdmin;
   const hasSchool = person?.relationships.schools.length;
   const hasContact = person?.attributes.email || person?.attributes.phone;
   const hasAttributes =
@@ -276,6 +276,16 @@ const Person = ({}) => {
             <Grid container spacing={8}>
               <Grid item xs={12} md={hasInfo ? 4 : 12}>
                 <Stack spacing={6}>
+                  {isAdmin ? (
+                    <Card variant="primaryLightened" size="small">
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Icon type="star" size="small" variant="primary" />
+                        <Typography variant="bodySmall">
+                          You are an admin and can edit this profile
+                        </Typography>
+                      </Stack>
+                    </Card>
+                  ) : null}
                   {isMyProfile ? (
                     <Button
                       variant="lightened"
