@@ -87,7 +87,7 @@ const School = ({}) => {
   const { agesServed, governance, charter } = NETWORK_SCHOOL_FIELDS;
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [claimSchoolModalOpen, setClaimSchoolModalOpen] = useState(false);
-  const { currentUser } = useUserContext();
+  const { currentUser, isAdmin } = useUserContext();
 
   const router = useRouter();
   const { schoolId } = router.query;
@@ -201,7 +201,8 @@ const School = ({}) => {
 
   const isMySchool =
     schoolLeaders?.some((leader) => leader.id === currentUser?.id) ||
-    adminId === currentUser?.id
+    adminId === currentUser?.id ||
+    isAdmin
       ? true
       : false;
 
@@ -257,6 +258,16 @@ const School = ({}) => {
             <Grid container spacing={8}>
               <Grid item xs={12} md={hasInfo ? 4 : 12}>
                 <Stack spacing={6}>
+                  {isAdmin ? (
+                    <Card variant="primaryLightened" size="small">
+                      <Stack direction="row" spacing={3} alignItems="center">
+                        <Icon type="star" size="small" variant="primary" />
+                        <Typography variant="bodySmall">
+                          You are an admin and can edit this profile
+                        </Typography>
+                      </Stack>
+                    </Card>
+                  ) : null}
                   {isMySchool ? (
                     <Button
                       variant="lightened"
