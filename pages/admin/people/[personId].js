@@ -525,6 +525,37 @@ const PersonIdPage = () => {
                 ))}
               </List>
             </Card>
+            <Card sx={{ borderRadius: 4 }}>
+              <List
+                subheader={
+                  <ListSubheader
+                    component="div"
+                    id="nested-list-subheader"
+                    sx={{
+                      background: "#f1f1f1",
+                      paddingX: 4,
+                      paddingY: 3,
+                    }}
+                  >
+                    <Typography variant="bodyLarge">Attributes</Typography>
+                  </ListSubheader>
+                }
+              >
+                <ListItem>
+                  <ListItemIcon>
+                    <Work />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Onboarded"
+                    secondary={
+                      person?.data?.attributes?.isOnboarded === true
+                        ? "Yes"
+                        : "No"
+                    }
+                  />
+                </ListItem>
+              </List>
+            </Card>
           </Stack>
         </Grid>
       </Grid>

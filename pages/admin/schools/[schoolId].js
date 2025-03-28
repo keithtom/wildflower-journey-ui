@@ -33,6 +33,7 @@ import {
   FormLabel,
   Checkbox,
 } from "@mui/material";
+import Link from "next/link";
 import { PageContainer } from "@ui";
 import {
   School,
@@ -177,7 +178,9 @@ const SchoolIdPage = () => {
         lastName: personData.attributes.lastName,
         roleList: transformedRoleList,
         imageUrl: personData.attributes.imageUrl,
+        startDate: schoolRelationship.attributes.startDate,
         endDate: schoolRelationship.attributes.endDate,
+        isOnboarded: personData.attributes.isOnboarded,
       };
     };
 
@@ -196,7 +199,10 @@ const SchoolIdPage = () => {
       .filter(Boolean); // Remove any null entries
 
     return {
-      activePeople: people.filter((person) => !person.endDate),
+      activePeople: people.filter(
+        (person) => !person.endDate && person.startDate
+      ),
+
       formerPeople: people.filter((person) => person.endDate),
     };
   }, [school]);
@@ -413,13 +419,21 @@ const SchoolIdPage = () => {
                           variant: "bodySmall",
                         }}
                       />
+
                       <ListItemSecondaryAction>
-                        <Button
-                          size="small"
-                          onClick={() => handleEditPerson(person)}
-                        >
-                          Edit
-                        </Button>
+                        <Stack direction="row" spacing={2}>
+                          <Link href={`/admin/people/${person.id}`}>
+                            <Button size="small" variant="text">
+                              View
+                            </Button>
+                          </Link>
+                          <Button
+                            size="small"
+                            onClick={() => handleEditPerson(person)}
+                          >
+                            Edit
+                          </Button>
+                        </Stack>
                       </ListItemSecondaryAction>
                     </ListItem>
                   ))
