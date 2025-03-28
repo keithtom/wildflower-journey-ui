@@ -70,9 +70,10 @@ import { mutate } from "swr";
 import peopleApi from "@api/people";
 import authApi from "@api/auth";
 
-const SchoolItem = ({ schoolId, personRelationships }) => {
+const SchoolItem = ({ schoolId }) => {
   const { data: schoolData, isLoading } = useSchool(schoolId);
   const router = useRouter();
+  const { personId } = router.query;
 
   if (isLoading) {
     return (
@@ -86,15 +87,12 @@ const SchoolItem = ({ schoolId, personRelationships }) => {
 
   if (!schoolData?.data) return null;
 
-  // Find the person in the included data that matches the school's people relationship
-  const schoolPerson = schoolData?.included?.find(
-    (item) =>
-      item.type === "person" &&
-      schoolData.data.relationships.people.data.some((p) => p.id === item.id)
-  );
-
-  // Get the role list from the matched person's attributes
-  const schoolRoleList = schoolPerson?.attributes?.roleList || [];
+  const schoolRoleList =
+    schoolData.included.find(
+      (item) =>
+        item.type === "schoolRelationship" &&
+        item.relationships.person.data.id === personId
+    )?.attributes?.roleList || [];
 
   return (
     <ListItem divider>
@@ -525,6 +523,37 @@ const PersonIdPage = () => {
                     </ListItemSecondaryAction>
                   </ListItem>
                 ))}
+              </List>
+            </Card>
+            <Card sx={{ borderRadius: 4 }}>
+              <List
+                subheader={
+                  <ListSubheader
+                    component="div"
+                    id="nested-list-subheader"
+                    sx={{
+                      background: "#f1f1f1",
+                      paddingX: 4,
+                      paddingY: 3,
+                    }}
+                  >
+                    <Typography variant="bodyLarge">Attributes</Typography>
+                  </ListSubheader>
+                }
+              >
+                <ListItem>
+                  <ListItemIcon>
+                    <Work />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Onboarded"
+                    secondary={
+                      person?.data?.attributes?.isOnboarded === true
+                        ? "Yes"
+                        : "No"
+                    }
+                  />
+                </ListItem>
               </List>
             </Card>
           </Stack>
