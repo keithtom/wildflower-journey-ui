@@ -1738,6 +1738,7 @@ const STATUS_OPTIONS = [
   { value: "Abandoned", label: "Abandoned" },
   { value: "Emerging", label: "Emerging" },
   { value: "Open", label: "Open" },
+  { value: "Paused", label: "Paused" },
 ];
 
 const SetStatusModal = ({ open, onClose, currentStatus }) => {
