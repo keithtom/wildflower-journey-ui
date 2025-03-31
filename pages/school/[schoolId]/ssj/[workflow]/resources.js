@@ -12,7 +12,8 @@ import Resource from "@components/Resource";
 import Hero from "@components/Hero";
 import getAuthHeader from "@lib/getAuthHeader";
 import { clearLoggedInState, redirectLoginProps } from "@lib/handleLogout";
-import useSSJResources from "@hooks/useSSJResources";
+// import useSSJResources from "@hooks/useSSJResources";
+import useResources from "@hooks/useResources";
 import useSchool from "@hooks/useSchool";
 
 import { getTranslatedAttr } from "@lib/utils/getTranslatedAttr";
@@ -39,7 +40,7 @@ const Resources = () => {
 
   // const { resources, isLoading } = useSSJResources(workflow);
   // console.log({ resources });
-  const { resources, isLoading } = useSSJResources(workflow);
+  const { resources, isLoading } = useResources(workflow);
   // console.log({ resources });
 
   const hero = "/assets/images/ssj/wildflowerSystems.jpg";
