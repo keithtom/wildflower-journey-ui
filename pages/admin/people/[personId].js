@@ -223,8 +223,6 @@ const PersonIdPage = () => {
     ];
   }, [person]);
 
-  console.log({ personData });
-
   const currentRoles = useMemo(() => {
     if (!person?.data?.attributes?.roleList) return [];
 
