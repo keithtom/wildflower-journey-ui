@@ -87,12 +87,19 @@ const SchoolItem = ({ schoolId }) => {
 
   if (!schoolData?.data) return null;
 
-  const schoolRoleList =
-    schoolData.included.find(
-      (item) =>
-        item.type === "schoolRelationship" &&
-        item.relationships.person.data.id === personId
-    )?.attributes?.roleList || [];
+  // Find the school relationship for this person
+  const schoolRelationship = schoolData.included.find(
+    (item) =>
+      item.type === "schoolRelationship" &&
+      item.relationships.person.data.id === personId
+  );
+
+  // If there's no relationship or it has an end date, don't display this school
+  if (!schoolRelationship || schoolRelationship.attributes.endDate) {
+    return null;
+  }
+
+  const schoolRoleList = schoolRelationship.attributes.roleList || [];
 
   return (
     <ListItem divider>

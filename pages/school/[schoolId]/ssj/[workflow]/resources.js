@@ -41,7 +41,7 @@ const Resources = () => {
   // const { resources, isLoading } = useSSJResources(workflow);
   // console.log({ resources });
   const { resources, isLoading } = useResources(workflow);
-  // console.log({ resources });
+  console.log({ resources });
 
   const hero = "/assets/images/ssj/wildflowerSystems.jpg";
 
