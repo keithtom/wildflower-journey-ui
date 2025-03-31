@@ -32,6 +32,9 @@ import {
   Chip,
   Skeleton,
   CircularProgress,
+  Modal,
+  Checkbox,
+  FormGroup,
 } from "@mui/material";
 import { PageContainer } from "@ui";
 import {
@@ -49,6 +52,7 @@ import {
   Badge,
   Key,
   CheckCircle,
+  Edit,
 } from "@mui/icons-material";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
@@ -126,8 +130,11 @@ const PersonIdPage = () => {
   const [editDetailsModalOpen, setEditDetailsModalOpen] = useState(false);
   const [removePersonModalOpen, setRemovePersonModalOpen] = useState(false);
   const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
+  const [editCurrentRolesModalOpen, setEditCurrentRolesModalOpen] =
+    useState(false);
   const router = useRouter();
   const { personId } = router.query;
+
   const { data: person, isLoading } = usePerson(personId);
 
   // Get school IDs from relationships
@@ -465,7 +472,20 @@ const PersonIdPage = () => {
                       paddingY: 3,
                     }}
                   >
-                    <Typography variant="bodyLarge">Current Roles</Typography>
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Typography variant="bodyLarge">Current Roles</Typography>
+                      <Button
+                        size="small"
+                        onClick={() => setEditCurrentRolesModalOpen(true)}
+                        startIcon={<Edit />}
+                      >
+                        Edit
+                      </Button>
+                    </Stack>
                   </ListSubheader>
                 }
               >
@@ -584,6 +604,13 @@ const PersonIdPage = () => {
         personName={`${
           personData.find((item) => item.key === "firstName")?.value
         } ${personData.find((item) => item.key === "lastName")?.value}`}
+      />
+      <EditCurrentRoles
+        open={editCurrentRolesModalOpen}
+        onClose={() => setEditCurrentRolesModalOpen(false)}
+        currentRoles={person?.data?.attributes?.roleList || []}
+        personId={personId}
+        mutate={mutate}
       />
     </PageContainer>
   );
@@ -1175,6 +1202,146 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
               <CircularProgress size={24} color="inherit" />
             ) : (
               "Remove Person"
+            )}
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+};
+
+const EditCurrentRoles = ({
+  open,
+  onClose,
+  currentRoles,
+  personId,
+  mutate,
+}) => {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      roles: currentRoles,
+    },
+  });
+
+  console.log({ currentRoles });
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      await peopleApi.update(personId, {
+        person: {
+          role_list: data.roles,
+        },
+      });
+      await mutate(`/v1/people/${personId}`);
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      setError("roles", {
+        type: "manual",
+        message: err?.response?.data?.message || "Failed to update roles",
+      });
+    }
+  });
+
+  const roleOptions = [
+    { value: "Emerging Teacher Leader", label: "Emerging Teacher Leader" },
+    { value: "Teacher Leader", label: "Teacher Leader" },
+    { value: "Wildflower Support", label: "Wildflower Support" },
+    { value: "Ops Guide", label: "Operations Guide" },
+    { value: "Foundation Partner", label: "Foundation Partner" },
+    { value: "Charter Partner", label: "Charter Partner" },
+    { value: "Regional Entrepreneur", label: "Regional Entrepreneur" },
+  ];
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Edit Current Roles</DialogTitle>
+      <form onSubmit={onSubmit}>
+        <DialogContent>
+          <Stack spacing={3}>
+            <FormControl error={!!errors?.roles} component="fieldset">
+              <FormLabel component="legend">Roles</FormLabel>
+              <Controller
+                name="roles"
+                control={control}
+                rules={{ required: "Please select at least one role" }}
+                render={({ field }) => (
+                  <FormGroup>
+                    {roleOptions.map((role) => {
+                      const isDisabled = [
+                        "Emerging Teacher Leader",
+                        "Teacher Leader",
+                        "Wildflower Support",
+                      ].includes(role.value);
+                      const isChecked = field.value.includes(role.value);
+
+                      return (
+                        <FormControlLabel
+                          key={role.value}
+                          control={
+                            <Checkbox
+                              checked={isChecked}
+                              onChange={(e) => {
+                                if (!isDisabled) {
+                                  const newRoles = e.target.checked
+                                    ? [...field.value, role.value]
+                                    : field.value.filter(
+                                        (r) => r !== role.value
+                                      );
+                                  field.onChange(newRoles);
+                                }
+                              }}
+                              disabled={isDisabled}
+                            />
+                          }
+                          label={
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                            >
+                              <Typography>{role.label}</Typography>
+                              {isDisabled && (
+                                <Chip
+                                  label="Added via school relationship"
+                                  size="small"
+                                  color="default"
+                                />
+                              )}
+                            </Stack>
+                          }
+                        />
+                      );
+                    })}
+                  </FormGroup>
+                )}
+              />
+              {errors?.roles && (
+                <FormHelperText>{errors.roles.message}</FormHelperText>
+              )}
+            </FormControl>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="inherit">
+            Cancel
+          </Button>
+          <Button type="submit" variant="contained" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Save Changes"
             )}
           </Button>
         </DialogActions>
