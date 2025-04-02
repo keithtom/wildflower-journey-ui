@@ -66,12 +66,26 @@ const SchoolPage = () => {
           (rel) => rel.relationships.person.data.id === person.id
         );
 
+        // Check if person exists in activePartners or invitedPartners
+        const isActivePartner = school?.data?.attributes?.activePartners?.some(
+          (partner) => partner.data.id === person.id
+        );
+        const isInvitedPartner =
+          school?.data?.attributes?.invitedPartners?.some(
+            (partner) => partner.data.id === person.id
+          );
+
         // Return person with roleList from their school relationship and the relationship ID
         return {
           ...person,
           attributes: {
             ...person.attributes,
             schoolRoleList: relationship.attributes.roleList,
+            schoolInvited: isInvitedPartner
+              ? true
+              : isActivePartner
+              ? false
+              : null,
           },
           relationships: {
             ...person.relationships,
@@ -221,6 +235,8 @@ const SchoolPage = () => {
     ],
     [t, school?.data?.attributes?.status]
   );
+
+  console.log({ school });
 
   return (
     <PageContainer title={school?.data.attributes.name}>

@@ -85,5 +85,5 @@ export const showResources = {
 export default {
   invitePartner, // DEPRECATED
   progress,
-  resources,
+  resources, // DEPRECATED
 };

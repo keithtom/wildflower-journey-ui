@@ -154,7 +154,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
     <ListItem
       disablePadding
       secondaryAction={
-        member.attributes.isOnboarded && isTeacher ? (
+        !member.attributes.schoolInvited && isTeacher ? (
           <IconButton
             aria-label="menu"
             onClick={(e) => {
@@ -169,7 +169,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
     >
       <StyledListItemButton
         onClick={
-          !member.attributes.isOnboarded
+          member.attributes.schoolInvited
             ? handleViewInvitedMember
             : member.attributes.active
             ? handleClick
@@ -181,7 +181,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
         onMouseMove={handleMouseMove}
       >
         <ListItemAvatar>
-          {member.attributes.isOnboarded ? (
+          {!member.attributes.schoolInvited ? (
             <Avatar
               sx={{ height: 40, width: 40 }}
               src={member.attributes.imageUrl}
@@ -204,7 +204,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
               <Typography variant="bodyRegular" bold>
                 {`${member.attributes.firstName} ${member.attributes.lastName}`}
               </Typography>
-              {!member.attributes.isOnboarded ? (
+              {member.attributes.schoolInvited ? (
                 <Chip label="Invited" size="small" />
               ) : null}
             </Stack>
@@ -238,7 +238,7 @@ const TeamMemberItem = ({ member, schoolId }) => {
         marginThreshold={16}
       >
         <List>
-          {member.attributes.active && member.attributes.isOnboarded ? (
+          {member.attributes.active && !member.attributes.schoolInvited ? (
             <>
               <ListItem>
                 <ListItemText>
@@ -556,7 +556,7 @@ const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
       <List>
         <ListItem disablePadding>
           <ListItemAvatar>
-            {member.attributes.isOnboarded ? (
+            {!member.attributes.schoolInvited ? (
               <Avatar
                 sx={{ height: 40, width: 40 }}
                 src={member.attributes.imageUrl}
@@ -579,7 +579,7 @@ const InvitedMemberModal = ({ toggle, open, schoolId, member }) => {
                 <Typography variant="bodyRegular" bold>
                   {`${member.attributes.firstName} ${member.attributes.lastName}`}
                 </Typography>
-                {!member.attributes.isOnboarded ? (
+                {member.attributes.schoolInvited ? (
                   <Chip label="Invited" size="small" />
                 ) : null}
               </Stack>
