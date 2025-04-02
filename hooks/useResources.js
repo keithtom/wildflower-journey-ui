@@ -13,7 +13,8 @@ const useResources = (workflowId, params = {}) => {
   );
 
   return {
-    resources: data?.data?.data,
+    // account for slightly different shape
+    resources: params.phase ? data?.data?.resources : data?.data?.data,
     isLoading: !error && !data,
     isError: error,
   };
