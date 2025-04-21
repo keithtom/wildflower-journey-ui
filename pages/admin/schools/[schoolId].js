@@ -181,29 +181,48 @@ const SchoolIdPage = () => {
         startDate: schoolRelationship.attributes.startDate,
         endDate: schoolRelationship.attributes.endDate,
         isOnboarded: personData.attributes.isOnboarded,
+        relationshipId: schoolRelationship.id,
       };
     };
 
-    const people = school.data.relationships.people.data
+    // Create a map to store the most recent record for each person
+    const peopleMap = new Map();
+
+    school.data.relationships.people.data
       .map((personRelation) => {
-        // Find the school relationship for this person
-        const schoolRelationship = school.included.find(
+        // Find all school relationships for this person
+        const personRelationships = school.included.filter(
           (item) =>
             item.type === "schoolRelationship" &&
             item.relationships?.person?.data?.id === personRelation.id &&
             item.relationships?.school?.data?.id === school.data.id
         );
 
-        return transformPerson(personRelation, schoolRelationship);
+        // Transform each relationship and return the person data
+        return personRelationships
+          .map((relationship) => transformPerson(personRelation, relationship))
+          .filter(Boolean);
       })
-      .filter(Boolean); // Remove any null entries
+      .flat()
+      .forEach((person) => {
+        // If we already have this person, only update if the new record is more recent
+        const existingPerson = peopleMap.get(person.id);
+        if (
+          !existingPerson ||
+          new Date(person.startDate) > new Date(existingPerson.startDate)
+        ) {
+          peopleMap.set(person.id, person);
+        }
+      });
+
+    // Convert map back to array and separate active and former people
+    const allPeople = Array.from(peopleMap.values());
 
     return {
-      activePeople: people.filter(
+      activePeople: allPeople.filter(
         (person) => !person.endDate && person.startDate
       ),
-
-      formerPeople: people.filter((person) => person.endDate),
+      formerPeople: allPeople.filter((person) => person.endDate),
     };
   }, [school]);
 
@@ -740,6 +759,7 @@ const AddPersonModal = ({ open, onClose, schoolStatus }) => {
         school_relationship: {
           school_id: schoolId,
           person_id: data.person.id,
+          end_date: null, // if a person is being added, they no longer have an end date
           start_date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
           role_list: [data.role],
           title: data.role === "Wildflower Support" ? data.title : undefined,
@@ -996,7 +1016,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="name"
               control={control}
-              rules={{ required: "School name is required" }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -1025,7 +1044,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="city"
               control={control}
-              rules={{ required: "City is required" }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -1040,7 +1058,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="state"
               control={control}
-              rules={{ required: "State is required" }}
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.state}>
                   <InputLabel>State</InputLabel>
@@ -1091,7 +1108,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="agesServedList"
               control={control}
-              rules={{ required: "Please select ages served" }}
               render={({ field: { value, onChange, ...field } }) => (
                 <FormControl fullWidth error={!!errors.agesServedList}>
                   <InputLabel>Ages Served</InputLabel>
@@ -1120,7 +1136,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="governanceType"
               control={control}
-              rules={{ required: "Please select governance type" }}
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.governanceType}>
                   <InputLabel>Governance Type</InputLabel>

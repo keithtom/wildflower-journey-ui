@@ -98,8 +98,14 @@ const SchoolItem = ({ schoolId }) => {
       item.relationships.person.data.id === personId
   );
 
-  // If there's no relationship or it has an end date, don't display this school
-  if (!schoolRelationship || schoolRelationship.attributes.endDate) {
+  const isPaused = schoolData?.data?.attributes?.status === "Paused";
+
+  // If there's no relationship or it has an end date, or if paused, don't display this school
+  if (
+    !schoolRelationship ||
+    schoolRelationship.attributes.endDate ||
+    isPaused
+  ) {
     return null;
   }
 
