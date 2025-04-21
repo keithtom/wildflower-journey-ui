@@ -1710,10 +1710,22 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
       const schoolRelationship = teacherLeaderRelationships.find(
         (rel) => rel.relationships.person.data.id === teacher.id
       );
+
+      // Check if teacher exists in activePartners or invitedPartners
+      const isActivePartner =
+        schoolData?.data?.attributes?.activePartners?.some(
+          (partner) => partner.data.id === teacher.id
+        );
+      const isInvitedPartner =
+        schoolData?.data?.attributes?.invitedPartners?.some(
+          (partner) => partner.data.id === teacher.id
+        );
+
       return {
         ...teacher,
         schoolRelationshipAttributes: schoolRelationship?.attributes,
         schoolRealtionshipId: schoolRelationship?.id,
+        schoolInvited: isInvitedPartner ? true : isActivePartner ? false : null,
       };
     })
     ?.filter((teacher) => teacher.schoolRealtionshipId)
@@ -1724,14 +1736,9 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
     return format(parsedDate, "MMMM d, yyyy");
   };
 
-  const watchFields = watch();
-
   const sortedTeachers = teachers.sort((a, b) => {
-    return a.attributes.isOnboarded === b.attributes.isOnboarded
-      ? 0
-      : a.attributes.isOnboarded
-      ? -1
-      : 1;
+    // Sort by schoolInvited: active (false) first, then invited (true)
+    return a.schoolInvited === b.schoolInvited ? 0 : a.schoolInvited ? 1 : -1;
   });
 
   // console.log(watchFields.teacher);
@@ -1948,7 +1955,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                           <Stack direction="row" spacing={2}>
                             <Typography
                               variant="bodyRegular"
-                              lightened={!teacher.attributes.isOnboarded}
+                              lightened={teacher.schoolInvited}
                               bold
                               noWrap
                               style={{
@@ -1960,7 +1967,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                               {teacher.attributes.firstName}{" "}
                               {teacher.attributes.lastName}
                             </Typography>
-                            {teacher.attributes.isOnboarded === false ? (
+                            {teacher.schoolInvited ? (
                               <Chip label="Invited" size="small" />
                             ) : null}
                           </Stack>
@@ -1990,7 +1997,7 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                                 handleRemovePerson(
                                   event,
                                   teacher.id,
-                                  teacher.attributes.isOnboarded
+                                  !teacher.schoolInvited
                                 )
                               }
                               data-cy={`schoolId-teacherLeaders-remove-${i}`}

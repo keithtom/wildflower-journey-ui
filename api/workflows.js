@@ -24,9 +24,15 @@ export const showWorkflow = {
 };
 
 export const showResources = {
-  key: (workflowId) => `/workflows/${workflowId}/resources`,
-  fetcher: (workflowId) => {
+  key: (workflowId, params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return `/workflows/${workflowId}/resources${
+      queryString ? `?${queryString}` : ""
+    }`;
+  },
+  fetcher: (workflowId, params = {}) => {
     const config = getAuthHeader();
+    config.params = params;
     return workflowsApi
       .get(`/workflows/${workflowId}/resources`, config)
       .then((response) => {

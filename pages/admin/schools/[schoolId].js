@@ -70,9 +70,9 @@ const SchoolIdPage = () => {
   const { schoolId } = router.query;
   const { data: school, isLoading } = useSchool(schoolId);
 
-  useEffect(() => {
-    console.log("Raw school data:", school);
-  }, [school]);
+  // useEffect(() => {
+  //   console.log("Raw school data:", school);
+  // }, [school]);
 
   const [addPersonModalOpen, setAddPersonModalOpen] = useState(false);
   const [editDetailsModalOpen, setEditDetailsModalOpen] = useState(false);
@@ -145,7 +145,7 @@ const SchoolIdPage = () => {
       },
     ];
 
-    console.log("Transformed school data:", transformedData);
+    // console.log("Transformed school data:", transformedData);
     return transformedData;
   }, [school]);
 
@@ -328,7 +328,7 @@ const SchoolIdPage = () => {
     });
     setEditPersonModalOpen(true);
   };
-  console.log(selectedPerson);
+  // console.log(selectedPerson);
 
   const handleRemoveWorkflow = (workflow) => {
     setSelectedWorkflow(workflow);
@@ -1960,9 +1960,9 @@ const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
 const WorkflowItem = ({ workflowId, onRemove }) => {
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
 
-  useEffect(() => {
-    console.log("Workflow data:", { workflowId, workflow, isLoading, isError });
-  }, [workflowId, workflow, isLoading, isError]);
+  // useEffect(() => {
+  //   console.log("Workflow data:", { workflowId, workflow, isLoading, isError });
+  // }, [workflowId, workflow, isLoading, isError]);
 
   if (isLoading) {
     return (
