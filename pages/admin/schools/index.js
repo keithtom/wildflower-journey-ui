@@ -127,13 +127,14 @@ const AdminSchools = () => {
                           : "default"
                       }
                     />
-                    {school.attributes.currentPhase && (
-                      <Chip
-                        label={school.attributes.currentPhase}
-                        size="small"
-                        variant="outlined"
-                      />
-                    )}
+                    {school.attributes.currentPhase &&
+                      school.attributes.status !== "Open" && (
+                        <Chip
+                          label={school.attributes.currentPhase}
+                          size="small"
+                          variant="outlined"
+                        />
+                      )}
                   </Stack>
                 </ListItemSecondaryAction>
               </ListItemButton>
