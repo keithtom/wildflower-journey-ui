@@ -181,29 +181,48 @@ const SchoolIdPage = () => {
         startDate: schoolRelationship.attributes.startDate,
         endDate: schoolRelationship.attributes.endDate,
         isOnboarded: personData.attributes.isOnboarded,
+        relationshipId: schoolRelationship.id,
       };
     };
 
-    const people = school.data.relationships.people.data
+    // Create a map to store the most recent record for each person
+    const peopleMap = new Map();
+
+    school.data.relationships.people.data
       .map((personRelation) => {
-        // Find the school relationship for this person
-        const schoolRelationship = school.included.find(
+        // Find all school relationships for this person
+        const personRelationships = school.included.filter(
           (item) =>
             item.type === "schoolRelationship" &&
             item.relationships?.person?.data?.id === personRelation.id &&
             item.relationships?.school?.data?.id === school.data.id
         );
 
-        return transformPerson(personRelation, schoolRelationship);
+        // Transform each relationship and return the person data
+        return personRelationships
+          .map((relationship) => transformPerson(personRelation, relationship))
+          .filter(Boolean);
       })
-      .filter(Boolean); // Remove any null entries
+      .flat()
+      .forEach((person) => {
+        // If we already have this person, only update if the new record is more recent
+        const existingPerson = peopleMap.get(person.id);
+        if (
+          !existingPerson ||
+          new Date(person.startDate) > new Date(existingPerson.startDate)
+        ) {
+          peopleMap.set(person.id, person);
+        }
+      });
+
+    // Convert map back to array and separate active and former people
+    const allPeople = Array.from(peopleMap.values());
 
     return {
-      activePeople: people.filter(
+      activePeople: allPeople.filter(
         (person) => !person.endDate && person.startDate
       ),
-
-      formerPeople: people.filter((person) => person.endDate),
+      formerPeople: allPeople.filter((person) => person.endDate),
     };
   }, [school]);
 

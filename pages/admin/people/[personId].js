@@ -79,8 +79,6 @@ const SchoolItem = ({ schoolId }) => {
   const router = useRouter();
   const { personId } = router.query;
 
-  console.log(schoolData);
-
   if (isLoading) {
     return (
       <ListItem divider>
