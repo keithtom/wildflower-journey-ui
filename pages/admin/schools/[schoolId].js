@@ -996,7 +996,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="name"
               control={control}
-              rules={{ required: "School name is required" }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -1025,7 +1024,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="city"
               control={control}
-              rules={{ required: "City is required" }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -1040,7 +1038,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="state"
               control={control}
-              rules={{ required: "State is required" }}
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.state}>
                   <InputLabel>State</InputLabel>
@@ -1091,7 +1088,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="agesServedList"
               control={control}
-              rules={{ required: "Please select ages served" }}
               render={({ field: { value, onChange, ...field } }) => (
                 <FormControl fullWidth error={!!errors.agesServedList}>
                   <InputLabel>Ages Served</InputLabel>
@@ -1120,7 +1116,6 @@ const EditDetailsModal = ({ open, onClose, school }) => {
             <Controller
               name="governanceType"
               control={control}
-              rules={{ required: "Please select governance type" }}
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.governanceType}>
                   <InputLabel>Governance Type</InputLabel>
