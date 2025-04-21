@@ -79,6 +79,9 @@ const SchoolItem = ({ schoolId }) => {
   const router = useRouter();
   const { personId } = router.query;
 
+  console.log({ schoolId });
+  console.log({ schoolData });
+
   if (isLoading) {
     return (
       <ListItem divider>
@@ -91,19 +94,37 @@ const SchoolItem = ({ schoolId }) => {
 
   if (!schoolData?.data) return null;
 
-  // Find the school relationship for this person
-  const schoolRelationship = schoolData.included.find(
+  // Find all school relationships for this person
+  const schoolRelationships = schoolData.included.filter(
     (item) =>
       item.type === "schoolRelationship" &&
       item.relationships.person.data.id === personId
   );
 
-  // If there's no relationship or it has an end date, don't display this school
-  if (!schoolRelationship || schoolRelationship.attributes.endDate) {
+  const isPaused = schoolData?.data?.attributes?.status === "Paused";
+
+  // Check if there's at least one active relationship (no end date)
+  const hasActiveRelationship = schoolRelationships.some(
+    (relationship) => !relationship.attributes.endDate
+  );
+
+  // If there are no relationships, all have end dates, or school is paused, don't display
+  if (schoolRelationships.length === 0 || !hasActiveRelationship || isPaused) {
     return null;
   }
 
-  const schoolRoleList = schoolRelationship.attributes.roleList || [];
+  // Get the most recent active relationship for role list
+  const activeRelationships = schoolRelationships.filter(
+    (relationship) => !relationship.attributes.endDate
+  );
+
+  // Sort by startDate in descending order and take the most recent
+  const mostRecentRelationship = activeRelationships.sort(
+    (a, b) =>
+      new Date(b.attributes.startDate) - new Date(a.attributes.startDate)
+  )[0];
+
+  const schoolRoleList = mostRecentRelationship.attributes.roleList || [];
 
   return (
     <ListItem divider>
@@ -443,9 +464,9 @@ const PersonIdPage = () => {
                     </ListItemText>
                   </ListItem>
                 ) : (
-                  schoolIds.map((schoolId) => (
+                  schoolIds.map((schoolId, index) => (
                     <SchoolItem
-                      key={schoolId}
+                      key={`${schoolId}-${index}`}
                       schoolId={schoolId}
                       personRelationships={schoolRelationships}
                     />
