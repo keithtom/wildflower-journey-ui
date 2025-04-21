@@ -759,6 +759,7 @@ const AddPersonModal = ({ open, onClose, schoolStatus }) => {
         school_relationship: {
           school_id: schoolId,
           person_id: data.person.id,
+          end_date: null, // if a person is being added, they no longer have an end date
           start_date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
           role_list: [data.role],
           title: data.role === "Wildflower Support" ? data.title : undefined,
