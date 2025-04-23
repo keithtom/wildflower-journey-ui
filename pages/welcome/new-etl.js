@@ -52,7 +52,7 @@ const NewETL = ({}) => {
       ?.id;
 
   const { data: school } = useSchool(selectedSchoolId);
-  const opsGuide = school?.data?.attributes?.opsGuides[0].data;
+  const opsGuide = school?.data?.attributes?.opsGuides[0]?.data;
   useAuth("/login");
   // console.log({ selectedSchoolId });
   // console.log({ school });
