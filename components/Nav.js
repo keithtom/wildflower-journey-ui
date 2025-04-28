@@ -547,6 +547,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
               <NavListItemButton
                 onClick={handleUserClick}
                 sx={{ cursor: "pointer" }}
+                data-cy="user-profile-button"
               >
                 <ListItemAvatar>
                   <Avatar
@@ -693,6 +694,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                         router.push("/admin");
                       }
                     }}
+                    data-cy="switch-to-admin-button"
                   >
                     <NavListItemIcon>
                       <Icon

@@ -20,7 +20,14 @@ const PageContent = styled(Box)`
   overflow-y: hidden;
 `;
 
-const PageContainer = ({ children, isLoading, hideNav, title }) => {
+const PageContainer = ({
+  children,
+  isLoading,
+  hideNav,
+  title,
+  isAdmin,
+  ...props
+}) => {
   const { screenSize } = getScreenSize();
   //TODO: Get this data from the backend
   const SSJAbandonProcessStarted = false;
@@ -65,7 +72,7 @@ const PageContainer = ({ children, isLoading, hideNav, title }) => {
           </>
         ) : (
           <>
-            {!hideNav && <Header title={title} />}
+            {!hideNav && <Header title={title} isAdmin={isAdmin} />}
 
             <PageContent
               sx={{
@@ -73,6 +80,7 @@ const PageContainer = ({ children, isLoading, hideNav, title }) => {
                   ? `${theme.util.appBarHeight * 2}px`
                   : `${theme.util.appBarHeight}px`,
               }}
+              {...props}
             >
               {isLoading ? (
                 <Box
