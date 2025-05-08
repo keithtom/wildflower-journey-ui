@@ -53,6 +53,7 @@ import {
   Key,
   CheckCircle,
   Edit,
+  Info,
 } from "@mui/icons-material";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
@@ -1291,6 +1292,17 @@ const EditCurrentRoles = ({
       <form onSubmit={onSubmit}>
         <DialogContent>
           <Stack spacing={3}>
+            <Card variant="light" sx={{ p: 4, borderRadius: 4 }}>
+              <Stack direction="row" spacing={3} alignItems="start">
+                <Info sx={{ color: "primary.main" }} />
+                <Typography variant="bodyRegular">
+                  Note that for ETL, TL, and WS roles, the person's roles are
+                  auto updated from the "school relationship". However, as an
+                  admin, you still have the ability to add or remove roles.
+                  Check the Associated Schools to ensure roles make sense.
+                </Typography>
+              </Stack>
+            </Card>
             <FormControl error={!!errors?.roles} component="fieldset">
               <FormLabel component="legend">Roles</FormLabel>
               <Controller
@@ -1300,13 +1312,7 @@ const EditCurrentRoles = ({
                 render={({ field }) => (
                   <FormGroup>
                     {roleOptions.map((role) => {
-                      const isDisabled = [
-                        "Emerging Teacher Leader",
-                        "Teacher Leader",
-                        "Wildflower Support",
-                      ].includes(role.value);
                       const isChecked = field.value.includes(role.value);
-
                       return (
                         <FormControlLabel
                           key={role.value}
@@ -1314,16 +1320,11 @@ const EditCurrentRoles = ({
                             <Checkbox
                               checked={isChecked}
                               onChange={(e) => {
-                                if (!isDisabled) {
-                                  const newRoles = e.target.checked
-                                    ? [...field.value, role.value]
-                                    : field.value.filter(
-                                        (r) => r !== role.value
-                                      );
-                                  field.onChange(newRoles);
-                                }
+                                const newRoles = e.target.checked
+                                  ? [...field.value, role.value]
+                                  : field.value.filter((r) => r !== role.value);
+                                field.onChange(newRoles);
                               }}
-                              disabled={isDisabled}
                             />
                           }
                           label={
@@ -1333,13 +1334,6 @@ const EditCurrentRoles = ({
                               alignItems="center"
                             >
                               <Typography>{role.label}</Typography>
-                              {isDisabled && (
-                                <Chip
-                                  label="Added via school relationship"
-                                  size="small"
-                                  color="default"
-                                />
-                              )}
                             </Stack>
                           }
                         />
