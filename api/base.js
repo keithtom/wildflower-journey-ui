@@ -5,6 +5,8 @@ import Router from "next/router";
 import axios from "axios";
 import { getCookie } from "cookies-next";
 import jwt_decode from "jwt-decode";
+import { TokenManager } from "@lib/utils/tokenManager";
+import { H } from "highlight.run";
 
 const token = getCookie("auth");
 
@@ -36,17 +38,71 @@ function register(path, options) {
 
   const client = axios.create(config);
 
+  // Request interceptor for logging
+  client.interceptors.request.use(
+    (config) => {
+      const token = TokenManager.getToken();
+      H.track("api_request", {
+        tags: { type: "api_request" },
+        url: config.url,
+        method: config.method,
+        hasToken: !!token,
+        isTokenValid: TokenManager.isTokenValid(token),
+        timestamp: new Date().toISOString(),
+      });
+      return config;
+    },
+    (error) => {
+      H.error(error, {
+        tags: { type: "api_request" },
+        severity: "error",
+      });
+      return Promise.reject(error);
+    }
+  );
+
+  // Response interceptor with enhanced logging
   client.interceptors.response.use(
     (response) => {
+      H.track("api_response", {
+        tags: { type: "api_response" },
+        url: response.config.url,
+        status: response.status,
+        timestamp: new Date().toISOString(),
+      });
       return response;
     },
     (error) => {
+      const requestInfo = {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        timestamp: new Date().toISOString(),
+      };
+
       if (error.response?.status === 401) {
+        const token = TokenManager.getToken();
+        H.error(new Error("API 401 Error"), {
+          tags: { type: "api_error", status: "401" },
+          severity: "error",
+          ...requestInfo,
+          hasToken: !!token,
+          isTokenValid: TokenManager.isTokenValid(token),
+          tokenExpiry: token ? TokenManager.getTokenExpiryTime(token) : null,
+          errorMessage: error.response?.data?.message || error.message,
+        });
+
         clearLoggedInState({});
-        return Promise.reject(error);
+        Router.push("/login");
       } else {
-        return Promise.reject(error);
+        H.error(error, {
+          tags: { type: "api_error" },
+          severity: "error",
+          ...requestInfo,
+        });
       }
+
+      return Promise.reject(error);
     }
   );
 

@@ -41,6 +41,7 @@ import Header from "./Header";
 import useAssignedSteps from "@hooks/useAssignedSteps";
 import TranslationToggle from "./TranslationToggle";
 import useWorkflow from "@hooks/useWorkflow";
+import registrationsApi from "@api/registrations";
 
 // import AdviceProcessNavigation from "./page-content/advice/AdviceProcessNavigation";
 
@@ -486,7 +487,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
 
   async function handleLogOut() {
     try {
-      const res = await logout();
+      const res = await registrationsApi.logout();
       console.log(res);
     } catch (err) {
       if (err?.response?.status !== 401) {

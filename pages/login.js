@@ -7,6 +7,8 @@ import authApi from "@api/auth";
 import { clearLoggedInState } from "@lib/handleLogout";
 import RedirectUser from "@lib/redirectUser";
 import usePerson from "@hooks/usePerson";
+import { TokenManager } from "@lib/utils/tokenManager";
+import { H } from "highlight.run";
 
 import { getScreenSize } from "../hooks/react-responsive";
 import {
@@ -33,6 +35,22 @@ const Login = ({}) => {
   const { data: personData } = usePerson(
     currentUser?.id ? currentUser.id : null
   );
+
+  // Add token monitoring
+  useEffect(() => {
+    const token = TokenManager.getToken();
+    if (token) {
+      const isValid = TokenManager.isTokenValid(token);
+      if (!isValid) {
+        H.error(new Error("Login: Token invalid"), {
+          tags: { type: "login" },
+          severity: "warning",
+          currentPath: router.asPath,
+        });
+        clearLoggedInState({});
+      }
+    }
+  }, [router.asPath]);
 
   useEffect(() => {
     if (isLoggedIn && currentUser) {
@@ -76,6 +94,12 @@ const Login = ({}) => {
       const downcasedEmail = data.email.toLowerCase();
       const response = await authApi.login(downcasedEmail, data.password);
 
+      H.track("login_success", {
+        tags: { type: "login" },
+        email: downcasedEmail,
+        timestamp: new Date().toISOString(),
+      });
+
       const userAttributes = response.data.data.attributes;
       const personId = response.data.data.relationships.person.data.id;
       const personData = response?.data?.included?.find(
@@ -107,7 +131,13 @@ const Login = ({}) => {
         preferredLanguage: personPreferredLanguage,
       });
     } catch (error) {
-      console.log(error);
+      H.error(error, {
+        tags: { type: "login" },
+        severity: "error",
+        email: data.email.toLowerCase(),
+        status: error.response?.status,
+      });
+
       if (error.response?.status === 401) {
         clearLoggedInState({});
         setError("email", {
@@ -132,8 +162,18 @@ const Login = ({}) => {
         const email = getValues("email");
         await authApi.resetPasswordEmail(email);
         setSentEmailLoginRequest(true);
+        H.track("password_reset_requested", {
+          tags: { type: "login" },
+          email: email.toLowerCase(),
+          timestamp: new Date().toISOString(),
+        });
       } catch (error) {
-        console.error(error);
+        H.error(error, {
+          tags: { type: "login" },
+          severity: "error",
+          email: getValues("email").toLowerCase(),
+          action: "password_reset_request",
+        });
         setError("Failed to send login link. Please try again.");
       }
     }
