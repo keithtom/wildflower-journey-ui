@@ -202,7 +202,9 @@ const TeamMemberItem = ({ member, schoolId }) => {
           primary={
             <Stack direction="row" alignItems="center" spacing={3}>
               <Typography variant="bodyRegular" bold>
-                {`${member.attributes.firstName} ${member.attributes.lastName}`}
+                {[member.attributes.firstName, member.attributes.lastName]
+                  .filter(Boolean)
+                  .join(" ") || "Unnamed Member"}
               </Typography>
               {member.attributes.schoolInvited ? (
                 <Chip label="Invited" size="small" />
