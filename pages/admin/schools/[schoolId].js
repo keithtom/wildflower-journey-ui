@@ -802,6 +802,7 @@ const AddPersonModal = ({ open, onClose, schoolStatus }) => {
     setPerPage(500);
     setFilters({
       models: "people",
+      show_all: true,
     });
   }, []);
 
