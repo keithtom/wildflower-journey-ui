@@ -33,13 +33,22 @@ const YourSchools = () => {
 
   //set grouped teams by phase
   const visioningTeams = schools?.data.filter(
-    (school) => school.attributes.currentPhase === "visioning"
+    (school) =>
+      school.attributes.currentPhase === "visioning" &&
+      school.attributes.status !== "Abandoned" &&
+      school.attributes.status !== "Paused"
   );
   const planningTeams = schools?.data.filter(
-    (school) => school.attributes.currentPhase === "planning"
+    (school) =>
+      school.attributes.currentPhase === "planning" &&
+      school.attributes.status !== "Abandoned" &&
+      school.attributes.status !== "Paused"
   );
   const startupTeams = schools?.data.filter(
-    (school) => school.attributes.currentPhase === "startup"
+    (school) =>
+      school.attributes.currentPhase === "startup" &&
+      school.attributes.status !== "Abandoned" &&
+      school.attributes.status !== "Paused"
   );
 
   useAuth("/login");

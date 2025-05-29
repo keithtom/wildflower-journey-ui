@@ -154,68 +154,75 @@ const SchoolIdPage = () => {
     if (!school?.data?.relationships?.people?.data || !school?.included)
       return { activePeople: [], formerPeople: [] };
 
-    const transformPerson = (personRelation, schoolRelationship) => {
-      // Find the person in the included array
-      const personData = school.included.find(
-        (item) => item.type === "person" && item.id === personRelation.id
-      );
-
-      if (!personData || !schoolRelationship) return null;
-
-      // Get the roleList from the school relationship
-      const roleList = schoolRelationship.attributes.roleList || [];
-
-      // If the role is "Wildflower Support", replace it with the title and append (WS)
-      const transformedRoleList = roleList.map((role) =>
-        role === "Wildflower Support" && schoolRelationship.attributes.title
-          ? `${schoolRelationship.attributes.title} (WS)`
-          : role
-      );
-
-      return {
-        id: personData.id,
-        firstName: personData.attributes.firstName,
-        lastName: personData.attributes.lastName,
-        roleList: transformedRoleList,
-        imageUrl: personData.attributes.imageUrl,
-        startDate: schoolRelationship.attributes.startDate,
-        endDate: schoolRelationship.attributes.endDate,
-        isOnboarded: personData.attributes.isOnboarded,
-        relationshipId: schoolRelationship.id,
-      };
-    };
-
     // Create a map to store the most recent record for each person
     const peopleMap = new Map();
 
-    school.data.relationships.people.data
-      .map((personRelation) => {
-        // Find all school relationships for this person
-        const personRelationships = school.included.filter(
-          (item) =>
-            item.type === "schoolRelationship" &&
-            item.relationships?.person?.data?.id === personRelation.id &&
-            item.relationships?.school?.data?.id === school.data.id
+    // First, group all school relationships by person_id
+    const relationshipsByPerson = school.included
+      .filter((item) => item.type === "schoolRelationship")
+      .reduce((acc, relationship) => {
+        const personId = relationship.relationships?.person?.data?.id;
+        if (!personId) return acc;
+
+        if (!acc[personId]) {
+          acc[personId] = [];
+        }
+        acc[personId].push(relationship);
+        return acc;
+      }, {});
+
+    // For each person, get their most relevant relationship
+    Object.entries(relationshipsByPerson).forEach(
+      ([personId, relationships]) => {
+        // Sort relationships: active first (no end date), then by start date
+        const sortedRelationships = relationships.sort((a, b) => {
+          // If one is active and other isn't, active comes first
+          if (!a.attributes.endDate && b.attributes.endDate) return -1;
+          if (a.attributes.endDate && !b.attributes.endDate) return 1;
+
+          // If both active or both inactive, sort by start date
+          return (
+            new Date(b.attributes.startDate) - new Date(a.attributes.startDate)
+          );
+        });
+
+        // Get the most relevant relationship
+        const mostRelevantRelationship = sortedRelationships[0];
+
+        // Find the person data
+        const personData = school.included.find(
+          (item) => item.type === "person" && item.id === personId
         );
 
-        // Transform each relationship and return the person data
-        return personRelationships
-          .map((relationship) => transformPerson(personRelation, relationship))
-          .filter(Boolean);
-      })
-      .flat()
-      .forEach((person) => {
-        // If we already have this person, only update if the new record is more recent
-        const existingPerson = peopleMap.get(person.id);
-        if (
-          !existingPerson ||
-          new Date(person.startDate) > new Date(existingPerson.startDate)
-        ) {
-          peopleMap.set(person.id, person);
-        }
-      });
+        if (!personData) return;
 
-    // Convert map back to array and separate active and former people
+        // Transform the role list
+        const roleList = mostRelevantRelationship.attributes.roleList || [];
+        const transformedRoleList = roleList.map((role) =>
+          role === "Wildflower Support" &&
+          mostRelevantRelationship.attributes.title
+            ? `${mostRelevantRelationship.attributes.title} (WS)`
+            : role
+        );
+
+        // Create the person object
+        const person = {
+          id: personData.id,
+          firstName: personData.attributes.firstName,
+          lastName: personData.attributes.lastName,
+          roleList: transformedRoleList,
+          imageUrl: personData.attributes.imageUrl,
+          startDate: mostRelevantRelationship.attributes.startDate,
+          endDate: mostRelevantRelationship.attributes.endDate,
+          isOnboarded: personData.attributes.isOnboarded,
+          relationshipId: mostRelevantRelationship.id,
+        };
+
+        peopleMap.set(personId, person);
+      }
+    );
+
+    // Convert map to array and separate active and former people
     const allPeople = Array.from(peopleMap.values());
 
     return {
@@ -225,6 +232,9 @@ const SchoolIdPage = () => {
       formerPeople: allPeople.filter((person) => person.endDate),
     };
   }, [school]);
+
+  console.log({ activePeople });
+  console.log({ formerPeople });
 
   const currentWorkflows = [{ id: 1, name: "School Startup Journey" }];
 
@@ -818,6 +828,7 @@ const AddPersonModal = ({
     setPerPage(500);
     setFilters({
       models: "people",
+      show_all: true,
     });
   }, []);
 

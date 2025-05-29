@@ -133,7 +133,8 @@ const School = ({}) => {
     const teacherLeaderRelationships = schoolData?.included?.filter(
       (rel) =>
         rel.type === "schoolRelationship" &&
-        rel.attributes.roleList.includes("Teacher Leader") &&
+        (rel.attributes.roleList.includes("Teacher Leader") ||
+          rel.attributes.roleList.includes("Emerging Teacher Leader")) &&
         rel.attributes.startDate &&
         !rel.attributes.endDate
     );

@@ -158,6 +158,7 @@ async function handleErrors(error) {
       clearLoggedInState({});
       // setCurrentUser(null);
       Router.push("/login");
+      return;
     }
   } else if (error.request) {
     console.log(error.request);
