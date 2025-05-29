@@ -80,7 +80,11 @@ const SchoolPage = () => {
           ...person,
           attributes: {
             ...person.attributes,
-            schoolRoleList: relationship.attributes.roleList,
+            schoolRoleList: relationship.attributes.roleList.map((role) =>
+              role === "Wildflower Support" && relationship.attributes.title
+                ? relationship.attributes.title
+                : role
+            ),
             schoolInvited: isInvitedPartner
               ? true
               : isActivePartner
