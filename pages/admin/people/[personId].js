@@ -1141,7 +1141,11 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
   });
 
   const confirmName = watch("confirmName");
-  const isNameConfirmed = confirmName === personName;
+  // Normalize spaces in both the input and the stored name
+  const normalizeSpaces = (str) => str.replace(/\s+/g, " ").trim();
+  const normalizedConfirmName = normalizeSpaces(confirmName);
+  const normalizedPersonName = normalizeSpaces(personName);
+  const isNameConfirmed = normalizedConfirmName === normalizedPersonName;
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -1195,7 +1199,8 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
               rules={{
                 required: "Please type the full name to confirm",
                 validate: (value) =>
-                  value === personName || "Name doesn't match exactly",
+                  normalizeSpaces(value) === normalizedPersonName ||
+                  "Name doesn't match exactly",
               }}
               render={({ field }) => (
                 <TextField
