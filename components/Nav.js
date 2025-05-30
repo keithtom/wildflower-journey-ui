@@ -363,7 +363,7 @@ const SchoolNavItem = ({
   openSection,
   onSectionClick,
 }) => (
-  <div>
+  <div data-cy="school-nav-item">
     <NavListItemButton
       onClick={() => handleSchoolClick(school.id)}
       selected={router.asPath === `/school/${school.id}`}

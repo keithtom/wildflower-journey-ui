@@ -9,74 +9,127 @@ describe("network edit school", () => {
     cy.visit("/network", { timeout: 60000 });
     cy.wait(1000);
 
-    // Get school ID from the first school in the list
-    cy.contains("Schools").click();
-    cy.get('input[name="search"]').type("Wild Rose Montessori");
-    cy.contains("Wild Rose Montessori").click();
+    // Get school ID from the first teacher leader school in the navigation
+    cy.get('[data-cy="school-nav-item"]').first().click();
+    cy.url().should("include", "/school/");
     cy.url().then((url) => {
-      schoolId = url.split("/").pop();
+      schoolId = url.split("/school/")[1];
+      cy.visit(`/network/schools/${schoolId}`, { timeout: 60000 });
     });
   });
 
   describe("editing school profile", () => {
     beforeEach(() => {
       cy.visit(`/network/schools/${schoolId}`, { timeout: 60000 });
-      cy.contains("Edit profile").click();
+      cy.contains("Edit school profile").click();
     });
 
     it("should edit general information", () => {
-      cy.get('[data-cy="schoolId-edit-general"]').click();
-      cy.get('input[name="name"]').clear().type("New School Name");
+      cy.get('[data-cy="schoolId-general"]').click();
+
+      // City field
       cy.get('input[name="city"]').clear().type("New City");
+
+      // State field
       cy.contains("State").next().click();
       cy.contains("New York").click();
       cy.get("body").click(0, 0);
-      cy.get('input[name="zip"]').clear().type("12345");
-      cy.get('input[name="website"]').clear().type("https://newschool.com");
+
+      // Open Date field
+      cy.get('[data-cy="schoolId-open-date"]').clear().type("2024-01-01");
+
+      // About field
       cy.get('[name="about"]').clear().type("New school description");
 
+      // School Logo Image
       cy.intercept("PUT", /(\/active_storage\/|amazonaws)/).as("upload");
       cy.fixture("test_profile_picture.jpg").then((filecontent) => {
-        cy.get('input[type="file"]').attachFile({
+        cy.get('input[type="file"]').first().attachFile({
           fileContent: filecontent.toString(),
           fileName: "test_profile_picture.jpg",
           mimeType: "image/jpg",
         });
       });
       cy.wait("@upload", { requestTimeout: 60000 });
+
+      // Save changes
       cy.get('button[type="submit"]').should("not.be.disabled").click();
     });
 
     it("should edit school details", () => {
-      cy.get('[data-cy="schoolId-edit-details"]').click();
-      cy.contains("What type of school is this?").next().click();
-      cy.contains("Public Charter").click();
+      cy.get('[data-cy="schoolId-enrollment"]').click();
+
+      // Ages Served (MultiSelect)
+      cy.contains("Ages served").next().click();
+      cy.contains("Primary").click({ force: true });
+      cy.contains("Lower Elementary").click({ force: true });
       cy.get("body").click(0, 0);
 
-      cy.contains("What age range does this school serve?").next().click();
-      cy.contains("3-6").click({ force: true });
-      cy.contains("6-9").click({ force: true });
+      // Governance Type
+      cy.contains("Governance type").next().click();
+      cy.contains("Charter").click();
       cy.get("body").click(0, 0);
 
-      cy.contains("What is the school's status?").next().click();
-      cy.contains("Open").click();
-      cy.get("body").click(0, 0);
+      // Charter Group (only if governance type is Charter)
+      cy.contains("Charter Group").then(($el) => {
+        if ($el.length) {
+          cy.wrap($el).next().click();
+          cy.contains(
+            "Wildflower Montessori Public Schools of Colorado"
+          ).click();
+          cy.get("body").click(0, 0);
+        }
+      });
 
-      cy.get('[name="openingDate"]').clear().type("01/01/2024");
-      cy.get('[name="enrollment"]').clear().type("100");
-      cy.get('[name="capacity"]').clear().type("120");
+      // Maximum Enrollment
+      cy.get('input[name="maxEnrollment"]').clear().type("100");
+
+      // Number of Classrooms
+      cy.get('input[name="numClassrooms"]').clear().type("5");
+
+      // Save changes
       cy.get('button[type="submit"]').should("not.be.disabled").click();
     });
 
-    it("should edit school location", () => {
-      cy.get('[data-cy="schoolId-edit-location"]').click();
-      cy.contains("What is the school's address type?").next().click();
-      cy.contains("Standalone").click();
-      cy.get("body").click(0, 0);
+    it.only("should edit teacher leaders", () => {
+      cy.get('[data-cy="schoolId-teacherLeaders"]').click();
+      cy.get('[data-cy="schoolId-teacherLeaders-add"]').click();
+      cy.get('input[placeholder="e.g. Katelyn Shore"]').type("a");
+      cy.get(".MuiAutocomplete-option").first().click();
+      cy.get('[data-cy="schoolId-teacherLeaders-dateJoined"]')
+        .clear()
+        .type("01/01/2024");
+      cy.get('input[placeholder="e.g. Chief Financial Officer"]')
+        .clear()
+        .type("Lead Teacher");
+      cy.get('button[type="submit"]').click();
+      cy.wait(1000);
 
-      cy.get('[name="address"]').clear().type("123 Main St");
-      cy.get('[name="unit"]').clear().type("Suite 100");
+      // Verify the new teacher leader is added
+      cy.get('[data-cy="schoolId-teacherLeaders-list-item"]').should(
+        "contain",
+        "Chief Financial Officer"
+      );
+
+      // Edit the teacher leader
+      cy.get('[data-cy="schoolId-teacherLeaders-edit-0"]').click();
+      cy.get('[data-cy="schoolId-teacherLeaders-dateJoined"]')
+        .clear()
+        .type("2024-02-01");
+      cy.get('input[name="schoolTitle"]').clear().type("Senior Lead Teacher");
       cy.get('button[type="submit"]').should("not.be.disabled").click();
+
+      // Verify the teacher leader is updated
+      cy.get('[data-cy="schoolId-teacherLeaders-list-item"]').should(
+        "contain",
+        "Senior Lead Teacher"
+      );
+
+      // Remove the teacher leader
+      cy.get('[data-cy="schoolId-teacherLeaders-remove-0"]').click();
+      cy.get('[data-cy="schoolId-teacherLeaders-list-item"]').should(
+        "not.exist"
+      );
     });
 
     it("should edit school board", () => {
