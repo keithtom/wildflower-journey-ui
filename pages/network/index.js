@@ -138,6 +138,7 @@ const Network = () => {
               setUserQuery(e.target.value);
             }}
             value={userQuery}
+            data-cy="network-search-input"
           />
         </Grid>
         <Grid item xs={12}>
@@ -149,11 +150,13 @@ const Network = () => {
                     value="people"
                     control={<Radio />}
                     label="People"
+                    data-cy="network-people-tab"
                   />
                   <FormControlLabel
                     value="schools"
                     control={<Radio />}
                     label="Schools"
+                    data-cy="network-schools-tab"
                   />
                 </Stack>
               </RadioGroup>
@@ -167,7 +170,9 @@ const Network = () => {
                     alignItems="center"
                   >
                     <Grid item>
-                      <Typography lightened>Filter by</Typography>
+                      <Typography lightened data-cy="network-filter-label">
+                        Filter by
+                      </Typography>
                     </Grid>
                     {screenSize.isSm && (
                       <Grid item>
