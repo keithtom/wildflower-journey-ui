@@ -90,6 +90,7 @@ const AdminSchools = () => {
             </Typography>
           </ListSubheader>
         }
+        data-cy="school-list"
       >
         {!filteredSchools?.length ? (
           <ListItem disablePadding>
@@ -105,6 +106,7 @@ const AdminSchools = () => {
               key={school.id}
               disablePadding
               divider={i !== schools.length - 1}
+              data-cy="school-list-item"
             >
               <ListItemButton onClick={() => handleSchoolClick(school.id)}>
                 <ListItemIcon>
@@ -156,7 +158,11 @@ const AdminSchools = () => {
               </Typography>
             </Grid>
             <Grid item>
-              <Button small onClick={() => setAddSchoolModalOpen(true)}>
+              <Button
+                small
+                onClick={() => setAddSchoolModalOpen(true)}
+                data-cy="add-school-button"
+              >
                 <Typography variant="bodyRegular" light bold>
                   Add
                 </Typography>
@@ -436,6 +442,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                               variant="danger"
                               small
                               onClick={() => handleRemovePerson(person.email)}
+                              data-cy="remove-person-button"
                             >
                               <Typography variant="bodyRegular" bold>
                                 Remove
@@ -528,6 +535,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                                 error?.type === "required" &&
                                 "This field is required"
                               }
+                              data-cy="search-person-input"
                               InputProps={{
                                 ...params.InputProps,
                                 endAdornment: (
@@ -571,6 +579,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                           error={!!errors.first_name}
                           helperText={errors.first_name?.message}
                           fullWidth
+                          data-cy="new-person-first-name"
                         />
                       )}
                     />
@@ -593,6 +602,7 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                           error={!!errors.last_name}
                           helperText={errors.last_name?.message}
                           fullWidth
+                          data-cy="new-person-last-name"
                         />
                       )}
                     />
@@ -619,10 +629,15 @@ const AddMultiplePeopleForm = ({ multiplePeople, setMultiplePeople }) => {
                       error={!!errors.email}
                       helperText={errors.email?.message}
                       fullWidth
+                      data-cy="new-person-email"
                     />
                   )}
                 />
-                <Button variant="lightened" type="submit">
+                <Button
+                  variant="lightened"
+                  type="submit"
+                  data-cy="add-new-person-button"
+                >
                   <Typography variant="bodyRegular" bold highlight>
                     Add Teacher Leader
                   </Typography>
@@ -677,7 +692,12 @@ const AddEmergingTeacherLeaders = ({
               </Grid>
             )}
             <Grid item>
-              <Button type="submit" disabled={!multiplePeople.length} small>
+              <Button
+                type="submit"
+                disabled={!multiplePeople.length}
+                small
+                data-cy="next-button-add-people"
+              >
                 <Typography variant="bodyRegular" bold light>
                   Next
                 </Typography>
@@ -784,7 +804,12 @@ const AddOperationsGuide = ({
               </Button>
             </Grid>
             <Grid item>
-              <Button type="submit" disabled={!isValid} small>
+              <Button
+                type="submit"
+                disabled={!isValid}
+                small
+                data-cy="next-button-select-og"
+              >
                 <Typography variant="bodyRegular" bold light>
                   Next
                 </Typography>
@@ -804,7 +829,7 @@ const AddOperationsGuide = ({
                 control={control}
                 rules={{ required: true }}
                 render={({ field: { onChange, value } }) => (
-                  <RadioGroup value={value}>
+                  <RadioGroup value={value} data-cy="og-radio-group">
                     {isLoading || isValidating ? (
                       <Card noBorder size="large">
                         <Grid container justifyContent="center">
@@ -956,7 +981,12 @@ const AddRegionalGrowthLead = ({
               </Button>
             </Grid>
             <Grid item>
-              <Button type="submit" disabled={!isValid} small>
+              <Button
+                type="submit"
+                disabled={!isValid}
+                small
+                data-cy="next-button-select-re"
+              >
                 <Typography variant="bodyRegular" bold light>
                   Next
                 </Typography>
@@ -976,7 +1006,7 @@ const AddRegionalGrowthLead = ({
                 control={control}
                 rules={{ required: true }}
                 render={({ field: { onChange, value } }) => (
-                  <RadioGroup value={value}>
+                  <RadioGroup value={value} data-cy="re-radio-group">
                     {isLoading || isValidating ? (
                       <Card noBorder size="large">
                         <Grid container justifyContent="center">
@@ -1107,7 +1137,12 @@ const AddWorkflow = ({
               </Button>
             </Grid>
             <Grid item>
-              <Button type="submit" disabled={!isValid} small>
+              <Button
+                type="submit"
+                disabled={!isValid}
+                small
+                data-cy="next-button-select-workflow"
+              >
                 <Typography variant="bodyRegular" bold light>
                   Next
                 </Typography>
@@ -1127,7 +1162,7 @@ const AddWorkflow = ({
                 control={control}
                 rules={{ required: true }}
                 render={({ field: { onChange, value } }) => (
-                  <RadioGroup value={value}>
+                  <RadioGroup value={value} data-cy="workflow-radio-group">
                     {isLoading || isValidating ? (
                       <Card noBorder size="large">
                         <Grid container justifyContent="center">
@@ -1279,7 +1314,12 @@ const InviteSchool = ({
               </Button>
             </Grid>
             <Grid item>
-              <Button type="submit" disabled={isSubmitting} small>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                small
+                data-cy="invite-button"
+              >
                 {isSubmitting ? (
                   <Spinner size={20} />
                 ) : (

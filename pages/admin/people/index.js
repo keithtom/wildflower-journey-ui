@@ -68,7 +68,7 @@ const AdminPeople = () => {
   };
 
   const PeopleList = ({ people }) => (
-    <List>
+    <List data-cy="people-list">
       {!filteredPeople?.length ? (
         <ListItem>
           <ListItemText>
@@ -83,6 +83,7 @@ const AdminPeople = () => {
             key={person.id}
             disablePadding
             divider={i !== people.length - 1}
+            data-cy="people-list-item"
           >
             <ListItemButton onClick={() => handlePersonClick(person.id)}>
               <ListItemIcon>
@@ -160,7 +161,11 @@ const AdminPeople = () => {
               </Typography>
             </Grid>
             <Grid item>
-              <Button small onClick={() => setAddPersonModalOpen(true)}>
+              <Button
+                small
+                onClick={() => setAddPersonModalOpen(true)}
+                data-cy="add-person-button"
+              >
                 <Typography variant="bodyRegular" light bold>
                   Add
                 </Typography>
@@ -281,6 +286,7 @@ const AddPersonModal = ({ open, onClose }) => {
                   helperText={errors.firstName?.message}
                   fullWidth
                   placeholder="e.g. Jane"
+                  data-cy="new-person-first-name"
                 />
               )}
             />
@@ -296,6 +302,7 @@ const AddPersonModal = ({ open, onClose }) => {
                   helperText={errors.lastName?.message}
                   fullWidth
                   placeholder="e.g. Smith"
+                  data-cy="new-person-last-name"
                 />
               )}
             />
@@ -318,6 +325,7 @@ const AddPersonModal = ({ open, onClose }) => {
                   helperText={errors.email?.message}
                   fullWidth
                   placeholder="e.g. jane.smith@example.com"
+                  data-cy="new-person-email"
                 />
               )}
             />
@@ -325,7 +333,7 @@ const AddPersonModal = ({ open, onClose }) => {
               name="role"
               control={control}
               render={({ field }) => (
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" data-cy="role-select">
                   <FormLabel component="legend">Role (Optional)</FormLabel>
                   <RadioGroup {...field} row>
                     <FormControlLabel
@@ -372,6 +380,7 @@ const AddPersonModal = ({ open, onClose }) => {
             variant="contained"
             disabled={isSubmitting}
             sx={{ minWidth: 100 }}
+            data-cy="add-person-submit"
           >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
