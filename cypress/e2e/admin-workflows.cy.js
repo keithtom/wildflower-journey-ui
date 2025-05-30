@@ -348,7 +348,7 @@ describe("Admin, Rollout Changes", () => {
   });
 });
 
-describe.only("Admin, Translations", () => {
+describe("Admin, Translations", () => {
   beforeEach(() => {
     cy.resetRolloutWorkflowFixture();
     cy.login("test@test.com", "password");

@@ -233,8 +233,7 @@ const PersonIdPage = () => {
       // Certification
       {
         key: "montessoriCertified",
-        value:
-          person.data.attributes.montessoriCertified === "1" ? "Yes" : "No",
+        value: person.data.attributes.montessoriCertified || "Not provided",
         icon: <Badge />,
       },
       {
@@ -289,6 +288,7 @@ const PersonIdPage = () => {
       icon: <Key />,
       action: () => setResetPasswordModalOpen(true),
       color: "primary",
+      dataCy: "reset-password-button",
     },
     {
       id: 2,
@@ -309,6 +309,7 @@ const PersonIdPage = () => {
           console.error("Error updating visibility:", error);
         }
       },
+      dataCy: "directory-visible-switch",
     },
     {
       id: 3,
@@ -318,6 +319,7 @@ const PersonIdPage = () => {
       icon: <Delete />,
       action: () => setRemovePersonModalOpen(true),
       color: "error",
+      dataCy: "remove-person-button",
     },
   ];
 
@@ -329,6 +331,7 @@ const PersonIdPage = () => {
             checked={action.value}
             onChange={(e) => action.action(e.target.checked)}
             color="primary"
+            data-cy={action.dataCy}
           />
         );
       case "button":
@@ -339,6 +342,7 @@ const PersonIdPage = () => {
             color={action.color}
             size="small"
             onClick={action.action}
+            data-cy={action.dataCy}
           >
             {action.label}
           </Button>
@@ -383,6 +387,7 @@ const PersonIdPage = () => {
                       size="small"
                       variant="contained"
                       onClick={() => setEditDetailsModalOpen(true)}
+                      data-cy="edit-person-button"
                     >
                       Edit Details
                     </Button>
@@ -399,6 +404,7 @@ const PersonIdPage = () => {
                       gap: 2,
                       px: 4,
                     }}
+                    data-cy={`person-detail-${item.key}`}
                   >
                     <ListItemIcon>{item.icon}</ListItemIcon>
                     <ListItemText
@@ -504,6 +510,7 @@ const PersonIdPage = () => {
                         size="small"
                         onClick={() => setEditCurrentRolesModalOpen(true)}
                         startIcon={<Edit />}
+                        data-cy="edit-roles-button"
                       >
                         Edit
                       </Button>
@@ -524,19 +531,21 @@ const PersonIdPage = () => {
                     </ListItemText>
                   </ListItem>
                 ) : (
-                  currentRoles.map((role) => (
-                    <ListItem key={role.id} divider>
-                      <ListItemIcon>
-                        <Work />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={role.role}
-                        secondary={
-                          role.since !== "N/A" ? `Since ${role.since}` : null
-                        }
-                      />
-                    </ListItem>
-                  ))
+                  <List data-cy="current-roles-list">
+                    {currentRoles.map((role) => (
+                      <ListItem key={role.id} divider>
+                        <ListItemIcon>
+                          <Work />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={role.role}
+                          secondary={
+                            role.since !== "N/A" ? `Since ${role.since}` : null
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
                 )}
               </List>
             </Card>
@@ -669,8 +678,15 @@ const EditDetailsModal = ({ open, onClose, person }) => {
       primaryLanguage: getDefaultValue("primaryLanguage"),
       gender: getDefaultValue("gender"),
       pronouns: getDefaultValue("pronouns"),
-      raceEthnicity:
-        person.find((item) => item.key === "raceEthnicity")?.value || [],
+      raceEthnicity: (
+        person.find((item) => item.key === "raceEthnicity")?.value || []
+      ).map(
+        (value) =>
+          ethnicityOptions.find((option) => option.value === value) || {
+            value,
+            label: value,
+          }
+      ),
       montessoriCertified: getDefaultValue("montessoriCertified"),
       montessoriCertifiedLevels:
         person.find((item) => item.key === "montessoriCertifiedLevels")
@@ -718,7 +734,9 @@ const EditDetailsModal = ({ open, onClose, person }) => {
 
     // Handle arrays - only include if they have values
     if (data.raceEthnicity?.length > 0) {
-      personUpdate.person.race_ethnicity_list = data.raceEthnicity;
+      personUpdate.person.race_ethnicity_list = data.raceEthnicity.map(
+        (item) => item.value || item
+      );
     }
 
     // Only include address_attributes if either city or state has a value
@@ -731,7 +749,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
 
     try {
       await peopleApi.update(personId, personUpdate);
-      await mutate(`/v1/people/${personId}`);
+      await mutate(`/v1/people/${personId}`, null, { revalidate: true });
       handleClose();
     } catch (err) {
       console.error(err);
@@ -768,6 +786,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                   error={!!errors.firstName}
                   helperText={errors.firstName?.message}
                   fullWidth
+                  data-cy="person-first-name-input"
                 />
               )}
             />
@@ -782,6 +801,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                   error={!!errors.lastName}
                   helperText={errors.lastName?.message}
                   fullWidth
+                  data-cy="person-last-name-input"
                 />
               )}
             />
@@ -803,6 +823,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                   error={!!errors.email}
                   helperText={errors.email?.message}
                   fullWidth
+                  data-cy="person-email-input"
                 />
               )}
             />
@@ -816,6 +837,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                   error={!!errors.phone}
                   helperText={errors.phone?.message}
                   fullWidth
+                  data-cy="person-phone-input"
                 />
               )}
             />
@@ -829,6 +851,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                   error={!!errors.city}
                   helperText={errors.city?.message}
                   fullWidth
+                  data-cy="person-city-input"
                 />
               )}
             />
@@ -838,7 +861,11 @@ const EditDetailsModal = ({ open, onClose, person }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.state}>
                   <InputLabel>State</InputLabel>
-                  <Select {...field} label="State">
+                  <Select
+                    {...field}
+                    label="State"
+                    data-cy="person-state-select"
+                  >
                     {unitedStatesOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -863,6 +890,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                   error={!!errors.about}
                   helperText={errors.about?.message}
                   fullWidth
+                  data-cy="person-about-input"
                 />
               )}
             />
@@ -877,7 +905,11 @@ const EditDetailsModal = ({ open, onClose, person }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.primaryLanguage}>
                   <InputLabel>Primary Language</InputLabel>
-                  <Select {...field} label="Primary Language">
+                  <Select
+                    {...field}
+                    label="Primary Language"
+                    data-cy="person-primary-language-select"
+                  >
                     {languageOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -898,7 +930,11 @@ const EditDetailsModal = ({ open, onClose, person }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.gender}>
                   <InputLabel>Gender</InputLabel>
-                  <Select {...field} label="Gender">
+                  <Select
+                    {...field}
+                    label="Gender"
+                    data-cy="person-gender-select"
+                  >
                     {genderOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -917,7 +953,11 @@ const EditDetailsModal = ({ open, onClose, person }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.pronouns}>
                   <InputLabel>Pronouns</InputLabel>
-                  <Select {...field} label="Pronouns">
+                  <Select
+                    {...field}
+                    label="Pronouns"
+                    data-cy="person-pronouns-select"
+                  >
                     {pronounsOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -947,6 +987,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                         label="Race/Ethnicity"
                         error={!!errors.raceEthnicity}
                         helperText={errors.raceEthnicity?.message}
+                        data-cy="person-race-ethnicity-input"
                       />
                     )}
                     renderTags={(value, getTagProps) =>
@@ -973,7 +1014,12 @@ const EditDetailsModal = ({ open, onClose, person }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.montessoriCertified}>
                   <InputLabel>Montessori Certified</InputLabel>
-                  <Select {...field} label="Montessori Certified">
+                  <Select
+                    {...field}
+                    label="Montessori Certified"
+                    data-cy="person-montessori-certified-select"
+                    value={field.value || ""}
+                  >
                     {montessoriCertificationOptions.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -1008,6 +1054,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                         label="Certification Levels"
                         error={!!errors.montessoriCertifiedLevels}
                         helperText={errors.montessoriCertifiedLevels?.message}
+                        data-cy="person-montessori-levels-input"
                       />
                     )}
                     renderTags={(value, getTagProps) =>
@@ -1036,6 +1083,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                   helperText={errors.montessoriCertifiedYear?.message}
                   placeholder="e.g. Primary/Early Childhood - 2015"
                   fullWidth
+                  data-cy="person-montessori-year-input"
                 />
               )}
             />
@@ -1045,12 +1093,13 @@ const EditDetailsModal = ({ open, onClose, person }) => {
           <Button onClick={handleClose} color="inherit">
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Save Changes"
-            )}
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            data-cy="save-person-button"
+          >
+            {isSubmitting ? <CircularProgress size={24} /> : "Save Changes"}
           </Button>
         </DialogActions>
       </form>
@@ -1210,6 +1259,7 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
                   error={!!errors.confirmName}
                   helperText={errors.confirmName?.message}
                   fullWidth
+                  data-cy="confirm-name-input"
                 />
               )}
             />
@@ -1224,6 +1274,7 @@ const RemovePersonModal = ({ open, onClose, personName }) => {
             variant="contained"
             color="error"
             disabled={!isNameConfirmed || isSubmitting}
+            data-cy="confirm-remove-person-button"
           >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
@@ -1315,7 +1366,7 @@ const EditCurrentRoles = ({
                 control={control}
                 rules={{ required: "Please select at least one role" }}
                 render={({ field }) => (
-                  <FormGroup>
+                  <FormGroup data-cy="role-checkboxes">
                     {roleOptions.map((role) => {
                       const isChecked = field.value.includes(role.value);
                       return (
@@ -1330,6 +1381,7 @@ const EditCurrentRoles = ({
                                   : field.value.filter((r) => r !== role.value);
                                 field.onChange(newRoles);
                               }}
+                              data-cy={`role-checkbox-${role.value}`}
                             />
                           }
                           label={
@@ -1354,10 +1406,19 @@ const EditCurrentRoles = ({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="inherit">
+          <Button
+            onClick={handleClose}
+            color="inherit"
+            data-cy="cancel-roles-button"
+          >
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            data-cy="save-roles-button"
+          >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
             ) : (

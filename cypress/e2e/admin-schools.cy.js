@@ -75,11 +75,6 @@ describe("School Management", () => {
       cy.get("[data-cy=school-list]").should("be.visible");
       cy.get("[data-cy=school-list-item]").should("have.length.gt", 0);
 
-      // Debug: Log all visible school names
-      cy.get("[data-cy=school-list-item]").each(($el) => {
-        cy.log("Found school:", $el.text());
-      });
-
       cy.get("body").then(($body) => {
         if ($body.find(':contains("newFirstName-school")').length) {
           // Set up intercepts for all the API calls that happen after clicking
@@ -329,7 +324,7 @@ describe("School Management", () => {
     cy.get('[data-cy="workflow-list-item"]').should("have.length.gt", 0);
   });
 
-  it.only("should manage administrative actions", () => {
+  it("should manage administrative actions", () => {
     // Set Status
     cy.get('[data-cy="set-status-button"]').click();
     cy.get('[data-cy="status-select"]').click();
