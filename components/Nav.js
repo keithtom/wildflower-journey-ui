@@ -363,7 +363,7 @@ const SchoolNavItem = ({
   openSection,
   onSectionClick,
 }) => (
-  <div>
+  <div data-cy="school-nav-item">
     <NavListItemButton
       onClick={() => handleSchoolClick(school.id)}
       selected={router.asPath === `/school/${school.id}`}
@@ -547,6 +547,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
               <NavListItemButton
                 onClick={handleUserClick}
                 sx={{ cursor: "pointer" }}
+                data-cy="user-profile-button"
               >
                 <ListItemAvatar>
                   <Avatar
@@ -693,6 +694,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                         router.push("/admin");
                       }
                     }}
+                    data-cy="switch-to-admin-button"
                   >
                     <NavListItemIcon>
                       <Icon
