@@ -210,7 +210,7 @@ const Login = ({}) => {
                                   errors.email.type === "pattern" &&
                                   "Please enter a valid email"
                             }
-                            data-cy="login-email"
+                            data-cy="login-email-input"
                             {...field}
                           />
                         )}
@@ -236,7 +236,7 @@ const Login = ({}) => {
                               errors.password.type === "required" &&
                               "This field is required"
                             }
-                            data-cy="login-password"
+                            data-cy="login-password-input"
                             {...field}
                           />
                         )}
@@ -256,7 +256,7 @@ const Login = ({}) => {
                           isSubmitting || isSubmitSuccessful || isLoggingIn
                         }
                         type="submit"
-                        data-cy="login-submit"
+                        data-cy="login-submit-button"
                       >
                         <Stack spacing={6} direction="row">
                           {isSubmitting || isSubmitSuccessful ? (
