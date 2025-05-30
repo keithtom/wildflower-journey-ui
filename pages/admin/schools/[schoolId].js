@@ -103,14 +103,14 @@ const SchoolIdPage = () => {
       {
         key: "openDate",
         value: school.data.attributes.openedOn
-          ? new Date(school.data.attributes.openedOn).toLocaleDateString(
-              "en-US",
-              {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }
-            )
+          ? new Date(
+              school.data.attributes.openedOn + "T00:00:00.000Z"
+            ).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              timeZone: "UTC",
+            })
           : "Not provided",
         icon: <Event />,
       },
@@ -259,6 +259,7 @@ const SchoolIdPage = () => {
       ),
       action: () => setSetStatusModalOpen(true),
       color: "primary",
+      dataCy: "set-status-button",
     },
     {
       id: 4,
@@ -276,6 +277,7 @@ const SchoolIdPage = () => {
       value: school?.data?.attributes?.affiliated || false,
       action: () => setEditMemberModalOpen(true),
       color: "primary",
+      dataCy: "set-membership-button",
     },
     {
       id: 5,
@@ -295,9 +297,9 @@ const SchoolIdPage = () => {
           mutate(`/v1/schools/${schoolId}`);
         } catch (err) {
           console.error("Failed to update directory visibility:", err);
-          // You might want to add a toast or other error notification here
         }
       },
+      dataCy: "directory-visible-switch",
     },
     {
       id: 2,
@@ -307,6 +309,7 @@ const SchoolIdPage = () => {
       icon: <Delete />,
       action: () => setRemoveSchoolModalOpen(true),
       color: "error",
+      dataCy: "remove-school-button",
     },
   ];
 
@@ -318,6 +321,7 @@ const SchoolIdPage = () => {
             checked={action.value}
             onChange={(e) => action.action(e.target.checked)}
             color="primary"
+            data-cy={action.dataCy}
           />
         );
       case "button":
@@ -328,6 +332,7 @@ const SchoolIdPage = () => {
             color={action.color}
             size="small"
             onClick={action.action}
+            data-cy={action.dataCy}
           >
             {action.label}
           </Button>
@@ -383,7 +388,11 @@ const SchoolIdPage = () => {
   }
 
   return (
-    <PageContainer isAdmin title={school?.data?.attributes?.name}>
+    <PageContainer
+      isAdmin
+      title={school?.data?.attributes?.name}
+      data-cy="school-detail"
+    >
       <Grid container spacing={6}>
         {/* Left Column */}
         <Grid item xs={12} md={6}>
@@ -391,6 +400,7 @@ const SchoolIdPage = () => {
             {/* Associated People Section */}
             <Card sx={{ borderRadius: 4 }}>
               <List
+                data-cy="person-list"
                 subheader={
                   <ListSubheader
                     component="div"
@@ -429,7 +439,11 @@ const SchoolIdPage = () => {
                   </ListItem>
                 ) : (
                   activePeople.map((person) => (
-                    <ListItem key={person.id} divider>
+                    <ListItem
+                      key={person.id}
+                      divider
+                      data-cy="person-list-item"
+                    >
                       <ListItemIcon>
                         <Avatar sx={{ bgcolor: "primary.main" }}>
                           <Typography variant="bodySmall">
@@ -459,6 +473,7 @@ const SchoolIdPage = () => {
                           <Button
                             size="small"
                             onClick={() => handleEditPerson(person)}
+                            data-cy="edit-person-button"
                           >
                             Edit
                           </Button>
@@ -531,6 +546,7 @@ const SchoolIdPage = () => {
                       size="small"
                       variant="contained"
                       onClick={() => setEditDetailsModalOpen(true)}
+                      data-cy="edit-details-button"
                     >
                       Edit Details
                     </Button>
@@ -607,11 +623,13 @@ const SchoolIdPage = () => {
                       variant="contained"
                       size="small"
                       onClick={handleAddWorkflow}
+                      data-cy="add-workflow-button"
                     >
                       Add Workflow
                     </Button>
                   </ListSubheader>
                 }
+                data-cy="workflow-list"
               >
                 {school?.data?.attributes?.workflowIds?.length > 0 ? (
                   school.data.attributes.workflowIds.map((workflowId) => (
@@ -677,6 +695,8 @@ const SchoolIdPage = () => {
         open={addPersonModalOpen}
         onClose={() => setAddPersonModalOpen(false)}
         schoolStatus={school?.data?.attributes?.status}
+        activePeople={activePeople}
+        formerPeople={formerPeople}
       />
       <EditDetailsModal
         open={editDetailsModalOpen}
@@ -732,7 +752,13 @@ const ROLE_OPTIONS = [
   "Board Member",
 ];
 
-const AddPersonModal = ({ open, onClose, schoolStatus }) => {
+const AddPersonModal = ({
+  open,
+  onClose,
+  schoolStatus,
+  activePeople,
+  formerPeople,
+}) => {
   const router = useRouter();
   const { schoolId } = router.query;
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -806,6 +832,14 @@ const AddPersonModal = ({ open, onClose, schoolStatus }) => {
     });
   }, []);
 
+  // Filter out current school members from the autocomplete options
+  const filteredPeople = useMemo(() => {
+    if (!people) return [];
+
+    const currentMemberIds = new Set(activePeople.map((person) => person.id));
+    return people.filter((person) => !currentMemberIds.has(person.id));
+  }, [people, activePeople]);
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add Person</DialogTitle>
@@ -819,7 +853,7 @@ const AddPersonModal = ({ open, onClose, schoolStatus }) => {
               render={({ field }) => (
                 <Autocomplete
                   {...field}
-                  options={people || []}
+                  options={filteredPeople || []}
                   getOptionLabel={(option) =>
                     option?.attributes
                       ? `${option.attributes.firstName} ${option.attributes.lastName}`
@@ -845,6 +879,10 @@ const AddPersonModal = ({ open, onClose, schoolStatus }) => {
                           </>
                         ),
                       }}
+                      inputProps={{
+                        ...params.inputProps,
+                        "data-cy": "search-person-input",
+                      }}
                     />
                   )}
                   onChange={(_, value) => field.onChange(value)}
@@ -860,7 +898,11 @@ const AddPersonModal = ({ open, onClose, schoolStatus }) => {
               control={control}
               rules={{ required: "Please select a role" }}
               render={({ field }) => (
-                <FormControl error={!!errors.role} fullWidth>
+                <FormControl
+                  error={!!errors.role}
+                  fullWidth
+                  data-cy="role-select"
+                >
                   <InputLabel>Role at school</InputLabel>
                   <Select {...field} label="Role at school">
                     {ROLE_OPTIONS.map((role) => (
@@ -905,7 +947,12 @@ const AddPersonModal = ({ open, onClose, schoolStatus }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            data-cy="add-person-submit"
+          >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
@@ -1012,7 +1059,13 @@ const EditDetailsModal = ({ open, onClose, school }) => {
   });
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      data-cy="edit-details-modal"
+    >
       <DialogTitle>Edit School Details</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent>
@@ -1033,6 +1086,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                   error={!!errors.name}
                   helperText={errors.name?.message}
                   fullWidth
+                  data-cy="school-name-input"
                 />
               )}
             />
@@ -1047,6 +1101,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                   multiline
                   rows={4}
                   fullWidth
+                  data-cy="school-about-input"
                 />
               )}
             />
@@ -1061,6 +1116,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                   error={!!errors.city}
                   helperText={errors.city?.message}
                   fullWidth
+                  data-cy="school-city-input"
                 />
               )}
             />
@@ -1071,7 +1127,11 @@ const EditDetailsModal = ({ open, onClose, school }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.state}>
                   <InputLabel>State</InputLabel>
-                  <Select {...field} label="State">
+                  <Select
+                    {...field}
+                    label="State"
+                    data-cy="school-state-select"
+                  >
                     {STATE_OPTIONS.map((state) => (
                       <MenuItem key={state} value={state}>
                         {state}
@@ -1097,6 +1157,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                   type="date"
                   fullWidth
                   InputLabelProps={{ shrink: true }}
+                  data-cy="school-open-date-input"
                 />
               )}
             />
@@ -1111,6 +1172,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                   type="date"
                   fullWidth
                   InputLabelProps={{ shrink: true }}
+                  data-cy="school-expected-start-date-input"
                 />
               )}
             />
@@ -1127,6 +1189,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                     onChange={onChange}
                     multiple
                     label="Ages Served"
+                    data-cy="school-ages-served-select"
                   >
                     {AGES_SERVED_OPTIONS.map((age) => (
                       <MenuItem key={age.value} value={age.value}>
@@ -1149,7 +1212,11 @@ const EditDetailsModal = ({ open, onClose, school }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.governanceType}>
                   <InputLabel>Governance Type</InputLabel>
-                  <Select {...field} label="Governance Type">
+                  <Select
+                    {...field}
+                    label="Governance Type"
+                    data-cy="school-governance-type-select"
+                  >
                     {GOVERNANCE_OPTIONS.map((type) => (
                       <MenuItem key={type.value} value={type.value}>
                         {type.label}
@@ -1182,6 +1249,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                   error={!!errors.maxEnrollment}
                   helperText={errors.maxEnrollment?.message}
                   fullWidth
+                  data-cy="school-max-enrollment-input"
                 />
               )}
             />
@@ -1203,6 +1271,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                   error={!!errors.numClassrooms}
                   helperText={errors.numClassrooms?.message}
                   fullWidth
+                  data-cy="school-num-classrooms-input"
                 />
               )}
             />
@@ -1224,6 +1293,7 @@ const EditDetailsModal = ({ open, onClose, school }) => {
                       value={value || ""}
                       onChange={onChange}
                       label="Charter Group"
+                      data-cy="school-charter-group-select"
                     >
                       {CHARTER_OPTIONS.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1243,8 +1313,15 @@ const EditDetailsModal = ({ open, onClose, school }) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button onClick={handleClose} data-cy="cancel-edit-school-details">
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            data-cy="save-school-details"
+          >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
@@ -1317,7 +1394,13 @@ const AddWorkflowModal = ({ open, onClose }) => {
   });
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      data-cy="add-workflow-modal"
+    >
       <DialogTitle>Add Workflow</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent>
@@ -1334,7 +1417,12 @@ const AddWorkflowModal = ({ open, onClose }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.workflow}>
                   <InputLabel>Workflow</InputLabel>
-                  <Select {...field} label="Workflow" disabled={isLoading}>
+                  <Select
+                    {...field}
+                    label="Workflow"
+                    disabled={isLoading}
+                    data-cy="workflow-select"
+                  >
                     {isLoading ? (
                       <MenuItem disabled>Loading workflows...</MenuItem>
                     ) : workflows?.length > 0 ? (
@@ -1353,7 +1441,11 @@ const AddWorkflowModal = ({ open, onClose }) => {
                             School Startup Journey
                           </MenuItem>,
                           ...groupedWorkflows.nonRecurring.map((workflow) => (
-                            <MenuItem key={workflow.id} value={workflow.id}>
+                            <MenuItem
+                              key={workflow.id}
+                              value={workflow.id}
+                              data-cy={`workflow-option-${workflow.id}`}
+                            >
                               <Stack
                                 direction="row"
                                 spacing={2}
@@ -1386,7 +1478,11 @@ const AddWorkflowModal = ({ open, onClose }) => {
                             Open School Checklist
                           </MenuItem>,
                           ...groupedWorkflows.recurring.map((workflow) => (
-                            <MenuItem key={workflow.id} value={workflow.id}>
+                            <MenuItem
+                              key={workflow.id}
+                              value={workflow.id}
+                              data-cy={`workflow-option-${workflow.id}`}
+                            >
                               <Stack
                                 direction="row"
                                 spacing={2}
@@ -1427,6 +1523,7 @@ const AddWorkflowModal = ({ open, onClose }) => {
             type="submit"
             variant="contained"
             disabled={isLoading || isSubmitting}
+            data-cy="add-workflow-submit"
           >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
@@ -1557,6 +1654,7 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
                       error={!!errors.confirmName}
                       helperText={errors.confirmName?.message}
                       fullWidth
+                      data-cy="remove-person-confirm-input"
                     />
                   )}
                 />
@@ -1573,6 +1671,7 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
                       helperText={errors.endDate?.message}
                       fullWidth
                       InputLabelProps={{ shrink: true }}
+                      data-cy="remove-person-end-date"
                     />
                   )}
                 />
@@ -1586,7 +1685,7 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
                     control={control}
                     rules={{ required: "Please select at least one role" }}
                     render={({ field }) => (
-                      <FormGroup>
+                      <FormGroup data-cy="role-checkboxes">
                         {ROLE_OPTIONS.map((role) => (
                           <FormControlLabel
                             key={role}
@@ -1599,6 +1698,7 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
                                     : field.value.filter((r) => r !== role);
                                   field.onChange(newRoles);
                                 }}
+                                data-cy={`role-checkbox-${role}`}
                               />
                             }
                             label={role}
@@ -1624,6 +1724,7 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
                         error={!!errors.title}
                         helperText={errors.title?.message}
                         fullWidth
+                        data-cy="wildflower-support-title"
                       />
                     )}
                   />
@@ -1638,6 +1739,7 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
               color="error"
               onClick={() => setIsRemoving(true)}
               sx={{ marginRight: "auto" }}
+              data-cy="remove-person-button"
             >
               Remove Person
             </Button>
@@ -1649,11 +1751,17 @@ const EditPersonModal = ({ open, onClose, person, schoolStatus }) => {
               variant="contained"
               color="error"
               disabled={!isNameConfirmed}
+              data-cy="confirm-remove-person-button"
             >
               Remove
             </Button>
           ) : (
-            <Button type="submit" variant="contained" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isSubmitting}
+              data-cy="save-person-role-button"
+            >
               {isSubmitting ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
@@ -1832,7 +1940,13 @@ const SetStatusModal = ({ open, onClose, currentStatus }) => {
   });
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      data-cy="set-status-modal"
+    >
       <DialogTitle>Set School Status</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent>
@@ -1849,7 +1963,7 @@ const SetStatusModal = ({ open, onClose, currentStatus }) => {
               render={({ field }) => (
                 <FormControl fullWidth error={!!errors.status}>
                   <InputLabel>Status</InputLabel>
-                  <Select {...field} label="Status">
+                  <Select {...field} label="Status" data-cy="status-select">
                     {STATUS_OPTIONS.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -1868,7 +1982,12 @@ const SetStatusModal = ({ open, onClose, currentStatus }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            data-cy="save-status-button"
+          >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
@@ -1930,7 +2049,13 @@ const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
   });
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      data-cy="remove-school-modal"
+    >
       <DialogTitle>Remove School</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent>
@@ -1957,6 +2082,7 @@ const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
                   error={!!errors.confirmName}
                   helperText={errors.confirmName?.message}
                   fullWidth
+                  data-cy="remove-school-confirm-input"
                 />
               )}
             />
@@ -1969,6 +2095,7 @@ const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
             variant="contained"
             color="error"
             disabled={!isNameConfirmed || isSubmitting}
+            data-cy="confirm-remove-school-button"
           >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
@@ -1984,10 +2111,6 @@ const RemoveSchoolModal = ({ open, onClose, schoolName }) => {
 
 const WorkflowItem = ({ workflowId, onRemove }) => {
   const { workflow, isLoading, isError } = useWorkflow(workflowId);
-
-  // useEffect(() => {
-  //   console.log("Workflow data:", { workflowId, workflow, isLoading, isError });
-  // }, [workflowId, workflow, isLoading, isError]);
 
   if (isLoading) {
     return (
@@ -2017,13 +2140,21 @@ const WorkflowItem = ({ workflowId, onRemove }) => {
   }
 
   return (
-    <ListItem divider>
+    <ListItem divider data-cy="workflow-list-item">
       <ListItemIcon>
         <FiberManualRecord />
       </ListItemIcon>
-      <ListItemText primary={workflow.attributes.name} />
+      <ListItemText
+        primary={workflow.attributes.name}
+        data-cy="workflow-name"
+      />
       <ListItemSecondaryAction>
-        <Button size="small" color="error" onClick={() => onRemove(workflow)}>
+        <Button
+          size="small"
+          color="error"
+          onClick={() => onRemove(workflow)}
+          data-cy="remove-workflow-button"
+        >
           Remove
         </Button>
       </ListItemSecondaryAction>
@@ -2099,7 +2230,13 @@ const EditMemberModal = ({ open, onClose, school }) => {
   const affiliated = watch("affiliated");
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      data-cy="edit-member-modal"
+    >
       <DialogTitle>Edit School Member Status</DialogTitle>
       <form onSubmit={onSubmit}>
         <DialogContent>
@@ -2119,6 +2256,7 @@ const EditMemberModal = ({ open, onClose, school }) => {
                       checked={value}
                       onChange={(e) => onChange(e.target.checked)}
                       {...field}
+                      data-cy="member-switch"
                     />
                   }
                   label="Member"
@@ -2146,6 +2284,7 @@ const EditMemberModal = ({ open, onClose, school }) => {
                     error={!!errors.affiliationDate}
                     helperText={errors.affiliationDate?.message}
                     InputLabelProps={{ shrink: true }}
+                    data-cy="affiliation-date-input"
                   />
                 )}
               />
@@ -2154,7 +2293,12 @@ const EditMemberModal = ({ open, onClose, school }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isSubmitting}
+            data-cy="save-membership-button"
+          >
             {isSubmitting ? (
               <CircularProgress size={24} color="inherit" />
             ) : (

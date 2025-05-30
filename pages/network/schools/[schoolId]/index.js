@@ -2002,7 +2002,6 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
                                 )
                               }
                               data-cy={`schoolId-teacherLeaders-remove-${i}`}
-                              data-cy-another={`schoolId-teacherLeaders-remove`}
                             >
                               Remove
                             </Typography>
