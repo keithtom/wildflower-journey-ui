@@ -138,7 +138,7 @@ const Person = ({}) => {
 
   if (!isLoading) {
     const includedSchools =
-      included?.filter((item) => item.type === "school") || [];
+      included?.filter((item) => item.type === "schoolSearch") || [];
 
     schoolsWhereRoleTeacherLeader =
       included?.filter(
@@ -1730,7 +1730,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
   const schools = teacherLeaderRelationships?.map((relationship) => {
     const schoolId = relationship.relationships.school.data.id;
     return personData.included.find(
-      (item) => item.type === "school" && item.id === schoolId
+      (item) => item.type === "schoolSearch" && item.id === schoolId
     );
   });
 
