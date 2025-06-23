@@ -22,7 +22,9 @@ const Resources = () => {
   const router = useRouter();
   const { workflow, schoolId } = router.query;
 
-  const { data: school } = useSchool(schoolId);
+  const { data: school } = useSchool(schoolId, {
+    serialization_fields: ["name"],
+  });
 
   const { t } = useTranslation("common");
 
