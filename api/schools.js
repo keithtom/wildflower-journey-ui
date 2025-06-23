@@ -68,7 +68,19 @@ export const showSchool = {
   key: (schoolId, params) => `/v1/schools/${schoolId}`,
   fetcher: (schoolId, params) => {
     const config = getAuthHeader();
-    config.params = params;
+    if (params) {
+      const apiParams = {};
+      Object.entries(params).forEach(([key, value]) => {
+        if (key === "serialization_fields" && Array.isArray(value)) {
+          apiParams[key] = value.join(",");
+        } else if (Array.isArray(value)) {
+          apiParams[key] = value;
+        } else {
+          apiParams[key] = value;
+        }
+      });
+      config.params = apiParams;
+    }
     return schoolsApi
       .get(`/${schoolId}`, config)
       .then((data) => {
