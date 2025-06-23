@@ -41,7 +41,9 @@ const PhasePage = () => {
   const router = useRouter();
   const { workflow, phase, schoolId } = router.query;
 
-  const { data: school } = useSchool(schoolId);
+  const { data: school } = useSchool(schoolId, {
+    serialization_fields: ["name"],
+  });
 
   const planningHero = "/assets/images/ssj/planning.jpg";
   const visioningHero = "/assets/images/ssj/visioning.jpg";
