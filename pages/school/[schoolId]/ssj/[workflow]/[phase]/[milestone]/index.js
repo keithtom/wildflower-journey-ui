@@ -35,7 +35,9 @@ const MilestonePage = ({ FakeMilestoneTasks }) => {
   const router = useRouter();
   const { workflow, phase, milestone: milestoneQuery, schoolId } = router.query;
 
-  const { data: school } = useSchool(schoolId);
+  const { data: school } = useSchool(schoolId, {
+    serialization_fields: ["name"],
+  });
 
   const { t } = useTranslation("common");
 
