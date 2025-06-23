@@ -14,7 +14,9 @@ const Resources = () => {
   const router = useRouter();
   const { workflow: workflowId, schoolId } = router.query;
 
-  const { data: school } = useSchool(schoolId);
+  const { data: school } = useSchool(schoolId, {
+    serialization_fields: ["name"],
+  });
 
   useAuth("/login");
 

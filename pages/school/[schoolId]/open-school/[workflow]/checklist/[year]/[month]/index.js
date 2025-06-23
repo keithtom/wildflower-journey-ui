@@ -58,7 +58,9 @@ const AdminChecklist = () => {
     workflow,
   } = router.query;
 
-  const { data: school } = useSchool(schoolId);
+  const { data: school } = useSchool(schoolId, {
+    serialization_fields: ["name"],
+  });
 
   const [isToday, setIsToday] = useState(false);
 
