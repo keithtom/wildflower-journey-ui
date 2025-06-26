@@ -154,6 +154,7 @@ const PersonIdPage = () => {
   const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
   const [editCurrentRolesModalOpen, setEditCurrentRolesModalOpen] =
     useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
   const router = useRouter();
   const { personId } = router.query;
 
@@ -167,6 +168,22 @@ const PersonIdPage = () => {
 
   const schoolRelationships =
     person?.data?.relationships?.schoolRelationships?.data || [];
+
+  // Pagination logic
+  const schoolsPerPage = 15;
+  const totalPages = Math.ceil(schoolIds.length / schoolsPerPage);
+  const startIndex = currentPage * schoolsPerPage;
+  const endIndex = startIndex + schoolsPerPage;
+  const currentSchoolIds = schoolIds.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  // Reset to first page when person changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [personId]);
 
   const personData = useMemo(() => {
     if (!person?.data?.attributes) return [];
@@ -453,7 +470,7 @@ const PersonIdPage = () => {
                     }}
                   >
                     <Typography variant="bodyLarge">
-                      Associated Schools
+                      Associated Schools ({schoolIds.length})
                     </Typography>
                   </ListSubheader>
                 }
@@ -471,13 +488,46 @@ const PersonIdPage = () => {
                     </ListItemText>
                   </ListItem>
                 ) : (
-                  schoolIds.map((schoolId, index) => (
-                    <SchoolItem
-                      key={`${schoolId}-${index}`}
-                      schoolId={schoolId}
-                      personRelationships={schoolRelationships}
-                    />
-                  ))
+                  <>
+                    {currentSchoolIds.map((schoolId, index) => (
+                      <SchoolItem
+                        key={`${schoolId}-${startIndex + index}`}
+                        schoolId={schoolId}
+                        personRelationships={schoolRelationships}
+                      />
+                    ))}
+                    {totalPages > 1 && (
+                      <ListItem>
+                        <ListItemText>
+                          <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            spacing={2}
+                            sx={{ mt: 2 }}
+                          >
+                            <Button
+                              size="small"
+                              disabled={currentPage === 0}
+                              onClick={() => handlePageChange(currentPage - 1)}
+                            >
+                              Previous
+                            </Button>
+                            <Typography variant="bodySmall">
+                              Page {currentPage + 1} of {totalPages}
+                            </Typography>
+                            <Button
+                              size="small"
+                              disabled={currentPage === totalPages - 1}
+                              onClick={() => handlePageChange(currentPage + 1)}
+                            >
+                              Next
+                            </Button>
+                          </Stack>
+                        </ListItemText>
+                      </ListItem>
+                    )}
+                  </>
                 )}
               </List>
             </Card>
