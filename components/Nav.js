@@ -41,6 +41,7 @@ import Header from "./Header";
 import useAssignedSteps from "@hooks/useAssignedSteps";
 import TranslationToggle from "./TranslationToggle";
 import useWorkflow from "@hooks/useWorkflow";
+import useSchool from "@hooks/useSchool";
 
 // import AdviceProcessNavigation from "./page-content/advice/AdviceProcessNavigation";
 
@@ -362,50 +363,63 @@ const SchoolNavItem = ({
   router,
   openSection,
   onSectionClick,
-}) => (
-  <div data-cy="school-nav-item">
-    <NavListItemButton
-      onClick={() => handleSchoolClick(school.id)}
-      selected={router.asPath === `/school/${school.id}`}
-    >
-      <NavListItemIcon>
-        <Box
-          sx={{
-            height: 24,
-            width: 24,
-            borderRadius: (theme) => theme.radius.md + "px",
-            backgroundColor: (theme) => theme.color.neutral.main,
-          }}
-        />
-      </NavListItemIcon>
-      <NavListItemText primary={school.name} bold />
-    </NavListItemButton>
-    <Collapse in={openSchoolId === school.id} timeout="auto" unmountOnExit>
-      <NavList sx={{ padding: 0 }}>
-        <NavListItemButton
-          onClick={() => router.push(`/school/${school.id}/to-do-list`)}
-          selected={router.pathname.endsWith("/to-do-list")}
-          sx={{ pl: 8 }}
-        >
-          <NavListItemIcon>
-            <Icon type="inbox" />
-          </NavListItemIcon>
-          <NavListItemText primary="To Do List" />
-        </NavListItemButton>
+}) => {
+  const { data } = useSchool(school.id, {
+    serialization_fields: ["status"],
+  });
 
-        {school.workflowIds?.map((workflowId) => (
-          <WorkflowNavItems
-            key={workflowId}
-            school={school}
-            workflowId={workflowId}
-            openSection={openSection}
-            onSectionClick={onSectionClick}
+  const doNotShow =
+    data?.data?.attributes?.status === "Paused" ||
+    data?.data?.attributes?.status === "Abandoned";
+
+  // NOTE: prop 'school' is the school object from the currentUser.attributes.schools array
+  // NOTE: doNoteShow is calculated from the useSchool hook to ensure that paused schools are not displayed
+
+  return doNotShow ? null : (
+    <div data-cy="school-nav-item">
+      <NavListItemButton
+        onClick={() => handleSchoolClick(school.id)}
+        selected={router.asPath === `/school/${school.id}`}
+      >
+        <NavListItemIcon>
+          <Box
+            sx={{
+              height: 24,
+              width: 24,
+              borderRadius: (theme) => theme.radius.md + "px",
+              backgroundColor: (theme) => theme.color.neutral.main,
+            }}
           />
-        ))}
-      </NavList>
-    </Collapse>
-  </div>
-);
+        </NavListItemIcon>
+        <NavListItemText primary={school.name} bold />
+      </NavListItemButton>
+      <Collapse in={openSchoolId === school.id} timeout="auto" unmountOnExit>
+        <NavList sx={{ padding: 0 }}>
+          <NavListItemButton
+            onClick={() => router.push(`/school/${school.id}/to-do-list`)}
+            selected={router.pathname.endsWith("/to-do-list")}
+            sx={{ pl: 8 }}
+          >
+            <NavListItemIcon>
+              <Icon type="inbox" />
+            </NavListItemIcon>
+            <NavListItemText primary="To Do List" />
+          </NavListItemButton>
+
+          {school.workflowIds?.map((workflowId) => (
+            <WorkflowNavItems
+              key={workflowId}
+              school={school}
+              workflowId={workflowId}
+              openSection={openSection}
+              onSectionClick={onSectionClick}
+            />
+          ))}
+        </NavList>
+      </Collapse>
+    </div>
+  );
+};
 
 const Nav = ({ toggleNavOpen, navOpen }) => {
   const router = useRouter();
