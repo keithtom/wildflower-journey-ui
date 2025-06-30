@@ -738,9 +738,18 @@ const EditDetailsModal = ({ open, onClose, person }) => {
           }
       ),
       montessoriCertified: getDefaultValue("montessoriCertified"),
-      montessoriCertifiedLevels:
+      montessoriCertifiedLevels: (
         person.find((item) => item.key === "montessoriCertifiedLevels")
-          ?.value || [],
+          ?.value || []
+      ).map(
+        (value) =>
+          levelsOfMontessoriCertification.find(
+            (option) => option.value === value
+          ) || {
+            value,
+            label: value,
+          }
+      ),
       montessoriCertifiedYear: getDefaultValue("montessoriCertifiedYear"),
     },
   });
@@ -1029,6 +1038,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                     {...field}
                     multiple
                     options={ethnicityOptions}
+                    getOptionLabel={(option) => option.label || option}
                     value={value || []}
                     onChange={(_, newValue) => onChange(newValue)}
                     renderInput={(params) => (
@@ -1096,6 +1106,7 @@ const EditDetailsModal = ({ open, onClose, person }) => {
                     {...field}
                     multiple
                     options={levelsOfMontessoriCertification}
+                    getOptionLabel={(option) => option.label || option}
                     value={value || []}
                     onChange={(_, newValue) => onChange(newValue)}
                     renderInput={(params) => (
