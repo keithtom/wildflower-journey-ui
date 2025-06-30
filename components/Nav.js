@@ -683,7 +683,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
                   <NavListItemButton
                     onClick={() => {
                       if (router.asPath.includes("/admin")) {
-                        teacherLeaderSchools
+                        teacherLeaderSchools.length > 0
                           ? router.push(
                               `/school/${teacherLeaderSchools[0]?.id}`
                             )
