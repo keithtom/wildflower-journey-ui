@@ -7,6 +7,7 @@ import {
   ListItemAvatar,
   ListItemText,
   ListItemIcon,
+  Skeleton,
 } from "@mui/material";
 import { mutate } from "swr";
 
@@ -51,7 +52,7 @@ const WorkflowOption = ({
 const ToDoListPage = ({}) => {
   const router = useRouter();
   const { schoolId } = router.query;
-  const { data: school } = useSchool(schoolId);
+  const { data: school, isLoading: isLoadingSchool } = useSchool(schoolId);
   const { currentUser } = useUserContext();
   const isOpen = school?.data?.attributes?.status === "Open";
 
@@ -144,15 +145,38 @@ const ToDoListPage = ({}) => {
               To Do List
             </Typography>
           </Grid>
-          {school?.data.attributes.workflowIds.map((w, i) => (
-            <Grid item key={i}>
-              <WorkflowOption
-                workflowId={w}
-                setSelectedWorkflow={setActiveWorkflow}
-                selectedWorkflow={activeWorkflow}
-              />
-            </Grid>
-          ))}
+          {isLoadingSchool ? (
+            // Show skeleton while loading
+            <>
+              <Grid item>
+                <Skeleton
+                  variant="rectangular"
+                  width={120}
+                  height={32}
+                  sx={{ borderRadius: 16 }}
+                />
+              </Grid>
+              <Grid item>
+                <Skeleton
+                  variant="rectangular"
+                  width={140}
+                  height={32}
+                  sx={{ borderRadius: 16 }}
+                />
+              </Grid>
+            </>
+          ) : (
+            // Show actual workflow options when loaded
+            (school?.data?.attributes?.workflowIds || []).map((w, i) => (
+              <Grid item key={i}>
+                <WorkflowOption
+                  workflowId={w}
+                  setSelectedWorkflow={setActiveWorkflow}
+                  selectedWorkflow={activeWorkflow}
+                />
+              </Grid>
+            ))
+          )}
         </Grid>
 
         {activeWorkflow && !isLoading && groupedSteps && (
