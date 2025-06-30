@@ -25,6 +25,15 @@ const YourSchools = () => {
   const { data: schools, isLoading } = useSchools({
     person_id: currentUser?.id,
     role: "Ops Guide",
+    serialization_fields: [
+      "status",
+      "currentPhase",
+      "name",
+      "tempLocation",
+      "expectedStartDate",
+      "activePartners",
+      "id",
+    ],
   });
 
   // useEffect(() => {
