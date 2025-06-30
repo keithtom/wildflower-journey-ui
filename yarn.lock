@@ -9395,9 +9395,9 @@ markdown-escapes@^1.0.0:
   integrity sha512-8z4efJYk43E0upd0NbVXwgSTQs6cT3T06etieCMEg7dRbzCbxUCK/GHlX8mhHRDcp+OLlHkPKsvqQTCvsRl2cg==
 
 markdown-to-jsx@^7.1.3:
-  version "7.1.5"
-  resolved "https://registry.npmjs.org/markdown-to-jsx/-/markdown-to-jsx-7.1.5.tgz"
-  integrity sha512-YQEMMMCX3PYOWtUAQu8Fmz5/sH09s17eyQnDubwaAo8sWmnRTT1og96EFv1vL59l4nWfmtF3L91pqkuheVqRlA==
+  version "7.7.1"
+  resolved "https://registry.yarnpkg.com/markdown-to-jsx/-/markdown-to-jsx-7.7.1.tgz#8840c35583c1c024330573adb0effa28746708ee"
+  integrity sha512-BjLkHb+fWCAH9gp7ndbgPrY+zeZlGFtCiQNTWk+PD+GKfLg9YsUPNonSsYXGw6nQ7eZqeR+i71X59PpWXlxc/w==
 
 matchmediaquery@^0.3.0:
   version "0.3.1"
