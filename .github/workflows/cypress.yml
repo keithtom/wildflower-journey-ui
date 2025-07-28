@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: "22"
           cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-platform
       - name: Cypress run
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v6
