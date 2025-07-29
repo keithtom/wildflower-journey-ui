@@ -102,7 +102,7 @@ const OpenSchoolToDoList = ({}) => {
               {isLoading ? (
                 <>
                   {Array.from({ length: 5 }, (_, j) => (
-                    <ListItem>
+                    <ListItem key={j}>
                       <Skeleton width={240} height={24} />
                     </ListItem>
                   ))}

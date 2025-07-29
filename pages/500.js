@@ -11,7 +11,11 @@ const Custom500 = () => {
       <Grid container justifyContent="center" alignItems="center">
         <Grid item mt={24}>
           <Stack spacing={24} alignItems="center">
-            <img src={website} style={{ maxWidth: "320px" }} />
+            <img
+              src={website}
+              alt="Website illustration"
+              style={{ maxWidth: "320px" }}
+            />
             <Stack spacing={12} alignItems="center">
               <Typography variant="h4" bold highlight>
                 ERROR 500

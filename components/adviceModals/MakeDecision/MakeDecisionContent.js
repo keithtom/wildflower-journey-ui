@@ -65,7 +65,7 @@ const MakeDecisionContent = ({
             </Grid>
             <Grid item xs={12}>
               {stakeholders.map((s, i) => (
-                <StakeholderStatusIndicator stakeholder={s} />
+                <StakeholderStatusIndicator stakeholder={s} key={i} />
               ))}
             </Grid>
             <Grid item xs={12}>

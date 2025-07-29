@@ -1,18 +1,10 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import {
-  Divider,
-  Avatar,
-  Grid,
-  Card,
-  Stack,
-  Typography,
-  Button
-} from '@ui'
-import UserContactModal from './UserContactModal'
+import { Divider, Avatar, Grid, Card, Stack, Typography, Button } from "@ui";
+import UserContactModal from "./UserContactModal";
 
 const SchoolProfileSummary = ({ school }) => {
-  const [contactModalOpen, setContactModalOpen] = useState(false)
+  const [contactModalOpen, setContactModalOpen] = useState(false);
 
   return (
     <>
@@ -24,8 +16,8 @@ const SchoolProfileSummary = ({ school }) => {
           </Stack>
           <Stack spacing={2}>
             <Grid container>
-              {school.attributes.map((a, i) =>
-                <Grid item xs={12}>
+              {school.attributes.map((a, i) => (
+                <Grid item xs={12} key={i}>
                   <Grid container alignItems="center">
                     <Grid item xs={12} sm={6}>
                       <Typography variant="subtitle2">{a.title}</Typography>
@@ -35,7 +27,7 @@ const SchoolProfileSummary = ({ school }) => {
                     </Grid>
                   </Grid>
                 </Grid>
-              )}
+              ))}
             </Grid>
           </Stack>
           <Stack spacing={2}>
@@ -45,13 +37,16 @@ const SchoolProfileSummary = ({ school }) => {
                 <Avatar
                   sx={{
                     width: 32,
-                    height: 32
+                    height: 32,
                   }}
                   src={school.contactMember.profileImage}
                 />
               </Grid>
               <Grid item>
-                <Typography>{school.contactMember.firstName} {school.contactMember.lastName}</Typography>
+                <Typography>
+                  {school.contactMember.firstName}{" "}
+                  {school.contactMember.lastName}
+                </Typography>
               </Grid>
             </Grid>
             <Button
@@ -61,8 +56,10 @@ const SchoolProfileSummary = ({ school }) => {
               Contact {school.contactMember.firstName}
             </Button>
           </Stack>
-          <Divider/>
-          <Typography variant="bodyLightened">Last updated 2 weeks ago</Typography>
+          <Divider />
+          <Typography variant="bodyLightened">
+            Last updated 2 weeks ago
+          </Typography>
         </Stack>
       </Card>
 
@@ -72,7 +69,7 @@ const SchoolProfileSummary = ({ school }) => {
         toggle={() => setContactModalOpen(!contactModalOpen)}
       />
     </>
-  )
-}
+  );
+};
 
-export default SchoolProfileSummary
+export default SchoolProfileSummary;
