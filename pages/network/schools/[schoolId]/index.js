@@ -102,11 +102,9 @@ const School = ({}) => {
   //   console.log({ charterSchools });
   // }, [schoolsData]);
 
-  const { data: schoolData, isLoading } = token
-    ? useSchool(schoolId, {
-        network: true,
-      })
-    : { data: null, isLoading: true };
+  const { data: schoolData, isLoading } = useSchool(token ? schoolId : null, {
+    network: true,
+  });
 
   const school = schoolData?.data;
   const included = schoolData?.included;

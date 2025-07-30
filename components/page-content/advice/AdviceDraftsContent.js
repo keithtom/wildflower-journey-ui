@@ -31,8 +31,8 @@ const AdviceDraftsContent = ({ drafts }) => {
         <Typography variant="overline">Helpful Tips</Typography>
         <Stack spacing={2}>
           {helpfulTips.map((t, i) => (
-            <div>
-              <Grid key={i} container spacing={2} direction="row">
+            <div key={i}>
+              <Grid container spacing={2} direction="row">
                 <Grid item>
                   <ArrowForward />
                 </Grid>
@@ -46,9 +46,8 @@ const AdviceDraftsContent = ({ drafts }) => {
       </Card>
 
       {drafts.map((draft, i) => (
-        <Card>
+        <Card key={i}>
           <AdviceSummary
-            key={i}
             status="draft"
             adviceId={draft.id}
             content={draft.attributes.title}

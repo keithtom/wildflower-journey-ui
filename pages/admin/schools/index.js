@@ -841,6 +841,7 @@ const AddOperationsGuide = ({
                     ) : (
                       opsGuides?.map((og, i) => (
                         <StyledPersonOption
+                          key={i}
                           size="small"
                           noBorder
                           noRadius
@@ -848,7 +849,6 @@ const AddOperationsGuide = ({
                         >
                           <FormControlLabel
                             sx={{ width: "100%", height: "100%", padding: 2 }}
-                            key={i}
                             value={og.id}
                             label={
                               <Grid container>
@@ -1018,6 +1018,7 @@ const AddRegionalGrowthLead = ({
                     ) : (
                       rgl?.map((rgl, i) => (
                         <StyledPersonOption
+                          key={i}
                           size="small"
                           noBorder
                           noRadius
@@ -1025,7 +1026,6 @@ const AddRegionalGrowthLead = ({
                         >
                           <FormControlLabel
                             sx={{ width: "100%", height: "100%", padding: 2 }}
-                            key={i}
                             value={rgl.id}
                             label={
                               <Grid container>
@@ -1174,6 +1174,7 @@ const AddWorkflow = ({
                     ) : (
                       SSJWorkflows?.map((workflow, i) => (
                         <StyledPersonOption
+                          key={i}
                           size="small"
                           noBorder
                           noRadius
@@ -1182,7 +1183,6 @@ const AddWorkflow = ({
                         >
                           <FormControlLabel
                             sx={{ width: "100%", height: "100%", padding: 2 }}
-                            key={i}
                             value={workflow.id}
                             label={
                               <Grid container>

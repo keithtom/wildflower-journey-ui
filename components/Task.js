@@ -343,6 +343,7 @@ const Task = ({
           <ListItemIcon
             sx={{ minWidth: "48px", paddingLeft: "1px" }}
             children={
+              // eslint-disable-line react/no-children-prop
               isDecision ? (
                 <Icon
                   type="zap"

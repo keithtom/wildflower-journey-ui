@@ -28,14 +28,9 @@ const StepItem = ({
   const [stepDrawerOpen, setStepDrawerOpen] = useState(false);
   const [isAddingStep, setIsAddingStep] = useState(true);
 
-  let step;
-  let isLoading;
-  let isError;
-  if (workingStep) {
-    step = workingStep;
-  } else {
-    ({ step, isLoading, isError } = useStep(id));
-  }
+  const { step: fetchedStep, isLoading, isError } = useStep(id);
+
+  const step = workingStep || fetchedStep;
   // console.log({ step });
 
   const handleAddStep = () => {
