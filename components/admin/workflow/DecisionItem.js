@@ -1,3 +1,18 @@
+import {
+  ListItem,
+  Grid,
+  Chip,
+  Box,
+  Icon,
+  Typography,
+  ListItemButton,
+  ListItemText,
+  Stack,
+} from "@mui/material";
+import DecisionDrawer from "./DecisionDrawer";
+import { useState } from "react";
+import { Add as AddIcon } from "@mui/icons-material";
+
 const DecisionItem = ({ decision, number, totalOptions }) => {
   const [showAddChip, setShowAddChip] = useState(false);
   const [showDraggable, setShowDraggable] = useState(false);
@@ -99,3 +114,31 @@ const DecisionItem = ({ decision, number, totalOptions }) => {
 };
 
 export default DecisionItem;
+
+const AddChip = ({ onClick, isLast }) => {
+  return (
+    <Stack
+      id="inline-action-tile-add-chip"
+      onClick={onClick}
+      sx={{
+        width: "24px",
+        height: "24px",
+        borderRadius: "50%",
+        backgroundColor: "#fafafa",
+        border: "1px solid #eaeaea",
+        position: "absolute",
+        top: isLast ? null : "-12px",
+        bottom: isLast ? "-12px" : null,
+        zIndex: 1,
+        cursor: "pointer",
+        "&:hover": {
+          backgroundColor: "#eaeaea",
+        },
+      }}
+      alignItems="center"
+      justifyContent="center"
+    >
+      <AddIcon color="primary" fontSize="small" />
+    </Stack>
+  );
+};

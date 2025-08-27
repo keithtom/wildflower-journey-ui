@@ -1,6 +1,5 @@
 import wildflowerApi from "@api/base";
 import { getCookie } from "cookies-next";
-import { useHistory } from "react-router-dom";
 
 const workflowsApi = wildflowerApi.register("/v1/workflow", {});
 

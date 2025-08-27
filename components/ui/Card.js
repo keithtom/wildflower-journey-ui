@@ -124,4 +124,6 @@ const Card = React.forwardRef(({ children, ...props }, ref) => {
   );
 });
 
+Card.displayName = "Card";
+
 export default Card;

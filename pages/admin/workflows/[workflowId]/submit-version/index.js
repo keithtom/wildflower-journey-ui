@@ -168,8 +168,8 @@ const SubmitVersionPage = () => {
           </Grid>
         ) : (
           groupedProcesses.map((phase, i) => (
-            <Grid container>
-              <Grid item xs={12} key={i}>
+            <Grid container key={i}>
+              <Grid item xs={12}>
                 <Card>
                   <List
                     fullWidth
