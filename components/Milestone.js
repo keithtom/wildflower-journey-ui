@@ -96,6 +96,7 @@ const Milestone = ({
             <ListItemIcon
               sx={{ minWidth: "48px", paddingLeft: "1px" }}
               children={
+                // eslint-disable-line react/no-children-prop
                 <>
                   {status === "done" && (
                     <Icon type="checkCircle" variant="success" />

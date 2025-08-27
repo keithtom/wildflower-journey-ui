@@ -340,30 +340,31 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                     )}
                     <Grid item xs={12}>
                       <Stack spacing={2}>
-                        {links && links.map((link, i) => (
-                          <Card key={i} fullWidth>
-                            <Grid container justifyContent="space-between">
-                              <Grid item>
-                                <Stack>
-                                  <Typography variant="body2">
-                                    Type
-                                  </Typography>
-                                  <Typography variant="h6">
-                                    Title
-                                  </Typography>
-                                  <Typography variant="body2">
-                                    {link.id}
-                                  </Typography>
-                                </Stack>
+                        {links &&
+                          links.map((link, i) => (
+                            <Card key={i} fullWidth>
+                              <Grid container justifyContent="space-between">
+                                <Grid item>
+                                  <Stack>
+                                    <Typography variant="body2">
+                                      Type
+                                    </Typography>
+                                    <Typography variant="h6">Title</Typography>
+                                    <Typography variant="body2">
+                                      {link.id}
+                                    </Typography>
+                                  </Stack>
+                                </Grid>
+                                <Grid item>
+                                  <Button
+                                    onClick={() => handleRemoveLink(link)}
+                                  >
+                                    x
+                                  </Button>
+                                </Grid>
                               </Grid>
-                              <Grid item>
-                                <Button onClick={() => handleRemoveLink(link)}>
-                                  x
-                                </Button>
-                              </Grid>
-                            </Grid>
-                          </Card>
-                        ))}
+                            </Card>
+                          ))}
                       </Stack>
                     </Grid>
                   </Grid>
@@ -383,7 +384,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {stakeholders &&
                         stakeholders.map((s, i) => (
                           // Filter returned stakeholders by categoriy (ie: "Your School")
-                          <Card>
+                          <Card key={i}>
                             <div>{s.id}</div>
                           </Card>
                         ))}
@@ -408,7 +409,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {stakeholders &&
                         stakeholders.map((s, i) => (
                           // Filter returned stakeholders by categoriy (ie: "Your Hub")
-                          <Card>
+                          <Card key={i}>
                             <div>{s.id}</div>
                           </Card>
                         ))}
@@ -433,7 +434,7 @@ const Decision = ({ decision, userId, includedStakeholders }) => {
                       {stakeholders &&
                         stakeholders.map((s, i) => (
                           // Filter returned stakeholders by categoriy (ie: "Foundation")
-                          <Card>
+                          <Card key={i}>
                             <div>{s.id}</div>
                           </Card>
                         ))}

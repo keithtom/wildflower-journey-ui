@@ -48,4 +48,6 @@ const TextField = React.forwardRef(
   }
 );
 
+TextField.displayName = "TextField";
+
 export default TextField;

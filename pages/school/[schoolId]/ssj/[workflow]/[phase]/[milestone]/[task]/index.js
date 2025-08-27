@@ -114,7 +114,7 @@ const TaskPage = ({ MilestoneId, MilestoneTitle }) => {
               </>
             ) : FakeResources ? (
               FakeResources?.map((r, i) => (
-                <Resource title={r.title} link={r.link} />
+                <Resource title={r.title} link={r.link} key={i} />
               ))
             ) : (
               <Card hoverable elevated size="small">
