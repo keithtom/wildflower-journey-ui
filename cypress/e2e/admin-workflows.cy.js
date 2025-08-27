@@ -118,8 +118,10 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
   });
   it("starts drafting a new version", () => {
-    cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
-    cy.startDraftingNewVersion();
+    cy.contains("Basic Workflow for Cypress Tests").click();
+    cy.wait("@getWorkflow");
+    cy.wait(1000);
+    cy.get("button.MuiButtonBase-root").contains("Draft New Version").click();
   });
   it("adds a brand new process", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
@@ -134,10 +136,11 @@ describe("Admin, Rollout Changes", () => {
     cy.get("button.MuiButton-text").contains("Create").click();
     cy.contains("New Test Process Title");
   });
-  // TODO: Add this back in when choosing is built
+  // Commented out because "choose" is not an option
   // it("adds an existing process", () => {
-  //   cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
-  //   cy.startDraftingNewVersion();
+  //   cy.contains("Basic Workflow for Cypress Tests").click();
+  //   cy.wait("@getWorkflow");
+  //   cy.get("button.MuiButtonBase-root").contains("Draft New Version").click();
   //   cy.wait(1000);
   //   cy.get("#inline-action-tile-add-chip").first().click();
   //   cy.contains("Choose").click();
@@ -152,28 +155,39 @@ describe("Admin, Rollout Changes", () => {
     cy.wait(1000);
     cy.get("button.MuiButton-text").contains("Reinstate").first().click();
   });
-  it("removes a brand new process", () => {
-    cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
-    cy.startDraftingNewVersion();
-    cy.wait(1000);
-    cy.get("#inline-action-tile-add-chip").first().click();
-    cy.contains("Choose").click();
-    cy.contains("Preview the Wildflower budget process").click();
-    cy.contains("Preview the Wildflower budget process");
-    cy.get("button.MuiButton-text").contains("Remove").first().click();
-  });
+  // Commented out because "choose" is not an option
+  // it("removes a brand new process", () => {
+  //   cy.contains("Basic Workflow for Cypress Tests").click();
+  //   cy.wait("@getWorkflow");
+  //   cy.get("button.MuiButtonBase-root").contains("Draft New Version").click();
+  //   cy.wait(1000);
+  //   cy.get("#inline-action-tile-add-chip").first().click();
+  //   cy.contains("Choose").click();
+  //   cy.contains("Preview the Wildflower budget process").click();
+  //   cy.contains("Preview the Wildflower budget process");
+  //   cy.get("button.MuiButton-text").contains("Remove").first().click();
+  // });
 
   it("navigates to a proces and elects to edit it", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.editProcess("Milestone A");
-  });
-  it("updates process a attribute", () => {
-    cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
-    cy.startDraftingNewVersion();
+    cy.contains("Milestone A").click();
+    cy.wait("@getProcess");
+    cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
-    cy.editProcess("Milestone A");
+    cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
+  });
+  it("updates process attribute", () => {
+    cy.contains("Basic Workflow for Cypress Tests").click();
+    cy.wait("@getWorkflow");
+    cy.get("button.MuiButtonBase-root").contains("Draft New Version").click();
+    cy.wait(1000);
+    cy.contains("Milestone A").click();
+    cy.wait("@getProcess");
+    cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
+    cy.wait(1000);
+    cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
     cy.get('textarea[name="description"]').clear().type("New description");
     cy.get("button.MuiButtonBase-root").contains("Update").click();
   });
@@ -181,7 +195,11 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.editProcess("Milestone C-Y");
+    cy.contains("Milestone C-Y").click();
+    cy.wait("@getProcess");
+    cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
+    cy.wait(1000);
+    cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
     cy.get("button.MuiButton-root").contains("Add Prerequisite").click();
     cy.contains("Milestone C-X").click();
     cy.wait(1000);
@@ -192,7 +210,11 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.editProcess("Milestone A");
+    cy.contains("Milestone A").click();
+    cy.wait("@getProcess");
+    cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
+    cy.wait(1000);
+    cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
     cy.get("#inline-action-tile-add-chip").first().click();
     cy.get("div.MuiDialog-container").within(() => {
       cy.get('input[name="title"]').type("New Test Step Title");
@@ -221,7 +243,11 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.editProcess("Milestone A");
+    cy.contains("Milestone A").click();
+    cy.wait("@getProcess");
+    cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
+    cy.wait(1000);
+    cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
     cy.wait(1000);
     cy.navigateToStep("Step 1");
     cy.contains("Step 1");
@@ -232,7 +258,11 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.editProcess("Milestone A");
+    cy.contains("Milestone A").click();
+    cy.wait("@getProcess");
+    cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
+    cy.wait(1000);
+    cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
     cy.wait(1000);
     cy.navigateToStep("Step 1");
     cy.contains("Step 1");
@@ -256,11 +286,18 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.editProcess("Milestone A");
+    cy.contains("Milestone A").click();
+    cy.wait("@getProcess");
+    cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
-    cy.navigateToStep("Step 1");
+    cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
+    cy.wait(1000);
+    cy.contains("Step 1").click();
+    cy.wait("@getStep");
+    cy.wait(1000);
     cy.contains("Step 1");
     cy.get('span[label="Kind"]').click();
+    cy.get('input[name="decision_question"]').type("New Decision Question");
     cy.get("button.MuiButtonBase-root").contains("Add Decision Option").click();
     cy.get("div.MuiDialog-container").within(() => {
       cy.get('input[name="decision_option"]').type("New Decision Option");
