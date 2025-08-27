@@ -118,8 +118,7 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
   });
   it("starts drafting a new version", () => {
-    cy.contains("Basic Workflow for Cypress Tests").click();
-    cy.wait("@getWorkflow");
+    cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.wait(1000);
     cy.get("button.MuiButtonBase-root").contains("Draft New Version").click();
   });
@@ -172,19 +171,16 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.contains("Milestone A").click();
-    cy.wait("@getProcess");
+    cy.navigateToProcess("Milestone A");
     cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
     cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
   });
   it("updates process attribute", () => {
-    cy.contains("Basic Workflow for Cypress Tests").click();
-    cy.wait("@getWorkflow");
+    cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.get("button.MuiButtonBase-root").contains("Draft New Version").click();
     cy.wait(1000);
-    cy.contains("Milestone A").click();
-    cy.wait("@getProcess");
+    cy.navigateToProcess("Milestone A");
     cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
     cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
@@ -195,8 +191,7 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.contains("Milestone C-Y").click();
-    cy.wait("@getProcess");
+    cy.navigateToProcess("Milestone C-Y");
     cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
     cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
@@ -210,8 +205,7 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.contains("Milestone A").click();
-    cy.wait("@getProcess");
+    cy.navigateToProcess("Milestone A");
     cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
     cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
@@ -243,8 +237,7 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.contains("Milestone A").click();
-    cy.wait("@getProcess");
+    cy.navigateToProcess("Milestone A");
     cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
     cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
@@ -258,8 +251,7 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.contains("Milestone A").click();
-    cy.wait("@getProcess");
+    cy.navigateToProcess("Milestone A");
     cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
     cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
@@ -286,15 +278,12 @@ describe("Admin, Rollout Changes", () => {
     cy.navigateToWorkflow("Basic Workflow for Cypress Tests");
     cy.startDraftingNewVersion();
     cy.wait(1000);
-    cy.contains("Milestone A").click();
-    cy.wait("@getProcess");
+    cy.navigateToProcess("Milestone A");
     cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
     cy.wait(1000);
     cy.get("button.MuiButtonBase-root").contains("Revert All Edits");
     cy.wait(1000);
-    cy.contains("Step 1").click();
-    cy.wait("@getStep");
-    cy.wait(1000);
+    cy.navigateToStep("Step 1");
     cy.contains("Step 1");
     cy.get('span[label="Kind"]').click();
     cy.get('input[name="decision_question"]').type("New Decision Question");
@@ -313,10 +302,13 @@ describe("Admin, Rollout Changes", () => {
     cy.startDraftingNewVersion();
     cy.wait(1000);
     cy.get("button.MuiButton-text").contains("Remove").first().click();
-    cy.contains("Review New Version").click();
+
+    // Set up the intercept BEFORE clicking the button that triggers the request
     cy.intercept("GET", "**/v1/workflow/definition/workflows/*").as(
       "getWorkflow"
     );
+
+    cy.contains("Review New Version").click();
     cy.wait("@getWorkflow");
     cy.contains("Confirm And Submit").click();
   });
