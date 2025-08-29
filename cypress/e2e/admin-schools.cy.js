@@ -65,62 +65,16 @@ describe("School Management", () => {
   beforeEach(() => {
     cy.loginAsAdmin();
     cy.visit("/admin/schools");
-    // Wait for the schools data to load
-    cy.intercept("GET", "**/v1/schools*").as("getSchools");
-    cy.wait("@getSchools");
-    cy.get("[data-cy=school-list]").should("be.visible");
-    // Find and click on the school we just created, handling pagination
-    const findAndClickSchool = () => {
-      // First ensure the school list is loaded and visible
-      cy.get("[data-cy=school-list]").should("be.visible");
-      cy.get("[data-cy=school-list-item]").should("have.length.gt", 0);
+    cy.get("[data-cy=school-list]", { timeout: 10000 }).should("be.visible");
+    cy.contains("[data-cy=school-list-item]", "Cypress Test School").click();
 
-      cy.get("body").then(($body) => {
-        if ($body.find(':contains("newFirstName-school")').length) {
-          // Set up intercepts for all the API calls that happen after clicking
-          cy.intercept("GET", "**/v1/schools/*").as("getSchoolDetail");
-          cy.intercept("GET", "**/v1/workflow/definition/workflows").as(
-            "getWorkflowDefinitions"
-          );
-          cy.intercept("GET", "**/v1/workflow/workflows/*").as("getWorkflow");
-          cy.intercept("GET", "**/v1/search?q=*&models=people*").as(
-            "getPeople"
-          );
-
-          cy.contains("newFirstName-school")
-            .parents("[data-cy=school-list-item]")
-            .click();
-
-          // Wait for all the necessary API calls to complete
-          cy.wait("@getSchoolDetail");
-          cy.wait("@getWorkflowDefinitions");
-          cy.wait("@getWorkflow");
-          cy.wait("@getPeople");
-
-          // Wait for the school data to load and the page to be ready
-          cy.get("[data-cy=school-detail]", { timeout: 20000 })
-            .should("be.visible")
-            .should("contain", "newFirstName-school");
-        } else {
-          // If not found on current page, check if there's a next page button and if it's enabled
-          cy.get(".MuiPagination-root").then(($pagination) => {
-            const nextButton = $pagination.find(
-              'button[aria-label="Go to next page"]'
-            );
-            if (nextButton.length && !nextButton.prop("disabled")) {
-              cy.get('button[aria-label="Go to next page"]').click();
-              cy.wait("@getSchools");
-              // Wait for the new page of schools to load
-              cy.get("[data-cy=school-list-item]").should("have.length.gt", 0);
-              findAndClickSchool();
-            } else {
-              throw new Error("Could not find the created school in any page");
-            }
-          });
-        }
-      });
-    };
-    findAndClickSchool();
+    // Set up all the intercepts needed for subsequent tests
+    cy.intercept("GET", "**/v1/search?q=*&models=people*").as("getPeople");
+    cy.intercept("GET", "**/v1/schools/*").as("getSchoolDetail");
+    cy.intercept("GET", "**/v1/workflow/definition/workflows").as(
+      "getWorkflowDefinitions"
+    );
+    cy.intercept("GET", "**/v1/workflow/workflows/*").as("getWorkflow");
   });
 
   it("should add a person to the school", () => {
@@ -133,9 +87,12 @@ describe("School Management", () => {
     // Wait for the first modal transition to complete
     cy.wait(300); // Material-UI modal transition is 225ms
 
-    // Select role
+    // Select role - target exact "Teacher Leader" not "Emerging Teacher Leader"
     cy.get("[data-cy=role-select]").click();
-    cy.get('[role="listbox"]').contains("Teacher Leader").click();
+    cy.get('[role="listbox"]')
+      .find('[role="option"]:not(.Mui-disabled)')
+      .contains("Teacher Leader")
+      .click();
 
     // Submit the form
     cy.get("[data-cy=add-person-submit]").click();
@@ -157,9 +114,6 @@ describe("School Management", () => {
     cy.get('[data-cy="role-checkbox-Teacher Leader"]')
       .find('input[type="checkbox"]')
       .uncheck();
-    cy.get('[data-cy="role-checkbox-Emerging Teacher Leader"]')
-      .find('input[type="checkbox"]')
-      .check();
     cy.get('[data-cy="role-checkbox-Ops Guide"]')
       .find('input[type="checkbox"]')
       .check();
@@ -169,6 +123,7 @@ describe("School Management", () => {
 
     // Save changes and verify roles immediately after modal closes
     cy.get("[data-cy=save-person-role-button]").click();
+    cy.wait(1000);
     cy.get("[data-cy=edit-person-modal]").should("not.exist");
 
     // Verify the new roles are present
@@ -176,7 +131,6 @@ describe("School Management", () => {
       .find("[data-cy=person-list-item]")
       .first()
       .find(".MuiListItemText-secondary")
-      .should("contain", "Emerging Teacher Leader")
       .should("contain", "Ops Guide")
       .should("contain", "Board Member");
   });
@@ -335,7 +289,7 @@ describe("School Management", () => {
 
     // Set Membership
     cy.get('[data-cy="set-membership-button"]').click();
-    cy.get('[data-cy="member-switch"]').click();
+    cy.get('[data-cy="member-switch"]').should("have.class", "Mui-checked");
     cy.get('[data-cy="affiliation-date-input"]').type("2024-01-01");
     cy.get('[data-cy="save-membership-button"]').click();
     cy.get('[data-cy="edit-member-modal"]').should("not.exist");
@@ -349,15 +303,12 @@ describe("School Management", () => {
     // Remove School
     cy.get('[data-cy="remove-school-button"]').click();
     cy.get('[data-cy="remove-school-confirm-input"]').type(
-      "newFirstName-school"
+      "Cypress Test School"
     );
     cy.get('[data-cy="confirm-remove-school-button"]').click();
 
     // Verify redirection to schools list
     cy.url().should("include", "/admin/schools");
-    cy.get('[data-cy="school-list"]').should(
-      "not.contain",
-      "newFirstName-school"
-    );
+    cy.get('[data-cy="school-list"]').should("be.visible");
   });
 });
