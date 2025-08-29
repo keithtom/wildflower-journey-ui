@@ -157,6 +157,7 @@ describe("network edit person", () => {
       cy.get('[data-cy="personId-edit-schoolHistory-add"]').click();
       cy.get('[name="school"]').click();
       cy.get('[name="school"]').type("Test");
+      cy.wait(5000);
       cy.get('li[data-option-index="0"]').contains("Test").click();
       cy.get('[data-cy="personId-edit-schoolHistory-dateJoined"]')
         .clear()
@@ -204,6 +205,7 @@ describe("network edit person", () => {
       cy.get('[data-cy="personId-edit-boardHistory-add"]').click();
       cy.get('[name="school"]').click();
       cy.get('[name="school"]').type("Test");
+      cy.wait(5000);
       cy.get('li[data-option-index="0"]').contains("Test").click();
       cy.get('[data-cy="personId-edit-boardHistory-dateJoined"]')
         .clear()
