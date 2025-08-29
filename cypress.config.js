@@ -9,6 +9,7 @@ module.exports = defineConfig({
   },
   retries: 2,
   experimentalMemoryManagement: true,
+  numTestsKeptInMemory: 10,
   e2e: {
     baseUrl: "http://localhost:3000",
     defaultCommandTimeout: 10000,

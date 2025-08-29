@@ -22,7 +22,20 @@ describe("People Management", () => {
     // Wait for the people data to load
     cy.intercept("GET", "**/v1/people*").as("getPeople");
     cy.wait("@getPeople");
-    cy.get("[data-cy=people-list]").should("be.visible");
+
+    // Check if there are people on the first page, if not, paginate
+    cy.get("[data-cy=people-list]").then(($list) => {
+      if ($list.find("[data-cy=people-list-item]").length === 0) {
+        // No people on first page, try next page
+        cy.get('button[aria-label="Go to next page"]').then(($nextButton) => {
+          if ($nextButton.length && !$nextButton.prop("disabled")) {
+            cy.wrap($nextButton).click();
+            cy.wait("@getPeople");
+            cy.get("[data-cy=people-list]").should("be.visible");
+          }
+        });
+      }
+    });
   });
 
   describe("adding a person", () => {

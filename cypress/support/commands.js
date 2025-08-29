@@ -173,3 +173,38 @@ Cypress.on("uncaught:exception", (err) => {
     return false;
   }
 });
+
+// Workflow Admin Navigation Commands
+Cypress.Commands.add("navigateToWorkflow", (workflowName) => {
+  cy.intercept("GET", "**/v1/workflow/definition/workflows/*").as(
+    "getWorkflow"
+  );
+  cy.contains(workflowName).click();
+  cy.wait("@getWorkflow");
+});
+
+Cypress.Commands.add("navigateToProcess", (processName) => {
+  cy.intercept("GET", "**/v1/workflow/definition/workflows/*/processes/*").as(
+    "getProcess"
+  );
+  cy.contains(processName).click();
+  cy.wait("@getProcess");
+});
+
+Cypress.Commands.add("navigateToStep", (stepName) => {
+  cy.intercept("GET", "**/v1/workflow/definition/processes/*/steps/*").as(
+    "getStep"
+  );
+  cy.contains(stepName).click();
+  cy.wait("@getStep");
+});
+
+Cypress.Commands.add("startDraftingNewVersion", () => {
+  cy.get("button.MuiButtonBase-root").contains("Draft New Version").click();
+});
+
+Cypress.Commands.add("editProcess", (processName) => {
+  cy.contains(processName).click();
+  cy.get("button.MuiButtonBase-root").contains("Edit This Process").click();
+  cy.contains("Revert All Edits");
+});
