@@ -66,12 +66,12 @@ const ToDoListPage = ({}) => {
     activeWorkflow ? activeWorkflow : null
   );
 
-  // Update activeWorkflow when selectedWorkflow changes
+  // Initialize activeWorkflow from selectedWorkflow, but don't overwrite user choice
   useEffect(() => {
-    if (selectedWorkflow?.id) {
+    if (!activeWorkflow && selectedWorkflow?.id) {
       setActiveWorkflow(selectedWorkflow.id);
     }
-  }, [selectedWorkflow]);
+  }, [selectedWorkflow, activeWorkflow]);
 
   // Group steps by assignee
   const groupedSteps =
@@ -247,7 +247,7 @@ const ToDoListPage = ({}) => {
                         }
                         isNext={index === 0}
                         removeStep={removeStep}
-                        workflow={activeWorkflow}
+                        workflowId={activeWorkflow}
                       />
                     ))}
                   </List>
