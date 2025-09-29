@@ -280,6 +280,7 @@ const SchoolPage = () => {
             {currentUserViewOnly ? null : (
               <AssignedStepsCard
                 workflows={school?.data?.attributes?.workflowIds}
+                selectedWorkflow={selectedWorkflow}
                 schoolId={schoolId}
                 schoolStatus={school?.data?.attributes?.status}
                 currentPhase={school?.data?.attributes?.currentPhase}
