@@ -325,13 +325,21 @@ const ProcessId = ({}) => {
   const phaseListField = watch("phase_list");
 
   useEffect(() => {
-    if (showChoosePositionModal.intent === true) {
+    if (
+      showChoosePositionModal.intent === true &&
+      phaseListField &&
+      originalData?.phase_list !== phaseListField
+    ) {
       setShowChoosePositionModal((prevState) => ({
         ...prevState,
         state: true,
       }));
     }
-  }, [phaseListField]);
+  }, [
+    phaseListField,
+    showChoosePositionModal.intent,
+    originalData?.phase_list,
+  ]);
 
   const handleChoosePosition = async (position, phase, selectedProcessId) => {
     // console.log(position);
@@ -841,7 +849,11 @@ const ProcessId = ({}) => {
       />
       {isRecurring ? null : (
         <ChoosePositionModal
-          open={showChoosePositionModal.state}
+          open={Boolean(
+            showChoosePositionModal.state &&
+              milestone?.relationships?.selectedProcesses?.data?.length &&
+              phaseListField
+          )}
           onClose={() =>
             setShowChoosePositionModal((prevState) => ({
               ...prevState,
@@ -866,7 +878,14 @@ const ProcessId = ({}) => {
         open={addStepModalOpen}
         addStepPosition={addStepPosition}
         handleCreateStep={handleCreateStep}
-        onClose={() => setAddStepModalOpen(false)}
+        onClose={() => {
+          setAddStepModalOpen(false);
+          setShowChoosePositionModal((prevState) => ({
+            ...prevState,
+            intent: false,
+            state: false,
+          }));
+        }}
         isRecurring={isRecurring}
       />
       <Snackbar
@@ -1350,7 +1369,7 @@ const ChoosePositionModal = ({
   // console.log(stagedPhase);
 
   const currentProcessSelectedProcessId =
-    milestone?.relationships.selectedProcesses.data[0].id;
+    milestone?.relationships?.selectedProcesses?.data?.[0]?.id ?? null;
 
   return (
     <Dialog open={open} fullWidth>
