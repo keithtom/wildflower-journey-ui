@@ -72,12 +72,14 @@ const Task = ({
   variant,
   removeStep,
   processName,
+  workflowId,
 }) => {
   const { screenSize } = getScreenSize();
   const { t } = useTranslation("common");
   const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow, milestone, schoolId } = router.query;
+  const effectiveWorkflowId = workflowId || workflow;
 
   // Get the current school data
   const { data: school, isLoading: schoolIsLoading } = useSchool(schoolId);
@@ -214,11 +216,11 @@ const Task = ({
 
       setInfoDrawerOpen(false);
       mutate(`/processes/${milestone}`);
-      mutate(`/workflows/${workflow}/assigned_steps`);
+      mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       if (removeStep) {
         removeStep(taskId);
         mutate(`/processes/${milestone}`);
-        mutate(`/workflows/${workflow}/assigned_steps`);
+        mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       }
     } catch (error) {
       if (error?.response?.status === 401) {
@@ -242,7 +244,7 @@ const Task = ({
       const task = response.data.data;
 
       mutate(`/processes/${milestone}`);
-      mutate(`/workflows/${workflow}/assigned_steps`);
+      mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
@@ -257,7 +259,7 @@ const Task = ({
       const response = await stepsApi.assign(taskId, assigneeId);
       const task = response.data.data;
       mutate(`/processes/${milestone}`);
-      mutate(`/workflows/${workflow}/assigned_steps`);
+      mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
@@ -277,7 +279,7 @@ const Task = ({
       if (removeStep) {
         removeStep(taskId);
         mutate(`/processes/${milestone}`);
-        mutate(`/workflows/${workflow}/assigned_steps`);
+        mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       }
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -298,13 +300,13 @@ const Task = ({
       const task = response.data.data;
 
       mutate(`/processes/${milestone}`);
-      mutate(`/workflows/${workflow}/assigned_steps`);
+      mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       setInfoDrawerOpen(false);
 
       if (removeStep) {
         removeStep(taskId);
         mutate(`/processes/${milestone}`);
-        mutate(`/workflows/${workflow}/assigned_steps`);
+        mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       }
     } catch (err) {
       if (err?.response?.status === 401) {
