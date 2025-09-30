@@ -31,7 +31,7 @@ const Resource = ({ title, link, description }) => {
           </Stack>
         </Grid>
         <Grid item>
-          <a href={link} target="_blank">
+          <a href={link} target="_blank" rel="noopener noreferrer">
             <IconButton>
               <Icon type="linkExternal" variant="lightened" />
             </IconButton>

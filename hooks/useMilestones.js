@@ -1,11 +1,14 @@
 import useSWR from "swr";
 import { showMilestones } from "@api/workflow/processes";
 
-const useMilestones = (workflowId, params) => {
+const useMilestones = (workflowId, params, swrOptions = {}) => {
   //Fetch the data using SWR
   const { data, error, isValidating } = useSWR(
     workflowId ? showMilestones.key(workflowId, params) : null,
-    () => showMilestones.fetcher(workflowId, params)
+    () => showMilestones.fetcher(workflowId, params),
+    {
+      ...swrOptions,
+    }
   );
 
   // Initialize data forms

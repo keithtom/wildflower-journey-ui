@@ -257,7 +257,7 @@ const AddProcessModal = ({ open, onClose, handleAddProcess }) => {
   } = useForm();
 
   const onSubmit = handleSubmit((data) => {
-    console.log({ data });
+    // console.log({ data });
     handleAddProcess(data);
     reset();
     onClose();

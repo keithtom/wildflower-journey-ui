@@ -159,7 +159,9 @@ const InfoDrawer = ({
                   <AssigneeRoster
                     handleAssignUser={handleAssignUser}
                     handleUnassignUser={handleUnassignUser}
-                    assignableUsers={assignableUsers}
+                    assignableUsers={
+                      Array.isArray(assignableUsers) ? assignableUsers : []
+                    }
                     assignees={assignees}
                     completers={completers}
                     completionType={completionType}

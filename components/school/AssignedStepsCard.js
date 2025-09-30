@@ -12,12 +12,12 @@ import {
 import { useTranslation } from "next-i18next";
 import useAssignedStepsCount from "@hooks/useAssignedStepsCount";
 import useMilestones from "@hooks/useMilestones";
-import useWorkflows from "@hooks/useWorkflows";
 import { theme } from "../../styles/theme";
 import { format } from "date-fns";
 
 const AssignedStepsCard = ({
   workflows = [],
+  selectedWorkflow,
   schoolId,
   schoolStatus,
   currentPhase,
@@ -41,20 +41,12 @@ const AssignedStepsCard = ({
     { current_user: true }
   );
   // debugger;
-  // Get all workflows and select the appropriate one
-  const { workflows: workflowsArray, isLoading: isLoadingWorkflows } =
-    useWorkflows(workflows);
-  const selectedWorkflow = useMemo(() => {
-    if (!workflowsArray?.length || assignedSteps > 0) return null;
-    return workflowsArray.find(
-      (workflow) => workflow?.data?.data?.attributes?.recurring === isOpen
-    );
-  }, [workflowsArray, isOpen, assignedSteps]);
+  // Use selectedWorkflow passed from parent to avoid duplicate fetching
 
   // Fetch milestones for the selected workflow only when assignedSteps is 0
   const { milestones, isLoading: isLoadingMilestones } = useMilestones(
-    assignedSteps === 0 ? selectedWorkflow?.data?.data?.id : null,
-    selectedWorkflow?.data?.data?.attributes?.recurring
+    assignedSteps === 0 ? selectedWorkflow?.id : null,
+    selectedWorkflow?.attributes?.recurring
       ? { timeframe: format(Date.now(), "yyyy-MM-dd"), omit_include: true }
       : { phase: currentPhase, omit_include: true }
   );
@@ -90,9 +82,7 @@ const AssignedStepsCard = ({
 
   // Combined loading state - only include milestone loading when we need it
   const isLoading =
-    isLoadingCount ||
-    isLoadingWorkflows ||
-    (assignedSteps === 0 && isLoadingMilestones);
+    isLoadingCount || (assignedSteps === 0 && isLoadingMilestones);
 
   if (isLoading) {
     return (
