@@ -487,7 +487,7 @@ const Nav = ({ toggleNavOpen, navOpen }) => {
   async function handleLogOut() {
     try {
       const res = await logout();
-      console.log(res);
+      // console.log(res);
     } catch (err) {
       if (err?.response?.status !== 401) {
         console.error("Error logging out:", err);

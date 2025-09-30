@@ -956,7 +956,7 @@ const AddStepModal = ({
   }, [open]);
 
   const onSubmit = handleSubmit((data) => {
-    console.log({ data });
+    // console.log({ data });
     handleCreateStep(data);
     reset();
     onClose();

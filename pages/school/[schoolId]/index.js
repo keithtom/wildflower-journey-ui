@@ -240,7 +240,7 @@ const SchoolPage = () => {
     [t, school?.data?.attributes?.status]
   );
 
-  console.log({ school });
+  // console.log({ school });
 
   return (
     <PageContainer title={school?.data.attributes.name}>

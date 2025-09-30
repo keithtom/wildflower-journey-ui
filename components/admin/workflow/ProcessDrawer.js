@@ -107,7 +107,7 @@ const ProcessDrawer = ({ process, open, toggle, isAdding, isEditing }) => {
     // Transform temporaryProcess data to match API structure
     const transformedData = transformDataForAPI(data);
     // Submit transformed temporaryProcess data
-    console.log(transformedData);
+    // console.log(transformedData);
   };
   // Function to transform process data to match temporaryProcess structure
   function transformProcessData(process) {
@@ -502,7 +502,7 @@ const TheStepItem = ({ stepId, control, errors, setTemporaryProcess }) => {
   //  temporaryStep object
 
   const { step, isLoading, isError } = useStep(stepId);
-  console.log(step);
+  // console.log(step);
 
   // This useEffect is to update the temporaryProcess state with the step data
   // reshaping received data to the shape that the API will expect to receive

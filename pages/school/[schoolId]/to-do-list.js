@@ -132,9 +132,9 @@ const ToDoListPage = ({}) => {
     );
   };
 
-  console.log({ assignedSteps });
-  console.log({ activeWorkflow });
-  console.log({ groupedSteps });
+  // console.log({ assignedSteps });
+  // console.log({ activeWorkflow });
+  // console.log({ groupedSteps });
 
   return (
     <PageContainer title={school?.data.attributes.name}>

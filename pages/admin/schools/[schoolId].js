@@ -233,8 +233,8 @@ const SchoolIdPage = () => {
     };
   }, [school]);
 
-  console.log({ activePeople });
-  console.log({ formerPeople });
+  // console.log({ activePeople });
+  // console.log({ formerPeople });
 
   const currentWorkflows = [{ id: 1, name: "School Startup Journey" }];
 
