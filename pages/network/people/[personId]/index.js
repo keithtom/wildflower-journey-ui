@@ -946,7 +946,7 @@ const GeneralFields = ({ handleToggle }) => {
                           });
                       })
                       .catch((error) => {
-                        console.log(error);
+                        // console.log(error);
                         console.error(error);
                       });
                   });
@@ -1635,7 +1635,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
       mutate(`/v1/people/${currentUser?.id}`);
       reset();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -1670,7 +1670,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
         schoolTitle: "",
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -1706,7 +1706,7 @@ const SchoolHistoryFields = ({ handleToggle }) => {
         schoolTitle: "",
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -2124,7 +2124,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
       mutate(`/v1/people/${currentUser?.id}`);
       reset();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -2158,7 +2158,7 @@ const BoardHistoryFields = ({ handleToggle }) => {
         dateLeft: "",
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
