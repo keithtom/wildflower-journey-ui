@@ -72,19 +72,19 @@ const Task = ({
   variant,
   removeStep,
   processName,
+  workflowId,
 }) => {
   const { screenSize } = getScreenSize();
   const { t } = useTranslation("common");
   const { currentUser } = useUserContext();
   const router = useRouter();
   const { workflow, milestone, schoolId } = router.query;
+  const effectiveWorkflowId = workflowId || workflow;
 
   // Get the current school data
   const { data: school, isLoading: schoolIsLoading } = useSchool(schoolId);
 
   let assignableUsers;
-
-  // console.log({ school });
 
   // Only set assignable users once school data is loaded
   if (!schoolIsLoading && school?.included) {
@@ -96,8 +96,8 @@ const Task = ({
     // Get the person IDs from the active relationships and map their roles
     const activePersonRoles = schoolRelationships.reduce(
       (acc, relationship) => {
-        acc[relationship.relationships.person.data.id] =
-          relationship.attributes.roleList;
+        const personId = relationship.relationships.person.data.id;
+        acc[personId] = relationship.attributes.roleList;
         return acc;
       },
       {}
@@ -214,11 +214,11 @@ const Task = ({
 
       setInfoDrawerOpen(false);
       mutate(`/processes/${milestone}`);
-      mutate(`/workflows/${workflow}/assigned_steps`);
+      mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       if (removeStep) {
         removeStep(taskId);
         mutate(`/processes/${milestone}`);
-        mutate(`/workflows/${workflow}/assigned_steps`);
+        mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       }
     } catch (error) {
       if (error?.response?.status === 401) {
@@ -242,7 +242,7 @@ const Task = ({
       const task = response.data.data;
 
       mutate(`/processes/${milestone}`);
-      mutate(`/workflows/${workflow}/assigned_steps`);
+      mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
@@ -257,7 +257,7 @@ const Task = ({
       const response = await stepsApi.assign(taskId, assigneeId);
       const task = response.data.data;
       mutate(`/processes/${milestone}`);
-      mutate(`/workflows/${workflow}/assigned_steps`);
+      mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
     } catch (err) {
       if (err?.response?.status === 401) {
         clearLoggedInState({});
@@ -277,7 +277,7 @@ const Task = ({
       if (removeStep) {
         removeStep(taskId);
         mutate(`/processes/${milestone}`);
-        mutate(`/workflows/${workflow}/assigned_steps`);
+        mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       }
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -298,13 +298,13 @@ const Task = ({
       const task = response.data.data;
 
       mutate(`/processes/${milestone}`);
-      mutate(`/workflows/${workflow}/assigned_steps`);
+      mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       setInfoDrawerOpen(false);
 
       if (removeStep) {
         removeStep(taskId);
         mutate(`/processes/${milestone}`);
-        mutate(`/workflows/${workflow}/assigned_steps`);
+        mutate(`/workflows/${effectiveWorkflowId}/assigned_steps`);
       }
     } catch (err) {
       if (err?.response?.status === 401) {
@@ -400,7 +400,7 @@ const Task = ({
         completers={taskCompleters}
         handleAssignUser={handleAssignUser}
         handleUnassignUser={handleUnassignUser}
-        assignableUsers={assignableUsers}
+        assignableUsers={Array.isArray(assignableUsers) ? assignableUsers : []}
         completionType={completionType}
         processName={processName}
         actions={

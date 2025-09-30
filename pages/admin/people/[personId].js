@@ -80,8 +80,8 @@ const SchoolItem = ({ schoolId }) => {
   const router = useRouter();
   const { personId } = router.query;
 
-  console.log({ schoolId });
-  console.log({ schoolData });
+  // console.log({ schoolId });
+  // console.log({ schoolData });
 
   if (isLoading) {
     return (
@@ -1368,7 +1368,7 @@ const EditCurrentRoles = ({
     },
   });
 
-  console.log({ currentRoles });
+  // console.log({ currentRoles });
 
   const handleClose = () => {
     reset();

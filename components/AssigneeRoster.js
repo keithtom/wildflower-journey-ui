@@ -24,9 +24,9 @@ const StyledAssigneeRoster = styled(Popover)`
 `;
 
 const AssigneeRoster = ({
-  assignees,
-  completers,
-  assignableUsers,
+  assignees = [],
+  completers = [],
+  assignableUsers = [],
   handleAssignUser,
   handleUnassignUser,
   completionType,

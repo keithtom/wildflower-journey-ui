@@ -53,10 +53,19 @@ const PhasePage = () => {
     milestonesByCurrentPhase,
     isLoadingMilestonesByCurrentPhase,
     isValidating,
-  } = useMilestones(workflow, {
-    phase: phase,
-    omit_include: true,
-  });
+  } = useMilestones(
+    workflow,
+    {
+      phase: phase,
+      omit_include: true,
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000,
+      keepPreviousData: true,
+    }
+  );
 
   // console.log({ milestonesByCurrentPhase });
   // console.log({ isLoadingMilestonesByCurrentPhase });
@@ -101,7 +110,7 @@ const PhasePage = () => {
             </Grid>
           </Grid>
 
-          {isLoadingMilestonesByCurrentPhase || isValidating ? (
+          {isLoadingMilestonesByCurrentPhase ? (
             <Stack spacing={6}>
               {Array.from({ length: 4 }, (_, i) => (
                 <Card key={i}>
