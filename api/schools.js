@@ -65,7 +65,23 @@ async function show(id, params = {}) {
 }
 
 export const showSchool = {
-  key: (schoolId, params) => `/v1/schools/${schoolId}`,
+  key: (schoolId, params = {}) => {
+    const entries = Object.entries(params || {});
+    if (!entries.length) return `/v1/schools/${schoolId}`;
+
+    const usp = new URLSearchParams();
+    entries.forEach(([key, value]) => {
+      if (key === "serialization_fields" && Array.isArray(value)) {
+        usp.append(key, value.join(","));
+      } else if (Array.isArray(value)) {
+        value.forEach((v) => usp.append(`${key}[]`, v));
+      } else if (value !== undefined && value !== null) {
+        usp.append(key, value);
+      }
+    });
+    const qs = usp.toString();
+    return qs ? `/v1/schools/${schoolId}?${qs}` : `/v1/schools/${schoolId}`;
+  },
   fetcher: (schoolId, params) => {
     const config = getAuthHeader();
     if (params) {

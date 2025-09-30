@@ -86,8 +86,6 @@ const Task = ({
 
   let assignableUsers;
 
-  // console.log({ school });
-
   // Only set assignable users once school data is loaded
   if (!schoolIsLoading && school?.included) {
     // First get all active school relationships
@@ -98,8 +96,8 @@ const Task = ({
     // Get the person IDs from the active relationships and map their roles
     const activePersonRoles = schoolRelationships.reduce(
       (acc, relationship) => {
-        acc[relationship.relationships.person.data.id] =
-          relationship.attributes.roleList;
+        const personId = relationship.relationships.person.data.id;
+        acc[personId] = relationship.attributes.roleList;
         return acc;
       },
       {}
@@ -402,7 +400,7 @@ const Task = ({
         completers={taskCompleters}
         handleAssignUser={handleAssignUser}
         handleUnassignUser={handleUnassignUser}
-        assignableUsers={assignableUsers}
+        assignableUsers={Array.isArray(assignableUsers) ? assignableUsers : []}
         completionType={completionType}
         processName={processName}
         actions={
