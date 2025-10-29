@@ -12,6 +12,7 @@ import { appWithTranslation } from "next-i18next";
 import Layout from "../components/Layout";
 import { H } from "highlight.run";
 import { ErrorBoundary } from "@highlight-run/react";
+import { SWRConfig } from "swr";
 
 if (process.env.NODE_ENV === "production") {
   console.log("enabling highlight.io", process.env);
@@ -52,6 +53,28 @@ function MyApp({ Component, pageProps }) {
     });
   }, [Router]);
 
+  // ignore abort / cancel errors
+  const isAbortLikeError = (err) => {
+    if (!err) return true;
+    const name = err.name;
+    const code = err.code;
+    const message = (err.message || "").toLowerCase();
+    // SWR/dom aborts, Axios cancels, Axios timeouts in background tabs
+    return (
+      name === "AbortError" ||
+      name === "CanceledError" ||
+      code === "ERR_CANCELED" ||
+      code === "ECONNABORTED" ||
+      message === "canceled"
+    );
+  };
+
+  const reportToHighlight = (err, key) => {
+    if (!err) return;
+    if (isAbortLikeError(err)) return;
+    if (H.consumeError) H.consumeError(err, { tags: { swr_key: key } });
+  };
+
   return (
     <ErrorBoundary>
       <meta
@@ -61,11 +84,41 @@ function MyApp({ Component, pageProps }) {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <UserProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </UserProvider>
+          <SWRConfig
+            value={{
+              onError: (err, key) => {
+                // AbortError is ignored;
+                reportToHighlight(err, key);
+              },
+
+              // Only skip retries for AbortError.
+              shouldRetryOnError: (err) => {
+                if (!err) return false;
+                if (isAbortLikeError(err)) return false;
+                return true; // keep SWR’s default behavior for all others
+              },
+
+              // Skip retry work only for AbortError; otherwise backoff.
+              onErrorRetry: (err, _key, _cfg, revalidate, ctx) => {
+                if (!err) return;
+                if (isAbortLikeError(err)) return; // do not retry aborts/cancels/timeouts
+
+                const retries = ctx.retryCount || 0;
+                if (retries >= 5) return;
+                const delay = Math.min(1000 * Math.pow(2, retries), 30000);
+                setTimeout(
+                  () => revalidate({ retryCount: retries + 1 }),
+                  delay
+                );
+              },
+            }}
+          >
+            <UserProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </UserProvider>
+          </SWRConfig>
         </ThemeProvider>
       </LocalizationProvider>
     </ErrorBoundary>
