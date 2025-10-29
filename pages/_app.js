@@ -53,25 +53,34 @@ function MyApp({ Component, pageProps }) {
     });
   }, [Router]);
 
-  // ignore abort / cancel errors
-  const isAbortLikeError = (err) => {
+  // classify cancel/timeout cases
+  const isAbortCancelError = (err) => {
     if (!err) return true;
     const name = err.name;
     const code = err.code;
     const message = (err.message || "").toLowerCase();
-    // SWR/dom aborts, Axios cancels, Axios timeouts in background tabs
+    // SWR/DOM aborts and axios cancels (not actionable)
     return (
       name === "AbortError" ||
       name === "CanceledError" ||
       code === "ERR_CANCELED" ||
-      code === "ECONNABORTED" ||
-      message === "canceled"
+      message.includes("cancel")
     );
+  };
+
+  const isHiddenTabTimeout = (err) => {
+    const hidden =
+      typeof document !== "undefined" && document.visibilityState === "hidden";
+    if (!hidden) return false;
+    const code = err.code;
+    const message = (err.message || "").toLowerCase();
+    // axios timeout while backgrounded
+    return code === "ECONNABORTED" || message.includes("timeout");
   };
 
   const reportToHighlight = (err, key) => {
     if (!err) return;
-    if (isAbortLikeError(err)) return;
+    if (isAbortCancelError(err) || isHiddenTabTimeout(err)) return;
     if (H.consumeError) H.consumeError(err, { tags: { swr_key: key } });
   };
 
@@ -91,17 +100,19 @@ function MyApp({ Component, pageProps }) {
                 reportToHighlight(err, key);
               },
 
-              // Only skip retries for AbortError.
+              // Only skip retries for cancels or hidden-tab timeouts
               shouldRetryOnError: (err) => {
                 if (!err) return false;
-                if (isAbortLikeError(err)) return false;
+                if (isAbortCancelError(err)) return false;
+                if (isHiddenTabTimeout(err)) return false;
                 return true; // keep SWR’s default behavior for all others
               },
 
-              // Skip retry work only for AbortError; otherwise backoff.
+              // Skip retry work for cancels or hidden-tab timeouts; otherwise backoff.
               onErrorRetry: (err, _key, _cfg, revalidate, ctx) => {
                 if (!err) return;
-                if (isAbortLikeError(err)) return; // do not retry aborts/cancels/timeouts
+                if (isAbortCancelError(err)) return; // do not retry cancels
+                if (isHiddenTabTimeout(err)) return; // do not retry hidden-tab timeouts
 
                 const retries = ctx.retryCount || 0;
                 if (retries >= 5) return;
