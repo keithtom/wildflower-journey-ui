@@ -170,9 +170,10 @@ const getLaunchDarklyPlugins = () => {
         enabled: true,
         recordHeadersAndBody: true,
       },
+      privacySetting: "default",
     }),
     new SessionReplay({
-      privacySetting: "default", // Equivalent to enableStrictPrivacy: false
+      privacySetting: "default",
     }),
   ];
 };
