@@ -161,8 +161,13 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-// Configure LaunchDarkly plugins, TEST using local env variable
+// Configure LaunchDarkly plugins (only in production)
 const getLaunchDarklyPlugins = () => {
+  // Only enable observability in production, matching original highlight.run behavior
+  if (process.env.NODE_ENV !== "production") {
+    return [];
+  }
+
   return [
     new Observability({
       tracingOrigins: ["api2.wildflowerschools.org"],
@@ -178,13 +183,22 @@ const getLaunchDarklyPlugins = () => {
   ];
 };
 
-// Wrap MyApp with LaunchDarkly provider
-const LDProvider = withLDProvider({
-  clientSideID: process.env.NEXT_PUBLIC_LAUNCHDARKLY_OBSERVABILITY_CLIENT_ID,
-  options: {
-    plugins: getLaunchDarklyPlugins(),
-  },
-})(MyApp);
+// Only wrap with LaunchDarkly provider in production
+// This prevents network errors in non-production environments
+const isProduction = process.env.NODE_ENV === "production";
+const clientSideID =
+  process.env.NEXT_PUBLIC_LAUNCHDARKLY_OBSERVABILITY_CLIENT_ID;
+
+// Conditionally wrap with LaunchDarkly provider only in production with valid client ID
+const LDProvider =
+  isProduction && clientSideID
+    ? withLDProvider({
+        clientSideID: clientSideID,
+        options: {
+          plugins: getLaunchDarklyPlugins(),
+        },
+      })(MyApp)
+    : MyApp;
 
 // Then wrap with translation HOC
 export default appWithTranslation(LDProvider);
