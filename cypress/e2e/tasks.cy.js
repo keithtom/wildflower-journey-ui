@@ -1,22 +1,51 @@
 describe("tasks", () => {
+  let schoolId;
+
   beforeEach(() => {
     cy.viewport(1280, 832);
   });
+
+  // Helper function to navigate to school and get schoolId
+  const setupSchoolNavigation = () => {
+    cy.visit("/network", { timeout: 60000 });
+    cy.wait(2000);
+    cy.get('[data-cy="school-nav-item"]', { timeout: 10000 }).first().click();
+    cy.url({ timeout: 10000 }).should("include", "/school/");
+    cy.url().then((url) => {
+      const pathParts = url.split("/school/")[1].split("/");
+      schoolId = pathParts[0];
+    });
+  };
+
+  // Helper function to navigate to Visioning phase
+  const navigateToVisioning = () => {
+    cy.contains("School Startup Journey").click();
+    cy.get(".MuiDrawer-paper").contains("Visioning").click();
+    cy.location("pathname", { timeout: 60000 }).should("include", "/visioning");
+  };
+
+  // Helper function to navigate to Planning phase
+  const navigateToPlanning = () => {
+    cy.contains("School Startup Journey", { timeout: 5000 }).then(($el) => {
+      if (!$el.parent().find(".MuiCollapse-entered").length) {
+        cy.wrap($el).click();
+      }
+    });
+    cy.get(".MuiDrawer-paper").contains("Planning").click();
+    cy.location("pathname", { timeout: 60000 }).should("include", "/planning");
+  };
+
   describe("single user", () => {
     beforeEach(() => {
       cy.resetFixturesAndLogin();
-      cy.visit("/ssj", { timeout: 60000 });
+      setupSchoolNavigation();
     });
     describe("assigning tasks", () => {
       it("should allow multiple assignments and can complete", () => {
         // navigate to the visioning phase page
-        cy.get('[data-cy="visioning-nav-item"]').click();
-        cy.location("pathname", { timeout: 60000 }).should(
-          "include",
-          "/visioning"
-        );
+        navigateToVisioning();
         // check for something that will be present on the visioning page
-        cy.get('[data-cy="visioning-header"]').click();
+        cy.get('[data-cy="visioning-header"]', { timeout: 10000 }).click();
         // navigate to Milestone A page
         cy.contains("Milestone A").click();
 
@@ -57,7 +86,7 @@ describe("tasks", () => {
         cy.contains("Step 1").should("be.visible");
         cy.contains("Step 2").should("be.visible");
 
-        cy.visit("/ssj", { timeout: 60000 });
+        cy.visit(`/school/${schoolId}`, { timeout: 60000 });
         cy.get('[data-cy="you-have-tasks-statement"]').should("be.visible");
 
         cy.contains("Visioning").click({ timeout: 10000 });
@@ -106,7 +135,7 @@ describe("tasks", () => {
         // check for something that will be present on the visioning page
         cy.get("#visioning-header");
         cy.contains("2 of 3 tasks completed").should("be.visible");
-        cy.visit("/ssj", { timeout: 60000 });
+        cy.visit(`/school/${schoolId}`, { timeout: 60000 });
         cy.contains(
           "Looks like you don't have any tasks on your to do list!"
         ).should("be.visible");
@@ -245,6 +274,21 @@ describe("tasks", () => {
   });
 
   describe("individual task for partners", () => {
+    // Helper function for partner to navigate to Visioning phase
+    const partnerNavigateToVisioning = () => {
+      cy.visit("/network", { timeout: 60000 });
+      cy.wait(2000);
+      cy.get('[data-cy="school-nav-item"]', { timeout: 10000 }).first().click();
+      cy.url({ timeout: 10000 }).should("include", "/school/");
+      cy.wait(1000);
+      cy.contains("School Startup Journey").click();
+      cy.get(".MuiDrawer-paper").contains("Visioning").click();
+      cy.location("pathname", { timeout: 60000 }).should(
+        "include",
+        "/visioning"
+      );
+    };
+
     beforeEach(() => {
       cy.resetPartnerFixtures().then((emails) => {
         emails.forEach((email, i) => {
@@ -258,12 +302,7 @@ describe("tasks", () => {
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -281,12 +320,7 @@ describe("tasks", () => {
       cy.get("@partner2Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.get(".MuiAvatar-img").should("have.length", 2); //once in the header and once in the assignment
 
@@ -309,12 +343,7 @@ describe("tasks", () => {
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -326,12 +355,7 @@ describe("tasks", () => {
       cy.get("@partner2Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.get("span.checkCircleAssignee").should("have.length", 1);
       cy.contains("Step 1").click();
@@ -347,12 +371,7 @@ describe("tasks", () => {
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -362,12 +381,7 @@ describe("tasks", () => {
       cy.get("@partner2Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -379,12 +393,7 @@ describe("tasks", () => {
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.contains("Step 1").should(
         "have.css",
@@ -400,12 +409,7 @@ describe("tasks", () => {
       cy.get("@partner2Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.contains("Step 1").should(
         "have.css",
@@ -424,12 +428,7 @@ describe("tasks", () => {
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -438,12 +437,7 @@ describe("tasks", () => {
       cy.get("@partner2Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.contains("Visioning").click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.contains("Step 1").click();
       cy.contains("Add to my to do list").click();
@@ -454,12 +448,7 @@ describe("tasks", () => {
       cy.get("@partner1Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.get('[data-cy="visioning-nav-item"]').click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.get(".MuiAvatar-img").should("have.length", 3);
       cy.contains("Step 1").click();
@@ -470,12 +459,7 @@ describe("tasks", () => {
       cy.get("@partner2Email").then((email) => {
         cy.login(email, "password");
       });
-      cy.visit("/ssj");
-      cy.contains("Visioning").click();
-      cy.location("pathname", { timeout: 60000 }).should(
-        "include",
-        "/visioning"
-      );
+      partnerNavigateToVisioning();
       cy.contains("Milestone A").click();
       cy.get(".MuiAvatar-img").should("have.length", 2);
       cy.contains("Step 1").click();

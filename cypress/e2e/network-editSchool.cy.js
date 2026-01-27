@@ -6,14 +6,19 @@ describe("network edit school", () => {
   beforeEach(() => {
     cy.viewport(1280, 832);
     cy.resetOpenSchoolFixturesAndLogin();
+    // Navigate to a page where the user's nav drawer will show their schools
+    // The nav drawer appears on school pages after login
     cy.visit("/network", { timeout: 60000 });
-    cy.wait(1000);
+    cy.wait(2000);
 
-    // Get school ID from the first teacher leader school in the navigation
-    cy.get('[data-cy="school-nav-item"]').first().click();
-    cy.url().should("include", "/school/");
+    // Get school ID from the first school in the navigation drawer
+    // The school-nav-item is in the nav drawer, click to expand and navigate
+    cy.get('[data-cy="school-nav-item"]', { timeout: 10000 }).first().click();
+    cy.url({ timeout: 10000 }).should("include", "/school/");
     cy.url().then((url) => {
-      schoolId = url.split("/school/")[1];
+      // Extract schoolId - URL is /school/{schoolId} or /school/{schoolId}/...
+      const pathParts = url.split("/school/")[1].split("/");
+      schoolId = pathParts[0];
       cy.visit(`/network/schools/${schoolId}`, { timeout: 60000 });
     });
   });
@@ -21,7 +26,7 @@ describe("network edit school", () => {
   describe("editing school profile", () => {
     beforeEach(() => {
       cy.visit(`/network/schools/${schoolId}`, { timeout: 60000 });
-      cy.contains("Edit school profile").click();
+      cy.get('[data-cy="schoolId-edit-school-profile"]', { timeout: 10000 }).click();
     });
 
     it("should edit general information", () => {
@@ -91,7 +96,7 @@ describe("network edit school", () => {
       cy.get('button[type="submit"]').should("not.be.disabled").click();
     });
 
-    it.only("should edit teacher leaders", () => {
+    it("should edit teacher leaders", () => {
       cy.get('[data-cy="schoolId-teacherLeaders"]').click();
       cy.get('[data-cy="schoolId-teacherLeaders-add"]').click();
       cy.get('input[placeholder="e.g. Katelyn Shore"]').type("a");
@@ -108,14 +113,14 @@ describe("network edit school", () => {
       // Verify the new teacher leader is added
       cy.get('[data-cy="schoolId-teacherLeaders-list-item"]').should(
         "contain",
-        "Chief Financial Officer"
+        "Lead Teacher"
       );
 
       // Edit the teacher leader
       cy.get('[data-cy="schoolId-teacherLeaders-edit-0"]').click();
       cy.get('[data-cy="schoolId-teacherLeaders-dateJoined"]')
         .clear()
-        .type("2024-02-01");
+        .type("02/01/2024");
       cy.get('input[name="schoolTitle"]').clear().type("Senior Lead Teacher");
       cy.get('button[type="submit"]').should("not.be.disabled").click();
 
@@ -133,37 +138,45 @@ describe("network edit school", () => {
     });
 
     it("should edit school board", () => {
-      cy.get('[data-cy="schoolId-edit-board"]').click();
+      cy.get('[data-cy="schoolId-boardMembers"]').click();
       // add
-      cy.get('[data-cy="schoolId-edit-board-add"]').click();
+      cy.get('[data-cy="schoolId-boardMembers-add"]').click();
       cy.get('[name="name"]').click();
       cy.get('[name="name"]').type("New Board Member");
-      cy.get('[data-cy="schoolId-edit-board-dateJoined"]')
+      cy.get('[data-cy="schoolId-boardMembers-dateJoined"]')
         .clear()
         .type("01/01/2024");
-      cy.get('[data-cy="schoolId-edit-board-dateLeft"]')
-        .clear()
-        .type("01/01/2025");
       cy.get('[name="title"]').click();
       cy.get('[name="title"]').type("Board Chair");
       cy.get('button[type="submit"]').should("not.be.disabled").click();
+      cy.wait(1000);
+
+      // Verify the new board member is added
+      cy.get('[data-cy="schoolId-boardMembers-list-item"]').should(
+        "contain",
+        "New Board Member"
+      );
 
       // edit
-      cy.get('[data-cy="schoolId-edit-board-edit-0"]').click();
-      cy.get('[data-cy="schoolId-edit-board-dateJoined"]')
+      cy.get('[data-cy="schoolId-boardMembers-edit-0"]').click();
+      cy.get('[data-cy="schoolId-boardMembers-dateJoined"]')
         .clear()
         .type("01/02/2024");
-      cy.get('[data-cy="schoolId-edit-board-dateLeft"]')
-        .clear()
-        .type("01/01/2025");
       cy.get('[name="title"]').click();
       cy.get('[name="title"]').clear().type("Vice Chair");
       cy.get('button[type="submit"]').should("not.be.disabled").click();
 
+      // Verify the board member is updated
+      cy.get('[data-cy="schoolId-boardMembers-list-item"]').should(
+        "contain",
+        "Vice Chair"
+      );
+
       // remove
-      cy.get('[data-cy="schoolId-edit-board-remove"]').each(($el) => {
-        cy.wrap($el).click();
-      });
+      cy.get('[data-cy="schoolId-boardMembers-remove-0"]').click();
+      cy.get('[data-cy="schoolId-boardMembers-list-item"]').should(
+        "not.exist"
+      );
     });
   });
 });
