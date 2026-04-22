@@ -1703,32 +1703,38 @@ const TeacherLeaderFields = ({ handleToggle, school }) => {
       rel.attributes.roleList.includes("Teacher Leader")
   );
 
-  const teachers = schoolData?.included
-    ?.filter((i) => i.type === "person")
-    ?.map((teacher) => {
-      const schoolRelationship = teacherLeaderRelationships.find(
-        (rel) => rel.relationships.person.data.id === teacher.id
-      );
-
-      // Check if teacher exists in activePartners or invitedPartners
-      const isActivePartner =
-        schoolData?.data?.attributes?.activePartners?.some(
-          (partner) => partner.data.id === teacher.id
-        );
-      const isInvitedPartner =
-        schoolData?.data?.attributes?.invitedPartners?.some(
-          (partner) => partner.data.id === teacher.id
+  const teachers =
+    schoolData?.included
+      ?.filter((i) => i.type === "person")
+      ?.map((teacher) => {
+        const schoolRelationship = teacherLeaderRelationships.find(
+          (rel) => rel.relationships.person.data.id === teacher.id
         );
 
-      return {
-        ...teacher,
-        schoolRelationshipAttributes: schoolRelationship?.attributes,
-        schoolRealtionshipId: schoolRelationship?.id,
-        schoolInvited: isInvitedPartner ? true : isActivePartner ? false : null,
-      };
-    })
-    ?.filter((teacher) => teacher.schoolRealtionshipId)
-    ?.filter((teacher) => !teacher.schoolRelationshipAttributes?.endDate);
+        // Check if teacher exists in activePartners or invitedPartners
+        const isActivePartner =
+          schoolData?.data?.attributes?.activePartners?.some(
+            (partner) => partner.data.id === teacher.id
+          );
+        const isInvitedPartner =
+          schoolData?.data?.attributes?.invitedPartners?.some(
+            (partner) => partner.data.id === teacher.id
+          );
+
+        return {
+          ...teacher,
+          schoolRelationshipAttributes: schoolRelationship?.attributes,
+          schoolRealtionshipId: schoolRelationship?.id,
+          schoolInvited: isInvitedPartner
+            ? true
+            : isActivePartner
+            ? false
+            : null,
+        };
+      })
+      ?.filter((teacher) => teacher.schoolRealtionshipId)
+      ?.filter((teacher) => !teacher.schoolRelationshipAttributes?.endDate) ||
+    [];
 
   const formatHumanDate = (date) => {
     const parsedDate = parseISO(date);
@@ -2522,39 +2528,42 @@ const BoardMemberFields = ({ handleToggle, school }) => {
 
   // console.log({ teacherLeaderRelationships });
 
-  const currentTeachers = schoolData?.included
-    ?.filter((i) => i.type === "person")
-    ?.map((teacher) => {
-      const schoolRelationship = teacherLeaderRelationships.find(
-        (rel) => rel.relationships.person.data.id === teacher.id
-      );
-      return {
-        ...teacher,
-        schoolRelationshipAttributes: schoolRelationship?.attributes,
-        schoolRealtionshipId: schoolRelationship?.id,
-      };
-    })
-    ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are teacher leaders
-    ?.filter(
-      (teacher) => teacher.schoolRelationshipAttributes.endDate === null
-    ); // Only include teachers who are still at the school
+  const currentTeachers =
+    schoolData?.included
+      ?.filter((i) => i.type === "person")
+      ?.map((teacher) => {
+        const schoolRelationship = teacherLeaderRelationships.find(
+          (rel) => rel.relationships.person.data.id === teacher.id
+        );
+        return {
+          ...teacher,
+          schoolRelationshipAttributes: schoolRelationship?.attributes,
+          schoolRealtionshipId: schoolRelationship?.id,
+        };
+      })
+      ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are teacher leaders
+      ?.filter(
+        (teacher) => teacher.schoolRelationshipAttributes.endDate === null
+      ) || []; // Only include teachers who are still at the school
 
   // console.log({ currentTeachers });
 
-  const teachers = schoolData?.included
-    ?.filter((i) => i.type === "person")
-    ?.map((teacher) => {
-      const schoolRelationship = boardMemberRelationships.find(
-        (rel) => rel.relationships.person.data.id === teacher.id
-      );
-      return {
-        ...teacher,
-        schoolRelationshipAttributes: schoolRelationship?.attributes,
-        schoolRealtionshipId: schoolRelationship?.id,
-      };
-    })
-    ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are board members
-    ?.filter((teacher) => !teacher.schoolRelationshipAttributes?.endDate); // Only include teachers who are still at the school
+  const teachers =
+    schoolData?.included
+      ?.filter((i) => i.type === "person")
+      ?.map((teacher) => {
+        const schoolRelationship = boardMemberRelationships.find(
+          (rel) => rel.relationships.person.data.id === teacher.id
+        );
+        return {
+          ...teacher,
+          schoolRelationshipAttributes: schoolRelationship?.attributes,
+          schoolRealtionshipId: schoolRelationship?.id,
+        };
+      })
+      ?.filter((teacher) => teacher.schoolRealtionshipId) // Only include teachers who are board members
+      ?.filter((teacher) => !teacher.schoolRelationshipAttributes?.endDate) ||
+    []; // Only include teachers who are still at the school
 
   const formatHumanDate = (date) => {
     const parsedDate = parseISO(date);
